@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ShirabeAndroidPlatformLayer/ShirabeAndroidPlatformLayer.iml" filepath="$PROJECT_DIR$/.idea/modules/ShirabeAndroidPlatformLayer/ShirabeAndroidPlatformLayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ShirabeEngineAndroidWorkspace.iml" filepath="$PROJECT_DIR$/.idea/modules/ShirabeEngineAndroidWorkspace.iml" />
+    </modules>
+  </component>
+</project>

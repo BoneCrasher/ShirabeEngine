@@ -1,0 +1,46 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+def recursivelySetBuildPath
+
+recursivelySetBuildPath = {
+    Set<Project> projectList ->
+        projectList.each {
+            Project subproject ->
+                println "Setting project path of subproject: ${subproject.name}"
+                subproject.buildDir = "${rootProject.buildDir}/${subproject.name}"
+                if (subproject.subprojects.size() > 0)
+                    recursivelySetBuildPath.call(subproject.subprojects)
+        }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    recursivelySetBuildPath(subprojects)
+}
+
+evaluationDependsOn(':ShirabeEngineTools:libassetconvert')
+
+task clean(type: Delete) {
+    delete project.buildDir
+}
+
+task debug() {
+    dependsOn subprojects.copyJar
+}
+
+task release() {
+    dependsOn subprojects.copyJar
+}
