@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{44532061-2211-490C-9696-CD637DDD7C95}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>SAE5300Project</RootNamespace>
+    <RootNamespace>ShirabeEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
