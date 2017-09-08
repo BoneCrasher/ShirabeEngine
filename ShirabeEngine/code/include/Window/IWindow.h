@@ -15,25 +15,10 @@
 namespace Engine {
 	
 	class IWindow;
-	DeclareSharedPointerType(IWindow)
+	DeclareSharedPointerType(IWindow);
 
-	class IWindow {
-	public:
-		class IEventCallback {
-		public:
-			//
-			// Facilitate proper destruction
-			//
-			virtual ~IEventCallback() = default;
-
-			//
-			// Deny Copy & Move
-			// 
-			IEventCallback(const IEventCallback&)             = delete;
-			IEventCallback(IEventCallback&&)                  = delete;
-			IEventCallback& operator =(const IEventCallback&) = delete;
-			IEventCallback& operator =(IEventCallback&)       = delete;
-
+	DeclareInterface(IWindow);
+		DeclareInterface(IEventCallback);
 			//
 			// API
 			// 
@@ -45,28 +30,10 @@ namespace Engine {
 			virtual void onPause(const IWindowPtr&)         = 0;
 			virtual void onClose(const IWindowPtr&)         = 0;
 
-		protected:
-			IEventCallback() = default;
-		};
-		DeclareSharedPointerType(IEventCallback)        // IEventCallbackPtr
-		DeclareListType(IEventCallbackPtr, IEventCallback) // IEventCallbackList
+		DeclareInterfaceEnd(IEventCallback);
+		DeclareSharedPointerType(IEventCallback);        // IEventCallbackPtr
+		DeclareListType(IEventCallbackPtr, IEventCallback); // IEventCallbackList
 
-		//
-		// Facilitate proper destruction
-		//
-		virtual ~IWindow() = default;
-
-		//
-		// Deny Copy & Move
-		// 
-		IWindow(const IWindow&)             = delete;
-		IWindow(IWindow&&)                  = delete;
-		IWindow& operator =(const IWindow&) = delete;
-		IWindow& operator =(IWindow&)       = delete;
-
-		//
-		// Interface API
-		//
 
 		// Platform
 		virtual const Platform::Window::WindowHandleWrapper::Handle& handle() const = 0;
@@ -87,10 +54,7 @@ namespace Engine {
 		virtual EEngineStatus registerCallback(const IWindow::IEventCallbackPtr& cb)   = 0;
 		virtual EEngineStatus unregisterCallback(const IWindow::IEventCallbackPtr& cb) = 0;
 
-	protected:
-		// Prevent direct instantiation
-		IWindow() = default;
-	};
+		DeclareInterfaceEnd(IWindow);
 	// DeclareSharedPointerType(IWindow)    // Declare IWindowPtr 
     DeclareListType(IWindowPtr, IWindow) // Declare IWindowList
 }

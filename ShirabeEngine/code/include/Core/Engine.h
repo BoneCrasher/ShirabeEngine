@@ -10,7 +10,7 @@
 
 #include "BuildingBlocks/Scene.h"
 
-#include "Renderer/IRenderer.h"
+#include "GAPI/IRenderer.h"
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 

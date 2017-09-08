@@ -1,6 +1,6 @@
 #include "Core/Engine.h"
 
-#include "Renderer/DirectX/DX11/DX11Renderer.h"
+#include "GAPI/DirectX/DX11/DX11Renderer.h"
 
 namespace Engine {
 
@@ -86,7 +86,7 @@ namespace Engine {
 		rendererConfiguration._requestFullscreen       = false;
 
 		_renderer = MakeSharedPointerType<DX11Renderer>();
-		status = _renderer->initialize(_environment, rendererConfiguration);
+		status = _renderer->initialize(_environment, rendererConfiguration, nullptr);
 		if (!CheckEngineError(status)) {
 			status = _scene.initialize();
 		}

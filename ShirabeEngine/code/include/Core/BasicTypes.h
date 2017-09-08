@@ -66,6 +66,7 @@ namespace Engine {
 		}
 
 		inline const T& operator[](const std::size_t& index) const { if (index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return _values[index]; }
+		inline       T& operator[](const std::size_t& index)       { if (index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return _values[index]; }
 		inline bool     operator==(const VecND<T, N>& other) const { return (_values == other._values); }
 
 		inline const std::array<T, N>& values() const {
@@ -309,17 +310,17 @@ namespace Engine {
 		Vec2Dl _position;
 		Vec2Dl _size;
 
-		explicit Rect()
-			: _position(0, 0),
-			_size(0, 0)
+		Rect()
+			: _position(0, 0)
+			, _size(0, 0)
 		{}
 
-		explicit Rect(const long &x,
-					  const long &y,
-					  const long &width,
-					  const long &height)
-			: _position(x, y),
-			_size(width, height)
+		Rect(const long &x,
+			 const long &y,
+			 const long &width,
+			 const long &height)
+			: _position(x, y)
+			, _size(width, height)
 		{
 		}
 
