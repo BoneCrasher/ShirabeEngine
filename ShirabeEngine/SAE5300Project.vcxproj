@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{44532061-2211-490C-9696-CD637DDD7C95}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>SAE5300Project</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)code\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)code\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
+    <ClCompile Include="code\source\Benchmarking\Timer\Timer.cpp" />
+    <ClCompile Include="code\source\Benchmarking\Timer\WindowsTime.cpp" />
+    <ClCompile Include="code\source\ECWS\MeshComponent.cpp" />
+    <ClCompile Include="code\source\Math\AxisAngle.cpp" />
+    <ClCompile Include="code\source\BuildingBlocks\Camera.cpp" />
+    <ClCompile Include="code\source\ApplicationMain.cpp" />
+    <ClCompile Include="code\source\Core\Engine.cpp" />
+    <ClCompile Include="code\source\Math\Matrix.cpp" />
+    <ClCompile Include="code\source\Memory\AllocatorBase\AllocatorBase.cpp" />
+    <ClCompile Include="code\source\Memory\AllocatorBase\PreallocatingAllocatorBase.cpp" />
+    <ClCompile Include="code\source\Memory\AllocTracking\AllocationTracking.cpp" />
+    <ClCompile Include="code\source\Memory\New.cpp" />
+    <ClCompile Include="code\source\Window\WindowManager.cpp" />
+    <ClCompile Include="code\source\Core\String.cpp" />
+    <ClCompile Include="code\source\Platform\Windows\WindowsWindowFactory.cpp" />
+    <ClCompile Include="code\source\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="code\source\Window\IWindowEventCallbackAdapter.cpp" />
+    <ClCompile Include="code\source\Renderer\DirectX\DX11\DX11Device.cpp" />
+    <ClCompile Include="code\source\Renderer\DirectX\DX11\DX11DeviceCapabilities.cpp" />
+    <ClCompile Include="code\source\Renderer\DirectX\DX11\DX11Renderer.cpp" />
+    <ClCompile Include="code\source\BuildingBlocks\Transform.cpp" />
+    <ClCompile Include="code\source\Math\Quaternion.cpp" />
+    <ClCompile Include="code\source\BuildingBlocks\Scene.cpp" />
+    <ClCompile Include="code\source\ECWS\Entity.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="code\include\Benchmarking\Timer\CallbackTimer.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\ITimespan.h" />
+    <ClInclude Include="code\include\Benchmarking\MeasurementChunk.h" />
+    <ClInclude Include="code\include\Benchmarking\MeasurementChunkTraits.h" />
+    <ClInclude Include="code\include\Benchmarking\MeasurementDataStore.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\PlatformTime.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\Timer.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\WindowsTime.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\TimespanUnit.h" />
+    <ClInclude Include="code\include\ECWS\IComponentFactory.h" />
+    <ClInclude Include="code\include\ECWS\MeshComponent.h" />
+    <ClInclude Include="code\include\Math\AxisAngle.h" />
+    <ClInclude Include="code\include\BuildingBlocks\Camera.h" />
+    <ClInclude Include="code\include\Core\Engine.h" />
+    <ClInclude Include="code\include\Core\EngineStatus.h" />
+    <ClInclude Include="code\include\Core\EngineTypeHelper.h" />
+    <ClInclude Include="code\include\Functional\FunctionBinding.h" />
+    <ClInclude Include="code\include\Math\Common.h" />
+    <ClInclude Include="code\include\Math\Field.h" />
+    <ClInclude Include="code\include\Math\Math.h" />
+    <ClInclude Include="code\include\Math\Matrix.h" />
+    <ClInclude Include="code\include\Math\MatrixOps.h" />
+    <ClInclude Include="code\include\Math\Vector.h" />
+    <ClInclude Include="code\include\Memory\AllocatorBase\AllocatorBase.h" />
+    <ClInclude Include="code\include\Memory\AllocatorBase\PreallocatingAllocatorBase.h" />
+    <ClInclude Include="code\include\Memory\AllocTracking\AllocationTracking.h" />
+    <ClInclude Include="code\include\Memory\Memory.h" />
+    <ClInclude Include="code\include\Memory\MemoryPool.h" />
+    <ClInclude Include="code\include\Memory\New.h" />
+    <ClInclude Include="code\include\Memory\STLTypeBase.h" />
+    <ClInclude Include="code\include\Memory\TypeBasedAllocatorBase\Allocator.h" />
+    <ClInclude Include="code\include\Memory\TypeBasedAllocatorBase\AllocatorPolicy.h" />
+    <ClInclude Include="code\include\Memory\TypeBasedAllocatorBase\AllocatorTraits.h" />
+    <ClInclude Include="code\include\Memory\Types.h" />
+    <ClInclude Include="code\include\Platform\Platform.h" />
+    <ClInclude Include="code\include\Platform\OSDisplay.h" />
+    <ClInclude Include="code\include\Platform\MathAdapter.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Common.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Linkage.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\IDXDevice.h" />
+    <ClInclude Include="code\include\Renderer\GAPIDeviceCapabilities.h" />
+    <ClInclude Include="code\include\Renderer\IRenderer.h" />
+    <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
+    <ClInclude Include="code\include\Window\IWindowFactory.h" />
+    <ClInclude Include="code\include\Compiler\MSVCWarnings.h" />
+    <ClInclude Include="code\include\Core\BasicTypes.h" />
+    <ClInclude Include="code\include\Window\IWindow.h" />
+    <ClInclude Include="code\include\Log\Log.h" />
+    <ClInclude Include="code\include\Window\WindowManager.h" />
+    <ClInclude Include="code\include\Core\String.h" />
+    <ClInclude Include="code\include\Platform\Windows\WindowsWindowFactory.h" />
+    <ClInclude Include="code\include\Platform\ApplicationEnvironment.h" />
+    <ClInclude Include="code\include\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="code\include\Platform\WindowHandleWrapper.h" />
+    <ClInclude Include="code\include\Window\IWindowEventCallbackAdapter.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Device.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11DeviceCapabilities.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Renderer.h" />
+    <ClInclude Include="code\include\BuildingBlocks\Transform.h" />
+    <ClInclude Include="code\include\Math\Quaternion.h" />
+    <ClInclude Include="code\include\BuildingBlocks\Scene.h" />
+    <ClInclude Include="code\include\ECWS\Entity.h" />
+    <ClInclude Include="code\include\ECWS\IComponent.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
