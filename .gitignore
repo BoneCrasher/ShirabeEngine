@@ -1,6 +1,16 @@
+# Visual Studio
+
+*.suo
+*.sdf
+
+# Build directories
 /build
 /.gradle
+Debug
+Release
 
+# Binaries
+*.exe
 *.so
 *.a
 *.lib
