@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <optional>
+#include <stdint.h>
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
@@ -19,7 +20,7 @@ namespace Engine
 		 *
 		 * \brief	Defines an alias representing the platform resource handle t
 		 **************************************************************************************************/
-		typedef unsigned int GFXAPIResourceHandle_t;
+		using GFXAPIResourceHandle_t = uint64_t;
 
 		DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 
@@ -150,17 +151,17 @@ namespace Engine
 		/**********************************************************************************************//**
 		 * \class	GFXAPIResourceAdapter
 		 *
-		 * \brief	Simple storage to hold a GFXAPIResourceHandle_t and make it accessible.
+		 * \brief	Simple storage base class to hold a GFXAPIResourceHandle_t and make it accessible.
 		 **************************************************************************************************/
 		class GFXAPIResourceAdapter
 		{
 		public:
+			inline const GFXAPIResourceHandle_t& handle() const { return _handle; }
+
+		protected:
 			inline GFXAPIResourceAdapter(const GFXAPIResourceHandle_t& handle)
 				: _handle(handle)
-			{
-			}
-
-			inline const GFXAPIResourceHandle_t& handle() const { return _handle; }
+			{ }
 
 		private:
 			GFXAPIResourceHandle_t _handle;
@@ -182,20 +183,19 @@ namespace Engine
 			UNAVAILABLE
 		};
 
-
 		template <typename TResource>
-		using PlatformResourcePtr = std::shared_ptr<TResource>;
+		using GFXAPIResourcePtr = std::shared_ptr<TResource>;
 
 		/**********************************************************************************************//**
 		 * \class	PlatformResourceProxy
 		 *
 		 * \brief	A platform resource wrapper.
 		 **************************************************************************************************/
-		class PlatformResourceProxy
+		class GFXAPIResourceProxy
 			: public Engine::IOC::Subject<IGFXAPIResourceCallback>
 		{
 		public:
-			inline PlatformResourceProxy()
+			inline GFXAPIResourceProxy()
 				: IOC::Subject<IGFXAPIResourceCallback>()
 				, _loadState(ELoadState::UNKNOWN)
 			{

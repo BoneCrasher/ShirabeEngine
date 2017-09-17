@@ -34,6 +34,10 @@ namespace Engine {
 			ResourceHandle            &outHandle
 		) = 0;
 
+		virtual EEngineStatus createShaderResource(
+			const ResourceHandle& inHandle
+		) = 0;
+
 		virtual EEngineStatus createRenderTarget(
 			const ResourceHandle &inHandle,
 			ResourceHandle       &outHandle

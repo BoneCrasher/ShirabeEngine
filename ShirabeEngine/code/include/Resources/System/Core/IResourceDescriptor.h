@@ -6,7 +6,7 @@
 #include <string>
 
 #include "Core/EngineTypeHelper.h"
-#include "Resources/EResourceType.h"
+#include "Resources/System/Core/EResourceType.h"
 
 namespace Engine {
 	namespace Resources {

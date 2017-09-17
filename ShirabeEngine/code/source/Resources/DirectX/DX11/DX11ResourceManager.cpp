@@ -20,8 +20,8 @@ namespace Engine {
 			EEngineStatus DX11ResourceManager::createTexture1D
 			(
 				const Texture1DDescriptor &desc,
-				ResourceHandle            &outHandle
-			) {
+				ResourceHandle            &outHandle) 
+			{
 				return createResource<DX11Texture1DResourceBuilder>(
 						desc,
 						outHandle
@@ -31,8 +31,8 @@ namespace Engine {
 			EEngineStatus DX11ResourceManager::createTexture2D
 			(
 				const Texture2DDescriptor &desc,
-				ResourceHandle            &outHandle
-			) {
+				ResourceHandle            &outHandle) 
+			{
 				return createResource<DX11Texture2DResourceBuilder>(
 						desc,
 						outHandle
@@ -42,8 +42,8 @@ namespace Engine {
 			EEngineStatus DX11ResourceManager::createTexture3D
 			(
 				const Texture3DDescriptor &desc,
-				ResourceHandle            &outHandle
-			) {
+				ResourceHandle            &outHandle) 
+			{
 				return createResource<DX11Texture3DResourceBuilder>(
 						desc,
 						outHandle
@@ -51,19 +51,25 @@ namespace Engine {
 			}
 
 			EEngineStatus DX11ResourceManager::createShaderResource(
-				const ResourceHandle& inHandle
-			) {
+				const ShaderResourceDescriptor &shaderResourceDescriptor,
+				const ResourceHandle           &inUnderlyingResourceHandle,
+				ResourceHandle                 &outShaderResourceHandle)
+			{
 				EEngineStatus eRes = EEngineStatus::Ok;
 
-
+				return createResource<DX11ShaderResourceBuilder>(
+					shaderResourceDescriptor,
+					inUnderlyingResourceHandle,
+					outShaderResourceHandle
+					);
 
 				return eRes;
 			}
 
 			EEngineStatus DX11ResourceManager::createRenderTarget(
 				const ResourceHandle &inHandle,
-				ResourceHandle       &outHandle
-			) {
+				ResourceHandle       &outHandle)
+			{
 				if (inHandle.type() != EResourceType::TEXTURE)
 					return EEngineStatus::GAPI_InvalidHandle;
 

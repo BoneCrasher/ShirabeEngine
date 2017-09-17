@@ -1,15 +1,46 @@
 #ifndef __SHIRABE_RENDERTARGET_H__
 #define __SHIRABE_RENDERTARGET_H__
 
-#include "Resources/EResourceType.h"
-#include "Resources/ResourceDescriptors.h"
-#include "Resources/IResource.h"
+#include "Resources/System/Core/EResourceType.h"
+#include "Resources/System/Core/IResource.h"
+#include "Resources/System/Core/Handle.h"
 
-#include "Resources/GFXAPI.h"
+#include "Resources/System/GFXAPI/Definitions.h"
+#include "Resources/System/GFXAPI/GFXAPI.h"
+
+#include "Resources/Types/TextureND.h"
 
 namespace Engine {
 	namespace Resources {	
 		using namespace GFXAPI;
+
+		struct SwapChainDescriptorImpl {
+			std::string              _name;
+			TextureDescriptorImpl<2> _texture;
+			bool                     _vsyncEnabled;
+			bool                     _fullscreen;
+			unsigned int             _windowHandle;
+			unsigned int             _backBufferCount;
+			unsigned int             _refreshRateNumerator;
+			unsigned int             _refreshRateDenominator;
+
+			std::string toString() const {
+				std::stringstream ss;
+
+				ss
+					<< "SwapChainDescriptor ('" << _name << "'): ";
+
+				return ss.str();
+			}
+		};
+
+		template <>
+		struct ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
+			: public SwapChainDescriptorImpl
+		{
+			typedef SwapChainDescriptorImpl type;
+		};
+		typedef ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN> SwapChainDescriptor;
 
 		/**********************************************************************************************//**
 		 * \class	SwapChainDescriptorAdapterBase

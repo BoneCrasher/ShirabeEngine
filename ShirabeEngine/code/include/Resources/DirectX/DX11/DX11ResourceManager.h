@@ -80,6 +80,11 @@ namespace Engine {
 
 				~DX11ResourceManager();
 
+				EEngineStatus createDevice(
+					const DeviceDescriptor &deviceDescriptor,
+					ResourceHandle         &outHandle
+				);
+
 				EEngineStatus createTexture1D (
 					const Texture1DDescriptor &desc,
 					ResourceHandle            &outHandle
@@ -87,7 +92,7 @@ namespace Engine {
 
 				EEngineStatus createTexture2D (
 					const Texture2DDescriptor &desc,
-					ResourceHandle        &outHandle
+					ResourceHandle            &outHandle
 				);
 
 				EEngineStatus createTexture3D (
@@ -96,7 +101,9 @@ namespace Engine {
 				);
 
 				EEngineStatus createShaderResource(
-					const ResourceHandle& inHandle
+					const ShaderResourceDescriptor &shaderResourceDescriptor,
+					const ResourceHandle           &inUnderlyingResourceHandle,
+					ResourceHandle                 &outShaderResourceHandle
 				);
 
 				EEngineStatus createRenderTarget(

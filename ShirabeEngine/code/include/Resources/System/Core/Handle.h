@@ -1,10 +1,10 @@
-#ifndef __SHIRABE_BASICHANDLE_H__
-#define __SHIRABE_BASICHANDLE_H__
+#ifndef __SHIRABE_RESOURCES_HANDLE_H__
+#define __SHIRABE_RESOURCES_HANDLE_H__
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/Random.h"
 
-#include "Resources/EResourceType.h"
+#include "Resources/System/Core/EResourceType.h"
 
 namespace Engine {
 	namespace Resources {
@@ -12,7 +12,7 @@ namespace Engine {
 		class ResourceHandle {
 		public:
 			/** \brief Unique numeric identifier of engine resources. */
-			using IResourceID_t = uint64_t;
+			using ResourceID_t = uint64_t;
 
 			inline ResourceHandle()
 				: _valid(false)
@@ -44,8 +44,11 @@ namespace Engine {
 
 			virtual inline ~ResourceHandle() { }
 
+			inline operator ResourceID_t() const {
+				return id();
+			}
 
-			inline IResourceID_t id() const {
+			inline ResourceID_t id() const {
 				return _id;
 			}
 
@@ -70,14 +73,14 @@ namespace Engine {
 			}
 
 		private:
-			inline static IResourceID_t randomIdGenerator() {
+			inline static ResourceID_t randomIdGenerator() {
 				static Random::RandomState _randomIdGenerator; // Todo: CRTP. dervie the random generator from something to make sure it is unique in a context, not system global.
 				return _randomIdGenerator.next();
 			}
 
 			bool _valid;
 
-			IResourceID_t    _id;
+			ResourceID_t     _id;
 			std::string      _name;
 			EResourceType    _type;
 			EResourceSubType _subtype;
@@ -104,7 +107,7 @@ namespace std {
 			typedef typename std::underlying_type<EResourceSubType>::type resource_sub_type;
 			// Compute individual hash values for two data members and combine them using XOR and bit shifting
 			return (
-				hash<ResourceHandle::IResourceID_t>()(k.id())
+				hash<ResourceHandle::ResourceID_t>()(k.id())
 				^ (
 				((uint32_t) hash<resource_type>()(((resource_type) k.type())) << 16)
 					| hash<resource_sub_type>()(((resource_sub_type) k.subtype()))

@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)code\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)code\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -99,6 +99,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
       <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +129,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
       <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -250,19 +254,25 @@
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11ResourceManager.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11SwapChainBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11TextureNDBuilder.h" />
-    <ClInclude Include="code\include\Resources\EResourceType.h" />
-    <ClInclude Include="code\include\Resources\GFXAPI.h" />
-    <ClInclude Include="code\include\Resources\Handle.h" />
-    <ClInclude Include="code\include\Resources\IResource.h" />
-    <ClInclude Include="code\include\Resources\IResourceDescriptor.h" />
-    <ClInclude Include="code\include\Resources\IResourceHandle.h" />
-    <ClInclude Include="code\include\Resources\IResourceManager.h" />
-    <ClInclude Include="code\include\Resources\IResourcePool.h" />
-    <ClInclude Include="code\include\Resources\RenderTarget.h" />
-    <ClInclude Include="code\include\Resources\ResourceBuilder.h" />
-    <ClInclude Include="code\include\Resources\ResourceDescriptors.h" />
-    <ClInclude Include="code\include\Resources\SwapChain.h" />
-    <ClInclude Include="code\include\Resources\TextureND.h" />
+    <ClInclude Include="code\include\Resources\System\Core\EResourceType.h" />
+    <ClInclude Include="code\include\Resources\System\GFXAPI\GFXAPI.h" />
+    <ClInclude Include="code\include\Resources\System\Core\Handle.h" />
+    <ClInclude Include="code\include\Resources\System\Core\IResource.h" />
+    <ClInclude Include="code\include\Resources\System\Core\IResourceDescriptor.h" />
+    <ClInclude Include="code\include\Resources\System\Core\IResourceManager.h" />
+    <ClInclude Include="code\include\Resources\System\Core\IResourcePool.h" />
+    <ClInclude Include="code\include\Resources\Types\ConstantBuffer.h" />
+    <ClInclude Include="code\include\Resources\Types\InstanceBuffer.h" />
+    <ClInclude Include="code\include\Resources\Types\ObjectBuffer.h" />
+    <ClInclude Include="code\include\Resources\Types\RenderTarget.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceBuilder.h" />
+    <ClInclude Include="code\include\Resources\System\GFXAPI\Definitions.h" />
+    <ClInclude Include="code\include\Resources\Types\Shader.h" />
+    <ClInclude Include="code\include\Resources\Types\ShaderResource.h" />
+    <ClInclude Include="code\include\Resources\Types\StructuredBuffer.h" />
+    <ClInclude Include="code\include\Resources\Types\SwapChain.h" />
+    <ClInclude Include="code\include\Resources\Types\TextureND.h" />
+    <ClInclude Include="code\include\Resources\Types\Device.h" />
     <ClInclude Include="code\include\Window\IWindowFactory.h" />
     <ClInclude Include="code\include\Compiler\MSVCWarnings.h" />
     <ClInclude Include="code\include\Core\BasicTypes.h" />
