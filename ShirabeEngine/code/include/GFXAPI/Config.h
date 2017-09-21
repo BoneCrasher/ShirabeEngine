@@ -11,7 +11,7 @@
 #endif
 
 namespace Engine {
-	namespace GAPI {
+	namespace GFXAPI {
 
 	}
 }

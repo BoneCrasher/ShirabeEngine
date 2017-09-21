@@ -1,5 +1,6 @@
+#include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
+
 #include "Resources/DirectX/DX11/DX11SwapChainBuilder.h"
-#include "GAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
 namespace Engine {
 	namespace DX {

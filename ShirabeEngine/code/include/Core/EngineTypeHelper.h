@@ -6,19 +6,22 @@
 #include <vector>
 
 namespace Engine {
+	template <typename T>
+	using Ptr = std::shared_ptr<T>;
+
 	#define DeclareSharedPointerType(type) \
-            using type##Ptr = std::shared_ptr<type>;
+            using type##Ptr = Ptr<type>;
 
 #define DeclarePrefixedSharedPointerType(prefix, type) \
-            using prefix##Ptr = std::shared_ptr<type>;
+            using prefix##Ptr = Ptr<type>;
 
     #define DeclareSharedPointerTypeCustomDeleter(type) \
-            using type##Ptr = std::shared_ptr<type>;
+            using type##Ptr = Ptr<type>;
 
     #define Template(...) __VA_ARGS__
 
     #define DeclareTemplatedSharedPointerType(prefix, type) \
-	        using prefix##Ptr = std::shared_ptr<type>;
+	        using prefix##Ptr = Ptr<type>;
 
 	template <typename TUnderlyingType, typename ... TArgs>
 	static inline std::shared_ptr<TUnderlyingType> MakeSharedPointerType(TArgs&&... args) {
@@ -29,11 +32,11 @@ namespace Engine {
 	using SharedPtrDeleterFn = std::function<void(T*)>;
 
 	template <typename T, typename TDeleter>
-	static inline std::shared_ptr<T> 
+	static inline Ptr<T>
 		MakeSharedPointerTypeCustomDeleter(
 			T          *pInstance,
 		    TDeleter    deleter) {
-		return std::shared_ptr<T>(pInstance, deleter);
+		return Ptr<T>(pInstance, deleter);
 	}
 
 	template <typename T, typename TPtr = std::shared_ptr<T>>

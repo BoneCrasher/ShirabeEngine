@@ -4,17 +4,18 @@
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
 
-#include "Resources/Handle.h"
-#include "Resources/ResourceBuilder.h"
-#include "Resources/SwapChain.h"
+#include "Resources/System/Core/Handle.h"
+#include "Resources/System/Core/ResourceBuilder.h"
 
-#include "GAPI/DirectX/DX11/DX11Types.h"
+#include "Resources/Types/SwapChain.h"
+
+#include "GFXAPI/DirectX/DX11/DX11Types.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
 			using namespace Engine::Resources;
-			using namespace GAPI;
+			using namespace GFXAPI;
 
 			class SwapChainBuilderImpl {
 				friend class DX11SwapChainResourceBuilder;

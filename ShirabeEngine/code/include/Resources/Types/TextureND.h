@@ -4,11 +4,10 @@
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/GFXAPI/GFXAPI.h"
-#include "Resources/System/GFXAPI/Definitions.h"
+#include "GFXAPI/Definitions.h"
 
 namespace Engine {
 	namespace Resources {
-		using namespace GAPI;
 		using namespace GFXAPI;
 
 		/**********************************************************************************************//**
@@ -17,8 +16,9 @@ namespace Engine {
 		 * \brief	A texture mip map descriptor.
 		 **************************************************************************************************/
 		struct TextureMipMapDescriptor {
-			bool    _useMipMaps;
-			uint8_t _mipLevels;
+			bool    useMipMaps;
+			uint8_t mipLevels;
+			uint8_t firstMipMapLevel;
 		};
 
 		/**********************************************************************************************//**
@@ -27,8 +27,9 @@ namespace Engine {
 		 * \brief	A texture array descriptor.
 		 **************************************************************************************************/
 		struct TextureArrayDescriptor {
-			bool    _isTextureArray;
-			uint8_t _textureCount;
+			bool    isTextureArray;
+			uint8_t size;
+			uint8_t firstArraySlice;
 		};
 
 		/**********************************************************************************************//**
@@ -37,9 +38,9 @@ namespace Engine {
 		 * \brief	A texture multisapmling descriptor.
 		 **************************************************************************************************/
 		struct TextureMultisapmlingDescriptor {
-			bool    _useMultisampling;
-			uint8_t _count;
-			uint8_t _quality;
+			bool    useMultisampling;
+			uint8_t size;
+			uint8_t quality;
 		};
 
 		/**********************************************************************************************//**
@@ -53,14 +54,14 @@ namespace Engine {
 		struct TextureDescriptorImpl {
 			static const uint8_t Dimensions = N;
 
-			std::string                    _name;
-			Format                         _textureFormat;
-			VecND<uint32_t, N>             _dimensions;
-			TextureMipMapDescriptor        _mipMap;
-			TextureArrayDescriptor         _array;
-			TextureMultisapmlingDescriptor _multisampling;
-			ResourceUsage                  _cpuGpuUsage;
-			BufferBindingFlags_t           _gpuBinding;
+			std::string                    name;
+			Format                         textureFormat;
+			VecND<uint32_t, N>             dimensionNb;
+			TextureMipMapDescriptor        mipMap;
+			TextureArrayDescriptor         array;
+			TextureMultisapmlingDescriptor multisampling;
+			ResourceUsage                  cpuGpuUsage;
+			BufferBindingFlags_t           gpuBinding;
 
 			std::string toString() const {
 				std::stringstream ss;
@@ -69,13 +70,13 @@ namespace Engine {
 					<< "TextureDescriptor<" << N << ">"
 					<< " ('" << _name << "'): "
 					<< " Dimensions: "      << N << ", "
-					<< " Format: "          << (uint8_t)_textureFormat << ", "
-					<< " MipMaps: "         << (_mipMap._useMipMaps ? "true" : "false") << "; Levels: " << _mipMap._mipLevels << ", "
-					<< " Array: "           << (_array._isTextureArray ? "true" : "false") << "; Layers: " << _array._textureCount << ", "
-					<< " Multisampling: "   << (_multisampling._useMultisampling ? "true" : "false")
-					<< "; Count/Quality:  " << _multisampling._count << "/" << _multisampling._quality << ", "
-					<< " CPU-GPU-Usage: "   << (uint8_t)_cpuGpuUsage << ", "
-					<< " GPU-Binding:  "    << (uint8_t)_gpuBinding << ";";
+					<< " Format: "          << (uint8_t)textureFormat << ", "
+					<< " MipMaps: "         << (mipMap.useMipMaps ? "true" : "false") << "; Levels: " << mipMap.mipLevels << ", "
+					<< " Array: "           << (array.isTextureArray ? "true" : "false") << "; Layers: " << array.size << ", "
+					<< " Multisampling: "   << (multisampling.useMultisampling ? "true" : "false")
+					<< "; Count/Quality:  " << multisampling.size << "/" << multisampling.quality << ", "
+					<< " CPU-GPU-Usage: "   << (uint8_t)cpuGpuUsage << ", "
+					<< " GPU-Binding:  "    << (uint8_t)gpuBinding << ";";
 
 				return ss.str();
 			}
@@ -203,32 +204,32 @@ namespace Engine {
 				descriptor() const { return _descriptor; }
 
 			inline const std::string& 
-				name() const { return _descriptor._name; }
+				name() const { return _descriptor.name; }
 
 			inline const Format&
-				format() const { return _descriptor._textureFormat; }
+				format() const { return _descriptor.textureFormat; }
 
 			inline const VecND<uint32_t, descriptor_type::Dimensions>&
-				dimensions() const { return _descriptor._dimensions; }
+				dimensionNb() const { return _descriptor.dimensionNb; }
 
 			inline const TextureMipMapDescriptor&
-				mipMap() const { return _descriptor._mipMap; }
+				mipMap() const { return _descriptor.mipMap; }
 
 			inline const TextureArrayDescriptor&
-				texArray() const { return _descriptor._array; }
+				texArray() const { return _descriptor.array; }
 
 			inline const TextureMultisapmlingDescriptor&
-				multiSampling() const { return _descriptor._multisampling; }
+				multiSampling() const { return _descriptor.multisampling; }
 
 			inline const ResourceUsage&
-				usage() const { return _descriptor._cpGpuUsage; }
+				usage() const { return _descriptor.cpGpuUsage; }
 
 			inline const BufferBindingFlags_t&
-				binding() const { return _descriptor._gpuBinding; }
+				binding() const { return _descriptor.gpuBinding; }
 
-			inline const uint32_t width()  const { return (N > 0 ? _descriptor._dimensions[0] : 0); }
-			inline const uint32_t height() const { return (N > 1 ? _descriptor._dimensions[1] : 0); }
-			inline const uint32_t depth()  const { return (N > 2 ? _descriptor._dimensions[2] : 0); }
+			inline const uint32_t width()  const { return (N > 0 ? _descriptor.dimensionNb[0] : 0); }
+			inline const uint32_t height() const { return (N > 1 ? _descriptor.dimensionNb[1] : 0); }
+			inline const uint32_t depth()  const { return (N > 2 ? _descriptor.dimensionNb[2] : 0); }
 
 		private:
 			descriptor_type _descriptor;

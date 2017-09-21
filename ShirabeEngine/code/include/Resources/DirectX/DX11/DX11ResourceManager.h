@@ -4,22 +4,57 @@
 #include "Platform/Platform.h"
 #include "Core/EngineTypeHelper.h"
 
-#include "GAPI/Config.h"
-#include "GAPI/DirectX/DX11/DX11Common.h"
-#include "GAPI/DirectX/DX11/DX11Types.h"
-#include "GAPI/DirectX/DX11/DX11Device.h"
+#include "GFXAPI/Config.h"
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/DX11Types.h"
+#include "GFXAPI/DirectX/DX11/DX11Device.h"
 
-#include "Resources/IResourcePool.h"
-#include "Resources/IResourceManager.h"
-#include "Resources/Handle.h"
+#include "Resources/System/Core/IResourcePool.h"
+#include "Resources/System/Core/IResourceManager.h"
+#include "Resources/System/Core/Handle.h"
 
 #include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
 #include "Resources/DirectX/DX11/DX11RenderTargetViewBuilder.h"
+#include "Resources/DirectX/DX11/DX11ShaderResourceViewBuilder.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
-			using namespace Resources;			
+			using namespace Resources;		
+
+			template <typename K, typename V>
+			static bool __extractKeys(const std::map<K, V>& map, std::vector<K>& outKeys) {
+				struct FetchKey
+				{
+					template <typename T>
+					typename T::first_type operator()(T keyValuePair) const
+					{
+						return keyValuePair.first;
+					}
+				};
+
+				// Retrieve all keys
+				std::transform(map.begin(), map.end(), back_inserter(outKeys), FetchKey());
+
+				return true;
+			}
+
+			template <typename K, typename V>
+			static bool __extractValues(const std::map<K, V>& map, std::vector<V>& outValues) {
+				struct FetchValue
+				{
+					template <typename T>
+					typename T::first_type operator()(T keyValuePair) const
+					{
+						return keyValuePair.second;
+					}
+				};
+
+				// Retrieve all keys
+				std::transform(map.begin(), map.end(), back_inserter(outValues), FetchValue());
+
+				return true;
+			}
 
 			class DX11ResourceManager
 				: public IResourceManager {
@@ -29,7 +64,10 @@ namespace Engine {
 				 * \fn	template < typename TBuilder, typename... TAdditionalArgs > EEngineStatus DX11ResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, ResourceHandle &outHandle, TAdditionalArgs&&... args )
 				 *
 				 * \brief	Unified algorithm to invoke a specific builder and store the data in the respective storage.
-				 *
+				 *			
+				 * \remarks Any manageable dx-resource inherits IUnknown, specifying the signature of AddRef & Release.
+				 * 			Since this is the only effective common denominator for, use this for storage.
+				 *			
 				 * \tparam	TBuilder	   	Type of the builder.
 				 * \tparam	TAdditionalArgs	Type of the additional arguments.
 				 * \param 		  	desc	 	The description.
@@ -44,7 +82,7 @@ namespace Engine {
 				>
 				EEngineStatus createResource(
 						const typename TBuilder::traits_type::descriptor_type &desc,
-						ResourceHandle                                        &outHandle,
+					    std::vector<ResourceHandle>                           &outHandles,
 						TAdditionalArgs&&...                                   args
 					) {
 					EEngineStatus status = EEngineStatus::Ok;
@@ -54,19 +92,24 @@ namespace Engine {
 					using resource_type    = TBuilder::traits_type::resource_type;
 					using resource_subtype = TBuilder::traits_type::resource_subtype;
 
-					resource_ptr res = nullptr;					
+					// Store any to-be-created resource in here to iteratively store them in the 
+					// respective resource-pools and return the handle-list.
+					std::map<ResourceHandle, IUnknownPtr> builtResources;
 
 					// Invoke the builder with the mandatory arguments: Device, Descriptor, outPointer and any additional argument.
-					status = build(_dxDevice->internalDevice(), desc, res, std::forward<TAdditionalArgs>(args)...);
+					status = build(_dxDevice->internalDevice(), desc, builtResources, std::forward<TAdditionalArgs>(args)...);
 					if (!CheckEngineError(status)) {
 						// If successful create a handle for the resource and store it in the respective manager 
 						// evaluated using the resource-type.
-						ResourceHandle p(desc._name, resource_type, resource_subtype);
-						if (CheckEngineError(status = store(p, res))) {
-							Log::Error(logTag(), "Failed to store resource. Releasing resource.");
-						}
-						else {
-							outHandle = p;
+						for( const std::pair<ResourceHandle, IUnknownPtr>& r : builtResources ) {
+							if( CheckEngineError(status = store_unknown(r.first, r.second)) ) {
+								Log::Error(logTag(), "Failed to store resource.");
+								// Todo release
+							}
+							else if( !__extractKeys(builtResources, outHandles) ) {
+								Log::Error(logTag(), "Failed to extract resource handles to list.");
+								// Todo release
+							}
 						}
 					}
 
@@ -123,19 +166,43 @@ namespace Engine {
 				// );
 
 			private:
-				template <typename TResource>
-				EEngineStatus store(const ResourceHandle& handle, const TResource& resource);
+				template <EResourceType type, EResourceSubType subtype>
+				EEngineStatus store_unknown(const ResourceHandle& handle, const IUnknownPtr& resource);
+
+				template <typename TResourcePtr>
+				EEngineStatus store(const ResourceHandle& handle, const TResourcePtr& resource);
 
 				IDXDevicePtr _dxDevice;
 
-				// TODO: Be specific here
+				// Be specific for each god-damn resource type to avoid the type-guessing & QueryInterface-overhead.
+				
+				// Any kind of textures required...
 				IIndexedResourcePoolPtr<ResourceHandle, ID3D11Texture1DPtr>          _tex1DPool;
 				IIndexedResourcePoolPtr<ResourceHandle, ID3D11Texture2DPtr>          _tex2DPool;
-				IIndexedResourcePoolPtr<ResourceHandle, ID3D11Texture3DPtr>          _tex3DPool;
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11Texture3DPtr>          _tex3DPool; 
+				// Constant-, Texture-, Structured-, Vertex-, Index-, Instance-, ...
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11Buffer>                _bufferPool;
+				// Shader inputs
 				IIndexedResourcePoolPtr<ResourceHandle, ID3D11ShaderResourceViewPtr> _srvPool;
+				// Render targets
 				IIndexedResourcePoolPtr<ResourceHandle, ID3D11RenderTargetViewPtr>   _rtvPool;
+				// Depth stencil views
 				IIndexedResourcePoolPtr<ResourceHandle, ID3D11DepthStencilViewPtr>   _dsvPool;
+				// Depth stencil states
 				IIndexedResourcePoolPtr<ResourceHandle, ID3D11DepthStencilStatePtr>  _dssPool;
+				// Rasterizer states
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11RasterizerStatePtr>    _rsPool;
+				// Blend states
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11BlendState>            _bsPool;
+				// Input layouts
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11InputLayout>           _ilPool;
+				// Shader types
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11VertexShader>          _vsPool;
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11HullShader>            _hsPool;
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11DomainShader>          _dsPool;
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11GeometryShader>        _gsPool;
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11ComputeShader>         _csPool;
+				IIndexedResourcePoolPtr<ResourceHandle, ID3D11PixelShader>           _psPool;
 
 			};
 			DeclareSharedPointerType(DX11ResourceManager);
@@ -143,6 +210,13 @@ namespace Engine {
 			//--------------------------------------------------------------------------------------------------
 			// Specializations of store<Handle, Resource>(const Handle&, const Resource&) : EEngineStatus
 			//--------------------------------------------------------------------------------------------------
+			
+			template <EResourceType type, EResourceSubType subtype>
+			EEngineStatus DX11ResourceManager::store_unknown(
+				const ResourceHandle &handle,
+				const IUnknownPtr    &resource) {
+				return this->store<typename DetermineDXResourceType<type, subtype>::type>(handle, resource);
+			}
 
 			template <>
 			EEngineStatus DX11ResourceManager

@@ -163,7 +163,7 @@ namespace Engine {
 				*/
 
 				if (*pMinor == NULL)
-					// Minor dimensions are each reduced by 1!
+					// Minor dimensionNb are each reduced by 1!
 					*pMinor = new val_type[(m - 1) * (n - 1)];
 
 				*pMinor_m = m - 1;

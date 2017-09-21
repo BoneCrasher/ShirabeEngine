@@ -28,19 +28,19 @@ namespace Engine {
 				typedef typename const value_type         const_value_type;
 
 				Field<T, bytesize, N, S>
-					(const std::size_t count  = N,
+					(const std::size_t size  = N,
 					 const std::size_t stride = S)
 				{
-					//_field = new T[count];
-					memset(_field, 0, (bytesize * count));
+					//_field = new T[size];
+					memset(_field, 0, (bytesize * size));
 				};
 
 				Field<T, bytesize, N, S>
 					(std::initializer_list<T> source,
-					 const std::size_t             count  = N,
+					 const std::size_t             size  = N,
 					 const std::size_t             stride = S)
 				{
-					//_field = new T[count];
+					//_field = new T[size];
 
 					size_t i = 0;
 					std::initializer_list<T>::iterator it;

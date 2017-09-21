@@ -1,10 +1,10 @@
-#include "GAPI/DirectX/DX11/DX11Renderer.h"
+#include "GFXAPI/DirectX/DX11/DX11Renderer.h"
 
 #include "Platform/Platform.h"
 
-#include "GAPI/Config.h"
-#include "GAPI/DirectX/DX11/DX11Common.h"
-#include "GAPI/DirectX/DX11/DX11DeviceCapabilities.h"
+#include "GFXAPI/Config.h"
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
 #include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
 
@@ -26,7 +26,7 @@ namespace Engine {
 												   const IResourceManagerPtr    &resourceManager) {
 				_config = configuration;
 				
-				using namespace Engine::GAPI;
+				using namespace Engine::GFXAPI;
 
 				EEngineStatus status = EEngineStatus::Ok;
 				HRESULT       dxRes  = S_OK;

@@ -101,6 +101,7 @@
       <EnablePREfast>false</EnablePREfast>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +132,7 @@
       <EnablePREfast>false</EnablePREfast>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,9 +161,9 @@
     <ClCompile Include="code\source\Benchmarking\Timer\Timer.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\WindowsTime.cpp" />
     <ClCompile Include="code\source\ECWS\MeshComponent.cpp" />
-    <ClCompile Include="code\source\GAPI\DirectX\DX11\DX11Device.cpp" />
-    <ClCompile Include="code\source\GAPI\DirectX\DX11\DX11DeviceCapabilities.cpp" />
-    <ClCompile Include="code\source\GAPI\DirectX\DX11\DX11Renderer.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Device.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Renderer.cpp" />
     <ClCompile Include="code\source\Math\AxisAngle.cpp" />
     <ClCompile Include="code\source\BuildingBlocks\Camera.cpp" />
     <ClCompile Include="code\source\ApplicationMain.cpp" />
@@ -173,9 +175,10 @@
     <ClCompile Include="code\source\Memory\New.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11RenderTargetViewBuilder.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11ResourceManager.cpp" />
+    <ClCompile Include="code\source\Resources\DirectX\DX11\DX11ShaderResourceViewBuilder.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11SwapChainBuilder.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11TextureNDBuilder.cpp" />
-    <ClCompile Include="code\source\Resources\Handle.cpp" />
+    <ClCompile Include="code\source\Resources\System\Core\Handle.cpp" />
     <ClCompile Include="code\source\Window\WindowManager.cpp" />
     <ClCompile Include="code\source\Core\String.cpp" />
     <ClCompile Include="code\source\Platform\Windows\WindowsWindowFactory.cpp" />
@@ -202,17 +205,17 @@
     <ClInclude Include="code\include\Core\Random.h" />
     <ClInclude Include="code\include\ECWS\IComponentFactory.h" />
     <ClInclude Include="code\include\ECWS\MeshComponent.h" />
-    <ClInclude Include="code\include\GAPI\Config.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\DX11\DX11Common.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\DX11\DX11Device.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\DX11\DX11DeviceCapabilities.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\DX11\DX11Linkage.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\DX11\DX11Renderer.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\DX11\DX11Types.h" />
-    <ClInclude Include="code\include\GAPI\DirectX\IDXDevice.h" />
-    <ClInclude Include="code\include\GAPI\GAPIDeviceCapabilities.h" />
-    <ClInclude Include="code\include\GAPI\IRenderer.h" />
-    <ClInclude Include="code\include\GAPI\RendererConfiguration.h" />
+    <ClInclude Include="code\include\GFXAPI\Config.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Common.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Device.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Linkage.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Renderer.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Types.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\IDXDevice.h" />
+    <ClInclude Include="code\include\GFXAPI\GFXAPIDeviceCapabilities.h" />
+    <ClInclude Include="code\include\GFXAPI\IRenderer.h" />
+    <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
     <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />
     <ClInclude Include="code\include\IOC\IOCProperty.hpp" />
     <ClInclude Include="code\include\IOC\IPropertyChangeListener.hpp" />
@@ -252,6 +255,7 @@
     <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11RenderTargetViewBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11ResourceManager.h" />
+    <ClInclude Include="code\include\Resources\DirectX\DX11\DX11ShaderResourceViewBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11SwapChainBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11TextureNDBuilder.h" />
     <ClInclude Include="code\include\Resources\System\Core\EResourceType.h" />
@@ -266,7 +270,7 @@
     <ClInclude Include="code\include\Resources\Types\ObjectBuffer.h" />
     <ClInclude Include="code\include\Resources\Types\RenderTarget.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceBuilder.h" />
-    <ClInclude Include="code\include\Resources\System\GFXAPI\Definitions.h" />
+    <ClInclude Include="code\include\GFXAPI\Definitions.h" />
     <ClInclude Include="code\include\Resources\Types\Shader.h" />
     <ClInclude Include="code\include\Resources\Types\ShaderResource.h" />
     <ClInclude Include="code\include\Resources\Types\StructuredBuffer.h" />

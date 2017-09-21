@@ -4,17 +4,17 @@
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
 
-#include "Resources/Handle.h"
-#include "Resources/ResourceBuilder.h"
-#include "Resources/TextureND.h"
+#include "Resources/System/Core/Handle.h"
+#include "Resources/System/Core/ResourceBuilder.h"
+#include "Resources/Types/TextureND.h"
 
-#include "GAPI/DirectX/DX11/DX11Types.h"
+#include "GFXAPI/DirectX/DX11/DX11Types.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
 			using namespace Engine::Resources;
-			using namespace GAPI;
+			using namespace GFXAPI;
 
 			EEngineStatus createTexture1D (
 				const ID3D11DevicePtr     &device,
@@ -40,7 +40,7 @@ namespace Engine {
 			 * \brief	A dx 11 texture 1 d resource builder.
 			 **************************************************************************************************/
 			class DX11Texture1DResourceBuilder
-				: public ResourceBuilderBase<ID3D11DevicePtr, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D, ID3D11Texture1DPtr>
+				: public ResourceBuilderBase<ID3D11DevicePtr, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D, IUnknownPtr>
 			{
 				DeclareLogTag(Texture1DResourceBuilder_ID3D11Device);
 
@@ -48,7 +48,7 @@ namespace Engine {
 				static EEngineStatus build(
 					gapi_device_type      &gapiDevice,
 					descriptor_type const &descriptor,
-					resource_type_ptr     &outResource)
+					built_resource_map    &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
@@ -60,7 +60,9 @@ namespace Engine {
 					}
 					else {
 						// Perform any further processing if necessary...
-						outResource = std::move(pTexture);
+						ResourceHandle p(descriptor.name, resource_type, resource_subtype);
+
+						outResources[p] = (IUnknownPtr) pTexture;
 					}
 
 					return status;
@@ -73,15 +75,16 @@ namespace Engine {
 			 * \brief	A dx 11 texture 2D resource builder.
 			 **************************************************************************************************/
 			class DX11Texture2DResourceBuilder
-				: public ResourceBuilderBase<ID3D11Device, EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D, ID3D11Texture2DPtr>
+				: public ResourceBuilderBase<ID3D11DevicePtr, EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D, IUnknownPtr>
 			{
 				DeclareLogTag(Texture2DResourceBuilder_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
-					typename traits_type::TGAPIDevicePtr        &gapiDevice,
-					typename const traits_type::descriptor_type &descriptor,
-					typename traits_type::resource_type_ptr     &outResource)
+					IResourceManagerPtr   &resourceManager,
+					gapi_device_type      &gapiDevice,
+					descriptor_type const &descriptor,
+					built_resource_map    &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
@@ -95,7 +98,9 @@ namespace Engine {
 					else
 					{
 						// Perform any further processing if necessary...
-						outResource = std::move(pTexture);
+						ResourceHandle p(descriptor.name, resource_type, resource_subtype);
+
+						outResources[p] = (IUnknownPtr)pTexture;
 					}
 
 					return status;
@@ -103,15 +108,16 @@ namespace Engine {
 			};
 
 			class DX11Texture3DResourceBuilder
-				: public ResourceBuilderBase<ID3D11Device, EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D, ID3D11Texture3DPtr>
+				: public ResourceBuilderBase<ID3D11DevicePtr, EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D, IUnknownPtr>
 			{
 				DeclareLogTag(Texture3DResourceBuilder_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
-					typename traits_type::TGAPIDevicePtr        &gapiDevice,
-					typename const traits_type::descriptor_type &descriptor,
-					typename traits_type::resource_type_ptr     &outResource)
+					IResourceManagerPtr   &resourceManager,
+					gapi_device_type      &gapiDevice,
+					descriptor_type const &descriptor,
+					built_resource_map    &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
@@ -125,7 +131,9 @@ namespace Engine {
 					else
 					{
 						// Perform any further processing if necessary...
-						outResource = std::move(pTexture);
+						ResourceHandle p(descriptor.name, resource_type, resource_subtype);
+
+						outResources[p] = (IUnknownPtr)pTexture;
 					}
 
 					return status;

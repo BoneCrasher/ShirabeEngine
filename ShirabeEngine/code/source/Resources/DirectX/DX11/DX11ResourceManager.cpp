@@ -1,12 +1,15 @@
-#include "GAPI/DirectX/DX11/DX11DeviceCapabilities.h"
+#include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 #include "Resources/DirectX/DX11/DX11ResourceManager.h"
 
 #include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
 #include "Resources/DirectX/DX11/DX11RenderTargetViewBuilder.h"
+#include "Resources/DirectX/DX11/DX11SwapChainBuilder.h"
+#include "Resources/DirectX/DX11/DX11ShaderResourceBuilder.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
+			using namespace Engine::Resources;
 
 			DX11ResourceManager::DX11ResourceManager(
 				const IDXDevicePtr& device
@@ -59,8 +62,8 @@ namespace Engine {
 
 				return createResource<DX11ShaderResourceBuilder>(
 					shaderResourceDescriptor,
-					inUnderlyingResourceHandle,
-					outShaderResourceHandle
+					outShaderResourceHandle,
+					inUnderlyingResourceHandle
 					);
 
 				return eRes;
@@ -74,7 +77,7 @@ namespace Engine {
 					return EEngineStatus::GAPI_InvalidHandle;
 
 				std::string       textureName;
-				GAPI::Format      textureFormat;
+				GFXAPI::Format    textureFormat;
 				ID3D11ResourcePtr textureResource;
 
                 #define FetchCase(case_condition, type, handle, src, name_var, format_var, resource_var) \

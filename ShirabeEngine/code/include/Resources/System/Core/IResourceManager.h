@@ -4,8 +4,10 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
 
-#include "Resources/Handle.h"
-#include "Resources/ResourceDescriptors.h"
+#include "Resources/System/Core/Handle.h"
+
+#include "Resources/Types/SwapChain.h"
+#include "Resources/Types/ShaderResource.h"
 
 namespace Engine {
 	namespace Resources {
@@ -35,7 +37,9 @@ namespace Engine {
 		) = 0;
 
 		virtual EEngineStatus createShaderResource(
-			const ResourceHandle& inHandle
+			const ShaderResourceDescriptor &shaderResourceDescriptor,
+			const ResourceHandle           &inUnderlyingResourceHandle,
+			ResourceHandle                 &outShaderResourceHandle
 		) = 0;
 
 		virtual EEngineStatus createRenderTarget(

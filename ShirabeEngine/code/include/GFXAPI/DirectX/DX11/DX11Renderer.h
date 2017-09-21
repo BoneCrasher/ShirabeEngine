@@ -3,15 +3,15 @@
 
 #include <atomic>
 
-#include <d3d.h>
-#include <d3d11.h>
-
-#include "GAPI/IRenderer.h"
-#include "Resources/DirectX/DX11/DX11ResourceManager.h"
-
+#include "DX11Common.h"
 #include "DX11Linkage.h"
 #include "DX11DeviceCapabilities.h"
 #include "DX11Device.h"
+
+#include "GFXAPI/IRenderer.h"
+
+#include "Resources/DirectX/DX11/DX11ResourceManager.h"
+
 
 namespace Engine {
 	namespace DX {

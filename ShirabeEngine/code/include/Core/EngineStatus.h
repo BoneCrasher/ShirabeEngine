@@ -41,9 +41,10 @@ namespace Engine {
 		DXDevice_Texture2DCreationFailed                                = -100371,
 		DXDevice_Texture3DCreationFailed                                = -100372,
 		DXDevice_AttachSwapChainToBackBuffer_CreateRTV_Failed           = -100400,
-		DXDevice_DepthStencilTextureCreationFailed                      = -100401,
-		DXDevice_DepthStencilStateCreationFailed                        = -100402,
-		DXDevice_RasterizerStateCreationFailed                          = -100450,
+		DXDevice_SRVCreationFailed                                      = -100430,
+		DXDevice_DepthStencilTextureCreationFailed                      = -100501,
+		DXDevice_DepthStencilStateCreationFailed                        = -100502,
+		DXDevice_RasterizerStateCreationFailed                          = -100550,
 		Timer_NoPlatformTimeInstance                                    = -300050,
 		Time_Win32__QueryPerformanceFrequencyFailed                     = -300101,
 		Time_Win32__QueryPerformanceCounterFailed                       = -300102

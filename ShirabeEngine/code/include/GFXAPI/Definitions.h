@@ -4,10 +4,10 @@
 #include <sstream>
 
 #include "Platform/Platform.h"
-#include "GAPI/Config.h"
+#include "GFXAPI/Config.h"
 
 #ifdef GAPI_USE_DX
-#include "GAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
 #else 
 
 #endif
@@ -19,7 +19,7 @@
 #include "Resources/System/Core/IResourceDescriptor.h"
 
 namespace Engine {
-	namespace Resources {
+	namespace GFXAPI {
 
 		enum class ResourceUsage {
 			CPU_None_GPU_ReadWrite      = 1, // i.e. DX11::D3D11_USAGE::Default

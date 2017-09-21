@@ -4,7 +4,7 @@
 #include "Core/EngineStatus.h"
 #include "Core/EngineTypeHelper.h"
 
-#include "GAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
 
 namespace Engine {
 	namespace DX {

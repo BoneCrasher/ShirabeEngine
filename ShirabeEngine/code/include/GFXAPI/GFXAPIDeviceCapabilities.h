@@ -4,11 +4,13 @@
 #include "Core/BasicTypes.h"
 #include "Core/EngineStatus.h"
 #include "Core/EngineTypeHelper.h"
+
 #include "Log/Log.h"
-#include "Resources/ResourceDescriptors.h"
+
+#include "GFXAPI/Definitions.h"
 
 namespace Engine {
-	namespace GAPI {
+	namespace GFXAPI {
 		using namespace Engine::Resources;
 
 		struct GAPIOutputMode {

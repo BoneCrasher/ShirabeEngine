@@ -5,7 +5,7 @@
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
 
-#include "Resources/System/GFXAPI/Definitions.h"
+#include "GFXAPI/Definitions.h"
 #include "Resources/System/GFXAPI/GFXAPI.h"
 
 #include "Resources/Types/TextureND.h"

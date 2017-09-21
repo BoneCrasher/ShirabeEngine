@@ -101,7 +101,7 @@ namespace Engine {
 			case '%':
 				// Can handle up to 10 entries indexed from 0..9! TODO: Replace with arbitrary number functionality
 				if ((k + 1) < format.size()                                          // Next index within format string?
-					&& std::size_t(format[k + 1] - '0') < formattedArguments.size()) // Provided argument index after % within passed argument count (0..9)?
+					&& std::size_t(format[k + 1] - '0') < formattedArguments.size()) // Provided argument index after % within passed argument size (0..9)?
 				{
 					stream << formattedArguments[std::size_t(format[++k] - '0')];
 					break;

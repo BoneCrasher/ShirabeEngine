@@ -5,7 +5,7 @@
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
 
-#include "Resources/System/GFXAPI/Definitions.h"
+#include "GFXAPI/Definitions.h"
 #include "Resources/System/GFXAPI/GFXAPI.h"
 
 #include "Resources/Types/TextureND.h"
@@ -20,24 +20,24 @@ namespace Engine {
 		 * \brief	A render target descriptor implementation.
 		 **************************************************************************************************/
 		struct RenderTargetDescriptorImpl {
-			std::string             _name;
-			Format                  _textureFormat;
-			unsigned int            _dimensions;
-			TextureArrayDescriptor  _array;
-			TextureMipMapDescriptor _mipMap;
+			std::string             name;
+			Format                  textureFormat;
+			unsigned int            dimensionNb;
+			TextureArrayDescriptor  array;
+			TextureMipMapDescriptor mipMap;
 
 			RenderTargetDescriptorImpl()
-				: _name("")
-				, _textureFormat(Format::UNKNOWN)
-				, _dimensions(0)
+				: name("")
+				, textureFormat(Format::UNKNOWN)
+				, dimensionNb(0)
 			{}
 
 			std::string toString() const {
 				std::stringstream ss;
 
 				ss
-					<< "RenderTargetDescriptor ('" << _name << "'): "
-					<< " Format: " << (uint8_t)_textureFormat << ";";
+					<< "RenderTargetDescriptor ('" << name << "'): "
+					<< " Format: " << (uint8_t)textureFormat << ";";
 
 				return ss.str();
 			}
@@ -76,7 +76,7 @@ namespace Engine {
 				descriptor() const { return _descriptor; }
 
 			inline const Format&
-				format() const { return _descriptor._textureFormat; }
+				format() const { return _descriptor.textureFormat; }
 
 		private:
 			descriptor_type _descriptor;

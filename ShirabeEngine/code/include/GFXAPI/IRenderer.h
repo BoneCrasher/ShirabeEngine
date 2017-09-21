@@ -4,8 +4,8 @@
 #include "Core/EngineStatus.h"
 
 #include "Platform/ApplicationEnvironment.h"
-#include "GAPI/RendererConfiguration.h"
-#include "Resources/IResourceManager.h"
+#include "GFXAPI/RendererConfiguration.h"
+#include "Resources/System/Core/IResourceManager.h"
 
 namespace Engine {
 	namespace Renderer {

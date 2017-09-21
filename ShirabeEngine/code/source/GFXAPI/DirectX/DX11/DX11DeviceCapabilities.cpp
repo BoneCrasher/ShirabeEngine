@@ -1,5 +1,5 @@
-#include "GAPI/DirectX/DX11/DX11Common.h"
-#include "GAPI/DirectX/DX11/DX11DeviceCapabilities.h"
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
 #include <functional>
 

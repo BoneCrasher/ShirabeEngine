@@ -1,18 +1,18 @@
 #ifndef __SHIRABE_DX11_DEVICECAPABILITIES_H__
 #define __SHIRABE_DX11_DEVICECAPABILITIES_H__
 
-#include "GAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
 
 #include "Core/BasicTypes.h"
 #include "Core/EngineStatus.h"
 #include "Core/EngineTypeHelper.h"
 #include "Log/Log.h"
-#include "GAPI/GAPIDeviceCapabilities.h"
+#include "GFXAPI/GFXAPIDeviceCapabilities.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
-			using namespace GAPI;		
+			using namespace GFXAPI;
 
 			class DX11DeviceCapsHelper {
 				DeclareLogTag(DX11DeviceCapsHelper)

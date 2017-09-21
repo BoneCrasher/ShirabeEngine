@@ -7,11 +7,16 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
 
-#include "Resources/IResourceDescriptor.h"
+#include "Resources/System/Core/IResourceDescriptor.h"
 
 namespace Engine {
 	namespace Resources {
 
+		/**********************************************************************************************//**
+		 * \struct	ResourceNotSupportedException
+		 *
+		 * \brief	Exception for signalling resource not supported errors.
+		 **************************************************************************************************/
 		struct ResourceNotSupportedException 
 			: public std::exception
 		{
@@ -44,11 +49,22 @@ namespace Engine {
 			}
 		};
 
+		/**********************************************************************************************//**
+		 * \struct	ResourceBuilderTraits
+		 *
+		 * \brief	Provides information about the specific resource type supported by a 
+		 * 			corresponding builder.
+		 *
+		 * \tparam	TGAPIDevice	Type of the tgapi device.
+		 * \tparam	type	   	Type of the type.
+		 * \tparam	subtype	   	Type of the subtype.
+		 * \tparam	TResource  	Type of the resource.
+		 **************************************************************************************************/
 		template <
 			typename         TGAPIDevice,
 			EResourceType    type,
 			EResourceSubType subtype,
-			typename         TResource
+			typename         TResourceBasePtr
 		>
 		struct ResourceBuilderTraits {
 			static const EResourceType    resource_type    = type;
@@ -60,29 +76,43 @@ namespace Engine {
 			typedef
 				TGAPIDevice
 				gapi_device_type;
-
 			DeclareSharedPointerType(TGAPIDevice);
-			using resource_type_ptr = std::shared_ptr<TResource>;
+
+			typedef std::map<ResourceHandle, TResourceBasePtr> built_resource_map;
 		};
 
+		/**********************************************************************************************//**
+		 * \class	ResourceBuilderBase
+		 *
+		 * \brief	Base-class for any resource builder, encapsulating a traits-class.
+		 *
+		 * \tparam	TGAPIDevice	Type of the tgapi device.
+		 * \tparam	type	   	Type of the type.
+		 * \tparam	subtype	   	Type of the subtype.
+		 * \tparam	TResource  	Type of the resource.
+		 * \tparam	TGAPIDevice	Type of the tgapi device.
+		 * \tparam	type	   	Type of the type.
+		 * \tparam	subtype	   	Type of the subtype.
+		 * \tparam	TResource  	Type of the resource.
+		 **************************************************************************************************/
 		template <
 			typename         TGAPIDevice,
 			EResourceType    type,
 			EResourceSubType subtype,
-			typename         TResource,
-			typename         Traits  = ResourceBuilderTraits<TGAPIDevice, type, subtype, TResource>
+			typename         TResourceBasePtr,
+			typename         Traits  = ResourceBuilderTraits<TGAPIDevice, type, subtype, TResourceBasePtr>
 		>
 		class ResourceBuilderBase
 		{
 		public:
-			typedef ResourceBuilderBase<TGAPIDevice, type, subtype, TResource, Traits>    my_type;
+			typedef ResourceBuilderBase<TGAPIDevice, type, subtype, TResource, Traits> my_type;
 			typedef typename Traits traits_type;
 
 			static const EResourceType    resource_type    = traits_type::resource_type;
 			static const EResourceSubType resource_subtype = traits_type::resource_subtype;
-			typedef typename traits_type::descriptor_type   descriptor_type;
-			typedef typename traits_type::gapi_device_type  gapi_device_type;
-			typedef typename traits_type::resource_type_ptr resource_type_ptr;
+			typedef typename traits_type::descriptor_type    descriptor_type;
+			typedef typename traits_type::gapi_device_type   gapi_device_type;
+			typedef typename traits_type::built_resource_map built_resource_map;
 		};
 
 	}

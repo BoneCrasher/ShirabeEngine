@@ -5,7 +5,7 @@
 
 #include <d3d11.h>
 
-#include "GAPI/DirectX/IDXDevice.h"
+#include "GFXAPI/DirectX/IDXDevice.h"
 
 namespace Engine {
 	namespace DX {

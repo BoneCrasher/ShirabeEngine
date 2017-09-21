@@ -225,7 +225,7 @@ namespace Engine {
 
         template <intmax_t iOtherBaseDenominator>
         Timespan(const Timespan<iOtherBaseDenominator>& other)
-            : _internalValue(chrono_duration_type(other).count())
+            : _internalValue(chrono_duration_type(other).size())
         {}
 
         explicit Timespan(intmax_t initialValue)
@@ -247,17 +247,17 @@ namespace Engine {
 
         inline Timespan<iSubsecondUnits> base() { return Factory::create(1); }
 
-        inline int subseconds() const { return (_internalValue.count() % iSubsecondUnits); }
+        inline int subseconds() const { return (_internalValue.size() % iSubsecondUnits); }
         inline int seconds() const { return  ((int) totalSeconds() % 60); }
         inline int minutes() const { return  ((int) totalMinutes() % 60); }
         inline int hours()   const { return  ((int) totalHours() % 24); }
         inline int days()    const { return  ((int) totalDays() % 365); }
 
-        inline double totalSubseconds() const { return (double) _internalValue.count(); }
-        inline double totalSeconds()    const { return (double) _internalValue.count() / (double)iSubsecondUnits; }
-        inline double totalMinutes()    const { return (double) _internalValue.count() / (double)(iSubsecondUnits * 60); }
-        inline double totalHours()      const { return (double) _internalValue.count() / (double)(iSubsecondUnits * 60 * 60); }
-        inline double totalDays()       const { return (double) _internalValue.count() / (double)(iSubsecondUnits * 60 * 60 * 24); }
+        inline double totalSubseconds() const { return (double) _internalValue.size(); }
+        inline double totalSeconds()    const { return (double) _internalValue.size() / (double)iSubsecondUnits; }
+        inline double totalMinutes()    const { return (double) _internalValue.size() / (double)(iSubsecondUnits * 60); }
+        inline double totalHours()      const { return (double) _internalValue.size() / (double)(iSubsecondUnits * 60 * 60); }
+        inline double totalDays()       const { return (double) _internalValue.size() / (double)(iSubsecondUnits * 60 * 60 * 24); }
 
         inline int compare(const ITimespanPtr& other) const
         { return compareImpl(other); }
@@ -333,7 +333,7 @@ namespace Engine {
 
         template <typename TRet, typename TPeriod>
         inline TRet convertTo(const chrono_duration_type& inValue) const {
-            return std::chrono::duration_cast<std::chrono::duration<TRet, TPeriod>>(inValue).count();
+            return std::chrono::duration_cast<std::chrono::duration<TRet, TPeriod>>(inValue).size();
         }
 
         static double UnitConversionFactor(

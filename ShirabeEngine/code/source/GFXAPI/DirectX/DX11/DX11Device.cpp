@@ -1,4 +1,4 @@
-#include "GAPI/DirectX/DX11/DX11Device.h"
+#include "GFXAPI/DirectX/DX11/DX11Device.h"
 
 namespace Engine {
 	namespace DX {
