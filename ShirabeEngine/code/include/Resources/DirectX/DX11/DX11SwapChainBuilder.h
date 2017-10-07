@@ -5,11 +5,11 @@
 #include "Log/Log.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/ResourceBuilder.h"
 
 #include "Resources/Types/SwapChain.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
+#include "Resources/DirectX/DX11/DX11BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -17,6 +17,11 @@ namespace Engine {
 			using namespace Engine::Resources;
 			using namespace GFXAPI;
 
+			/**********************************************************************************************//**
+			 * \class	SwapChainBuilderImpl
+			 *
+			 * \brief	A swap chain builder implementation.
+			 **************************************************************************************************/
 			class SwapChainBuilderImpl {
 				friend class DX11SwapChainResourceBuilder;
 
@@ -32,36 +37,46 @@ namespace Engine {
 				);
 			};
 
-
+			/**********************************************************************************************//**
+			 * \class	DX11SwapChainResourceBuilder
+			 *
+			 * \brief	A dx 11 swap chain resource builder.
+			 **************************************************************************************************/
 			class DX11SwapChainResourceBuilder
-				: public ResourceBuilderBase<ID3D11Device, EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN, IDXGISwapChainPtr>
+				: public DX11ResourceBuilderBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN, IUnknownPtr>
 			{
 				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
-					typename traits_type::TGAPIDevicePtr        &gapiDevice,
-					typename const traits_type::descriptor_type &descriptor,
-					typename traits_type::resource_type_ptr     &outResource)
+					descriptor_type const        &descriptor,
+					gfxapi_parameter_struct_type &gfxapiParams,
+					built_resource_map           &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
-					IDXGISwapChainPtr   pRes = nullptr;
-					ID3D11Texture2DList pBackbufferPtrs;
+					IDXGISwapChainPtr   pSC = nullptr;
+					ID3D11Texture2DList backbufferTexturePointers;
 
-					status = DX::_11::SwapChainBuilderImpl::createSwapChain(gapiDevice, descriptor, pRes);
+					status = DX::_11::SwapChainBuilderImpl::createSwapChain(gfxapiParams.device, descriptor, pSC);
 					if (CheckEngineError(status)) {
 						Log::Error(logTag(), String::format("Cannot create RenderTargetView internal resource for descriptor: %s", descriptor.toString().c_str()));
 					}
 					else {
 						// What to pass to the texND to encapsulate the internal handle and resource? How to recreated it?
-						if (CheckEngineError(DX::_11::SwapChainBuilderImpl::createBackBufferTextureResources(pRes, pBackbufferPtrs))) {
+						if (CheckEngineError(DX::_11::SwapChainBuilderImpl::createBackBufferTextureResources(pSC, backbufferTexturePointers))) {
 							status = EEngineStatus::DXSwapChain_AttachSwapChainToBackBuffer_GetBackBufferPtr_Failed;
 						}
 						else {
-							// Todo: Here it becomes tricky: The signature only expects a single resource as output! 
-							// Consider moving the whole backbuffer fetch into separate helper function visible to the resource manager, OR, open up the interface to create a resource with an existing TEX2D.
-							outResource = std::move(pRes);
+							// TODO: Create resource hierarchy/dependencies for automatic release.
+
+							ResourceHandle sc(descriptor.name, resource_type, resource_subtype);
+							outResources[sc] = pSC;
+							for( unsigned int k=0; k < backbufferTexturePointers.size(); ++k ) {
+								const ID3D11Texture2DPtr &t = backbufferTexturePointers[k];
+								ResourceHandle pT(String::format("%0_%1", descriptor.name, k), EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D);
+								outResources[pT] = t;
+							}
 						}
 					}
 

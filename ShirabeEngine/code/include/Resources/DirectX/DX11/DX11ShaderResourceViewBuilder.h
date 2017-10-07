@@ -5,11 +5,11 @@
 #include "Log/Log.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/ResourceBuilder.h"
 
 #include "Resources/Types/ShaderResource.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
+#include "Resources/DirectX/DX11/DX11BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -22,7 +22,7 @@ namespace Engine {
 				static EEngineStatus createShaderResource(
 					const ID3D11DevicePtr          &device,
 					const ShaderResourceDescriptor &desc,
-					ID3D11ResourcePtr              &inUnderlyingResource,
+					IUnknownPtr                    &inUnderlyingResource,
 					ID3D11ShaderResourceViewPtr    &outRes
 				);
 
@@ -30,27 +30,28 @@ namespace Engine {
 
 
 			class DX11ShaderResourceBuilder
-				: public ResourceBuilderBase<ID3D11Device, EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW, ID3D11ShaderResourceViewPtr>
+				: public DX11ResourceBuilderBase<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW, IUnknownPtr>
 			{
 				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
-					typename traits_type::TGAPIDevicePtr        &gapiDevice,
 					typename const traits_type::descriptor_type &descriptor,
-					ID3D11ResourcePtr                           &inUnderlyingResource,
-					typename traits_type::resource_type_ptr     &outResource)
+					gfxapi_parameter_struct_type                &gfxapiParams,
+					built_resource_map                          &outResources,
+					IUnknownPtr                                 &inUnderlyingResource)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
-					ID3D11ShaderResourceViewPtr   pRes = nullptr;
+					ID3D11ShaderResourceViewPtr pRes = nullptr;
 
-					status = DX::_11::DX11ShaderResourceBuilderImpl::createShaderResource(gapiDevice, descriptor, inUnderlyingResource, pRes);
+					status = DX::_11::DX11ShaderResourceBuilderImpl::createShaderResource(gfxapiParams.device, descriptor, inUnderlyingResource, pRes);
 					if (CheckEngineError(status)) {
 						Log::Error(logTag(), String::format("Cannot create RenderTargetView internal resource for descriptor: %s", descriptor.toString().c_str()));
 					}
 					else {
-						outResource = std::move(pRes);
+						ResourceHandle p(descriptor.name, resource_type, resource_subtype);
+						outResources[p] = pRes;
 					}
 
 					return status;

@@ -16,12 +16,12 @@ namespace Engine {
 				EEngineStatus eRes  = EEngineStatus::Ok;
 
 				D3D11_TEXTURE1D_DESC texDesc ={};
-				texDesc.Width     = desc._dimensions[0];
-				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc._textureFormat);
-				texDesc.MipLevels = (desc._mipMap._useMipMaps    ? desc._mipMap._mipLevels   : 1);
-				texDesc.ArraySize = (desc._array._isTextureArray ? desc._array._textureCount : 1);
-				texDesc.Usage     = DX11DeviceCapsHelper::convertResourceUsageGAPI2D3D11(desc._cpuGpuUsage);
-				texDesc.BindFlags = DX11DeviceCapsHelper::convertBufferBindingGAPI2D3D11(desc._gpuBinding);
+				texDesc.Width     = desc.dimensionNb[0];
+				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
+				texDesc.MipLevels = (desc.mipMap.useMipMaps    ? desc.mipMap.mipLevels   : 1);
+				texDesc.ArraySize = (desc.array.isTextureArray ? desc.array.size : 1);
+				texDesc.Usage     = DX11DeviceCapsHelper::convertResourceUsageGAPI2D3D11(desc.cpuGpuUsage);
+				texDesc.BindFlags = DX11DeviceCapsHelper::convertBufferBindingGAPI2D3D11(desc.gpuBinding);
 				// Additional flags
 				texDesc.CPUAccessFlags = 0;
 				texDesc.MiscFlags      = 0;
@@ -48,17 +48,17 @@ namespace Engine {
 				EEngineStatus eRes = EEngineStatus::Ok;
 
 				D3D11_TEXTURE2D_DESC texDesc ={};
-				texDesc.Width     = desc._dimensions[0];
-				texDesc.Height    = desc._dimensions[1];
-				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc._textureFormat);
-				texDesc.MipLevels = (desc._mipMap._useMipMaps    ? desc._mipMap._mipLevels   : 1);
-				texDesc.ArraySize = (desc._array._isTextureArray ? desc._array._textureCount : 1);
-				texDesc.Usage     = DX11DeviceCapsHelper::convertResourceUsageGAPI2D3D11(desc._cpuGpuUsage);
-				texDesc.BindFlags = DX11DeviceCapsHelper::convertBufferBindingGAPI2D3D11(desc._gpuBinding);
+				texDesc.Width     = desc.dimensionNb[0];
+				texDesc.Height    = desc.dimensionNb[1];
+				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
+				texDesc.MipLevels = (desc.mipMap.useMipMaps    ? desc.mipMap.mipLevels   : 1);
+				texDesc.ArraySize = (desc.array.isTextureArray ? desc.array.size : 1);
+				texDesc.Usage     = DX11DeviceCapsHelper::convertResourceUsageGAPI2D3D11(desc.cpuGpuUsage);
+				texDesc.BindFlags = DX11DeviceCapsHelper::convertBufferBindingGAPI2D3D11(desc.gpuBinding);
 				// Multisampling
-				if (desc._multisampling._useMultisampling) {
-					texDesc.SampleDesc.Count   = desc._multisampling._count;
-					texDesc.SampleDesc.Quality = desc._multisampling._quality;
+				if (desc.multisampling.useMultisampling) {
+					texDesc.SampleDesc.Count   = desc.multisampling.size;
+					texDesc.SampleDesc.Quality = desc.multisampling.quality;
 				}
 				else {
 					texDesc.SampleDesc.Count   = 0;
@@ -91,14 +91,14 @@ namespace Engine {
 				EEngineStatus eRes = EEngineStatus::Ok;
 
 				D3D11_TEXTURE3D_DESC texDesc ={};
-				texDesc.Width     = desc._dimensions[0];
-				texDesc.Height    = desc._dimensions[1];
-				texDesc.Depth     = desc._dimensions[2];
-				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc._textureFormat);
-				texDesc.MipLevels = (desc._mipMap._useMipMaps ? desc._mipMap._mipLevels : 1);
-				// Invalid for 3D: texDesc.ArraySize = (desc._array._isTextureArray ? desc._array._textureCount : 1);
-				texDesc.Usage     = DX11DeviceCapsHelper::convertResourceUsageGAPI2D3D11(desc._cpuGpuUsage);
-				texDesc.BindFlags = DX11DeviceCapsHelper::convertBufferBindingGAPI2D3D11(desc._gpuBinding);
+				texDesc.Width     = desc.dimensionNb[0];
+				texDesc.Height    = desc.dimensionNb[1];
+				texDesc.Depth     = desc.dimensionNb[2];
+				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
+				texDesc.MipLevels = (desc.mipMap.useMipMaps ? desc.mipMap.mipLevels : 1);
+				// Invalid for 3D: texDesc.ArraySize = (desc.array.isTextureArray ? desc.array.textureCount : 1);
+				texDesc.Usage     = DX11DeviceCapsHelper::convertResourceUsageGAPI2D3D11(desc.cpuGpuUsage);
+				texDesc.BindFlags = DX11DeviceCapsHelper::convertBufferBindingGAPI2D3D11(desc.gpuBinding);
 				// Additional flags
 				texDesc.CPUAccessFlags = 0;
 				texDesc.MiscFlags      = 0;

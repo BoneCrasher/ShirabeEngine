@@ -5,10 +5,10 @@
 #include "Log/Log.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/ResourceBuilder.h"
 #include "Resources/Types/RenderTarget.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
+#include "Resources/DirectX/DX11/DX11BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -19,34 +19,35 @@ namespace Engine {
 			EEngineStatus createRenderTargetView (
 				const ID3D11DevicePtr        &device,
 				const RenderTargetDescriptor &desc,
-				ID3D11ResourcePtr            &sourceResource,
+				IUnknownPtr                  &sourceResource,
 				ID3D11RenderTargetViewPtr    &outRTV
 			);
 
 
 			class DX11RenderTargetResourceBuilder
-				: public ResourceBuilderBase<ID3D11Device, EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW, ID3D11RenderTargetViewPtr>
+				: public DX11ResourceBuilderBase<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW, IUnknownPtr>
 			{
 				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
-					typename traits_type::TGAPIDevicePtr        &gapiDevice,
 					typename const traits_type::descriptor_type &descriptor,
-					typename traits_type::resource_type_ptr     &outResource,
-					ID3D11ResourcePtr                           &inSourceResource)
+					gfxapi_parameter_struct_type                &gfxapiParams,
+					built_resource_map                          &outResources,
+					IUnknownPtr                                 &inSourceResource)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
-					ID3D11RenderTargetViewPtr pRTV           = nullptr;
+					ID3D11RenderTargetViewPtr pRTV = nullptr;
 
-					status = DX::_11::createRenderTargetView(gapiDevice, descriptor, inSourceResource, pRTV);
+					status = DX::_11::createRenderTargetView(gfxapiParams.device, descriptor, inSourceResource, pRTV);
 					if (CheckEngineError(status)) {
 						Log::Error(logTag(), String::format("Cannot create RenderTargetView internal resource for descriptor: %s", descriptor.toString().c_str()));
 					}
 					else {
 						// What to pass to the texND to encapsulate the internal handle and resource? How to recreated it?
-						outResource = std::move(pRTV);
+						ResourceHandle p(descriptor.name, resource_type, resource_subtype);
+						outResources[p] = pRTV;
 					}
 
 					return status;

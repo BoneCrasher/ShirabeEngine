@@ -193,6 +193,7 @@
     <ClCompile Include="code\source\ECWS\Entity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="code\Header.h" />
     <ClInclude Include="code\include\Benchmarking\Timer\CallbackTimer.h" />
     <ClInclude Include="code\include\Benchmarking\Timer\ITimespan.h" />
     <ClInclude Include="code\include\Benchmarking\MeasurementChunk.h" />
@@ -253,12 +254,14 @@
     <ClInclude Include="code\include\Renderer\GAPIDeviceCapabilities.h" />
     <ClInclude Include="code\include\Renderer\IRenderer.h" />
     <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
+    <ClInclude Include="code\include\Resources\DirectX\DX11\DX11BuilderBase.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11RenderTargetViewBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11ResourceManager.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11ShaderResourceViewBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11SwapChainBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11TextureNDBuilder.h" />
     <ClInclude Include="code\include\Resources\System\Core\EResourceType.h" />
+    <ClInclude Include="code\include\Resources\System\Core\IResourceProxy.h" />
     <ClInclude Include="code\include\Resources\System\GFXAPI\GFXAPI.h" />
     <ClInclude Include="code\include\Resources\System\Core\Handle.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResource.h" />
@@ -277,6 +280,7 @@
     <ClInclude Include="code\include\Resources\Types\SwapChain.h" />
     <ClInclude Include="code\include\Resources\Types\TextureND.h" />
     <ClInclude Include="code\include\Resources\Types\Device.h" />
+    <ClInclude Include="code\include\Threading\Looper.h" />
     <ClInclude Include="code\include\Window\IWindowFactory.h" />
     <ClInclude Include="code\include\Compiler\MSVCWarnings.h" />
     <ClInclude Include="code\include\Core\BasicTypes.h" />

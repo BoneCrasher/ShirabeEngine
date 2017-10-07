@@ -1,11 +1,14 @@
 #ifndef __SHIRABE_ENGINETYPEHELPER_H__
 #define __SHIRABE_ENGINETYPEHELPER_H__
 
+#include <any>
 #include <memory>
 #include <functional>
 #include <vector>
 
 namespace Engine {
+
+
 	template <typename T>
 	using Ptr = std::shared_ptr<T>;
 
@@ -136,14 +139,14 @@ namespace Engine {
 	         using prefix##List = std::vector<std::shared_ptr<type>>;
 
 
-#define DenyCopyAndMove(type, alias)              \
+	#define DenyCopyAndMove(type, alias)              \
 		type(const alias&)              = delete; \
 		type(alias&&)                   = delete; \
 		alias& operator =(const alias&) = delete; \
 		alias& operator =(alias&&)      = delete; 
 
 	#define DeclareInterface(name)           \
-    class name {                             \
+		class name {                         \
             public:                          \
                 virtual ~name() = default;   \
                                              \
@@ -162,6 +165,17 @@ namespace Engine {
                 DenyCopyAndMove(name, alias);                 \
             protected:                                  	  \
                 name() = default;                       	  \
+            public:
+
+	#define DeclareDerivedInterface(name, base) \
+		class name 								\
+	        : public base {                     \
+            public:                             \
+                virtual ~name() = default;      \
+                                                \
+                DenyCopyAndMove(name, name);    \
+            protected:                          \
+                name() = default;               \
             public:
 
 	#define DeclareInterfaceEnd(name) };

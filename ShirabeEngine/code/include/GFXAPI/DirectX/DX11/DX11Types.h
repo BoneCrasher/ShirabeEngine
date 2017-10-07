@@ -36,6 +36,28 @@ namespace Engine {
 			DeclareSharedPointerType(ID3D11RasterizerState);
 			DeclareSharedPointerType(ID3D11BlendState);
 
+			DeclareListType(IUnknownPtr,                  IUnknown);
+			DeclareListType(ID3D11DevicePtr,              ID3D11Device);
+			DeclareListType(ID3D11DeviceContextPtr,       ID3D11DeviceContext);
+			DeclareListType(IDXGISwapChainPtr,            IDXGISwapChain);
+			DeclareListType(ID3D11Texture1DPtr,           ID3D11Texture1D);
+			DeclareListType(ID3D11Texture2DPtr,           ID3D11Texture2D);
+			DeclareListType(ID3D11Texture3DPtr,           ID3D11Texture3D);
+			DeclareListType(ID3D11VertexShaderPtr,        ID3D11VertexShader);
+			DeclareListType(ID3D11HullShaderPtr,          ID3D11HullShader);
+			DeclareListType(ID3D11DomainShaderPtr,        ID3D11DomainShader);
+			DeclareListType(ID3D11GeometryShaderPtr,      ID3D11GeometryShader);
+			DeclareListType(ID3D11PixelShaderPtr,         ID3D11PixelShader);
+			DeclareListType(ID3D11ComputeShaderPtr,       ID3D11ComputeShader);
+			DeclareListType(ID3D11BufferPtr,              ID3D11Buffer);
+			DeclareListType(ID3D11RenderTargetViewPtr,    ID3D11RenderTargetView);
+			DeclareListType(ID3D11ShaderResourceViewPtr,  ID3D11ShaderResourceView);
+			DeclareListType(ID3D11DepthStencilViewPtr,    ID3D11DepthStencilView);
+			DeclareListType(ID3D11UnorderedAccessViewPtr, ID3D11UnorderedAccessView);
+			DeclareListType(ID3D11DepthStencilStatePtr,   ID3D11DepthStencilState);
+			DeclareListType(ID3D11RasterizerStatePtr,     ID3D11RasterizerState);
+			DeclareListType(ID3D11BlendStatePtr,          ID3D11BlendState);
+
 		#define DeclareDxType(_type, _subtype, _dxresource)      \
 			template <>											 \
 			struct DetermineDXResourceType < _type, _subtype > { \

@@ -14,26 +14,37 @@ namespace Engine {
 	namespace Resources {	
 		using namespace GFXAPI;
 
+		/**********************************************************************************************//**
+		 * \struct	SwapChainDescriptorImpl
+		 *
+		 * \brief	Implementation of the SwapChainDescriptor wrapper.
+		 **************************************************************************************************/
 		struct SwapChainDescriptorImpl {
-			std::string              _name;
-			TextureDescriptorImpl<2> _texture;
-			bool                     _vsyncEnabled;
-			bool                     _fullscreen;
-			unsigned int             _windowHandle;
-			unsigned int             _backBufferCount;
-			unsigned int             _refreshRateNumerator;
-			unsigned int             _refreshRateDenominator;
+			std::string              name;
+			TextureDescriptorImpl<2> texture;
+			bool                     vsyncEnabled;
+			bool                     fullscreen;
+			unsigned int             windowHandle;
+			unsigned int             backBufferCount;
+			unsigned int             refreshRateNumerator;
+			unsigned int             refreshRateDenominator;
 
 			std::string toString() const {
 				std::stringstream ss;
 
 				ss
-					<< "SwapChainDescriptor ('" << _name << "'): ";
+					<< "SwapChainDescriptor ('" << name << "'): ";
 
 				return ss.str();
 			}
 		};
 
+		/**********************************************************************************************//**
+		 * \struct	ResourceDescriptor<EResourceType::GAPI_COMPONENT,EResourceSubType::SWAP_CHAIN>
+		 *
+		 * \brief	Make the SwapChainDescriptorImpl accessible with the resource descriptor 
+		 * 			wrappers.
+		 **************************************************************************************************/
 		template <>
 		struct ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
 			: public SwapChainDescriptorImpl
@@ -42,18 +53,14 @@ namespace Engine {
 		};
 		typedef ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN> SwapChainDescriptor;
 
-		/**********************************************************************************************//**
-		 * \class	SwapChainDescriptorAdapterBase
-		 *
-		 * \brief	A swap chain descriptor adapter base.
-		 **************************************************************************************************/
-		class SwapChainDescriptorAdapterBase {		
+		template <EResourceType type, EResourceSubType subtype>
+		class ResourceDescriptorAdapterBase {
 		public:
 			typedef
-				typename ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>::type
+				typename ResourceDescriptor<type, subtype>::type
 				descriptor_type;
 
-			inline SwapChainDescriptorAdapterBase(
+			inline ResourceDescriptorAdapterBase(
 				const descriptor_type& descriptor
 			) : _descriptor(descriptor)
 			{}
@@ -64,6 +71,19 @@ namespace Engine {
 
 		private:
 			descriptor_type _descriptor;
+		};
+
+		/**********************************************************************************************//**
+		 * \class	SwapChainDescriptorAdapterBase
+		 *
+		 * \brief	Descriptor 
+		 **************************************************************************************************/
+		class SwapChainDescriptorAdapterBase 
+			: public ResourceDescriptorAdapterBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
+		{		
+		public:
+			
+
 		};
 
 		/**********************************************************************************************//**

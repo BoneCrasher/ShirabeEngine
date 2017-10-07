@@ -39,7 +39,7 @@ namespace Engine {
 		 *
 		 * \return	In as a std::wstring.
 		 **************************************************************************************************/
-		static std::wstring toWideString(const std::string& in);
+		//static std::wstring toWideString(const std::string& in);
 
 		/**********************************************************************************************//**
 		 * \fn	static std::string String::toNarrowString(const std::wstring& in);
@@ -51,7 +51,19 @@ namespace Engine {
 		 *
 		 * \return	In as a std::string.
 		 **************************************************************************************************/
-		static std::string  toNarrowString(const std::wstring& in);
+		//static std::string  toNarrowString(const std::wstring& in);
+
+		static std::wstring String::toWideString(const std::string& in) {
+			std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
+			std::wstring wide = converter.from_bytes(in);
+			return wide;
+		}
+
+		static std::string String::toNarrowString(const std::wstring& in) {
+			std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
+			std::string narrow = converter.to_bytes(in);
+			return narrow;
+		}
 
 	private:
 		template <typename TArg, typename enable = void>

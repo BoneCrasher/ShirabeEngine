@@ -30,6 +30,34 @@ namespace Engine {
 		static inline std::ostream& operator <<(std::ostream& s, const ResourceDescriptor<type, subtype>& d) {
 			return (s << d.toString());
 		}
+
+		/**********************************************************************************************//**
+		 * \class	ResourceDescriptorAdapterBase
+		 *
+		 * \brief	A resource descriptor adapter base.
+		 *
+		 * \tparam	type   	Type of the type.
+		 * \tparam	subtype	Type of the subtype.
+		 **************************************************************************************************/
+		template <EResourceType type, EResourceSubType subtype>
+		class ResourceDescriptorAdapterBase {
+		public:
+			typedef
+				typename ResourceDescriptor<type, subtype>::type
+				descriptor_type;
+
+			inline ResourceDescriptorAdapterBase(
+				const descriptor_type& descriptor
+			) : _descriptor(descriptor)
+			{}
+
+			inline const descriptor_type&
+				descriptor() const { return _descriptor; }
+
+
+		private:
+			descriptor_type _descriptor;
+		};
 	}
 }
 
