@@ -13,6 +13,18 @@
 namespace Engine {
 	namespace Resources {
 
+		/**********************************************************************************************//**
+		 * \fn	template <typename K, typename V> static bool __extractKeys(const std::map<K, V>& map, std::vector<K>& outKeys)
+		 *
+		 * \brief	Extracts the keys
+		 *
+		 * \tparam	K	Generic type parameter.
+		 * \tparam	V	Generic type parameter.
+		 * \param 		  	map	   	The map.
+		 * \param [in,out]	outKeys	The out keys.
+		 *
+		 * \return	True if it succeeds, false if it fails.
+		 **************************************************************************************************/
 		template <typename K, typename V>
 		static bool __extractKeys(const std::map<K, V>& map, std::vector<K>& outKeys) {
 			struct FetchKey
@@ -30,6 +42,18 @@ namespace Engine {
 			return true;
 		}
 
+		/**********************************************************************************************//**
+		 * \fn	template <typename K, typename V> static bool __extractValues(const std::map<K, V>& map, std::vector<V>& outValues)
+		 *
+		 * \brief	Extracts the values
+		 *
+		 * \tparam	K	Generic type parameter.
+		 * \tparam	V	Generic type parameter.
+		 * \param 		  	map		 	The map.
+		 * \param [in,out]	outValues	The out values.
+		 *
+		 * \return	True if it succeeds, false if it fails.
+		 **************************************************************************************************/
 		template <typename K, typename V>
 		static bool __extractValues(const std::map<K, V>& map, std::vector<V>& outValues) {
 			struct FetchValue
@@ -47,10 +71,25 @@ namespace Engine {
 			return true;
 		}
 
+		/**********************************************************************************************//**
+		 * \class	ProxyBasedResourceManager
+		 *
+		 * \brief	Manager for proxy based resources.
+		 **************************************************************************************************/
 		class ProxyBasedResourceManager
 			: public IResourceManager {
 			DeclareLogTag(ProxyBasedResourceManager);
 
+			/**********************************************************************************************//**
+			 * \fn	bool ProxyBasedResourceManager::loadDependenciesRecursively(const IResourceProxyBasePtr& base, ResourceProxyMap& outDependencies)
+			 *
+			 * \brief	Loads dependencies recursively
+			 *
+			 * \param 		  	base		   	The base.
+			 * \param [in,out]	outDependencies	The out dependencies.
+			 *
+			 * \return	True if it succeeds, false if it fails.
+			 **************************************************************************************************/
 			bool loadDependenciesRecursively(const IResourceProxyBasePtr& base, ResourceProxyMap& outDependencies) {
 				bool result = true;
 
@@ -126,12 +165,13 @@ namespace Engine {
 			}
 
 			/**********************************************************************************************//**
-			 * \fn	EEngineStatus DX11ResourceManager::proxyLoad(const Ptr<AnyProxy>& proxy)
+			 * \fn	EEngineStatus ProxyBasedResourceManager::proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy)
 			 *
-			 * \brief	Load dependencies and root of resource tree.
-			 * 			This function only deals with root elements of a resource-tree.
+			 * \brief	Load dependencies and root of resource tree. This function only deals with root
+			 * 			elements of a resource-tree.
 			 *
-			 * \param	proxy	The proxy.
+			 * \param	handle	The handle.
+			 * \param	proxy 	The proxy.
 			 *
 			 * \return	The EEngineStatus.
 			 **************************************************************************************************/
@@ -199,21 +239,21 @@ namespace Engine {
 
 				return EEngineStatus::Ok;
 			}
+
 			/**********************************************************************************************//**
-			 * \fn	template < typename TBuilder, typename... TAdditionalArgs > EEngineStatus DX11ResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, ResourceHandle &outHandle, TAdditionalArgs&&... args )
+			 * \fn	template <typename TBuilder> EEngineStatus ProxyBasedResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, bool creationDeferred, Ptr<typename TBuilder::proxy> &outProxy, std::vector<ResourceHandle> &outHandles )
 			 *
-			 * \brief	Unified algorithm to invoke a specific builder and store the data in the respective storage.
+			 * \brief	Unified algorithm to invoke a specific builder and store the data in the respective
+			 * 			storage.
 			 *
-			 * \remarks Any manageable dx-resource inherits IUnknown, specifying the signature of AddRef & Release.
-			 * 			Since this is the only effective common denominator for, use this for storage.
-			 *
-			 * \tparam	TBuilder	   	Type of the builder.
-			 * \tparam	TAdditionalArgs	Type of the additional arguments.
-			 * \param 		  	desc	 	The description.
-			 * \param [in,out]	outHandle	Handle of the out.
-			 * \param 		  	args	 	Variable arguments providing [in,out] The arguments.
+			 * \tparam	TBuilder	Type of the builder.
+			 * \param 		  	desc				The description.
+			 * \param 		  	creationDeferred	Handle of the out.
+			 * \param [in,out]	outProxy			Variable arguments providing  The arguments.
+			 * \param [in,out]	outHandles			The out handles.
 			 *
 			 * \return	The new resource.
+			 *
 			 **************************************************************************************************/
 			template <typename TBuilder>
 			EEngineStatus createResource(
@@ -265,19 +305,23 @@ namespace Engine {
 
 
 		public:
-			ProxyBasedResourceManager();
-			~ProxyBasedResourceManager();
+			ProxyBasedResourceManager()  = default;
+			~ProxyBasedResourceManager() = default;
 
 		private:
-			AnyProxy getResourceProxy(const ResourceHandle& handle);
+			inline AnyProxy getResourceProxy(const ResourceHandle& handle) {
+				return _resources->getResource(handle);
+			}
 
-			bool storeResourceProxy(
+			inline bool storeResourceProxy(
 				const ResourceHandle &handle,
-				const AnyProxy       &proxy) {
+				const AnyProxy       &proxy) 
+			{
 				return _resources->addResource(handle, proxy);
 			}
 
-			// Any kind of textures required...
+			// Any kind of resources. 
+			// TODO: Implement resourcepool using anyproxy.
 			IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> _resources;
 		};
 		DeclareSharedPointerType(ProxyBasedResourceManager);

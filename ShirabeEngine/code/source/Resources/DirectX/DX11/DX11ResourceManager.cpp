@@ -29,6 +29,16 @@ namespace Engine {
 				// TODO: The createResource-Function has to output
 				//       all non-internal resources created.
 				//       This is especially important for SRV's and RTV's.
+				// OTHER:
+				//  The proxies used will then implement loading the resources using 
+				//  the resource thread.
+				//  Although the proxy signature is inherently threading-capable, 
+				//  the specific means using the Looper, Runnables and future/promise
+				//  will be implemented specifically.
+				//  Options:
+				//    --> A) Create a derived class from handler and implement the process-function
+				//    --> B) Make handler accept pointer to function with params.
+				//    Check if handlers are copyable properly...
 				return createResource<DX11Texture1DResourceBuilder>(
 						desc,
 						false,

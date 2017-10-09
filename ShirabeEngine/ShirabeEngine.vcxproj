@@ -260,6 +260,7 @@
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11ShaderResourceViewBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11SwapChainBuilder.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\DX11TextureNDBuilder.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ProxyBasedResourceManager.h" />
     <ClInclude Include="code\include\Resources\System\Core\EResourceType.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResourceProxy.h" />
     <ClInclude Include="code\include\Resources\System\GFXAPI\GFXAPI.h" />
