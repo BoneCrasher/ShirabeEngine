@@ -52,11 +52,11 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <uint8_t N>
 		struct TextureDescriptorImpl {
-			static const uint8_t Dimensions = N;
+			static const uint8_t dimensionNb = N;
 
 			std::string                    name;
 			Format                         textureFormat;
-			VecND<uint32_t, N>             dimensionNb;
+			VecND<uint32_t, N>             dimensions;
 			TextureMipMapDescriptor        mipMap;
 			TextureArrayDescriptor         array;
 			TextureMultisapmlingDescriptor multisampling;

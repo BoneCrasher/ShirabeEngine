@@ -11,9 +11,9 @@
 
 #include "Resources/System/Core/ProxyBasedResourceManager.h"
 
-#include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
-#include "Resources/DirectX/DX11/DX11RenderTargetViewBuilder.h"
-#include "Resources/DirectX/DX11/DX11ShaderResourceViewBuilder.h"
+#include "Resources/DirectX/DX11/Builders/TextureND.h"
+#include "Resources/DirectX/DX11/Builders/RenderTargetView.h"
+#include "Resources/DirectX/DX11/Builders/ShaderResourceView.h"
 
 namespace Engine {
 	namespace DX {

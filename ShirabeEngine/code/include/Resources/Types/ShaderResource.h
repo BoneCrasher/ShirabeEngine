@@ -29,20 +29,37 @@ namespace Engine {
 			Format                  format;
 			ShaderResourceDimension srvType;
 
-			union {
-				struct {
+			union ShaderResourceDimension {
+				struct Texture {
 					unsigned int            dimensionNb; // 1..3
-					unsigned int            dimensions[3];
+				    VecND<uint32_t, 3>      dimensions;
 					bool                    isCube; // Implies the dimensions[2] to be 6
 					TextureArrayDescriptor  array;
 					TextureMipMapDescriptor mipMap;
+
+					inline Texture()
+						: dimensionNb(0)
+						, dimensions({ 0, 0, 0 })
+						, isCube(false)
+						, array()
+						, mipMap()
+					{}
 				} texture;
 
-				struct {
+				struct StructuredBuffer {
 					unsigned int firstElementOffset;
 					unsigned int elementWidthInBytes;
+
+					inline StructuredBuffer()
+						: firstElementOffset(0)
+						, elementWidthInBytes(0)
+					{}
 				} structuredBuffer;
 
+				inline ShaderResourceDimension()
+					: texture()
+					, structuredBuffer()
+				{}
 			} shaderResourceDimension;
 
 			ShaderResourceDescriptorImpl()
@@ -59,8 +76,8 @@ namespace Engine {
 
 				if( srvType == ShaderResourceDimension::Texture ) {
 					ss 
-						<< " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb               << "\n,"
-						<< " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size       << "\n,"
+						<< " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb              << "\n,"
+						<< " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size               << "\n,"
 						<< " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice    << "\n,"
 						<< " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels         << "\n,"
 						<< " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel  << ";";
@@ -108,7 +125,7 @@ namespace Engine {
 				descriptor() const { return _descriptor; }
 
 			inline const Format&
-				format() const { return _descriptor.shaderResourceDimension.texture.textureFormat; }
+				format() const { return _descriptor.format; }
 
 		private:
 			descriptor_type _descriptor;

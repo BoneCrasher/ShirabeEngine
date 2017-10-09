@@ -104,6 +104,8 @@ namespace Engine {
 				ResourceHandleList dependecyHandles = base->dependencies();
 				if( !dependecyHandles.empty() ) {
 					for( const ResourceHandle& resourceHandle : dependecyHandles ) {
+						// The reason all proxies have to be created by the proxy-creator and 
+						// stored before this function call, can be seen below:
 						AnyProxy dependencyProxy = getResourceProxy(resourceHandle);
 						if( !dependencyProxy.has_value() ) {
 							// Even if we dealt with an internal resource not to be 
@@ -116,7 +118,7 @@ namespace Engine {
 
 						IResourceProxyBasePtr dependencyBase = BaseProxyCast(dependencyProxy);
 						if( !dependencyBase ) {
-
+							// MBT TODO: How to handle this case?
 						}
 
 						// Do we even hav to load the resource? If the resource type is internal, there won't 
@@ -136,28 +138,23 @@ namespace Engine {
 							break;
 						}
 
-						// TODO: Consider having each call of 'loadDependenciesRecursively' 
-						//       use its own map, until everything was loaded successfully.
-						//       Finally, merge.
-						//       
-						//       This is due to the loadSync function not requiring any previous dependencies in the maps.
 						if( !dependencyBase->loadSync(resourceHandle, inDependencies) ) {
 							Log::Error(logTag(), String::format("Failed to load resource of proxy."));
 							result |= false;
 							break;
 						}
-						else {
-							if( dependencyBase->loadState() != ELoadState::LOADED ) {
-								std::string msg = "CRITICAL LOGIC ERROR: Resource should be loaded successfully "
-									"at this point, but isn't or state is not updated properly.";
-								Log::WTF(logTag(), String::format(msg));
-								break;
-							}
 
-							// Yay... Finally store the thing... (and it's dependencies as they need be persisted, too)!
-							outDependencies.insert(inDependencies.begin(), inDependencies.end());
-							outDependencies[resourceHandle] = dependencyProxy;
+						if( dependencyBase->loadState() != ELoadState::LOADED ) {
+							std::string msg =
+								"CRITICAL LOGIC ERROR: Resource should be loaded successfully "
+								"at this point, but isn't or state is not updated properly.";
+							Log::WTF(logTag(), String::format(msg));
+							break;
 						}
+
+						// Yay... Finally store the thing... (and it's dependencies as they need be persisted, too)!
+						outDependencies.insert(inDependencies.begin(), inDependencies.end());
+						outDependencies[resourceHandle] = dependencyProxy;						
 					}
 				}
 
@@ -175,10 +172,14 @@ namespace Engine {
 			 *
 			 * \return	The EEngineStatus.
 			 **************************************************************************************************/
-			EEngineStatus proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy) {
+			EEngineStatus proxyLoad(const ResourceHandle& handle) {
 				EEngineStatus status = EEngineStatus::Ok;
 
-				IResourceProxyBasePtr base = BaseProxyCast(proxy);
+				AnyProxy root = getResourceProxy(handle);
+				if( !root.has_value() )
+					return EEngineStatus::ResourceManager_RootProxyFetchFailed;
+
+				IResourceProxyBasePtr base = BaseProxyCast(root);
 				if( !base ) {
 					return EEngineStatus::ResourceManager_BaseProxyCastFailed;
 				}
@@ -221,20 +222,10 @@ namespace Engine {
 					return EEngineStatus::ResourceManager_DependencyLoadFailed;
 				}
 
+				// Finally load the root resource
 				if( !base->loadSync(handle, dependencyResources) ) {
 					Log::Error(logTag(), "Failed to load underlying resource of resource proxy.");
 					return EEngineStatus::ResourceManager_ResourceLoadFailed;
-				}
-				else {
-					// If successful create a handle for the resource and store it in the respective manager 
-					// evaluated using the resource-type.
-					for( const ResourceProxyMap::value_type& r : builtResources ) {
-						if( !storeResourceProxy(r.first, r.second) ) {
-							Log::Error(logTag(), "Failed to store resource.");
-							// TODO: Release madness
-						}
-					}
-
 				}
 
 				return EEngineStatus::Ok;
@@ -259,8 +250,8 @@ namespace Engine {
 			EEngineStatus createResource(
 				const typename TBuilder::traits_type::descriptor_type &desc,
 				bool                                                   creationDeferred,
-				Ptr<typename TBuilder::proxy>                         &outProxy,
-				std::vector<ResourceHandle>                           &outHandles
+				ResourceProxyList                                     &outProxiesCreated,
+				ResourceHandleList                                    &outHandlesCreated
 			) {
 				EEngineStatus status = EEngineStatus::Ok;
 
@@ -272,29 +263,33 @@ namespace Engine {
 				// Create a resource proxy, which serves as a handle to the effective
 				// underlying resource.
 				//
-				// The proxy will be responsible for persisting the descriptor,
-				// enqueue creation tasks in the resource thread and maintain 
-				// the resource load state.
-				Ptr<proxy_type> proxy = ProxyCreator<resource_type, resource_subtype>::create(desc);
-				if( !proxy ) {
-					Log::Error(logTag(), "Unable to create proxy.");
+				// The proxy will be responsible for:
+				// - persisting the descriptor,
+				// - create proxies and hierarchy for the required resource strucutre
+				// - enqueue creation tasks in the resource thread to load 
+				//   underlying resource 
+				// - maintain the resource load state.
+				// 
+				ResourceProxyMap outProxies;
+				// ResourceHierarchyNode outResourceHierarchy;
+
+				ResourceHandle rootProxyHandle = ProxyCreator<resource_type, resource_subtype>::create(desc, outProxies/*, outResourceHierarchy*/);
+				if( !rootProxyHandle.valid() ) {
+					Log::Error(logTag(), "Unable to create root resource proxy.");
 					return EEngineStatus::ResourceManager_ProxyCreationFailed;
 				}
 
-				// Store whatever proxy in "AnyProxy (:= std::any)" and access using 
-				// BaseProxyCast(anyProxy) or AnyProxyCast<TProxy>(anyProxy).
-				AnyProxy typeErasedProxy = AnyProxy(proxy);
-
-				// Create handle and store
-				ResourceHandle handle(desc.name, resource_type, resource_subtype);
-				if( !store(handle, proxy) ) {
-					Log::Error(logTag(), "Unable to store newly created proxy.");
-					return EEngineStatus::ResourceManager_ProxyStoreFailed;
+				// Store all depdency proxies as well as the root proxy itself
+				for( const ResourceProxyMap::value_type& r : outProxies ) {
+					if( !storeResourceProxy(r.first, r.second) ) {
+						Log::Error(logTag(), "Failed to store resource proxy.");
+						// TODO: Release madness
+					}
 				}
 
 				// If creation is not deferred, immediately load the resources using the proxy.
 				if( !creationDeferred ) {
-					if( CheckEngineError((status = proxyLoad(handle, proxy))) ) {
+					if( CheckEngineError((status = proxyLoad(rootProxyHandle))) ) {
 						Log::Error(logTag(), "Failed to load resources using proxy.");
 						return EEngineStatus::ResourceManager_ProxyLoadFailed;
 					}
@@ -302,8 +297,7 @@ namespace Engine {
 
 				return status;
 			}
-
-
+			
 		public:
 			ProxyBasedResourceManager()  = default;
 			~ProxyBasedResourceManager() = default;
@@ -320,8 +314,7 @@ namespace Engine {
 				return _resources->addResource(handle, proxy);
 			}
 
-			// Any kind of resources. 
-			// TODO: Implement resourcepool using anyproxy.
+			// Any kind of resources, abstracted away entirely.
 			IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> _resources;
 		};
 		DeclareSharedPointerType(ProxyBasedResourceManager);

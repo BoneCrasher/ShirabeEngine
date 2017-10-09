@@ -25,9 +25,10 @@ namespace Engine {
 		WindowMessageHandlerError                                       =    -251,
 		WindowEventError                                                =    -252,
 		ResourceManager_Generic                                         =   -1000, // ResourceManager
-		ResourceManager_BaseProxyCastFailed                             =   -1050, // ResourceManager::Proxy
-		ResourceManager_DependencyLoadFailed							=   -1051,
-		ResourceManager_ResourceLoadFailed								=   -1052,
+		ResourceManager_RootProxyFetchFailed                            =   -1050,
+		ResourceManager_BaseProxyCastFailed                             =   -1051, // ResourceManager::Proxy
+		ResourceManager_DependencyLoadFailed							=   -1052,
+		ResourceManager_ResourceLoadFailed								=   -1053,
 		GAPI_Generic                                                    =  -50000, // GAPI
 		GAPI_NoPrimaryAdapter                                           =  -50001,
 		GAPI_NoPrimaryAdapterOutputs                                    =  -50002,

@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_DX11RENDERTARGETVIEWBUILDER_H__
-#define __SHIRABE_DX11RENDERTARGETVIEWBUILDER_H__
+#ifndef __SHIRABE_RenderTargetViewBuilder_H__
+#define __SHIRABE_RenderTargetViewBuilder_H__
 
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
@@ -8,7 +8,7 @@
 #include "Resources/Types/RenderTarget.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/DX11BuilderBase.h"
+#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
 
 namespace Engine {
 	namespace DX {

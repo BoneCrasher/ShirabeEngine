@@ -9,7 +9,7 @@
 #include "Resources/Types/ShaderResource.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/DX11BuilderBase.h"
+#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
 
 namespace Engine {
 	namespace DX {

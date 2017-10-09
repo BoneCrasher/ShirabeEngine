@@ -58,12 +58,25 @@ namespace Engine {
 			this->operator=<U>(other);
 		}
 
+		template <typename U, std::size_t NU>
+		inline VecND(const VecND<U, NU>& other) {
+			this->operator=<U, NU>(other);
+		}
+
 		template <typename U>
 		inline VecND<T, N>& operator =(const VecND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, N>& other) {
 			_values.assign(0);
 			std::copy(other.values().begin(), other.values().end(), _values.begin());
 			return *this;
 		}
+		
+		template <typename U, std::size_t NU>
+			inline VecND<T, N>& operator =(const VecND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, NU>& other) {
+			_values.assign(0);
+			std::copy(other.values().begin(), other.values().begin() + (std::min(N, NU)), _values.begin());
+			return *this;
+		}
+
 
 		inline const T& operator[](const std::size_t& index) const { if (index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return _values[index]; }
 		inline       T& operator[](const std::size_t& index)       { if (index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return _values[index]; }

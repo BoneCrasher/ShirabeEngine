@@ -3,6 +3,7 @@
 
 #include <any>
 #include <map>
+#include <vector>
 
 #include "Core/EngineTypeHelper.h"
 #include "Resources/System/Core/EResourceType.h"
@@ -22,6 +23,9 @@ namespace Engine {
 			: public std::any
 		{ };
 
+		using ResourceProxyList = std::vector<AnyProxy>;
+		using ResourceProxyMap  = std::map<ResourceHandle, AnyProxy>;
+
 		/**********************************************************************************************//**
 		 * \class	ProxyCreator
 		 *
@@ -32,12 +36,14 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <EResourceType type, EResourceSubType subtype>
 		class ProxyCreator {
-			static Ptr<IResourceProxy<type, subtype>> create(const ResourceDescriptor<type, subtype>& desc) {
+			static ResourceHandle create(
+				const ResourceDescriptor<type, subtype> &desc,
+				ResourceProxyMap                        &outProxies/*,
+				ResourceHierarchyNode                   &outResourceHierarchy*/) 
+			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}
 		};
-
-		using ResourceProxyMap = std::map<ResourceHandle, AnyProxy>;
 
 		/**********************************************************************************************//**
 		 * \enum	EProxyType
@@ -86,8 +92,6 @@ namespace Engine {
 		template <EResourceType type, EResourceSubType subtype>
 		DeclareDerivedInterface(IResourceProxy, IResourceProxyBase);
 
-		virtual bool load(ResourceProxyMap& dependencies, ResourceProxyMap& outResources) = 0;
-		virtual bool unload()                                                             = 0;
 		virtual bool destroy()                                                            = 0;
 
 	private:

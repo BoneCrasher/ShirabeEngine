@@ -2,7 +2,7 @@
 #include "Resources/DirectX/DX11/DX11ResourceManager.h"
 
 #include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
-#include "Resources/DirectX/DX11/DX11RenderTargetViewBuilder.h"
+#include "Resources/DirectX/DX11/RenderTargetViewBuilder.h"
 #include "Resources/DirectX/DX11/DX11SwapChainBuilder.h"
 #include "Resources/DirectX/DX11/DX11ShaderResourceBuilder.h"
 

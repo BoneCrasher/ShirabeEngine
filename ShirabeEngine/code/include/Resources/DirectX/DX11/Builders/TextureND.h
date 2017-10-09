@@ -8,13 +8,15 @@
 #include "Resources/Types/TextureND.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/DX11BuilderBase.h"
+#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
 			using namespace Engine::Resources;
 			using namespace GFXAPI;
+
+			
 
 			EEngineStatus createTexture1D (
 				const ID3D11DevicePtr     &device,

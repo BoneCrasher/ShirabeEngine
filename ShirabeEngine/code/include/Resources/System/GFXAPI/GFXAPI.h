@@ -10,6 +10,8 @@
 #include "Core/EngineStatus.h"
 #include "IOC/Observer.h"
 
+#include "Resources/System/Core/IResourceProxy.h"
+
 namespace Engine
 {
 	namespace GFXAPI
@@ -183,37 +185,35 @@ namespace Engine
 			UNAVAILABLE
 		};
 
-		template <typename TResource>
-		using GFXAPIResourcePtr = std::shared_ptr<TResource>;
-
 		/**********************************************************************************************//**
 		 * \class	PlatformResourceProxy
 		 *
 		 * \brief	A platform resource wrapper.
 		 **************************************************************************************************/
+		template <EResourceType type, EResourceSubType subtype>
 		class GFXAPIResourceProxy
-			: public Engine::IOC::Subject<IGFXAPIResourceCallback>
+			: public Engine::Resources::IResourceProxy<type, subtype>
 		{
 		public:
 			inline GFXAPIResourceProxy()
-				: IOC::Subject<IGFXAPIResourceCallback>()
+				: Engine::Resources::IResourceProxy<type, subtype>()
+				, _type(EProxyType::Unknown)
 				, _loadState(ELoadState::UNKNOWN)
+				, _dependencies()
 			{
 			}
 
-			virtual EEngineStatus load()
-			{
-				return EEngineStatus::Ok;
-			}
-			virtual EEngineStatus unload()
-			{
-				return EEngineStatus::Ok;
-			}
+			inline EProxyType type()      const { return _type;      }
+			inline ELoadState loadState() const { return _loadState; }
 
-			inline ELoadState loadState() const
-			{
-				return _loadState;
-			}
+			inline ResourceHandleList dependencies() const { return _dependencies; }
+
+			bool loadSync(
+				const ResourceHandle  &inHandle,
+				const ResourceProxyMap&inDependencies);
+			bool unloadSync();
+
+			inline bool destroy() { return unloadSync(); }
 
 		protected:
 			inline void setLoadState(const ELoadState& newLoadState) { _loadState = newLoadState; }
@@ -224,12 +224,27 @@ namespace Engine
 			// Nothing to specify, implemented as base-class.
 
 		private:
+			EProxyType _type;
 			ELoadState _loadState;
 
-			GFXAPIResourceHandleList _subresources;
+			ResourceHandleList _dependencies;
 		};
 
+		template <EResourceType type, EResourceSubType subtype>
+		bool GFXAPIResourceProxy<type, subtype>
+			::loadSync(
+				const ResourceHandle  &inHandle,
+				const ResourceProxyMap&inDependencies)
+		{
+			return true;
+		}
 
+		template <EResourceType type, EResourceSubType subtype>
+		bool GFXAPIResourceProxy<type, subtype>
+			::unloadSync()
+		{
+			return true;
+		}
 	}
 }
 

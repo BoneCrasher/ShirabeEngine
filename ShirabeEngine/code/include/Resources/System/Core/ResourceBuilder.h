@@ -81,7 +81,7 @@ namespace Engine {
 		};
 
 		/**********************************************************************************************//**
-		 * \class	ResourceBuilderBase
+		 * \class	ResourceXMMATRIX
 		 *
 		 * \brief	Base-class for any resource builder, encapsulating a traits-class.
 		 *
