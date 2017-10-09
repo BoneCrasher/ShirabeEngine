@@ -25,8 +25,13 @@ namespace Engine {
 				const Texture1DDescriptor &desc,
 				ResourceHandle            &outHandle) 
 			{
+				// NEXT-TASK:
+				// TODO: The createResource-Function has to output
+				//       all non-internal resources created.
+				//       This is especially important for SRV's and RTV's.
 				return createResource<DX11Texture1DResourceBuilder>(
 						desc,
+						false,
 						outHandle
 						);
 			}

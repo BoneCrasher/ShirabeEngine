@@ -37,7 +37,19 @@ namespace Engine {
 			}
 		};
 
-		using ResourceProxyMap = std::map<ResourceHandle, Ptr<AnyProxy>>;
+		using ResourceProxyMap = std::map<ResourceHandle, AnyProxy>;
+
+		/**********************************************************************************************//**
+		 * \enum	EProxyType
+		 *
+		 * \brief	Values that represent proxy types
+		 **************************************************************************************************/
+		enum class EProxyType {
+			Unknown    = 0,
+			Internal,
+			Persistent,
+			Dynamic
+		};
 
 		/**********************************************************************************************//**
 		 * \fn	DeclareInterface(IResourceProxyBase);
@@ -48,7 +60,16 @@ namespace Engine {
 		 **************************************************************************************************/
 		DeclareInterface(IResourceProxyBase);
 
+		virtual EProxyType         type()      const = 0;
+		virtual ELoadState         loadState() const = 0;
+
 		virtual ResourceHandleList dependencies() const = 0;
+
+		virtual bool loadSync(
+			const ResourceHandle  &inHandle, 
+			const ResourceProxyMap&inDependencies) = 0;
+		virtual bool unloadSync() = 0;
+		// TODO: Consider loadAsync returning a future/promise.
 
 		DeclareInterfaceEnd(IResourceProxyBase);
 		DeclareSharedPointerType(IResourceProxyBase);
@@ -66,8 +87,8 @@ namespace Engine {
 		DeclareDerivedInterface(IResourceProxy, IResourceProxyBase);
 
 		virtual bool load(ResourceProxyMap& dependencies, ResourceProxyMap& outResources) = 0;
-		virtual bool unload()                                                   = 0;
-		virtual bool destroy()                                                  = 0;
+		virtual bool unload()                                                             = 0;
+		virtual bool destroy()                                                            = 0;
 
 	private:
 		friend class ProxyCreator<type, subtype>;
