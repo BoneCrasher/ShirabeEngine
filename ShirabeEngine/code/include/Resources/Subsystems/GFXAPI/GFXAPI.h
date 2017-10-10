@@ -10,12 +10,12 @@
 #include "Core/EngineStatus.h"
 #include "IOC/Observer.h"
 
-#include "Resources/System/Core/IResourceProxy.h"
+#include "Resources/System/Core/ResourceSubsystemProxy.h"
 
-namespace Engine
-{
-	namespace GFXAPI
-	{
+namespace Engine {
+	namespace GFXAPI {
+
+		using namespace Engine::Resources;
 
 		/**********************************************************************************************//**
 		 * \typedef	unsigned int GFXAPIResourceHandle_t
@@ -23,28 +23,11 @@ namespace Engine
 		 * \brief	Defines an alias representing the platform resource handle t
 		 **************************************************************************************************/
 		using GFXAPIResourceHandle_t = uint64_t;
+		static const GFXAPIResourceHandle_t GFXAPIUninitializedResourceHandle = 0;
 
 		DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 
-		/**********************************************************************************************//**
-		 * \class	IGFXAPIResourceCallback
-		 *
-		 * \brief	Defines platform resource callback to handle life-cycle and perform events
-		 * 			on load/unload or structure change.
-		 **************************************************************************************************/
-		DeclareInterface(IGFXAPIResourceCallback);
-
-		virtual void onResourceAvailable()   = 0;
-		virtual void onResourceUnavailable() = 0;
-
-		virtual void onLoad()   = 0;
-		virtual void onUnload() = 0;
-
-		virtual void onSubresourceAdded(const GFXAPIResourceHandle_t&)   = 0;
-		virtual void onSubresourceRemoved(const GFXAPIResourceHandle_t&) = 0;
-
-		DeclareInterfaceEnd(IGFXAPIResourceCallback);
-
+		
 	#define DefineStorageCondition(sz)                            \
 		template <typename T>	                                  \
 		struct u##sz##StorageCondition	                          \
@@ -161,9 +144,16 @@ namespace Engine
 			inline const GFXAPIResourceHandle_t& handle() const { return _handle; }
 
 		protected:
-			inline GFXAPIResourceAdapter(const GFXAPIResourceHandle_t& handle)
+			inline GFXAPIResourceAdapter(const GFXAPIResourceHandle_t& handle = GFXAPIUninitializedResourceHandle)
 				: _handle(handle)
 			{ }
+
+		protected:
+			inline bool setHandle(const GFXAPIResourceHandle_t& handle) { 
+				if( _handle > 0 )
+					return false; // Overwrite not allowed!
+				_handle = handle; 
+			}
 
 		private:
 			GFXAPIResourceHandle_t _handle;
@@ -185,6 +175,8 @@ namespace Engine
 			UNAVAILABLE
 		};
 
+		class IGFXAPIResourceSubsystem {};
+
 		/**********************************************************************************************//**
 		 * \class	PlatformResourceProxy
 		 *
@@ -192,50 +184,39 @@ namespace Engine
 		 **************************************************************************************************/
 		template <EResourceType type, EResourceSubType subtype>
 		class GFXAPIResourceProxy
-			: public Engine::Resources::IResourceProxy<type, subtype>
+			: public ResourceSubsystemProxy<IGFXAPIResourceSubsystem, type, subtype>
+			, public GFXAPIResourceAdapter
 		{
 		public:
-			inline GFXAPIResourceProxy()
-				: Engine::Resources::IResourceProxy<type, subtype>()
-				, _type(EProxyType::Unknown)
-				, _loadState(ELoadState::UNKNOWN)
-				, _dependencies()
+			inline GFXAPIResourceProxy(
+				const EProxyType                        &proxyType,
+				const Ptr<IGFXAPIResourceSubsystem>     &subsystem,
+				const ResourceDescriptor<type, subtype> &descriptor)
+				: ResourceSubsystemProxy<IGFXAPIResourceSubsystem, type, subtype>(proxyType, subsystem, descriptor)
+				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
 			{
 			}
 
-			inline EProxyType type()      const { return _type;      }
-			inline ELoadState loadState() const { return _loadState; }
-
-			inline ResourceHandleList dependencies() const { return _dependencies; }
-
 			bool loadSync(
-				const ResourceHandle  &inHandle,
-				const ResourceProxyMap&inDependencies);
+				const ResourceHandle   &inHandle,
+				const ResourceProxyMap &inDependencies);
+
 			bool unloadSync();
 
-			inline bool destroy() { return unloadSync(); }
+			virtual bool bind(
+				const GFXAPIResourceHandle_t &gfxApiHandle,
+				const ResourceProxyMap       &inDependencies) = 0;
 
 		protected:
-			inline void setLoadState(const ELoadState& newLoadState) { _loadState = newLoadState; }
-
-			//
-			// IOC::Subject<IGFXAPIResourceCallback>
-			//
-			// Nothing to specify, implemented as base-class.
-
 		private:
-			EProxyType _type;
-			ELoadState _loadState;
-
-			ResourceHandleList _dependencies;
 		};
 
 		template <EResourceType type, EResourceSubType subtype>
 		bool GFXAPIResourceProxy<type, subtype>
 			::loadSync(
-				const ResourceHandle  &inHandle,
-				const ResourceProxyMap&inDependencies)
-		{
+				const ResourceHandle   &inHandle,
+				const ResourceProxyMap &inDependencies)
+		{			
 			return true;
 		}
 

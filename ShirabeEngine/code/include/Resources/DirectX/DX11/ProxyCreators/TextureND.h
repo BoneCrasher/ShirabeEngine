@@ -10,13 +10,19 @@
 #include "Resources/Types/TextureND.h"
 #include "Resources/Types/ShaderResource.h"
 #include "Resources/Types/RenderTarget.h"
-#include "Resources/Types/DepthStencilView.h"
+// #include "Resources/Types/DepthStencilView.h"
+
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "Resources/DirectX/DX11/ProxyCreators/ShaderResourceView.h"
 #include "Resources/DirectX/DX11/ProxyCreators/RenderTargetView.h"
 
 namespace Engine {
 	namespace Resources {
+
+		using TextureNDSRVProxyPtr = Ptr<IResourceProxy<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>>;
+		using TextureNDRTVProxyPtr = Ptr<IResourceProxy<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>>;
+		using TextureNDDSVProxyPtr = Ptr<IResourceProxy<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>>;
 
 		template <std::size_t N>
 		static bool createTextureNDSRVProxy(
@@ -28,7 +34,9 @@ namespace Engine {
 			const TextureMipMapDescriptor &mipMapDesc,
 			const Format                  &textureFormat,
 			bool                           isCube,
-			ResourceProxyMap              &outProxies)
+			const ResourceHandle          &textureNDProxyHandle,
+			ResourceHandle                &outSRVHandle,
+			TextureNDRTVProxyPtr          &outSRVProxy)
 		{
 			if( (bindFlags.gpuBinding & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderResource) ) {
 				ShaderResourceDescriptor srvDesc;
@@ -40,8 +48,8 @@ namespace Engine {
 				srvDesc.shaderResourceDimension.texture.isCube      = isCube;
 				srvDesc.shaderResourceDimension.texture.mipMap      = mipMapDesc;
 
-				Ptr<IResourceProxy<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>> srvProxy
-					= ProxyCreator<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>::create(srvDesc, outProxies);
+				TextureNDSRVProxyPtr srvProxy
+					= ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>::create(srvDesc, { textureNDProxyHandle }, outProxies);
 
 				if( !srvProxy ) {
 					// TODO: Log
@@ -64,7 +72,9 @@ namespace Engine {
 			const TextureArrayDescriptor  &arrayDesc,
 			const TextureMipMapDescriptor &mipMapDesc,
 			const Format                  &textureFormat,
-			ResourceProxyMap              &outProxies)
+			const ResourceHandle          &textureNDProxyHandle,
+			ResourceHandle                &outRTVHandle,
+			TextureNDRTVProxyPtr          &outRTVProxy)
 		{
 			if( (bindFlags.gpuBinding & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_RenderTarget) ) {
 				RenderTargetDescriptor rtvDesc;
@@ -74,8 +84,8 @@ namespace Engine {
 				rtvDesc.array         = arrayDesc;
 				rtvDesc.mipMap        = mipMapDesc;
 
-				Ptr<IResourceProxy<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>> rtvProxy
-					= ProxyCreator<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>::create(rtvDesc, outProxies);
+				TextureNDRTVProxyPtr rtvProxy
+					= ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>::create(rtvDesc, { textureNDProxyHandle }, outProxies);
 				if( !rtvProxy ) {
 					// TODO: Log
 					return false;
@@ -99,7 +109,9 @@ namespace Engine {
 			const TextureMipMapDescriptor &mipMapDesc,
 			const Format                  &textureFormat,
 			bool                           isCube,
-			ResourceProxyMap              &outProxies)
+			const ResourceHandle          &textureNDProxyHandle,
+			ResourceHandle                &outDSVHandle,       
+			TextureNDDSVProxyPtr          &outDSVProxy )
 		{
 			if( (bindFlags.gpuBinding & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_DepthStencil) ) {
 				DepthStencilViewDescriptor dsvDesc;
@@ -109,8 +121,8 @@ namespace Engine {
 				dsvDesc.array         = arrayDesc;
 				dsvDesc.mipMap        = mipMapDesc;
 
-				Ptr<IResourceProxy<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>> dsvProxy
-					= ProxyCreator<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>::create(dsvDesc, outProxies);
+				TextureNDDSVProxyPtr dsvProxy
+					= ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>::create(dsvDesc, { textureNDProxyHandle }, outProxies);
 				if( !dsvProxy ) {
 					// TODO: Log
 					return false;
@@ -134,7 +146,14 @@ namespace Engine {
 			const TextureMipMapDescriptor &mipMapDesc,
 			const Format                  &textureFormat,
 			bool                           isCube,
-			ResourceProxyMap              &outProxies)
+			const ResourceHandle          &textureNDProxyHandle,
+			ResourceHandle                &outSrvHandle,
+			TextureNDSRVProxyPtr          &outSrvProxy,
+			ResourceHandle                &outRtvHandle,
+			TextureNDRTVProxyPtr          &outRtvProxy,
+			ResourceHandle                &outDsvHandle,
+			TextureNDDSVProxyPtr          &outDsvProxy
+			)
 		{
 			bool result = true;
 
@@ -148,7 +167,9 @@ namespace Engine {
 				mipMapDesc,
 				textureFormat,
 				isCube,
-				outProxies);
+				textureNDProxyHandle,
+				outSrvHandle,
+				outSrvProxy);
 
 			// If the parent resource should be bound as a render target view, create a descriptor and proxy for it.
 			result |= createTextureNDRTVProxy<N>(
@@ -158,7 +179,9 @@ namespace Engine {
 				arrayDesc,
 				mipMapDesc,
 				textureFormat,
-				outProxies);
+				textureNDProxyHandle,
+				outRtvHandle,
+				outRtvProxy);
 
 			// If the parent resource should be bound as a render target view, create a descriptor and proxy for it.
 			result |= createTextureNDDSVProxy<N>(
@@ -170,24 +193,40 @@ namespace Engine {
 				mipMapDesc,
 				textureFormat,
 				isCube,
-				outProxies);
+				textureNDProxyHandle,
+				outDsvHandle,
+				outDsvProxy);
 		}
 		
 		template <>
-		class ProxyCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D> {
+		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>;
 
-			static ResourceHandle create(
-				const Descriptor &desc,
-				ResourceProxyMap &outProxies/*,
+			static bool create(
+				const Ptr<IResourceProxyFactory> &proxyFactory,
+				const Descriptor                 &desc,
+				ResourceHandleList               &inDependencyHandles,
+				ResourceProxyMap                 &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
 			{
 				Texture1DDescriptor t1DDesc = (Texture1DDescriptor)desc;
-				Ptr<GFXAPIProxy> t1DProxy = Ptr<GFXAPIProxy>(new GFXAPIProxy(desc));
+				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>> proxy
+					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>(t1DDesc, inDependencyHandles);
+
+				ResourceHandle handle(t1DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D);
+				outProxies[handle] = AnyProxy(proxy);
+
 
 				bool isCubeMap      = false; // Not possible for 1D textures
 				bool isCubeMapArray = false; // Not possible for 1D textures
+
+				ResourceHandle       srvHandle;
+				TextureNDSRVProxyPtr srvProxy = nullptr;
+				ResourceHandle       rtvHandle;
+				TextureNDRTVProxyPtr rtvProxy = nullptr;
+				ResourceHandle       dsvHandle;
+				TextureNDDSVProxyPtr dsvProxy = nullptr;
 
 				if( !createTextureNDDependerProxies<1>(
 					t1DDesc.name,
@@ -198,28 +237,56 @@ namespace Engine {
 					t1DDesc.mipMap,
 					t1DDesc.textureFormat,
 					isCubeMap,
-					outProxies) )
+					handle,
+					srvHandle,
+					srvProxy,
+					rtvHandle,
+					rtvProxy,
+					dsvHandle,
+					dsvProxy) )
 				{
 				}
+				
+				if( srvProxy )
+					outProxies[srvHandle] = AnyProxy(srvProxy);
+				if( rtvProxy )
+					outProxies[rtvHandle] = AnyProxy(rtvProxy);
+				if( dsvProxy )
+					outProxies[dsvHandle] = AnyProxy(dsvProxy);
 			}
 		};
 
 		template <>
-		class ProxyCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D> {
+		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>;
 
-			static ResourceHandle create(
-				const Descriptor &desc,
-				ResourceProxyMap &outProxies/*,
+			static bool create(
+				const Ptr<IResourceProxyFactory> &proxyFactory,
+				const Descriptor                 &desc,
+				ResourceHandleList               &inDependencyHandles,
+				ResourceProxyMap                 &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
 			{
 				Texture2DDescriptor t2DDesc = (Texture2DDescriptor)desc;
+				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>> proxy
+					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>(t2DDesc, inDependencyHandles);
+
+				ResourceHandle handle(t2DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D);
+				outProxies[handle] = AnyProxy(proxy);
+
 
 				bool isCubeMap      = (t2DDesc.array.isTextureArray && (t2DDesc.array.size % 6) == 0);
 				bool isCubeMapArray = isCubeMap && ((t2DDesc.array.size / 6) > 1);
 
-				if( !createTextureNDDependerProxies<1>(
+				ResourceHandle       srvHandle;
+				TextureNDSRVProxyPtr srvProxy = nullptr;
+				ResourceHandle       rtvHandle;
+				TextureNDRTVProxyPtr rtvProxy = nullptr;
+				ResourceHandle       dsvHandle;
+				TextureNDDSVProxyPtr dsvProxy = nullptr;
+
+				if( !createTextureNDDependerProxies<2>(
 					t2DDesc.name,
 					t2DDesc.gpuBinding,
 					t2DDesc.dimensionNb,
@@ -228,28 +295,56 @@ namespace Engine {
 					t2DDesc.mipMap,
 					t2DDesc.textureFormat,
 					isCubeMap,
-					outProxies) )
+					handle,
+					srvHandle,
+					srvProxy,
+					rtvHandle,
+					rtvProxy,
+					dsvHandle,
+					dsvProxy) )
 				{
 				}
+
+				if( srvProxy )
+					outProxies[srvHandle] = AnyProxy(srvProxy);
+				if( rtvProxy )
+					outProxies[rtvHandle] = AnyProxy(rtvProxy);
+				if( dsvProxy )
+					outProxies[dsvHandle] = AnyProxy(dsvProxy);
 			}
 		};
 
 		template <>
-		class ProxyCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D> {
+		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>;
 
-			static ResourceHandle create(
-				const Descriptor &desc,
-				ResourceProxyMap &outProxies/*,
+			static bool create(
+				const Ptr<IResourceProxyFactory> &proxyFactory,
+				const Descriptor                 &desc,
+				ResourceHandleList               &inDependencyHandles,
+				ResourceProxyMap                 &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
 			{
 				Texture3DDescriptor t3DDesc = (Texture3DDescriptor)desc;
+				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>> proxy
+					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>(t3DDesc, inDependencyHandles);
+
+
+				ResourceHandle handle(t3DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D);
+				outProxies[handle] = AnyProxy(proxy);
 
 				bool isCubeMap      = false; // Not possible for 3D textures
 				bool isCubeMapArray = false; // Not possible for 3D textures
 
-				if( !createTextureNDDependerProxies<1>(
+				ResourceHandle       srvHandle;
+				TextureNDSRVProxyPtr srvProxy = nullptr;
+				ResourceHandle       rtvHandle;
+				TextureNDRTVProxyPtr rtvProxy = nullptr;
+				ResourceHandle       dsvHandle;
+				TextureNDDSVProxyPtr dsvProxy = nullptr;
+
+				if( !createTextureNDDependerProxies<3>(
 					t3DDesc.name,
 					t3DDesc.gpuBinding,
 					t3DDesc.dimensionNb,
@@ -258,9 +353,22 @@ namespace Engine {
 					t3DDesc.mipMap,
 					t3DDesc.textureFormat,
 					isCubeMap,
-					outProxies) )
+					handle,
+					srvHandle,
+					srvProxy,
+					rtvHandle,
+					rtvProxy,
+					dsvHandle,
+					dsvProxy) )
 				{
 				}
+
+				if( srvProxy ) 
+					outProxies[srvHandle] = AnyProxy(srvProxy);
+				if( rtvProxy )
+					outProxies[rtvHandle] = AnyProxy(rtvProxy);
+				if( dsvProxy )
+					outProxies[dsvHandle] = AnyProxy(dsvProxy);
 			}
 		};
 

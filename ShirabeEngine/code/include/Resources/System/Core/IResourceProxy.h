@@ -19,9 +19,7 @@ namespace Engine {
 		 * \brief	The AnyProxy class is basically an std::any to allow any kind of proxy
 		 * 			being provided in a map.
 		 **************************************************************************************************/
-		class AnyProxy
-			: public std::any
-		{ };
+		typedef std::any AnyProxy;
 
 		using ResourceProxyList = std::vector<AnyProxy>;
 		using ResourceProxyMap  = std::map<ResourceHandle, AnyProxy>;
@@ -35,9 +33,11 @@ namespace Engine {
 		 * \tparam	subtype	Type of the subtype.
 		 **************************************************************************************************/
 		template <EResourceType type, EResourceSubType subtype>
-		class ProxyCreator {
-			static ResourceHandle create(
+		class ProxyTreeCreator {
+			static bool create(
+				const Ptr<IResourceProxyFactory>        &proxyFactory,
 				const ResourceDescriptor<type, subtype> &desc,
+				ResourceHandleList                      &inDependencyHandles,
 				ResourceProxyMap                        &outProxies/*,
 				ResourceHierarchyNode                   &outResourceHierarchy*/) 
 			{
@@ -66,16 +66,15 @@ namespace Engine {
 		 **************************************************************************************************/
 		DeclareInterface(IResourceProxyBase);
 
-		virtual EProxyType         type()      const = 0;
-		virtual ELoadState         loadState() const = 0;
+		virtual EProxyType type()      const = 0;
+		virtual ELoadState loadState() const = 0;
 
 		virtual ResourceHandleList dependencies() const = 0;
 
 		virtual bool loadSync(
-			const ResourceHandle  &inHandle, 
-			const ResourceProxyMap&inDependencies) = 0;
+			const ResourceHandle   &inHandle, 
+			const ResourceProxyMap &inDependencies) = 0;
 		virtual bool unloadSync() = 0;
-		// TODO: Consider loadAsync returning a future/promise.
 
 		DeclareInterfaceEnd(IResourceProxyBase);
 		DeclareSharedPointerType(IResourceProxyBase);
@@ -92,7 +91,7 @@ namespace Engine {
 		template <EResourceType type, EResourceSubType subtype>
 		DeclareDerivedInterface(IResourceProxy, IResourceProxyBase);
 
-		virtual bool destroy()                                                            = 0;
+		virtual bool destroy() = 0;
 
 	private:
 		friend class ProxyCreator<type, subtype>;
@@ -132,6 +131,47 @@ namespace Engine {
 		static Ptr<IResourceProxy<type, subtype>> ProxyCast(const AnyProxy& proxy) {
 			return std::any_cast<Ptr<IResourceProxy<type, subtype>>>(proxy);
 		}
+
+
+		template <EResourceType type, EResourceSubType subtype>
+		class GenericProxyBase
+			: public Engine::Resources::IResourceProxy<type, subtype>
+		{
+		public:
+			inline GenericProxyBase(
+				const EProxyType                        &proxyType,
+				const ResourceDescriptor<type, subtype> &descriptor)
+				: Engine::Resources::IResourceProxy<type, subtype>()
+				, _type(proxyType)
+				, _loadState(ELoadState::UNKNOWN)
+				, _descriptor(descriptor)
+				, _dependencies()
+			{
+			}
+
+			inline EProxyType type()      const { return _type; }
+			inline ELoadState loadState() const { return _loadState; }
+
+			inline const ResourceDescriptor<type, subtype>& descriptor()   const { return _descriptor;   }
+			inline const ResourceHandleList&                dependencies() const { return _dependencies; }
+
+			inline bool destroy() { return unloadSync(); }
+
+		protected:
+			inline void setLoadState(const ELoadState& newLoadState) { _loadState = newLoadState; }
+
+			//
+			// IOC::Subject<IGFXAPIResourceCallback>
+			//
+			// Nothing to specify, implemented as base-class.
+
+		private:
+			EProxyType _type;
+			ELoadState _loadState;
+
+			ResourceDescriptor<type, subtype> _descriptor;
+			ResourceHandleList                _dependencies;
+		};
 
 	}
 }

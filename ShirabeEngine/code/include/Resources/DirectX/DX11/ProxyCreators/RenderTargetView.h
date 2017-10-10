@@ -15,7 +15,7 @@ namespace Engine {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>;
 
-			static ResourceHandle create(
+			static bool create(
 				const Descriptor      &desc,
 				ResourceProxyMap      &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
