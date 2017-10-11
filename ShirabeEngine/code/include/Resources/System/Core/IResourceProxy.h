@@ -35,7 +35,7 @@ namespace Engine {
 		template <EResourceType type, EResourceSubType subtype>
 		class ProxyTreeCreator {
 			static bool create(
-				const Ptr<IResourceProxyFactory>        &proxyFactory,
+				const Ptr<ResourceProxyFactory>         &proxyFactory,
 				const ResourceDescriptor<type, subtype> &desc,
 				ResourceHandleList                      &inDependencyHandles,
 				ResourceProxyMap                        &outProxies/*,

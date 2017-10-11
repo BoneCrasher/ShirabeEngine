@@ -6,6 +6,7 @@
 
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/IResourceProxy.h"
+#include "Resources/System/Core/ResourceProxyFactory.h"
 
 #include "Resources/Types/TextureND.h"
 #include "Resources/Types/ShaderResource.h"
@@ -57,7 +58,8 @@ namespace Engine {
 				}
 				else {
 					ResourceHandle handle(srvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW);
-					outProxies[handle] = srvProxy;
+					outSRVHandle = handle;
+					outSRVProxy  = srvProxy;
 				}
 			}
 
@@ -92,7 +94,8 @@ namespace Engine {
 				}
 				else {
 					ResourceHandle handle(rtvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW);
-					outProxies[handle] = rtvProxy;
+					outRTVHandle = handle;
+					outRTVProxy  = rtvProxy;
 				}
 			}
 
@@ -129,7 +132,8 @@ namespace Engine {
 				}
 				else {
 					ResourceHandle handle(dsvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW);
-					outProxies[handle] = dsvProxy;
+					outDSVHandle = handle;
+					outDSVProxy  = dsvProxy;
 				}
 			}
 
@@ -204,15 +208,15 @@ namespace Engine {
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>;
 
 			static bool create(
-				const Ptr<IResourceProxyFactory> &proxyFactory,
-				const Descriptor                 &desc,
-				ResourceHandleList               &inDependencyHandles,
-				ResourceProxyMap                 &outProxies/*,
+				const Ptr<ResourceProxyFactory> &proxyFactory,
+				const Descriptor                &desc,
+				ResourceHandleList              &inDependencyHandles,
+				ResourceProxyMap                &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
 			{
 				Texture1DDescriptor t1DDesc = (Texture1DDescriptor)desc;
 				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>> proxy
-					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>(t1DDesc, inDependencyHandles);
+					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>(EProxyType::Dynamic, t1DDesc, inDependencyHandles);
 
 				ResourceHandle handle(t1DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D);
 				outProxies[handle] = AnyProxy(proxy);
@@ -223,8 +227,10 @@ namespace Engine {
 
 				ResourceHandle       srvHandle;
 				TextureNDSRVProxyPtr srvProxy = nullptr;
+
 				ResourceHandle       rtvHandle;
 				TextureNDRTVProxyPtr rtvProxy = nullptr;
+
 				ResourceHandle       dsvHandle;
 				TextureNDDSVProxyPtr dsvProxy = nullptr;
 
@@ -262,19 +268,18 @@ namespace Engine {
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>;
 
 			static bool create(
-				const Ptr<IResourceProxyFactory> &proxyFactory,
-				const Descriptor                 &desc,
-				ResourceHandleList               &inDependencyHandles,
-				ResourceProxyMap                 &outProxies/*,
+				const Ptr<ResourceProxyFactory> &proxyFactory,
+				const Descriptor                &desc,
+				ResourceHandleList              &inDependencyHandles,
+				ResourceProxyMap                &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
 			{
 				Texture2DDescriptor t2DDesc = (Texture2DDescriptor)desc;
 				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>> proxy
-					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>(t2DDesc, inDependencyHandles);
+					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>(EProxyType::Dynamic, t2DDesc, inDependencyHandles);
 
 				ResourceHandle handle(t2DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D);
 				outProxies[handle] = AnyProxy(proxy);
-
 
 				bool isCubeMap      = (t2DDesc.array.isTextureArray && (t2DDesc.array.size % 6) == 0);
 				bool isCubeMapArray = isCubeMap && ((t2DDesc.array.size / 6) > 1);
@@ -320,16 +325,15 @@ namespace Engine {
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>;
 
 			static bool create(
-				const Ptr<IResourceProxyFactory> &proxyFactory,
-				const Descriptor                 &desc,
-				ResourceHandleList               &inDependencyHandles,
-				ResourceProxyMap                 &outProxies/*,
+				const Ptr<ResourceProxyFactory> &proxyFactory,
+				const Descriptor                &desc,
+				ResourceHandleList              &inDependencyHandles,
+				ResourceProxyMap                &outProxies/*,
 												 ResourceHierarchyNode &outResourceHierarchy*/)
 			{
 				Texture3DDescriptor t3DDesc = (Texture3DDescriptor)desc;
 				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>> proxy
-					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>(t3DDesc, inDependencyHandles);
-
+					= proxyFactory->create<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>(EProxyType::Dynamic, t3DDesc, inDependencyHandles);
 
 				ResourceHandle handle(t3DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D);
 				outProxies[handle] = AnyProxy(proxy);

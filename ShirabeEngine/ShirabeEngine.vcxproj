@@ -263,11 +263,14 @@
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\RenderTargetView.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\ShaderResourceView.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\TextureND.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyBasedResourceManager.h" />
     <ClInclude Include="code\include\Resources\System\Core\EResourceType.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResourceProxy.h" />
-    <ClInclude Include="code\include\Resources\System\GFXAPI\GFXAPI.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPI.h" />
     <ClInclude Include="code\include\Resources\System\Core\Handle.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResource.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResourceDescriptor.h" />

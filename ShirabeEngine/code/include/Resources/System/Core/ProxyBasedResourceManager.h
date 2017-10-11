@@ -8,7 +8,9 @@
 #include "Resources/System/Core/IResourcePool.h"
 #include "Resources/System/Core/IResourceManager.h"
 #include "Resources/System/Core/IResourceProxy.h"
+#include "Resources/System/Core/ResourceProxyFactory.h"
 #include "Resources/System/Core/Handle.h"
+
 
 namespace Engine {
 	namespace Resources {
@@ -246,20 +248,14 @@ namespace Engine {
 			 * \return	The new resource.
 			 *
 			 **************************************************************************************************/
-			template <typename TBuilder>
+			template <EResourceType type, EResourceSubType subtype>
 			EEngineStatus createResource(
-				const typename TBuilder::traits_type::descriptor_type &desc,
-				bool                                                   creationDeferred,
-				ResourceProxyList                                     &outProxiesCreated,
-				ResourceHandleList                                    &outHandlesCreated
+				const ResourceDescriptor<type, subtype> &desc,
+				bool                                     creationDeferred,
+				ResourceHandleList                      &outHandlesCreated
 			) {
 				EEngineStatus status = EEngineStatus::Ok;
-
-				using resource_ptr     = typename TBuilder::traits_type::resource_type_ptr;
-				using resource_type    = typename TBuilder::traits_type::resource_type;
-				using resource_subtype = typename TBuilder::traits_type::resource_subtype;
-				using proxy_type       = ResourceProxy<resource_type, resource_subtype>;
-
+			
 				// Create a resource proxy, which serves as a handle to the effective
 				// underlying resource.
 				//
@@ -273,18 +269,22 @@ namespace Engine {
 				ResourceProxyMap outProxies;
 				// ResourceHierarchyNode outResourceHierarchy;
 
-				ResourceHandle rootProxyHandle = ProxyCreator<resource_type, resource_subtype>::create(desc, outProxies/*, outResourceHierarchy*/);
-				if( !rootProxyHandle.valid() ) {
+				bool treeCreationSuccessful = ProxyTreeCreator<type, subtype>::create(_gfxApiProxyFactory, desc, {}, outProxies/*, outResourceHierarchy*/);
+				if( !treeCreationSuccessful ) {
 					Log::Error(logTag(), "Unable to create root resource proxy.");
 					return EEngineStatus::ResourceManager_ProxyCreationFailed;
 				}
 
-				// Store all depdency proxies as well as the root proxy itself
+				// Store all dependencies, roots and dependers, to have the loadProxy function 
+				// work out well.
 				for( const ResourceProxyMap::value_type& r : outProxies ) {
 					if( !storeResourceProxy(r.first, r.second) ) {
 						Log::Error(logTag(), "Failed to store resource proxy.");
 						// TODO: Release madness
 					}
+
+					// Make sure to write out the created handles
+					outHandlesCreated.push_back(r.first);
 				}
 
 				// If creation is not deferred, immediately load the resources using the proxy.
@@ -299,7 +299,11 @@ namespace Engine {
 			}
 			
 		public:
-			ProxyBasedResourceManager()  = default;
+			ProxyBasedResourceManager(
+				const Ptr<ResourceProxyFactory> &proxyFactory)
+				: _gfxApiProxyFactory(proxyFactory)
+			{}
+
 			~ProxyBasedResourceManager() = default;
 
 		private:
@@ -313,6 +317,8 @@ namespace Engine {
 			{
 				return _resources->addResource(handle, proxy);
 			}
+
+			Ptr<ResourceProxyFactory> _gfxApiProxyFactory;
 
 			// Any kind of resources, abstracted away entirely.
 			IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> _resources;
