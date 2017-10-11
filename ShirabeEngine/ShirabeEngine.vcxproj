@@ -265,6 +265,7 @@
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\TextureND.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyBasedResourceManager.h" />

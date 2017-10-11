@@ -8,6 +8,7 @@
 #include "Core/EngineTypeHelper.h"
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/Handle.h"
+#include "Resources/System/Core/ResourceHierarchy.h"
 #include "Resources/System/Core/IResourceDescriptor.h"
 
 namespace Engine {
@@ -38,8 +39,8 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory>         &proxyFactory,
 				const ResourceDescriptor<type, subtype> &desc,
 				ResourceHandleList                      &inDependencyHandles,
-				ResourceProxyMap                        &outProxies/*,
-				ResourceHierarchyNode                   &outResourceHierarchy*/) 
+				ResourceProxyMap                        &outProxies,
+				DependerTreeNodeList                    &outResourceHierarchy) 
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}

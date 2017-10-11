@@ -156,7 +156,7 @@ namespace Engine {
 
 						// Yay... Finally store the thing... (and it's dependencies as they need be persisted, too)!
 						outDependencies.insert(inDependencies.begin(), inDependencies.end());
-						outDependencies[resourceHandle] = dependencyProxy;						
+						outDependencies[resourceHandle] = dependencyProxy;
 					}
 				}
 
@@ -255,7 +255,8 @@ namespace Engine {
 				ResourceHandleList                      &outHandlesCreated
 			) {
 				EEngineStatus status = EEngineStatus::Ok;
-			
+
+				//
 				// Create a resource proxy, which serves as a handle to the effective
 				// underlying resource.
 				//
@@ -266,10 +267,10 @@ namespace Engine {
 				//   underlying resource 
 				// - maintain the resource load state.
 				// 
-				ResourceProxyMap outProxies;
-				// ResourceHierarchyNode outResourceHierarchy;
+				ResourceProxyMap     outProxies;
+				DependerTreeNodeList outDependerHierarchies;
 
-				bool treeCreationSuccessful = ProxyTreeCreator<type, subtype>::create(_gfxApiProxyFactory, desc, {}, outProxies/*, outResourceHierarchy*/);
+				bool treeCreationSuccessful = ProxyTreeCreator<type, subtype>::create(_gfxApiProxyFactory, desc, {}, outProxies, outDependerHierarchies);
 				if( !treeCreationSuccessful ) {
 					Log::Error(logTag(), "Unable to create root resource proxy.");
 					return EEngineStatus::ResourceManager_ProxyCreationFailed;
@@ -286,6 +287,17 @@ namespace Engine {
 					// Make sure to write out the created handles
 					outHandlesCreated.push_back(r.first);
 				}
+				
+				// Two hierarchy scenarios:
+				// 1) Single resource, multiple dependers
+				// 2) Multiple resources, single depender (or single resource, multiple dependencies)
+				// 
+				// The problem:
+				// Single-root tree's not possible with scenario 2.
+				// So: The functions have to return a list of dependency-roots, having it's dependers as children.
+				// Cleanup would release it's leaves iteratively und till none are left and move up one step!
+				// By returning dependency roots, we can make sure that no other parent-resource refers the node.
+				
 
 				// If creation is not deferred, immediately load the resources using the proxy.
 				if( !creationDeferred ) {
@@ -297,7 +309,7 @@ namespace Engine {
 
 				return status;
 			}
-			
+
 		public:
 			ProxyBasedResourceManager(
 				const Ptr<ResourceProxyFactory> &proxyFactory)
@@ -313,7 +325,7 @@ namespace Engine {
 
 			inline bool storeResourceProxy(
 				const ResourceHandle &handle,
-				const AnyProxy       &proxy) 
+				const AnyProxy       &proxy)
 			{
 				return _resources->addResource(handle, proxy);
 			}

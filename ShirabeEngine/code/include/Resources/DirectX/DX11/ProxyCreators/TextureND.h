@@ -211,8 +211,8 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
-				ResourceProxyMap                &outProxies/*,
-												 ResourceHierarchyNode &outResourceHierarchy*/)
+				ResourceProxyMap                &outProxies,
+				DependerTreeNodeList            &outResourceHierarchy)
 			{
 				Texture1DDescriptor t1DDesc = (Texture1DDescriptor)desc;
 				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>> proxy
@@ -221,6 +221,8 @@ namespace Engine {
 				ResourceHandle handle(t1DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D);
 				outProxies[handle] = AnyProxy(proxy);
 
+				DependerTreeNode resourceNode;
+				resourceNode.resourceHandle = handle;
 
 				bool isCubeMap      = false; // Not possible for 1D textures
 				bool isCubeMapArray = false; // Not possible for 1D textures
@@ -253,12 +255,31 @@ namespace Engine {
 				{
 				}
 				
-				if( srvProxy )
+				if( srvProxy ) {
 					outProxies[srvHandle] = AnyProxy(srvProxy);
-				if( rtvProxy )
+
+					DependerTreeNode srvResourceNode;
+					srvResourceNode.resourceHandle = srvHandle;
+					resourceNode.children.push_back(srvResourceNode);
+				}
+
+				if( rtvProxy ) {
 					outProxies[rtvHandle] = AnyProxy(rtvProxy);
-				if( dsvProxy )
+
+					DependerTreeNode rtvResourceNode;
+					rtvResourceNode.resourceHandle = rtvHandle;
+					resourceNode.children.push_back(rtvResourceNode);
+				}
+
+				if( dsvProxy ) {
 					outProxies[dsvHandle] = AnyProxy(dsvProxy);
+
+					DependerTreeNode dsvResourceNode;
+					dsvResourceNode.resourceHandle = dsvHandle;
+					resourceNode.children.push_back(dsvResourceNode);
+				}
+
+				outResourceHierarchy.push_back(resourceNode);
 			}
 		};
 
@@ -271,8 +292,8 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
-				ResourceProxyMap                &outProxies/*,
-												 ResourceHierarchyNode &outResourceHierarchy*/)
+				ResourceProxyMap                &outProxies,
+				DependerTreeNodeList            &outResourceHierarchy)
 			{
 				Texture2DDescriptor t2DDesc = (Texture2DDescriptor)desc;
 				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>> proxy
@@ -280,6 +301,9 @@ namespace Engine {
 
 				ResourceHandle handle(t2DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D);
 				outProxies[handle] = AnyProxy(proxy);
+
+				DependerTreeNode resourceNode;
+				resourceNode.resourceHandle = handle;
 
 				bool isCubeMap      = (t2DDesc.array.isTextureArray && (t2DDesc.array.size % 6) == 0);
 				bool isCubeMapArray = isCubeMap && ((t2DDesc.array.size / 6) > 1);
@@ -310,12 +334,31 @@ namespace Engine {
 				{
 				}
 
-				if( srvProxy )
+				if( srvProxy ) {
 					outProxies[srvHandle] = AnyProxy(srvProxy);
-				if( rtvProxy )
+
+					DependerTreeNode srvResourceNode;
+					srvResourceNode.resourceHandle = srvHandle;
+					resourceNode.children.push_back(srvResourceNode);
+				}
+
+				if( rtvProxy ) {
 					outProxies[rtvHandle] = AnyProxy(rtvProxy);
-				if( dsvProxy )
+
+					DependerTreeNode rtvResourceNode;
+					rtvResourceNode.resourceHandle = rtvHandle;
+					resourceNode.children.push_back(rtvResourceNode);
+				}
+
+				if( dsvProxy ) {
 					outProxies[dsvHandle] = AnyProxy(dsvProxy);
+
+					DependerTreeNode dsvResourceNode;
+					dsvResourceNode.resourceHandle = dsvHandle;
+					resourceNode.children.push_back(dsvResourceNode);
+				}
+
+				outResourceHierarchy.push_back(resourceNode);
 			}
 		};
 
@@ -328,8 +371,8 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
-				ResourceProxyMap                &outProxies/*,
-												 ResourceHierarchyNode &outResourceHierarchy*/)
+				ResourceProxyMap                &outProxies,
+				DependerTreeNodeList            &outResourceHierarchy)
 			{
 				Texture3DDescriptor t3DDesc = (Texture3DDescriptor)desc;
 				Ptr<IResourceProxy<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>> proxy
@@ -337,6 +380,9 @@ namespace Engine {
 
 				ResourceHandle handle(t3DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D);
 				outProxies[handle] = AnyProxy(proxy);
+
+				DependerTreeNode resourceNode;
+				resourceNode.resourceHandle = handle;
 
 				bool isCubeMap      = false; // Not possible for 3D textures
 				bool isCubeMapArray = false; // Not possible for 3D textures
@@ -367,12 +413,31 @@ namespace Engine {
 				{
 				}
 
-				if( srvProxy ) 
+				if( srvProxy ) {
 					outProxies[srvHandle] = AnyProxy(srvProxy);
-				if( rtvProxy )
+
+					DependerTreeNode srvResourceNode;
+					srvResourceNode.resourceHandle = srvHandle;
+					resourceNode.children.push_back(srvResourceNode);
+				}
+
+				if( rtvProxy ) {
 					outProxies[rtvHandle] = AnyProxy(rtvProxy);
-				if( dsvProxy )
+
+					DependerTreeNode rtvResourceNode;
+					rtvResourceNode.resourceHandle = rtvHandle;
+					resourceNode.children.push_back(rtvResourceNode);
+				}
+
+				if( dsvProxy ) {
 					outProxies[dsvHandle] = AnyProxy(dsvProxy);
+
+					DependerTreeNode dsvResourceNode;
+					dsvResourceNode.resourceHandle = dsvHandle;
+					resourceNode.children.push_back(dsvResourceNode);
+				}
+
+				outResourceHierarchy.push_back(resourceNode);
 			}
 		};
 
