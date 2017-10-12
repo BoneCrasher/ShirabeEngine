@@ -11,10 +11,13 @@
 namespace Engine {
 	namespace DX {
 		namespace _11 {
+			using namespace Engine::Resources;
+
 			template <EResourceType type, EResourceSubType subtype>
 			struct DetermineDXResourceType {};
 
 			DeclareSharedPointerType(IUnknown);
+			DeclareSharedPointerType(ID3D11Resource);
 			DeclareSharedPointerType(ID3D11Device);
 			DeclareSharedPointerType(ID3D11DeviceContext);
 			DeclareSharedPointerType(IDXGISwapChain);

@@ -12,6 +12,7 @@
 
 #include "Resources/System/Core/ResourceSubsystemProxy.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceSubsystem.h"
 
 namespace Engine {
 	namespace GFXAPI {

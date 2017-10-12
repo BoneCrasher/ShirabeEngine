@@ -5,6 +5,7 @@
 #include "Core/EngineStatus.h"
 
 #include "Resources/System/Core/IResourceProxy.h"
+#include "Resources/System/Core/IResourceDescriptor.h"
 
 namespace Engine {
 	namespace Resources {

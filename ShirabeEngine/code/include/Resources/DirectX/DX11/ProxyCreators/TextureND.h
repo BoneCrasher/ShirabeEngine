@@ -7,6 +7,7 @@
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/IResourceProxy.h"
 #include "Resources/System/Core/ResourceProxyFactory.h"
+#include "Resources/System/Core/ProxyTreeCreator.h"
 
 #include "Resources/Types/TextureND.h"
 #include "Resources/Types/ShaderResource.h"

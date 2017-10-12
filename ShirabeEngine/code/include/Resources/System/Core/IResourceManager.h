@@ -15,10 +15,8 @@ namespace Engine {
 		DeclareInterface(IResourceManager);
 
 		virtual EEngineStatus createSwapChain(
-			const SwapChainDescriptor &desc,
-			ResourceHandle            &outSwapChainHandle,
-			ResourceHandleList        &outBackBufferHandles
-		) = 0;
+			const SwapChainDescriptor &inDesc,
+			Ptr<SwapChain>            &outSwapChain) = 0;
 
 		virtual EEngineStatus createTexture1D
 		(

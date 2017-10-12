@@ -13,11 +13,11 @@ namespace Platform {
 
 	struct ApplicationEnvironment {
 #ifdef PLATFORM_WINDOWS
-		HINSTANCE _instanceHandle;
-		HINSTANCE _previousInstanceHandle;
-		HWND      _primaryWindowHandle;
+		HINSTANCE instanceHandle;
+		HINSTANCE previousInstanceHandle;
+		HWND      primaryWindowHandle;
 #endif // PLATFORM_WINDOWS
-		OSDisplayDescriptorList _osDisplays;
+		OSDisplayDescriptorList osDisplays;
 	};
 
 }

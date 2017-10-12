@@ -184,9 +184,6 @@
     <ClCompile Include="code\source\Platform\Windows\WindowsWindowFactory.cpp" />
     <ClCompile Include="code\source\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="code\source\Window\IWindowEventCallbackAdapter.cpp" />
-    <ClCompile Include="code\source\Renderer\DirectX\DX11\DX11Device.cpp" />
-    <ClCompile Include="code\source\Renderer\DirectX\DX11\DX11DeviceCapabilities.cpp" />
-    <ClCompile Include="code\source\Renderer\DirectX\DX11\DX11Renderer.cpp" />
     <ClCompile Include="code\source\BuildingBlocks\Transform.cpp" />
     <ClCompile Include="code\source\Math\Quaternion.cpp" />
     <ClCompile Include="code\source\BuildingBlocks\Scene.cpp" />
@@ -262,9 +259,11 @@
     <ClInclude Include="code\include\Resources\DirectX\DX11\Builders\TextureND.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\RenderTargetView.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\ShaderResourceView.h" />
+    <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\SwapChain.h" />
     <ClInclude Include="code\include\Resources\DirectX\DX11\ProxyCreators\TextureND.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ProxyTreeCreator.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />

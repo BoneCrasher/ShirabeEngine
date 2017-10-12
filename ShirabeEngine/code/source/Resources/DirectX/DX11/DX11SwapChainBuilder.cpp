@@ -1,6 +1,6 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "Resources/DirectX/DX11/DX11SwapChainBuilder.h"
+#include "Resources/DirectX/DX11/Builders/SwapChain.h"
 
 namespace Engine {
 	namespace DX {
@@ -19,15 +19,15 @@ namespace Engine {
 
 				DXGI_SWAP_CHAIN_DESC scDesc ={};
 				// Setup backbuffer
-				scDesc.BufferCount                 = desc._backBufferCount;
-				scDesc.BufferDesc.Width            = desc._texture._dimensions[0];
-				scDesc.BufferDesc.Height           = desc._texture._dimensions[1];
-				scDesc.BufferDesc.Format           = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc._texture._textureFormat);
+				scDesc.BufferCount                 = desc.backBufferCount;
+				scDesc.BufferDesc.Width            = desc.texture.dimensions[0];
+				scDesc.BufferDesc.Height           = desc.texture.dimensions[1];
+				scDesc.BufferDesc.Format           = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.texture.textureFormat);
 				scDesc.BufferDesc.Scaling          = DXGI_MODE_SCALING_UNSPECIFIED;
 				scDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-				if (desc._vsyncEnabled) {
-					scDesc.BufferDesc.RefreshRate.Numerator   = desc._refreshRateNumerator;
-					scDesc.BufferDesc.RefreshRate.Denominator = desc._refreshRateDenominator;
+				if (desc.vsyncEnabled) {
+					scDesc.BufferDesc.RefreshRate.Numerator   = desc.refreshRateNumerator;
+					scDesc.BufferDesc.RefreshRate.Denominator = desc.refreshRateDenominator;
 				}
 				else {
 					scDesc.BufferDesc.RefreshRate.Numerator   = 0;
@@ -39,9 +39,9 @@ namespace Engine {
 				scDesc.SampleDesc.Count   = 1;
 				scDesc.SampleDesc.Quality = 0;
 				// Fullscreen?
-				scDesc.Windowed     = true; // Do not set immediately! desc._fullscreen;
+				scDesc.Windowed     = true; // Do not set immediately! desc.fullscreen;
 				// Attach to window
-				scDesc.OutputWindow = static_cast<HWND>(reinterpret_cast<void *>(desc._windowHandle));
+				scDesc.OutputWindow = static_cast<HWND>(reinterpret_cast<void *>(desc.windowHandle));
 				scDesc.SwapEffect   = DXGI_SWAP_EFFECT_DISCARD;
 
 				dxRes = CreateDXGIFactory(__uuidof(IDXGIFactory1), (void **) &pFactory);

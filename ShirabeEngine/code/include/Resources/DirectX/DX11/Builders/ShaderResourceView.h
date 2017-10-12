@@ -22,9 +22,8 @@ namespace Engine {
 				static EEngineStatus createShaderResource(
 					const ID3D11DevicePtr          &device,
 					const ShaderResourceDescriptor &desc,
-					IUnknownPtr                    &inUnderlyingResource,
-					ID3D11ShaderResourceViewPtr    &outRes
-				);
+					ID3D11ResourcePtr              &inUnderlyingResource,
+					ID3D11ShaderResourceViewPtr    &outRes);
 
 			};
 
@@ -39,7 +38,7 @@ namespace Engine {
 					typename const traits_type::descriptor_type &descriptor,
 					gfxapi_parameter_struct_type                &gfxapiParams,
 					built_resource_map                          &outResources,
-					IUnknownPtr                                 &inUnderlyingResource)
+					ID3D11ResourcePtr                           &inUnderlyingResource)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 

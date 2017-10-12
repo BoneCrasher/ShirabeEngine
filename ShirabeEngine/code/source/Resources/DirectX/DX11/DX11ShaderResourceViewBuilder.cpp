@@ -1,6 +1,6 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "Resources/DirectX/DX11/DX11ShaderResourceViewBuilder.h"
+#include "Resources/DirectX/DX11/Builders/ShaderResourceView.h"
 
 namespace Engine {
 	namespace DX {
@@ -21,11 +21,11 @@ namespace Engine {
 				srvDesc.Format = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.format);
 
 				// Map configuration to DX11 creation struct
-				if( desc.srvType == ShaderResourceDescriptor::ShaderResourceDimension::Texture ) {
+				if( desc.srvType == ShaderResourceDescriptor::EShaderResourceDimension::Texture ) {
 					switch( desc.shaderResourceDimension.texture.dimensionNb ) {
 					case 1:
 						if( desc.shaderResourceDimension.texture.array.isTextureArray ) {
-							srvDesc.Texture1DArray.ArraySize       = desc.shaderResourceDimension.texture.array.count;
+							srvDesc.Texture1DArray.ArraySize       = desc.shaderResourceDimension.texture.array.size;
 							srvDesc.Texture1DArray.FirstArraySlice = desc.shaderResourceDimension.texture.array.firstArraySlice;
 							srvDesc.Texture1DArray.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
 							srvDesc.Texture1DArray.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;

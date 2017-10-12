@@ -1,4 +1,4 @@
-#include "Resources/DirectX/DX11/RenderTargetViewBuilder.h"
+#include "Resources/DirectX/DX11/Builders/RenderTargetView.h"
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
 namespace Engine {

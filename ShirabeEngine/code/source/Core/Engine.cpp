@@ -1,6 +1,6 @@
 #include "Core/Engine.h"
 
-#include "GAPI/DirectX/DX11/DX11Renderer.h"
+#include "GFXAPI/DirectX/DX11/DX11Renderer.h"
 
 namespace Engine {
 
@@ -68,7 +68,7 @@ namespace Engine {
 			status = EEngineStatus::WindowCreationError;
 		}
 		else {
-			_environment._primaryWindowHandle = _mainWindow->handle();
+			_environment.primaryWindowHandle = _mainWindow->handle();
 
 			status = _mainWindow->resume();
 			if (!CheckEngineError(status))
@@ -79,11 +79,11 @@ namespace Engine {
 		_mainWindow->registerCallback(dummy);
 
 		RendererConfiguration rendererConfiguration;
-		rendererConfiguration._enableVSync             = true;
-		rendererConfiguration._frustum                 = Vec4Dd(windowWidth, windowHeight, 0.1f, 1000.0f);
-		rendererConfiguration._preferredBackBufferSize = Vec2Dl(windowWidth, windowHeight);
-		rendererConfiguration._preferredWindowSize     = rendererConfiguration._preferredBackBufferSize;
-		rendererConfiguration._requestFullscreen       = false;
+		rendererConfiguration.enableVSync             = true;
+		rendererConfiguration.frustum                 = Vec4Dd(windowWidth, windowHeight, 0.1f, 1000.0f);
+		rendererConfiguration.preferredBackBufferSize = Vec2Dl(windowWidth, windowHeight);
+		rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
+		rendererConfiguration.requestFullscreen       = false;
 
 		_renderer = MakeSharedPointerType<DX11Renderer>();
 		status = _renderer->initialize(_environment, rendererConfiguration, nullptr);

@@ -26,30 +26,29 @@ namespace Engine {
 				
 			public:
 				DX11ResourceManager(
-					const IDXDevicePtr& device
-				);
+					const Ptr<ResourceProxyFactory> &proxyFactory,
+					const IDXDevicePtr              &device);
 
-				~DX11ResourceManager();
+				virtual ~DX11ResourceManager();
 
-				EEngineStatus createDevice(
-					const DeviceDescriptor &deviceDescriptor,
-					ResourceHandle         &outHandle
-				);
+				// EEngineStatus createDevice(
+				// 	const DeviceDescriptor &deviceDescriptor,
+				// 	ResourceHandle         &outHandle);
+				EEngineStatus createSwapChain(
+					const SwapChainDescriptor &inDesc,
+					Ptr<SwapChain>            &outSwapChain);
 
 				EEngineStatus createTexture1D(
 					const Texture1DDescriptor &desc,
-					ResourceHandle            &outHandle
-				);
+					ResourceHandleList        &outHandles);
 
 				EEngineStatus createTexture2D(
 					const Texture2DDescriptor &desc,
-					ResourceHandle            &outHandle
-				);
+					ResourceHandleList        &outHandles);
 
 				EEngineStatus createTexture3D(
 					const Texture3DDescriptor &desc,
-					ResourceHandle            &outHandle
-				);
+					ResourceHandleList        &outHandles);
 
 				EEngineStatus createShaderResource(
 					const ShaderResourceDescriptor &shaderResourceDescriptor,

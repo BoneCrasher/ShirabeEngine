@@ -6,11 +6,11 @@
 #include "Core/EngineTypeHelper.h"
 
 #include "Resources/System/Core/IResourcePool.h"
+#include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/IResourceManager.h"
 #include "Resources/System/Core/IResourceProxy.h"
+#include "Resources/System/Core/ProxyTreeCreator.h"
 #include "Resources/System/Core/ResourceProxyFactory.h"
-#include "Resources/System/Core/Handle.h"
-
 
 namespace Engine {
 	namespace Resources {
@@ -82,6 +82,7 @@ namespace Engine {
 			: public IResourceManager {
 			DeclareLogTag(ProxyBasedResourceManager);
 
+		protected:
 			/**********************************************************************************************//**
 			 * \fn	bool ProxyBasedResourceManager::loadDependenciesRecursively(const IResourceProxyBasePtr& base, ResourceProxyMap& outDependencies)
 			 *
@@ -126,8 +127,8 @@ namespace Engine {
 						// Do we even hav to load the resource? If the resource type is internal, there won't 
 						// be any necessity to go deeper. Internal resources and all it's children will be created
 						// without any control from our side.		
-						if( dependencyBase->type() == EProxyType::Internal
-						   || dependencyBase->type() == EProxyType::Unknown )
+						if(   dependencyBase->proxyType() == EProxyType::Internal
+						   || dependencyBase->proxyType() == EProxyType::Unknown )
 						{
 							// Nothing to do...
 							continue;
@@ -248,11 +249,11 @@ namespace Engine {
 			 * \return	The new resource.
 			 *
 			 **************************************************************************************************/
-			template <EResourceType type, EResourceSubType subtype>
+			template <EResourceType type, EResourceSubType subtype, typename TResourceBinding>
 			EEngineStatus createResource(
 				const ResourceDescriptor<type, subtype> &desc,
 				bool                                     creationDeferred,
-				ResourceHandleList                      &outHandlesCreated
+				TResourceBinding                        &binding
 			) {
 				EEngineStatus status = EEngineStatus::Ok;
 
@@ -270,7 +271,7 @@ namespace Engine {
 				ResourceProxyMap     outProxies;
 				DependerTreeNodeList outDependerHierarchies;
 
-				bool treeCreationSuccessful = ProxyTreeCreator<type, subtype>::create(_gfxApiProxyFactory, desc, {}, outProxies, outDependerHierarchies);
+				bool treeCreationSuccessful = ProxyTreeCreator<type, subtype, TResourceBinding>::create(_gfxApiProxyFactory, desc, {}, binding, outDependerHierarchies);
 				if( !treeCreationSuccessful ) {
 					Log::Error(logTag(), "Unable to create root resource proxy.");
 					return EEngineStatus::ResourceManager_ProxyCreationFailed;
@@ -316,7 +317,10 @@ namespace Engine {
 				: _gfxApiProxyFactory(proxyFactory)
 			{}
 
-			~ProxyBasedResourceManager() = default;
+			virtual ~ProxyBasedResourceManager() {
+				// _resources->clear();
+				_gfxApiProxyFactory = nullptr;
+			};
 
 		private:
 			inline AnyProxy getResourceProxy(const ResourceHandle& handle) {

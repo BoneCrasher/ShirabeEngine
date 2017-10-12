@@ -6,7 +6,7 @@
 #include "Resources/System/Core/Handle.h"
 
 #include "GFXAPI/Definitions.h"
-#include "Resources/System/GFXAPI/GFXAPI.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "Resources/Types/TextureND.h"
 
@@ -82,30 +82,32 @@ namespace Engine {
 			descriptor_type _descriptor;
 		};
 
+		struct RenderTargetResourceBinding {
+			ResourceHandle handle;
+			unsigned int   index;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	GFXAPIRenderTarget
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
-		class GFXAPIRenderTarget
+		class RenderTarget
 			: public RenderTargetDescriptorAdapterBase
-			, public GFXAPIResourceAdapter
 		{
 		public:
-			using my_type = GFXAPIRenderTarget;
+			using my_type = RenderTarget;
 
-			GFXAPIRenderTarget(
-				const descriptor_type        &descriptor,
-				const GFXAPIResourceHandle_t &platformResourceHandle)
+			RenderTarget(
+				const descriptor_type        &descriptor)
 				: RenderTargetDescriptorAdapterBase(descriptor)
-				, GFXAPIResourceAdapter(platformResourceHandle)
 			{}
 			
 		private:
 			ResourceHandle _underlyingTexture; // Reference to the underlying texture resource used for the rendertarget.
 		};
 
-		DeclareSharedPointerType(GFXAPIRenderTarget);
+		DeclareSharedPointerType(RenderTarget);
 	}
 }
 

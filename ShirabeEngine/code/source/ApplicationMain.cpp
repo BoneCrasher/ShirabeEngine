@@ -21,9 +21,9 @@ int WINAPI WinMain(
 	Log::Status(Main::logTag(), "SAE5300 - Application", Log::Style::CENTRE);
 
 	Platform::ApplicationEnvironment appEnvironment;
-	appEnvironment._instanceHandle         = hInstance;
-	appEnvironment._previousInstanceHandle = hPrevInstance;
-	appEnvironment._osDisplays             = Platform::OSDisplay::GetDisplays();
+	appEnvironment.instanceHandle         = hInstance;
+	appEnvironment.previousInstanceHandle = hPrevInstance;
+	appEnvironment.osDisplays             = Platform::OSDisplay::GetDisplays();
 
 	// TODO: Configuation
 	// EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);

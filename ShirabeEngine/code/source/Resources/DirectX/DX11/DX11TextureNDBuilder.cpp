@@ -1,6 +1,6 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
+#include "Resources/DirectX/DX11/Builders/TextureND.h"
 
 namespace Engine {
 	namespace DX {
@@ -16,7 +16,7 @@ namespace Engine {
 				EEngineStatus eRes  = EEngineStatus::Ok;
 
 				D3D11_TEXTURE1D_DESC texDesc ={};
-				texDesc.Width     = desc.dimensionNb[0];
+				texDesc.Width     = desc.dimensions[0];
 				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
 				texDesc.MipLevels = (desc.mipMap.useMipMaps    ? desc.mipMap.mipLevels   : 1);
 				texDesc.ArraySize = (desc.array.isTextureArray ? desc.array.size : 1);
@@ -48,8 +48,8 @@ namespace Engine {
 				EEngineStatus eRes = EEngineStatus::Ok;
 
 				D3D11_TEXTURE2D_DESC texDesc ={};
-				texDesc.Width     = desc.dimensionNb[0];
-				texDesc.Height    = desc.dimensionNb[1];
+				texDesc.Width     = desc.dimensions[0];
+				texDesc.Height    = desc.dimensions[1];
 				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
 				texDesc.MipLevels = (desc.mipMap.useMipMaps    ? desc.mipMap.mipLevels   : 1);
 				texDesc.ArraySize = (desc.array.isTextureArray ? desc.array.size : 1);
@@ -91,9 +91,9 @@ namespace Engine {
 				EEngineStatus eRes = EEngineStatus::Ok;
 
 				D3D11_TEXTURE3D_DESC texDesc ={};
-				texDesc.Width     = desc.dimensionNb[0];
-				texDesc.Height    = desc.dimensionNb[1];
-				texDesc.Depth     = desc.dimensionNb[2];
+				texDesc.Width     = desc.dimensions[0];
+				texDesc.Height    = desc.dimensions[1];
+				texDesc.Depth     = desc.dimensions[2];
 				texDesc.Format    = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
 				texDesc.MipLevels = (desc.mipMap.useMipMaps ? desc.mipMap.mipLevels : 1);
 				// Invalid for 3D: texDesc.ArraySize = (desc.array.isTextureArray ? desc.array.textureCount : 1);

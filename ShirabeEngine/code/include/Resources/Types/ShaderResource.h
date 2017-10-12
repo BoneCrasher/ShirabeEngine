@@ -6,7 +6,7 @@
 #include "Resources/System/Core/Handle.h"
 
 #include "GFXAPI/Definitions.h"
-#include "Resources/System/GFXAPI/GFXAPI.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "Resources/Types/TextureND.h"
 
@@ -20,14 +20,14 @@ namespace Engine {
 		 * \brief	A render target descriptor implementation.
 		 **************************************************************************************************/
 		struct ShaderResourceDescriptorImpl {
-			enum class ShaderResourceDimension {
+			enum class EShaderResourceDimension {
 				Texture,
 				StructuredBuffer
 			};
 
-			std::string             name;
-			Format                  format;
-			ShaderResourceDimension srvType;
+			std::string              name;
+			Format                   format;
+			EShaderResourceDimension srvType;
 
 			union ShaderResourceDimension {
 				struct Texture {
@@ -74,7 +74,7 @@ namespace Engine {
 					<< "RenderTargetDescriptor ('" << name << "'): \n"
 					<< " Format:     " << (uint8_t)format << "\n,";
 
-				if( srvType == ShaderResourceDimension::Texture ) {
+				if( srvType == EShaderResourceDimension::Texture ) {
 					ss 
 						<< " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb              << "\n,"
 						<< " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size               << "\n,"
@@ -136,25 +136,22 @@ namespace Engine {
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
-		class GFXAPIShaderResource
+		class ShaderResource
 			: public ShaderResourceDescriptorAdapterBase
-			, public GFXAPIResourceAdapter
 		{
 		public:
-			using my_type = GFXAPIShaderResource;
+			using my_type = ShaderResource;
 
-			GFXAPIShaderResource(
-				const descriptor_type        &descriptor,
-				const GFXAPIResourceHandle_t &platformResourceHandle)
+			ShaderResource(
+				const descriptor_type        &descriptor)
 				: ShaderResourceDescriptorAdapterBase(descriptor)
-				, GFXAPIResourceAdapter(platformResourceHandle)
 			{}
 
 		private:
 			ResourceHandle _underlyingTexture; // Reference to the underlying texture resource used for the rendertarget.
 		};
 
-		DeclareSharedPointerType(GFXAPIShaderResource);
+		DeclareSharedPointerType(ShaderResource);
 
 
 	}

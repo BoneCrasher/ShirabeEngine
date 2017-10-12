@@ -1,10 +1,10 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 #include "Resources/DirectX/DX11/DX11ResourceManager.h"
 
-#include "Resources/DirectX/DX11/DX11TextureNDBuilder.h"
-#include "Resources/DirectX/DX11/RenderTargetViewBuilder.h"
-#include "Resources/DirectX/DX11/DX11SwapChainBuilder.h"
-#include "Resources/DirectX/DX11/DX11ShaderResourceBuilder.h"
+#include "Resources/DirectX/DX11/Builders/TextureND.h"
+#include "Resources/DirectX/DX11/Builders/RenderTargetView.h"
+#include "Resources/DirectX/DX11/Builders/SwapChain.h"
+#include "Resources/DirectX/DX11/Builders/ShaderResourceView.h"
 
 namespace Engine {
 	namespace DX {
@@ -12,115 +12,65 @@ namespace Engine {
 			using namespace Engine::Resources;
 
 			DX11ResourceManager::DX11ResourceManager(
-				const IDXDevicePtr& device
-			) : _dxDevice(device)
+				const Ptr<ResourceProxyFactory> &proxyFactory,
+				const IDXDevicePtr              &device) 
+				: ProxyBasedResourceManager(proxyFactory)
+				, _dxDevice(device)
 			{ }
 
 			DX11ResourceManager::~DX11ResourceManager() {
 				_dxDevice = nullptr;
 			}
 
-			EEngineStatus DX11ResourceManager::createTexture1D
-			(
-				const Texture1DDescriptor &desc,
-				ResourceHandle            &outHandle) 
-			{
-				// NEXT-TASK:
-				// TODO: The createResource-Function has to output
-				//       all non-internal resources created.
-				//       This is especially important for SRV's and RTV's.
-				// OTHER:
-				//  The proxies used will then implement loading the resources using 
-				//  the resource thread.
-				//  Although the proxy signature is inherently threading-capable, 
-				//  the specific means using the Looper, Runnables and future/promise
-				//  will be implemented specifically.
-				//  Options:
-				//    --> A) Create a derived class from handler and implement the process-function
-				//    --> B) Make handler accept pointer to function with params.
-				//    Check if handlers are copyable properly...
-				return createResource<DX11Texture1DResourceBuilder>(
-						desc,
-						false,
-						outHandle
-						);
-			}
 
-			EEngineStatus DX11ResourceManager::createTexture2D
-			(
-				const Texture2DDescriptor &desc,
-				ResourceHandle            &outHandle) 
-			{
-				return createResource<DX11Texture2DResourceBuilder>(
-						desc,
-						outHandle
-						);
-			}			
+			EEngineStatus DX11ResourceManager::createSwapChain(
+				const SwapChainDescriptor &inDesc,
+				Ptr<SwapChain>            &outSwapChain) 
+			{				
+				SwapChainResourceBinding binding;
 
-			EEngineStatus DX11ResourceManager::createTexture3D
-			(
-				const Texture3DDescriptor &desc,
-				ResourceHandle            &outHandle) 
-			{
-				return createResource<DX11Texture3DResourceBuilder>(
-						desc,
-						outHandle
-					);
-			}
+				EEngineStatus status = createResource<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN, SwapChainResourceBinding>(
+					inDesc,
+					false,
+					binding);
 
-			EEngineStatus DX11ResourceManager::createShaderResource(
-				const ShaderResourceDescriptor &shaderResourceDescriptor,
-				const ResourceHandle           &inUnderlyingResourceHandle,
-				ResourceHandle                 &outShaderResourceHandle)
-			{
-				EEngineStatus eRes = EEngineStatus::Ok;
-
-				return createResource<DX11ShaderResourceBuilder>(
-					shaderResourceDescriptor,
-					outShaderResourceHandle,
-					inUnderlyingResourceHandle
-					);
-
-				return eRes;
-			}
-
-			EEngineStatus DX11ResourceManager::createRenderTarget(
-				const ResourceHandle &inHandle,
-				ResourceHandle       &outHandle)
-			{
-				if (inHandle.type() != EResourceType::TEXTURE)
-					return EEngineStatus::GAPI_InvalidHandle;
-
-				std::string       textureName;
-				GFXAPI::Format    textureFormat;
-				ID3D11ResourcePtr textureResource;
-
-                #define FetchCase(case_condition, type, handle, src, name_var, format_var, resource_var) \
-					case case_condition:				             	 \
-					{                                                    \
-						type tND = src->getResource(inHandle);           \
-						if (tND) {										 \
-							name_var     = tND->name();				     \
-							format_var   = tND->format();				 \
-						}                                                \
-					}
-
-				// Fetch resource for handle.
-				switch (inHandle.subtype()) {
-					FetchCase(EResourceSubType::TEXTURE_1D, GAPITexture1DPtr, inHandle, _tex1DPool, textureName, textureFormat, textureResource); break;
-					FetchCase(EResourceSubType::TEXTURE_2D, GAPITexture2DPtr, inHandle, _tex2DPool, textureName, textureFormat, textureResource); break;
-					FetchCase(EResourceSubType::TEXTURE_3D, GAPITexture3DPtr, inHandle, _tex3DPool, textureName, textureFormat, textureResource); break;
+				if( CheckEngineError(status) ) {
+					Log::Error(logTag(), "Failed to create swapchain resource.");
+					return status;
 				}
 
-				RenderTargetDescriptor desc ={};
-				desc._name          = String::format("RenderTargetViewOfTexture_%0", textureName);
-				desc._textureFormat = textureFormat;
+				outSwapChain = SwapChain::create(inDesc, binding);
+				return EEngineStatus::Ok;
+			}
 
-				return createResource<DX11RenderTargetResourceBuilder>(
+			EEngineStatus DX11ResourceManager::createTexture1D(
+				const Texture1DDescriptor &desc,
+				ResourceHandleList        &outHandles) 
+			{
+				return createResource<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>(
+						desc,
+						false,
+						outHandles);
+			}
+
+			EEngineStatus DX11ResourceManager::createTexture2D(
+				const Texture2DDescriptor &desc,
+				ResourceHandleList        &outHandles)
+			{
+				return createResource<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>(
+						desc,
+						false,
+						outHandles);
+			}			
+
+			EEngineStatus DX11ResourceManager::createTexture3D(
+				const Texture3DDescriptor &desc,
+				ResourceHandleList        &outHandles)
+			{
+				return createResource<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>(
 					desc,
-					outHandle,
-					textureResource
-					);
+					false,
+					outHandles);
 			}
 
 			// EEngineStatus DX11ResourceManager::createDepthStencilView(
@@ -180,103 +130,7 @@ namespace Engine {
 			// 	}
 			// 	
 			// 	return res;
-			// }
-
-
-
-			//--------------------------------------------------------------------------------------------------
-			// Specializations of store<Handle, Resource>(const Handle&, const Resource&) : EEngineStatus
-			//--------------------------------------------------------------------------------------------------
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11Texture1DPtr>
-				(const ResourceHandle& handle, const ID3D11Texture1DPtr& resource) {
-				if (!_tex1DPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11Texture2DPtr>
-				(const ResourceHandle& handle, const ID3D11Texture2DPtr& resource) {
-				if (!_tex2DPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11Texture3DPtr>
-				(const ResourceHandle& handle, const ID3D11Texture3DPtr& resource) {
-				if (!_tex3DPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11ShaderResourceViewPtr>
-				(const ResourceHandle& handle, const ID3D11ShaderResourceViewPtr& resource) {
-				if (!_srvPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11RenderTargetViewPtr>
-				(const ResourceHandle& handle, const ID3D11RenderTargetViewPtr& resource) {
-				if (!_rtvPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11DepthStencilViewPtr>
-				(const ResourceHandle& handle, const ID3D11DepthStencilViewPtr& resource) {
-				if (!_dsvPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			template <>
-			EEngineStatus DX11ResourceManager
-				::store<ID3D11DepthStencilStatePtr>
-				(const ResourceHandle& handle, const ID3D11DepthStencilStatePtr& resource) {
-				if (!_dssPool->addResource(handle, resource)) {
-					// return EEngineStatus:: ? ;
-					return EEngineStatus::Error;  // MBT: Make appropriate error conditions.
-				}
-				else
-					return EEngineStatus::Ok;
-			}
-
-			//--------------------------------------------------------------------------------------------------
-			// END: Specializations of store<Handle, Resource>(const Handle&, const Resource&) : EEngineStatus
-			//--------------------------------------------------------------------------------------------------
-
-
+			// }			
 		}
 	}
 }

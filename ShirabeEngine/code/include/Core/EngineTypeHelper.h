@@ -178,6 +178,19 @@ namespace Engine {
                 name() = default;               \
             public:
 
+	#define DeclareDerivedTemplatedInterface(name, alias, base) \
+		class name 								\
+	        : public base {                     \
+            public:                             \
+				typedef alias my_type;		    \
+												\
+                virtual ~name() = default;      \
+                                                \
+                DenyCopyAndMove(name, alias);   \
+            protected:                          \
+                name() = default;               \
+            public:
+
 	#define DeclareInterfaceEnd(name) };
 
 }

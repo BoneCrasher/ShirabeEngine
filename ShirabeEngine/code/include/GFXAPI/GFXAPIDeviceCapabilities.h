@@ -14,34 +14,34 @@ namespace Engine {
 		using namespace Engine::Resources;
 
 		struct GAPIOutputMode {
-			Format   _format;
-			Vec2Dui  _size;
-			Vec2Dui  _refreshRate;
+			Format   format;
+			Vec2Dui  size;
+			Vec2Dui  refreshRate;
 		};
 		DeclareListType(GAPIOutputMode, GAPIOutputMode);
 
 		struct GAPIOutput {
-			unsigned int       _outputIndex;
-			GAPIOutputModeList _outputModes;
+			unsigned int       outputIndex;
+			GAPIOutputModeList outputModes;
 		};
 		DeclareListType(GAPIOutput, GAPIOutput);
 
 		struct GAPIAdapterDescription {
-			std::string   _name;
-			unsigned long _dedicatedGPUMemory;
-			unsigned long _dedicatedSysMemory;
+			std::string   name;
+			unsigned long dedicatedGPUMemory;
+			unsigned long dedicatedSysMemory;
 
 		};
 
 		struct GAPIAdapter {
-			unsigned int           _adapterIndex;
-			GAPIAdapterDescription _description;
-			GAPIOutputList         _outputs;
+			unsigned int           adapterIndex;
+			GAPIAdapterDescription description;
+			GAPIOutputList         outputs;
 		};
-		DeclareListType(GAPIAdapter, GAPIAdapter)
+		DeclareListType(GAPIAdapter, GAPIAdapter);
 
-			struct GAPIDeviceCapabilities {
-			GAPIAdapterList _adapters;
+		struct GAPIDeviceCapabilities {
+			GAPIAdapterList adapters;
 		};
 
 	}

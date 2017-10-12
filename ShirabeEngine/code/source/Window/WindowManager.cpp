@@ -31,7 +31,7 @@ namespace Engine {
 		const Platform::ApplicationEnvironment& environment
 	) {
 #ifdef PLATFORM_WINDOWS
-		_windowFactory = MakeSharedPointerType<Platform::Windows::WindowsWindowFactory>(environment._instanceHandle);
+		_windowFactory = MakeSharedPointerType<Platform::Windows::WindowsWindowFactory>(environment.instanceHandle);
 		// TODO: Create conditional "ApplicationEnvironment"-struct, which contains HINSTANCE as a member in csase  of MSC_VER
 #endif // PLATFORM_WINDOWS
 

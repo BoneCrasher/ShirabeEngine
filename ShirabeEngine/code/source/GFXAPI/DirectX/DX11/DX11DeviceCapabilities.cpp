@@ -236,11 +236,11 @@ namespace Engine {
 							}
 
 							GAPIAdapterDescription outAdapterDesc ={};
-							outAdapterDesc._name               = String::toNarrowString(tmpAdapterDesc.Description);
-							outAdapterDesc._dedicatedGPUMemory = tmpAdapterDesc.DedicatedVideoMemory;
-							outAdapterDesc._dedicatedSysMemory = tmpAdapterDesc.DedicatedSystemMemory;
+							outAdapterDesc.name               = String::toNarrowString(tmpAdapterDesc.Description);
+							outAdapterDesc.dedicatedGPUMemory = tmpAdapterDesc.DedicatedVideoMemory;
+							outAdapterDesc.dedicatedSysMemory = tmpAdapterDesc.DedicatedSystemMemory;
 
-							outAdapter._description = outAdapterDesc;
+							outAdapter.description = outAdapterDesc;
 						}
 
 						// Enumerate outputs (monitors)
@@ -270,18 +270,18 @@ namespace Engine {
 											return EEngineStatus::DXGI_PrimaryAdapterGetOutputModesFailed;
 									}
 
-									outAdapterOutput._outputIndex = j;
+									outAdapterOutput.outputIndex = j;
 									
 									// Now process all modes and store them
 									for (unsigned int i=0; i < nOutputModes; ++i) {
 										GAPIOutputMode outAdapterOutputMode ={};
 
 										DXGI_MODE_DESC desc = tmpOutputModes[i];
-										outAdapterOutputMode._size        = Vec2Dui(desc.Width, desc.Height);
-										outAdapterOutputMode._format      = convertFormatDXGI2GAPI(desc.Format);
-										outAdapterOutputMode._refreshRate = Vec2Dui(desc.RefreshRate.Numerator, desc.RefreshRate.Denominator);
+										outAdapterOutputMode.size        = Vec2Dui(desc.Width, desc.Height);
+										outAdapterOutputMode.format      = convertFormatDXGI2GAPI(desc.Format);
+										outAdapterOutputMode.refreshRate = Vec2Dui(desc.RefreshRate.Numerator, desc.RefreshRate.Denominator);
 
-										outAdapterOutput._outputModes.push_back(outAdapterOutputMode);
+										outAdapterOutput.outputModes.push_back(outAdapterOutputMode);
 									};
 
 									// DON'T FORGET TO CLEAN UP UNMANAGED DATA.
@@ -302,7 +302,7 @@ namespace Engine {
 							}
 						}
 
-						outAdapter._outputs = outAdapterOutputs;
+						outAdapter.outputs = outAdapterOutputs;
 						outAdapters.push_back(outAdapter);
 
 						++k;
@@ -313,7 +313,7 @@ namespace Engine {
 						return EEngineStatus::DXGI_FactoryGetAdapterFailed;
 					}
 
-					pOutCapabilities->_adapters = outAdapters;
+					pOutCapabilities->adapters = outAdapters;
 				}
 
 				return EEngineStatus::Ok;

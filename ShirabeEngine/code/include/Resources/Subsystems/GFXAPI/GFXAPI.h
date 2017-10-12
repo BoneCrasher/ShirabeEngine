@@ -134,21 +134,7 @@ namespace Engine {
 		}
 
 
-		/**********************************************************************************************//**
-		 * \enum	ELoadState
-		 *
-		 * \brief	Represents the current state of a platform resource.
-		 **************************************************************************************************/
-		enum class ELoadState
-		{
-			UNKNOWN  = 0,
-			UNLOADED,
-			UNLOADING,
-			LOADED,
-			LOADING,
-			AVAILABLE,
-			UNAVAILABLE
-		};
+		
 	}
 }
 

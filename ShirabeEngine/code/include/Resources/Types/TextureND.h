@@ -3,7 +3,7 @@
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
-#include "Resources/System/GFXAPI/GFXAPI.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 #include "GFXAPI/Definitions.h"
 
 namespace Engine {
@@ -68,7 +68,7 @@ namespace Engine {
 
 				ss
 					<< "TextureDescriptor<" << N << ">"
-					<< " ('" << _name << "'): "
+					<< " ('" << name << "'): "
 					<< " Dimensions: "      << N << ", "
 					<< " Format: "          << (uint8_t)textureFormat << ", "
 					<< " MipMaps: "         << (mipMap.useMipMaps ? "true" : "false") << "; Levels: " << mipMap.mipLevels << ", "
@@ -209,7 +209,7 @@ namespace Engine {
 			inline const Format&
 				format() const { return _descriptor.textureFormat; }
 
-			inline const VecND<uint32_t, descriptor_type::Dimensions>&
+			inline const VecND<uint32_t, descriptor_type::dimensionNb>&
 				dimensionNb() const { return _descriptor.dimensionNb; }
 
 			inline const TextureMipMapDescriptor&
@@ -245,17 +245,13 @@ namespace Engine {
 		template <uint8_t N>
 		class TextureNDBase
 			: public TextureDescriptorAdapterBase<N>
-			, public GFXAPIResourceAdapter
 		{
 		public:
 			using my_type = TextureNDBase<N>;
 
 			TextureNDBase(
-				const descriptor_type          &descriptor,
-				const GFXAPIResourceHandle_t &platformResourceHandle
-			) 
+				const descriptor_type &descriptor) 
 				: TextureDescriptorAdapterBase<N>(descriptor)
-				, GFXAPIResourceAdapter(platformResourceHandle)
 			{}
 
 		private:
@@ -271,9 +267,8 @@ namespace Engine {
 		{
 		public:
 			inline GAPITexture1D(
-				const descriptor_type        &descriptor,
-				const GFXAPIResourceHandle_t &platformResourceHandle)
-				: TextureNDBase<1>(descriptor, platformResourceHandle) 
+				const descriptor_type &descriptor)
+				: TextureNDBase<1>(descriptor) 
 			{}
 		};
 
@@ -287,9 +282,8 @@ namespace Engine {
 		{
 		public:
 			inline GAPITexture2D(
-				const descriptor_type          &descriptor,
-				const GFXAPIResourceHandle_t &platformResourceHandle)
-				: TextureNDBase<2>(descriptor, platformResourceHandle)
+				const descriptor_type &descriptor)
+				: TextureNDBase<2>(descriptor)
 			{}
 		};
 
@@ -303,9 +297,8 @@ namespace Engine {
 		{
 		public:
 			inline GAPITexture3D(
-				const descriptor_type          &descriptor,
-				const GFXAPIResourceHandle_t &platformResourceHandle)
-				: TextureNDBase<3>(descriptor, platformResourceHandle)
+				const descriptor_type &descriptor)
+				: TextureNDBase<3>(descriptor)
 			{}
 		};
 
