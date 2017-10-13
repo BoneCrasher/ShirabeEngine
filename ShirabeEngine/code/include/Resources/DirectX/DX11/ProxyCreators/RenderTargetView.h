@@ -9,11 +9,13 @@
 #include "Resources/System/Core/ResourceProxyFactory.h"
 #include "Resources/System/Core/ProxyTreeCreator.h"
 
+#include "Resources/Types/RenderTarget.h"
+
 namespace Engine {
 	namespace Resources {
 
 		template <>
-		class ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW> {
+		class ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW, RenderTargetResourceBinding> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>;
 
@@ -21,7 +23,8 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
-				ResourceProxyMap                &outProxies,
+				RenderTargetResourceBinding     &outBinding,
+				ResourceProxyMap                &outProxyMap,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");

@@ -277,6 +277,7 @@
     <ClInclude Include="code\include\Resources\System\Core\IResourceManager.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResourcePool.h" />
     <ClInclude Include="code\include\Resources\Types\ConstantBuffer.h" />
+    <ClInclude Include="code\include\Resources\Types\DepthStencil.h" />
     <ClInclude Include="code\include\Resources\Types\InstanceBuffer.h" />
     <ClInclude Include="code\include\Resources\Types\ObjectBuffer.h" />
     <ClInclude Include="code\include\Resources\Types\RenderTarget.h" />

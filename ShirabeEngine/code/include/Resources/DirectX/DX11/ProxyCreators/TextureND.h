@@ -204,7 +204,7 @@ namespace Engine {
 		}
 		
 		template <>
-		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D> {
+		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D, TextureNDResourceBinding> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>;
 
@@ -212,6 +212,7 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
+				TextureNDResourceBinding        &outBinding,
 				ResourceProxyMap                &outProxies,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{
@@ -228,14 +229,17 @@ namespace Engine {
 				bool isCubeMap      = false; // Not possible for 1D textures
 				bool isCubeMapArray = false; // Not possible for 1D textures
 
-				ResourceHandle       srvHandle;
-				TextureNDSRVProxyPtr srvProxy = nullptr;
+				ResourceHandle                srvHandle;
+				TextureNDSRVProxyPtr          srvProxy = nullptr;
+				ShaderResourceResourceBinding srvBinding;
 
-				ResourceHandle       rtvHandle;
-				TextureNDRTVProxyPtr rtvProxy = nullptr;
+				ResourceHandle              rtvHandle;
+				TextureNDRTVProxyPtr        rtvProxy = nullptr;
+				RenderTargetResourceBinding rtvBinding;
 
-				ResourceHandle       dsvHandle;
-				TextureNDDSVProxyPtr dsvProxy = nullptr;
+				ResourceHandle              dsvHandle;
+				TextureNDDSVProxyPtr        dsvProxy = nullptr;
+				DepthStencilResourceBinding dsvBinding;
 
 				if( !createTextureNDDependerProxies<1>(
 					t1DDesc.name,
@@ -255,6 +259,9 @@ namespace Engine {
 					dsvProxy) )
 				{
 				}
+
+				TextureNDResourceBinding binding;
+				binding.handle = handle;
 				
 				if( srvProxy ) {
 					outProxies[srvHandle] = AnyProxy(srvProxy);
@@ -262,6 +269,8 @@ namespace Engine {
 					DependerTreeNode srvResourceNode;
 					srvResourceNode.resourceHandle = srvHandle;
 					resourceNode.children.push_back(srvResourceNode);
+
+					binding.srvBinding = srvBinding;
 				}
 
 				if( rtvProxy ) {
@@ -270,6 +279,8 @@ namespace Engine {
 					DependerTreeNode rtvResourceNode;
 					rtvResourceNode.resourceHandle = rtvHandle;
 					resourceNode.children.push_back(rtvResourceNode);
+
+					binding.rtvBinding = rtvBinding;
 				}
 
 				if( dsvProxy ) {
@@ -278,6 +289,8 @@ namespace Engine {
 					DependerTreeNode dsvResourceNode;
 					dsvResourceNode.resourceHandle = dsvHandle;
 					resourceNode.children.push_back(dsvResourceNode);
+
+					binding.dsvBinding = dsvBinding;
 				}
 
 				outResourceHierarchy.push_back(resourceNode);
@@ -285,7 +298,7 @@ namespace Engine {
 		};
 
 		template <>
-		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D> {
+		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D, TextureNDResourceBinding> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>;
 
@@ -293,6 +306,7 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
+				TextureNDResourceBinding        &outBinding,
 				ResourceProxyMap                &outProxies,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{
@@ -364,7 +378,7 @@ namespace Engine {
 		};
 
 		template <>
-		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D> {
+		class ProxyTreeCreator<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D, TextureNDResourceBinding> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>;
 
@@ -372,6 +386,7 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
+				TextureNDResourceBinding        &outBinding,
 				ResourceProxyMap                &outProxies,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{

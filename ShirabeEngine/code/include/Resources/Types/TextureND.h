@@ -6,6 +6,10 @@
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 #include "GFXAPI/Definitions.h"
 
+#include "Resources/Types/ShaderResource.h"
+#include "Resources/Types/RenderTarget.h"
+#include "Resources/Types/DepthStencil.h"
+
 namespace Engine {
 	namespace Resources {
 		using namespace GFXAPI;
@@ -235,6 +239,13 @@ namespace Engine {
 			descriptor_type _descriptor;
 		};
 
+		struct TextureNDResourceBinding {
+			ResourceHandle handle;
+			ShaderResourceResourceBinding srvBinding;
+			RenderTargetResourceBinding   rtvBinding;
+			DepthStencilResourceBinding   dsvBinding;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	TextureNDBase
 		 *
@@ -262,11 +273,11 @@ namespace Engine {
 		 *
 		 * \brief	A gapi texture 1 d.
 		 **************************************************************************************************/
-		class GAPITexture1D
+		class Texture1D
 			: public TextureNDBase<1>
 		{
 		public:
-			inline GAPITexture1D(
+			inline Texture1D(
 				const descriptor_type &descriptor)
 				: TextureNDBase<1>(descriptor) 
 			{}
@@ -277,11 +288,11 @@ namespace Engine {
 		 *
 		 * \brief	A gapi texture 2d.
 		 **************************************************************************************************/
-		class GAPITexture2D
+		class Texture2D
 			: public TextureNDBase<2>
 		{
 		public:
-			inline GAPITexture2D(
+			inline Texture2D(
 				const descriptor_type &descriptor)
 				: TextureNDBase<2>(descriptor)
 			{}
@@ -292,19 +303,19 @@ namespace Engine {
 		 *
 		 * \brief	A gapi texture 3d.
 		 **************************************************************************************************/
-		class GAPITexture3D
+		class Texture3D
 			: public TextureNDBase<3>
 		{
 		public:
-			inline GAPITexture3D(
+			inline Texture3D(
 				const descriptor_type &descriptor)
 				: TextureNDBase<3>(descriptor)
 			{}
 		};
 
-		DeclareSharedPointerType(GAPITexture1D);
-		DeclareSharedPointerType(GAPITexture2D);
-		DeclareSharedPointerType(GAPITexture3D);
+		DeclareSharedPointerType(Texture1D);
+		DeclareSharedPointerType(Texture2D);
+		DeclareSharedPointerType(Texture3D);
 	}
 }
 

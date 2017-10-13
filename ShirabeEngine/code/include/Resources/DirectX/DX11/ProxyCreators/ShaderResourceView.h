@@ -13,7 +13,7 @@ namespace Engine {
 	namespace Resources {
 
 		template <>
-		class ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW> {
+		class ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW, ShaderResourceResourceBinding> {
 		public:
 			using Descriptor = ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>;
 
@@ -21,7 +21,8 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory> &proxyFactory,
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
-				ResourceProxyMap                &outProxies,
+				ShaderResourceResourceBinding   &outBinding,
+				ResourceProxyMap                &outProxyMap,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");

@@ -27,6 +27,7 @@ namespace Engine {
 				const Descriptor                &desc,
 				ResourceHandleList              &inDependencyHandles,
 				SwapChainResourceBinding        &outBinding,
+				ResourceProxyMap                &outProxyMap,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{
 				if( desc.backBufferCount < 1 ) {

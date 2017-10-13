@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_RESOURCETYPES_SHADERRESOURCE_H__
-#define __SHIRABE_RESOURCETYPES_SHADERRESOURCE_H__
+#ifndef __SHIRABE_RESOURCETYPES_DEPTHSTENCIL_H__
+#define __SHIRABE_RESOURCETYPES_DEPTHSTENCIL_H__
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
@@ -15,10 +15,10 @@ namespace Engine {
 		using namespace GFXAPI;
 
 		/**********************************************************************************************//**
-		 * \struct	ShaderResourceDescriptorImpl
-		 *
-		 * \brief	A render target descriptor implementation.
-		 **************************************************************************************************/
+																										* \struct	ShaderResourceDescriptorImpl
+																										*
+																										* \brief	A render target descriptor implementation.
+																										**************************************************************************************************/
 		struct ShaderResourceDescriptorImpl {
 			enum class EShaderResourceDimension {
 				Texture,
@@ -32,7 +32,7 @@ namespace Engine {
 			union ShaderResourceDimension {
 				struct Texture {
 					unsigned int            dimensionNb; // 1..3
-				    VecND<uint32_t, 3>      dimensions;
+					VecND<uint32_t, 3>      dimensions;
 					bool                    isCube; // Implies the dimensions[2] to be 6
 					TextureArrayDescriptor  array;
 					TextureMipMapDescriptor mipMap;
@@ -75,14 +75,13 @@ namespace Engine {
 					<< " Format:     " << (uint8_t)format << "\n,";
 
 				if( srvType == EShaderResourceDimension::Texture ) {
-					ss 
-						<< " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb              << "\n,"
-						<< " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size               << "\n,"
-						<< " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice    << "\n,"
-						<< " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels         << "\n,"
-						<< " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel  << ";";
-				}
-				else { // StructuredBuffer
+					ss
+						<< " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb << "\n,"
+						<< " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size << "\n,"
+						<< " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice << "\n,"
+						<< " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels << "\n,"
+						<< " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel << ";";
+				} else { // StructuredBuffer
 					ss
 						<< " First elem. off.: " << (uint8_t)shaderResourceDimension.structuredBuffer.firstElementOffset << ","
 						<< " Elem. byte-size:  " << (uint8_t)shaderResourceDimension.structuredBuffer.elementWidthInBytes << ";";
@@ -93,10 +92,10 @@ namespace Engine {
 		};
 
 		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::GAPI_VIEW,EResourceSubType::RENDER_TARGET_VIEW>
-		 *
-		 * \brief	A render target view>.
-		 **************************************************************************************************/
+																										* \struct	ResourceDescriptor<EResourceType::GAPI_VIEW,EResourceSubType::RENDER_TARGET_VIEW>
+																										*
+																										* \brief	A render target view>.
+																										**************************************************************************************************/
 		template <>
 		struct ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>
 			: public ShaderResourceDescriptorImpl
@@ -106,10 +105,10 @@ namespace Engine {
 		typedef ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW> ShaderResourceDescriptor;
 
 		/**********************************************************************************************//**
-		 * \class	ShaderResourceDescriptorAdapterBase
-		 *
-		 * \brief	A render target descriptor adapter base.
-		 **************************************************************************************************/
+																										* \class	ShaderResourceDescriptorAdapterBase
+																										*
+																										* \brief	A render target descriptor adapter base.
+																										**************************************************************************************************/
 		class ShaderResourceDescriptorAdapterBase {
 		public:
 			typedef
@@ -136,10 +135,10 @@ namespace Engine {
 		};
 
 		/**********************************************************************************************//**
-		 * \class	GFXAPIShaderResource
-		 *
-		 * \brief	A gfxapi render target.
-		 **************************************************************************************************/
+																										* \class	GFXAPIShaderResource
+																										*
+																										* \brief	A gfxapi render target.
+																										**************************************************************************************************/
 		class ShaderResource
 			: public ShaderResourceDescriptorAdapterBase
 		{
