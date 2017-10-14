@@ -6,13 +6,14 @@
 #include "Resources/System/Core/Handle.h"
 
 #include "GFXAPI/Definitions.h"
+#include "GFXAPI/Types/TextureND.h"
+
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
-#include "Resources/Types/TextureND.h"
 
-namespace Engine {
-	namespace Resources {	
-		using namespace GFXAPI;
+namespace Engine 
+	namespace GFXAPI {
+
 
 		/**********************************************************************************************//**
 		 * \struct	RenderTargetDescriptorImpl

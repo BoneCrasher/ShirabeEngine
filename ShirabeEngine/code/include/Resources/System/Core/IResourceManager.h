@@ -6,8 +6,9 @@
 
 #include "Resources/System/Core/Handle.h"
 
-#include "Resources/Types/SwapChain.h"
-#include "Resources/Types/ShaderResource.h"
+#include "GFXAPI/Types/SwapChain.h"
+#include "GFXAPI/Types/ShaderResource.h"
+#include "GFXAPI/Types/TextureND.h"
 
 namespace Engine {
 	namespace Resources {

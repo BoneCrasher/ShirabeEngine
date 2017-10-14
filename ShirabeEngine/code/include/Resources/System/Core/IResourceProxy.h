@@ -84,15 +84,18 @@ namespace Engine {
 		 * \tparam	subtype	Type of the subtype.
 		 * \param	parameter1	The first parameter.
 		 **************************************************************************************************/
-		template <EResourceType type, EResourceSubType subtype>
-		DeclareDerivedTemplatedInterface(IResourceProxy, Template(IResourceProxy<type, subtype>), IResourceProxyBase);
+		template <typename TResource>
+		DeclareDerivedTemplatedInterface(IResourceProxy, Template(IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>), IResourceProxyBase);
+
+			using resource_type    = typename TResource::resource_type;
+			using resource_subtype = typename TResource::resource_subtype;
 
 			virtual bool destroy() = 0;
 
 		private:
 			// friend class ProxyTreeCreator<type, subtype>;
 
-			virtual bool create(const ResourceDescriptor<type, subtype>& desc) = 0;
+			virtual bool create(const ResourceDescriptor<resource_type, resource_subtype>& desc) = 0;
 		DeclareInterfaceEnd(IResourceProxy);
 
 	/**********************************************************************************************//**
@@ -105,8 +108,8 @@ namespace Engine {
 	 * \param	parameter1	The first parameter.
 	 * \param	parameter2	The second parameter.
 	 **************************************************************************************************/
-	template <EResourceType type, EResourceSubType subtype>
-	DeclareTemplatedSharedPointerType(IResourceProxy, Template(IResourceProxy<type, subtype>));
+	template <typename TResource>
+	DeclareTemplatedSharedPointerType(IResourceProxy, Template(IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>));
 
 	static Ptr<IResourceProxyBase> BaseProxyCast(const AnyProxy& proxy) {
 		return std::any_cast<Ptr<IResourceProxyBase>>(proxy);
@@ -123,20 +126,22 @@ namespace Engine {
 	 *
 	 * \return	A Ptr&lt;IResourceProxy&lt;type,subtype&gt;&gt;
 	 **************************************************************************************************/
-	template <EResourceType type, EResourceSubType subtype>
-	static Ptr<IResourceProxy<type, subtype>> ProxyCast(const AnyProxy& proxy) {
-		return std::any_cast<Ptr<IResourceProxy<type, subtype>>>(proxy);
+	template <typename TResource>
+	static Ptr<IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>> ProxyCast(const AnyProxy& proxy) {
+		return std::any_cast<Ptr<IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>>>(proxy);
 	}
 
 
-	template <EResourceType type, EResourceSubType subtype>
+	template <typename TResource>
 	class GenericProxyBase
-		: public Engine::Resources::IResourceProxy<type, subtype>
+		: public Engine::Resources::IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>
 	{
 	public:
+		using descriptor_type = ResourceDescriptor<typename TResource::resource_type, typename TResource::resource_subtype>;
+
 		inline GenericProxyBase(
-			const EProxyType                        &proxyType,
-			const ResourceDescriptor<type, subtype> &descriptor)
+			const EProxyType      &proxyType,
+			const descriptor_type &descriptor)
 			: Engine::Resources::IResourceProxy<type, subtype>()
 			, _type(proxyType)
 			, _loadState(ELoadState::UNKNOWN)
@@ -148,8 +153,8 @@ namespace Engine {
 		inline EProxyType proxyType() const { return _type; }
 		inline ELoadState loadState() const { return _loadState; }
 
-		inline const ResourceDescriptor<type, subtype>& descriptor()   const { return _descriptor; }
-		inline const ResourceHandleList&                dependencies() const { return _dependencies; }
+		inline const descriptor_type&     descriptor()   const { return _descriptor; }
+		inline const ResourceHandleList&  dependencies() const { return _dependencies; }
 
 		inline bool destroy() { return unloadSync(); }
 
@@ -165,8 +170,8 @@ namespace Engine {
 		EProxyType _type;
 		ELoadState _loadState;
 
-		ResourceDescriptor<type, subtype> _descriptor;
-		ResourceHandleList                _dependencies;
+		descriptor_type    _descriptor;
+		ResourceHandleList _dependencies;
 	};
 
 	}

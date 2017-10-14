@@ -10,24 +10,19 @@
 
 namespace Engine {
 	namespace Resources {
-
-		struct ResourceDescriptorBase {
-		};
-
-		DeclareListType(ResourceDescriptorBase, ResourceDescriptorBase);
-
-		template <EResourceType type, EResourceSubType subtype>
+		
+		template <typename TResource>
 		struct ResourceDescriptor
-			: ResourceDescriptorBase {
-			static const constexpr EResourceType    resource_type    = type;
-			static const constexpr EResourceSubType resource_subtype = subtype;
+			: public typename TResource::descriptor_impl_type 
+		{
+			static const constexpr EResourceType    resource_type    = TResource::resource_type;
+			static const constexpr EResourceSubType resource_subtype = TResource::resource_subtype;
+
+			using descriptor_impl_type = typename TResource::descriptor_impl_type;
 		};
-
-		template <EResourceType type, EResourceSubType subtype>
-		DeclareListType(Template(ResourceDescriptor<type, subtype>), ResourceDescriptor);
-
-		template <EResourceType type, EResourceSubType subtype>
-		static inline std::ostream& operator <<(std::ostream& s, const ResourceDescriptor<type, subtype>& d) {
+		
+		template <typename TResource>
+		static inline std::ostream& operator <<(std::ostream& s, const ResourceDescriptor<TResource>& d) {
 			return (s << d.toString());
 		}
 
@@ -39,11 +34,11 @@ namespace Engine {
 		 * \tparam	type   	Type of the type.
 		 * \tparam	subtype	Type of the subtype.
 		 **************************************************************************************************/
-		template <EResourceType type, EResourceSubType subtype>
+		template <typename TResource>
 		class ResourceDescriptorAdapterBase {
 		public:
 			typedef
-				typename ResourceDescriptor<type, subtype>::type
+				typename ResourceDescriptor<TResource>::type
 				descriptor_type;
 
 			inline ResourceDescriptorAdapterBase(

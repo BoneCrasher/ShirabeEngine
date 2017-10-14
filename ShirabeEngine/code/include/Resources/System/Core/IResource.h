@@ -7,13 +7,13 @@
 namespace Engine {
 	namespace Resources {
 
-		template <typename TGAPIResource>
-		using GAPIResourcePtr = std::shared_ptr<TGAPIResource>;
+		template <typename TResource>
+		using GAPIResourcePtr = std::shared_ptr<TResource>;
 
-		template <typename TGAPIResource>
+		template <typename TResource>
 		DeclareInterface(IGAPIResourceAdapter);
 		
-		virtual const GAPIResourcePtr<TGAPIResource>
+		virtual const GAPIResourcePtr<TResource>
 			getGAPIResource() const = 0;
 
 		virtual EEngineStatus 
@@ -21,12 +21,12 @@ namespace Engine {
 
 		DeclareInterfaceEnd(IGAPIResourceAdapter);
 
-		template <typename TGAPIResource>
+		template <typename TResource>
 		// using IGAPIResourceAdapterPtr = std::shared_ptr<IGAPIResourceAdapter<TGAPIResource>>;
-		DeclareTemplatedSharedPointerType(IGAPIResourceAdapter, typename IGAPIResourceAdapter<TGAPIResource>);
+		DeclareTemplatedSharedPointerType(IGAPIResourceAdapter, typename IGAPIResourceAdapter<TResource>);
 
-		template <typename TGAPIResource>
-		DeclareListType(IGAPIResourceAdapterPtr<TGAPIResource>, IGAPIResourceAdapter);
+		template <typename TResource>
+		DeclareListType(IGAPIResourceAdapterPtr<TResource>, IGAPIResourceAdapter);
 	}
 }
 

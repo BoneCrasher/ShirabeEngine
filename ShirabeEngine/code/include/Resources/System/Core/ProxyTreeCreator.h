@@ -23,8 +23,12 @@ namespace Engine {
 		 * ### tparam	type   	Type of the type.
 		 * ### tparam	subtype	Type of the subtype.
 		 **************************************************************************************************/
-		template <EResourceType type, EResourceSubType subtype, typename TResourceBinding>
+		template <typename TResource>
 		class ProxyTreeCreator {
+
+			using resource_type    = typename TResource::resource_type;
+			using resource_subtype = typename TResource::resource_subtype;
+			using binding_type     = typename TResource::binding_type;
 
 			/**********************************************************************************************//**
 			 * \fn	static bool ProxyTreeCreator::create( const Ptr<ResourceProxyFactory> &proxyFactory, const ResourceDescriptor<type, subtype> &desc, ResourceHandleList &inDependencyHandles, TResourceBinding &outBinding, ResourceProxyMap &outProxyMap, DependerTreeNodeList &outResourceHierarchy)
@@ -44,12 +48,12 @@ namespace Engine {
 			 **************************************************************************************************/
 			static bool create(
 				//
-				const Ptr<ResourceProxyFactory>         &proxyFactory,
-				const ResourceDescriptor<type, subtype> &desc,
-				ResourceHandleList                      &inDependencyHandles,
-				TResourceBinding                        &outBinding,      
-				ResourceProxyMap                        &outProxyMap,        
-				DependerTreeNodeList                    &outResourceHierarchy)
+				const Ptr<ResourceProxyFactory>                           &proxyFactory,
+				const ResourceDescriptor<resource_type, resource_subtype> &desc,
+				ResourceHandleList                                        &inDependencyHandles,
+				binding_type                                              &outBinding,      
+				ResourceProxyMap                                          &outProxyMap,        
+				DependerTreeNodeList                                      &outResourceHierarchy)
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}
