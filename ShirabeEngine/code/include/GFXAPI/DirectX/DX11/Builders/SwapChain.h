@@ -6,10 +6,10 @@
 
 #include "Resources/System/Core/Handle.h"
 
-#include "Resources/Types/SwapChain.h"
+#include "GFXAPI/Types/SwapChain.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -43,7 +43,7 @@ namespace Engine {
 			 * \brief	A dx 11 swap chain resource builder.
 			 **************************************************************************************************/
 			class DX11SwapChainResourceBuilder
-				: public DX11ResourceBuilderBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN, IUnknownPtr>
+				: public DX11ResourceBuilderBase<SwapChain, IUnknownPtr>
 			{
 				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
 

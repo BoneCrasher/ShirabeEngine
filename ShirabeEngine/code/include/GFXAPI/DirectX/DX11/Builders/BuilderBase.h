@@ -15,10 +15,9 @@ namespace Engine {
 		};
 		
 		template <
-			EResourceType    type,
-			EResourceSubType subtype,
-			typename         TResourceBasePtr>
-	    using DX11ResourceBuilderBase = ResourceBuilderBase<type, subtype, DX11BuilderParameters, TResourceBasePtr>;
+			typename TResource,
+			typename TResourceBasePtr>
+	    using DX11ResourceBuilderBase = ResourceBuilderBase<TResource, DX11BuilderParameters, TResourceBasePtr>;
 	}
 }
 

@@ -61,18 +61,18 @@ namespace Engine {
 		 * \tparam	TResource  	Type of the resource.
 		 **************************************************************************************************/
 		template <
-			EResourceType    type,
-			EResourceSubType subtype,
-			typename         TGFXAPIParametersStruct,
-			typename         TResourceBasePtr
+			typename TResource,
+			typename TGFXAPIParametersStruct,
+			typename TResourceBasePtr
 		>
 		struct ResourceBuilderTraits {
-			static const EResourceType    resource_type    = type;
-			static const EResourceSubType resource_subtype = subtype;
+			static const EResourceType    resource_type    = TResource::resource_type;
+			static const EResourceSubType resource_subtype = TResource::resource_subtype;
 
 			typedef 
-				typename ResourceDescriptor<resource_type, resource_subtype>  
+				ResourceDescriptor<TResource>  
 				descriptor_type;
+
 			typedef
 				TGFXAPIParametersStruct
 				gfxapi_parameter_struct_type;
@@ -95,16 +95,15 @@ namespace Engine {
 		 * \tparam	TResource  	Type of the resource.
 		 **************************************************************************************************/
 		template <
-			EResourceType    type,
-			EResourceSubType subtype,
-			typename         TGFXAPIParametersStruct,
-			typename         TResourceBasePtr,
-			typename         Traits  = ResourceBuilderTraits<type, subtype, TGFXAPIParametersStruct, TResourceBasePtr>
+			typename TResource,
+			typename TGFXAPIParametersStruct,
+			typename TResourceBasePtr,
+			typename Traits  = ResourceBuilderTraits<TResource, TGFXAPIParametersStruct, TResourceBasePtr>
 		>
 		class ResourceBuilderBase
 		{
 		public:
-			typedef ResourceBuilderBase<type, subtype, TGFXAPIParametersStruct, TResourceBasePtr, Traits> my_type;
+			typedef ResourceBuilderBase<TResource, TGFXAPIParametersStruct, TResourceBasePtr, Traits> my_type;
 			typedef typename Traits traits_type;
 
 			static const EResourceType    resource_type    = traits_type::resource_type;

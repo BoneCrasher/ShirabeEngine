@@ -1,15 +1,15 @@
-#include "Resources/DirectX/DX11/Builders/RenderTargetView.h"
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
+#include "GFXAPI/DirectX/DX11/Builders/RenderTargetView.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
 
 			EEngineStatus createRenderTargetView (
-				const ID3D11DevicePtr        &device,
-				const RenderTargetDescriptor &desc,
-				ID3D11ResourcePtr            &sourceResource,
-				ID3D11RenderTargetViewPtr    &outRTV
+				const ID3D11DevicePtr            &device,
+				const RenderTargetViewDescriptor &desc,
+				ID3D11ResourcePtr                &sourceResource,
+				ID3D11RenderTargetViewPtr        &outRTV
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes  = EEngineStatus::Ok;

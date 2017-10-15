@@ -150,6 +150,15 @@ namespace Engine {
 			ResourceHandle dsvBinding;
 		};
 
+		template <uint8_t N>
+		struct TextureNDTraits {
+			static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_1D;
+
+			using binding_type         = TextureNDResourceBinding;
+			using descriptor_impl_type = TextureDescriptorImpl<N>;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	TextureNDBase
 		 *
@@ -159,23 +168,20 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <uint8_t N>
 		class TextureNDBase
-			: public ResourceDescriptorAdapter<TextureNDBase<N>>
-			, public ResourceBindingAdapter<TextureNDBase<N>>
+			: public ResourceDescriptorAdapter<TextureNDTraits<N>>
+			, public ResourceBindingAdapter<TextureNDTraits<N>>
 		{
 		public:
-			static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
-			static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_1D;
-
-			using binding_type         = TextureNDResourceBinding;
-			using descriptor_impl_type = TextureDescriptorImpl<N>;
-
 			using my_type = TextureNDBase<N>;
+			static const constexpr EResourceType    resource_type    = TextureNDTraits<N>::resource_type;
+			static const constexpr EResourceSubType resource_subtype = TextureNDTraits<N>::resource_subtype;
+			using descriptor_impl_type = typename TextureNDTraits<N>::descriptor_impl_type;
 
 			TextureNDBase(
 				const descriptor_type &descriptor,
 				const binding_type    &binding) 
-				: ResourceDescriptorAdapter<TextureNDBase<N>>(descriptor)
-				, ResourceBindingAdapter<TextureNDBase<N>>(binding)
+				: ResourceDescriptorAdapter<TextureNDTraits<N>>(descriptor)
+				, ResourceBindingAdapter<TextureNDTraits<N>>(binding)
 			{}
 
 		private:

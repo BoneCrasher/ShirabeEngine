@@ -51,17 +51,17 @@ namespace Engine {
 		 *
 		 * \brief	A platform resource wrapper.
 		 **************************************************************************************************/
-		template <EResourceType type, EResourceSubType subtype>
+		template <typename TResource>
 		class GFXAPIResourceProxy
-			: public ResourceSubsystemProxy<IGFXAPIResourceSubsystem, type, subtype>
+			: public ResourceSubsystemProxy<IGFXAPIResourceSubsystem, TResource>
 			, public GFXAPIResourceAdapter
 		{
 		public:
 			inline GFXAPIResourceProxy(
-				const EProxyType                        &proxyType,
-				const Ptr<IGFXAPIResourceSubsystem>     &subsystem,
-				const ResourceDescriptor<type, subtype> &descriptor)
-				: ResourceSubsystemProxy<IGFXAPIResourceSubsystem, type, subtype>(proxyType, subsystem, descriptor)
+				const EProxyType                    &proxyType,
+				const Ptr<IGFXAPIResourceSubsystem> &subsystem,
+				const ResourceDescriptor<TResource> &descriptor)
+				: ResourceSubsystemProxy<IGFXAPIResourceSubsystem, TResource>(proxyType, subsystem, descriptor)
 				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
 			{
 			}
@@ -80,8 +80,8 @@ namespace Engine {
 		private:
 		};
 
-		template <EResourceType type, EResourceSubType subtype>
-		bool GFXAPIResourceProxy<type, subtype>
+		template <typename TResource>
+		bool GFXAPIResourceProxy<TResource>
 			::loadSync(
 				const ResourceHandle   &inHandle,
 				const ResourceProxyMap &inDependencies)
@@ -89,8 +89,8 @@ namespace Engine {
 			return true;
 		}
 
-		template <EResourceType type, EResourceSubType subtype>
-		bool GFXAPIResourceProxy<type, subtype>
+		template <typename TResource>
+		bool GFXAPIResourceProxy<TResource>
 			::unloadSync()
 		{
 			return true;

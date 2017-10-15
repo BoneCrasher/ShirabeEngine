@@ -11,7 +11,6 @@
 #include "IOC/Observer.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPIResourceProxy.h"
 
 namespace Engine {
 	namespace GFXAPI {

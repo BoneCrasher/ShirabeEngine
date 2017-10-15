@@ -1,6 +1,6 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "Resources/DirectX/DX11/Builders/TextureND.h"
+#include "GFXAPI/DirectX/DX11/Builders/TextureND.h"
 
 namespace Engine {
 	namespace DX {

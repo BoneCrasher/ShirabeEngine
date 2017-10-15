@@ -1,16 +1,16 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "Resources/DirectX/DX11/Builders/ShaderResourceView.h"
+#include "GFXAPI/DirectX/DX11/Builders/ShaderResourceView.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
 
 			EEngineStatus DX11ShaderResourceBuilderImpl::createShaderResource(
-				const ID3D11DevicePtr          &device,
-				const ShaderResourceDescriptor &desc,
-				ID3D11ResourcePtr              &inUnderlyingResource,
-				ID3D11ShaderResourceViewPtr    &outRes
+				const ID3D11DevicePtr              &device,
+				const ShaderResourceViewDescriptor &desc,
+				ID3D11ResourcePtr                  &inUnderlyingResource,
+				ID3D11ShaderResourceViewPtr        &outRes
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes  = EEngineStatus::Ok;
@@ -21,7 +21,7 @@ namespace Engine {
 				srvDesc.Format = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.format);
 
 				// Map configuration to DX11 creation struct
-				if( desc.srvType == ShaderResourceDescriptor::EShaderResourceDimension::Texture ) {
+				if( desc.srvType == ShaderResourceViewDescriptor::EShaderResourceDimension::Texture ) {
 					switch( desc.shaderResourceDimension.texture.dimensionNb ) {
 					case 1:
 						if( desc.shaderResourceDimension.texture.array.isTextureArray ) {

@@ -5,10 +5,11 @@
 #include "Log/Log.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/Types/RenderTarget.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
+
+#include "GFXAPI/Types/RenderTargetView.h"
 
 namespace Engine {
 	namespace DX {
@@ -17,15 +18,15 @@ namespace Engine {
 			using namespace GFXAPI;
 
 			EEngineStatus createRenderTargetView (
-				const ID3D11DevicePtr        &device,
-				const RenderTargetDescriptor &desc,
-				IUnknownPtr                  &sourceResource,
-				ID3D11RenderTargetViewPtr    &outRTV
+				const ID3D11DevicePtr            &device,
+				const RenderTargetViewDescriptor &desc,
+				IUnknownPtr                      &sourceResource,
+				ID3D11RenderTargetViewPtr        &outRTV
 			);
 
 
 			class DX11RenderTargetResourceBuilder
-				: public DX11ResourceBuilderBase<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW, IUnknownPtr>
+				: public DX11ResourceBuilderBase<RenderTargetView, IUnknownPtr>
 			{
 				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
 

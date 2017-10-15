@@ -7,7 +7,7 @@
 #include "Resources/System/Core/Handle.h"
 
 #include "GFXAPI/Types/SwapChain.h"
-#include "GFXAPI/Types/ShaderResource.h"
+#include "GFXAPI/Types/ShaderResourceView.h"
 #include "GFXAPI/Types/TextureND.h"
 
 namespace Engine {
@@ -22,28 +22,17 @@ namespace Engine {
 		virtual EEngineStatus createTexture1D
 		(
 			const Texture1DDescriptor &desc,
-			ResourceHandle            &outHandle
+			Ptr<Texture1D>            &outTexture1D
 		) = 0;
 		virtual EEngineStatus createTexture2D
 		(
 			const Texture2DDescriptor &desc,
-			ResourceHandle            &outHandle
+			Ptr<Texture2D>            &outTexture2D
 		) = 0;
 		virtual EEngineStatus createTexture3D
 		(
 			const Texture3DDescriptor &desc,
-			ResourceHandle            &outHandle
-		) = 0;
-
-		virtual EEngineStatus createShaderResource(
-			const ShaderResourceDescriptor &shaderResourceDescriptor,
-			const ResourceHandle           &inUnderlyingResourceHandle,
-			ResourceHandle                 &outShaderResourceHandle
-		) = 0;
-
-		virtual EEngineStatus createRenderTarget(
-			const ResourceHandle &inHandle,
-			ResourceHandle       &outHandle
+			Ptr<Texture3D>            &outTexture3D
 		) = 0;
 
 		DeclareInterfaceEnd(IResourceManager);

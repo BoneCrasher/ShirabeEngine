@@ -6,10 +6,6 @@
 namespace Engine {
 	namespace Resources {
 
-		template <typename TResource>
-		struct ResourceBinding {
-
-		};
 
 		/**********************************************************************************************//**
 		 * \class	ProxyTreeCreator
@@ -48,12 +44,12 @@ namespace Engine {
 			 **************************************************************************************************/
 			static bool create(
 				//
-				const Ptr<ResourceProxyFactory>                           &proxyFactory,
-				const ResourceDescriptor<resource_type, resource_subtype> &desc,
-				ResourceHandleList                                        &inDependencyHandles,
-				binding_type                                              &outBinding,      
-				ResourceProxyMap                                          &outProxyMap,        
-				DependerTreeNodeList                                      &outResourceHierarchy)
+				const Ptr<ResourceProxyFactory>     &proxyFactory,
+				const ResourceDescriptor<TResource> &desc,
+				ResourceHandleList                  &inDependencyHandles,
+				binding_type                        &outBinding,      
+				ResourceProxyMap                    &outProxyMap,        
+				DependerTreeNodeList                &outResourceHierarchy)
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}

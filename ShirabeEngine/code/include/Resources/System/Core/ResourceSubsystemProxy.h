@@ -10,16 +10,16 @@
 namespace Engine {
 	namespace Resources {
 
-		template <typename TSubsystem, EResourceType type, EResourceSubType subtype>
+		template <typename TSubsystem, typename TResource>
 		class ResourceSubsystemProxy
-			: public GenericProxyBase<type, subtype>
+			: public GenericProxyBase<TResource>
 		{
 		public:
 			inline ResourceSubsystemProxy(
-				const EProxyType                        &proxyType,
-				const Ptr<TSubsystem>                   &subsystem,
-				const ResourceDescriptor<type, subtype> &descriptor)
-				: GenericProxyBase<type, subtype>(proxyType, descriptor)
+				const EProxyType                    &proxyType,
+				const Ptr<TSubsystem>               &subsystem,
+				const ResourceDescriptor<TResource> &descriptor)
+				: GenericProxyBase<TResource>(proxyType, descriptor)
 				, _subsystem(subsystem)
 			{ }
 

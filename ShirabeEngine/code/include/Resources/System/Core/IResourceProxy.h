@@ -85,17 +85,14 @@ namespace Engine {
 		 * \param	parameter1	The first parameter.
 		 **************************************************************************************************/
 		template <typename TResource>
-		DeclareDerivedTemplatedInterface(IResourceProxy, Template(IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>), IResourceProxyBase);
-
-			using resource_type    = typename TResource::resource_type;
-			using resource_subtype = typename TResource::resource_subtype;
+		DeclareDerivedTemplatedInterface(IResourceProxy, Template(IResourceProxy<TResource>), IResourceProxyBase);
 
 			virtual bool destroy() = 0;
 
 		private:
 			// friend class ProxyTreeCreator<type, subtype>;
 
-			virtual bool create(const ResourceDescriptor<resource_type, resource_subtype>& desc) = 0;
+			virtual bool create(const ResourceDescriptor<TResource>& desc) = 0;
 		DeclareInterfaceEnd(IResourceProxy);
 
 	/**********************************************************************************************//**
@@ -109,7 +106,7 @@ namespace Engine {
 	 * \param	parameter2	The second parameter.
 	 **************************************************************************************************/
 	template <typename TResource>
-	DeclareTemplatedSharedPointerType(IResourceProxy, Template(IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>));
+	DeclareTemplatedSharedPointerType(IResourceProxy, Template(IResourceProxy<TResource>));
 
 	static Ptr<IResourceProxyBase> BaseProxyCast(const AnyProxy& proxy) {
 		return std::any_cast<Ptr<IResourceProxyBase>>(proxy);
@@ -127,22 +124,22 @@ namespace Engine {
 	 * \return	A Ptr&lt;IResourceProxy&lt;type,subtype&gt;&gt;
 	 **************************************************************************************************/
 	template <typename TResource>
-	static Ptr<IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>> ProxyCast(const AnyProxy& proxy) {
-		return std::any_cast<Ptr<IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>>>(proxy);
+	static Ptr<IResourceProxy<TResource>> ProxyCast(const AnyProxy& proxy) {
+		return std::any_cast<Ptr<IResourceProxy<TResource>>>(proxy);
 	}
 
 
 	template <typename TResource>
 	class GenericProxyBase
-		: public Engine::Resources::IResourceProxy<typename TResource::resource_type, typename TResource::resource_subtype>
+		: public Engine::Resources::IResourceProxy<TResource>
 	{
 	public:
-		using descriptor_type = ResourceDescriptor<typename TResource::resource_type, typename TResource::resource_subtype>;
+		using descriptor_type = ResourceDescriptor<TResource>;
 
 		inline GenericProxyBase(
 			const EProxyType      &proxyType,
 			const descriptor_type &descriptor)
-			: Engine::Resources::IResourceProxy<type, subtype>()
+			: Engine::Resources::IResourceProxy<TResource>()
 			, _type(proxyType)
 			, _loadState(ELoadState::UNKNOWN)
 			, _descriptor(descriptor)

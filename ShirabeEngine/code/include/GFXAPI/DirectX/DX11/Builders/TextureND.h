@@ -5,10 +5,10 @@
 #include "Log/Log.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/Types/TextureND.h"
+#include "GFXAPI/Types/TextureND.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -42,7 +42,7 @@ namespace Engine {
 			 * \brief	A dx 11 texture 1 d resource builder.
 			 **************************************************************************************************/
 			class DX11Texture1DResourceBuilder
-				: public DX11ResourceBuilderBase<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D, IUnknownPtr>
+				: public DX11ResourceBuilderBase<Texture1D, IUnknownPtr>
 			{
 				DeclareLogTag(Texture1DResourceBuilder_ID3D11Device);
 
@@ -77,7 +77,7 @@ namespace Engine {
 			 * \brief	A dx 11 texture 2D resource builder.
 			 **************************************************************************************************/
 			class DX11Texture2DResourceBuilder
-				: public DX11ResourceBuilderBase<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D, IUnknownPtr>
+				: public DX11ResourceBuilderBase<Texture2D, IUnknownPtr>
 			{
 				DeclareLogTag(Texture2DResourceBuilder_ID3D11Device);
 
@@ -109,7 +109,7 @@ namespace Engine {
 			};
 
 			class DX11Texture3DResourceBuilder
-				: public DX11ResourceBuilderBase<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D, IUnknownPtr>
+				: public DX11ResourceBuilderBase<Texture3D, IUnknownPtr>
 			{
 				DeclareLogTag(Texture3DResourceBuilder_ID3D11Device);
 

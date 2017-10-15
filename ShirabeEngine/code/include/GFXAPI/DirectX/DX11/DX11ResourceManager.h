@@ -11,9 +11,9 @@
 
 #include "Resources/System/Core/ProxyBasedResourceManager.h"
 
-#include "Resources/DirectX/DX11/Builders/TextureND.h"
-#include "Resources/DirectX/DX11/Builders/RenderTargetView.h"
-#include "Resources/DirectX/DX11/Builders/ShaderResourceView.h"
+#include "GFXAPI/DirectX/DX11/Builders/TextureND.h"
+#include "GFXAPI/DirectX/DX11/Builders/RenderTargetView.h"
+#include "GFXAPI/DirectX/DX11/Builders/ShaderResourceView.h"
 
 namespace Engine {
 	namespace DX {
@@ -40,26 +40,15 @@ namespace Engine {
 
 				EEngineStatus createTexture1D(
 					const Texture1DDescriptor &desc,
-					ResourceHandleList        &outHandles);
+					Ptr<Texture1D>            &outTexture1D);
 
 				EEngineStatus createTexture2D(
 					const Texture2DDescriptor &desc,
-					ResourceHandleList        &outHandles);
+					Ptr<Texture2D>            &outTexture2D);
 
 				EEngineStatus createTexture3D(
 					const Texture3DDescriptor &desc,
-					ResourceHandleList        &outHandles);
-
-				EEngineStatus createShaderResource(
-					const ShaderResourceDescriptor &shaderResourceDescriptor,
-					const ResourceHandle           &inUnderlyingResourceHandle,
-					ResourceHandle                 &outShaderResourceHandle
-				);
-
-				EEngineStatus createRenderTarget(
-					const ResourceHandle &inHandle,
-					ResourceHandle       &outHandle
-				);
+					Ptr<Texture3D>            &outTexture3D);
 
 				// EEngineStatus createDepthStencilView(
 				// 	const DepthStencilViewDescriptor &desc,

@@ -1,10 +1,11 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
-#include "Resources/DirectX/DX11/DX11ResourceManager.h"
+#include "GFXAPI/DirectX/DX11/DX11ResourceManager.h"
 
-#include "Resources/DirectX/DX11/Builders/TextureND.h"
-#include "Resources/DirectX/DX11/Builders/RenderTargetView.h"
-#include "Resources/DirectX/DX11/Builders/SwapChain.h"
-#include "Resources/DirectX/DX11/Builders/ShaderResourceView.h"
+#include "GFXAPI/DirectX/DX11/Builders/TextureND.h"
+#include "GFXAPI/DirectX/DX11/Builders/SwapChain.h"
+#include "GFXAPI/DirectX/DX11/Builders/ShaderResourceView.h"
+#include "GFXAPI/DirectX/DX11/Builders/RenderTargetView.h"
+// #include "GFXAPI/DirectX/DX11/Builders/DepthStencilView.h"
 
 namespace Engine {
 	namespace DX {
@@ -29,7 +30,7 @@ namespace Engine {
 			{				
 				SwapChainResourceBinding binding;
 
-				EEngineStatus status = createResource<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN, SwapChainResourceBinding>(
+				EEngineStatus status = createResource<SwapChain>(
 					inDesc,
 					false,
 					binding);
@@ -45,32 +46,59 @@ namespace Engine {
 
 			EEngineStatus DX11ResourceManager::createTexture1D(
 				const Texture1DDescriptor &desc,
-				ResourceHandleList        &outHandles) 
+				Ptr<Texture1D>            &outTexture1D) 
 			{
-				return createResource<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>(
+				TextureNDResourceBinding binding; 
+
+				EEngineStatus status = createResource<Texture1D>(
 						desc,
 						false,
-						outHandles);
+						binding);
+				if( CheckEngineError(status) ) {
+					Log::Error(logTag(), "Failed to create swapchain resource.");
+					return status;
+				}
+
+				outTexture1D = Texture1D::create(desc, binding);
+				return EEngineStatus::Ok;
 			}
 
 			EEngineStatus DX11ResourceManager::createTexture2D(
 				const Texture2DDescriptor &desc,
-				ResourceHandleList        &outHandles)
+				Ptr<Texture2D>            &outTexture2D)
 			{
-				return createResource<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>(
-						desc,
-						false,
-						outHandles);
-			}			
+				TextureNDResourceBinding binding;
+
+				EEngineStatus status = createResource<Texture2D>(
+					desc,
+					false,
+					binding);
+				if( CheckEngineError(status) ) {
+					Log::Error(logTag(), "Failed to create swapchain resource.");
+					return status;
+				}
+
+				outTexture2D = Texture2D::create(desc, binding);
+				return EEngineStatus::Ok;
+			}
 
 			EEngineStatus DX11ResourceManager::createTexture3D(
 				const Texture3DDescriptor &desc,
-				ResourceHandleList        &outHandles)
+				Ptr<Texture3D>            &outTexture3D)
 			{
-				return createResource<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>(
+				TextureNDResourceBinding binding;
+
+				EEngineStatus status = createResource<Texture3D>(
 					desc,
 					false,
-					outHandles);
+					binding);
+				if( CheckEngineError(status) ) {
+					Log::Error(logTag(), "Failed to create swapchain resource.");
+					return status;
+				}
+
+				outTexture3D = Texture3D::create(desc, binding);
+				return EEngineStatus::Ok;
 			}
 
 			// EEngineStatus DX11ResourceManager::createDepthStencilView(

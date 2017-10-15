@@ -100,29 +100,34 @@ namespace Engine {
 			ResourceHandle handle;
 		};
 
+		struct ShaderResourceViewTraits {
+			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SHADER_RESOURCE_VIEW;
+
+			using descriptor_impl_type = ShaderResourceViewDescriptorImpl;
+			using binding_type         = ShaderResourceViewResourceBinding;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	GFXAPIShaderResource
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class ShaderResourceView
-			: public ResourceDescriptorAdapter<ShaderResourceView>
-			, public ResourceBindingAdapter<ShaderResourceView>
+			: public ResourceDescriptorAdapter<ShaderResourceViewTraits>
+			, public ResourceBindingAdapter<ShaderResourceViewTraits>
 		{
 		public:
-			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SHADER_RESOURCE_VIEW;
-
-			using descriptor_impl_type = ShaderResourceViewDescriptorImpl;
-			using binding_type         = ShaderResourceViewResourceBinding;
-
 			using my_type = ShaderResourceView;
+			static const constexpr EResourceType    resource_type    = ShaderResourceViewTraits::resource_type;
+			static const constexpr EResourceSubType resource_subtype = ShaderResourceViewTraits::resource_subtype;
+			using descriptor_impl_type = ShaderResourceViewTraits::descriptor_impl_type;
 
 			ShaderResourceView(
 				const descriptor_type &descriptor,
 				const binding_type    &binding)
-				: ResourceDescriptorAdapter<ShaderResourceView>(descriptor)
-				, ResourceBindingAdapter<ShaderResourceView>(binding)
+				: ResourceDescriptorAdapter<ShaderResourceViewTraits>(descriptor)
+				, ResourceBindingAdapter<ShaderResourceViewTraits>(binding)
 			{}
 		};
 

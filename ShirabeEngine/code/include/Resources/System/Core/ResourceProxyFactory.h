@@ -20,15 +20,13 @@ namespace Engine {
 				: _gfxApiResourceSubsystem(gfxApiResourceSubsystem)
 			{ }
 
-			template <EResourceType type, EResourceSubType subtype>
-			Ptr<IResourceProxy<type, subtype>> create(
-				const EProxyType                        &proxyType,
-				const ResourceDescriptor<type, subtype> &descriptor,
-				const ResourceHandleList                &dependencyHandles) {
-
-				using proxy_type = typename ProxyTypeMapper<type, subtype>::type;
-
-				Ptr<IResourceProxy<type, subtype>> proxy = nullptr;
+			template <typename TResource>
+			Ptr<IResourceProxy<TResource>> create(
+				const EProxyType                    &proxyType,
+				const ResourceDescriptor<TResource> &descriptor,
+				const ResourceHandleList            &dependencyHandles) {
+				
+				Ptr<IResourceProxy<TResource>> proxy = nullptr;
 
 				switch( type ) {
 				// GFXAPI-types
@@ -39,7 +37,7 @@ namespace Engine {
 				case EResourceType::MESH:
 				case EResourceType::SHADER:
 				case EResourceType::TEXTURE:
-					proxy = Ptr<GFXAPIResourceProxy<type, subtype>>(new GFXAPIResourceProxy<type, subtype>(proxyType, _gfxApiResourceSubsystem, descriptor, dependencyHandles));
+					proxy = Ptr<GFXAPIResourceProxy<TResource>>(new GFXAPIResourceProxy<TResource>(proxyType, _gfxApiResourceSubsystem, descriptor, dependencyHandles));
 					break;
 			    // Other
 				default:

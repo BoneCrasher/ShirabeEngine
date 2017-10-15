@@ -6,10 +6,10 @@
 
 #include "Resources/System/Core/Handle.h"
 
-#include "Resources/Types/ShaderResource.h"
+#include "GFXAPI/Types/ShaderResourceView.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "Resources/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -20,16 +20,16 @@ namespace Engine {
 				friend class DX11ShaderResourceBuilder;
 
 				static EEngineStatus createShaderResource(
-					const ID3D11DevicePtr          &device,
-					const ShaderResourceDescriptor &desc,
-					ID3D11ResourcePtr              &inUnderlyingResource,
-					ID3D11ShaderResourceViewPtr    &outRes);
+					const ID3D11DevicePtr              &device,
+					const ShaderResourceViewDescriptor &desc,
+					ID3D11ResourcePtr                  &inUnderlyingResource,
+					ID3D11ShaderResourceViewPtr        &outRes);
 
 			};
 
 
 			class DX11ShaderResourceBuilder
-				: public DX11ResourceBuilderBase<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW, IUnknownPtr>
+				: public DX11ResourceBuilderBase<ShaderResourceView, IUnknownPtr>
 			{
 				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
 

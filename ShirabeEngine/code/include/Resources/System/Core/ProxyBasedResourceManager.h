@@ -251,9 +251,9 @@ namespace Engine {
 			 **************************************************************************************************/
 			template <typename TResource>
 			EEngineStatus createResource(
-				const ResourceDescriptor<typename TResource::resource_type, typename TResource::resource_subtype> &desc,
-				bool                                                                                               creationDeferred,
-				typename TResource::binding_type                                                                  &binding
+				const ResourceDescriptor<TResource> &desc,
+				bool                                 creationDeferred,
+				typename TResource::binding_type    &binding
 			) {
 				using resource_type    = typename TResource::resource_type;
 				using resource_subtype = typename TResource::resource_subtype;
@@ -275,7 +275,7 @@ namespace Engine {
 				ResourceProxyMap     outProxies;
 				DependerTreeNodeList outDependerHierarchies;
 
-				bool treeCreationSuccessful = ProxyTreeCreator<resource_type, resource_subtype, binding_type>::create(_gfxApiProxyFactory, desc, {}, binding, outDependerHierarchies);
+				bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(_gfxApiProxyFactory, desc, {}, binding, outDependerHierarchies);
 				if( !treeCreationSuccessful ) {
 					Log::Error(logTag(), "Unable to create root resource proxy.");
 					return EEngineStatus::ResourceManager_ProxyCreationFailed;

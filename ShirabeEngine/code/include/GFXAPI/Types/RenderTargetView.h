@@ -49,35 +49,42 @@ namespace Engine {
 			// BufferResourceBinding    bufferBinding;
 		};
 
+		struct RenderTargetViewTraits {
+			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::RENDER_TARGET_VIEW;
+
+			using descriptor_impl_type = RenderTargetViewDescriptorImpl;
+			using binding_type         = RenderTargetViewResourceBinding;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	GFXAPIRenderTarget
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class RenderTargetView
-			: public ResourceDescriptorAdapter<RenderTargetView>
-			, public ResourceBindingAdapter<RenderTargetView>
+			: public ResourceDescriptorAdapter<RenderTargetViewTraits>
+			, public ResourceBindingAdapter<RenderTargetViewTraits>
 		{
 		public:
-			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-			static const constexpr EResourceSubType resource_subtype = EResourceSubType::RENDER_TARGET_VIEW;
-
-			using descriptor_impl_type = RenderTargetViewDescriptorImpl;
-			using binding_type         = RenderTargetViewResourceBinding;
-
 			using my_type = RenderTargetView;
+
+			static const constexpr EResourceType    resource_type    = RenderTargetViewTraits::resource_type;
+			static const constexpr EResourceSubType resource_subtype = RenderTargetViewTraits::resource_subtype;
+
+			using descriptor_impl_type = RenderTargetViewTraits::descriptor_impl_type;
 
 			RenderTargetView(
 				const descriptor_type &descriptor,
 				const binding_type    &binding)
-				: ResourceDescriptorAdapter<RenderTargetView>(descriptor)
-				, ResourceBindingAdapter<RenderTargetView>(binding)
+				: ResourceDescriptorAdapter<RenderTargetViewTraits>(descriptor)
+				, ResourceBindingAdapter<RenderTargetViewTraits>(binding)
 			{}
 		};
 
 		DeclareSharedPointerType(RenderTargetView);
 
-		using RenderTargetViewDescriptor = ResourceDescriptor<RenderTargetView>;
+		typedef ResourceDescriptor<RenderTargetView> RenderTargetViewDescriptor;
 	}
 }
 

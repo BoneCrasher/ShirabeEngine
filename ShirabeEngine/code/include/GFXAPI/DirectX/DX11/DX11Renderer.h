@@ -10,7 +10,7 @@
 
 #include "GFXAPI/IRenderer.h"
 
-#include "Resources/DirectX/DX11/DX11ResourceManager.h"
+#include "GFXAPI/DirectX/DX11/DX11ResourceManager.h"
 
 
 namespace Engine {

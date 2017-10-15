@@ -47,24 +47,29 @@ namespace Engine {
 			std::vector<RenderTargetViewResourceBinding> backBufferRenderTargetBindings;
 		};
 
+		struct SwapChainTraits {
+			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN;
+
+			using descriptor_impl_type = SwapChainDescriptorImpl;
+			using binding_type         = SwapChainResourceBinding;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	GAPISwapChain
 		 *
 		 * \brief	A gapi swap chain.
 		 **************************************************************************************************/
 		class SwapChain
-			: public ResourceDescriptorAdapter<SwapChain>
-			, public ResourceBindingAdapter<SwapChain>
+			: public ResourceDescriptorAdapter<SwapChainTraits>
+			, public ResourceBindingAdapter<SwapChainTraits>
 		{
 		public:
-			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN;
-
-			using descriptor_impl_type = SwapChainDescriptorImpl;
-			using binding_type         = SwapChainResourceBinding;
-
 			using my_type = SwapChain;
 
+			static const constexpr EResourceType    resource_type    = SwapChainTraits::resource_type;
+			static const constexpr EResourceSubType resource_subtype = SwapChainTraits::resource_subtype;
+			using descriptor_impl_type = SwapChainTraits::descriptor_impl_type;
 			//
 			// GAPISwapChain<TGAPIResource> implementation
 			// 
@@ -82,8 +87,8 @@ namespace Engine {
 			inline SwapChain(
 				const descriptor_type &desc,
 				const binding_type    &binding)
-				: ResourceDescriptorAdapter<SwapChain>(desc)
-				, ResourceBindingAdapter<SwapChain>(binding)
+				: ResourceDescriptorAdapter<SwapChainTraits>(desc)
+				, ResourceBindingAdapter<SwapChainTraits>(binding)
 				, _currentBackBufferIndex(0)
 			{}
 

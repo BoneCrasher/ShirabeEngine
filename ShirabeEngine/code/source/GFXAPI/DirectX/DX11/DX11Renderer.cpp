@@ -6,7 +6,7 @@
 #include "GFXAPI/DirectX/DX11/DX11Common.h"
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "Resources/DirectX/DX11/Builders/TextureND.h"
+#include "GFXAPI/DirectX/DX11/Builders/TextureND.h"
 
 namespace Engine {
 	namespace DX {
@@ -38,6 +38,7 @@ namespace Engine {
 				ResourceHandle depthStencilHandle ={};
 
 				Texture2DDescriptor dsTexDesc ={};
+				Ptr<Texture2D>      dsTex = nullptr;
 
 				ID3D11Device            *tmpDevice                   = nullptr;
 				ID3D11DeviceContext     *tmpDeviceContext            = nullptr;
@@ -157,21 +158,11 @@ namespace Engine {
 				dsTexDesc.multisampling.size    = 1;
 				dsTexDesc.multisampling.quality = 0;
 
-				status = resourceManager->createTexture2D(dsTexDesc, depthStencilHandle);
+				status = resourceManager->createTexture2D(dsTexDesc, dsTex);
 				if( CheckEngineError(status) ) {
 					goto _return_failed;
 				}
 
-				D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc={ };
-				dsViewDesc.Format             = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(Format::D24_UNORM_S8_UINT);
-				dsViewDesc.ViewDimension      = D3D11_DSV_DIMENSION_TEXTURE2D;
-				dsViewDesc.Texture2D.MipSlice = 0;
-
-				dxRes = tmpDevice->CreateDepthStencilView(tmpDepthStencilTexture, &dsViewDesc, &tmpDepthStencilView);
-				if( FAILED(dxRes) ) {
-					status = EEngineStatus::DXDevice_DepthStencilStateCreationFailed;
-					goto _return_failed;
-				}
 				// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
 				tmpDeviceContext->OMSetRenderTargets(1, &tmpBackBufferRTV, tmpDepthStencilView);
 
