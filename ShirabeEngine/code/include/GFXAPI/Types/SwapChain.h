@@ -5,15 +5,17 @@
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceBinding.h"
 
 #include "GFXAPI/Definitions.h"
+#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/RenderTargetView.h"
+
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
-#include "Resources/Types/TextureND.h"
-
 namespace Engine {
-	namespace Resources {	
-		using namespace GFXAPI;
+	namespace GFXAPI {	
+		using namespace Resources;
 
 		/**********************************************************************************************//**
 		 * \struct	SwapChainDescriptorImpl
@@ -40,43 +42,9 @@ namespace Engine {
 			}
 		};
 
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::GAPI_COMPONENT,EResourceSubType::SWAP_CHAIN>
-		 *
-		 * \brief	Make the SwapChainDescriptorImpl accessible with the resource descriptor 
-		 * 			wrappers.
-		 **************************************************************************************************/
-		template <>
-		struct ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
-			: public SwapChainDescriptorImpl
-		{
-			typedef SwapChainDescriptorImpl type;
-		};
-		typedef ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN> SwapChainDescriptor;
-		
-		/**********************************************************************************************//**
-		 * \class	SwapChainDescriptorAdapterBase
-		 *
-		 * \brief	Descriptor 
-		 **************************************************************************************************/
-		class SwapChainDescriptorAdapterBase 
-			: public ResourceDescriptorAdapterBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
-		{		
-		public:
-			inline SwapChainDescriptorAdapterBase(
-				const descriptor_type& descriptor
-			) : ResourceDescriptorAdapterBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>(descriptor)
-			{}
-		};
-
-		/**********************************************************************************************//**
-		 * \struct	SwapChainResourceBinding
-		 *
-		 * \brief	A swap chain resource binding.
-		 **************************************************************************************************/
 		struct SwapChainResourceBinding {
-			ResourceHandle                           swapChainHandle;
-			std::vector<RenderTargetResourceBinding> backBufferRenderTargetBindings;
+			ResourceHandle swapChainHandle;
+			std::vector<RenderTargetViewResourceBinding> backBufferRenderTargetBindings;
 		};
 
 		/**********************************************************************************************//**
@@ -85,9 +53,16 @@ namespace Engine {
 		 * \brief	A gapi swap chain.
 		 **************************************************************************************************/
 		class SwapChain
-			: public SwapChainDescriptorAdapterBase
+			: public ResourceDescriptorAdapter<SwapChain>
+			, public ResourceBindingAdapter<SwapChain>
 		{
 		public:
+			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN;
+
+			using descriptor_impl_type = SwapChainDescriptorImpl;
+			using binding_type         = SwapChainResourceBinding;
+
 			using my_type = SwapChain;
 
 			//
@@ -105,18 +80,19 @@ namespace Engine {
 
 		private:
 			inline SwapChain(
-				const descriptor_type          &desc,
-				const SwapChainResourceBinding &binding)
-				: SwapChainDescriptorAdapterBase(desc)
+				const descriptor_type &desc,
+				const binding_type    &binding)
+				: ResourceDescriptorAdapter<SwapChain>(desc)
+				, ResourceBindingAdapter<SwapChain>(binding)
 				, _currentBackBufferIndex(0)
-				, _resourceBinding(binding)
 			{}
 
-			std::size_t              _currentBackBufferIndex;
-			SwapChainResourceBinding _resourceBinding;
+			std::size_t  _currentBackBufferIndex;
 		};
-
 		DeclareSharedPointerType(SwapChain);
+
+		typedef ResourceDescriptor<SwapChain> SwapChainDescriptor;
+
 	}
 }
 

@@ -4,11 +4,13 @@
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
+#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceBinding.h"
 
 #include "GFXAPI/Definitions.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+#include "GFXAPI/Types/TextureND.h"
 
-#include "Resources/Types/TextureND.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 namespace Engine {
 	namespace Resources {
@@ -19,7 +21,7 @@ namespace Engine {
 		 *
 		 * \brief	A render target descriptor implementation.
 		 **************************************************************************************************/
-		struct ShaderResourceDescriptorImpl {
+		struct ShaderResourceViewDescriptorImpl {
 			enum class EShaderResourceDimension {
 				Texture,
 				StructuredBuffer
@@ -62,7 +64,7 @@ namespace Engine {
 				{}
 			} shaderResourceDimension;
 
-			ShaderResourceDescriptorImpl()
+			ShaderResourceViewDescriptorImpl()
 				: name("")
 				, shaderResourceDimension()
 			{}
@@ -92,46 +94,9 @@ namespace Engine {
 			}
 		};
 
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::GAPI_VIEW,EResourceSubType::RENDER_TARGET_VIEW>
-		 *
-		 * \brief	A render target view>.
-		 **************************************************************************************************/
-		template <>
-		struct ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>
-			: public ShaderResourceDescriptorImpl
-		{
-			typedef ShaderResourceDescriptorImpl type;
-		};
-		typedef ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW> ShaderResourceDescriptor;
+		
 
-		/**********************************************************************************************//**
-		 * \class	ShaderResourceDescriptorAdapterBase
-		 *
-		 * \brief	A render target descriptor adapter base.
-		 **************************************************************************************************/
-		class ShaderResourceDescriptorAdapterBase {
-		public:
-			typedef
-				typename ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>::type
-				descriptor_type;
-
-			inline ShaderResourceDescriptorAdapterBase(
-				const descriptor_type& descriptor
-			) : _descriptor(descriptor)
-			{}
-
-			inline const descriptor_type&
-				descriptor() const { return _descriptor; }
-
-			inline const Format&
-				format() const { return _descriptor.format; }
-
-		private:
-			descriptor_type _descriptor;
-		};
-
-		struct ShaderResourceResourceBinding {
+		struct ShaderResourceViewResourceBinding {
 			ResourceHandle handle;
 		};
 
@@ -140,25 +105,32 @@ namespace Engine {
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
-		class ShaderResource
-			: public ShaderResourceDescriptorAdapterBase
+		class ShaderResourceView
+			: public ResourceDescriptorAdapter<ShaderResourceView>
+			, public ResourceBindingAdapter<ShaderResourceView>
 		{
 		public:
-			using my_type = ShaderResource;
+			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SHADER_RESOURCE_VIEW;
 
-			ShaderResource(
-				const descriptor_type        &descriptor)
-				: ShaderResourceDescriptorAdapterBase(descriptor)
+			using descriptor_impl_type = ShaderResourceViewDescriptorImpl;
+			using binding_type         = ShaderResourceViewResourceBinding;
+
+			using my_type = ShaderResourceView;
+
+			ShaderResourceView(
+				const descriptor_type &descriptor,
+				const binding_type    &binding)
+				: ResourceDescriptorAdapter<ShaderResourceView>(descriptor)
+				, ResourceBindingAdapter<ShaderResourceView>(binding)
 			{}
-
-		private:
-			ResourceHandle _underlyingTexture; // Reference to the underlying texture resource used for the rendertarget.
 		};
 
-		DeclareSharedPointerType(ShaderResource);
+		DeclareSharedPointerType(ShaderResourceView);
 
-
+		using ShaderResourceViewDescriptor = ResourceDescriptor<ShaderResourceView>;
 	}
 }
 
 #endif
+

@@ -4,29 +4,33 @@
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
 
-#include "Resources/Types/SwapChain.h"
-
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/IResourceProxy.h"
 #include "Resources/System/Core/ResourceProxyFactory.h"
 #include "Resources/System/Core/ProxyTreeCreator.h"
 
+#include "GFXAPI/Types/SwapChain.h"
+
 namespace Engine {
 	namespace Resources {
 
 		template <>
-		class ProxyTreeCreator<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN, SwapChainResourceBinding> 
+		class ProxyTreeCreator<SwapChain> 
 		{
 			DeclareLogTag(ProxyTreeCreator<SwapChain>);
 
 		public:
-			using Descriptor = ResourceDescriptor<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>;
+			static const constexpr EResourceType    resource_type    = SwapChain::resource_type;
+			static const constexpr EResourceSubType resource_subtype = SwapChain::resource_subtype;
+
+			using binding_type    = SwapChain::binding_type;
+			using descriptor_type = ResourceDescriptor<SwapChain>
 
 			static bool create(
 				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const Descriptor                &desc,
+				const descriptor_type           &desc,
 				ResourceHandleList              &inDependencyHandles,
-				SwapChainResourceBinding        &outBinding,
+				binding_type                    &outBinding,
 				ResourceProxyMap                &outProxyMap,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{

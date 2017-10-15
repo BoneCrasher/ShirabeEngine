@@ -9,26 +9,26 @@
 #include "Resources/System/Core/ResourceProxyFactory.h"
 #include "Resources/System/Core/ProxyTreeCreator.h"
 
-#include "GFXAPI/Types/RenderTarget.h"
+#include "GFXAPI/Types/RenderTargetView.h"
 
 namespace Engine {
 	namespace Resources {
 
 		template <>
-		class ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW, RenderTargetResourceBinding> {
+		class ProxyTreeCreator<RenderTargetView> {
 		public:
 
-			using resource_type    = RenderTargetView::resource_type;
-			using resource_subtype = RenderTargetView::resource_subtype;
-			using binding_type     = RenderTargetView::binding_type;
+			static const constexpr EResourceType    resource_type    = RenderTargetView::resource_type;
+			static const constexpr EResourceSubType resource_subtype = RenderTargetView::resource_subtype;
 
-			using Descriptor = ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>;
+			using binding_type    = RenderTargetView::binding_type;
+			using descriptor_type = ResourceDescriptor<RenderTargetView>;
 
 			static bool create(
 				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const Descriptor                &desc,
+				const descriptor_type           &desc,
 				ResourceHandleList              &inDependencyHandles,
-				RenderTargetResourceBinding     &outBinding,
+				binding_type                    &outBinding,
 				ResourceProxyMap                &outProxyMap,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{

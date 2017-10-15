@@ -66,30 +66,8 @@ namespace Engine {
 			}
 		};
 
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::GAPI_VIEW,EResourceSubType::DEPTH_STENCIL_VIEW>
-		 *
-		 * \brief	A depth stencil view>.
-		 **************************************************************************************************/
-	}
-
-	namespace Resources {
-		using namespace Engine::GFXAPI;
-
-		template <>
-		struct ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>
-			: public DepthStencilViewDescriptorImpl
-		{
-			typedef DepthStencilViewDescriptorImpl type;
-		};
-		typedef ResourceDescriptor<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW> DepthStencilViewDescriptor;			
-	}
-
-	namespace GFXAPI {
-
-		struct DepthStencilViewInfo {
-			static const EResourceType    resource_type    = EResourceType::GAPI_VIEW;
-			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_VIEW;
+		struct DepthStencilViewResourceBinding {
+			ResourceHandle handle;
 		};
 
 		/**********************************************************************************************//**
@@ -98,21 +76,30 @@ namespace Engine {
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class DepthStencilView
-			: public ResourceDescriptorAdapterBase<DepthStencilViewInfo::resource_type, DepthStencilViewInfo::resource_subtype>
+			: public ResourceDescriptorAdapterBase<DepthStencilView>
 		{
 		public:
-			using my_type         = DepthStencilView;
-			using descriptor_type = ResourceDescriptor<DepthStencilViewInfo::resource_type, DepthStencilViewInfo::resource_subtype>;
+			static const EResourceType    resource_type    = EResourceType::GAPI_VIEW;
+			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_VIEW;
+
+			using binding_type    = DepthStencilViewResourceBinding;
+			using descriptor_type = ResourceDescriptor<DepthStencilView>;
+
+			using my_type = DepthStencilView;
 
 			DepthStencilView(
-				const descriptor_type &descriptor)
-				: ResourceDescriptorAdapterBase<DepthStencilViewInfo::resource_type, DepthStencilViewInfo::resource_subtype>(descriptor)
+				const descriptor_type &descriptor,
+				binding_type          &binding)
+				: ResourceDescriptorAdapterBase<DepthStencilView>(descriptor)
+				, _binding(binding)
 			{}
 
 		private:
-			ResourceHandle _underlyingTexture; // Reference to the underlying texture resource used for the rendertarget.
+			binding_type _binding;
 		};
 		DeclareSharedPointerType(DepthStencilView);
+
+		typedef ResourceDescriptor<DepthStencilView>  DepthStencilViewDescriptor;
 
 		/**********************************************************************************************//**
 		 * \struct	DepthStencilStateDescriptorImpl
@@ -179,30 +166,13 @@ namespace Engine {
 			}
 		};
 
-	}
-
-	namespace Resources {
-
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::GAPI_STATE,EResourceSubType::DEPTH_STENCIL_STATE>
-		 *
-		 * \brief	A depth stencil state>.
-		 **************************************************************************************************/
-		template <>
-		struct ResourceDescriptor<EResourceType::GAPI_STATE, EResourceSubType::DEPTH_STENCIL_STATE>
-			: public DepthStencilStateDescriptorImpl
-		{
-			typedef DepthStencilStateDescriptorImpl type;
-		};
-		typedef ResourceDescriptor<EResourceType::GAPI_STATE, EResourceSubType::DEPTH_STENCIL_STATE> DepthStencilStateDescriptor;
-	}
-
-	namespace GFXAPI {
-
 		struct DepthStencilStateInfo {
-			static const EResourceType    resource_type    = EResourceType::GAPI_STATE;
-			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_STATE;
 		};
+		
+		struct DepthStencilStateResourceBinding {
+			ResourceHandle handle;
+		};
+
 
 		/**********************************************************************************************//**
 		 * \class	DepthStencilView
@@ -210,17 +180,29 @@ namespace Engine {
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class DepthStencilState
-			: public ResourceDescriptorAdapterBase<DepthStencilStateInfo::resource_type, DepthStencilStateInfo::resource_subtype> {
+			: public ResourceDescriptorAdapterBase<DepthStencilState> {
 		public:
+			static const EResourceType    resource_type    = EResourceType::GAPI_STATE;
+			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_STATE;
+
+			using binding_type    = DepthStencilStateResourceBinding;
+			using descriptor_type = ResourceDescriptor<DepthStencilState>;
+
 			using my_type         = DepthStencilState;
-			using descriptor_type = ResourceDescriptor<DepthStencilStateInfo::resource_type, DepthStencilStateInfo::resource_subtype>;
 
 			DepthStencilState(
-				const descriptor_type &descriptor)
-				: ResourceDescriptorAdapterBase<DepthStencilStateInfo::resource_type, DepthStencilStateInfo::resource_subtype>(descriptor)
+				const descriptor_type &descriptor,
+				binding_type          &binding)
+				: ResourceDescriptorAdapterBase<DepthStencilState>(descriptor)
+				, _binding(binding)
 			{}
+
+		private:
+			binding_type _binding;
 		};
 		DeclareSharedPointerType(DepthStencilState);
+
+		typedef ResourceDescriptor<DepthStencilState> DepthStencilStateDescriptor;
 
 		/**********************************************************************************************//**
 		 * \fn	static D3D11_DEPTH_WRITE_MASK convertToDX11DepthWriteMask(const DepthStencilStateDescriptorImpl::DepthWriteMask& mask)

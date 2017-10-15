@@ -264,6 +264,7 @@
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyTreeCreator.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceBinding.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />
@@ -280,11 +281,11 @@
     <ClInclude Include="code\include\GFXAPI\Types\DepthStencilView.h" />
     <ClInclude Include="code\include\GFXAPI\Types\InstanceBuffer.h" />
     <ClInclude Include="code\include\GFXAPI\Types\ObjectBuffer.h" />
-    <ClInclude Include="code\include\GFXAPI\Types\RenderTarget.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\RenderTargetView.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceBuilder.h" />
     <ClInclude Include="code\include\GFXAPI\Definitions.h" />
     <ClInclude Include="code\include\GFXAPI\Types\Shader.h" />
-    <ClInclude Include="code\include\GFXAPI\Types\ShaderResource.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\ShaderResourceView.h" />
     <ClInclude Include="code\include\GFXAPI\Types\StructuredBuffer.h" />
     <ClInclude Include="code\include\GFXAPI\Types\SwapChain.h" />
     <ClInclude Include="code\include\GFXAPI\Types\TextureND.h" />

@@ -3,12 +3,12 @@
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceBinding.h"
+
 #include "GFXAPI/Definitions.h"
 
-#include "Resources/Types/ShaderResource.h"
-#include "Resources/Types/RenderTarget.h"
-#include "Resources/Types/DepthStencil.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 namespace Engine {
 	namespace Resources {
@@ -100,46 +100,7 @@ namespace Engine {
 		std::ostream& operator<<(std::ostream& s, const TextureDescriptorImpl<N>& d) {
 			return (s << d.toString());
 		}
-
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::TEXTURE,EResourceSubType::TEXTURE_1D>
-		 *
-		 * \brief	A texture 1 d>.
-		 **************************************************************************************************/
-		template <>
-		struct ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D>
-			: public TextureDescriptorImpl<1>
-		{
-			typedef TextureDescriptorImpl<1> type;
-		};
-		typedef ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D> Texture1DDescriptor;
-
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::TEXTURE,EResourceSubType::TEXTURE_2D>
-		 *
-		 * \brief	A texture 2 d>.
-		 **************************************************************************************************/
-		template <>
-		struct ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>
-			: public TextureDescriptorImpl<2>
-		{
-			typedef TextureDescriptorImpl<2> type;
-		};
-		typedef ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D> Texture2DDescriptor;
-
-		/**********************************************************************************************//**
-		 * \struct	ResourceDescriptor<EResourceType::TEXTURE,EResourceSubType::TEXTURE_3D>
-		 *
-		 * \brief	A texture 3 d>.
-		 **************************************************************************************************/
-		template <>
-		struct ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D>
-			: public TextureDescriptorImpl<3>
-		{
-			typedef TextureDescriptorImpl<3> type;
-		};
-		typedef ResourceDescriptor<EResourceType::TEXTURE, EResourceSubType::TEXTURE_3D> Texture3DDescriptor;
-
+		
 		/**********************************************************************************************//**
 		 * \struct	TextureResourceSubtypeMapper
 		 *
@@ -181,69 +142,12 @@ namespace Engine {
 			static constexpr const EResourceSubType value = EResourceSubType::TEXTURE_3D;
 		};
 
-		/**********************************************************************************************//**
-		 * \class	TextureDescriptorAdapterBase
-		 *
-		 * \brief	A texture descriptor adapter base.
-		 *
-		 * \tparam	N	Type of the n.
-		 **************************************************************************************************/
-		template <uint8_t N>
-		class TextureDescriptorAdapterBase {		
-
-			template <uint8_t N, uint8_t Condition>
-			using has_dimension_t = typename std::enable_if<N >= Condition, uint32_t>::type;
-
-		public:
-			typedef
-				typename ResourceDescriptor<EResourceType::TEXTURE, TextureResourceSubtypeMapper<N>::value>::type
-				descriptor_type;
-
-			inline TextureDescriptorAdapterBase(
-				const descriptor_type& descriptor
-			) : _descriptor(descriptor)
-			{}
-
-			inline const descriptor_type&
-				descriptor() const { return _descriptor; }
-
-			inline const std::string& 
-				name() const { return _descriptor.name; }
-
-			inline const Format&
-				format() const { return _descriptor.textureFormat; }
-
-			inline const VecND<uint32_t, descriptor_type::dimensionNb>&
-				dimensionNb() const { return _descriptor.dimensionNb; }
-
-			inline const TextureMipMapDescriptor&
-				mipMap() const { return _descriptor.mipMap; }
-
-			inline const TextureArrayDescriptor&
-				texArray() const { return _descriptor.array; }
-
-			inline const TextureMultisapmlingDescriptor&
-				multiSampling() const { return _descriptor.multisampling; }
-
-			inline const ResourceUsage&
-				usage() const { return _descriptor.cpGpuUsage; }
-
-			inline const BufferBindingFlags_t&
-				binding() const { return _descriptor.gpuBinding; }
-
-			inline const uint32_t width()  const { return (N > 0 ? _descriptor.dimensionNb[0] : 0); }
-			inline const uint32_t height() const { return (N > 1 ? _descriptor.dimensionNb[1] : 0); }
-			inline const uint32_t depth()  const { return (N > 2 ? _descriptor.dimensionNb[2] : 0); }
-
-		private:
-			descriptor_type _descriptor;
-		};
 
 		struct TextureNDResourceBinding {
 			ResourceHandle handle;
-			ShaderResourceResourceBinding srvBinding;
-			RenderTargetResourceBinding   rtvBinding;
-			DepthStencilResourceBinding   dsvBinding;
+			ResourceHandle srvBinding;
+			ResourceHandle rtvBinding;
+			ResourceHandle dsvBinding;
 		};
 
 		/**********************************************************************************************//**
@@ -255,14 +159,23 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <uint8_t N>
 		class TextureNDBase
-			: public TextureDescriptorAdapterBase<N>
+			: public ResourceDescriptorAdapter<TextureNDBase<N>>
+			, public ResourceBindingAdapter<TextureNDBase<N>>
 		{
 		public:
+			static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
+			static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_1D;
+
+			using binding_type         = TextureNDResourceBinding;
+			using descriptor_impl_type = TextureDescriptorImpl<N>;
+
 			using my_type = TextureNDBase<N>;
 
 			TextureNDBase(
-				const descriptor_type &descriptor) 
-				: TextureDescriptorAdapterBase<N>(descriptor)
+				const descriptor_type &descriptor,
+				const binding_type    &binding) 
+				: ResourceDescriptorAdapter<TextureNDBase<N>>(descriptor)
+				, ResourceBindingAdapter<TextureNDBase<N>>(binding)
 			{}
 
 		private:
@@ -278,8 +191,9 @@ namespace Engine {
 		{
 		public:
 			inline Texture1D(
-				const descriptor_type &descriptor)
-				: TextureNDBase<1>(descriptor) 
+				const descriptor_type &descriptor,
+				const binding_type    &binding)
+				: TextureNDBase<1>(descriptor, binding) 
 			{}
 		};
 
@@ -293,8 +207,9 @@ namespace Engine {
 		{
 		public:
 			inline Texture2D(
-				const descriptor_type &descriptor)
-				: TextureNDBase<2>(descriptor)
+				const descriptor_type &descriptor,
+				const binding_type    &binding)
+				: TextureNDBase<2>(descriptor, binding)
 			{}
 		};
 
@@ -308,14 +223,19 @@ namespace Engine {
 		{
 		public:
 			inline Texture3D(
-				const descriptor_type &descriptor)
-				: TextureNDBase<3>(descriptor)
+				const descriptor_type &descriptor,
+				const binding_type    &binding)
+				: TextureNDBase<3>(descriptor, binding)
 			{}
 		};
 
 		DeclareSharedPointerType(Texture1D);
 		DeclareSharedPointerType(Texture2D);
 		DeclareSharedPointerType(Texture3D);
+
+		typedef ResourceDescriptor<Texture1D> Texture1DDescriptor;
+		typedef ResourceDescriptor<Texture2D> Texture2DDescriptor;
+		typedef ResourceDescriptor<Texture3D> Texture3DDescriptor;
 	}
 }
 
