@@ -8,6 +8,9 @@
 
 #include "Window/WindowManager.h"
 
+#include "Resources/System/Core/IResourceManager.h"
+#include "Resources/System/Core/ResourceProxyFactory.h"
+
 #include "BuildingBlocks/Scene.h"
 
 #include "GFXAPI/IRenderer.h"
@@ -16,6 +19,7 @@ class EngineTime; // Fwd Definition to expose concept, but spare definition for 
 
 namespace Engine {
 	using namespace Renderer;
+	using namespace Resources;
 
 	class EngineInstance
 	{
@@ -34,6 +38,9 @@ namespace Engine {
 		Platform::ApplicationEnvironment _environment;
 		WindowManagerPtr                 _windowManager;
 		IWindowPtr                       _mainWindow;
+
+		Ptr<ResourceProxyFactory> _proxyFactory;
+		Ptr<IResourceManager>     _resourceManager;
 
 		IRendererPtr _renderer;
 		Scene        _scene;

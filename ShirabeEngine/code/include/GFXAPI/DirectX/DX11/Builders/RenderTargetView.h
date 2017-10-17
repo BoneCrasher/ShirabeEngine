@@ -17,7 +17,7 @@ namespace Engine {
 			using namespace Engine::Resources;
 			using namespace GFXAPI;
 
-			EEngineStatus createRenderTargetView (
+			EEngineStatus createRenderTargetView(
 				const ID3D11DevicePtr            &device,
 				const RenderTargetViewDescriptor &desc,
 				IUnknownPtr                      &sourceResource,
@@ -42,10 +42,9 @@ namespace Engine {
 					ID3D11RenderTargetViewPtr pRTV = nullptr;
 
 					status = DX::_11::createRenderTargetView(gfxapiParams.device, descriptor, inSourceResource, pRTV);
-					if (CheckEngineError(status)) {
+					if( CheckEngineError(status) ) {
 						Log::Error(logTag(), String::format("Cannot create RenderTargetView internal resource for descriptor: %s", descriptor.toString().c_str()));
-					}
-					else {
+					} else {
 						// What to pass to the texND to encapsulate the internal handle and resource? How to recreated it?
 						ResourceHandle p(descriptor.name, resource_type, resource_subtype);
 						outResources[p] = pRTV;

@@ -70,36 +70,41 @@ namespace Engine {
 			ResourceHandle handle;
 		};
 
+		struct DepthStencilViewTraits {
+			static const EResourceType    resource_type    = EResourceType::GAPI_VIEW;
+			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_VIEW;
+
+			using binding_type         = DepthStencilViewResourceBinding;
+			using descriptor_impl_type = DepthStencilViewDescriptorImpl;
+		};
+
 		/**********************************************************************************************//**
 		 * \class	DepthStencilView
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class DepthStencilView
-			: public ResourceDescriptorAdapterBase<DepthStencilView>
+			: public ResourceDescriptorAdapter<DepthStencilViewTraits>
+			, public ResourceBindingAdapter<DepthStencilViewTraits>
 		{
 		public:
-			static const EResourceType    resource_type    = EResourceType::GAPI_VIEW;
-			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_VIEW;
-
-			using binding_type    = DepthStencilViewResourceBinding;
-			using descriptor_type = ResourceDescriptor<DepthStencilView>;
-
 			using my_type = DepthStencilView;
+
+			static const constexpr EResourceType    resource_type    = DepthStencilViewTraits::resource_type;
+			static const constexpr EResourceSubType resource_subtype = DepthStencilViewTraits::resource_subtype;
+
+			using descriptor_impl_type = DepthStencilViewTraits::descriptor_impl_type;
 
 			DepthStencilView(
 				const descriptor_type &descriptor,
 				binding_type          &binding)
-				: ResourceDescriptorAdapterBase<DepthStencilView>(descriptor)
-				, _binding(binding)
+				: ResourceDescriptorAdapter<DepthStencilViewTraits>(descriptor)
+				, ResourceBindingAdapter<DepthStencilViewTraits>(binding)
 			{}
-
-		private:
-			binding_type _binding;
 		};
 		DeclareSharedPointerType(DepthStencilView);
 
-		typedef ResourceDescriptor<DepthStencilView>  DepthStencilViewDescriptor;
+		typedef ResourceDescriptor<DepthStencilView> DepthStencilViewDescriptor;
 
 		/**********************************************************************************************//**
 		 * \struct	DepthStencilStateDescriptorImpl
@@ -173,6 +178,13 @@ namespace Engine {
 			ResourceHandle handle;
 		};
 
+		struct DepthStencilStateTraits {
+			static const EResourceType    resource_type    = EResourceType::GAPI_STATE;
+			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_STATE;
+
+			using binding_type         = DepthStencilStateResourceBinding;
+			using descriptor_impl_type = DepthStencilStateDescriptorImpl;
+		};
 
 		/**********************************************************************************************//**
 		 * \class	DepthStencilView
@@ -180,25 +192,23 @@ namespace Engine {
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class DepthStencilState
-			: public ResourceDescriptorAdapterBase<DepthStencilState> {
+			: public ResourceDescriptorAdapter<DepthStencilStateTraits> 
+		    , public ResourceBindingAdapter<DepthStencilStateTraits> 
+		{
 		public:
-			static const EResourceType    resource_type    = EResourceType::GAPI_STATE;
-			static const EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_STATE;
-
-			using binding_type    = DepthStencilStateResourceBinding;
-			using descriptor_type = ResourceDescriptor<DepthStencilState>;
-
 			using my_type         = DepthStencilState;
+
+			static const constexpr EResourceType    resource_type    = DepthStencilStateTraits::resource_type;
+			static const constexpr EResourceSubType resource_subtype = DepthStencilStateTraits::resource_subtype;
+
+			using descriptor_impl_type = DepthStencilStateTraits::descriptor_impl_type;
 
 			DepthStencilState(
 				const descriptor_type &descriptor,
 				binding_type          &binding)
-				: ResourceDescriptorAdapterBase<DepthStencilState>(descriptor)
-				, _binding(binding)
+				: ResourceDescriptorAdapter<DepthStencilStateTraits>(descriptor)
+				, ResourceBindingAdapter<DepthStencilStateTraits>(binding)
 			{}
-
-		private:
-			binding_type _binding;
 		};
 		DeclareSharedPointerType(DepthStencilState);
 

@@ -19,6 +19,8 @@ namespace Engine {
 
 		DeclareInterface(IGFXAPIResourceSubsystem);
 
+		
+
 		DeclareInterfaceEnd(IGFXAPIResourceSubsystem);
 		DeclareSharedPointerType(IGFXAPIResourceSubsystem);
 	}

@@ -179,6 +179,7 @@
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11SwapChainBuilder.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11TextureNDBuilder.cpp" />
     <ClCompile Include="code\source\Resources\System\Core\Handle.cpp" />
+    <ClCompile Include="code\source\Resources\System\Core\ProxyBasedResourceManager.cpp" />
     <ClCompile Include="code\source\Window\WindowManager.cpp" />
     <ClCompile Include="code\source\Core\String.cpp" />
     <ClCompile Include="code\source\Platform\Windows\WindowsWindowFactory.cpp" />

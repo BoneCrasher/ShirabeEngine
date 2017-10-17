@@ -326,6 +326,22 @@ namespace Engine {
 				_gfxApiProxyFactory = nullptr;
 			};
 
+			EEngineStatus createSwapChain(
+				const SwapChainDescriptor &inDesc,
+				Ptr<SwapChain>            &outSwapChain);
+
+			EEngineStatus createTexture1D(
+				const Texture1DDescriptor &desc,
+				Ptr<Texture1D>            &outTexture1D);
+
+			EEngineStatus createTexture2D(
+				const Texture2DDescriptor &desc,
+				Ptr<Texture2D>            &outTexture2D);
+
+			EEngineStatus createTexture3D(
+				const Texture3DDescriptor &desc,
+				Ptr<Texture3D>            &outTexture3D);
+
 		private:
 			inline AnyProxy getResourceProxy(const ResourceHandle& handle) {
 				return _resources->getResource(handle);

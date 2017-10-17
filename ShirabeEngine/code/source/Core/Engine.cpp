@@ -1,5 +1,7 @@
 #include "Core/Engine.h"
 
+#include "Resources/System/Core/ProxyBasedResourceManager.h"
+
 #include "GFXAPI/DirectX/DX11/DX11Renderer.h"
 
 namespace Engine {
@@ -78,6 +80,19 @@ namespace Engine {
 		IWindow::IEventCallbackPtr dummy = MakeSharedPointerType<TestDummy>();
 		_mainWindow->registerCallback(dummy);
 
+		// Instantiate the appropriate gfx api from engine config, BUT match it against 
+		// the platform capabilities!
+		// --> #ifndef WIN32 Fallback to Vk. If Vk is not available, fallback to OpenGL, put that into "ChooseGfxApi(preferred) : EGfxApiID"
+		
+		// Create all necessary subsystems.
+		// Their life-cycle management will become the manager's task.
+		Ptr<IGFXAPIResourceSubsystem> gfxApiResourceSubsystem = nullptr;
+
+		_proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(gfxApiResourceSubsystem));
+		_resourceManager = Ptr<ProxyBasedResourceManager>(new ProxyBasedResourceManager(_proxyFactory));
+
+		// TODO: Think about how to link renderer and resource manager or subsystem to allow efficient binding!
+
 		RendererConfiguration rendererConfiguration;
 		rendererConfiguration.enableVSync             = true;
 		rendererConfiguration.frustum                 = Vec4Dd(windowWidth, windowHeight, 0.1f, 1000.0f);
@@ -96,7 +111,16 @@ namespace Engine {
 
 	EEngineStatus EngineInstance::deinitialize() {
 		EEngineStatus status = EEngineStatus::Ok;
-		
+
+		if( _resourceManager ) {
+			_resourceManager->clear(); // Will implicitely clear all subsystems!
+			_resourceManager = nullptr;
+		}
+
+		if( _proxyFactory ) {
+			_proxyFactory = nullptr;
+		}
+
 		if (_renderer) {
 			status = _renderer->deinitialize();
 		}

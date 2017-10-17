@@ -6,7 +6,8 @@
 #include "GFXAPI/DirectX/DX11/DX11Common.h"
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "GFXAPI/DirectX/DX11/Builders/TextureND.h"
+#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/DepthStencilView.h"
 
 namespace Engine {
 	namespace DX {
@@ -37,18 +38,9 @@ namespace Engine {
 
 				ResourceHandle depthStencilHandle ={};
 
-				Texture2DDescriptor dsTexDesc ={};
-				Ptr<Texture2D>      dsTex = nullptr;
-
-				ID3D11Device            *tmpDevice                   = nullptr;
-				ID3D11DeviceContext     *tmpDeviceContext            = nullptr;
-				IDXGISwapChain          *tmpSwapChain                = nullptr;
-				ID3D11Texture2D         *tmpBackBufferPtr            = nullptr;
-				ID3D11RenderTargetView  *tmpBackBufferRTV            = nullptr;
-				ID3D11Texture2D         *tmpDepthStencilTexture      = nullptr;
-				ID3D11DepthStencilView  *tmpDepthStencilView         = nullptr;
-				ID3D11DepthStencilState *tmpDefaultDepthStencilState = nullptr;
-				ID3D11RasterizerState   *tmpRasterizerState          = nullptr;
+				Texture2DDescriptor   dsTexDesc ={};
+				Ptr<Texture2D>        dsTex  = nullptr;
+				Ptr<DepthStencilView> dsView = nullptr;
 
 				GAPIOutputMode outputMode ={};
 
@@ -162,6 +154,8 @@ namespace Engine {
 				if( CheckEngineError(status) ) {
 					goto _return_failed;
 				}
+
+				dsView = resourceManager->getResource<DepthStencilView>(dsTex->binding().dsvBinding);
 
 				// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
 				tmpDeviceContext->OMSetRenderTargets(1, &tmpBackBufferRTV, tmpDepthStencilView);

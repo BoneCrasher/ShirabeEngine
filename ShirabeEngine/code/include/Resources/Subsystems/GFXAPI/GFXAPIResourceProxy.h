@@ -86,6 +86,7 @@ namespace Engine {
 				const ResourceHandle   &inHandle,
 				const ResourceProxyMap &inDependencies)
 		{
+			_subsystem-> ? ;
 			return true;
 		}
 

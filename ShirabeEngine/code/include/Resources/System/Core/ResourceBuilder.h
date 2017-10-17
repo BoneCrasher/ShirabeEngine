@@ -1,6 +1,7 @@
 #ifndef __SHIRABE_IRESOURCEBUILDER_H__
 #define __SHIRABE_IRESOURCEBUILDER_H__
 
+#include <map>
 #include <exception>
 #include <sstream>
 
