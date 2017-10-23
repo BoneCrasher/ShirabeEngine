@@ -210,6 +210,7 @@
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Linkage.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Renderer.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Types.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\IDXDevice.h" />
     <ClInclude Include="code\include\GFXAPI\GFXAPIDeviceCapabilities.h" />
@@ -266,6 +267,7 @@
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyTreeCreator.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceBinding.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceTask.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />

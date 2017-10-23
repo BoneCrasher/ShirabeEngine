@@ -10,8 +10,6 @@
 #include "Core/EngineStatus.h"
 #include "IOC/Observer.h"
 
-#include "Resources/System/Core/ResourceSubsystemProxy.h"
-
 namespace Engine {
 	namespace GFXAPI {
 

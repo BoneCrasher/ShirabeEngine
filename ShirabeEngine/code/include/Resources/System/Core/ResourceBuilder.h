@@ -115,6 +115,11 @@ namespace Engine {
 			typedef typename traits_type::built_resource_map           built_resource_map;
 		};
 
+		template <typename TResource>
+		class ResourceBuilder 
+		{
+
+		};
 	}
 }
 

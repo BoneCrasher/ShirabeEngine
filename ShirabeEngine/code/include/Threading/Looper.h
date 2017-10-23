@@ -10,6 +10,9 @@
 
 namespace Engine {
 	namespace Threading {
+
+		template<typename... TRunParameters>
+		struct param_pack { };
 		
 		/**********************************************************************************************//**
 		 * \fn	DeclareInterface(ILooper);
@@ -21,6 +24,8 @@ namespace Engine {
 		template <typename... TRunParameters>
 		DeclareInterface(ILooper);
 		public:
+			using params = param_pack<TRunParameters...>;
+
 			/**********************************************************************************************//**
 			 * \enum	Priority
 			 *
