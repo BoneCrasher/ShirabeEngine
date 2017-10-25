@@ -11,8 +11,8 @@
 #include "IOC/Observer.h"
 
 #include "Resources/System/Core/ResourceSubsystemProxy.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceSubsystem.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 namespace Engine {
 	namespace GFXAPI {
@@ -35,7 +35,6 @@ namespace Engine {
 				: _handle(handle)
 			{ }
 
-		protected:
 			inline bool setHandle(const GFXAPIResourceHandle_t& handle) {
 				if( _handle > 0 )
 					return false; // Overwrite not allowed!
@@ -53,24 +52,25 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <typename TResource>
 		class GFXAPIResourceProxy
-			: public ResourceSubsystemProxy<IGFXAPIResourceSubsystem, TResource>
+			: public ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>
 			, public GFXAPIResourceAdapter
 		{
+			DeclareLogTag(GFXAPIResourceProxy<TResource>);
+
 		public:
 			inline GFXAPIResourceProxy(
 				const EProxyType                    &proxyType,
-				const Ptr<IGFXAPIResourceSubsystem> &subsystem,
+				const Ptr<GFXAPIResourceSubSystem>  &subsystem,
 				const ResourceDescriptor<TResource> &descriptor)
-				: ResourceSubsystemProxy<IGFXAPIResourceSubsystem, TResource>(proxyType, subsystem, descriptor)
+				: ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>(proxyType, subsystem, descriptor)
 				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
-			{
-			}
+			{ }
 
-			bool loadSync(
+			EEngineStatus loadSync(
 				const ResourceHandle   &inHandle,
 				const ResourceProxyMap &inDependencies);
 
-			bool unloadSync();
+			EEngineStatus unloadSync();
 
 			virtual bool bind(
 				const GFXAPIResourceHandle_t &gfxApiHandle,
@@ -80,21 +80,75 @@ namespace Engine {
 		private:
 		};
 
+		/**********************************************************************************************//**
+		 * \fn	template <typename TResource> static Ptr<GFXAPIResourceProxy<TResource>> GFXAPIProxyCast(const AnyProxy& proxy)
+		 *
+		 * \brief	Gfxapi proxy cast
+		 *
+		 * \tparam	TResource	Type of the resource.
+		 * \param	proxy	The proxy.
+		 *
+		 * \return	A Ptr&lt;GFXAPIResourceProxy&lt;TResource&gt;&gt;
+		 **************************************************************************************************/
 		template <typename TResource>
-		bool GFXAPIResourceProxy<TResource>
+		static Ptr<GFXAPIResourceProxy<TResource>> GFXAPIProxyCast(const AnyProxy& proxy) {
+			try {
+				Ptr<GFXAPIResourceProxy<TResource>> tmp = std::any_cast<Ptr<GFXAPIResourceProxy<TResource>>>(proxy);
+				return tmp;
+			} catch( std::bad_any_cast& ) {
+				return nullptr;
+			}
+		}
+		
+		template <typename TResource>
+		EEngineStatus GFXAPIResourceProxy<TResource>
 			::loadSync(
 				const ResourceHandle   &inHandle,
 				const ResourceProxyMap &inDependencies)
 		{
-			_subsystem-> ? ;
-			return true;
+			this->setLoadState(ELoadState::LOADING);
+
+			// Make sure to extract the GFXAPI-resource handles from the dependencies
+			GFXAPIResourceHandleMap inDependencyHandles;
+			for( const ResourceProxyMap::value_type& pair : inDependencies ) {
+				Ptr<GFXAPIResourceProxy<TResource>> dependencyProxy = ProxyCast<TResource>(pair.second);
+				if( !dependencyProxy )
+					continue;
+
+				inDependencyHandles[pair.first] = dependencyProxy->handle();
+			}
+			
+			// Request synchronous resource load and if successful, set the internal handle 
+			// and load state.
+			EEngineStatus status = EEngineStatus::Ok; 
+
+			const ResourceDescriptor<TResource>& rd = static_cast<GenericProxyBase<TResource>*>(this)->descriptor();
+
+			GFXAPIResourceHandle_t handle = 0;
+			status = _subsystem->loadSync(rd, inDependencyHandles, handle);
+
+			if( CheckEngineError(status) ) {
+				// MBT TODO: Consider distinguishing the above returned status a little more in 
+				//           order to reflect UNLOADED or UNAVAILABLE state.
+				this->setLoadState(ELoadState::UNLOADED);
+
+				Log::Error(logTag(), String::format("Failed to load GFXAPI resource '%0'", rd.name()));
+
+				return EEngineStatus::GFXAPI_LoadResourceFailed;
+			}
+
+			this->setHandle(handle);
+			this->setLoadState(ELoadState::LOADED);
+
+			return EEngineStatus::Ok;
 		}
 
 		template <typename TResource>
-		bool GFXAPIResourceProxy<TResource>
+		EEngineStatus GFXAPIResourceProxy<TResource>
 			::unloadSync()
 		{
-			return true;
+			//_subsystem-> ?;
+			return EEngineStatus::Ok;
 		}
 	}
 }

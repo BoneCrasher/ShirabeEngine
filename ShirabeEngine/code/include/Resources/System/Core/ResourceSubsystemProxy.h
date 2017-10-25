@@ -23,7 +23,8 @@ namespace Engine {
 				, _subsystem(subsystem)
 			{ }
 
-			// Possible functionality based on the subsystem?
+		protected:
+			TSubsystem subsystem() { return _subsystem; }
 
 		private:
 			Ptr<TSubsystem> _subsystem;

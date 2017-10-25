@@ -86,7 +86,7 @@ namespace Engine {
 		
 		// Create all necessary subsystems.
 		// Their life-cycle management will become the manager's task.
-		Ptr<IGFXAPIResourceSubsystem> gfxApiResourceSubsystem = nullptr;
+		Ptr<GFXAPIResourceSubSystem> gfxApiResourceSubsystem = nullptr;
 
 		_proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(gfxApiResourceSubsystem));
 		_resourceManager = Ptr<ProxyBasedResourceManager>(new ProxyBasedResourceManager(_proxyFactory));

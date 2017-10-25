@@ -16,7 +16,7 @@ namespace Engine {
 		{
 		public:
 			inline ResourceProxyFactory(
-				const Ptr<IGFXAPIResourceSubsystem>& gfxApiResourceSubsystem)
+				const Ptr<GFXAPIResourceSubSystem>& gfxApiResourceSubsystem)
 				: _gfxApiResourceSubsystem(gfxApiResourceSubsystem)
 			{ }
 
@@ -48,7 +48,7 @@ namespace Engine {
 			}
 
 		private:
-			Ptr<IGFXAPIResourceSubsystem> _gfxApiResourceSubsystem;
+			Ptr<GFXAPIResourceSubSystem> _gfxApiResourceSubsystem;
 		};
 	}
 }

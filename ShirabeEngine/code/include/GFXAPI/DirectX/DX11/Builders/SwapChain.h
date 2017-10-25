@@ -68,8 +68,6 @@ namespace Engine {
 							status = EEngineStatus::DXSwapChain_AttachSwapChainToBackBuffer_GetBackBufferPtr_Failed;
 						}
 						else {
-							// TODO: Create resource hierarchy/dependencies for automatic release.
-
 							ResourceHandle sc(descriptor.name, resource_type, resource_subtype);
 							outResources[sc] = pSC;
 							for( unsigned int k=0; k < backbufferTexturePointers.size(); ++k ) {

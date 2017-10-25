@@ -5,6 +5,8 @@
 #include <typeinfo>
 #include <optional>
 #include <stdint.h>
+#include <map>
+#include <vector>
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
@@ -24,6 +26,7 @@ namespace Engine {
 		static const GFXAPIResourceHandle_t GFXAPIUninitializedResourceHandle = 0;
 
 		DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
+		DeclareMapType(ResourceHandle, GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 
 		
 	#define DefineStorageCondition(sz)                            \

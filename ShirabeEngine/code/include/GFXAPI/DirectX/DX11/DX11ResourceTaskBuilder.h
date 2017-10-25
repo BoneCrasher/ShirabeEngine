@@ -64,7 +64,7 @@ namespace Engine {
 					const ResourceDescriptor<GfxApiType> &descriptor,
 					const EResourceTaskType              &taskType) 
 				{
-					using BuilderType    = DX11ResourceBuilderBase<TResource, typename ResourceMapping<TResource>::mapped_resource_type>;
+					using BuilderType = DX11ResourceBuilderBase<TResource, typename ResourceMapping<TResource>::mapped_resource_type>;
 					// using UpdaterType    = ...;
 					// using DestructorType = ...;
 					// using QueryType      = ...;

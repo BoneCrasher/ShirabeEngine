@@ -16,8 +16,6 @@ namespace Engine {
 			using namespace Engine::Resources;
 			using namespace GFXAPI;
 
-			
-
 			EEngineStatus createTexture1D (
 				const ID3D11DevicePtr     &device,
 				const Texture1DDescriptor &desc,

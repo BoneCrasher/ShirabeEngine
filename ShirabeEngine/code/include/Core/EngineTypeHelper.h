@@ -133,6 +133,7 @@ namespace Engine {
 	}
 
 #define DeclareListType(type, prefix) using prefix##List = std::vector<type>;
+#define DeclareMapType(keytype, valuetype, prefix) using prefix##Map = std::map<keytype, valuetype>;
 
 #define DeclareTemplateListType(type, prefix) \
              template <typename type>         \

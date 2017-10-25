@@ -8,6 +8,7 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
 
+#include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/IResourceDescriptor.h"
 
 namespace Engine {

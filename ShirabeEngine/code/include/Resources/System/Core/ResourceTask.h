@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_RESOURCE_TASK_H__
 #define __SHIRABE_RESOURCE_TASK_H__
 
+#include <type_traits>
+
 #include "Core/EngineTypeHelper.h"
 
 #include "Resources/System/Core/IResourceDescriptor.h"
@@ -26,11 +28,15 @@ namespace Engine {
 			virtual Ptr<Task> build(const ResourceDescriptor<GfxApiType>& descriptor, const EResourceTaskType& taskType) = 0;
 		};		
 
-		template <template <typename> TBuilderImplementation, typename GfxApiType>
-		using is_task_builder_implementation_v = std::is_base_of<ITaskBuilderImplementationBase<GfxApiType>, TBuilderImplementation<GfxApiType>>::value;
-
-		template <template <typename> TBuilderImplementation, typename GfxApiType>
-		using is_task_builder_implementation_t = std::enable_if<is_task_builder_implementation_v<TBuilderImplementation, GfxApiType>, TBuilderImplementation<GfxApiType>>::type;
+		template <template <typename> typename TBuilderImplementation, typename GfxApiType>
+		using is_task_builder_implementation_t
+			= typename std::enable_if<
+				std::is_base_of<
+					ITaskBuilderImplementationBase<GfxApiType>, 
+					TBuilderImplementation<GfxApiType>
+				>::value, 
+				TBuilderImplementation<GfxApiType>
+			>::type;
 
 		/**********************************************************************************************//**
 		 * \class	GfxApiTaskBuilder
@@ -40,7 +46,7 @@ namespace Engine {
 		 * \tparam	GfxApiFirstType	Type of the graphics API first type.
 		 * \tparam	GfxApiMoreTypes	Type of the graphics API more types.
 		 **************************************************************************************************/
-		template <template <typename> TBuilderImplementation, typename GfxApiFirstType, typename... GfxApiMoreTypes>
+		template <template <typename> typename TBuilderImplementation, typename GfxApiFirstType, typename... GfxApiMoreTypes>
 		class GfxApiTaskBuilder
 			: public is_task_builder_implementation_t<TBuilderImplementation, GfxApiFirstType>
 			, public GfxApiTaskBuilder<TBuilderImplementation, GfxApiMoreTypes...>
@@ -53,12 +59,12 @@ namespace Engine {
 		 *
 		 * \tparam	GfxApiType	Type of the graphics API type.
 		 **************************************************************************************************/
-		template <template <typename> TBuilderImplementation, typename GfxApiType>
+		template <template <typename> typename TBuilderImplementation, typename GfxApiType>
 		class GfxApiTaskBuilder<TBuilderImplementation, GfxApiType>
 			: public is_task_builder_implementation_t<TBuilderImplementation, GfxApiType>
 		{};
 		
-		template <template <typename> TBuilderImplementation, typename... GfxApiTypes>
+		template <template <typename> typename TBuilderImplementation, typename... GfxApiTypes>
 		class GenericTaskBuilder
 			: public GfxApiTaskBuilder<TBuilderImplementation, GfxApiTypes...>
 		{
