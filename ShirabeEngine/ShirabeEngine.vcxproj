@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.cpp" />
+    <ClCompile Include="code\include\Threading\Looper.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\Timer.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\WindowsTime.cpp" />

@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <functional>
 #include <future>
+#include <assert.h>
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
@@ -47,10 +48,19 @@ namespace Engine {
 			Vulkan_
 		};
 
-		enum class ERequestMode {
+		enum class ETaskSynchronization {
 			Async = 1,
 			Sync  = 2
 		};
+
+		enum class EResourceTaskType {
+			Create  = 1,
+			Query   = 2, // = Read Info
+			Update  = 4,
+			Destroy = 8
+		};
+
+		using ResourceTaskFn_t = std::function<GFXAPIResourceHandle_t()>;
 
 		/**********************************************************************************************//**
 		 * \struct	DeferredResourceCreationHandle
@@ -88,40 +98,41 @@ namespace Engine {
 			EEngineStatus load(
 				const ResourceDescriptor<TResource> &inDescriptor,
 				const GFXAPIResourceHandleMap       &inResourceDependencyHandles,
-				const ERequestMode                  &inRequestMode,
+				const ETaskSynchronization          &inRequestMode,
 				const Ptr<IAsyncLoadCallback>       &inCallback,
 				GFXAPIResourceHandle_t              &outResourceHandle);
 
 			template <typename TResource>
 			EEngineStatus unload(
-				GFXAPIResourceHandle_t &outResourceHandle,
-				const ERequestMode     &inRequestMode);
+				GFXAPIResourceHandle_t     &inResourceHandle,
+				const ETaskSynchronization &inSynchronization);
 
 
 		private:
 			template <typename TResource>
 			EEngineStatus loadImpl(
-				const ResourceDescriptor<TResource> &descriptor,
+				const ResourceDescriptor<TResource> &inDescriptor,
 				GFXAPIResourceHandleMap             &inResourceDependencyHandles,
 				DeferredResourceCreationHandle      &outHandle);
 
 			template <typename TResource>
-			EEngineStatus createBuilder(
-				const ResourceDescriptor<TResource> &desc,
-				GFXAPIResourceHandleMap             &inResourceDependencyHandles,
-				ResourceBuilder<TResource>          &outBuilder);
+			EEngineStatus createTask(
+				const ResourceDescriptor<TResource> &inDesc,
+				const GFXAPIResourceHandleMap       &inResourceDependencyHandles,
+				const EResourceTaskType             &inTaskType,
+				ResourceTaskFn_t                    &outTask);
 			
 			template <typename TResource>
 			EEngineStatus enqueue(
-				const ResourceBuilder<TResource>           &builder,
+				const ResourceTaskFn_t                     &inTask,
 				std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture);
 
 		private:
-			Threading::Looper<
+			Threading::Looper::Handler m_resourceThreadHandler;
 		};
 
 		/**********************************************************************************************//**
-		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ERequestMode &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
+		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
 		 *
 		 * \brief	Loads
 		 *
@@ -138,20 +149,18 @@ namespace Engine {
 		EEngineStatus GFXAPIResourceSubSystem::load(
 			const ResourceDescriptor<TResource> &inDescriptor,
 			const GFXAPIResourceHandleMap       &inResourceDependencyHandles,
-			const ERequestMode                  &inRequestMode,
+			const ETaskSynchronization          &inSynchronization,
 			const Ptr<IAsyncLoadCallback>       &inCallback,
 			GFXAPIResourceHandle_t              &outResourceHandle)
 		{
-			DeferredResourceCreationHandle handle;
-
 			GFXAPIResourceHandle_t resourceHandle = 0;
 
-			EEngineStatus status = loadImpl(descriptor, inResourceDependencyHandles, handle);
+			DeferredResourceCreationHandle handle;
+			EEngineStatus status = loadImpl(inDescriptor, inResourceDependencyHandles, handle);
 			if( !CheckEngineError(status) ) {
-				switch( inRequestMode ) {
+				switch( inSynchronization ) {
 				default:
-				case ERequestMode::Sync:
-
+				case ETaskSynchronization::Sync:
 					resourceHandle = handle.futureHandle.get(); // Wait for it...
 					if( resourceHandle == 0 )
 						// Invalid
@@ -161,7 +170,7 @@ namespace Engine {
 						status = EEngineStatus::Ok;
 					}
 					break;
-				case ERequestMode::Async:
+				case ETaskSynchronization::Async:
 					break;
 				}
 			}				
@@ -169,16 +178,28 @@ namespace Engine {
 			return status;
 		}
 
+		/**********************************************************************************************//**
+		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::loadImpl( const ResourceDescriptor<TResource> &inDescriptor, GFXAPIResourceHandleMap &inResourceDependencyHandles, DeferredResourceCreationHandle &outHandle)
+		 *
+		 * \brief	Loads an implementation
+		 *
+		 * \tparam	TResource	Type of the resource.
+		 * \param 		  	inDescriptor			   	Information describing the in.
+		 * \param [in,out]	inResourceDependencyHandles	The in resource dependency handles.
+		 * \param [in,out]	outHandle				   	Handle of the out.
+		 *
+		 * \return	The implementation.
+		 **************************************************************************************************/
 		template <typename TResource>
 		EEngineStatus GFXAPIResourceSubSystem::loadImpl(
-			const ResourceDescriptor<TResource> &descriptor,
+			const ResourceDescriptor<TResource> &inDescriptor,
 			GFXAPIResourceHandleMap             &inResourceDependencyHandles,
 			DeferredResourceCreationHandle      &outHandle)
 		{
 			EEngineStatus status = EEngineStatus::Ok;
 
-			ResourceBuilder<TResource> builder;
-			status = createBuilder<TResource>(descriptor, inResourceDependencyHandles, builder);
+		    ResourceTaskFn_t task = nullptr;
+			status = createTask<TResource>(inDescriptor, inResourceDependencyHandles, task);
 			if( CheckEngineError(status) ) {
 				Log::Error(logTag(), String::format("Failed to create builder for resource '%0'", descriptor.name()));
 				return status;
@@ -194,20 +215,99 @@ namespace Engine {
 			return status;
 		}
 
+		/**********************************************************************************************//**
+		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::createTask( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const EResourceTaskType &inTaskType, ResourceTaskFn_t &outTask)
+		 *
+		 * \brief	Creates a task
+		 *
+		 * \tparam	TResource	Type of the resource.
+		 * \param 		  	inDescriptor			   	Information describing the in.
+		 * \param 		  	inResourceDependencyHandles	The in resource dependency handles.
+		 * \param 		  	inTaskType				   	Type of the in task.
+		 * \param [in,out]	outTask					   	The out task.
+		 *
+		 * \return	The new task.
+		 **************************************************************************************************/
 		template <typename TResource>
-		EEngineStatus GFXAPIResourceSubSystem::createBuilder(
-			const ResourceDescriptor<TResource> &desc,
-			GFXAPIResourceHandleMap             &inResourceDependencyHandles,
-			ResourceBuilder<TResource>          &outBuilder)
+		EEngineStatus GFXAPIResourceSubSystem::createTask(
+			const ResourceDescriptor<TResource> &inDescriptor,
+			const GFXAPIResourceHandleMap       &inResourceDependencyHandles,
+			const EResourceTaskType             &inTaskType,
+			ResourceTaskFn_t                    &outTask)
 		{
-			// Invoke task builder for the desired GFX-API.
+			// Determine the specific graphics API and access the task builder
+			// to create the appropriate task type on the API.
 		}
 
+		using namespace Threading;
+		class FutureAssignmentTask 
+			: public Looper::ITask 
+		{
+		public:
+			FutureAssignmentTask(
+				const ResourceTaskFn_t                     &inUnderlyingTaskFn,
+				const Looper::Priority                     &inPriority,
+				std::shared_future<GFXAPIResourceHandle_t> &inOutSharedFuture)
+				: m_priority(inPriority)
+			{
+				assert(inUnderlyingTaskFn != nullptr);
+
+				std::function<bool()> fn =
+					[=] () -> bool 
+				{
+					GFXAPIResourceHandle_t id = inUnderlyingTaskFn();
+					if( id == 0 ) {
+						inOutSharedFuture.
+						return false;
+					} else {
+
+					}
+				};
+
+				m_bindingFunction = fn;
+			}
+
+			inline Looper::Priority priority() { return m_priority; }
+
+			bool run() {
+				
+
+				return true;
+			}
+
+		private:
+			std::function<bool()>  m_bindingFunction;
+			Looper::Priority       m_priority;
+		};
+
+		/**********************************************************************************************//**
+		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::enqueue( const ResourceTaskFn_t &inTask, std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture)
+		 *
+		 * \brief	Adds an object onto the end of this queue
+		 *
+		 * \tparam	TResource	Type of the resource.
+		 * \param 		  	inTask		   	The in task.
+		 * \param [in,out]	outSharedFuture	The out shared future.
+		 *
+		 * \return	The EEngineStatus.
+		 **************************************************************************************************/
 		template <typename TResource>
 		EEngineStatus GFXAPIResourceSubSystem::enqueue(
-			const ResourceBuilder<TResource>           &builder,
+			const ResourceTaskFn_t                     &inTask,
 			std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture) {
+			// Here it becomes interesting: 
+			// The looper itself should not be tied to whatever return type. 
+			// In addition, resource task creation should not be tied to 
+			// the looper or any other subsystem.
+			//
+			// Solution:
+			// Wrap the resource task in another and implement the assignment 
+			// of the shared-future there.		
 
+			FutureAssignmentTaskPtr looperTask
+				= MakeSharedPointerType<FutureAssignmentTask>(inTask, Looper::Priority::Normal, outSharedFuture);
+
+			m_resourceThreadHandler.post(looperTask);
 		}
 	}
 }
