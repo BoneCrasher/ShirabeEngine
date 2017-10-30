@@ -5,10 +5,19 @@ namespace Engine{
 	namespace Threading {
 
 		template <typename TTaskResult>
-		ILooper<TTaskResult>::Task::Task()
+		ILooper<TTaskResult>::Task
+			::Task()
 			: _priority(Priority::Normal)
 			, _task()
 		{ }
+
+		template <typename TTaskResult>
+		std::future<TTaskResult> ILooper<TTaskResult>::Task
+			::bind(std::function<TTaskResult()>& fn)
+		{
+			_task = std::packaged_task<TTaskResult()>(fn);
+			return std::move(_task.get_future());
+		}
 		
 		/**********************************************************************************************//**
 		 * \fn	void Looper::Handler::storeDelayedPostFuture(std::future<bool>& f)

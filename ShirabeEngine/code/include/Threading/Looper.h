@@ -51,10 +51,7 @@ namespace Engine {
 				
 				inline void setPriority(const Priority& priority) { _priority = priority; }
 
-				inline std::future<TTaskResult> bind(std::function<TTaskResult()>& fn) {
-					_task = std::packaged_task<TTaskResult()>(fn);
-					return std::move(_task.get_future());
-				}
+				std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
 
 			private:
 				TTaskResult run() {
