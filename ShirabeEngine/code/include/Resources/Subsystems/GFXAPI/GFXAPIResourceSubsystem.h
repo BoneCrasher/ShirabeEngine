@@ -124,11 +124,11 @@ namespace Engine {
 			
 			template <typename TResource>
 			EEngineStatus enqueue(
-				const ResourceTaskFn_t                     &inTask,
-				std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture);
+				const ResourceTaskFn_t              &inTask,
+				std::future<GFXAPIResourceHandle_t> &outSharedFuture);
 
 		private:
-			Threading::Looper::Handler m_resourceThreadHandler;
+			Threading::Looper<GFXAPIResourceHandle_t>::Handler m_resourceThreadHandler;
 		};
 
 		/**********************************************************************************************//**
@@ -205,12 +205,14 @@ namespace Engine {
 				return status;
 			}
 
-			std::shared_future<GFXAPIResourceHandle_t> future;
+			std::future<GFXAPIResourceHandle_t> future;
 			status = enqueue<TResource>(task, future);
 			if( CheckEngineError(status) ) {
 				Log::Error(logTag(), String::format("Failed to enqueue resource creation task for resource '%0'", descriptor.name()));
 				return status;
 			}
+
+			outHandle.futureHandle = std::move(future);
 
 			return status;
 		}
@@ -239,47 +241,6 @@ namespace Engine {
 			// to create the appropriate task type on the API.
 		}
 
-		using namespace Threading;
-		class FutureAssignmentTask 
-			: public Looper::ITask 
-		{
-		public:
-			FutureAssignmentTask(
-				const ResourceTaskFn_t                     &inUnderlyingTaskFn,
-				const Looper::Priority                     &inPriority,
-				std::shared_future<GFXAPIResourceHandle_t> &inOutSharedFuture)
-				: m_priority(inPriority)
-			{
-				assert(inUnderlyingTaskFn != nullptr);
-
-				std::function<bool()> fn =
-					[=] () -> bool 
-				{
-					GFXAPIResourceHandle_t id = inUnderlyingTaskFn();
-					if( id == 0 ) {
-						inOutSharedFuture.
-						return false;
-					} else {
-
-					}
-				};
-
-				m_bindingFunction = fn;
-			}
-
-			inline Looper::Priority priority() { return m_priority; }
-
-			bool run() {
-				
-
-				return true;
-			}
-
-		private:
-			std::function<bool()>  m_bindingFunction;
-			Looper::Priority       m_priority;
-		};
-
 		/**********************************************************************************************//**
 		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::enqueue( const ResourceTaskFn_t &inTask, std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture)
 		 *
@@ -293,21 +254,19 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <typename TResource>
 		EEngineStatus GFXAPIResourceSubSystem::enqueue(
-			const ResourceTaskFn_t                     &inTask,
-			std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture) {
-			// Here it becomes interesting: 
-			// The looper itself should not be tied to whatever return type. 
-			// In addition, resource task creation should not be tied to 
-			// the looper or any other subsystem.
-			//
-			// Solution:
-			// Wrap the resource task in another and implement the assignment 
-			// of the shared-future there.		
+			const ResourceTaskFn_t              &inTask,
+			std::future<GFXAPIResourceHandle_t> &outSharedFuture) 
+		{
+			std::future<GFXAPIResourceHandle_t>  looperTaskFuture;
+			Looper<GFXAPIResourceHandle_t>::Task looperTask;
 
-			FutureAssignmentTaskPtr looperTask
-				= MakeSharedPointerType<FutureAssignmentTask>(inTask, Looper::Priority::Normal, outSharedFuture);
+			looperTask = ILooper<GFXAPIResourceHandle_t>::Task();
+			looperTask.setPriority(ILooper<GFXAPIResourceHandle_t>::Priority::Normal);
 
-			m_resourceThreadHandler.post(looperTask);
+			looperTaskFuture = looperTask.bind(inTask, Looper::Priority::Normal);
+			outSharedFuture  = std::move(looperTaskFuture);
+
+			m_resourceThreadHandler.post(std::move(looperTask));
 		}
 	}
 }
