@@ -10,7 +10,20 @@
 
 namespace Engine {
 	namespace Threading {
-				
+		/**********************************************************************************************//**
+		* \enum	Priority
+		*
+		* \brief	Values that represent priorities
+		**************************************************************************************************/
+		enum class Priority {
+			Least     =    1,
+			Less      =    2,
+			Normal    =    4,
+			Higher    =    8,
+			Highest   =   16,
+			TonyStark = 1337 // 04/10/2017 - 04:49: Now i want to watch Avengers...
+		};	
+
 		/**********************************************************************************************//**
 		 * \fn	DeclareInterface(ILooper);
 		 *
@@ -21,20 +34,6 @@ namespace Engine {
 	    template <typename TTaskResult>
 		DeclareInterface(ILooper);
 		public:
-			/**********************************************************************************************//**
-			 * \enum	Priority
-			 *
-			 * \brief	Values that represent priorities
-			 **************************************************************************************************/
-			enum class Priority {
-				Least     =    1,
-				Less      =    2,
-				Normal    =    4,
-				Higher    =    8,
-				Highest   =   16,
-				TonyStark = 1337 // 04/10/2017 - 04:49: Now i want to watch Avengers...
-			};
-
 			class Task {
 			public:
 				friend class ILooper<TTaskResult>;

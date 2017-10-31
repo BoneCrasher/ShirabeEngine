@@ -122,9 +122,8 @@ namespace Engine {
 				const EResourceTaskType             &inTaskType,
 				ResourceTaskFn_t                    &outTask);
 			
-			template <typename TResource>
 			EEngineStatus enqueue(
-				const ResourceTaskFn_t              &inTask,
+				ResourceTaskFn_t                    &inTask,
 				std::future<GFXAPIResourceHandle_t> &outSharedFuture);
 
 		private:
@@ -242,7 +241,7 @@ namespace Engine {
 		}
 
 		/**********************************************************************************************//**
-		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::enqueue( const ResourceTaskFn_t &inTask, std::shared_future<GFXAPIResourceHandle_t> &outSharedFuture)
+		 * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::enqueue( const ResourceTaskFn_t &inTask, std::future<GFXAPIResourceHandle_t> &outSharedFuture)
 		 *
 		 * \brief	Adds an object onto the end of this queue
 		 *
@@ -252,18 +251,17 @@ namespace Engine {
 		 *
 		 * \return	The EEngineStatus.
 		 **************************************************************************************************/
-		template <typename TResource>
 		EEngineStatus GFXAPIResourceSubSystem::enqueue(
-			const ResourceTaskFn_t              &inTask,
+			ResourceTaskFn_t                    &inTask,
 			std::future<GFXAPIResourceHandle_t> &outSharedFuture) 
 		{
-			std::future<GFXAPIResourceHandle_t>  looperTaskFuture;
-			Looper<GFXAPIResourceHandle_t>::Task looperTask;
+			using namespace Threading;
 
-			looperTask = ILooper<GFXAPIResourceHandle_t>::Task();
-			looperTask.setPriority(ILooper<GFXAPIResourceHandle_t>::Priority::Normal);
+			std::future<GFXAPIResourceHandle_t>   looperTaskFuture;
+			ILooper<GFXAPIResourceHandle_t>::Task looperTask;
+			looperTask.setPriority(Priority::Normal);
 
-			looperTaskFuture = looperTask.bind(inTask, Looper::Priority::Normal);
+			looperTaskFuture = looperTask.bind(inTask);
 			outSharedFuture  = std::move(looperTaskFuture);
 
 			m_resourceThreadHandler.post(std::move(looperTask));
