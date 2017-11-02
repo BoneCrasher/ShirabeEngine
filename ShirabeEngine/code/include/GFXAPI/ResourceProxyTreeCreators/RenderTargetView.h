@@ -21,12 +21,12 @@ namespace Engine {
 			static const constexpr EResourceType    resource_type    = RenderTargetView::resource_type;
 			static const constexpr EResourceSubType resource_subtype = RenderTargetView::resource_subtype;
 
-			using binding_type    = RenderTargetView::binding_type;
-			using descriptor_type = ResourceDescriptor<RenderTargetView>;
+			using binding_type = RenderTargetView::binding_type;
+			using request_type = ResourceCreationRequest<RenderTargetView>;
 
 			static bool create(
 				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const descriptor_type           &desc,
+				const request_type              &request,
 				ResourceHandleList              &inDependencyHandles,
 				binding_type                    &outBinding,
 				ResourceProxyMap                &outProxyMap,

@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_RENDERTARGET_H__
-#define __SHIRABE_RENDERTARGET_H__
+#ifndef __SHIRABE_SWAPCHAIN_H__
+#define __SHIRABE_SWAPCHAIN_H__
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/Handle.h"
@@ -42,16 +42,57 @@ namespace Engine {
 			}
 		};
 
+		struct SwapChainCreationRequestImpl {
+		public:
+			inline const SwapChainDescriptorImpl& resourceDescriptor() const { return _resourceDescriptor; }
+
+			std::string toString() const {
+				std::stringstream ss;
+
+				ss
+					<< "SwapChainCreationRequest: \n"
+					<< "[\n"
+					<< _resourceDescriptor.toString() << "\n"
+					<< "]"
+					<< std::endl;
+
+				return ss.str();
+			}
+		private:
+			SwapChainDescriptorImpl _resourceDescriptor;
+		};
+
+		struct SwapChainDestructionRequestImpl {
+
+		};
+
+		struct SwapChainQueryRequestImpl {
+
+		};
+
 		struct SwapChainResourceBinding {
 			ResourceHandle swapChainHandle;
 			std::vector<RenderTargetViewResourceBinding> backBufferRenderTargetBindings;
 		};
 
+		class SwapChain;
+
 		struct SwapChainTraits {
 			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
 			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN;
 
-			using descriptor_impl_type = SwapChainDescriptorImpl;
+			using descriptor_impl_type          = SwapChainDescriptorImpl;
+			using creation_request_impl_type    = SwapChainCreationRequestImpl;
+			// using update_request_impl_type   = SwapChainUpdateRequestImpl;
+			using query_request_impl_type       = SwapChainQueryRequestImpl;
+			using destruction_request_impl_type = SwapChainDestructionRequestImpl;
+
+			typedef ResourceDescriptor        <SwapChain> SwapChainDescriptor;
+			typedef ResourceCreationRequest   <SwapChain> SwapChainCreationRequest;
+			// typedef ResourceUpdateRequest     <SwapChain> SwapChainUpdateRequest;
+			typedef ResourceQueryRequest      <SwapChain> SwapChainQueryRequest;
+			typedef ResourceDestructionRequest<SwapChain> SwapChainDestructionRequest;
+
 			using binding_type         = SwapChainResourceBinding;
 		};
 
@@ -69,7 +110,19 @@ namespace Engine {
 
 			static const constexpr EResourceType    resource_type    = SwapChainTraits::resource_type;
 			static const constexpr EResourceSubType resource_subtype = SwapChainTraits::resource_subtype;
-			using descriptor_impl_type = SwapChainTraits::descriptor_impl_type;
+
+			using descriptor_impl_type          = SwapChainTraits::descriptor_impl_type;
+			using creation_request_impl_type    = SwapChainTraits::creation_request_impl_type;
+			// using update_request_impl_type      = SwapChainTraits::update_request_impl_type;
+			using query_request_impl_type       = SwapChainTraits::query_request_impl_type;
+			using destruction_request_impl_type = SwapChainTraits::destruction_request_impl_type;
+
+			typedef SwapChainTraits::SwapChainDescriptor         SwapChainDescriptor;
+			typedef SwapChainTraits::SwapChainCreationRequest    SwapChainCreationRequest;
+			// typedef SwapChainTraits::SwapChainUpdateRequest      SwapChainUpdateRequest;
+			typedef SwapChainTraits::SwapChainQueryRequest       SwapChainQueryRequest;
+			typedef SwapChainTraits::SwapChainDestructionRequest SwapChainDestructionRequest;
+
 			//
 			// GAPISwapChain<TGAPIResource> implementation
 			// 
@@ -78,15 +131,15 @@ namespace Engine {
 			EEngineStatus present(bool verticallySynchronized = true);
 
 			inline static Ptr<SwapChain> create(
-				const descriptor_type          &desc,
+				const SwapChainDescriptor      &desc,
 				const SwapChainResourceBinding &binding) {
 				return Ptr<SwapChain>(new SwapChain(desc, binding));
 			}
 
 		private:
 			inline SwapChain(
-				const descriptor_type &desc,
-				const binding_type    &binding)
+				const SwapChainDescriptor      &desc, // Forward declaration issue?!
+				const SwapChainResourceBinding &binding)
 				: ResourceDescriptorAdapter<SwapChainTraits>(desc)
 				, ResourceBindingAdapter<SwapChainTraits>(binding)
 				, _currentBackBufferIndex(0)
@@ -96,8 +149,11 @@ namespace Engine {
 		};
 		DeclareSharedPointerType(SwapChain);
 
-		typedef ResourceDescriptor<SwapChain> SwapChainDescriptor;
-
+		typedef SwapChainTraits::SwapChainDescriptor		 SwapChainDescriptor;
+		typedef SwapChainTraits::SwapChainCreationRequest    SwapChainCreationRequest;
+		// typedef SwapChainTraits::SwapChainUpdateRequest	     SwapChainUpdateRequest;
+		typedef SwapChainTraits::SwapChainQueryRequest	     SwapChainQueryRequest;
+		typedef SwapChainTraits::SwapChainDestructionRequest SwapChainDestructionRequest;
 	}
 }
 

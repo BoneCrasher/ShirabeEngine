@@ -92,7 +92,7 @@ namespace Engine {
 		private:
 			// friend class ProxyTreeCreator<type, subtype>;
 
-			virtual bool create(const ResourceDescriptor<TResource>& desc) = 0;
+			virtual bool create(const ResourceCreationRequest<TResource>& desc) = 0;
 		DeclareInterfaceEnd(IResourceProxy);
 
 		/**********************************************************************************************//**
@@ -137,17 +137,18 @@ namespace Engine {
 		template <typename TResource>
 		class GenericProxyBase
 			: public Engine::Resources::IResourceProxy<TResource>
+			, public ResourceCreationRequestAdapter<TResource>
 		{
 		public:
-			using descriptor_type = ResourceDescriptor<TResource>;
+			using creation_request_type = ResourceCreationRequest<TResource>;
 
 			inline GenericProxyBase(
-				const EProxyType      &proxyType,
-				const descriptor_type &descriptor)
+				const EProxyType            &proxyType,
+				const creation_request_type &request)
 				: Engine::Resources::IResourceProxy<TResource>()
+				, ResourceCreationRequestAdapter<TResource>(request)
 				, _type(proxyType)
 				, _loadState(ELoadState::UNKNOWN)
-				, _descriptor(descriptor)
 				, _dependencies()
 			{
 			}
@@ -155,8 +156,7 @@ namespace Engine {
 			inline EProxyType proxyType() const { return _type; }
 			inline ELoadState loadState() const { return _loadState; }
 
-			inline const descriptor_type&     descriptor()   const { return _descriptor; }
-			inline const ResourceHandleList&  dependencies() const { return _dependencies; }
+			inline const ResourceHandleList& dependencies() const { return _dependencies; }
 
 			inline bool destroy() { return unloadSync(); }
 
@@ -167,7 +167,6 @@ namespace Engine {
 			EProxyType _type;
 			ELoadState _loadState;
 
-			descriptor_type    _descriptor;
 			ResourceHandleList _dependencies;
 		};
 

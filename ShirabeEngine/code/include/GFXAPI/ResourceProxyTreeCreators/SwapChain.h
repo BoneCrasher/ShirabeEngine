@@ -23,12 +23,12 @@ namespace Engine {
 			static const constexpr EResourceType    resource_type    = SwapChain::resource_type;
 			static const constexpr EResourceSubType resource_subtype = SwapChain::resource_subtype;
 
-			using binding_type    = SwapChain::binding_type;
-			using descriptor_type = ResourceDescriptor<SwapChain>
+			using binding_type = SwapChain::binding_type;
+			using request_type = ResourceCreationRequest<SwapChain>;
 
 			static bool create(
 				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const descriptor_type           &desc,
+				const request_type              &request,
 				ResourceHandleList              &inDependencyHandles,
 				binding_type                    &outBinding,
 				ResourceProxyMap                &outProxyMap,

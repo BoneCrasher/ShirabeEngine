@@ -86,6 +86,42 @@ namespace Engine {
 			}
 		};
 
+		template <uint8_t N>
+		struct TextureNDCreationRequestImpl {
+		public:
+			inline const TextureDescriptorImpl<N>& resourceDescriptor() const { return _resourceDescriptor; }
+
+			std::string toString() const {
+				std::stringstream ss;
+
+				ss
+					<< "TextureNDCreationRequest<" << N << ">: \n"
+					<< "[\n"
+					<< _resourceDescriptor.toString() << "\n"
+					<< "]"
+					<< std::endl;
+
+				return ss.str();
+			}
+		private:
+			TextureDescriptorImpl<N> _resourceDescriptor;
+		};
+
+		template <uint8_t N>
+		struct TextureNDDestructionRequestImpl {
+
+		};
+
+		template <uint8_t N>
+		struct TextureNDUpdateRequestImpl {
+
+		};
+
+		template <uint8_t N>
+		struct TextureNDQueryRequestImpl {
+
+		};
+
 		/**********************************************************************************************//**
 		 * \fn	template <uint8_t N> std::ostream& operator<<(std::ostream& s, const TextureDescriptorImpl<N>& d)
 		 *
@@ -155,8 +191,12 @@ namespace Engine {
 			static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
 			static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_1D;
 
-			using binding_type         = TextureNDResourceBinding;
-			using descriptor_impl_type = TextureDescriptorImpl<N>;
+			using binding_type                  = TextureNDResourceBinding;
+			using descriptor_impl_type          = TextureDescriptorImpl<N>;
+			using creation_request_impl_type    = TextureNDCreationRequestImpl<N>;
+			// using update_request_impl_type   = TextureNDUpdateRequestImpl<N>;
+			using query_request_impl_type       = TextureNDQueryRequestImpl<N>;
+			using destruction_request_impl_type = TextureNDDestructionRequestImpl<N>;
 		};
 
 		/**********************************************************************************************//**
@@ -175,9 +215,14 @@ namespace Engine {
 			using my_type = TextureNDBase<N>;
 			static const constexpr EResourceType    resource_type    = TextureNDTraits<N>::resource_type;
 			static const constexpr EResourceSubType resource_subtype = TextureNDTraits<N>::resource_subtype;
-			using descriptor_impl_type = typename TextureNDTraits<N>::descriptor_impl_type;
-
-			TextureNDBase(
+			
+			using descriptor_impl_type          = typename TextureNDTraits<N>::descriptor_impl_type;
+			using creation_request_impl_type    = typename TextureNDTraits<N>::creation_request_impl_type;
+			using update_request_impl_type	    = typename TextureNDTraits<N>::update_request_impl_type;
+			using query_request_impl_type	    = typename TextureNDTraits<N>::query_request_impl_type;
+			using destruction_request_impl_type = typename TextureNDTraits<N>::destruction_request_impl_type;
+			
+				TextureNDBase(
 				const descriptor_type &descriptor,
 				const binding_type    &binding) 
 				: ResourceDescriptorAdapter<TextureNDTraits<N>>(descriptor)

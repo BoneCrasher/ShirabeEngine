@@ -21,11 +21,11 @@ namespace Engine {
 			static const constexpr EResourceSubType resource_subtype = ShaderResourceView::resource_subtype;
 
 			using binding_type    = ShaderResourceView::binding_type;
-			using descriptor_type = ResourceDescriptor<ShaderResourceView>;
+			using request_type = ResourceCreationRequest<ShaderResourceView>;
 
 			static bool create(
 				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const descriptor_type           &desc,
+				const request_type              &request,
 				ResourceHandleList              &inDependencyHandles,
 				binding_type                    &outBinding,
 				ResourceProxyMap                &outProxyMap,

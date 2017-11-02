@@ -16,10 +16,10 @@ namespace Engine {
 		{
 		public:
 			inline ResourceSubsystemProxy(
-				const EProxyType                    &proxyType,
-				const Ptr<TSubsystem>               &subsystem,
-				const ResourceDescriptor<TResource> &descriptor)
-				: GenericProxyBase<TResource>(proxyType, descriptor)
+				const EProxyType                         &proxyType,
+				const Ptr<TSubsystem>                    &subsystem,
+				const ResourceCreationRequest<TResource> &request)
+				: GenericProxyBase<TResource>(proxyType, request)
 				, _subsystem(subsystem)
 			{ }
 

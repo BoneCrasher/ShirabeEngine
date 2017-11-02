@@ -251,9 +251,9 @@ namespace Engine {
 			 **************************************************************************************************/
 			template <typename TResource>
 			EEngineStatus createResource(
-				const ResourceDescriptor<TResource> &desc,
-				bool                                 creationDeferred,
-				typename TResource::binding_type    &binding
+				const ResourceCreationRequest<TResource> &request,
+				bool                                      creationDeferred,
+				typename TResource::binding_type         &binding
 			) {
 				using resource_type    = typename TResource::resource_type;
 				using resource_subtype = typename TResource::resource_subtype;
@@ -275,7 +275,7 @@ namespace Engine {
 				ResourceProxyMap     outProxies;
 				DependerTreeNodeList outDependerHierarchies;
 
-				bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(_gfxApiProxyFactory, desc, {}, binding, outDependerHierarchies);
+				bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(_gfxApiProxyFactory, request, {}, binding, outDependerHierarchies);
 				if( !treeCreationSuccessful ) {
 					Log::Error(logTag(), "Unable to create root resource proxy.");
 					return EEngineStatus::ResourceManager_ProxyCreationFailed;
@@ -327,20 +327,20 @@ namespace Engine {
 			};
 
 			EEngineStatus createSwapChain(
-				const SwapChainDescriptor &inDesc,
-				Ptr<SwapChain>            &outSwapChain);
+				const ResourceCreationRequest<SwapChain> &inRequest,
+				Ptr<SwapChain>                           &outSwapChain);
 
 			EEngineStatus createTexture1D(
-				const Texture1DDescriptor &desc,
-				Ptr<Texture1D>            &outTexture1D);
+				const ResourceCreationRequest<Texture1D> &request,
+				Ptr<Texture1D>                           &outTexture1D);
 
 			EEngineStatus createTexture2D(
-				const Texture2DDescriptor &desc,
-				Ptr<Texture2D>            &outTexture2D);
+				const ResourceCreationRequest<Texture2D> &request,
+				Ptr<Texture2D>                           &outTexture2D);
 
 			EEngineStatus createTexture3D(
-				const Texture3DDescriptor &desc,
-				Ptr<Texture3D>            &outTexture3D);
+				const ResourceCreationRequest<Texture3D> &request,
+				Ptr<Texture3D>                           &outTexture3D);
 
 		private:
 			inline AnyProxy getResourceProxy(const ResourceHandle& handle) {

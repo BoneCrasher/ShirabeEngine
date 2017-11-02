@@ -59,10 +59,10 @@ namespace Engine {
 
 		public:
 			inline GFXAPIResourceProxy(
-				const EProxyType                    &proxyType,
-				const Ptr<GFXAPIResourceSubSystem>  &subsystem,
-				const ResourceDescriptor<TResource> &descriptor)
-				: ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>(proxyType, subsystem, descriptor)
+				const EProxyType                         &proxyType,
+				const Ptr<GFXAPIResourceSubSystem>       &subsystem,
+				const ResourceCreationRequest<TResource> &request)
+				: ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>(proxyType, subsystem, request)
 				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
 			{ }
 

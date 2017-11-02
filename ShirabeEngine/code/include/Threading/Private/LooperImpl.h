@@ -65,7 +65,7 @@ namespace Engine{
 				return;
 
 			// Convenience
-			using future_type = std::future<bool>;
+			using future_type = std::future<TTaskResult>;
 			using future_list = std::vector<future_type>;
 			using f_it        = future_list::const_iterator;
 			using f_it_list   = std::vector<future_list::const_iterator>;

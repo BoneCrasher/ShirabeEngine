@@ -107,7 +107,6 @@ namespace Engine {
 				GFXAPIResourceHandle_t     &inResourceHandle,
 				const ETaskSynchronization &inSynchronization);
 
-
 		private:
 			template <typename TResource>
 			EEngineStatus loadImpl(
