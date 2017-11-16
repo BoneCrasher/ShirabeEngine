@@ -34,14 +34,16 @@ namespace Engine {
 				ResourceProxyMap                &outProxyMap,
 				DependerTreeNodeList            &outResourceHierarchy)
 			{
+				const ResourceDescriptor<SwapChain> desc = request.resourceDescriptor();
+
 				if( desc.backBufferCount < 1 ) {
 					Log::Error(logTag(), "Invalid swapchain back buffer count. Expected 'count >= 1'.");
 					return false; // Must be at least 1 for double buffering
 				}
 
 				ResourceHandle rootHandle(desc.name, EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN);
-				Ptr<IResourceProxy<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>> rootProxy
-					= proxyFactory->create<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>(EProxyType::Persistent, desc, inDependencyHandles);
+				Ptr<IResourceProxy<SwapChain>> rootProxy
+					= proxyFactory->create<SwapChain>(EProxyType::Persistent, request, inDependencyHandles);
 
 				outBinding.swapChainHandle = rootHandle;
 			}

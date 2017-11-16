@@ -5,7 +5,7 @@
 #include "Core/EngineStatus.h"
 
 #include "Handle.h"
-#include "IResourceDescriptor.h"
+#include "ResourceDomainTransfer.h"
 
 #include "GFXAPI/Types/SwapChain.h"
 #include "GFXAPI/Types/ShaderResourceView.h"

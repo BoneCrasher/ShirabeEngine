@@ -47,11 +47,12 @@ namespace Engine {
 				const Ptr<ResourceProxyFactory>          &proxyFactory,
 				const ResourceCreationRequest<TResource> &request,
 				ResourceHandleList                       &inDependencyHandles,
-				binding_type                             &outBinding,      
-				ResourceProxyMap                         &outProxyMap,        
+				binding_type                             &outBinding,
+				ResourceProxyMap                         &outProxyMap,
 				DependerTreeNodeList                     &outResourceHierarchy)
 			{
-				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
+        static_assert(false, "Proxy creation undefined for unspecialized type and subtype.");
+				// throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}
 		};
 

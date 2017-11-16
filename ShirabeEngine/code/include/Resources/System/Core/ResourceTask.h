@@ -5,7 +5,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceBuilder.h"
 
 namespace Engine {

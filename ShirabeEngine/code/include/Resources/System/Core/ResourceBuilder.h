@@ -9,7 +9,7 @@
 #include "Core/EngineStatus.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
 	namespace Resources {

@@ -16,7 +16,7 @@
 #include "Core/BasicTypes.h"
 
 #include "Resources/System/Core/EResourceType.h"
-#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
 	namespace GFXAPI {

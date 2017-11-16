@@ -14,6 +14,8 @@
 namespace Engine {
 	namespace GFXAPI {
 
+    class RenderTargetView;
+
 		/**********************************************************************************************//**
 		 * \struct	RenderTargetDescriptorImpl
 		 *
@@ -42,20 +44,54 @@ namespace Engine {
 				return ss.str();
 			}
 		};		
+    
+    struct RenderTargetViewCreationRequestImpl {
+    public:
+      inline const RenderTargetViewDescriptorImpl& resourceDescriptor() const { return _resourceDescriptor; }
 
-		struct RenderTargetViewResourceBinding {
-			ResourceHandle           handle;
-			TextureNDResourceBinding textureBinding;
-			// BufferResourceBinding    bufferBinding;
-		};
+      std::string toString() const {
+        std::stringstream ss;
 
-		struct RenderTargetViewTraits {
-			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-			static const constexpr EResourceSubType resource_subtype = EResourceSubType::RENDER_TARGET_VIEW;
+        ss
+          << "RenderTargetViewCreationRequest: \n"
+          << "[\n"
+          << _resourceDescriptor.toString() << "\n"
+          << "]"
+          << std::endl;
 
-			using descriptor_impl_type = RenderTargetViewDescriptorImpl;
-			using binding_type         = RenderTargetViewResourceBinding;
-		};
+        return ss.str();
+      }
+    private:
+      RenderTargetViewDescriptorImpl _resourceDescriptor;
+    };
+
+
+    struct RenderTargetViewDestructionRequestImpl {
+
+    };
+
+    struct RenderTargetViewQueryRequestImpl {
+
+    };
+
+    struct RenderTargetViewResourceBinding {
+      ResourceHandle           handle;
+      TextureNDResourceBinding textureBinding;
+      // BufferResourceBinding    bufferBinding;
+    };
+
+    DeclareResourceTraits(RenderTargetView,
+                          RenderTargetView,
+                          EResourceType::GAPI_VIEW,
+                          EResourceSubType::RENDER_TARGET_VIEW,
+                          RenderTargetViewResourceBinding,
+                          RenderTargetViewDescriptorImpl,
+                          RenderTargetViewCreationRequestImpl,
+                          void,
+                          RenderTargetViewQueryRequestImpl,
+                          RenderTargetViewDestructionRequestImpl);
+
+    DefineTraitsPublicTypes(RenderTargetView, RenderTargetViewTraits);
 
 		/**********************************************************************************************//**
 		 * \class	GFXAPIRenderTarget
@@ -63,21 +99,18 @@ namespace Engine {
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class RenderTargetView
-			: public ResourceDescriptorAdapter<RenderTargetViewTraits>
+			: public RenderTargetViewTraits
+      , public ResourceDescriptorAdapter<RenderTargetViewTraits>
 			, public ResourceBindingAdapter<RenderTargetViewTraits>
 		{
 		public:
 			using my_type = RenderTargetView;
 
-			static const constexpr EResourceType    resource_type    = RenderTargetViewTraits::resource_type;
-			static const constexpr EResourceSubType resource_subtype = RenderTargetViewTraits::resource_subtype;
-
-			using descriptor_impl_type = RenderTargetViewTraits::descriptor_impl_type;
-
 			RenderTargetView(
-				const descriptor_type &descriptor,
-				const binding_type    &binding)
-				: ResourceDescriptorAdapter<RenderTargetViewTraits>(descriptor)
+				const RenderTargetViewDescriptor &descriptor,
+				const RenderTargetViewBinding    &binding)
+				: RenderTargetViewTraits()
+        , ResourceDescriptorAdapter<RenderTargetViewTraits>(descriptor)
 				, ResourceBindingAdapter<RenderTargetViewTraits>(binding)
 			{}
 		};

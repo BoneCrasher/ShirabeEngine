@@ -14,7 +14,7 @@
 #include "IOC/Observer.h"
 #include "Threading/Looper.h"
 
-#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceBuilder.h"
 #include "Resources/System/Core/ResourceTask.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
@@ -104,8 +104,8 @@ namespace Engine {
 
 			template <typename TResource>
 			EEngineStatus unload(
-				GFXAPIResourceHandle_t     &inResourceHandle,
-				const ETaskSynchronization &inSynchronization);
+			  const	GFXAPIResourceHandle_t &inResourceHandle,
+				const ETaskSynchronization   &inSynchronization);
 
 		private:
 			template <typename TResource>
@@ -263,7 +263,9 @@ namespace Engine {
 			looperTaskFuture = looperTask.bind(inTask);
 			outSharedFuture  = std::move(looperTaskFuture);
 
-			m_resourceThreadHandler.post(std::move(looperTask));
+			bool enqueued = m_resourceThreadHandler.post(std::move(looperTask));
+		
+			return (enqueued ? EEngineStatus::Ok : EEngineStatus::GFXAPI_SubsystemThreadEnqueueFailed);
 		}
 	}
 }

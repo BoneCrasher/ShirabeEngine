@@ -5,7 +5,7 @@
 #include "Log/Log.h"
 
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/IResourceProxy.h"
 #include "Resources/System/Core/ResourceProxyFactory.h"
 #include "Resources/System/Core/ProxyTreeCreator.h"
@@ -38,10 +38,10 @@ namespace Engine {
 			bool                           isCube,
 			const ResourceHandle          &textureNDProxyHandle,
 			ResourceHandle                &outSRVHandle,
-			TextureNDRTVProxyPtr          &outSRVProxy)
+			TextureNDSRVProxyPtr          &outSRVProxy)
 		{
-			if( (bindFlags.gpuBinding & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderResource) ) {
-				ShaderResourceDescriptor srvDesc;
+			if( (bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderResource) ) {
+				ShaderResourceViewDescriptor srvDesc;
 				srvDesc.name                                        = String::format("%0_SRV", textureName);
 				srvDesc.format                                      = textureFormat;
 				srvDesc.shaderResourceDimension.texture.dimensionNb = dimensionNb;
@@ -50,8 +50,14 @@ namespace Engine {
 				srvDesc.shaderResourceDimension.texture.isCube      = isCube;
 				srvDesc.shaderResourceDimension.texture.mipMap      = mipMapDesc;
 
+        ShaderResourceViewCreationRequest srvCreationRequest(srvDesc);
+
+        ShaderResourceViewBinding binding;
+        ResourceProxyMap          proxies;
+        DependerTreeNodeList      hierarchy;
+
 				TextureNDSRVProxyPtr srvProxy
-					= ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>::create(srvDesc, { textureNDProxyHandle }, outProxies);
+					= ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, { textureNDProxyHandle }, binding, proxies, hierarchy, outProxies);
 
 				if( !srvProxy ) {
 					// TODO: Log
@@ -223,7 +229,7 @@ namespace Engine {
 				// Down-cast to known type!
 				const Texture1DDescriptor& t1DDesc = static_cast<const Texture1DDescriptor&>(request.resourceDescriptor());
 				Ptr<IResourceProxy<Texture1D>> proxy
-					= proxyFactory->create<Texture1D>(EProxyType::Dynamic, t1DDesc, inDependencyHandles);
+					= proxyFactory->create<Texture1D>(EProxyType::Dynamic, request, inDependencyHandles);
 
 				ResourceHandle handle(t1DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D);
 				outProxies[handle] = AnyProxy(proxy);
@@ -402,7 +408,7 @@ namespace Engine {
 			{
 				const Texture3DDescriptor& t3DDesc = static_cast<const Texture3DDescriptor&>(request.resourceDescriptor());
 				Ptr<IResourceProxy<Texture3D>> proxy
-					= proxyFactory->create<Texture3D>(EProxyType::Dynamic, t3DDesc, inDependencyHandles);
+					= proxyFactory->create<Texture3D>(EProxyType::Dynamic, request, inDependencyHandles);
 
 				ResourceHandle handle(t3DDesc.name, resource_type, resource_subtype);
 				outProxies[handle] = AnyProxy(proxy);

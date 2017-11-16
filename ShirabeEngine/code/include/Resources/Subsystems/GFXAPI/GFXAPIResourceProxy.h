@@ -78,6 +78,7 @@ namespace Engine {
 
 		protected:
 		private:
+			Ptr<GFXAPIResourceSubSystem> _subsystem;
 		};
 
 		/**********************************************************************************************//**
@@ -111,7 +112,7 @@ namespace Engine {
 			// Make sure to extract the GFXAPI-resource handles from the dependencies
 			GFXAPIResourceHandleMap inDependencyHandles;
 			for( const ResourceProxyMap::value_type& pair : inDependencies ) {
-				Ptr<GFXAPIResourceProxy<TResource>> dependencyProxy = ProxyCast<TResource>(pair.second);
+				Ptr<GFXAPIResourceProxy<TResource>> dependencyProxy = GFXAPIProxyCast<TResource>(pair.second);
 				if( !dependencyProxy )
 					continue;
 
@@ -122,17 +123,17 @@ namespace Engine {
 			// and load state.
 			EEngineStatus status = EEngineStatus::Ok; 
 
-			const ResourceDescriptor<TResource>& rd = static_cast<GenericProxyBase<TResource>*>(this)->descriptor();
+      const ResourceDescriptor<TResource>& rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
 
 			GFXAPIResourceHandle_t handle = 0;
-			status = _subsystem->loadSync(rd, inDependencyHandles, handle);
 
+			status = _subsystem->load<TResource>(rd, inDependencyHandles, ETaskSynchronization::Sync, nullptr, handle);
 			if( CheckEngineError(status) ) {
 				// MBT TODO: Consider distinguishing the above returned status a little more in 
 				//           order to reflect UNLOADED or UNAVAILABLE state.
 				this->setLoadState(ELoadState::UNLOADED);
 
-				Log::Error(logTag(), String::format("Failed to load GFXAPI resource '%0'", rd.name()));
+				Log::Error(logTag(), String::format("Failed to load GFXAPI resource '%0'", rd.name));
 
 				return EEngineStatus::GFXAPI_LoadResourceFailed;
 			}
@@ -147,7 +148,19 @@ namespace Engine {
 		EEngineStatus GFXAPIResourceProxy<TResource>
 			::unloadSync()
 		{
-			//_subsystem-> ?;
+			EEngineStatus status = EEngineStatus::Ok;
+			status = _subsystem->unload<TResource>(handle(), ETaskSynchronization::Sync);
+
+			if( CheckEngineError(status) ) {
+				this->setLoadState(ELoadState::UNKNOWN);
+
+				Log::Error(logTag(), String::format("Failed to unload GFXAPI resource '%0'", handle()));
+
+				return EEngineStatus::GFXAPI_UnloadResourceFailed;
+			}
+
+			this->setLoadState(ELoadState::UNLOADED);
+
 			return EEngineStatus::Ok;
 		}
 	}

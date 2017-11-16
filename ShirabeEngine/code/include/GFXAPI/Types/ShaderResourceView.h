@@ -4,8 +4,7 @@
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/IResourceDescriptor.h"
-#include "Resources/System/Core/ResourceBinding.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 
 #include "GFXAPI/Definitions.h"
 #include "GFXAPI/Types/TextureND.h"
@@ -15,6 +14,8 @@
 namespace Engine {
 	namespace Resources {
 		using namespace GFXAPI;
+
+    class ShaderResourceView;
 
 		/**********************************************************************************************//**
 		 * \struct	ShaderResourceDescriptorImpl
@@ -94,19 +95,51 @@ namespace Engine {
 			}
 		};
 
-		
+    struct ShaderResourceViewCreationRequestImpl {
+    public:
+      const struct ResourceDescriptor<ShaderResourceView>& resourceDescriptor() const; 
+
+      std::string toString() const {
+        std::stringstream ss;
+
+        ss
+          << "ShaderResourceViewCreationRequest: \n"
+          << "[\n"
+          << _resourceDescriptor.toString() << "\n"
+          << "]"
+          << std::endl;
+
+        return ss.str();
+      }
+    private:
+      ShaderResourceViewDescriptorImpl _resourceDescriptor;
+    };
+
+
+    struct ShaderResourceViewDestructionRequestImpl {
+
+    };
+
+    struct ShaderResourceViewQueryRequestImpl {
+
+    };
 
 		struct ShaderResourceViewResourceBinding {
 			ResourceHandle handle;
 		};
 
-		struct ShaderResourceViewTraits {
-			static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-			static const constexpr EResourceSubType resource_subtype = EResourceSubType::SHADER_RESOURCE_VIEW;
+    DeclareResourceTraits(ShaderResourceView,
+                          ShaderResourceView,
+                          EResourceType::GAPI_VIEW,
+                          EResourceSubType::SHADER_RESOURCE_VIEW,
+                          ShaderResourceViewResourceBinding,
+                          ShaderResourceViewDescriptorImpl,
+                          ShaderResourceViewCreationRequestImpl,
+                          void,
+                          ShaderResourceViewQueryRequestImpl,
+                          ShaderResourceViewDestructionRequestImpl);
 
-			using descriptor_impl_type = ShaderResourceViewDescriptorImpl;
-			using binding_type         = ShaderResourceViewResourceBinding;
-		};
+    DefineTraitsPublicTypes(ShaderResourceView, ShaderResourceViewTraits);
 
 		/**********************************************************************************************//**
 		 * \class	GFXAPIShaderResource
@@ -114,19 +147,18 @@ namespace Engine {
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class ShaderResourceView
-			: public ResourceDescriptorAdapter<ShaderResourceViewTraits>
+			: public ShaderResourceViewTraits
+      , public ResourceDescriptorAdapter<ShaderResourceViewTraits>
 			, public ResourceBindingAdapter<ShaderResourceViewTraits>
 		{
 		public:
 			using my_type = ShaderResourceView;
-			static const constexpr EResourceType    resource_type    = ShaderResourceViewTraits::resource_type;
-			static const constexpr EResourceSubType resource_subtype = ShaderResourceViewTraits::resource_subtype;
-			using descriptor_impl_type = ShaderResourceViewTraits::descriptor_impl_type;
 
 			ShaderResourceView(
-				const descriptor_type &descriptor,
-				const binding_type    &binding)
-				: ResourceDescriptorAdapter<ShaderResourceViewTraits>(descriptor)
+				const ShaderResourceViewDescriptor &descriptor,
+				const ShaderResourceViewBinding    &binding)
+				: ShaderResourceViewTraits()
+        , ResourceDescriptorAdapter<ShaderResourceViewTraits>(descriptor)
 				, ResourceBindingAdapter<ShaderResourceViewTraits>(binding)
 			{}
 		};
@@ -134,6 +166,12 @@ namespace Engine {
 		DeclareSharedPointerType(ShaderResourceView);
 
 		using ShaderResourceViewDescriptor = ResourceDescriptor<ShaderResourceView>;
+
+    const ResourceDescriptor<ShaderResourceView>& ShaderResourceViewCreationRequestImpl
+      ::resourceDescriptor() const
+    {
+      return ResourceDescriptor<ShaderResourceView>(_resourceDescriptor);
+    }
 	}
 }
 

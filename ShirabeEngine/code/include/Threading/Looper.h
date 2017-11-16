@@ -45,6 +45,18 @@ namespace Engine {
 				Task(const Task&)            = delete;
 				Task& operator=(const Task&) = delete;
 
+				Task(Task&& t)
+					: _priority(t._priority)
+					, _task(std::move(t._task))
+				{}
+
+				Task& operator=(Task&& t) {
+					_priority = t._priority;
+					_task     = std::move(t._task);
+
+					return *this;
+				}
+
 				inline Priority priority()       { return _priority; }
 				inline Priority priority() const { return _priority; }
 				
@@ -57,7 +69,7 @@ namespace Engine {
 					return _task();
 				}
 
-				Priority                         _priority;
+				Priority                          _priority;
 				std::packaged_task<TTaskResult()> _task;
 			};
 			/**************************************************************************************************//**/

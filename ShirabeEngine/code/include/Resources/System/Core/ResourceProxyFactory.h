@@ -37,11 +37,11 @@ namespace Engine {
 				case EResourceType::MESH:
 				case EResourceType::SHADER:
 				case EResourceType::TEXTURE:
-					proxy = Ptr<GFXAPIResourceProxy<TResource>>(new GFXAPIResourceProxy<TResource>(proxyType, _gfxApiResourceSubsystem, creationRequest, dependencyHandles));
+					proxy = MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(proxyType, _gfxApiResourceSubsystem, creationRequest, dependencyHandles);
 					break;
 			    // Other
 				default:
-
+					break;
 				}
 
 				return proxy;

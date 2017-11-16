@@ -9,7 +9,7 @@
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/ResourceHierarchy.h"
-#include "Resources/System/Core/IResourceDescriptor.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
 	namespace Resources {
@@ -65,12 +65,12 @@ namespace Engine {
 		virtual EProxyType proxyType() const = 0;
 		virtual ELoadState loadState() const = 0;
 
-		virtual ResourceHandleList dependencies() const = 0;
+		virtual const ResourceHandleList& dependencies() const = 0;
 
-		virtual bool loadSync(
+		virtual EEngineStatus loadSync(
 			const ResourceHandle   &inHandle,
 			const ResourceProxyMap &inDependencies) = 0;
-		virtual bool unloadSync() = 0;
+		virtual EEngineStatus unloadSync() = 0;
 
 		DeclareInterfaceEnd(IResourceProxyBase);
 		DeclareSharedPointerType(IResourceProxyBase);
@@ -158,7 +158,7 @@ namespace Engine {
 
 			inline const ResourceHandleList& dependencies() const { return _dependencies; }
 
-			inline bool destroy() { return unloadSync(); }
+			inline bool destroy() { return !CheckEngineError(unloadSync()); }
 
 		protected:
 			inline void setLoadState(const ELoadState& newLoadState) { _loadState = newLoadState; }
