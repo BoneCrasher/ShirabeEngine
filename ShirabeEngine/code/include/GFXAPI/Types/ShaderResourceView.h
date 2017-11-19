@@ -7,7 +7,7 @@
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 
 #include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/TextureNDDefinition.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
@@ -126,6 +126,10 @@ namespace Engine {
 
 		struct ShaderResourceViewResourceBinding {
 			ResourceHandle handle;
+
+      inline ShaderResourceViewResourceBinding()
+        : handle(ResourceHandle::Invalid())
+      {}
 		};
 
     DeclareResourceTraits(ShaderResourceView,

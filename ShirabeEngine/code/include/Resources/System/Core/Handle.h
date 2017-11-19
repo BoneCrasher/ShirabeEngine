@@ -15,16 +15,14 @@ namespace Engine {
 			using ResourceID_t = uint64_t;
 
 			inline ResourceHandle()
-				: _valid(false)
-				, _id(ResourceHandle::randomIdGenerator())
+				: _id(ResourceHandle::randomIdGenerator())
 				, _name("")
 				, _type(EResourceType::UNKNOWN)
 				, _subtype(EResourceSubType::UNKNOWN)
 			{}
 
 			inline ResourceHandle(const ResourceHandle& other)
-				: _valid(other.valid())
-				, _id(other.id())
+				: _id(other.id())
 				, _name(other.name())
 				, _type(other.type())
 				, _subtype(other.subtype())
@@ -35,8 +33,7 @@ namespace Engine {
 				const EResourceType    &type,
 				const EResourceSubType &subtype
 			)
-				: _valid(true)
-				, _id(ResourceHandle::randomIdGenerator())
+				: _id(ResourceHandle::randomIdGenerator())
 				, _name(name)
 				, _type(type)
 				, _subtype(subtype)
@@ -64,22 +61,24 @@ namespace Engine {
 				return _subtype;
 			}
 
-			bool valid() const {
-				return _valid;
-			}
+      static const ResourceHandle Invalid() {
+        static ResourceHandle g_nullHandle("NULL", EResourceType::UNKNOWN, EResourceSubType::UNKNOWN);
 
-			bool setValid(bool valid) {
-				_valid = valid;
-			}
+        return g_nullHandle;
+      }
+
+      static bool IsValid(const ResourceHandle& handle) {
+        return !(handle == Invalid());
+      }
+
+      inline bool valid() const { return ResourceHandle::IsValid(*this); }
 
 		private:
 			inline static ResourceID_t randomIdGenerator() {
 				static Random::RandomState _randomIdGenerator; // Todo: CRTP. dervie the random generator from something to make sure it is unique in a context, not system global.
 				return _randomIdGenerator.next();
 			}
-
-			bool _valid;
-
+  
 			ResourceID_t     _id;
 			std::string      _name;
 			EResourceType    _type;

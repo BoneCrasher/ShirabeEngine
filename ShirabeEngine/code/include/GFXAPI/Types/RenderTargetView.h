@@ -6,7 +6,7 @@
 #include "Resources/System/Core/Handle.h"
 
 #include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/TextureNDDefinition.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
@@ -75,8 +75,11 @@ namespace Engine {
     };
 
     struct RenderTargetViewResourceBinding {
-      ResourceHandle           handle;
-      TextureNDResourceBinding textureBinding;
+      ResourceHandle handle;
+
+      inline RenderTargetViewResourceBinding()
+        : handle(ResourceHandle::Invalid())
+      {}
       // BufferResourceBinding    bufferBinding;
     };
 

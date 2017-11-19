@@ -217,6 +217,7 @@
     <ClInclude Include="code\include\GFXAPI\GFXAPIDeviceCapabilities.h" />
     <ClInclude Include="code\include\GFXAPI\IRenderer.h" />
     <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\TextureNDDefinition.h" />
     <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />
     <ClInclude Include="code\include\IOC\IOCProperty.hpp" />
     <ClInclude Include="code\include\IOC\IPropertyChangeListener.hpp" />
@@ -254,11 +255,11 @@
     <ClInclude Include="code\include\Renderer\GAPIDeviceCapabilities.h" />
     <ClInclude Include="code\include\Renderer\IRenderer.h" />
     <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
-    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Builders\BuilderBase.h" />
-    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Builders\RenderTargetView.h" />
-    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Builders\ShaderResourceView.h" />
-    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Builders\SwapChain.h" />
-    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Builders\TextureND.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Tasks\TaskBase.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Tasks\RenderTargetView.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Tasks\ShaderResourceView.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Tasks\SwapChain.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Tasks\TextureND.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\RenderTargetView.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\ShaderResourceView.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\SwapChain.h" />
@@ -266,7 +267,7 @@
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyTreeCreator.h" />
-    <ClInclude Include="code\include\Resources\System\Core\ResourceTask.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceTaskBuilder.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />
@@ -284,7 +285,7 @@
     <ClInclude Include="code\include\GFXAPI\Types\InstanceBuffer.h" />
     <ClInclude Include="code\include\GFXAPI\Types\ObjectBuffer.h" />
     <ClInclude Include="code\include\GFXAPI\Types\RenderTargetView.h" />
-    <ClInclude Include="code\include\Resources\System\Core\ResourceBuilder.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceTask.h" />
     <ClInclude Include="code\include\GFXAPI\Definitions.h" />
     <ClInclude Include="code\include\GFXAPI\Types\Shader.h" />
     <ClInclude Include="code\include\GFXAPI\Types\ShaderResourceView.h" />

@@ -1,6 +1,6 @@
 #include "GFXAPI/DirectX/DX11/DX11DeviceCapabilities.h"
 
-#include "GFXAPI/DirectX/DX11/Builders/ShaderResourceView.h"
+#include "GFXAPI/DirectX/DX11/Tasks/ShaderResourceView.h"
 
 namespace Engine {
 	namespace DX {

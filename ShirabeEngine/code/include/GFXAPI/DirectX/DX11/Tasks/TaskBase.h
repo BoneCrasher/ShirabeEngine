@@ -3,21 +3,21 @@
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
 
-#include "Resources/System/Core/ResourceBuilder.h"
+#include "Resources/System/Core/ResourceTask.h"
 
 namespace Engine {
 	namespace Resources {
 
 		using namespace Engine::DX::_11;
 
-		struct DX11BuilderParameters {
+		struct DX11TaskParameters {
 			ID3D11DevicePtr device;
 		};
 		
 		template <
 			typename TResource,
 			typename TResourceBasePtr>
-	    using DX11ResourceBuilderBase = ResourceBuilderBase<TResource, DX11BuilderParameters, TResourceBasePtr>;
+	    using DX11ResourceTaskBase = ResourceTaskBase<TResource, DX11TaskParameters, TResourceBasePtr>;
 	}
 }
 

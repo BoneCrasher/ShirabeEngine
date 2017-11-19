@@ -15,7 +15,7 @@
 #include "Threading/Looper.h"
 
 #include "Resources/System/Core/ResourceDomainTransfer.h"
-#include "Resources/System/Core/ResourceBuilder.h"
+#include "Resources/System/Core/ResourceTaskBuilder.h"
 #include "Resources/System/Core/ResourceTask.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 

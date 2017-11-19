@@ -9,7 +9,7 @@
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/TextureNDDefinition.h"
 
 namespace Engine {
 	namespace GFXAPI {
@@ -100,6 +100,10 @@ namespace Engine {
 
     struct DepthStencilViewResourceBinding {
       ResourceHandle handle;
+
+      inline DepthStencilViewResourceBinding()
+        : handle(ResourceHandle::Invalid())
+      {}
     };
 
     DeclareResourceTraits(DepthStencilView,

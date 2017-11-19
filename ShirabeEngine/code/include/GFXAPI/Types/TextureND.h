@@ -7,6 +7,10 @@
 #include "Resources/System/Core/ResourceTraits.h"
 
 #include "GFXAPI/Definitions.h"
+#include "GFXAPI/Types/TextureNDDefinition.h"
+#include "GFXAPI/Types/RenderTargetView.h"
+#include "GFXAPI/Types/ShaderResourceView.h"
+#include "GFXAPI/Types/DepthStencilView.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
@@ -101,38 +105,6 @@ namespace Engine {
       typedef Texture3D type;
     };
 
-    /**********************************************************************************************//**
-     * \struct	TextureMipMapDescriptor
-     *
-     * \brief	A texture mip map descriptor.
-     **************************************************************************************************/
-    struct TextureMipMapDescriptor {
-      bool    useMipMaps;
-      uint8_t mipLevels;
-      uint8_t firstMipMapLevel;
-    };
-
-    /**********************************************************************************************//**
-     * \struct	TextureArrayDescriptor
-     *
-     * \brief	A texture array descriptor.
-     **************************************************************************************************/
-    struct TextureArrayDescriptor {
-      bool    isTextureArray;
-      uint8_t size;
-      uint8_t firstArraySlice;
-    };
-
-    /**********************************************************************************************//**
-     * \struct	TextureMultisapmlingDescriptor
-     *
-     * \brief	A texture multisapmling descriptor.
-     **************************************************************************************************/
-    struct TextureMultisapmlingDescriptor {
-      bool    useMultisampling;
-      uint8_t size;
-      uint8_t quality;
-    };
 
     /**********************************************************************************************//**
      * \struct	TextureDescriptorImpl
@@ -220,10 +192,17 @@ namespace Engine {
     };
 
     struct TextureNDResourceBinding {
-      ResourceHandle handle;
-      ResourceHandle srvBinding;
-      ResourceHandle rtvBinding;
-      ResourceHandle dsvBinding;
+      ResourceHandle            handle;
+      ShaderResourceViewBinding srvBinding;
+      RenderTargetViewBinding   rtvBinding;
+      DepthStencilViewBinding   dsvBinding;
+
+      inline TextureNDResourceBinding()
+        : handle(ResourceHandle::Invalid())
+        , srvBinding()
+        , rtvBinding()
+        , dsvBinding()
+      {}
     };
 
     template <uint8_t N>

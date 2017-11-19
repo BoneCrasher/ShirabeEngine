@@ -1,99 +1,124 @@
-#ifndef __SHIRABE_RESOURCE_TASK_H__
-#define __SHIRABE_RESOURCE_TASK_H__
+#ifndef __SHIRABE_IRESOURCETask_H__
+#define __SHIRABE_IRESOURCETask_H__
 
-#include <type_traits>
+#include <map>
+#include <exception>
+#include <sstream>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/EngineStatus.h"
 
+#include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/ResourceDomainTransfer.h"
-#include "Resources/System/Core/ResourceBuilder.h"
 
 namespace Engine {
 	namespace Resources {
 
-		enum class EResourceTaskType {
-			Creation    = 1,
-			Update      = 2,
-			Destruction = 4,
-			Query       = 8 // Needed?
-		};
-
-		class Task {
-			
-		};
-
-		template <typename GfxApiType>
-		class ITaskBuilderImplementationBase {
-		protected: // Make sure it's not publicly visible
-			virtual Ptr<Task> build(const ResourceDescriptor<GfxApiType>& descriptor, const EResourceTaskType& taskType) = 0;
-		};		
-
-		template <template <typename> typename TBuilderImplementation, typename GfxApiType>
-		using is_task_builder_implementation_t
-			= typename std::enable_if<
-				std::is_base_of<
-					ITaskBuilderImplementationBase<GfxApiType>, 
-					TBuilderImplementation<GfxApiType>
-				>::value, 
-				TBuilderImplementation<GfxApiType>
-			>::type;
-
 		/**********************************************************************************************//**
-		 * \class	GfxApiTaskBuilder
+		 * \struct	ResourceNotSupportedException
 		 *
-		 * \brief	Task builder composition of type list of size N > 1
-		 *
-		 * \tparam	GfxApiFirstType	Type of the graphics API first type.
-		 * \tparam	GfxApiMoreTypes	Type of the graphics API more types.
+		 * \brief	Exception for signalling resource not supported errors.
 		 **************************************************************************************************/
-		template <template <typename> typename TBuilderImplementation, typename GfxApiFirstType, typename... GfxApiMoreTypes>
-		class GfxApiTaskBuilder
-			: public is_task_builder_implementation_t<TBuilderImplementation, GfxApiFirstType>
-			, public GfxApiTaskBuilder<TBuilderImplementation, GfxApiMoreTypes...>
-		{};
-
-		/**********************************************************************************************//**
-		 * \class	GfxApiTaskBuilder<GfxApiType>
-		 *
-		 * \brief	Task builder composition of type list of size N == 1
-		 *
-		 * \tparam	GfxApiType	Type of the graphics API type.
-		 **************************************************************************************************/
-		template <template <typename> typename TBuilderImplementation, typename GfxApiType>
-		class GfxApiTaskBuilder<TBuilderImplementation, GfxApiType>
-			: public is_task_builder_implementation_t<TBuilderImplementation, GfxApiType>
-		{};
-		
-		template <template <typename> typename TBuilderImplementation, typename... GfxApiTypes>
-		class GenericTaskBuilder
-			: public GfxApiTaskBuilder<TBuilderImplementation, GfxApiTypes...>
+		struct ResourceNotSupportedException 
+			: public std::exception
 		{
-			template <typename GfxApiType>
-			Ptr<Task> builderResourceTaskGeneric(const ResourceDescriptor<GfxApiType>& desc, const EResourceTaskType& taskType) {
-				return (*this).TBuilderImplementation<GfxApiType>::build(desc, taskType);
+			ResourceNotSupportedException() throw()
+				: exception()
+			{ }
+
+			explicit ResourceNotSupportedException(char const* const message) throw()
+				: exception(message)
+			{ }
+
+			ResourceNotSupportedException(char const* const message, int k) throw()
+				: exception(message, k)
+			{ }
+
+			ResourceNotSupportedException(ResourceNotSupportedException const& other) throw()
+				: exception(other)
+			{ }
+
+			ResourceNotSupportedException& operator=(ResourceNotSupportedException const& other) throw() {
+				exception::operator=((std::exception) other);
+				return *this;
 			}
 
-		public:
-			template <typename GfxApiType> 
-			Ptr<Task> builderResourceCreationTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			virtual ~ResourceNotSupportedException() throw() {
 			}
 
-			template <typename GfxApiType>
-			Ptr<Task> builderResourceUpdateTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
-			}
-
-			template <typename GfxApiType>
-			Ptr<Task> builderResourceDestructionTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
-			}
-
-			template <typename GfxApiType>
-			Ptr<Task> builderResourceQueryTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			virtual char const* what() const {
+				return exception::what();
 			}
 		};
+
+		/**********************************************************************************************//**
+		 * \struct	ResourceTaskTraits
+		 *
+		 * \brief	Provides information about the specific resource type supported by a 
+		 * 			corresponding Task.
+		 *
+		 * \tparam	TGAPIDevice	Type of the tgapi device.
+		 * \tparam	type	   	Type of the type.
+		 * \tparam	subtype	   	Type of the subtype.
+		 * \tparam	TResource  	Type of the resource.
+		 **************************************************************************************************/
+		template <
+			typename TResource,
+			typename TGFXAPIParametersStruct,
+			typename TResourceBasePtr
+		>
+		struct ResourceTaskTraits {
+			static const EResourceType    resource_type    = TResource::resource_type;
+			static const EResourceSubType resource_subtype = TResource::resource_subtype;
+
+			typedef 
+				ResourceDescriptor<TResource>  
+				descriptor_type;
+
+			typedef
+				TGFXAPIParametersStruct
+				gfxapi_parameter_struct_type;
+
+			typedef std::map<ResourceHandle, TResourceBasePtr> built_resource_map;
+		};
+
+		/**********************************************************************************************//**
+		 * \class	ResourceXMMATRIX
+		 *
+		 * \brief	Base-class for any resource Task, encapsulating a traits-class.
+		 *
+		 * \tparam	TGAPIDevice	Type of the tgapi device.
+		 * \tparam	type	   	Type of the type.
+		 * \tparam	subtype	   	Type of the subtype.
+		 * \tparam	TResource  	Type of the resource.
+		 * \tparam	TGAPIDevice	Type of the tgapi device.
+		 * \tparam	type	   	Type of the type.
+		 * \tparam	subtype	   	Type of the subtype.
+		 * \tparam	TResource  	Type of the resource.
+		 **************************************************************************************************/
+		template <
+			typename TResource,
+			typename TGFXAPIParametersStruct,
+			typename TResourceBasePtr,
+			typename Traits  = ResourceTaskTraits<TResource, TGFXAPIParametersStruct, TResourceBasePtr>
+		>
+		class ResourceTaskBase
+		{
+		public:
+			typedef ResourceTaskBase<TResource, TGFXAPIParametersStruct, TResourceBasePtr, Traits> my_type;
+			typedef typename Traits traits_type;
+
+			static const EResourceType    resource_type    = traits_type::resource_type;
+			static const EResourceSubType resource_subtype = traits_type::resource_subtype;
+
+			typedef typename traits_type::descriptor_type              descriptor_type;
+			typedef typename traits_type::gfxapi_parameter_struct_type gfxapi_parameter_struct_type;
+			typedef typename traits_type::built_resource_map           built_resource_map;
+		};
+
+		template <typename TResource>
+		class ResourceTask 
+		{	};
 	}
 }
 

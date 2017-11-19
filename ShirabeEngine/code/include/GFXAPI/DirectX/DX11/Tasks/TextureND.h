@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_DX11TEXTURENDBUILDER_H__
-#define __SHIRABE_DX11TEXTURENDBUILDER_H__
+#ifndef __SHIRABE_DX11TEXTURENDTask_H__
+#define __SHIRABE_DX11TEXTURENDTask_H__
 
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
@@ -8,7 +8,7 @@
 #include "GFXAPI/Types/TextureND.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Tasks/TaskBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -35,14 +35,14 @@ namespace Engine {
 			);
 
 			/**********************************************************************************************//**
-			 * \class	DX11Texture1DResourceBuilder
+			 * \class	DX11Texture1DResourceTask
 			 *
-			 * \brief	A dx 11 texture 1 d resource builder.
+			 * \brief	A dx 11 texture 1 d resource Task.
 			 **************************************************************************************************/
-			class DX11Texture1DResourceBuilder
-				: public DX11ResourceBuilderBase<Texture1D, IUnknownPtr>
+			class DX11Texture1DResourceTask
+				: public DX11ResourceTaskBase<Texture1D, IUnknownPtr>
 			{
-				DeclareLogTag(Texture1DResourceBuilder_ID3D11Device);
+				DeclareLogTag(Texture1DResourceTask_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
@@ -70,14 +70,14 @@ namespace Engine {
 			};
 
 			/**********************************************************************************************//**
-			 * \class	DX11Texture2DResourceBuilder
+			 * \class	DX11Texture2DResourceTask
 			 *
-			 * \brief	A dx 11 texture 2D resource builder.
+			 * \brief	A dx 11 texture 2D resource Task.
 			 **************************************************************************************************/
-			class DX11Texture2DResourceBuilder
-				: public DX11ResourceBuilderBase<Texture2D, IUnknownPtr>
+			class DX11Texture2DResourceTask
+				: public DX11ResourceTaskBase<Texture2D, IUnknownPtr>
 			{
-				DeclareLogTag(Texture2DResourceBuilder_ID3D11Device);
+				DeclareLogTag(Texture2DResourceTask_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
@@ -106,10 +106,10 @@ namespace Engine {
 				}
 			};
 
-			class DX11Texture3DResourceBuilder
-				: public DX11ResourceBuilderBase<Texture3D, IUnknownPtr>
+			class DX11Texture3DResourceTask
+				: public DX11ResourceTaskBase<Texture3D, IUnknownPtr>
 			{
-				DeclareLogTag(Texture3DResourceBuilder_ID3D11Device);
+				DeclareLogTag(Texture3DResourceTask_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
@@ -138,11 +138,29 @@ namespace Engine {
 				}
 			};
 
-			DeclareTemplatedSharedPointerType(DX11Texture1DResourceBuilder, DX11Texture1DResourceBuilder);
-			DeclareTemplatedSharedPointerType(DX11Texture2DResourceBuilder, DX11Texture2DResourceBuilder);
-			DeclareTemplatedSharedPointerType(DX11Texture3DResourceBuilder, DX11Texture3DResourceBuilder);
+			DeclareTemplatedSharedPointerType(DX11Texture1DResourceTask, DX11Texture1DResourceTask);
+			DeclareTemplatedSharedPointerType(DX11Texture2DResourceTask, DX11Texture2DResourceTask);
+			DeclareTemplatedSharedPointerType(DX11Texture3DResourceTask, DX11Texture3DResourceTask);
+
 		}
 	}
+
+  namespace Resources {
+    template <>
+    class ResourceTask<Texture1D> {
+      typedef DX11Texture1DResourceTask type;
+    };
+
+    template <>
+    class ResourceTask<Texture2D> {
+      typedef DX11Texture2DResourceTask type;
+    };
+
+    template <>
+    class ResourceTask<Texture3D> {
+      typedef DX11Texture3DResourceTask type;
+    };
+  }
 }
 
 #endif

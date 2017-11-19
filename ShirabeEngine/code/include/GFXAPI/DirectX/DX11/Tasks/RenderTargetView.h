@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_RenderTargetViewBuilder_H__
-#define __SHIRABE_RenderTargetViewBuilder_H__
+#ifndef __SHIRABE_RenderTargetViewTask_H__
+#define __SHIRABE_RenderTargetViewTask_H__
 
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
@@ -7,7 +7,7 @@
 #include "Resources/System/Core/Handle.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Tasks/TaskBase.h"
 
 #include "GFXAPI/Types/RenderTargetView.h"
 
@@ -25,10 +25,10 @@ namespace Engine {
 			);
 
 
-			class DX11RenderTargetResourceBuilder
-				: public DX11ResourceBuilderBase<RenderTargetView, IUnknownPtr>
+			class DX11RenderTargetResourceTask
+				: public DX11ResourceTaskBase<RenderTargetView, IUnknownPtr>
 			{
-				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
+				DeclareLogTag(DX11RenderTargetResourceTask_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
@@ -54,10 +54,17 @@ namespace Engine {
 				}
 			};
 
-			DeclareTemplatedSharedPointerType(DX11RenderTargetResourceBuilder, DX11RenderTargetResourceBuilder);
+			DeclareTemplatedSharedPointerType(DX11RenderTargetResourceTask, DX11RenderTargetResourceTask);
 		}
 
 	}
+  
+  namespace Resources {
+    template <>
+    class ResourceTask<RenderTargetView> {
+      typedef DX11RenderTargetResourceTask type;
+    };
+  }
 }
 
 #endif

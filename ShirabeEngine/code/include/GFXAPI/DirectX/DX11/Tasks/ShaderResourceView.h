@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_DX11_SHADERRESOURCEBUILDER_H__
-#define __SHIRABE_DX11_SHADERRESOURCEBUILDER_H__
+#ifndef __SHIRABE_DX11_SHADERRESOURCETask_H__
+#define __SHIRABE_DX11_SHADERRESOURCETask_H__
 
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
@@ -9,15 +9,15 @@
 #include "GFXAPI/Types/ShaderResourceView.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Tasks/TaskBase.h"
 
 namespace Engine {
 	namespace DX {
 		namespace _11 {
 			using namespace Engine::Resources;
 
-			class DX11ShaderResourceBuilderImpl {
-				friend class DX11ShaderResourceBuilder;
+			class DX11ShaderResourceTaskImpl {
+				friend class DX11ShaderResourceTask;
 
 				static EEngineStatus createShaderResource(
 					const ID3D11DevicePtr              &device,
@@ -28,10 +28,10 @@ namespace Engine {
 			};
 
 
-			class DX11ShaderResourceBuilder
-				: public DX11ResourceBuilderBase<ShaderResourceView, IUnknownPtr>
+			class DX11ShaderResourceTask
+				: public DX11ResourceTaskBase<ShaderResourceView, IUnknownPtr>
 			{
-				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
+				DeclareLogTag(DX11RenderTargetResourceTask_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
@@ -44,7 +44,7 @@ namespace Engine {
 
 					ID3D11ShaderResourceViewPtr pRes = nullptr;
 
-					status = DX::_11::DX11ShaderResourceBuilderImpl::createShaderResource(gfxapiParams.device, descriptor, inUnderlyingResource, pRes);
+					status = DX::_11::DX11ShaderResourceTaskImpl::createShaderResource(gfxapiParams.device, descriptor, inUnderlyingResource, pRes);
 					if (CheckEngineError(status)) {
 						Log::Error(logTag(), String::format("Cannot create RenderTargetView internal resource for descriptor: %s", descriptor.toString().c_str()));
 					}
@@ -57,10 +57,17 @@ namespace Engine {
 				}
 			};
 
-			DeclareTemplatedSharedPointerType(DX11ShaderResourceBuilderImpl, DX11ShaderResourceBuilderImpl);
+			DeclareTemplatedSharedPointerType(DX11ShaderResourceTaskImpl, DX11ShaderResourceTaskImpl);
 		}
 
 	}
+
+  namespace Resources {
+    template <>
+    class ResourceTask<ShaderResourceView> {
+      typedef DX11ShaderResourceTask type;
+    };
+  }
 }
 
 #endif

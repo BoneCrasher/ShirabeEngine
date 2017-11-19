@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_DX11SWAPCHAINBUILDER_H__
-#define __SHIRABE_DX11SWAPCHAINBUILDER_H__
+#ifndef __SHIRABE_DX11SWAPCHAINTask_H__
+#define __SHIRABE_DX11SWAPCHAINTask_H__
 
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
@@ -9,7 +9,7 @@
 #include "GFXAPI/Types/SwapChain.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Types.h"
-#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
+#include "GFXAPI/DirectX/DX11/Tasks/TaskBase.h"
 
 namespace Engine {
 	namespace DX {
@@ -18,12 +18,12 @@ namespace Engine {
 			using namespace GFXAPI;
 
 			/**********************************************************************************************//**
-			 * \class	SwapChainBuilderImpl
+			 * \class	SwapChainTaskImpl
 			 *
-			 * \brief	A swap chain builder implementation.
+			 * \brief	A swap chain Task implementation.
 			 **************************************************************************************************/
-			class SwapChainBuilderImpl {
-				friend class DX11SwapChainResourceBuilder;
+			class SwapChainTaskImpl {
+				friend class DX11SwapChainResourceTask;
 
 				static EEngineStatus createSwapChain (
 					const ID3D11DevicePtr        &device,
@@ -38,14 +38,14 @@ namespace Engine {
 			};
 
 			/**********************************************************************************************//**
-			 * \class	DX11SwapChainResourceBuilder
+			 * \class	DX11SwapChainResourceTask
 			 *
-			 * \brief	A dx 11 swap chain resource builder.
+			 * \brief	A dx 11 swap chain resource Task.
 			 **************************************************************************************************/
-			class DX11SwapChainResourceBuilder
-				: public DX11ResourceBuilderBase<SwapChain, IUnknownPtr>
+			class DX11SwapChainResourceTask
+				: public DX11ResourceTaskBase<SwapChain, IUnknownPtr>
 			{
-				DeclareLogTag(DX11RenderTargetResourceBuilder_ID3D11Device);
+				DeclareLogTag(DX11RenderTargetResourceTask_ID3D11Device);
 
 			public:
 				static EEngineStatus build(
@@ -58,13 +58,13 @@ namespace Engine {
 					IDXGISwapChainPtr   pSC = nullptr;
 					ID3D11Texture2DList backbufferTexturePointers;
 
-					status = DX::_11::SwapChainBuilderImpl::createSwapChain(gfxapiParams.device, descriptor, pSC);
+					status = DX::_11::SwapChainTaskImpl::createSwapChain(gfxapiParams.device, descriptor, pSC);
 					if (CheckEngineError(status)) {
 						Log::Error(logTag(), String::format("Cannot create RenderTargetView internal resource for descriptor: %s", descriptor.toString().c_str()));
 					}
 					else {
 						// What to pass to the texND to encapsulate the internal handle and resource? How to recreated it?
-						if (CheckEngineError(DX::_11::SwapChainBuilderImpl::createBackBufferTextureResources(pSC, backbufferTexturePointers))) {
+						if (CheckEngineError(DX::_11::SwapChainTaskImpl::createBackBufferTextureResources(pSC, backbufferTexturePointers))) {
 							status = EEngineStatus::DXSwapChain_AttachSwapChainToBackBuffer_GetBackBufferPtr_Failed;
 						}
 						else {
@@ -82,10 +82,17 @@ namespace Engine {
 				}
 			};
 
-			DeclareTemplatedSharedPointerType(DX11SwapChainResourceBuilder, DX11SwapChainResourceBuilder);
+			DeclareTemplatedSharedPointerType(DX11SwapChainResourceTask, DX11SwapChainResourceTask);
 		}
 
 	}
+
+  namespace Resources {
+    template <>
+    class ResourceTask<SwapChain> {
+      typedef DX11SwapChainResourceTask type;
+    };
+  }
 }
 
 #endif
