@@ -53,15 +53,15 @@ namespace Engine {
     };
 
 #define DeclareResourceTraits(Prefix, Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction) \
-    class Prefix##Traits                                                                                        \
+    class Prefix##Traits                                                                                               \
       : public ResourceTraits<Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction>         \
-    {}      
+    {};
 
 #define DeclareTemplatedResourceTraits(Tpl, Prefix, Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction) \
-    Tpl                                                                                                                       \
-    class Prefix##Traits                                                                                                      \
+    Tpl                                                                                                                              \
+    class Prefix##Traits                                                                                                             \
       : public ResourceTraits<Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction>                       \
-    {}
+    {};
 
 #define DefineTraitsPublicTypes(Prefix, Traits)                                 \
     using Prefix##Binding              = Traits::binding_public_type            ; \

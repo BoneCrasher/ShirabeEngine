@@ -32,12 +32,12 @@ namespace Engine {
 			 * 			underlying resource properties.
 			 **************************************************************************************************/
 			struct Texture {
-				VecND<uint32_t, 2>      dimensions;
+				uint8_t                 dimensionNb;
 				TextureArrayDescriptor  array;
 				TextureMipMapDescriptor mipMap;
 
 				inline Texture()
-					: dimensions({ 0, 0 })
+					: dimensionNb(0)
 					, array()
 					, mipMap()
 				{}

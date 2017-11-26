@@ -12,92 +12,92 @@
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 namespace Engine {
-	namespace Resources {
-		using namespace GFXAPI;
+  namespace Resources {
+    using namespace GFXAPI;
 
     class ShaderResourceView;
 
-		/**********************************************************************************************//**
-		 * \struct	ShaderResourceDescriptorImpl
-		 *
-		 * \brief	A render target descriptor implementation.
-		 **************************************************************************************************/
-		struct ShaderResourceViewDescriptorImpl {
-			enum class EShaderResourceDimension {
-				Texture,
-				StructuredBuffer
-			};
+    /**********************************************************************************************//**
+     * \struct	ShaderResourceDescriptorImpl
+     *
+     * \brief	A render target descriptor implementation.
+     **************************************************************************************************/
+    struct ShaderResourceViewDescriptorImpl {
+      enum class EShaderResourceDimension {
+        Texture,
+        StructuredBuffer
+      };
 
-			std::string              name;
-			Format                   format;
-			EShaderResourceDimension srvType;
+      std::string              name;
+      Format                   format;
+      EShaderResourceDimension srvType;
 
-			union ShaderResourceDimension {
-				struct Texture {
-					unsigned int            dimensionNb; // 1..3
-				    VecND<uint32_t, 3>      dimensions;
-					bool                    isCube; // Implies the dimensions[2] to be 6
-					TextureArrayDescriptor  array;
-					TextureMipMapDescriptor mipMap;
+      union ShaderResourceDimension {
+        struct Texture {
+          unsigned int            dimensionNb; // 1..3
+          VecND<uint32_t, 3>      dimensions;
+          bool                    isCube; // Implies the dimensions[2] to be 6
+          TextureArrayDescriptor  array;
+          TextureMipMapDescriptor mipMap;
 
-					inline Texture()
-						: dimensionNb(0)
-						, dimensions({ 0, 0, 0 })
-						, isCube(false)
-						, array()
-						, mipMap()
-					{}
-				} texture;
+          inline Texture()
+            : dimensionNb(0)
+            , dimensions({0, 0, 0})
+            , isCube(false)
+            , array()
+            , mipMap()
+          {}
+        } texture;
 
-				struct StructuredBuffer {
-					unsigned int firstElementOffset;
-					unsigned int elementWidthInBytes;
+        struct StructuredBuffer {
+          unsigned int firstElementOffset;
+          unsigned int elementWidthInBytes;
 
-					inline StructuredBuffer()
-						: firstElementOffset(0)
-						, elementWidthInBytes(0)
-					{}
-				} structuredBuffer;
+          inline StructuredBuffer()
+            : firstElementOffset(0)
+            , elementWidthInBytes(0)
+          {}
+        } structuredBuffer;
 
-				inline ShaderResourceDimension()
-					: texture()
-					, structuredBuffer()
-				{}
-			} shaderResourceDimension;
+        inline ShaderResourceDimension()
+          : texture()
+          , structuredBuffer()
+        {}
+      } shaderResourceDimension;
 
-			ShaderResourceViewDescriptorImpl()
-				: name("")
-				, shaderResourceDimension()
-			{}
+      ShaderResourceViewDescriptorImpl()
+        : name("")
+        , shaderResourceDimension()
+      {}
 
-			std::string toString() const {
-				std::stringstream ss;
+      std::string toString() const {
+        std::stringstream ss;
 
-				ss
-					<< "RenderTargetDescriptor ('" << name << "'): \n"
-					<< " Format:     " << (uint8_t)format << "\n,";
+        ss
+          << "RenderTargetDescriptor ('" << name << "'): \n"
+          << " Format:     " << (uint8_t)format << "\n,";
 
-				if( srvType == EShaderResourceDimension::Texture ) {
-					ss 
-						<< " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb              << "\n,"
-						<< " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size               << "\n,"
-						<< " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice    << "\n,"
-						<< " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels         << "\n,"
-						<< " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel  << ";";
-				}
-				else { // StructuredBuffer
-					ss
-						<< " First elem. off.: " << (uint8_t)shaderResourceDimension.structuredBuffer.firstElementOffset << ","
-						<< " Elem. byte-size:  " << (uint8_t)shaderResourceDimension.structuredBuffer.elementWidthInBytes << ";";
-				}
+        if(srvType == EShaderResourceDimension::Texture) {
+          ss
+            << " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb << "\n,"
+            << " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size << "\n,"
+            << " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice << "\n,"
+            << " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels << "\n,"
+            << " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel << ";";
+        }
+        else { // StructuredBuffer
+          ss
+            << " First elem. off.: " << (uint8_t)shaderResourceDimension.structuredBuffer.firstElementOffset << ","
+            << " Elem. byte-size:  " << (uint8_t)shaderResourceDimension.structuredBuffer.elementWidthInBytes << ";";
+        }
 
-				return ss.str();
-			}
-		};
+        return ss.str();
+      }
+    };
 
     struct ShaderResourceViewCreationRequestImpl {
     public:
-      const struct ResourceDescriptor<ShaderResourceView>& resourceDescriptor() const; 
+      const struct ResourceDescriptor<ShaderResourceView>& resourceDescriptor() const;
 
       std::string toString() const {
         std::stringstream ss;
@@ -111,6 +111,7 @@ namespace Engine {
 
         return ss.str();
       }
+
     private:
       ShaderResourceViewDescriptorImpl _resourceDescriptor;
     };
@@ -124,13 +125,13 @@ namespace Engine {
 
     };
 
-		struct ShaderResourceViewResourceBinding {
-			ResourceHandle handle;
+    struct ShaderResourceViewResourceBinding {
+      ResourceHandle handle;
 
       inline ShaderResourceViewResourceBinding()
         : handle(ResourceHandle::Invalid())
       {}
-		};
+    };
 
     DeclareResourceTraits(ShaderResourceView,
                           ShaderResourceView,
@@ -145,38 +146,38 @@ namespace Engine {
 
     DefineTraitsPublicTypes(ShaderResourceView, ShaderResourceViewTraits);
 
-		/**********************************************************************************************//**
-		 * \class	GFXAPIShaderResource
-		 *
-		 * \brief	A gfxapi render target.
-		 **************************************************************************************************/
-		class ShaderResourceView
-			: public ShaderResourceViewTraits
+    /**********************************************************************************************//**
+     * \class	GFXAPIShaderResource
+     *
+     * \brief	A gfxapi render target.
+     **************************************************************************************************/
+    class ShaderResourceView
+      : public ShaderResourceViewTraits
       , public ResourceDescriptorAdapter<ShaderResourceViewTraits>
-			, public ResourceBindingAdapter<ShaderResourceViewTraits>
-		{
-		public:
-			using my_type = ShaderResourceView;
+      , public ResourceBindingAdapter<ShaderResourceViewTraits>
+    {
+    public:
+      using my_type = ShaderResourceView;
 
-			ShaderResourceView(
-				const ShaderResourceViewDescriptor &descriptor,
-				const ShaderResourceViewBinding    &binding)
-				: ShaderResourceViewTraits()
+      ShaderResourceView(
+        const ResourceDescriptor<ShaderResourceView> &descriptor,
+        const ResourceBinding<ShaderResourceView>    &binding)
+        : ShaderResourceViewTraits()
         , ResourceDescriptorAdapter<ShaderResourceViewTraits>(descriptor)
-				, ResourceBindingAdapter<ShaderResourceViewTraits>(binding)
-			{}
-		};
+        , ResourceBindingAdapter<ShaderResourceViewTraits>(binding)
+      {}
+    };
 
-		DeclareSharedPointerType(ShaderResourceView);
+    DeclareSharedPointerType(ShaderResourceView);
 
-		using ShaderResourceViewDescriptor = ResourceDescriptor<ShaderResourceView>;
+    using ShaderResourceViewDescriptor = ResourceDescriptor<ShaderResourceView>;
 
     const ResourceDescriptor<ShaderResourceView>& ShaderResourceViewCreationRequestImpl
       ::resourceDescriptor() const
     {
       return ResourceDescriptor<ShaderResourceView>(_resourceDescriptor);
     }
-	}
+  }
 }
 
 #endif

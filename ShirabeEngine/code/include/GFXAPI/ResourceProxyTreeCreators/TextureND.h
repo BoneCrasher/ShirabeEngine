@@ -38,10 +38,11 @@ namespace Engine {
       const Format                        &textureFormat,
       bool                                 isCube,
       const ResourceHandle                &textureNDProxyHandle,
+      const Ptr<ResourceProxyFactory>     &proxyFactory,
       // Output
       ResourceBinding<ShaderResourceView> &outSRVBinding,
       ResourceProxyMap                    &outSRVProxy,
-      DependerTreeNodeList                &outSRVHierarchy)
+      DependerTreeNode                    &outSRVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderResource)) {
         ShaderResourceViewDescriptor srvDesc;
@@ -59,6 +60,8 @@ namespace Engine {
         ResourceProxyMap          proxies;
         DependerTreeNodeList      hierarchy;
 
+        ResourceHandleList dependencyInjection ={textureNDProxyHandle};
+
         // There will only be exactly one proxy, which is the SRV root. 
         // SRVs in DirectX can basically handle any combination of Textures, Arrays, MipMaps etc.
         // Vulkan is much more complex regarding textures and binding to the Pipeline.
@@ -66,7 +69,9 @@ namespace Engine {
         // and update and needs wrapper classes to handle those 5 million calls in OGL.
         // These will basically be the SRV and RTV implementations on the respective platforms.
         TextureNDSRVProxyPtr srvProxy
-          = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, {textureNDProxyHandle}, binding, proxies, hierarchy, outProxies);
+          = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
+
+        // Verify?
 
         if(!srvProxy) {
           // TODO: Log
@@ -75,8 +80,12 @@ namespace Engine {
         else {
           ResourceHandle handle(srvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW);
           outSRVBinding   = binding;
-          outSRVProxy     = srvProxy;
-          outSRVHierarchy = hierarchy;
+
+          outSRVProxy[handle] = srvProxy;
+          for(ResourceProxyMap::value_type const& p : proxies)
+            outSRVProxy[p.first] = p.second;
+
+          outSRVHierarchy = hierarchy.at(0);
         }
       }
 
@@ -92,9 +101,10 @@ namespace Engine {
       const TextureMipMapDescriptor     &mipMapDesc,
       const Format                      &textureFormat,
       const ResourceHandle              &textureNDProxyHandle,
+      const Ptr<ResourceProxyFactory>   &proxyFactory,
       ResourceBinding<RenderTargetView> &outRTVBinding,
-      TextureNDRTVProxyPtr              &outRTVProxy,
-      DependerTreeNodeList              &outRTVHierarchy)
+      ResourceProxyMap                  &outRTVProxy,
+      DependerTreeNode                  &outRTVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_RenderTarget)) {
         RenderTargetViewDescriptor rtvDesc ={0};
@@ -104,16 +114,29 @@ namespace Engine {
         rtvDesc.array         = arrayDesc;
         rtvDesc.mipMap        = mipMapDesc;
 
+        RenderTargetViewCreationRequest rtvCreationRequest(rtvDesc);
+
+        ResourceBinding<RenderTargetView> binding;
+        ResourceProxyMap                  proxies;
+        DependerTreeNodeList              hierarchy;
+
+        ResourceHandleList dependencyInjection ={textureNDProxyHandle};
+
         TextureNDRTVProxyPtr rtvProxy
-          = ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW>::create(rtvDesc, {textureNDProxyHandle}, outProxies);
+          = ProxyTreeCreator<RenderTargetView>::create(proxyFactory, rtvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
         if(!rtvProxy) {
           // TODO: Log
           return false;
         }
         else {
           ResourceHandle handle(rtvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW);
-          outRTVBinding.handle = handle;
-          outRTVProxy          = rtvProxy;
+          outRTVBinding = binding;
+
+          outRTVProxy[handle] = rtvProxy;
+          for(ResourceProxyMap::value_type const& p : proxies)
+            outRTVProxy[p.first] = p.second;
+
+          outRTVHierarchy = hierarchy.at(0);
         }
       }
 
@@ -131,28 +154,42 @@ namespace Engine {
       const Format                      &textureFormat,
       bool                               isCube,
       const ResourceHandle              &textureNDProxyHandle,
+      const Ptr<ResourceProxyFactory>   &proxyFactory,
       ResourceBinding<DepthStencilView> &outDSVBinding,
-      TextureNDDSVProxyPtr              &outDSVProxy,
-      DependerTreeNodeList              &outDSVHierarchy)
+      ResourceProxyMap                  &outDSVProxy,
+      DependerTreeNode                  &outDSVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_DepthStencil)) {
         DepthStencilViewDescriptor dsvDesc;
-        dsvDesc.name          = String::format("%0_DSV", textureName);
-        dsvDesc.textureFormat = textureFormat;
-        dsvDesc.dimensionNb   = dimensionNb;
-        dsvDesc.array         = arrayDesc;
-        dsvDesc.mipMap        = mipMapDesc;
+        dsvDesc.name                = String::format("%0_DSV", textureName);
+        dsvDesc.format              = textureFormat;
+        dsvDesc.texture.dimensionNb = dimensionNb;
+        dsvDesc.texture.array       = arrayDesc;
+        dsvDesc.texture.mipMap      = mipMapDesc;
+
+        DepthStencilViewCreationRequest dsvCreationRequest(dsvDesc);
+
+        ResourceBinding<DepthStencilView> binding;
+        ResourceProxyMap                  proxies;
+        DependerTreeNodeList              hierarchy;
+
+        ResourceHandleList dependencyInjection ={textureNDProxyHandle};
 
         TextureNDDSVProxyPtr dsvProxy
-          = ProxyTreeCreator<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>::create(dsvDesc, {textureNDProxyHandle}, outProxies);
+          = ProxyTreeCreator<DepthStencilView>::create(proxyFactory, dsvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
         if(!dsvProxy) {
           // TODO: Log
           return false;
         }
         else {
           ResourceHandle handle(dsvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW);
-          outDSVBinding.handle = handle;
-          outDSVProxy          = dsvProxy;
+          outDSVBinding = binding;
+
+          outDSVProxy[handle] = dsvProxy;
+          for(ResourceProxyMap::value_type const& p : proxies)
+            outDSVProxy[p.first] = p.second;
+
+          outDSVHierarchy = hierarchy.at(0);
         }
       }
 
@@ -161,27 +198,33 @@ namespace Engine {
 
     template <std::size_t N>
     static bool createTextureNDDependerProxies(
-      const std::string                   &textureName,
-      BufferBindingFlags_t                 bindFlags,
-      const unsigned int                   dimensionNb,
-      const VecND<uint32_t, N>            &dimensions,
-      const TextureArrayDescriptor        &arrayDesc,
-      const TextureMipMapDescriptor       &mipMapDesc,
-      const Format                        &textureFormat,
-      bool                                 isCube,
-      const ResourceHandle                &textureNDProxyHandle,
-      ResourceBinding<ShaderResourceView> &outSrvBinding,
-      TextureNDSRVProxyPtr                &outSrvProxy,
-      DependerTreeNodeList                &outSrvHierarchy,
-      ResourceBinding<RenderTargetView>   &outRtvBinding,
-      TextureNDRTVProxyPtr                &outRtvProxy,
-      DependerTreeNodeList                &outRtvHierarchy,
-      ResourceBinding<DepthStencilView>   &outDsvBinding,
-      TextureNDDSVProxyPtr                &outDsvProxy,
-      DependerTreeNodeList                &outDsvHierarchy
-    )
+      const std::string               &textureName,
+      BufferBindingFlags_t             bindFlags,
+      const unsigned int               dimensionNb,
+      const VecND<uint32_t, N>        &dimensions,
+      const TextureArrayDescriptor    &arrayDesc,
+      const TextureMipMapDescriptor   &mipMapDesc,
+      const Format                    &textureFormat,
+      bool                             isCube,
+      const ResourceHandle            &textureNDProxyHandle,
+      const Ptr<ResourceProxyFactory> &proxyFactory,
+      TextureNDResourceBinding        &inOutBinding,
+      ResourceProxyMap                &inOutProxies,
+      DependerTreeNode                &inOutHierarchyRoot)
     {
       bool result = true;
+
+      ResourceBinding<ShaderResourceView> srvBinding;
+      ResourceProxyMap                    srvProxy;
+      DependerTreeNode                    srvHierarchy;
+
+      ResourceBinding<RenderTargetView> rtvBinding;
+      ResourceProxyMap                  rtvProxy;
+      DependerTreeNode                  rtvHierarchy;
+
+      ResourceBinding<DepthStencilView> dsvBinding;
+      ResourceProxyMap                  dsvProxy;
+      DependerTreeNode                  dsvHierarchy;
 
       // If the parent resource should be bound as a shader resource view, create a descriptor and proxy for it.			
       result |= createTextureNDSRVProxy<N>(
@@ -194,9 +237,19 @@ namespace Engine {
         textureFormat,
         isCube,
         textureNDProxyHandle,
-        outSrvBinding,
-        outSrvProxy,
-        outSrvHierarchy);
+        proxyFactory,
+        srvBinding,
+        srvProxy,
+        srvHierarchy);
+
+      if(result
+         && srvBinding.handle.valid()
+         && !srvProxy.empty())
+      {
+        inOutProxies[srvBinding.handle] = AnyProxy(srvProxy);
+        inOutBinding.srvBinding         = srvBinding;
+        inOutHierarchyRoot.children.push_back(srvHierarchy);
+      }
 
       // If the parent resource should be bound as a render target view, create a descriptor and proxy for it.
       result |= createTextureNDRTVProxy<N>(
@@ -207,9 +260,19 @@ namespace Engine {
         mipMapDesc,
         textureFormat,
         textureNDProxyHandle,
-        outRtvBinding,
-        outRtvProxy,
-        outRtvHierarchy);
+        proxyFactory,
+        rtvBinding,
+        rtvProxy,
+        rtvHierarchy);
+
+      if(result
+         && rtvBinding.handle.valid()
+         && !rtvProxy.empty())
+      {
+        inOutProxies[rtvBinding.handle] = AnyProxy(rtvProxy);
+        inOutBinding.rtvBinding         = rtvBinding;
+        inOutHierarchyRoot.children.push_back(rtvHierarchy);
+      }
 
       // If the parent resource should be bound as a render target view, create a descriptor and proxy for it.
       result |= createTextureNDDSVProxy<N>(
@@ -222,9 +285,19 @@ namespace Engine {
         textureFormat,
         isCube,
         textureNDProxyHandle,
-        outDsvBinding,
-        outDsvProxy,
-        outDsvHierarchy);
+        proxyFactory,
+        dsvBinding,
+        dsvProxy,
+        dsvHierarchy);
+
+      if(result
+         && dsvBinding.handle.valid()
+         && !dsvProxy.empty())
+      {
+        inOutProxies[dsvBinding.handle] = AnyProxy(dsvProxy);
+        inOutBinding.dsvBinding         = dsvBinding;
+        inOutHierarchyRoot.children.push_back(dsvHierarchy);
+      }
     }
 
     template <>
@@ -258,17 +331,10 @@ namespace Engine {
         bool isCubeMap      = false; // Not possible for 1D textures
         bool isCubeMapArray = false; // Not possible for 1D textures
 
-        ResourceBinding<ShaderResourceView> srvBinding;
-        TextureNDSRVProxyPtr                srvProxy = nullptr;
-        DependerTreeNodeList                srvHierarchy;
+        TextureNDResourceBinding binding;
+        binding.handle = handle;
 
-        ResourceBinding<RenderTargetView> rtvBinding;
-        TextureNDRTVProxyPtr              rtvProxy = nullptr;
-        DependerTreeNodeList              rtvHierarchy;
-
-        ResourceBinding<DepthStencilView> dsvBinding;
-        TextureNDDSVProxyPtr              dsvProxy = nullptr;
-        DependerTreeNodeList              dsvHierarchy;
+        outResourceHierarchy.push_back(resourceNode);
 
         if(!createTextureNDDependerProxies<1>(
           t1DDesc.name,
@@ -280,52 +346,13 @@ namespace Engine {
           t1DDesc.textureFormat,
           isCubeMap,
           handle,
-          srvBinding,
-          srvProxy,
-          srvHierarchy,
-          rtvBinding,
-          rtvProxy,
-          rtvHierarchy,
-          dsvBinding,
-          dsvProxy,
-          dsvHierarchy))
+          proxyFactory,
+          binding,
+          outProxies,
+          resourceNode))
         {
         }
 
-        TextureNDResourceBinding binding;
-        binding.handle = handle;
-
-        if(srvBinding.handle.valid() && srvProxy) {
-          outProxies[srvBinding.handle] = AnyProxy(srvProxy);
-
-          for(DependerTreeNode const& d : srvHierarchy)
-            resourceNode.children.push_back(d);
-
-          binding.srvBinding = srvBinding;
-        }
-
-        if(rtvBinding.handle.valid() && rtvProxy) {
-          outProxies[rtvBinding.handle] = AnyProxy(rtvProxy);
-
-          for(DependerTreeNode const& d : rtvHierarchy)
-            resourceNode.children.push_back(d);
-
-          binding.rtvBinding = rtvBinding;
-        }
-
-        if(dsvBinding.handle.valid() && dsvProxy) {
-          outProxies[dsvBinding.handle] = AnyProxy(dsvProxy);
-
-          DependerTreeNode dsvTree;
-          // How?
-          for(DependerTreeNode const& d : dsvHierarchy)
-            resourceNode.children.push_back(d);
-          resourceNode.children.push_back(dsvTree);
-
-          binding.dsvBinding = dsvBinding;
-        }
-
-        outResourceHierarchy.push_back(resourceNode);
       }
     };
 
@@ -359,12 +386,10 @@ namespace Engine {
         bool isCubeMap      = (t2DDesc.array.isTextureArray && (t2DDesc.array.size % 6) == 0);
         bool isCubeMapArray = isCubeMap && ((t2DDesc.array.size / 6) > 1);
 
-        ResourceHandle       srvHandle;
-        TextureNDSRVProxyPtr srvProxy = nullptr;
-        ResourceHandle       rtvHandle;
-        TextureNDRTVProxyPtr rtvProxy = nullptr;
-        ResourceHandle       dsvHandle;
-        TextureNDDSVProxyPtr dsvProxy = nullptr;
+        TextureNDResourceBinding binding;
+        binding.handle = handle;
+
+        outResourceHierarchy.push_back(resourceNode);
 
         if(!createTextureNDDependerProxies<2>(
           t2DDesc.name,
@@ -376,40 +401,12 @@ namespace Engine {
           t2DDesc.textureFormat,
           isCubeMap,
           handle,
-          srvHandle,
-          srvProxy,
-          rtvHandle,
-          rtvProxy,
-          dsvHandle,
-          dsvProxy))
+          proxyFactory,
+          binding,
+          outProxies,
+          resourceNode))
         {
         }
-
-        if(srvProxy) {
-          outProxies[srvHandle] = AnyProxy(srvProxy);
-
-          DependerTreeNode srvResourceNode;
-          srvResourceNode.resourceHandle = srvHandle;
-          resourceNode.children.push_back(srvResourceNode);
-        }
-
-        if(rtvProxy) {
-          outProxies[rtvHandle] = AnyProxy(rtvProxy);
-
-          DependerTreeNode rtvResourceNode;
-          rtvResourceNode.resourceHandle = rtvHandle;
-          resourceNode.children.push_back(rtvResourceNode);
-        }
-
-        if(dsvProxy) {
-          outProxies[dsvHandle] = AnyProxy(dsvProxy);
-
-          DependerTreeNode dsvResourceNode;
-          dsvResourceNode.resourceHandle = dsvHandle;
-          resourceNode.children.push_back(dsvResourceNode);
-        }
-
-        outResourceHierarchy.push_back(resourceNode);
       }
     };
 
@@ -443,12 +440,10 @@ namespace Engine {
         bool isCubeMap      = false; // Not possible for 3D textures
         bool isCubeMapArray = false; // Not possible for 3D textures
 
-        ResourceHandle       srvHandle;
-        TextureNDSRVProxyPtr srvProxy = nullptr;
-        ResourceHandle       rtvHandle;
-        TextureNDRTVProxyPtr rtvProxy = nullptr;
-        ResourceHandle       dsvHandle;
-        TextureNDDSVProxyPtr dsvProxy = nullptr;
+        TextureNDResourceBinding binding;
+        binding.handle = handle;
+
+        outResourceHierarchy.push_back(resourceNode);
 
         if(!createTextureNDDependerProxies<3>(
           t3DDesc.name,
@@ -460,40 +455,12 @@ namespace Engine {
           t3DDesc.textureFormat,
           isCubeMap,
           handle,
-          srvHandle,
-          srvProxy,
-          rtvHandle,
-          rtvProxy,
-          dsvHandle,
-          dsvProxy))
+          proxyFactory,
+          binding,
+          outProxies,
+          resourceNode))
         {
         }
-
-        if(srvProxy) {
-          outProxies[srvHandle] = AnyProxy(srvProxy);
-
-          DependerTreeNode srvResourceNode;
-          srvResourceNode.resourceHandle = srvHandle;
-          resourceNode.children.push_back(srvResourceNode);
-        }
-
-        if(rtvProxy) {
-          outProxies[rtvHandle] = AnyProxy(rtvProxy);
-
-          DependerTreeNode rtvResourceNode;
-          rtvResourceNode.resourceHandle = rtvHandle;
-          resourceNode.children.push_back(rtvResourceNode);
-        }
-
-        if(dsvProxy) {
-          outProxies[dsvHandle] = AnyProxy(dsvProxy);
-
-          DependerTreeNode dsvResourceNode;
-          dsvResourceNode.resourceHandle = dsvHandle;
-          resourceNode.children.push_back(dsvResourceNode);
-        }
-
-        outResourceHierarchy.push_back(resourceNode);
       }
     };
 
