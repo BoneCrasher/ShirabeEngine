@@ -4,6 +4,7 @@
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
+#include "Resources/System/Core/ResourceDomainTransfer.h"
 
 #include "GFXAPI/Definitions.h"
 #include "GFXAPI/Types/TextureNDDefinition.h"
@@ -13,88 +14,58 @@
 
 namespace Engine {
 	namespace GFXAPI {
-
-    class RenderTargetView;
-
+    
 		/**********************************************************************************************//**
 		 * \struct	RenderTargetDescriptorImpl
 		 *
 		 * \brief	A render target descriptor implementation.
 		 **************************************************************************************************/
-		struct RenderTargetViewDescriptorImpl {
-			std::string             name;
-			Format                  textureFormat;
-			unsigned int            dimensionNb;
-			TextureArrayDescriptor  array;
-			TextureMipMapDescriptor mipMap;
-
-			RenderTargetViewDescriptorImpl()
-				: name("")
-				, textureFormat(Format::UNKNOWN)
-				, dimensionNb(0)
-			{}
-
-			std::string toString() const {
-				std::stringstream ss;
-
-				ss
-					<< "RenderTargetDescriptor ('" << name << "'): "
-					<< " Format: " << (uint8_t)textureFormat << ";";
-
-				return ss.str();
-			}
-		};		
-    
-    struct RenderTargetViewCreationRequestImpl {
+		
+    class RenderTargetViewDeclaration {
     public:
-      inline const RenderTargetViewDescriptorImpl& resourceDescriptor() const { return _resourceDescriptor; }
+      static const constexpr EResourceType    resource_type    = EResourceType::GAPI_VIEW;
+      static const constexpr EResourceSubType resource_subtype = EResourceSubType::RENDER_TARGET_VIEW;
 
-      std::string toString() const {
-        std::stringstream ss;
 
-        ss
-          << "RenderTargetViewCreationRequest: \n"
-          << "[\n"
-          << _resourceDescriptor.toString() << "\n"
-          << "]"
-          << std::endl;
+      struct Descriptor {
+        std::string             name;
+        Format                  textureFormat;
+        unsigned int            dimensionNb;
+        TextureArrayDescriptor  array;
+        TextureMipMapDescriptor mipMap;
 
-        return ss.str();
-      }
-    private:
-      RenderTargetViewDescriptorImpl _resourceDescriptor;
+        Descriptor();
+
+        std::string toString() const;
+      };
+
+      struct CreationRequest {
+      public:
+        CreationRequest(const Descriptor &desc);
+
+        const Descriptor& resourceDescriptor() const;
+
+        std::string toString() const;
+      private:
+        Descriptor _resourceDescriptor;
+      };
+      
+      struct UpdateRequest { };
+
+      struct DestructionRequest {
+
+      };
+
+      struct Query {
+
+      };
+
+      struct Binding {
+        ResourceHandle handle;
+
+        inline Binding();
+      };
     };
-
-
-    struct RenderTargetViewDestructionRequestImpl {
-
-    };
-
-    struct RenderTargetViewQueryRequestImpl {
-
-    };
-
-    struct RenderTargetViewResourceBinding {
-      ResourceHandle handle;
-
-      inline RenderTargetViewResourceBinding()
-        : handle(ResourceHandle::Invalid())
-      {}
-      // BufferResourceBinding    bufferBinding;
-    };
-
-    DeclareResourceTraits(RenderTargetView,
-                          RenderTargetView,
-                          EResourceType::GAPI_VIEW,
-                          EResourceSubType::RENDER_TARGET_VIEW,
-                          RenderTargetViewResourceBinding,
-                          RenderTargetViewDescriptorImpl,
-                          RenderTargetViewCreationRequestImpl,
-                          void,
-                          RenderTargetViewQueryRequestImpl,
-                          RenderTargetViewDestructionRequestImpl);
-
-    DefineTraitsPublicTypes(RenderTargetView, RenderTargetViewTraits);
 
 		/**********************************************************************************************//**
 		 * \class	GFXAPIRenderTarget
@@ -102,25 +73,20 @@ namespace Engine {
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
 		class RenderTargetView
-			: public RenderTargetViewTraits
-      , public ResourceDescriptorAdapter<RenderTargetViewTraits>
-			, public ResourceBindingAdapter<RenderTargetViewTraits>
+			: public RenderTargetViewDeclaration
+      , public ResourceDescriptorAdapter<RenderTargetViewDeclaration::Descriptor>
+			, public ResourceBindingAdapter<RenderTargetViewDeclaration::Binding>
 		{
 		public:
 			using my_type = RenderTargetView;
 
-			RenderTargetView(
-				const RenderTargetViewDescriptor &descriptor,
-				const RenderTargetViewBinding    &binding)
-				: RenderTargetViewTraits()
-        , ResourceDescriptorAdapter<RenderTargetViewTraits>(descriptor)
-				, ResourceBindingAdapter<RenderTargetViewTraits>(binding)
-			{}
+      RenderTargetView(
+        const RenderTargetView::Descriptor &descriptor,
+        const RenderTargetView::Binding    &binding);
 		};
 
 		DeclareSharedPointerType(RenderTargetView);
-
-		typedef ResourceDescriptor<RenderTargetView> RenderTargetViewDescriptor;
+    DefineTraitsPublicTypes(RenderTargetView);
 	}
 }
 

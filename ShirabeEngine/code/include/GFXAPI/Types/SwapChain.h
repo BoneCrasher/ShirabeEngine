@@ -94,10 +94,7 @@ namespace Engine {
                           void,
                           SwapChainQueryRequestImpl,
                           SwapChainDestructionRequestImpl);
-
-    DefineTraitsPublicTypes(SwapChain, SwapChainTraits);
-
-
+  
 		/**********************************************************************************************//**
 		 * \class	GAPISwapChain
 		 *
@@ -119,17 +116,17 @@ namespace Engine {
 			// EEngineStatus present(bool verticallySynchronized = true);
 
 			inline static Ptr<SwapChain> create(
-				const SwapChainDescriptor &desc,
-				const SwapChainBinding    &binding) {
+        const ResourceDescriptor<SwapChain> &desc,
+        const ResourceBinding<SwapChain>    &binding) {
 				return Ptr<SwapChain>(new SwapChain(desc, binding));
 			}
 
 		private:
 			inline SwapChain(
-				const SwapChainDescriptor &desc, // Forward declaration issue?!
-				const SwapChainBinding    &binding)
+        const ResourceDescriptor<SwapChain> &descriptor,
+        const ResourceBinding<SwapChain>    &binding)
 				: SwapChainTraits()
-        , ResourceDescriptorAdapter<SwapChainTraits>(desc)
+        , ResourceDescriptorAdapter<SwapChainTraits>(descriptor)
 				, ResourceBindingAdapter<SwapChainTraits>(binding)
 				, _currentBackBufferIndex(0)
 			{}
@@ -137,6 +134,7 @@ namespace Engine {
 			std::size_t  _currentBackBufferIndex;
 		};
 		DeclareSharedPointerType(SwapChain);
+    DefineTraitsPublicTypes(SwapChain);
 
 
     const ResourceDescriptor<SwapChain> SwapChainCreationRequestImpl

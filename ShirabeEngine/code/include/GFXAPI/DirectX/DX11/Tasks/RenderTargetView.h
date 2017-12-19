@@ -18,10 +18,10 @@ namespace Engine {
 			using namespace GFXAPI;
 
 			EEngineStatus createRenderTargetView(
-				const ID3D11DevicePtr            &device,
-				const RenderTargetViewDescriptor &desc,
-				IUnknownPtr                      &sourceResource,
-				ID3D11RenderTargetViewPtr        &outRTV
+				const ID3D11DevicePtr              &device,
+				const RenderTargetView::Descriptor &desc,
+				IUnknownPtr                        &sourceResource,
+				ID3D11RenderTargetViewPtr          &outRTV
 			);
 
 
@@ -32,7 +32,7 @@ namespace Engine {
 
 			public:
 				static EEngineStatus build(
-					typename const traits_type::descriptor_type &descriptor,
+					typename RenderTargetView::Descriptor const &descriptor,
 					gfxapi_parameter_struct_type                &gfxapiParams,
 					built_resource_map                          &outResources,
 					IUnknownPtr                                 &inSourceResource)

@@ -20,11 +20,10 @@ namespace Engine {
 				friend class DX11ShaderResourceTask;
 
 				static EEngineStatus createShaderResource(
-					const ID3D11DevicePtr              &device,
-					const ShaderResourceViewDescriptor &desc,
-					ID3D11ResourcePtr                  &inUnderlyingResource,
-					ID3D11ShaderResourceViewPtr        &outRes);
-
+					const ID3D11DevicePtr                &device,					
+          ShaderResourceView::Descriptor const &desc,
+					ID3D11ResourcePtr                    &inUnderlyingResource,
+					ID3D11ShaderResourceViewPtr          &outRes);
 			};
 
 
@@ -35,10 +34,10 @@ namespace Engine {
 
 			public:
 				static EEngineStatus build(
-					typename const traits_type::descriptor_type &descriptor,
-					gfxapi_parameter_struct_type                &gfxapiParams,
-					built_resource_map                          &outResources,
-					ID3D11ResourcePtr                           &inUnderlyingResource)
+					ShaderResourceView::Descriptor const &descriptor,
+					gfxapi_parameter_struct_type         &gfxapiParams,
+					built_resource_map                   &outResources,
+					ID3D11ResourcePtr                    &inUnderlyingResource)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 

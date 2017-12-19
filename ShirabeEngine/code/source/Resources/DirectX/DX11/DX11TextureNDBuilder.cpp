@@ -8,9 +8,9 @@ namespace Engine {
 
 			EEngineStatus createTexture1D
 			(
-				const ID3D11DevicePtr     &device,
-				const Texture1DDescriptor &desc,
-				ID3D11Texture1DPtr        &outTexture
+				const ID3D11DevicePtr                &device,
+				const ResourceDescriptor<Texture<1>> &desc,
+				ID3D11Texture1DPtr                   &outTexture
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes  = EEngineStatus::Ok;
@@ -40,9 +40,9 @@ namespace Engine {
 
 			EEngineStatus createTexture2D
 			(
-				const ID3D11DevicePtr     &device,
-				const Texture2DDescriptor &desc,
-				ID3D11Texture2DPtr        &outTexture
+				const ID3D11DevicePtr                &device,
+				const ResourceDescriptor<Texture<2>> &desc,
+				ID3D11Texture2DPtr                   &outTexture
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes = EEngineStatus::Ok;
@@ -83,9 +83,9 @@ namespace Engine {
 
 			EEngineStatus createTexture3D
 			(
-				const ID3D11DevicePtr     &device,
-				const Texture3DDescriptor &desc,
-				ID3D11Texture3DPtr        &outTexture
+				const ID3D11DevicePtr                &device,
+				const ResourceDescriptor<Texture<3>> &desc,
+				ID3D11Texture3DPtr                   &outTexture
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes = EEngineStatus::Ok;

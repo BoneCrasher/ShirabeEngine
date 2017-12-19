@@ -17,21 +17,21 @@ namespace Engine {
 			using namespace GFXAPI;
 
 			EEngineStatus createTexture1D (
-				const ID3D11DevicePtr     &device,
-				const Texture1DDescriptor &desc,
-				ID3D11Texture1DPtr        &outTexture
+				const ID3D11DevicePtr               &device,
+				const ResourceDescriptor<Texture1D> &desc,
+				ID3D11Texture1DPtr                  &outTexture
 			);
 
 			EEngineStatus createTexture2D (
-				const ID3D11DevicePtr     &device,
-				const Texture2DDescriptor &desc,
-				ID3D11Texture2DPtr        &outTexture
+				const ID3D11DevicePtr               &device,
+				const ResourceDescriptor<Texture2D> &desc,
+				ID3D11Texture2DPtr                  &outTexture
 			);
 
 			EEngineStatus createTexture3D (
-				const ID3D11DevicePtr     &device,
-				const Texture3DDescriptor &desc,
-				ID3D11Texture3DPtr        &outTexture
+				const ID3D11DevicePtr               &device,
+				const ResourceDescriptor<Texture3D> &desc,
+				ID3D11Texture3DPtr                  &outTexture
 			);
 
 			/**********************************************************************************************//**
@@ -46,9 +46,9 @@ namespace Engine {
 
 			public:
 				static EEngineStatus build(
-					descriptor_type const        &descriptor,
-					gfxapi_parameter_struct_type &gfxapiParams,
-					built_resource_map           &outResources)
+					ResourceDescriptor<Texture1D> const &descriptor,
+					gfxapi_parameter_struct_type         &gfxapiParams,
+					built_resource_map                   &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
@@ -81,9 +81,9 @@ namespace Engine {
 
 			public:
 				static EEngineStatus build(
-					descriptor_type const        &descriptor,
-					gfxapi_parameter_struct_type &gfxapiParams,
-					built_resource_map           &outResources)
+					ResourceDescriptor<Texture2D> const &descriptor,
+					gfxapi_parameter_struct_type         &gfxapiParams,
+					built_resource_map                   &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 
@@ -113,9 +113,9 @@ namespace Engine {
 
 			public:
 				static EEngineStatus build(
-					descriptor_type const        &descriptor,
-					gfxapi_parameter_struct_type &gfxapiParams,
-					built_resource_map           &outResources)
+					ResourceDescriptor<Texture3D> const &descriptor,
+					gfxapi_parameter_struct_type         &gfxapiParams,
+					built_resource_map                   &outResources)
 				{
 					EEngineStatus status = EEngineStatus::Ok;
 

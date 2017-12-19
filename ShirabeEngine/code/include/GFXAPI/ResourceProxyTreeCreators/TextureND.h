@@ -17,7 +17,16 @@
 
 #include "GFXAPI/ResourceProxyTreeCreators/ShaderResourceView.h"
 #include "GFXAPI/ResourceProxyTreeCreators/RenderTargetView.h"
-// #include "GFXAPI/ResourceProxyTreeCreators/DepthStencilView.h"
+#include "GFXAPI/ResourceProxyTreeCreators/DepthStencilView.h"
+
+template <typename TKey, typename TValue>
+TValue& __map_get_if_contained(std::map<TKey, TValue> const& inMap, const TKey& inKey) {
+  typename std::map<TKey, TValue>::const_iterator it = inMap.find(inKey);
+  if(inKey == inMap.end())
+    return nullptr;
+  else
+    return it->second;
+}
 
 namespace Engine {
   namespace Resources {
@@ -68,12 +77,13 @@ namespace Engine {
         // OpenGL doesn't really GAF anyway, but is a bit more complex regarding texture binding
         // and update and needs wrapper classes to handle those 5 million calls in OGL.
         // These will basically be the SRV and RTV implementations on the respective platforms.
-        TextureNDSRVProxyPtr srvProxy
-          = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
+        bool successful = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
 
+        AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
+        TextureNDSRVProxyPtr srvProxy = (result.has_value() ? GFXAPIProxyCast<ShaderResourceView>(result) : nullptr);
         // Verify?
 
-        if(!srvProxy) {
+        if(!(successful && srvProxy)) {
           // TODO: Log
           return false;
         }
@@ -107,7 +117,7 @@ namespace Engine {
       DependerTreeNode                  &outRTVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_RenderTarget)) {
-        RenderTargetViewDescriptor rtvDesc ={0};
+        RenderTargetViewDescriptor rtvDesc ={};
         rtvDesc.name          = String::format("%0_RTV", textureName);
         rtvDesc.textureFormat = textureFormat;
         rtvDesc.dimensionNb   = dimensionNb;
@@ -122,9 +132,12 @@ namespace Engine {
 
         ResourceHandleList dependencyInjection ={textureNDProxyHandle};
 
-        TextureNDRTVProxyPtr rtvProxy
-          = ProxyTreeCreator<RenderTargetView>::create(proxyFactory, rtvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
-        if(!rtvProxy) {
+        bool successful = ProxyTreeCreator<RenderTargetView>::create(proxyFactory, rtvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
+
+        AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
+        TextureNDRTVProxyPtr rtvProxy = (result.has_value() ? GFXAPIProxyCast<RenderTargetView>(result) : nullptr);
+
+        if(!(successful && rtvProxy)) {
           // TODO: Log
           return false;
         }
@@ -174,10 +187,13 @@ namespace Engine {
         DependerTreeNodeList              hierarchy;
 
         ResourceHandleList dependencyInjection ={textureNDProxyHandle};
+        
+        bool successful = ProxyTreeCreator<DepthStencilView>::create(proxyFactory, dsvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
 
-        TextureNDDSVProxyPtr dsvProxy
-          = ProxyTreeCreator<DepthStencilView>::create(proxyFactory, dsvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
-        if(!dsvProxy) {
+        AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
+        TextureNDDSVProxyPtr dsvProxy = (result.has_value() ? GFXAPIProxyCast<DepthStencilView>(result) : nullptr);
+
+        if(!(successful && dsvProxy)) {
           // TODO: Log
           return false;
         }
@@ -208,7 +224,7 @@ namespace Engine {
       bool                             isCube,
       const ResourceHandle            &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory> &proxyFactory,
-      TextureNDResourceBinding        &inOutBinding,
+      Texture1D::Binding              &inOutBinding,
       ResourceProxyMap                &inOutProxies,
       DependerTreeNode                &inOutHierarchyRoot)
     {
@@ -306,7 +322,7 @@ namespace Engine {
       static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_1D;
 
-      using binding_type = TextureNDResourceBinding;
+      using binding_type = Texture1D::Binding;
       using request_type = ResourceCreationRequest<Texture1D>;
 
       static bool create(
@@ -318,7 +334,7 @@ namespace Engine {
         DependerTreeNodeList            &outResourceHierarchy)
       {
         // Down-cast to known type!
-        const Texture1DDescriptor& t1DDesc = static_cast<const Texture1DDescriptor&>(request.resourceDescriptor());
+        const Texture1D::Descriptor& t1DDesc = request.resourceDescriptor();
         Ptr<IResourceProxy<Texture1D>> proxy
           = proxyFactory->create<Texture1D>(EProxyType::Dynamic, request, inDependencyHandles);
 
@@ -331,7 +347,7 @@ namespace Engine {
         bool isCubeMap      = false; // Not possible for 1D textures
         bool isCubeMapArray = false; // Not possible for 1D textures
 
-        TextureNDResourceBinding binding;
+        Texture1D::Binding binding;
         binding.handle = handle;
 
         outResourceHierarchy.push_back(resourceNode);

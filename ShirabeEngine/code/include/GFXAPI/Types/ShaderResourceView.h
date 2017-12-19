@@ -15,168 +15,143 @@ namespace Engine {
   namespace Resources {
     using namespace GFXAPI;
 
-    class ShaderResourceView;
-
     /**********************************************************************************************//**
-     * \struct	ShaderResourceDescriptorImpl
+     * \class ShaderResourceViewDeclaration
      *
-     * \brief	A render target descriptor implementation.
+     * \brief A shader resource view declaration.
      **************************************************************************************************/
-    struct ShaderResourceViewDescriptorImpl {
-      enum class EShaderResourceDimension {
-        Texture,
-        StructuredBuffer
+    class ShaderResourceViewDeclaration {
+    public:
+      static const constexpr EResourceType    resource_type    = EResourceType::GAPI_VIEW;
+      static const constexpr EResourceSubType resource_subtype = EResourceSubType::SHADER_RESOURCE_VIEW;
+
+      /**********************************************************************************************//**
+       * \struct  Texture
+       *
+       * \brief A texture.
+       **************************************************************************************************/
+      struct Texture {
+        unsigned int            dimensionNb; // 1..3
+        VecND<uint32_t, 3>      dimensions;
+        bool                    isCube; // Implies the dimensions[2] to be 6
+        TextureArrayDescriptor  array;
+        TextureMipMapDescriptor mipMap;
+
+        Texture();          
       };
 
-      std::string              name;
-      Format                   format;
-      EShaderResourceDimension srvType;
+      /**********************************************************************************************//**
+       * \struct  StructuredBuffer
+       *
+       * \brief Buffer for structured.
+       **************************************************************************************************/
+      struct StructuredBuffer {
+        unsigned int firstElementOffset;
+        unsigned int elementWidthInBytes;
 
+        StructuredBuffer();
+      };
+
+      /**********************************************************************************************//**
+       * \union ShaderResourceDimension
+       *
+       * \brief A shader resource dimension.
+       **************************************************************************************************/
       union ShaderResourceDimension {
-        struct Texture {
-          unsigned int            dimensionNb; // 1..3
-          VecND<uint32_t, 3>      dimensions;
-          bool                    isCube; // Implies the dimensions[2] to be 6
-          TextureArrayDescriptor  array;
-          TextureMipMapDescriptor mipMap;
+        Texture          texture;
+        StructuredBuffer structuredBuffer;
 
-          inline Texture()
-            : dimensionNb(0)
-            , dimensions({0, 0, 0})
-            , isCube(false)
-            , array()
-            , mipMap()
-          {}
-        } texture;
+        ShaderResourceDimension();
+      };
 
-        struct StructuredBuffer {
-          unsigned int firstElementOffset;
-          unsigned int elementWidthInBytes;
+      /**********************************************************************************************//**
+       * \struct	ShaderResourceDescriptorImpl
+       *
+       * \brief	A render target descriptor implementation.
+       **************************************************************************************************/
+      struct Descriptor {
+        enum class EShaderResourceDimension {
+          Texture,
+          StructuredBuffer
+        };
 
-          inline StructuredBuffer()
-            : firstElementOffset(0)
-            , elementWidthInBytes(0)
-          {}
-        } structuredBuffer;
+        std::string              name;
+        Format                   format;
+        EShaderResourceDimension srvType;
+        ShaderResourceDimension  shaderResourceDimension;
 
-        inline ShaderResourceDimension()
-          : texture()
-          , structuredBuffer()
-        {}
-      } shaderResourceDimension;
+        Descriptor();
 
-      ShaderResourceViewDescriptorImpl()
-        : name("")
-        , shaderResourceDimension()
-      {}
+        std::string toString() const;
+      };
 
-      std::string toString() const {
-        std::stringstream ss;
+      /**********************************************************************************************//**
+       * \struct  CreationRequest
+       *
+       * \brief A creation request.
+       **************************************************************************************************/
+      struct CreationRequest {
+      public:
+        const Descriptor& resourceDescriptor() const;
 
-        ss
-          << "RenderTargetDescriptor ('" << name << "'): \n"
-          << " Format:     " << (uint8_t)format << "\n,";
+        std::string toString() const;
 
-        if(srvType == EShaderResourceDimension::Texture) {
-          ss
-            << " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb << "\n,"
-            << " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size << "\n,"
-            << " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice << "\n,"
-            << " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels << "\n,"
-            << " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel << ";";
-        }
-        else { // StructuredBuffer
-          ss
-            << " First elem. off.: " << (uint8_t)shaderResourceDimension.structuredBuffer.firstElementOffset << ","
-            << " Elem. byte-size:  " << (uint8_t)shaderResourceDimension.structuredBuffer.elementWidthInBytes << ";";
-        }
+      private:
+        Descriptor _resourceDescriptor;
+      };
 
-        return ss.str();
-      }
+      struct UpdateRequest { };
+
+      /**********************************************************************************************//**
+       * \struct  DestructionRequest
+       *
+       * \brief A destruction request.
+       **************************************************************************************************/
+      struct DestructionRequest {
+
+      };
+
+      /**********************************************************************************************//**
+       * \struct  Query
+       *
+       * \brief A query.
+       **************************************************************************************************/
+      struct Query {
+
+      };
+
+      /**********************************************************************************************//**
+       * \struct  Binding
+       *
+       * \brief A binding.
+       **************************************************************************************************/
+      struct Binding {
+        ResourceHandle handle;
+
+        Binding();
+      };
     };
-
-    struct ShaderResourceViewCreationRequestImpl {
-    public:
-      const struct ResourceDescriptor<ShaderResourceView>& resourceDescriptor() const;
-
-      std::string toString() const {
-        std::stringstream ss;
-
-        ss
-          << "ShaderResourceViewCreationRequest: \n"
-          << "[\n"
-          << _resourceDescriptor.toString() << "\n"
-          << "]"
-          << std::endl;
-
-        return ss.str();
-      }
-
-    private:
-      ShaderResourceViewDescriptorImpl _resourceDescriptor;
-    };
-
-
-    struct ShaderResourceViewDestructionRequestImpl {
-
-    };
-
-    struct ShaderResourceViewQueryRequestImpl {
-
-    };
-
-    struct ShaderResourceViewResourceBinding {
-      ResourceHandle handle;
-
-      inline ShaderResourceViewResourceBinding()
-        : handle(ResourceHandle::Invalid())
-      {}
-    };
-
-    DeclareResourceTraits(ShaderResourceView,
-                          ShaderResourceView,
-                          EResourceType::GAPI_VIEW,
-                          EResourceSubType::SHADER_RESOURCE_VIEW,
-                          ShaderResourceViewResourceBinding,
-                          ShaderResourceViewDescriptorImpl,
-                          ShaderResourceViewCreationRequestImpl,
-                          void,
-                          ShaderResourceViewQueryRequestImpl,
-                          ShaderResourceViewDestructionRequestImpl);
-
-    DefineTraitsPublicTypes(ShaderResourceView, ShaderResourceViewTraits);
-
+    
     /**********************************************************************************************//**
      * \class	GFXAPIShaderResource
      *
      * \brief	A gfxapi render target.
      **************************************************************************************************/
     class ShaderResourceView
-      : public ShaderResourceViewTraits
-      , public ResourceDescriptorAdapter<ShaderResourceViewTraits>
-      , public ResourceBindingAdapter<ShaderResourceViewTraits>
+      : public ShaderResourceViewDeclaration
+      , public ResourceDescriptorAdapter<class ShaderResourceView, ShaderResourceViewDeclaration::Descriptor>
+      , public ResourceBindingAdapter<class ShaderResourceView, ShaderResourceViewDeclaration::Binding>
     {
     public:
       using my_type = ShaderResourceView;
 
       ShaderResourceView(
-        const ResourceDescriptor<ShaderResourceView> &descriptor,
-        const ResourceBinding<ShaderResourceView>    &binding)
-        : ShaderResourceViewTraits()
-        , ResourceDescriptorAdapter<ShaderResourceViewTraits>(descriptor)
-        , ResourceBindingAdapter<ShaderResourceViewTraits>(binding)
-      {}
+        const ShaderResourceView::Descriptor &descriptor,
+        const ShaderResourceView::Binding    &binding);
     };
 
     DeclareSharedPointerType(ShaderResourceView);
-
-    using ShaderResourceViewDescriptor = ResourceDescriptor<ShaderResourceView>;
-
-    const ResourceDescriptor<ShaderResourceView>& ShaderResourceViewCreationRequestImpl
-      ::resourceDescriptor() const
-    {
-      return ResourceDescriptor<ShaderResourceView>(_resourceDescriptor);
-    }
+    DefineTraitsPublicTypes(ShaderResourceView);
   }
 }
 

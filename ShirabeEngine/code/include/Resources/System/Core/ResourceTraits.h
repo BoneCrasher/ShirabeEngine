@@ -31,7 +31,7 @@ namespace Engine {
       typename TQueryRequest,
       typename TDestructionRequest
     >
-    class ResourceTraits {
+      class ResourceTraits {
       public:
         static const constexpr EResourceType    resource_type    = type;
         static const constexpr EResourceSubType resource_subtype = subtype;
@@ -44,12 +44,17 @@ namespace Engine {
         typedef TQueryRequest       query_request_impl_type;
         typedef TDestructionRequest destruction_request_impl_type;
 
-        typedef ResourceDescriptor<TClass>         descriptor_public_type;
-        typedef ResourceBinding<TClass>            binding_public_type;
-        typedef ResourceCreationRequest<TClass>    creation_request_public_type;
-        typedef ResourceUpdateRequest<TClass>      update_request_public_type;
-        typedef ResourceQueryRequest<TClass>       query_request_public_type;
-        typedef ResourceDestructionRequest<TClass> destruction_request_public_type;
+    };
+
+    template <typename T>
+    class ResourcePublicTraits {
+    public:
+      typedef typename T::Descriptor         descriptor_public_type;
+      typedef typename T::Binding            binding_public_type;
+      typedef typename T::CreationRequest    creation_request_public_type;
+      typedef typename T::UpdateRequest      update_request_public_type;
+      typedef typename T::Query              query_request_public_type;
+      typedef typename T::DestructionRequest destruction_request_public_type;
     };
 
 #define DeclareResourceTraits(Prefix, Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction) \
@@ -63,22 +68,21 @@ namespace Engine {
       : public ResourceTraits<Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction>                       \
     {};
 
-#define DefineTraitsPublicTypes(Prefix, Traits)                                 \
-    using Prefix##Binding              = Traits::binding_public_type            ; \
-    using Prefix##Descriptor           = Traits::descriptor_public_type         ; \
-    using Prefix##CreationRequest      = Traits::creation_request_public_type   ; \
-    using Prefix##UpdateRequest        = Traits::update_request_public_type     ; \
-    using Prefix##QueryRequest         = Traits::query_request_public_type      ; \
-    using Prefix##DesctructionRequest  = Traits::destruction_request_public_type; 
+#define DefineTraitsPublicTypes(Type)                                                               \
+    using Type##Binding              = ResourcePublicTraits<Type>::binding_public_type            ; \
+    using Type##Descriptor           = ResourcePublicTraits<Type>::descriptor_public_type         ; \
+    using Type##CreationRequest      = ResourcePublicTraits<Type>::creation_request_public_type   ; \
+    using Type##UpdateRequest        = ResourcePublicTraits<Type>::update_request_public_type     ; \
+    using Type##QueryRequest         = ResourcePublicTraits<Type>::query_request_public_type      ; \
+    using Type##DesctructionRequest  = ResourcePublicTraits<Type>::destruction_request_public_type; 
 
-#define DefineTraitsPublicTemplateTypes(Tpl, Prefix, Traits)                                 \
-    Tpl using Prefix##Binding              = typename Traits::binding_public_type            ; \
-    Tpl using Prefix##Descriptor           = typename Traits::descriptor_public_type         ; \
-    Tpl using Prefix##CreationRequest      = typename Traits::creation_request_public_type   ; \
-    Tpl using Prefix##UpdateRequest        = typename Traits::update_request_public_type     ; \
-    Tpl using Prefix##QueryRequest         = typename Traits::query_request_public_type      ; \
-    Tpl using Prefix##DesctructionRequest  = typename Traits::destruction_request_public_type; 
-
+#define DefineTraitsPublicTemplateTypes(Tpl, Prefix, Type)                                                         \
+    Tpl using Prefix##Binding              = typename ResourcePublicTraits<Type>::binding_public_type            ; \
+    Tpl using Prefix##Descriptor           = typename ResourcePublicTraits<Type>::descriptor_public_type         ; \
+    Tpl using Prefix##CreationRequest      = typename ResourcePublicTraits<Type>::creation_request_public_type   ; \
+    Tpl using Prefix##UpdateRequest        = typename ResourcePublicTraits<Type>::update_request_public_type     ; \
+    Tpl using Prefix##QueryRequest         = typename ResourcePublicTraits<Type>::query_request_public_type      ; \
+    Tpl using Prefix##DesctructionRequest  = typename ResourcePublicTraits<Type>::destruction_request_public_type; 
   }
 }
 

@@ -166,6 +166,8 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Device.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Renderer.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\RenderTargetView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\ShaderResourceView.cpp" />
     <ClCompile Include="code\source\Math\AxisAngle.cpp" />
     <ClCompile Include="code\source\BuildingBlocks\Camera.cpp" />
     <ClCompile Include="code\source\ApplicationMain.cpp" />
@@ -217,6 +219,7 @@
     <ClInclude Include="code\include\GFXAPI\GFXAPIDeviceCapabilities.h" />
     <ClInclude Include="code\include\GFXAPI\IRenderer.h" />
     <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
+    <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilView.h" />
     <ClInclude Include="code\include\GFXAPI\Types\TextureNDDefinition.h" />
     <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />
     <ClInclude Include="code\include\IOC\IOCProperty.hpp" />
