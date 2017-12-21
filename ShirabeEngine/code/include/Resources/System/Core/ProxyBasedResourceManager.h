@@ -152,9 +152,9 @@ namespace Engine {
        **************************************************************************************************/
       template <typename TResource>
       EEngineStatus createResource(
-        const ResourceCreationRequest<TResource> &request,
-        bool                                      creationDeferred,
-        ResourceBinding<TResource>               &binding
+        const typename TResource::CreationRequest &request,
+        bool                                       creationDeferred,
+        typename TResource::Binding               &binding
       );
 
     public:
@@ -169,20 +169,20 @@ namespace Engine {
       };
 
       EEngineStatus createSwapChain(
-        const ResourceCreationRequest<SwapChain> &inRequest,
-        Ptr<SwapChain>                           &outSwapChain);
+        const SwapChain::CreationRequest &inRequest,
+        Ptr<SwapChain>                   &outSwapChain);
 
       EEngineStatus createTexture1D(
-        const ResourceCreationRequest<Texture1D> &request,
-        Ptr<Texture1D>                           &outTexture1D);
+        const Texture1D::CreationRequest &request,
+        Ptr<Texture1D>                   &outTexture1D);
 
       EEngineStatus createTexture2D(
-        const ResourceCreationRequest<Texture2D> &request,
-        Ptr<Texture2D>                           &outTexture2D);
+        const Texture2D::CreationRequest &request,
+        Ptr<Texture2D>                   &outTexture2D);
 
       EEngineStatus createTexture3D(
-        const ResourceCreationRequest<Texture3D> &request,
-        Ptr<Texture3D>                           &outTexture3D);
+        const Texture3D::CreationRequest &request,
+        Ptr<Texture3D>                   &outTexture3D);
 
     private:
       inline AnyProxy getResourceProxy(const ResourceHandle& handle) {
@@ -481,9 +481,9 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus ProxyBasedResourceManager
       ::createResource(
-        const ResourceCreationRequest<TResource> &request,
-        bool                                      creationDeferred,
-        ResourceBinding<TResource>               &binding)
+        const typename TResource::CreationRequest &request,
+        bool                                       creationDeferred,
+        typename TResource::Binding               &binding)
     {
       static const constexpr EResourceType    resource_type    = TResource::resource_type;
       static const constexpr EResourceSubType resource_subtype = TResource::resource_subtype;

@@ -49,12 +49,12 @@ namespace Engine {
       const ResourceHandle                &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory>     &proxyFactory,
       // Output
-      ResourceBinding<ShaderResourceView> &outSRVBinding,
+      ShaderResourceView::Binding    const&outSRVBinding,
       ResourceProxyMap                    &outSRVProxy,
       DependerTreeNode                    &outSRVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderResource)) {
-        ShaderResourceViewDescriptor srvDesc;
+        ShaderResourceView::Descriptor srvDesc;
         srvDesc.name                                        = String::format("%0_SRV", textureName);
         srvDesc.format                                      = textureFormat;
         srvDesc.shaderResourceDimension.texture.dimensionNb = dimensionNb;
@@ -63,11 +63,11 @@ namespace Engine {
         srvDesc.shaderResourceDimension.texture.isCube      = isCube;
         srvDesc.shaderResourceDimension.texture.mipMap      = mipMapDesc;
 
-        ShaderResourceViewCreationRequest srvCreationRequest(srvDesc);
+        ShaderResourceView::CreationRequest srvCreationRequest(srvDesc);
 
-        ShaderResourceViewBinding binding;
-        ResourceProxyMap          proxies;
-        DependerTreeNodeList      hierarchy;
+        ShaderResourceView::Binding binding;
+        ResourceProxyMap            proxies;
+        DependerTreeNodeList        hierarchy;
 
         ResourceHandleList dependencyInjection ={textureNDProxyHandle};
 
@@ -89,7 +89,7 @@ namespace Engine {
         }
         else {
           ResourceHandle handle(srvDesc.name, EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW);
-          outSRVBinding   = binding;
+          outSRVBinding = binding;
 
           outSRVProxy[handle] = srvProxy;
           for(ResourceProxyMap::value_type const& p : proxies)
@@ -112,7 +112,7 @@ namespace Engine {
       const Format                      &textureFormat,
       const ResourceHandle              &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory>   &proxyFactory,
-      ResourceBinding<RenderTargetView> &outRTVBinding,
+      RenderTargetView::Binding    const&outRTVBinding,
       ResourceProxyMap                  &outRTVProxy,
       DependerTreeNode                  &outRTVHierarchy)
     {
@@ -126,9 +126,9 @@ namespace Engine {
 
         RenderTargetViewCreationRequest rtvCreationRequest(rtvDesc);
 
-        ResourceBinding<RenderTargetView> binding;
-        ResourceProxyMap                  proxies;
-        DependerTreeNodeList              hierarchy;
+        RenderTargetView::Binding binding;
+        ResourceProxyMap          proxies;
+        DependerTreeNodeList      hierarchy;
 
         ResourceHandleList dependencyInjection ={textureNDProxyHandle};
 
@@ -168,23 +168,23 @@ namespace Engine {
       bool                               isCube,
       const ResourceHandle              &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory>   &proxyFactory,
-      ResourceBinding<DepthStencilView> &outDSVBinding,
+      DepthStencilView::Binding    const&outDSVBinding,
       ResourceProxyMap                  &outDSVProxy,
       DependerTreeNode                  &outDSVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_DepthStencil)) {
-        DepthStencilViewDescriptor dsvDesc;
+        DepthStencilView::Descriptor dsvDesc;
         dsvDesc.name                = String::format("%0_DSV", textureName);
         dsvDesc.format              = textureFormat;
         dsvDesc.texture.dimensionNb = dimensionNb;
         dsvDesc.texture.array       = arrayDesc;
         dsvDesc.texture.mipMap      = mipMapDesc;
 
-        DepthStencilViewCreationRequest dsvCreationRequest(dsvDesc);
+        DepthStencilView::CreationRequest dsvCreationRequest(dsvDesc);
 
-        ResourceBinding<DepthStencilView> binding;
-        ResourceProxyMap                  proxies;
-        DependerTreeNodeList              hierarchy;
+        DepthStencilView::Binding binding;
+        ResourceProxyMap          proxies;
+        DependerTreeNodeList      hierarchy;
 
         ResourceHandleList dependencyInjection ={textureNDProxyHandle};
         
@@ -224,23 +224,23 @@ namespace Engine {
       bool                             isCube,
       const ResourceHandle            &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory> &proxyFactory,
-      Texture1D::Binding              &inOutBinding,
+      typename Texture<N>::Binding    &inOutBinding,
       ResourceProxyMap                &inOutProxies,
       DependerTreeNode                &inOutHierarchyRoot)
     {
       bool result = true;
 
-      ResourceBinding<ShaderResourceView> srvBinding;
-      ResourceProxyMap                    srvProxy;
-      DependerTreeNode                    srvHierarchy;
+      ShaderResourceView::Binding srvBinding;
+      ResourceProxyMap            srvProxy;
+      DependerTreeNode            srvHierarchy;
 
-      ResourceBinding<RenderTargetView> rtvBinding;
-      ResourceProxyMap                  rtvProxy;
-      DependerTreeNode                  rtvHierarchy;
+      RenderTargetView::Binding rtvBinding;
+      ResourceProxyMap          rtvProxy;
+      DependerTreeNode          rtvHierarchy;
 
-      ResourceBinding<DepthStencilView> dsvBinding;
-      ResourceProxyMap                  dsvProxy;
-      DependerTreeNode                  dsvHierarchy;
+      DepthStencilView::Binding dsvBinding;
+      ResourceProxyMap          dsvProxy;
+      DependerTreeNode          dsvHierarchy;
 
       // If the parent resource should be bound as a shader resource view, create a descriptor and proxy for it.			
       result |= createTextureNDSRVProxy<N>(
@@ -321,17 +321,14 @@ namespace Engine {
     public:
       static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_1D;
-
-      using binding_type = Texture1D::Binding;
-      using request_type = ResourceCreationRequest<Texture1D>;
-
+      
       static bool create(
-        const Ptr<ResourceProxyFactory> &proxyFactory,
-        const request_type              &request,
-        ResourceHandleList              &inDependencyHandles,
-        binding_type                    &outBinding,
-        ResourceProxyMap                &outProxies,
-        DependerTreeNodeList            &outResourceHierarchy)
+        const Ptr<ResourceProxyFactory>  &proxyFactory,
+        const Texture1D::CreationRequest &request,
+        ResourceHandleList               &inDependencyHandles,
+        Texture1D::Binding               &outBinding,
+        ResourceProxyMap                 &outProxies,
+        DependerTreeNodeList             &outResourceHierarchy)
       {
         // Down-cast to known type!
         const Texture1D::Descriptor& t1DDesc = request.resourceDescriptor();
@@ -377,19 +374,16 @@ namespace Engine {
     public:
       static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_2D;
-
-      using binding_type = TextureNDResourceBinding;
-      using request_type = ResourceCreationRequest<Texture2D>;
-
+      
       static bool create(
-        const Ptr<ResourceProxyFactory> &proxyFactory,
-        const request_type              &request,
-        ResourceHandleList              &inDependencyHandles,
-        binding_type                    &outBinding,
-        ResourceProxyMap                &outProxies,
-        DependerTreeNodeList            &outResourceHierarchy)
+        const Ptr<ResourceProxyFactory>  &proxyFactory,
+        const Texture2D::CreationRequest &request,
+        ResourceHandleList               &inDependencyHandles,
+        Texture2D::Binding               &outBinding,
+        ResourceProxyMap                 &outProxies,
+        DependerTreeNodeList             &outResourceHierarchy)
       {
-        const Texture2DDescriptor& t2DDesc = static_cast<const Texture2DDescriptor&>(request.resourceDescriptor());
+        const Texture2D::Descriptor& t2DDesc = request.resourceDescriptor();
         Ptr<IResourceProxy<Texture2D>> proxy
           = proxyFactory->create<Texture2D>(EProxyType::Dynamic, request, inDependencyHandles);
 
@@ -402,7 +396,7 @@ namespace Engine {
         bool isCubeMap      = (t2DDesc.array.isTextureArray && (t2DDesc.array.size % 6) == 0);
         bool isCubeMapArray = isCubeMap && ((t2DDesc.array.size / 6) > 1);
 
-        TextureNDResourceBinding binding;
+        Texture2D::Binding binding;
         binding.handle = handle;
 
         outResourceHierarchy.push_back(resourceNode);
@@ -431,19 +425,16 @@ namespace Engine {
     public:
       static const constexpr EResourceType    resource_type    = EResourceType::TEXTURE;
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_3D;
-
-      using binding_type = TextureNDResourceBinding;
-      using request_type = ResourceCreationRequest<Texture3D>;
-
+      
       static bool create(
-        const Ptr<ResourceProxyFactory> &proxyFactory,
-        const request_type              &request,
-        ResourceHandleList              &inDependencyHandles,
-        binding_type                    &outBinding,
-        ResourceProxyMap                &outProxies,
-        DependerTreeNodeList            &outResourceHierarchy)
+        const Ptr<ResourceProxyFactory>  &proxyFactory,
+        const Texture3D::CreationRequest &request,
+        ResourceHandleList               &inDependencyHandles,
+        Texture3D::Binding               &outBinding,
+        ResourceProxyMap                 &outProxies,
+        DependerTreeNodeList             &outResourceHierarchy)
       {
-        const Texture3DDescriptor& t3DDesc = static_cast<const Texture3DDescriptor&>(request.resourceDescriptor());
+        const Texture3D::Descriptor& t3DDesc = request.resourceDescriptor();
         Ptr<IResourceProxy<Texture3D>> proxy
           = proxyFactory->create<Texture3D>(EProxyType::Dynamic, request, inDependencyHandles);
 
@@ -456,7 +447,7 @@ namespace Engine {
         bool isCubeMap      = false; // Not possible for 3D textures
         bool isCubeMapArray = false; // Not possible for 3D textures
 
-        TextureNDResourceBinding binding;
+        Texture3D::Binding binding;
         binding.handle = handle;
 
         outResourceHierarchy.push_back(resourceNode);

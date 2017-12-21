@@ -20,17 +20,14 @@ namespace Engine {
 
 			static const constexpr EResourceType    resource_type    = DepthStencilView::resource_type;
 			static const constexpr EResourceSubType resource_subtype = DepthStencilView::resource_subtype;
-
-			using binding_type = DepthStencilView::binding_type;
-			using request_type = ResourceCreationRequest<DepthStencilView>;
-
+      
 			static bool create(
-				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const request_type              &request,
-				ResourceHandleList              &inDependencyHandles,
-				binding_type                    &outBinding,
-				ResourceProxyMap                &outProxyMap,
-				DependerTreeNodeList            &outResourceHierarchy)
+				const Ptr<ResourceProxyFactory>         &proxyFactory,
+				const DepthStencilView::CreationRequest &request,
+				ResourceHandleList                      &inDependencyHandles,
+        DepthStencilView::Binding               &outBinding,
+				ResourceProxyMap                        &outProxyMap,
+				DependerTreeNodeList                    &outResourceHierarchy)
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}

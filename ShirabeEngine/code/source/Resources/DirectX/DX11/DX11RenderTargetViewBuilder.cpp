@@ -6,10 +6,10 @@ namespace Engine {
 		namespace _11 {
 
 			EEngineStatus createRenderTargetView (
-				const ID3D11DevicePtr            &device,
-				const RenderTargetViewDescriptor &desc,
-				ID3D11ResourcePtr                &sourceResource,
-				ID3D11RenderTargetViewPtr        &outRTV
+				const ID3D11DevicePtr              &device,
+				const RenderTargetView::Descriptor &desc,
+				ID3D11ResourcePtr                  &sourceResource,
+				ID3D11RenderTargetViewPtr          &outRTV
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes  = EEngineStatus::Ok;

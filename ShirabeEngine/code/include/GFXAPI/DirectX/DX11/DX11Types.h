@@ -1,7 +1,6 @@
 #ifndef __SHIRABE_DX11TYPES_H__
 #define __SHIRABE_DX11TYPES_H__
 
-#include "GFXAPI/DirectX/DX11/DX11Common.h"
 #include "GFXAPI/DirectX/DX11/DX11Linkage.h"
 
 #include "Core/EngineTypeHelper.h"
@@ -17,6 +16,9 @@ namespace Engine {
 			struct DetermineDXResourceType {};
 
 			DeclareSharedPointerType(IUnknown);
+      DeclareSharedPointerType(IDXGIFactory);
+      DeclareSharedPointerType(IDXGIAdapter);
+      DeclareSharedPointerType(IDXGIOutput);
 			DeclareSharedPointerType(ID3D11Resource);
 			DeclareSharedPointerType(ID3D11Device);
 			DeclareSharedPointerType(ID3D11DeviceContext);

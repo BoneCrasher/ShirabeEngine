@@ -17,93 +17,95 @@ namespace Engine {
 	namespace GFXAPI {	
 		using namespace Resources;
     
-    class SwapChain;
+    class SwapChainDeclaration {
+    public:
+      static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
+      static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN;
 
-		/**********************************************************************************************//**
-		 * \struct	SwapChainDescriptorImpl
-		 *
-		 * \brief	Implementation of the SwapChainDescriptor wrapper.
-		 **************************************************************************************************/
-		struct SwapChainDescriptorImpl 
-			: public DescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
-		{
-			std::string            name;
-			TextureNDDescriptor<2> texture;
-			bool                   vsyncEnabled;
-			bool                   fullscreen;
-			unsigned int           windowHandle;
-			unsigned int           backBufferCount;
-			unsigned int           refreshRateNumerator;
-			unsigned int           refreshRateDenominator;
+      /**********************************************************************************************//**
+       * \struct	SwapChainDescriptorImpl
+       *
+       * \brief	Implementation of the SwapChainDescriptor wrapper.
+       **************************************************************************************************/
+      struct Descriptor
+        : public DescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
+      {
+        std::string           name;
+        Texture2D::Descriptor texture;
+        bool                  vsyncEnabled;
+        bool                  fullscreen;
+        unsigned int          windowHandle;
+        unsigned int          backBufferCount;
+        unsigned int          refreshRateNumerator;
+        unsigned int          refreshRateDenominator;
 
-			std::string toString() const {
-				std::stringstream ss;
+        std::string toString() const {
+          std::stringstream ss;
 
-				ss
-					<< "SwapChainDescriptor ('" << name << "'): ";
+          ss
+            << "SwapChainDescriptor ('" << name << "'): ";
 
-				return ss.str();
-			}
-		};
+          return ss.str();
+        }
+      };
 
-		/**********************************************************************************************//**
-		 * \struct	SwapChainCreationRequestImpl
-		 *
-		 * \brief	A swap chain creation request implementation.
-		 **************************************************************************************************/
-		struct SwapChainCreationRequestImpl {
-		public:
-      const struct ResourceDescriptor<SwapChain> resourceDescriptor() const; //  const { return ResourceDescriptor<SwapChain>(_resourceDescriptor); }
+      /**********************************************************************************************//**
+       * \struct	SwapChainCreationRequestImpl
+       *
+       * \brief	A swap chain creation request implementation.
+       **************************************************************************************************/
+      struct CreationRequest {
+      public:
+        CreationRequest(Descriptor const& desc)
+          : _resourceDescriptor(desc)
+        {}
 
-			std::string toString() const {
-				std::stringstream ss;
+        const Descriptor& resourceDescriptor() const; //  const { return ResourceDescriptor<SwapChain>(_resourceDescriptor); }
 
-				ss
-					<< "SwapChainCreationRequest: \n"
-					<< "[\n"
-					<< _resourceDescriptor.toString() << "\n"
-					<< "]"
-					<< std::endl;
+        std::string toString() const {
+          std::stringstream ss;
 
-				return ss.str();
-			}
-		private:
-			SwapChainDescriptorImpl _resourceDescriptor;
-		};
+          ss
+            << "SwapChainCreationRequest: \n"
+            << "[\n"
+            << _resourceDescriptor.toString() << "\n"
+            << "]"
+            << std::endl;
 
-		struct SwapChainDestructionRequestImpl {
+          return ss.str();
+        }
+      private:
+        Descriptor _resourceDescriptor;
+      };
 
-		};
+      struct UpdateRequest {
 
-		struct SwapChainQueryRequestImpl {
+      };
 
-		};
+      struct DestructionRequest {
 
-		struct SwapChainResourceBinding {
-			ResourceHandle swapChainHandle;
-			std::vector<RenderTargetViewResourceBinding> backBufferRenderTargetBindings;
-		};
-    
-    DeclareResourceTraits(SwapChain,
-                          SwapChain,
-                          EResourceType::GAPI_COMPONENT,
-                          EResourceSubType::SWAP_CHAIN,
-                          SwapChainResourceBinding,
-                          SwapChainDescriptorImpl,
-                          SwapChainCreationRequestImpl,
-                          void,
-                          SwapChainQueryRequestImpl,
-                          SwapChainDestructionRequestImpl);
-  
+      };
+
+      struct Query {
+
+      };
+
+      struct Binding {
+        ResourceHandle swapChainHandle;
+        std::vector<RenderTargetView::Binding> backBufferRenderTargetBindings;
+      };
+
+    };
+      
 		/**********************************************************************************************//**
 		 * \class	GAPISwapChain
 		 *
 		 * \brief	A gapi swap chain.
 		 **************************************************************************************************/
 		class SwapChain
-			: public SwapChainTraits
-      , public ResourceDescriptorAdapter<SwapChainTraits>
-			, public ResourceBindingAdapter<SwapChainTraits>
+			: public SwapChainDeclaration
+      , public ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>
+			, public ResourceBindingAdapter<SwapChainDeclaration::Binding>
 		{
 		public:
 			using my_type = SwapChain;
@@ -116,18 +118,18 @@ namespace Engine {
 			// EEngineStatus present(bool verticallySynchronized = true);
 
 			inline static Ptr<SwapChain> create(
-        const ResourceDescriptor<SwapChain> &desc,
-        const ResourceBinding<SwapChain>    &binding) {
+        const SwapChain::Descriptor &desc,
+        const SwapChain::Binding    &binding) {
 				return Ptr<SwapChain>(new SwapChain(desc, binding));
 			}
 
 		private:
 			inline SwapChain(
-        const ResourceDescriptor<SwapChain> &descriptor,
-        const ResourceBinding<SwapChain>    &binding)
-				: SwapChainTraits()
-        , ResourceDescriptorAdapter<SwapChainTraits>(descriptor)
-				, ResourceBindingAdapter<SwapChainTraits>(binding)
+        const SwapChain::Descriptor &descriptor,
+        const SwapChain::Binding    &binding)
+				: SwapChainDeclaration()
+        , ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>(descriptor)
+				, ResourceBindingAdapter<SwapChainDeclaration::Binding>(binding)
 				, _currentBackBufferIndex(0)
 			{}
 
@@ -135,12 +137,12 @@ namespace Engine {
 		};
 		DeclareSharedPointerType(SwapChain);
     DefineTraitsPublicTypes(SwapChain);
-
-
-    const ResourceDescriptor<SwapChain> SwapChainCreationRequestImpl
+    
+    const SwapChain::Descriptor& 
+      SwapChainDeclaration::CreationRequest
       ::resourceDescriptor() const 
     { 
-      return ResourceDescriptor<SwapChain>(_resourceDescriptor); 
+      return _resourceDescriptor;
     }
 	}
 }

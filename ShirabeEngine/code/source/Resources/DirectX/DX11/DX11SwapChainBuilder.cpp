@@ -7,9 +7,9 @@ namespace Engine {
 		namespace _11 {
 
 			EEngineStatus SwapChainBuilderImpl::createSwapChain (
-				const ID3D11DevicePtr     &device,
-				const SwapChainDescriptor &desc,
-				IDXGISwapChainPtr         &outRes
+				const ID3D11DevicePtr       &device,
+				const SwapChain::Descriptor &desc,
+				IDXGISwapChainPtr           &outRes
 			) {
 				HRESULT       dxRes = S_OK;
 				EEngineStatus eRes  = EEngineStatus::Ok;

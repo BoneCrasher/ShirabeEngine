@@ -70,11 +70,7 @@ namespace Engine {
 		struct ResourceTaskTraits {
 			static const EResourceType    resource_type    = TResource::resource_type;
 			static const EResourceSubType resource_subtype = TResource::resource_subtype;
-
-			typedef 
-				ResourceDescriptor<TResource>  
-				descriptor_type;
-
+      
 			typedef
 				TGFXAPIParametersStruct
 				gfxapi_parameter_struct_type;
@@ -108,10 +104,10 @@ namespace Engine {
 			typedef ResourceTaskBase<TResource, TGFXAPIParametersStruct, TResourceBasePtr, Traits> my_type;
 			typedef typename Traits traits_type;
 
-			static const EResourceType    resource_type    = traits_type::resource_type;
-			static const EResourceSubType resource_subtype = traits_type::resource_subtype;
+			static const EResourceType    resource_type    = TResource::resource_type;
+			static const EResourceSubType resource_subtype = TResource::resource_subtype;
 
-			typedef typename traits_type::descriptor_type              descriptor_type;
+			typedef typename TResource::Descriptor                     descriptor_type;
 			typedef typename traits_type::gfxapi_parameter_struct_type gfxapi_parameter_struct_type;
 			typedef typename traits_type::built_resource_map           built_resource_map;
 		};

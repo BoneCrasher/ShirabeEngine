@@ -44,8 +44,8 @@ namespace Engine {
 			 **************************************************************************************************/
 			static bool create(
 				//
-				const Ptr<ResourceProxyFactory>          &proxyFactory,
-				const ResourceCreationRequest<TResource> &request,
+				Ptr<ResourceProxyFactory>           const&proxyFactory,
+				typename TResource::CreationRequest const&request,
 				ResourceHandleList                       &inDependencyHandles,
 				binding_type                             &outBinding,
 				ResourceProxyMap                         &outProxyMap,

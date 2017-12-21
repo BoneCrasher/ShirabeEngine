@@ -22,26 +22,23 @@ namespace Engine {
 		public:
 			static const constexpr EResourceType    resource_type    = SwapChain::resource_type;
 			static const constexpr EResourceSubType resource_subtype = SwapChain::resource_subtype;
-
-			using binding_type = SwapChain::binding_type;
-			using request_type = ResourceCreationRequest<SwapChain>;
-
+      
 			static bool create(
-				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const request_type              &request,
-				ResourceHandleList              &inDependencyHandles,
-				binding_type                    &outBinding,
-				ResourceProxyMap                &outProxyMap,
-				DependerTreeNodeList            &outResourceHierarchy)
+				const Ptr<ResourceProxyFactory>  &proxyFactory,
+				const SwapChain::CreationRequest &request,
+				ResourceHandleList               &inDependencyHandles,
+				SwapChain::Binding               &outBinding,
+				ResourceProxyMap                 &outProxyMap,
+				DependerTreeNodeList             &outResourceHierarchy)
 			{
-				const ResourceDescriptor<SwapChain> desc = request.resourceDescriptor();
+				const SwapChain::Descriptor desc = request.resourceDescriptor();
 
 				if( desc.backBufferCount < 1 ) {
 					Log::Error(logTag(), "Invalid swapchain back buffer count. Expected 'count >= 1'.");
 					return false; // Must be at least 1 for double buffering
 				}
 
-				ResourceHandle rootHandle(desc.name, EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN);
+				ResourceHandle rootHandle(desc.name, SwapChain::resource_type, SwapChain::resource_subtype);
 				Ptr<IResourceProxy<SwapChain>> rootProxy
 					= proxyFactory->create<SwapChain>(EProxyType::Persistent, request, inDependencyHandles);
 

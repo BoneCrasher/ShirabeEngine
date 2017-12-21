@@ -33,110 +33,18 @@ namespace Engine {
 				EEngineStatus status = EEngineStatus::Ok;
 				HRESULT       dxRes  = S_OK;
 
-				static const std::size_t BACK_BUFFER_COUNT = 1;
 				Ptr<SwapChain> swapChain = nullptr;
 
 				ResourceHandle depthStencilHandle ={};
 
-				Texture2DDescriptor   dsTexDesc ={};
+				Texture2D::Descriptor dsTexDesc ={};
 				Ptr<Texture2D>        dsTex  = nullptr;
 				Ptr<DepthStencilView> dsView = nullptr;
 
 				GAPIOutputMode outputMode ={};
 
-				//
-				// Get the currenntly available device capabilities and try to find a matching display mode for the 
-				// desired backbuffer format in the primary adapter.
-				// 
-				GAPIDeviceCapabilities capabilities;
-				status = DX11DeviceCapsHelper::GetDeviceCapabilities(Format::RGBA_8_UNORM, &capabilities);
-				if( !CheckEngineError(status) ) {
-					// No adapters, or adapterindex > 0? --> No primary adapter. 
-					// TODO: Is the effective adapter index of any importance?
-					if( capabilities.adapters.empty()
-					   || capabilities.adapters[0].adapterIndex > 0 ) {
-						status = EEngineStatus::GAPI_NoPrimaryAdapter;
-						goto _return_failed;
-					}
-
-					GAPIAdapter primaryAdapter = capabilities.adapters[0];
-
-					// If this is no "Output"-Adapter, return.
-					if( primaryAdapter.outputs.empty() ) {
-						status = EEngineStatus::GAPI_NoPrimaryAdapterOutputs;
-						goto _return_failed;
-					}
-
-					// TODO: How about non-output adapters for offline-stuff?
-
-					// Loop all outputs and find an output with a valid output mode configuration!
-					for( GAPIOutput output : primaryAdapter.outputs ) {
-						if( output.outputModes.empty() ) {
-							status = EEngineStatus::GAPI_NoPrimaryAdapterOutputModes;
-							// No failure createria, if there's at least another output for our desired modes.
-						}
-
-						for( GAPIOutputMode mode : output.outputModes ) {
-							if( mode.format != Format::RGBA_8_UNORM )
-								// The format is mandatory!!!
-								break;
-
-							if( mode.size.xy() == configuration.preferredBackBufferSize ) {
-								outputMode = mode;
-								goto _createDeviceAndSwapChain;
-							}
-						}
-					}
-
-					// If we dropped here, no valid output mode was found in any of the adapters
-					status = EEngineStatus::GAPI_NoPrimaryAdapterOutputModes;
-					goto _return_failed;
-				}
-
 			_createDeviceAndSwapChain:
-				// Define the desired DX11-Device feature level
-				D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-
-				// CREATE. This will also create an ID3D11Texture2D-backbuffer for the swap-chain, which
-				//         is NOT maintained by the resource-manager currently! 			
-				dxRes = D3D11CreateDevice(
-					NULL,                     // Adapter
-					D3D_DRIVER_TYPE_HARDWARE, // What kind of device to create?
-					NULL,                     // Software module handle
-				#ifdef CONFIGURATION_DEBUG
-					D3D11_CREATE_DEVICE_DEBUG,// Creation flags for Debug
-				#else 
-					0,                        // Creation flags for Release
-				#endif
-					&featureLevel,            // Array of desired d3d feature levels
-					1,                        // Number of feature level array
-					D3D11_SDK_VERSION,        // Specific SDK version to use
-					&tmpDevice,               // Device output
-					NULL,                     // Feature Level output array of feature levels supported
-					&tmpDeviceContext);       // The primary, immediate context of the DX11 device created.
-				if( FAILED(dxRes) ) {
-					status = EEngineStatus::DXGI_DeviceAndSwapChainCreationFailed;
-					goto _return_failed;
-				}
-
-				// Get the swap chain.
-				SwapChainDescriptor swapChainDesc ={};
-				swapChainDesc.name                   = "DefaultSwapChain";
-				swapChainDesc.backBufferCount        = BACK_BUFFER_COUNT;
-				swapChainDesc.texture.name           = "DefaultSwapChainTexture2D";
-				swapChainDesc.texture.textureFormat  = outputMode.format;
-				swapChainDesc.texture.dimensions[0]  = outputMode.size.x();
-				swapChainDesc.texture.dimensions[1]  = outputMode.size.y();
-				swapChainDesc.vsyncEnabled           = configuration.enableVSync;
-				swapChainDesc.refreshRateNumerator   = outputMode.refreshRate.x();
-				swapChainDesc.refreshRateDenominator = outputMode.refreshRate.y();
-				swapChainDesc.fullscreen             = !configuration.requestFullscreen;
-				swapChainDesc.windowHandle           = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
-
-				status = resourceManager->createSwapChain(swapChainDesc, swapChain);
-				if( CheckEngineError(status) ) {
-					goto _return_failed;
-				}
+				
 
 				dsTexDesc     ={};
 				dsTexDesc.dimensions            ={ outputMode.size.x(), outputMode.size.y() };

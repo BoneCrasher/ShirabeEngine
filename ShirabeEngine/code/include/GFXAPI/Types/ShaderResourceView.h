@@ -92,6 +92,8 @@ namespace Engine {
        **************************************************************************************************/
       struct CreationRequest {
       public:
+        CreationRequest(Descriptor const&desc);
+
         const Descriptor& resourceDescriptor() const;
 
         std::string toString() const;
@@ -139,8 +141,8 @@ namespace Engine {
      **************************************************************************************************/
     class ShaderResourceView
       : public ShaderResourceViewDeclaration
-      , public ResourceDescriptorAdapter<class ShaderResourceView, ShaderResourceViewDeclaration::Descriptor>
-      , public ResourceBindingAdapter<class ShaderResourceView, ShaderResourceViewDeclaration::Binding>
+      , public ResourceDescriptorAdapter<ShaderResourceViewDeclaration::Descriptor>
+      , public ResourceBindingAdapter<ShaderResourceViewDeclaration::Binding>
     {
     public:
       using my_type = ShaderResourceView;

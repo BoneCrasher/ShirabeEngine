@@ -25,7 +25,7 @@ namespace Engine {
 		template <typename GfxApiType>
 		class ITaskBuilderImplementationBase {
 		protected: // Make sure it's not publicly visible
-			virtual Ptr<Task> build(const ResourceDescriptor<GfxApiType>& descriptor, const EResourceTaskType& taskType) = 0;
+			virtual Ptr<Task> build(const typename GfxApiType::Descriptor& descriptor, const EResourceTaskType& taskType) = 0;
 		};		
 
 		template <template <typename> typename TBuilderImplementation, typename GfxApiType>
@@ -69,29 +69,30 @@ namespace Engine {
 			: public GfxApiTaskBuilder<TBuilderImplementation, GfxApiTypes...>
 		{
 			template <typename GfxApiType>
-			Ptr<Task> builderResourceTaskGeneric(const ResourceDescriptor<GfxApiType>& desc, const EResourceTaskType& taskType) {
+			Ptr<Task> buildResourceTaskGeneric(const typename GfxApiType::Descriptor& desc, const EResourceTaskType& taskType) {
 				return (*this).TBuilderImplementation<GfxApiType>::build(desc, taskType);
 			}
 
+      // THIS CODE BELOW MUST BE ADJUSTED APPROPRIATELY!
 		public:
 			template <typename GfxApiType> 
-			Ptr<Task> builderResourceCreationTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceCreationTask(const typename GfxApiType::Descriptor& desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> builderResourceUpdateTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceUpdateTask(const typename GfxApiType::Descriptor& desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> builderResourceDestructionTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceDestructionTask(const typename GfxApiType::Descriptor& desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> builderResourceQueryTask(const ResourceDescriptor<GfxApiType>& desc) {
-				return builderResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceQueryTask(const typename GfxApiType::Descriptor desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
 			}
 		};
 	}

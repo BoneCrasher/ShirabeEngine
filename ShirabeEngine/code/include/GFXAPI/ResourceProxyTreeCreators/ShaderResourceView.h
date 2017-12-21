@@ -19,17 +19,14 @@ namespace Engine {
 		public:
 			static const constexpr EResourceType    resource_type    = ShaderResourceView::resource_type;
 			static const constexpr EResourceSubType resource_subtype = ShaderResourceView::resource_subtype;
-
-			using binding_type    = ShaderResourceView::binding_type;
-			using request_type = ResourceCreationRequest<ShaderResourceView>;
-
+      
 			static bool create(
-				const Ptr<ResourceProxyFactory> &proxyFactory,
-				const request_type              &request,
-				ResourceHandleList              &inDependencyHandles,
-				binding_type                    &outBinding,
-				ResourceProxyMap                &outProxyMap,
-				DependerTreeNodeList            &outResourceHierarchy)
+				const Ptr<ResourceProxyFactory>           &proxyFactory,
+				const ShaderResourceView::CreationRequest &request,
+				ResourceHandleList                        &inDependencyHandles,
+        ShaderResourceView::Binding               &outBinding,
+				ResourceProxyMap                          &outProxyMap,
+				DependerTreeNodeList                      &outResourceHierarchy)
 			{
 				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
 			}

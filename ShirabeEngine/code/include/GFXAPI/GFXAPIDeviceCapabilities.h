@@ -14,6 +14,7 @@ namespace Engine {
 		using namespace Engine::Resources;
 
 		struct GAPIOutputMode {
+      uint32_t modeIndex;
 			Format   format;
 			Vec2Dui  size;
 			Vec2Dui  refreshRate;
@@ -21,7 +22,7 @@ namespace Engine {
 		DeclareListType(GAPIOutputMode, GAPIOutputMode);
 
 		struct GAPIOutput {
-			unsigned int       outputIndex;
+			uint32_t           outputIndex;
 			GAPIOutputModeList outputModes;
 		};
 		DeclareListType(GAPIOutput, GAPIOutput);
@@ -34,14 +35,21 @@ namespace Engine {
 		};
 
 		struct GAPIAdapter {
-			unsigned int           adapterIndex;
+      uint32_t               adapterIndex;
 			GAPIAdapterDescription description;
 			GAPIOutputList         outputs;
 		};
 		DeclareListType(GAPIAdapter, GAPIAdapter);
 
+    struct GAPIAdapterOutputConfig {
+      int32_t adapterIndex;
+      int32_t outputIndex;
+      int32_t modeIndex;
+    };
+
 		struct GAPIDeviceCapabilities {
-			GAPIAdapterList adapters;
+			GAPIAdapterList         adapters;
+      GAPIAdapterOutputConfig selectedConfig;
 		};
 
 	}

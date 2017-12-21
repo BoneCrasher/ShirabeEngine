@@ -4,6 +4,9 @@
 #include <d3d.h>
 #include <d3d11.h>
 
+#include "DX11Linkage.h"
+#include "DX11Types.h"
+
 namespace Engine {
 	namespace DX {
 		namespace _11 {

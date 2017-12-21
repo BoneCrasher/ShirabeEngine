@@ -36,6 +36,11 @@ namespace Engine {
       , shaderResourceDimension()
     {}
 
+    ShaderResourceViewDeclaration::CreationRequest
+      ::CreationRequest(Descriptor const&desc)
+      : _resourceDescriptor(desc)
+    {}
+
     std::string 
       ShaderResourceViewDeclaration::Descriptor
       ::toString() const
@@ -91,8 +96,8 @@ namespace Engine {
         const ShaderResourceView::Descriptor &descriptor,
         const ShaderResourceView::Binding    &binding)
       : ShaderResourceViewDeclaration()
-      , ResourceDescriptorAdapter<class ShaderResourceView, ShaderResourceViewDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<class ShaderResourceView, ShaderResourceViewDeclaration::Binding>(binding)
+      , ResourceDescriptorAdapter<ShaderResourceViewDeclaration::Descriptor>(descriptor)
+      , ResourceBindingAdapter<ShaderResourceViewDeclaration::Binding>(binding)
     {}
   }
 }

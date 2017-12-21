@@ -59,9 +59,9 @@ namespace Engine {
 
 		public:
 			inline GFXAPIResourceProxy(
-				const EProxyType                         &proxyType,
-				const Ptr<GFXAPIResourceSubSystem>       &subsystem,
-				const ResourceCreationRequest<TResource> &request)
+				EProxyType                          const&proxyType,
+				Ptr<GFXAPIResourceSubSystem>        const&subsystem,
+				typename TResource::CreationRequest const&request)
 				: ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>(proxyType, subsystem, request)
 				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
 			{ }
@@ -123,7 +123,7 @@ namespace Engine {
 			// and load state.
 			EEngineStatus status = EEngineStatus::Ok; 
 
-      const ResourceDescriptor<TResource>& rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
+      const typename TResource::Descriptor& rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
 
 			GFXAPIResourceHandle_t handle = 0;
 

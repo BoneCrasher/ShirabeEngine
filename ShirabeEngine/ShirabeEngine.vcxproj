@@ -165,7 +165,10 @@
     <ClCompile Include="code\source\ECWS\MeshComponent.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Device.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Environment.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Renderer.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\DepthStencilState.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\DepthStencilView.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\RenderTargetView.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\ShaderResourceView.cpp" />
     <ClCompile Include="code\source\Math\AxisAngle.cpp" />
@@ -211,6 +214,7 @@
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Common.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Device.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Environment.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Linkage.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Renderer.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder.h" />
@@ -220,6 +224,7 @@
     <ClInclude Include="code\include\GFXAPI\IRenderer.h" />
     <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilView.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\DepthStencilState.h" />
     <ClInclude Include="code\include\GFXAPI\Types\TextureNDDefinition.h" />
     <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />
     <ClInclude Include="code\include\IOC\IOCProperty.hpp" />

@@ -92,7 +92,7 @@ namespace Engine {
 		private:
 			// friend class ProxyTreeCreator<type, subtype>;
 
-			virtual bool create(const ResourceCreationRequest<TResource>& desc) = 0;
+			virtual bool create(typename TResource::CreationRequest const&desc) = 0;
 		DeclareInterfaceEnd(IResourceProxy);
 
 		/**********************************************************************************************//**
@@ -137,14 +137,12 @@ namespace Engine {
 		template <typename TResource>
 		class GenericProxyBase
 			: public Engine::Resources::IResourceProxy<TResource>
-			, public ResourceCreationRequestAdapter<TResource>
+			, public ResourceCreationRequestAdapter<typename TResource::CreationRequest>
 		{
 		public:
-			using creation_request_type = ResourceCreationRequest<TResource>;
-
 			inline GenericProxyBase(
-				const EProxyType            &proxyType,
-				const creation_request_type &request)
+				EProxyType                          const&proxyType,
+				typename TResource::CreationRequest const&request)
 				: Engine::Resources::IResourceProxy<TResource>()
 				, ResourceCreationRequestAdapter<TResource>(request)
 				, _type(proxyType)

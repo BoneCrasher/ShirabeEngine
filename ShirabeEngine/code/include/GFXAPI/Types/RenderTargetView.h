@@ -41,7 +41,8 @@ namespace Engine {
 
       struct CreationRequest {
       public:
-        CreationRequest(const Descriptor &desc);
+        CreationRequest(
+          Descriptor const&desc);
 
         const Descriptor& resourceDescriptor() const;
 

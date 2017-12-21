@@ -22,9 +22,9 @@ namespace Engine {
 
 			template <typename TResource>
 			Ptr<IResourceProxy<TResource>> create(
-				const EProxyType                         &proxyType,
-				const ResourceCreationRequest<TResource> &creationRequest,
-				const ResourceHandleList                 &dependencyHandles) {
+				const EProxyType                          &proxyType,
+				const typename TResource::CreationRequest &creationRequest,
+				const ResourceHandleList                  &dependencyHandles) {
 				
 				Ptr<IResourceProxy<TResource>> proxy = nullptr;
 

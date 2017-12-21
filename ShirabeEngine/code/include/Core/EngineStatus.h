@@ -4,6 +4,7 @@
 #include <ostream>
 
 #include "Core/EngineTypeHelper.h"
+#include "Log/Log.h"
 
 namespace Engine {
 	enum class EEngineStatus
@@ -67,6 +68,32 @@ namespace Engine {
 	static inline bool CheckEngineError(const EEngineStatus& status) { 
 		return (static_cast<EngineStatusInternal_t>(status) < 0); /* All errors are values less than zero. */ 
 	}
+
+  class EngineException
+    : public std::exception
+  {
+  public:
+    inline EngineException(
+      EEngineStatus const&status,
+      std::string   const&message)
+      : std::exception(message.c_str())
+      , m_status(status)
+    { }
+
+    EEngineStatus const& status()  const { return m_status;                  }
+    std::string   const& message() const { return std::string(this->what()); }
+
+  private:
+    EEngineStatus m_status;
+  };
+
+  static inline void HandleEngineStatusError(
+    EEngineStatus const& status,
+    std::string   const& message)
+  {
+    if(CheckEngineError(status))
+      throw EngineException(status, message);
+  }
 
 	static inline std::ostream& operator<<(std::ostream& stream, const EEngineStatus& status) {
 		return (stream << ((EngineStatusInternal_t)status));
