@@ -117,13 +117,13 @@ namespace Engine {
 
       // Create all necessary subsystems.
       // Their life-cycle management will become the manager's task.
-      // The subsystem-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
-      Ptr<GFXAPIResourceSubSystem> gfxApiResourceSubsystem = Ptr<GFXAPIResourceSubSystem>(new GFXAPIResourceSubSystem());
+      // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
+      Ptr<GFXAPIResourceBackend> dx11ResourceBackend = Ptr<GFXAPIResourceBackend>(new Dx11ResourceBackend());
 
-      _proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(gfxApiResourceSubsystem));
+      _proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(dx11ResourceBackend));
       _resourceManager = Ptr<ProxyBasedResourceManager>(new ProxyBasedResourceManager(_proxyFactory));
 
-      // TODO: Think about how to link renderer and resource manager or subsystem to allow efficient binding!
+      // TODO: Think about how to link renderer and resource manager or resourceBackend to allow efficient binding!
     };
 
     std::function<void()> fnCreatePlatformRenderer 

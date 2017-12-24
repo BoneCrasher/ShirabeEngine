@@ -166,7 +166,7 @@ namespace Engine {
 		private:
 			void runFunc();
 
-      bool loop(const typename Threading::ILooper<GFXAPIResourceHandle_t>::Task&& runnable);
+      bool loop(const typename Threading::ILooper<TTaskResult>::Task&& runnable);
 
 			bool post(TaskType&&);
 

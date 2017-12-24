@@ -13,7 +13,7 @@ namespace Engine {
 			const SwapChain::CreationRequest &inRequest,
 			Ptr<SwapChain>                   &outSwapChain)
 		{
-      SwapChain::Binding binding;
+      SwapChain::Binding binding ={};
 
 			EEngineStatus status = createResource<SwapChain>(
 				inRequest,

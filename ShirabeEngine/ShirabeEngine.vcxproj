@@ -157,7 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.cpp" />
+    <ClCompile Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceBackend.cpp" />
     <ClCompile Include="code\include\Threading\Looper.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\Timer.cpp" />
@@ -274,12 +274,12 @@
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\SwapChain.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\TextureND.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
-    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceSubsystem.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceBackend.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyTreeCreator.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceTaskBuilder.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceProxyFactory.h" />
-    <ClInclude Include="code\include\Resources\System\Core\ResourceSubsystemProxy.h" />
+    <ClInclude Include="code\include\Resources\System\Core\ResourceBackendProxy.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyBasedResourceManager.h" />
     <ClInclude Include="code\include\Resources\System\Core\EResourceType.h" />
     <ClInclude Include="code\include\Resources\System\Core\IResourceProxy.h" />

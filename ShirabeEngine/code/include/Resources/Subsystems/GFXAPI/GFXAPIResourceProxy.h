@@ -10,8 +10,8 @@
 #include "Core/EngineStatus.h"
 #include "IOC/Observer.h"
 
-#include "Resources/System/Core/ResourceSubsystemProxy.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPIResourceSubsystem.h"
+#include "Resources/System/Core/ResourceBackendProxy.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 namespace Engine {
@@ -52,7 +52,7 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <typename TResource>
 		class GFXAPIResourceProxy
-			: public ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>
+			: public ResourceBackendProxy<GFXAPIResourceBackend, TResource>
 			, public GFXAPIResourceAdapter
 		{
 			DeclareLogTag(GFXAPIResourceProxy<TResource>);
@@ -60,9 +60,9 @@ namespace Engine {
 		public:
 			inline GFXAPIResourceProxy(
 				EProxyType                          const&proxyType,
-				Ptr<GFXAPIResourceSubSystem>        const&subsystem,
+				Ptr<GFXAPIResourceBackend>          const&resourceBackend,
 				typename TResource::CreationRequest const&request)
-				: ResourceSubsystemProxy<GFXAPIResourceSubSystem, TResource>(proxyType, subsystem, request)
+				: ResourceBackendProxy<GFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
 				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
 			{ }
 
@@ -78,7 +78,7 @@ namespace Engine {
 
 		protected:
 		private:
-			Ptr<GFXAPIResourceSubSystem> _subsystem;
+			Ptr<GFXAPIResourceBackend> _subsystem;
 		};
 
 		/**********************************************************************************************//**

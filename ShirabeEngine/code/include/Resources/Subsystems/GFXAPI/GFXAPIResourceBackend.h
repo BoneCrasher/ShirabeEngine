@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_GFXAPIRESOURCESUBSYSTEM_H__
-#define __SHIRABE_GFXAPIRESOURCESUBSYSTEM_H__
+#ifndef __SHIRABE_GFXAPIResourceBackend_H__
+#define __SHIRABE_GFXAPIResourceBackend_H__
 
 #include <type_traits>
 #include <typeinfo>
@@ -72,20 +72,20 @@ namespace Engine {
     };
 
     /**********************************************************************************************//**
-     * \class	GFXAPIResourceSubSystem
+     * \class	GFXAPIResourceBackend
      *
-     * \brief	The GFXAPIResourceSubSystem is responsible for spawning a resource task based on
+     * \brief	The GFXAPIResourceBackend is responsible for spawning a resource task based on
      * 			 the specific request, executing it (a-)synchronuously and store the results.
      * 			The task itself will be spawned by a TaskBuilder, determined during runtime.
-     * 			The subsystem holds a mapping of GFXAPIResourceHandle_t to GFXAPIResourceHolder to
+     * 			The resourceBackend holds a mapping of GFXAPIResourceHandle_t to GFXAPIResourceHolder to
      * 			 store and manage the resources.
      **************************************************************************************************/
-    class GFXAPIResourceSubSystem {
-      DeclareLogTag(GFXAPIResourceSubSystem);
+    class GFXAPIResourceBackend {
+      DeclareLogTag(GFXAPIResourceBackend);
     public:
       DeclareInterface(IAsyncLoadCallback);
       /**********************************************************************************************//**
-       * \fn	virtual void GFXAPIResourceSubSystem::onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
+       * \fn	virtual void GFXAPIResourceBackend::onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
        *
        * \brief	Invoked once the resource was loaded. If the handle is 0, loading failed. If > 0, successful.
        *
@@ -94,7 +94,7 @@ namespace Engine {
       virtual void onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
       DeclareInterfaceEnd(IAsyncLoadCallback);
 
-      GFXAPIResourceSubSystem();
+      GFXAPIResourceBackend();
 
       template <typename TResource>
       EEngineStatus load(
@@ -132,14 +132,13 @@ namespace Engine {
       Threading::Looper<GFXAPIResourceHandle_t>::Handler m_resourceThreadHandler;
     };
 
-    template <typename TResource>
-    GFXAPIResourceSubSystem<TResource>::GFXAPIResourceSubSystem()
-      : m_resourceThread
+    GFXAPIResourceBackend::GFXAPIResourceBackend()
+      : m_resourceThread()
       , m_resourceThreadHandler(m_resourceThread)
     {}
 
     /**********************************************************************************************//**
-     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
+     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
      *
      * \brief	Loads
      *
@@ -153,7 +152,7 @@ namespace Engine {
      * \return	The EEngineStatus.
      **************************************************************************************************/
     template <typename TResource>
-    EEngineStatus GFXAPIResourceSubSystem::load(
+    EEngineStatus GFXAPIResourceBackend::load(
       const typename TResource::Descriptor &inDescriptor,
       const GFXAPIResourceHandleMap        &inResourceDependencyHandles,
       const ETaskSynchronization           &inSynchronization,
@@ -186,7 +185,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::loadImpl( const ResourceDescriptor<TResource> &inDescriptor, GFXAPIResourceHandleMap &inResourceDependencyHandles, DeferredResourceCreationHandle &outHandle)
+     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::loadImpl( const ResourceDescriptor<TResource> &inDescriptor, GFXAPIResourceHandleMap &inResourceDependencyHandles, DeferredResourceCreationHandle &outHandle)
      *
      * \brief	Loads an implementation
      *
@@ -198,7 +197,7 @@ namespace Engine {
      * \return	The implementation.
      **************************************************************************************************/
     template <typename TResource>
-    EEngineStatus GFXAPIResourceSubSystem::loadImpl(
+    EEngineStatus GFXAPIResourceBackend::loadImpl(
       const typename TResource::Descriptor &inDescriptor,
       GFXAPIResourceHandleMap              &inResourceDependencyHandles,
       DeferredResourceCreationHandle       &outHandle)
@@ -225,7 +224,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::createTask( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const EResourceTaskType &inTaskType, ResourceTaskFn_t &outTask)
+     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::createTask( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const EResourceTaskType &inTaskType, ResourceTaskFn_t &outTask)
      *
      * \brief	Creates a task
      *
@@ -238,7 +237,7 @@ namespace Engine {
      * \return	The new task.
      **************************************************************************************************/
     template <typename TResource>
-    EEngineStatus GFXAPIResourceSubSystem::createTask(
+    EEngineStatus GFXAPIResourceBackend::createTask(
       const typename TResource::Descriptor &inDescriptor,
       const GFXAPIResourceHandleMap        &inResourceDependencyHandles,
       const EResourceTaskType              &inTaskType,
@@ -255,7 +254,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::enqueue( const ResourceTaskFn_t &inTask, std::future<GFXAPIResourceHandle_t> &outSharedFuture)
+     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::enqueue( const ResourceTaskFn_t &inTask, std::future<GFXAPIResourceHandle_t> &outSharedFuture)
      *
      * \brief	Adds an object onto the end of this queue
      *
@@ -265,7 +264,7 @@ namespace Engine {
      *
      * \return	The EEngineStatus.
      **************************************************************************************************/
-    EEngineStatus GFXAPIResourceSubSystem::enqueue(
+    EEngineStatus GFXAPIResourceBackend::enqueue(
       ResourceTaskFn_t                    &inTask,
       std::future<GFXAPIResourceHandle_t> &outSharedFuture)
     {

@@ -10,28 +10,28 @@
 namespace Engine {
 	namespace Resources {
 
-		template <typename TSubsystem, typename TResource>
-		class ResourceSubsystemProxy
+		template <typename TBackend, typename TResource>
+		class ResourceBackendProxy
 			: public GenericProxyBase<TResource>
 		{
 		public:
-			inline ResourceSubsystemProxy(
+			inline ResourceBackendProxy(
 				const EProxyType                          &proxyType,
-				const Ptr<TSubsystem>                     &subsystem,
+				const Ptr<TBackend>                       &resourceBackend,
 				const typename TResource::CreationRequest &request)
 				: GenericProxyBase<TResource>(proxyType, request)
-				, _subsystem(subsystem)
+				, _subsystem(resourceBackend)
 			{ }
 
 		protected:
-			TSubsystem subsystem() { return _subsystem; }
+			TBackend resourceBackend() { return _subsystem; }
 
 		private:
-			Ptr<TSubsystem> _subsystem;
+			Ptr<TBackend> _subsystem;
 		};
 
-		// template <typename TSubsystem, EResourceType type, EResourceSubType subtype>
-		// bool ResourceSubsystemProxy<TSubsystem, type, subtype>
+		// template <typename TBackend, EResourceType type, EResourceSubType subtype>
+		// bool ResourceBackendProxy<TBackend, type, subtype>
 		// 	::loadSync(
 		// 		const ResourceHandle  &inHandle,
 		// 		const ResourceProxyMap&inDependencies)
@@ -39,8 +39,8 @@ namespace Engine {
 		// 	return true;
 		// }
 		// 
-		// template <typename TSubsystem, EResourceType type, EResourceSubType subtype>
-		// bool ResourceSubsystemProxy<TSubsystem, type, subtype>
+		// template <typename TBackend, EResourceType type, EResourceSubType subtype>
+		// bool ResourceBackendProxy<TBackend, type, subtype>
 		// 	::unloadSync()
 		// {
 		// }

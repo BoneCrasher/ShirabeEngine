@@ -6,7 +6,7 @@
 
 #include "Resources/System/Core/IResourceProxy.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceProxy.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPIResourceSubsystem.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 
 namespace Engine {
 	namespace Resources {
@@ -16,8 +16,8 @@ namespace Engine {
 		{
 		public:
 			inline ResourceProxyFactory(
-				const Ptr<GFXAPIResourceSubSystem>& gfxApiResourceSubsystem)
-				: _gfxApiResourceSubsystem(gfxApiResourceSubsystem)
+				const Ptr<GFXAPIResourceBackend>& GFXAPIResourceBackend)
+				: _gfxApiResourceBackend(GFXAPIResourceBackend)
 			{ }
 
 			template <typename TResource>
@@ -37,7 +37,7 @@ namespace Engine {
 				case EResourceType::MESH:
 				case EResourceType::SHADER:
 				case EResourceType::TEXTURE:
-					proxy = MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(proxyType, _gfxApiResourceSubsystem, creationRequest, dependencyHandles);
+					proxy = MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(proxyType, _gfxApiResourceBackend, creationRequest, dependencyHandles);
 					break;
 			    // Other
 				default:
@@ -48,7 +48,7 @@ namespace Engine {
 			}
 
 		private:
-			Ptr<GFXAPIResourceSubSystem> _gfxApiResourceSubsystem;
+			Ptr<GFXAPIResourceBackend> _gfxApiResourceBackend;
 		};
 	}
 }
