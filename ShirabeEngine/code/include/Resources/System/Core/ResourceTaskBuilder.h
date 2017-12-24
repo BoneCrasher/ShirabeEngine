@@ -76,23 +76,23 @@ namespace Engine {
       // THIS CODE BELOW MUST BE ADJUSTED APPROPRIATELY!
 		public:
 			template <typename GfxApiType> 
-			Ptr<Task> buildResourceCreationTask(const typename GfxApiType::Descriptor& desc) {
+			Ptr<Task> buildResourceCreationTask(const typename GfxApiType::CreationRequest& desc) {
 				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> buildResourceUpdateTask(const typename GfxApiType::Descriptor& desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceUpdateTask(const typename GfxApiType::UpdateRequest& desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Update);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> buildResourceDestructionTask(const typename GfxApiType::Descriptor& desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceDestructionTask(const typename GfxApiType::DestructionRequest& desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Destruction);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> buildResourceQueryTask(const typename GfxApiType::Descriptor desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			Ptr<Task> buildResourceQueryTask(const typename GfxApiType::Query desc) {
+				return buildResourceTaskGeneric(desc, EResourceTaskType::Query);
 			}
 		};
 	}

@@ -94,6 +94,8 @@ namespace Engine {
       virtual void onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
       DeclareInterfaceEnd(IAsyncLoadCallback);
 
+      GFXAPIResourceSubSystem();
+
       template <typename TResource>
       EEngineStatus load(
         const typename TResource::Descriptor &inDescriptor,
@@ -106,7 +108,7 @@ namespace Engine {
       EEngineStatus unload(
         const	GFXAPIResourceHandle_t &inResourceHandle,
         const ETaskSynchronization   &inSynchronization);
-
+      
     private:
       template <typename TResource>
       EEngineStatus loadImpl(
@@ -126,8 +128,15 @@ namespace Engine {
         std::future<GFXAPIResourceHandle_t> &outSharedFuture);
 
     private:
+      Threading::Looper<GFXAPIResourceHandle_t>          m_resourceThread;
       Threading::Looper<GFXAPIResourceHandle_t>::Handler m_resourceThreadHandler;
     };
+
+    template <typename TResource>
+    GFXAPIResourceSubSystem<TResource>::GFXAPIResourceSubSystem()
+      : m_resourceThread
+      , m_resourceThreadHandler(m_resourceThread)
+    {}
 
     /**********************************************************************************************//**
      * \fn	template <typename TResource> EEngineStatus GFXAPIResourceSubSystem::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
@@ -237,6 +246,12 @@ namespace Engine {
     {
       // Determine the specific graphics API and access the task builder
       // to create the appropriate task type on the API.
+      asdf; iasjfklj saf; kslaj;klwe as.,df 
+
+      // IMPORTANT:
+      //  There's the generic-task-builder, which needs to create the tasks using a specific TaskBuilderImplementation.
+      //  The above signature is no more valid. 
+      //  
     }
 
     /**********************************************************************************************//**

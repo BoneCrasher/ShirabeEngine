@@ -1,6 +1,7 @@
 #ifndef __SHIRABE_DX11TYPES_H__
 #define __SHIRABE_DX11TYPES_H__
 
+#include "GFXAPI/DirectX/DX11/DX11Common.h"
 #include "GFXAPI/DirectX/DX11/DX11Linkage.h"
 
 #include "Core/EngineTypeHelper.h"
@@ -94,6 +95,14 @@ namespace Engine {
 			DeclareDxType(EResourceType::GAPI_STATE,     EResourceSubType::DEPTH_STENCIL_STATE,   ID3D11DepthStencilState);
 			DeclareDxType(EResourceType::GAPI_STATE,     EResourceSubType::RASTERIZER_STATE,      ID3D11RasterizerState);
 			DeclareDxType(EResourceType::GAPI_STATE,     EResourceSubType::BLEND_STATE,           ID3D11BlendState);
+
+      template <typename T>
+      static std::shared_ptr<T> MakeDxSharedPointer(T *pInRaw) {
+        if(!pInRaw)
+          return nullptr;
+
+        return std::shared_ptr<T>(pInRaw, DxResourceDeleter<T>());
+      }
 
 		}
 	}

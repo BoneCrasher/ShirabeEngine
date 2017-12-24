@@ -123,6 +123,17 @@ namespace Engine {
 				return Ptr<SwapChain>(new SwapChain(desc, binding));
 			}
 
+      Ptr<RenderTargetView> const& getBackBufferRenderTargetView(uint32_t const& index) {
+        if(index < 0 || index >= _backBufferRenderTargetViews.size())
+          return nullptr;
+
+        return _backBufferRenderTargetViews[index];
+      }
+
+      Ptr<RenderTargetView> const& getCurrentBackBufferRenderTargetView() {
+        return getBackBufferRenderTargetView(_currentBackBufferIndex);
+      }
+      
 		private:
 			inline SwapChain(
         const SwapChain::Descriptor &descriptor,
@@ -133,8 +144,10 @@ namespace Engine {
 				, _currentBackBufferIndex(0)
 			{}
 
-			std::size_t  _currentBackBufferIndex;
+			std::size_t                        _currentBackBufferIndex;
+      std::vector<Ptr<RenderTargetView>> _backBufferRenderTargetViews;
 		};
+
 		DeclareSharedPointerType(SwapChain);
     DefineTraitsPublicTypes(SwapChain);
     

@@ -31,7 +31,7 @@ namespace Engine {
 		 *
 		 * \param	parameter1	The first parameter.
 		 **************************************************************************************************/
-	    template <typename TTaskResult>
+	  template <typename TTaskResult>
 		DeclareInterface(ILooper);
 		public:
 			class Task {
@@ -131,7 +131,7 @@ namespace Engine {
 				bool is_ready(std::future<TTaskResult> const& f);
 
 				void checkDelayedPostFutures();
-
+        
 				LooperType& m_assignedLooper;
 
 				std::recursive_mutex                  m_delayedPostFuturesMutex;
@@ -165,6 +165,8 @@ namespace Engine {
 
 		private:
 			void runFunc();
+
+      bool loop(const typename Threading::ILooper<GFXAPIResourceHandle_t>::Task&& runnable);
 
 			bool post(TaskType&&);
 

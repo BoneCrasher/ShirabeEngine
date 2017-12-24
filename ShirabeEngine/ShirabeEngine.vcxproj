@@ -257,6 +257,7 @@
     <ClInclude Include="code\include\Platform\Platform.h" />
     <ClInclude Include="code\include\Platform\OSDisplay.h" />
     <ClInclude Include="code\include\Platform\MathAdapter.h" />
+    <ClInclude Include="code\include\Platform\Windows\WindowsError.h" />
     <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Common.h" />
     <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Linkage.h" />
     <ClInclude Include="code\include\Renderer\DirectX\IDXDevice.h" />

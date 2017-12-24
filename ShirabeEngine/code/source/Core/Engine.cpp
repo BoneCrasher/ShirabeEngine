@@ -40,9 +40,11 @@ namespace Engine {
 	};
 
 	EngineInstance::EngineInstance(const Platform::ApplicationEnvironment& environment)
-		: _environment(environment),
-		  _windowManager(nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
-	{
+		: _environment(environment)
+		, _windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
+	  , _mainWindow(nullptr)
+    , _dx11Environment()
+  {
 	}
 
 	EngineInstance::~EngineInstance() {
@@ -54,57 +56,105 @@ namespace Engine {
 	EEngineStatus EngineInstance::initialize() {
 		using namespace Engine::DX::_11;
 
+
 		EEngineStatus status;
 
-		unsigned long windowWidth  = 1920;
-		unsigned long windowHeight = 1080;
+    unsigned long windowWidth  = _environment.osDisplays[0]._bounds._size.x;
+    unsigned long windowHeight = _environment.osDisplays[0]._bounds._size.y;
 
-		_windowManager = MakeSharedPointerType<WindowManager>();
-		if (!(_windowManager && !CheckWindowManagerError(_windowManager->initialize(_environment)))) {
-			// Log::Error(logTag(), "Failed to create window manager.");
-			return EEngineStatus::EngineComponentInitializationError;
-		}
+    std::function<void()> fnCreatePlatformWindowSystem
+      = [&, this] () -> void
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-		_mainWindow = _windowManager->createWindow("MainWindow", Rect(0, 0, windowWidth, windowHeight));
-		if (!_mainWindow) {
-			status = EEngineStatus::WindowCreationError;
-		}
-		else {
-			_environment.primaryWindowHandle = _mainWindow->handle();
+      _windowManager = MakeSharedPointerType<WindowManager>();
+      if(!(_windowManager && !CheckWindowManagerError(_windowManager->initialize(_environment)))) {
+        status = EEngineStatus::EngineComponentInitializationError;
+        HandleEngineStatusError(status, "Failed to create WindowManager.");
+      }
 
-			status = _mainWindow->resume();
-			if (!CheckEngineError(status))
-				status = _mainWindow->show();
-		}
+      _mainWindow = _windowManager->createWindow("MainWindow", Rect(0, 0, windowWidth, windowHeight));
+      if(!_mainWindow) {
+        status = EEngineStatus::WindowCreationError;
+        HandleEngineStatusError(status, "Failed to create main window in WindowManager.");
+      }
+      else {
+        _environment.primaryWindowHandle = _mainWindow->handle();
 
-		IWindow::IEventCallbackPtr dummy = MakeSharedPointerType<TestDummy>();
-		_mainWindow->registerCallback(dummy);
+        status = _mainWindow->resume();
+        HandleEngineStatusError(status, "Failed to resume operation in main window.");
 
-		// Instantiate the appropriate gfx api from engine config, BUT match it against 
-		// the platform capabilities!
-		// --> #ifndef WIN32 Fallback to Vk. If Vk is not available, fallback to OpenGL, put that into "ChooseGfxApi(preferred) : EGfxApiID"
-		
-		// Create all necessary subsystems.
-		// Their life-cycle management will become the manager's task.
-		Ptr<GFXAPIResourceSubSystem> gfxApiResourceSubsystem = nullptr;
+        if(!CheckEngineError(status)) {
+          status = _mainWindow->show();
+          HandleEngineStatusError(status, "Failed to show main window.");
+        }
+      }
 
-		_proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(gfxApiResourceSubsystem));
-		_resourceManager = Ptr<ProxyBasedResourceManager>(new ProxyBasedResourceManager(_proxyFactory));
+      IWindow::IEventCallbackPtr dummy = MakeSharedPointerType<TestDummy>();
+      _mainWindow->registerCallback(dummy);
+    };
 
-		// TODO: Think about how to link renderer and resource manager or subsystem to allow efficient binding!
+    RendererConfiguration rendererConfiguration;
+    rendererConfiguration.enableVSync             = true;
+    rendererConfiguration.frustum                 = Vec4Dd(windowWidth, windowHeight, 0.1f, 1000.0f);
+    rendererConfiguration.preferredBackBufferSize = Vec2Dl(windowWidth, windowHeight);
+    rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
+    rendererConfiguration.requestFullscreen       = false;
 
-		RendererConfiguration rendererConfiguration;
-		rendererConfiguration.enableVSync             = true;
-		rendererConfiguration.frustum                 = Vec4Dd(windowWidth, windowHeight, 0.1f, 1000.0f);
-		rendererConfiguration.preferredBackBufferSize = Vec2Dl(windowWidth, windowHeight);
-		rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
-		rendererConfiguration.requestFullscreen       = false;
+    std::function<void()> fnCreateDefaultGFXAPI
+      = [this, &rendererConfiguration] () -> void
+    {
+      EEngineStatus status = _dx11Environment.initialize(_environment, rendererConfiguration);
+      HandleEngineStatusError(status, "DirectX11 initialization failed.");
+    };
+    
+    std::function<void()> fnCreatePlatformResourceSystem 
+      = [&, this] () -> void
+    {
+      // Instantiate the appropriate gfx api from engine config, BUT match it against 
+      // the platform capabilities!
+      // --> #ifndef WIN32 Fallback to Vk. If Vk is not available, fallback to OpenGL, put that into "ChooseGfxApi(preferred) : EGfxApiID"
 
-		_renderer = MakeSharedPointerType<DX11Renderer>();
-		status = _renderer->initialize(_environment, rendererConfiguration, nullptr);
-		if (!CheckEngineError(status)) {
-			status = _scene.initialize();
-		}
+      // Create all necessary subsystems.
+      // Their life-cycle management will become the manager's task.
+      // The subsystem-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
+      Ptr<GFXAPIResourceSubSystem> gfxApiResourceSubsystem = Ptr<GFXAPIResourceSubSystem>(new GFXAPIResourceSubSystem());
+
+      _proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(gfxApiResourceSubsystem));
+      _resourceManager = Ptr<ProxyBasedResourceManager>(new ProxyBasedResourceManager(_proxyFactory));
+
+      // TODO: Think about how to link renderer and resource manager or subsystem to allow efficient binding!
+    };
+
+    std::function<void()> fnCreatePlatformRenderer 
+      = [&, this] () -> void
+    {
+      _renderer = MakeSharedPointerType<DX11Renderer>();
+      status = _renderer->initialize(_environment, rendererConfiguration, nullptr);
+      if(!CheckEngineError(status)) {
+        status = _scene.initialize();
+      }
+    };
+
+    try {
+      fnCreatePlatformWindowSystem();
+      fnCreateDefaultGFXAPI();
+      fnCreatePlatformResourceSystem();
+      fnCreatePlatformRenderer();
+
+    } catch(WindowsException const we) {
+      Log::Error(logTag(), we.message());
+      return we.engineStatus();
+    } catch(EngineException const e) {
+      Log::Error(logTag(), e.message());
+      return e.status();
+    } catch(std::exception const stde) {
+      Log::Error(logTag(), stde.what());
+      return EEngineStatus::Error;
+    } catch(...) {
+      Log::Error(logTag(), "Unknown error occurred.");
+      return EEngineStatus::Error;
+    }
 
 		return status;
 	}

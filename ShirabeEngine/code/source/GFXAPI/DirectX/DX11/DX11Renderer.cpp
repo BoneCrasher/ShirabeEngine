@@ -23,30 +23,57 @@ namespace Engine {
 			}
 
 			EEngineStatus DX11Renderer::initialize(
-				const ApplicationEnvironment &environment,
-				const RendererConfiguration  &configuration,
-				const IResourceManagerPtr    &resourceManager) {
-				_config = configuration;
+				ApplicationEnvironment const &environment,
+        DX11Environment        const &dx11Environment,
+				RendererConfiguration  const &configuration,
+				IResourceManagerPtr    const &resourceManager) 
+      {
+
+				_config          = configuration;
+        _resourceManager = resourceManager;
 
 				using namespace Engine::GFXAPI;
 
 				EEngineStatus status = EEngineStatus::Ok;
 				HRESULT       dxRes  = S_OK;
 
-				Ptr<SwapChain> swapChain = nullptr;
+        GAPIOutputMode const& outputMode = dx11Environment.getOutputMode();
 
-				ResourceHandle depthStencilHandle ={};
+				static const std::size_t BACK_BUFFER_COUNT = 1;
 
-				Texture2D::Descriptor dsTexDesc ={};
-				Ptr<Texture2D>        dsTex  = nullptr;
-				Ptr<DepthStencilView> dsView = nullptr;
+				Ptr<SwapChain>        swapChain    = nullptr;    	
+        Ptr<RenderTargetView> swapChainRTV = swapChain->getCurrentBackBufferRenderTargetView();
+        if(!swapChainRTV) {
+          // Mimimi...
+        }
 
-				GAPIOutputMode outputMode ={};
+				// Get the swap chain.
+				SwapChain::Descriptor swapChainDesc ={};
+				swapChainDesc.name                   = "DefaultSwapChain";
+				swapChainDesc.backBufferCount        = BACK_BUFFER_COUNT;
+				swapChainDesc.texture.name           = "DefaultSwapChainTexture2D";
+				swapChainDesc.texture.textureFormat  = outputMode.format;
+				swapChainDesc.texture.dimensions[0]  = outputMode.size.x();
+				swapChainDesc.texture.dimensions[1]  = outputMode.size.y();
+				swapChainDesc.vsyncEnabled           = configuration.enableVSync;
+				swapChainDesc.refreshRateNumerator   = outputMode.refreshRate.x();
+				swapChainDesc.refreshRateDenominator = outputMode.refreshRate.y();
+				swapChainDesc.fullscreen             = !configuration.requestFullscreen;
+				swapChainDesc.windowHandle           = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
 
-			_createDeviceAndSwapChain:
-				
+        SwapChain::CreationRequest swapChainCreationRequest(swapChainDesc);
 
-				dsTexDesc     ={};
+				status = resourceManager->createSwapChain(swapChainDesc, swapChain);
+        HandleEngineStatusError(status, String::format("Failed to create swap chain:\n Desc:%0", swapChainDesc.toString()));
+
+        _swapChain = swapChain;
+
+        Ptr<Texture2D>        defaultDSTex   = nullptr;
+        Ptr<DepthStencilView> defaultDSView  = nullptr;
+
+        ResourceHandle depthStencilHandle ={};
+
+        Texture2D::Descriptor dsTexDesc ={};
 				dsTexDesc.dimensions            ={ outputMode.size.x(), outputMode.size.y() };
 				dsTexDesc.textureFormat         = Format::D24_UNORM_S8_UINT;
 				dsTexDesc.mipMap.useMipMaps     = false;
@@ -58,15 +85,19 @@ namespace Engine {
 				dsTexDesc.multisampling.size    = 1;
 				dsTexDesc.multisampling.quality = 0;
 
-				status = resourceManager->createTexture2D(dsTexDesc, dsTex);
-				if( CheckEngineError(status) ) {
-					goto _return_failed;
-				}
+				status = resourceManager->createTexture2D(dsTexDesc, defaultDSTex);
+        HandleEngineStatusError(status, String::format("Failed to create depth stencil view:\n Desc:%0", dsTexDesc.toString()));
 
-				dsView = resourceManager->getResource<DepthStencilView>(dsTex->binding().dsvBinding);
+        defaultDSView = defaultDSTex->depthStencilView();
+        if(!defaultDSView) {
+          // Mimimi...
+        }
+
+        ID3D11RenderTargetView *const d3d11SwapChainRTV = _resourceManager.getUnderlyingResourceHandle(swapChainRTV);
+        ID3D11DepthStencilView *const d3d11DSV          = _resourceManager.getUnderlyingResourceHandle(defaultDSView);
 
 				// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
-				tmpDeviceContext->OMSetRenderTargets(1, &tmpBackBufferRTV, tmpDepthStencilView);
+				dx11Environment.getImmediateContext()->OMSetRenderTargets(1, &d3d11SwapChainRTV, d3d11DSV);
 
 				// _createDepthStencilState:
 					// 
@@ -131,8 +162,6 @@ namespace Engine {
 				tmpDeviceContext->RSSetViewports(1, &vpDesc);
 
 				// _commit:
-				_device                 = MakeSharedPointerTypeCustomDeleter(tmpDevice, DxResourceDeleter<ID3D11Device>());
-				_deviceImmediateContext = MakeSharedPointerTypeCustomDeleter(tmpDeviceContext, DxResourceDeleter<ID3D11DeviceContext>());
 				_swapChain              = MakeSharedPointerTypeCustomDeleter(tmpSwapChain, DxResourceDeleter<IDXGISwapChain>());
 				_backBufferRTV          = MakeSharedPointerTypeCustomDeleter(tmpBackBufferRTV, DxResourceDeleter<ID3D11RenderTargetView>());
 				_depthStencilTexture    = MakeSharedPointerTypeCustomDeleter(tmpDepthStencilTexture, DxResourceDeleter<ID3D11Texture2D>());
@@ -140,20 +169,7 @@ namespace Engine {
 
 				_depthStencilState = MakeSharedPointerTypeCustomDeleter(tmpDefaultDepthStencilState, DxResourceDeleter<ID3D11DepthStencilState>());
 				_rasterizerState   = MakeSharedPointerTypeCustomDeleter(tmpRasterizerState, DxResourceDeleter<ID3D11RasterizerState>());
-
-				goto _return_success; // Make sure not to drop into the deleter!
-
-			_return_failed:
-				DxRelease(&tmpRasterizerState);
-				DxRelease(&tmpDefaultDepthStencilState);
-				DxRelease(&tmpDepthStencilView);
-				DxRelease(&tmpDepthStencilTexture);
-				DxRelease(&tmpBackBufferRTV);
-				DxRelease(&tmpSwapChain);
-				DxRelease(&tmpDeviceContext);
-				DxRelease(&tmpDevice);
-
-			_return_success:
+        
 				return status;
 			}
 

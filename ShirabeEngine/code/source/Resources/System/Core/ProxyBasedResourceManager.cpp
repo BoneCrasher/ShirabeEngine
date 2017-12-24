@@ -3,6 +3,12 @@
 namespace Engine {
 	namespace Resources {
 
+
+    bool ProxyBasedResourceManager
+      ::clear()
+    {
+    }
+
 		EEngineStatus ProxyBasedResourceManager::createSwapChain(
 			const SwapChain::CreationRequest &inRequest,
 			Ptr<SwapChain>                   &outSwapChain)
@@ -19,8 +25,9 @@ namespace Engine {
 				return status;
 			}
 
-			const SwapChainDescriptor& desc = static_cast<const SwapChainDescriptor&>(inRequest.resourceDescriptor());
+			const SwapChain::Descriptor& desc = inRequest.resourceDescriptor();
 			outSwapChain = SwapChain::create(desc, binding);
+
 			return EEngineStatus::Ok;
 		}
 
@@ -40,8 +47,8 @@ namespace Engine {
 			}
 
 			const Texture1D::Descriptor& desc = request.resourceDescriptor();
-
 			outTexture1D = MakeSharedPointerType<Texture1D>(desc, binding);
+
 			return EEngineStatus::Ok;
 		}
 

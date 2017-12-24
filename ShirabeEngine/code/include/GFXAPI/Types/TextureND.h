@@ -147,7 +147,14 @@ namespace Engine {
         const typename Texture<N>::Descriptor &descriptor,
         const typename Texture<N>::Binding    &binding);
 
+      inline Ptr<RenderTargetView>   renderTargetView()   const { return _renderTargetView;   }
+      inline Ptr<ShaderResourceView> shaderResourceView() const { return _shaderResourceView; }
+      inline Ptr<DepthStencilView>   depthStencilView()   const { return _depthStencilView;   }
+
     private:
+      Ptr<RenderTargetView>   _renderTargetView;
+      Ptr<ShaderResourceView> _shaderResourceView;
+      Ptr<DepthStencilView>   _depthStencilView;
     };
 
     template <uint8_t N>

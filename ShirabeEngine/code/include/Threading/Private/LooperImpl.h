@@ -354,6 +354,12 @@ namespace Engine{
 			return true;
 		}
 
+    template <typename TTaskResult>
+    bool Looper<TTaskResult>
+      ::loop(const typename ILooper<TTaskResult>::Task&& runnable)
+    {
+      TTaskResult result = runnable.run();
+    }
 	}
 }
 

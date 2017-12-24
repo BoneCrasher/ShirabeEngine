@@ -168,6 +168,8 @@ namespace Engine {
         _gfxApiProxyFactory = nullptr;
       };
 
+      bool clear();
+
       EEngineStatus createSwapChain(
         const SwapChain::CreationRequest &inRequest,
         Ptr<SwapChain>                   &outSwapChain);

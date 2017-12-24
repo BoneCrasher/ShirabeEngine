@@ -2,6 +2,7 @@
 #define __SHIRABE_ENGINEINSTANCE_H__
 
 #include "Platform/ApplicationEnvironment.h"
+#include "Platform/Platform.h"
 
 #include "Core/EngineStatus.h"
 #include "Core/EngineTypeHelper.h"
@@ -14,6 +15,14 @@
 #include "BuildingBlocks/Scene.h"
 
 #include "GFXAPI/IRenderer.h"
+
+#ifdef PLATFORM_WINDOWS
+#include "Platform/Windows/WindowsError.h"
+#include "GFXAPI/DirectX/DX11/DX11Environment.h"
+
+using namespace Platform::Windows;
+using namespace Engine::DX::_11;
+#endif
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 
@@ -38,6 +47,11 @@ namespace Engine {
 		Platform::ApplicationEnvironment _environment;
 		WindowManagerPtr                 _windowManager;
 		IWindowPtr                       _mainWindow;
+
+#ifdef PLATFORM_WINDOWS
+    DX11Environment _dx11Environment;
+#endif
+
 
 		Ptr<ResourceProxyFactory> _proxyFactory;
 		Ptr<IResourceManager>     _resourceManager;

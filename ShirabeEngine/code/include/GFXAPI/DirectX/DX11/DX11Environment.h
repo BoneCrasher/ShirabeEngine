@@ -3,10 +3,14 @@
 
 #include "Core/EngineStatus.h"
 #include "Platform/ApplicationEnvironment.h"
+#include "Log/Log.h"
+
 #include "GFXAPI/RendererConfiguration.h"
+#include "GFXAPI/GFXAPIDeviceCapabilities.h"
 
 #include "DX11Common.h"
 #include "DX11Linkage.h"
+#include "DX11Types.h"
 
 namespace Engine {
   namespace DX {
@@ -14,8 +18,11 @@ namespace Engine {
 
       using Platform::ApplicationEnvironment;
       using Engine::Renderer::RendererConfiguration;
+      using Engine::GFXAPI::GAPIDeviceCapabilities;
 
       class DX11Environment {
+        DeclareLogTag(DX11Environment);
+
       public:
         DX11Environment();
 
@@ -24,18 +31,24 @@ namespace Engine {
           RendererConfiguration  const& configuration);
         EEngineStatus deinitialize();
 
-        IDXGISwapChainPtr      getSwapChain();
-        ID3D11DevicePtr        getDevice();
-        ID3D11DeviceContextPtr getImmediateContext();
+        ID3D11DevicePtr        getDevice()           const;
+        ID3D11DeviceContextPtr getImmediateContext() const;
+        
+        GAPIOutputMode const& getOutputMode() const;
 
       private:
-        Engine::GFXAPI::GAPIDeviceCapabilities m_caps;
+
+        EEngineStatus getDeviceCapabilities(
+          Format const&, 
+          GAPIDeviceCapabilities*
+        );
+
+        GAPIDeviceCapabilities m_caps;
 
         IDXGIFactoryPtr        m_dxgiFactory;
         IDXGIAdapterPtr        m_selectedAdapter;
         IDXGIOutputPtr         m_selectedOutput;
 
-        IDXGISwapChainPtr      m_swapChain;
         ID3D11DevicePtr        m_device;
         ID3D11DeviceContextPtr m_immediateContext;
       };

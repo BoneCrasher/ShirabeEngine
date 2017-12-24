@@ -19,18 +19,14 @@ namespace Engine {
 			public:
 
 				static DXGI_FORMAT convertFormatGAPI2DXGI(const Format& fmt); 
-				static Format  convertFormatDXGI2GAPI(const DXGI_FORMAT& fmt);
-
-				static D3D11_USAGE       convertResourceUsageGAPI2D3D11(const ResourceUsage&);
+				static Format      convertFormatDXGI2GAPI(const DXGI_FORMAT& fmt);
+         
+				static D3D11_USAGE   convertResourceUsageGAPI2D3D11(const ResourceUsage&);
 				static ResourceUsage convertResourceUsageD3D112GAPI(const D3D11_USAGE&);
 
-				static UINT                     convertBufferBindingGAPI2D3D11(const BufferBindingFlags_t&);
+				static UINT                 convertBufferBindingGAPI2D3D11(const BufferBindingFlags_t&);
 				static BufferBindingFlags_t convertBufferBindingD3D112GAPI(const UINT&);
 
-				static EEngineStatus GetDeviceCapabilities(
-					const Format&, 
-					GAPIDeviceCapabilities*
-				);
 			};
 
 		}
