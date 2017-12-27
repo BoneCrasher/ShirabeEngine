@@ -224,6 +224,7 @@
     <ClInclude Include="code\include\GFXAPI\IRenderer.h" />
     <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilView.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\All.h" />
     <ClInclude Include="code\include\GFXAPI\Types\DepthStencilState.h" />
     <ClInclude Include="code\include\GFXAPI\Types\TextureNDDefinition.h" />
     <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />

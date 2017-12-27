@@ -3,6 +3,7 @@
 #include "Resources/System/Core/ProxyBasedResourceManager.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Renderer.h"
+#include "GFXAPI/DirectX/DX11/DX11ResourceTaskBuilder.h"
 
 namespace Engine {
 
@@ -118,12 +119,26 @@ namespace Engine {
       // Create all necessary subsystems.
       // Their life-cycle management will become the manager's task.
       // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
-      Ptr<GFXAPIResourceBackend> dx11ResourceBackend = Ptr<GFXAPIResourceBackend>(new Dx11ResourceBackend());
+      // 
+      EGFXAPI        gfxApi        = EGFXAPI::DirectX;
+      EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::DirectX_11_0;
 
-      _proxyFactory    = Ptr<ResourceProxyFactory>(new ResourceProxyFactory(dx11ResourceBackend));
-      _resourceManager = Ptr<ProxyBasedResourceManager>(new ProxyBasedResourceManager(_proxyFactory));
+      Ptr<BasicGFXAPIResourceBackend>              resourceBackend     = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
+      Ptr<IGFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
 
-      // TODO: Think about how to link renderer and resource manager or resourceBackend to allow efficient binding!
+      if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
+            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>();
+
+      resourceBackend->setResourceTaskBackend(resourceTaskBackend);
+
+      _proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);
+
+      Ptr<ProxyBasedResourceManager> manager = MakeSharedPointerType<ProxyBasedResourceManager>(_proxyFactory);
+      manager->setResourceBackend(resourceBackend);
+
+      _resourceManager = manager;
+
+      // Renderer will have access to resourceBackend!
     };
 
     std::function<void()> fnCreatePlatformRenderer 

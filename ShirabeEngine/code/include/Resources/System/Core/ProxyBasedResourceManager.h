@@ -170,6 +170,12 @@ namespace Engine {
 
       bool clear();
 
+      void setResourceBackend(Ptr<BasicGFXAPIResourceBackend> const& backend) {
+        assert(backend != nullptr);
+
+        m_resourceBackend = backend;
+      }
+
       EEngineStatus createSwapChain(
         const SwapChain::CreationRequest &inRequest,
         Ptr<SwapChain>                   &outSwapChain);
@@ -198,7 +204,8 @@ namespace Engine {
         return _resources->addResource(handle, proxy);
       }
 
-      Ptr<ResourceProxyFactory> _gfxApiProxyFactory;
+      Ptr<ResourceProxyFactory>       _gfxApiProxyFactory;
+      Ptr<BasicGFXAPIResourceBackend> m_resourceBackend;
 
       // Any kind of resources, abstracted away entirely.
       IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> _resources;

@@ -15,9 +15,10 @@
 #include "Threading/Looper.h"
 
 #include "Resources/System/Core/ResourceDomainTransfer.h"
-#include "Resources/System/Core/ResourceTaskBuilder.h"
 #include "Resources/System/Core/ResourceTask.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+
+#include "GFXAPI/Types/All.h"
 
 namespace Engine {
   namespace GFXAPI {
@@ -59,9 +60,51 @@ namespace Engine {
       Update  = 4,
       Destroy = 8
     };
-
+    
     using ResourceTaskFn_t = std::function<GFXAPIResourceHandle_t()>;
 
+    template <typename TFirst, typename... TOther>
+    class IGFXAPIResourceTaskBackend
+      : public IGFXAPIResourceTaskBackend<TOther...>
+    {
+    public:
+      virtual EEngineStatus creationTask(
+        const typename TFirst::CreationRequest &inRequest,
+        ResourceTaskFn_t                       &outTask) = 0;
+
+      virtual EEngineStatus updateTask(
+        const typename TFirst::UpdateRequest &inRequest,
+        ResourceTaskFn_t                     &outTask) = 0;
+
+      virtual EEngineStatus destructionTask(
+        const typename TFirst::DestructionRequest &inRequest,
+        ResourceTaskFn_t                          &outTask) = 0;
+
+      virtual EEngineStatus queryTask(
+        const typename TFirst::Query &inRequest,
+        ResourceTaskFn_t             &outTask) = 0;
+    };
+
+    template <typename TLast>
+    class IGFXAPIResourceTaskBackend<TLast> {
+    public:
+      virtual EEngineStatus creationTask(
+        const typename TLast::CreationRequest &inRequest,
+        ResourceTaskFn_t                      &outTask) = 0;
+
+      virtual EEngineStatus updateTask(
+        const typename TLast::UpdateRequest &inRequest,
+        ResourceTaskFn_t                    &outTask) = 0;
+
+      virtual EEngineStatus destructionTask(
+        const typename TLast::DestructionRequest &inRequest,
+        ResourceTaskFn_t                         &outTask) = 0;
+
+      virtual EEngineStatus queryTask(
+        const typename TLast::Query &inRequest,
+        ResourceTaskFn_t            &outTask) = 0;
+    };
+    
     /**********************************************************************************************//**
      * \struct	DeferredResourceCreationHandle
      *
@@ -69,8 +112,19 @@ namespace Engine {
      **************************************************************************************************/
     struct DeferredResourceCreationHandle {
       std::future<GFXAPIResourceHandle_t>& futureHandle;
-    };
+    };    
 
+    DeclareInterface(IAsyncLoadCallback);
+      /**********************************************************************************************//**
+       * \fn	virtual void GFXAPIResourceBackend::onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
+       *
+       * \brief	Invoked once the resource was loaded. If the handle is 0, loading failed. If > 0, successful.
+       *
+       * \param	handle	The handle.
+       **************************************************************************************************/
+      virtual void onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
+    DeclareInterfaceEnd(IAsyncLoadCallback);
+    
     /**********************************************************************************************//**
      * \class	GFXAPIResourceBackend
      *
@@ -80,19 +134,14 @@ namespace Engine {
      * 			The resourceBackend holds a mapping of GFXAPIResourceHandle_t to GFXAPIResourceHolder to
      * 			 store and manage the resources.
      **************************************************************************************************/
-    class GFXAPIResourceBackend {
+    template <typename... TSupportedResourceTypes>
+    class GFXAPIResourceBackend 
+    {
       DeclareLogTag(GFXAPIResourceBackend);
+
     public:
-      DeclareInterface(IAsyncLoadCallback);
-      /**********************************************************************************************//**
-       * \fn	virtual void GFXAPIResourceBackend::onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
-       *
-       * \brief	Invoked once the resource was loaded. If the handle is 0, loading failed. If > 0, successful.
-       *
-       * \param	handle	The handle.
-       **************************************************************************************************/
-      virtual void onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
-      DeclareInterfaceEnd(IAsyncLoadCallback);
+      typedef IGFXAPIResourceTaskBackend<TSupportedResourceTypes...> ResourceTaskBackend_t;
+      typedef Ptr<ResourceTaskBackend_t>                             ResourceTaskBackendPtr;
 
       GFXAPIResourceBackend();
 
@@ -102,11 +151,33 @@ namespace Engine {
         const ETaskSynchronization                &inRequestMode,
         const Ptr<IAsyncLoadCallback>             &inCallback,
         GFXAPIResourceHandle_t                    &outResourceHandle);
-
+      
       template <typename TResource>
       EEngineStatus unload(
         const	GFXAPIResourceHandle_t &inResourceHandle,
         const ETaskSynchronization   &inSynchronization);
+
+      template <typename TUnderlyingType>
+      EEngineStatus getUnderlyingHandle(
+        GFXAPIResourceHandle_t const&handle,
+        Ptr<TUnderlyingType>        &outHandlePtr) 
+      {
+        assert(CheckValidHandle(handle));
+        
+        Ptr<void> anything = findUnderlyingHandle(handle);
+        assert(anything != nullptr);
+
+        Ptr<TUnderlyingType> p = std::dynamic_pointer_cast<TUnderlyingType>(anything);
+        assert(p != nullptr);
+
+        return p;
+      }
+
+      void setResourceTaskBackend(ResourceTaskBackendPtr const& backend) {
+        assert(backend != nullptr);
+
+        m_resourceTaskBackend = backend;
+      }
 
     private:
       template <typename TResource>
@@ -118,31 +189,15 @@ namespace Engine {
         ResourceTaskFn_t                    &inTask,
         std::future<GFXAPIResourceHandle_t> &outSharedFuture);
 
-      template <typename TResource>
-      EEngineStatus creationTask(
-        const typename TResource::CreationRequest &inRequest,
-        ResourceTaskFn_t                          &outTask);
-
-      template <typename TResource>
-      EEngineStatus updateTask(
-        const typename TResource::UpdateRequest &inRequest,
-        ResourceTaskFn_t                        &outTask);
-
-      template <typename TResource>
-      EEngineStatus destructionTask(
-        const typename TResource::DestructionRequest &inRequest,
-        ResourceTaskFn_t                             &outTask);
-
-      template <typename TResource>
-      EEngineStatus queryTask(
-        const typename TResource::Query &inRequest,
-        ResourceTaskFn_t                &outTask);
+      ResourceTaskBackendPtr m_resourceTaskBackend;
 
       Threading::Looper<GFXAPIResourceHandle_t>           m_resourceThread;
       Threading::Looper<GFXAPIResourceHandle_t>::Handler &m_resourceThreadHandler;
     };
 
-    GFXAPIResourceBackend::GFXAPIResourceBackend()
+    template <typename... TSupportedResourceTypes>
+    GFXAPIResourceBackend<TSupportedResourceTypes...>
+      ::GFXAPIResourceBackend()
       : m_resourceThread()
       , m_resourceThreadHandler(m_resourceThread.getHandler())
     {}
@@ -161,9 +216,10 @@ namespace Engine {
      *
      * \return	The EEngineStatus.
      **************************************************************************************************/
+    template <typename... TSupportedResourceTypes>
     template <typename TResource>
     EEngineStatus
-      GFXAPIResourceBackend
+      GFXAPIResourceBackend<TSupportedResourceTypes...>
       ::load(
         const typename TResource::CreationRequest &inRequest,
         const ETaskSynchronization                &inSynchronization,
@@ -173,7 +229,7 @@ namespace Engine {
       GFXAPIResourceHandle_t resourceHandle = 0;
 
       DeferredResourceCreationHandle handle;
-      EEngineStatus status = loadImpl(inRequest, handle);
+      EEngineStatus status = loadImpl<TResource>(inRequest, handle);
       if(!CheckEngineError(status)) {
         switch(inSynchronization) {
         default:
@@ -197,9 +253,10 @@ namespace Engine {
       return status;
     }
 
+    template <typename... TSupportedResourceTypes>
     template <typename TResource>
     EEngineStatus
-      GFXAPIResourceBackend
+      GFXAPIResourceBackend<TSupportedResourceTypes...>
       ::unload(
         const	GFXAPIResourceHandle_t &inResourceHandle,
         const ETaskSynchronization   &inSynchronization)
@@ -221,15 +278,17 @@ namespace Engine {
      *
      * \return	The implementation.
      **************************************************************************************************/
+    template <typename... TSupportedResourceTypes>
     template <typename TResource>
-    EEngineStatus GFXAPIResourceBackend::loadImpl(
+    EEngineStatus GFXAPIResourceBackend<TSupportedResourceTypes...>
+      ::loadImpl(
       const typename TResource::CreationRequest &inRequest,
       DeferredResourceCreationHandle            &outHandle)
     {
       EEngineStatus status = EEngineStatus::Ok;
 
       ResourceTaskFn_t task = nullptr;
-      status = creationTask<TResource>(inRequest, task);
+      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackend<TResource>::creationTask(inRequest, task);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to create builder for resource '%0'", descriptor.name()));
         return status;
@@ -247,54 +306,6 @@ namespace Engine {
       return status;
     }
 
-    template <typename TResource>
-    EEngineStatus
-      GFXAPIResourceBackend
-      ::creationTask(
-        const typename TResource::CreationRequest &inRequest,
-        ResourceTaskFn_t                          &outTask)
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-      
-      return status;
-    }
-
-    template <typename TResource>
-    EEngineStatus
-      GFXAPIResourceBackend
-      ::updateTask(
-        const typename TResource::UpdateRequest &inRequest,
-        ResourceTaskFn_t                        &outTask)
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-
-      return status;
-    }
-
-    template <typename TResource>
-    EEngineStatus
-      GFXAPIResourceBackend
-      ::destructionTask(
-        const typename TResource::DestructionRequest &inRequest,
-        ResourceTaskFn_t                             &outTask)
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-
-      return status;
-    }
-
-    template <typename TResource>
-    EEngineStatus
-      GFXAPIResourceBackend
-      ::queryTask(
-        const typename TResource::Query &inRequest,
-        ResourceTaskFn_t                &outTask)
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-
-      return status;
-    }
-
     /**********************************************************************************************//**
      * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::enqueue( const ResourceTaskFn_t &inTask, std::future<GFXAPIResourceHandle_t> &outSharedFuture)
      *
@@ -306,7 +317,10 @@ namespace Engine {
      *
      * \return	The EEngineStatus.
      **************************************************************************************************/
-    EEngineStatus GFXAPIResourceBackend::enqueue(
+    template <typename... TSupportedResourceTypes>
+    EEngineStatus
+      GFXAPIResourceBackend<TSupportedResourceTypes...>
+      ::enqueue(
       ResourceTaskFn_t                    &inTask,
       std::future<GFXAPIResourceHandle_t> &outSharedFuture)
     {
@@ -323,6 +337,8 @@ namespace Engine {
 
       return (enqueued ? EEngineStatus::Ok : EEngineStatus::GFXAPI_SubsystemThreadEnqueueFailed);
     }
+
+    using BasicGFXAPIResourceBackend = GFXAPIResourceBackend<EngineTypes>;
   }
 }
 

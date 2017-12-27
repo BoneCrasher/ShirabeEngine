@@ -28,6 +28,9 @@ namespace Engine {
 		DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 		DeclareMapType(ResourceHandle, GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 
+    static bool CheckValidHandle(GFXAPIResourceHandle_t const& h) {
+      return (h > 0); // For now this is the only condition...
+    }
 		
 	#define DefineStorageCondition(sz)                            \
 		template <typename T>	                                  \

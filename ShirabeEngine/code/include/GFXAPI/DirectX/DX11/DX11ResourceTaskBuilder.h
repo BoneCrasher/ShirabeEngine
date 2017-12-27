@@ -2,9 +2,9 @@
 #define __SHIRABE_RESOURCES_DX11TASKBUILDER_H__
 
 #include "Resources/System/Core/ResourceTask.h"
+#include "Resources/System/Core/ResourceTaskBuilder.h"
 
 #include "GFXAPI/Types/TextureND.h"
-#include "GFXAPI/DirectX/DX11/Builders/BuilderBase.h"
 #include "GFXAPI/DirectX/DX11/DX11Common.h"
 
 namespace Engine {
@@ -88,14 +88,30 @@ namespace Engine {
         }
       };
 
+#define ImplementTaskBuilder(Type)                                                                       \
+      EEngineStatus creationTask   (Type::CreationRequest    const& request, ResourceTaskFn_t &outTask); \
+      EEngineStatus updateTask     (Type::UpdateRequest      const& request, ResourceTaskFn_t &outTask); \
+      EEngineStatus destructionTask(Type::DestructionRequest const& request, ResourceTaskFn_t &outTask); \
+      EEngineStatus queryTask      (Type::Query              const& request, ResourceTaskFn_t &outTask); 
+
+
       /**********************************************************************************************//**
        * \class	DX11ResourceTaskBuilder
        *
        * \brief	Glue...
        **************************************************************************************************/
       class DX11ResourceTaskBuilder
-        : public GenericTaskBuilder<DX11ResourceTaskBuilderImplementation, DxTypes__>
-      { };
+        : public GenericTaskBuilder<DX11ResourceTaskBuilderImplementation, EngineTypes>
+      { 
+        ImplementTaskBuilder(Texture1D);
+        ImplementTaskBuilder(Texture2D);
+        ImplementTaskBuilder(Texture3D);
+        ImplementTaskBuilder(ShaderResourceView);
+        ImplementTaskBuilder(RenderTargetView);
+        ImplementTaskBuilder(DepthStencilView);
+        ImplementTaskBuilder(DepthStencilState);
+        ImplementTaskBuilder(SwapChain);
+      };
 
     }
   }

@@ -7,9 +7,11 @@
 
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceTask.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 
 namespace Engine {
 	namespace Resources {
+    using namespace Engine::GFXAPI;
 
 		enum class EResourceTaskType {
 			Creation    = 1,
@@ -22,11 +24,13 @@ namespace Engine {
 			
 		};
 
+    // This additional hierarchy creation structure is created in order to
+    // ensure consistent access using SFINAE and a replaceable implementation...
+
 		template <typename GfxApiType>
-		class ITaskBuilderImplementationBase {
-		protected: // Make sure it's not publicly visible
-			virtual Ptr<Task> build(const typename GfxApiType::Descriptor& descriptor, const EResourceTaskType& taskType) = 0;
-		};		
+		class ITaskBuilderImplementationBase 
+      : public IGFXAPIResourceTaskBackend<GfxApiType>
+    { };		
 
 		template <template <typename> typename TBuilderImplementation, typename GfxApiType>
 		using is_task_builder_implementation_t
@@ -68,31 +72,37 @@ namespace Engine {
 		class GenericTaskBuilder
 			: public GfxApiTaskBuilder<TBuilderImplementation, GfxApiTypes...>
 		{
-			template <typename GfxApiType>
-			Ptr<Task> buildResourceTaskGeneric(const typename GfxApiType::Descriptor& desc, const EResourceTaskType& taskType) {
-				return (*this).TBuilderImplementation<GfxApiType>::build(desc, taskType);
-			}
-
-      // THIS CODE BELOW MUST BE ADJUSTED APPROPRIATELY!
 		public:
 			template <typename GfxApiType> 
-			Ptr<Task> buildResourceCreationTask(const typename GfxApiType::CreationRequest& desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Creation);
+			EEngineStatus creationTask(
+        const typename GfxApiType::CreationRequest &desc,
+        ResourceTaskFn_t                           &task) 
+      {
+        return (*this).TBuilderImplementation<GfxApiType>::creationTask(desc, task);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> buildResourceUpdateTask(const typename GfxApiType::UpdateRequest& desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Update);
+      EEngineStatus updateTask(
+        const typename GfxApiType::UpdateRequest &desc,
+        ResourceTaskFn_t                         &task) 
+      {
+        return (*this).TBuilderImplementation<GfxApiType>::updateTask(desc, task);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> buildResourceDestructionTask(const typename GfxApiType::DestructionRequest& desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Destruction);
+			Ptr<Task> destructionTask(
+        const typename GfxApiType::DestructionRequest &desc,
+        ResourceTaskFn_t                              &task) 
+      {
+        return (*this).TBuilderImplementation<GfxApiType>::destructionTask(desc, task);
 			}
 
 			template <typename GfxApiType>
-			Ptr<Task> buildResourceQueryTask(const typename GfxApiType::Query desc) {
-				return buildResourceTaskGeneric(desc, EResourceTaskType::Query);
+			Ptr<Task> queryTask(
+        const typename GfxApiType::Query &desc,
+        ResourceTaskFn_t                 &task) 
+      {
+        return (*this).TBuilderImplementation<GfxApiType>::queryTask(desc, task);
 			}
 		};
 	}

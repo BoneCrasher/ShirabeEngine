@@ -16,9 +16,7 @@
 
 namespace Engine {
 	namespace GFXAPI {
-
 		using namespace Engine::Resources;
-
 
 		/**********************************************************************************************//**
 		 * \class	GFXAPIResourceAdapter
@@ -52,7 +50,7 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <typename TResource>
 		class GFXAPIResourceProxy
-			: public ResourceBackendProxy<GFXAPIResourceBackend, TResource>
+			: public ResourceBackendProxy<BasicGFXAPIResourceBackend, TResource>
 			, public GFXAPIResourceAdapter
 		{
 			DeclareLogTag(GFXAPIResourceProxy<TResource>);
@@ -60,9 +58,9 @@ namespace Engine {
 		public:
 			inline GFXAPIResourceProxy(
 				EProxyType                          const&proxyType,
-				Ptr<GFXAPIResourceBackend>          const&resourceBackend,
+				Ptr<BasicGFXAPIResourceBackend>     const&resourceBackend,
 				typename TResource::CreationRequest const&request)
-				: ResourceBackendProxy<GFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
+				: ResourceBackendProxy<BasicGFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
 				, GFXAPIResourceAdapter(GFXAPIUninitializedResourceHandle)
 			{ }
 
@@ -78,7 +76,7 @@ namespace Engine {
 
 		protected:
 		private:
-			Ptr<GFXAPIResourceBackend> _subsystem;
+			Ptr<BasicGFXAPIResourceBackend> _backend;
 		};
 
 		/**********************************************************************************************//**
@@ -127,7 +125,7 @@ namespace Engine {
 
 			GFXAPIResourceHandle_t handle = 0;
 
-			status = _subsystem->load<TResource>(rd, inDependencyHandles, ETaskSynchronization::Sync, nullptr, handle);
+			status = _backend->load<TResource>(rd, ETaskSynchronization::Sync, nullptr, handle);
 			if( CheckEngineError(status) ) {
 				// MBT TODO: Consider distinguishing the above returned status a little more in 
 				//           order to reflect UNLOADED or UNAVAILABLE state.
@@ -149,7 +147,7 @@ namespace Engine {
 			::unloadSync()
 		{
 			EEngineStatus status = EEngineStatus::Ok;
-			status = _subsystem->unload<TResource>(handle(), ETaskSynchronization::Sync);
+			status = _backend->unload<TResource>(handle(), ETaskSynchronization::Sync);
 
 			if( CheckEngineError(status) ) {
 				this->setLoadState(ELoadState::UNKNOWN);
