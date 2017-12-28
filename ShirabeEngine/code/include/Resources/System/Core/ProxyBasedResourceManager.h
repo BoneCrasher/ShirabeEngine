@@ -515,7 +515,7 @@ namespace Engine {
       ResourceProxyMap     outProxies;
       DependerTreeNodeList outDependerHierarchies;
 
-      bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(_gfxApiProxyFactory, request, inDependencies, binding, outProxies, outDependerHierarchies);
+      bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(_gfxApiProxyFactory, request, binding, outProxies, outDependerHierarchies);
       if(!treeCreationSuccessful) {
         Log::Error(logTag(), "Unable to create root resource proxy.");
         return EEngineStatus::ResourceManager_ProxyCreationFailed;

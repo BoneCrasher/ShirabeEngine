@@ -64,8 +64,8 @@ namespace Engine {
 
 				std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
 
-				inline TTaskResult run() const {
-					return _task();
+				inline TTaskResult run() {
+          _task(); // Return value is stored in the shared state wrapped by the future returned on bind!
 				}
 
       private:
@@ -85,7 +85,7 @@ namespace Engine {
 			 *
 			 * \return	True if it succeeds, false if it fails.
 			 **************************************************************************************************/
-			virtual bool loop(const typename ILooper<TTaskResult>::Task&& runnable) = 0;
+			virtual bool loop(typename ILooper<TTaskResult>::Task&& runnable) = 0;
 	   
 		DeclareInterfaceEnd(ILooper);
 
@@ -166,7 +166,7 @@ namespace Engine {
 		private:
 			void runFunc();
 
-      bool loop(const typename Threading::ILooper<TTaskResult>::Task&& runnable);
+      bool loop(typename Threading::ILooper<TTaskResult>::Task&& runnable);
 
 			bool post(TaskType&&);
 

@@ -49,7 +49,7 @@ namespace Engine {
       const ResourceHandle                &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory>     &proxyFactory,
       // Output
-      ShaderResourceView::Binding    const&outSRVBinding,
+      ShaderResourceView::Binding         &outSRVBinding,
       ResourceProxyMap                    &outSRVProxy,
       DependerTreeNode                    &outSRVHierarchy)
     {
@@ -110,7 +110,7 @@ namespace Engine {
       const Format                      &textureFormat,
       const ResourceHandle              &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory>   &proxyFactory,
-      RenderTargetView::Binding    const&outRTVBinding,
+      RenderTargetView::Binding         &outRTVBinding,
       ResourceProxyMap                  &outRTVProxy,
       DependerTreeNode                  &outRTVHierarchy)
     {
@@ -164,7 +164,7 @@ namespace Engine {
       bool                               isCube,
       const ResourceHandle              &textureNDProxyHandle,
       const Ptr<ResourceProxyFactory>   &proxyFactory,
-      DepthStencilView::Binding    const&outDSVBinding,
+      DepthStencilView::Binding         &outDSVBinding,
       ResourceProxyMap                  &outDSVProxy,
       DependerTreeNode                  &outDSVHierarchy)
     {

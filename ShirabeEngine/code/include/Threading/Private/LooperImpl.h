@@ -356,7 +356,7 @@ namespace Engine{
 
     template <typename TTaskResult>
     bool Looper<TTaskResult>
-      ::loop(const typename ILooper<TTaskResult>::Task&& runnable)
+      ::loop(typename ILooper<TTaskResult>::Task&& runnable)
     {
       TTaskResult result = runnable.run();
 

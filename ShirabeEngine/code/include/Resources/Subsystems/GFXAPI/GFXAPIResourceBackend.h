@@ -246,7 +246,10 @@ namespace Engine {
           if(!resourceHandle.valid())
             status = EEngineStatus::GFXAPI_SubsystemResourceCreationFailed;
           else {
-            outResourceHandle = resourceHandle;
+            // Store the internal handle and return the public handle
+            StoreTheFuckOutOfIt(resourceHandle);
+            outResourceHandle = resourceHandle.publicHandle;
+            
             status = EEngineStatus::Ok;
           }
           break;

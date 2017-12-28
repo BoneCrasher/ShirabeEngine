@@ -125,7 +125,7 @@ namespace Engine {
 
 			GFXAPIResourceHandle_t handle = 0;
 
-			status = _backend->load<TResource>(rd, ETaskSynchronization::Sync, nullptr, handle);
+			status = _backend->load<TResource>(static_cast<GenericProxyBase<TResource>*>(this)->creationRequest(), ETaskSynchronization::Sync, nullptr, handle);
 			if( CheckEngineError(status) ) {
 				// MBT TODO: Consider distinguishing the above returned status a little more in 
 				//           order to reflect UNLOADED or UNAVAILABLE state.
