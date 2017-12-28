@@ -40,7 +40,9 @@ namespace Engine {
        *
        * \brief	A render target descriptor implementation.
        **************************************************************************************************/
-      struct Descriptor {
+      struct Descriptor 
+        : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>
+      {
         std::string name;
         Format      format;
         Texture     texture;
@@ -53,14 +55,17 @@ namespace Engine {
       struct CreationRequest {
       public:
         CreationRequest(
-          const Descriptor &desc);
+          Descriptor     const&desc,
+          ResourceHandle const&underlyingTextureHandle);
 
-        const Descriptor& resourceDescriptor() const;
+        Descriptor     const& resourceDescriptor() const;
+        ResourceHandle const& underlyingTextureHandle() const;
 
         std::string toString() const;
 
       private:
-        Descriptor _resourceDescriptor;
+        Descriptor     _resourceDescriptor;
+        ResourceHandle _underlyingTextureHandle;
       };
 
       struct UpdateRequest {

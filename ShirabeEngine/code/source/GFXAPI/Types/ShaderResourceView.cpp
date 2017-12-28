@@ -31,17 +31,20 @@ namespace Engine {
     {}
 
     ShaderResourceViewDeclaration::Descriptor
-    ::Descriptor()
+      ::Descriptor()
       : name("")
       , shaderResourceDimension()
     {}
 
     ShaderResourceViewDeclaration::CreationRequest
-      ::CreationRequest(Descriptor const&desc)
+      ::CreationRequest(
+        Descriptor     const&desc,
+        ResourceHandle const&underlyingBufferHandle)
       : _resourceDescriptor(desc)
+      , _underlyingBufferHandle(underlyingBufferHandle)
     {}
 
-    std::string 
+    std::string
       ShaderResourceViewDeclaration::Descriptor
       ::toString() const
     {
@@ -68,12 +71,19 @@ namespace Engine {
       return ss.str();
     }
 
-    const ShaderResourceViewDeclaration::Descriptor& 
+    ShaderResourceViewDeclaration::Descriptor const&
       ShaderResourceViewDeclaration::CreationRequest
       ::CreationRequest
       ::resourceDescriptor() const
     {
       return _resourceDescriptor;
+    }
+
+    ResourceHandle const&
+      ShaderResourceViewDeclaration::CreationRequest
+      ::underlyingBufferHandle() const
+    {
+      return _underlyingBufferHandle;
     }
 
     std::string

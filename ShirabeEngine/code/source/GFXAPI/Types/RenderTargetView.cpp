@@ -24,15 +24,25 @@ namespace Engine {
 
 
     RenderTargetViewDeclaration::CreationRequest
-      ::CreationRequest(const Descriptor &desc)
+      ::CreationRequest(
+        Descriptor     const&desc,
+        ResourceHandle const&underlyingTextureHandle)
       : _resourceDescriptor(desc)
+      , _underlyingTextureHandle(underlyingTextureHandle)
     {}
 
-    const RenderTargetViewDeclaration::Descriptor&
+    RenderTargetViewDeclaration::Descriptor const&
       RenderTargetViewDeclaration::CreationRequest
       ::resourceDescriptor() const
     {
       return  _resourceDescriptor;
+    }
+
+    ResourceHandle const&
+      RenderTargetViewDeclaration::CreationRequest
+      ::underlyingTextureHandle() const
+    {
+      return _underlyingTextureHandle;
     }
 
     std::string RenderTargetViewDeclaration::CreationRequest

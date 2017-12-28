@@ -24,12 +24,24 @@ namespace Engine {
 			static bool create(
 				const Ptr<ResourceProxyFactory>         &proxyFactory,
 				const DepthStencilView::CreationRequest &request,
-				ResourceHandleList                      &inDependencyHandles,
         DepthStencilView::Binding               &outBinding,
 				ResourceProxyMap                        &outProxyMap,
 				DependerTreeNodeList                    &outResourceHierarchy)
 			{
-				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
+        DepthStencilView::Descriptor const& desc = request.resourceDescriptor();
+        Ptr<IResourceProxy<DepthStencilView>> proxy
+          = proxyFactory->create<DepthStencilView>(EProxyType::Dynamic, request);
+
+        ResourceHandle handle(desc.name, EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW);
+        outProxyMap[handle] = AnyProxy(proxy);
+
+        DependerTreeNode resourceNode;
+        resourceNode.resourceHandle = handle;
+
+        DepthStencilView::Binding binding;
+        binding.handle = handle;
+
+        outResourceHierarchy.push_back(resourceNode);
 			}
 		};
 		 

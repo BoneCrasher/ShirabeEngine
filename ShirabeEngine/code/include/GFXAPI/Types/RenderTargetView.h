@@ -27,7 +27,9 @@ namespace Engine {
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::RENDER_TARGET_VIEW;
 
 
-      struct Descriptor {
+      struct Descriptor
+        : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW> 
+      {
         std::string             name;
         Format                  textureFormat;
         unsigned int            dimensionNb;
@@ -42,13 +44,17 @@ namespace Engine {
       struct CreationRequest {
       public:
         CreationRequest(
-          Descriptor const&desc);
+          Descriptor     const&desc,
+          ResourceHandle const&underlyingTextureHandle);
 
-        const Descriptor& resourceDescriptor() const;
+        Descriptor     const& resourceDescriptor()      const;
+        ResourceHandle const& underlyingTextureHandle() const;
 
         std::string toString() const;
+
       private:
-        Descriptor _resourceDescriptor;
+        Descriptor     _resourceDescriptor;
+        ResourceHandle _underlyingTextureHandle;
       };
       
       struct UpdateRequest { };

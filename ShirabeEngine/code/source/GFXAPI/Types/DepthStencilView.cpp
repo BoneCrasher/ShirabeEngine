@@ -37,8 +37,10 @@ namespace Engine {
 
     DepthStencilViewDeclaration::CreationRequest
       ::CreationRequest(
-        Descriptor const&desc)
+        Descriptor     const&desc,
+        ResourceHandle const&underlyingTextureHandle)
       : _resourceDescriptor(desc)
+      , _underlyingTextureHandle(underlyingTextureHandle)
     {}
 
     DepthStencilViewDeclaration::Descriptor const&
@@ -46,6 +48,13 @@ namespace Engine {
       ::resourceDescriptor() const
     {
       return _resourceDescriptor;
+    }
+
+    ResourceHandle const&
+      DepthStencilViewDeclaration::CreationRequest
+      ::underlyingTextureHandle() const
+    {
+      return _underlyingTextureHandle;
     }
 
     std::string

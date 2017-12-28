@@ -167,6 +167,13 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Environment.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Renderer.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_DepthStencilState.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_DepthStencilView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_RenderTargetView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_ShaderResourceView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_SwapChain.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_TextureND.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\DepthStencilState.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\DepthStencilView.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\RenderTargetView.cpp" />
@@ -180,8 +187,6 @@
     <ClCompile Include="code\source\Memory\AllocatorBase\PreallocatingAllocatorBase.cpp" />
     <ClCompile Include="code\source\Memory\AllocTracking\AllocationTracking.cpp" />
     <ClCompile Include="code\source\Memory\New.cpp" />
-    <ClCompile Include="code\source\Resources\DirectX\DX11\DX11RenderTargetViewBuilder.cpp" />
-    <ClCompile Include="code\source\Resources\DirectX\DX11\DX11ShaderResourceViewBuilder.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11SwapChainBuilder.cpp" />
     <ClCompile Include="code\source\Resources\DirectX\DX11\DX11TextureNDBuilder.cpp" />
     <ClCompile Include="code\source\Resources\System\Core\Handle.cpp" />

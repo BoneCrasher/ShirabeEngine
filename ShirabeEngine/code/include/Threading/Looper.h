@@ -64,11 +64,11 @@ namespace Engine {
 
 				std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
 
-			private:
-				TTaskResult run() {
+				inline TTaskResult run() const {
 					return _task();
 				}
 
+      private:
 				Priority                          _priority;
 				std::packaged_task<TTaskResult()> _task;
 			};

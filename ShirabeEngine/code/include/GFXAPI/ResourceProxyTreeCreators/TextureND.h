@@ -63,13 +63,11 @@ namespace Engine {
         srvDesc.shaderResourceDimension.texture.isCube      = isCube;
         srvDesc.shaderResourceDimension.texture.mipMap      = mipMapDesc;
 
-        ShaderResourceView::CreationRequest srvCreationRequest(srvDesc);
+        ShaderResourceView::CreationRequest srvCreationRequest(srvDesc, textureNDProxyHandle);
 
         ShaderResourceView::Binding binding;
         ResourceProxyMap            proxies;
         DependerTreeNodeList        hierarchy;
-
-        ResourceHandleList dependencyInjection ={textureNDProxyHandle};
 
         // There will only be exactly one proxy, which is the SRV root. 
         // SRVs in DirectX can basically handle any combination of Textures, Arrays, MipMaps etc.
@@ -77,7 +75,7 @@ namespace Engine {
         // OpenGL doesn't really GAF anyway, but is a bit more complex regarding texture binding
         // and update and needs wrapper classes to handle those 5 million calls in OGL.
         // These will basically be the SRV and RTV implementations on the respective platforms.
-        bool successful = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
+        bool successful = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, binding, proxies, hierarchy);
 
         AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
         TextureNDSRVProxyPtr srvProxy = (result.has_value() ? GFXAPIProxyCast<ShaderResourceView>(result) : nullptr);
@@ -124,15 +122,13 @@ namespace Engine {
         rtvDesc.array         = arrayDesc;
         rtvDesc.mipMap        = mipMapDesc;
 
-        RenderTargetViewCreationRequest rtvCreationRequest(rtvDesc);
+        RenderTargetView::CreationRequest rtvCreationRequest(rtvDesc, textureNDProxyHandle);
 
         RenderTargetView::Binding binding;
         ResourceProxyMap          proxies;
         DependerTreeNodeList      hierarchy;
 
-        ResourceHandleList dependencyInjection ={textureNDProxyHandle};
-
-        bool successful = ProxyTreeCreator<RenderTargetView>::create(proxyFactory, rtvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
+        bool successful = ProxyTreeCreator<RenderTargetView>::create(proxyFactory, rtvCreationRequest, binding, proxies, hierarchy);
 
         AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
         TextureNDRTVProxyPtr rtvProxy = (result.has_value() ? GFXAPIProxyCast<RenderTargetView>(result) : nullptr);
@@ -180,15 +176,13 @@ namespace Engine {
         dsvDesc.texture.array       = arrayDesc;
         dsvDesc.texture.mipMap      = mipMapDesc;
 
-        DepthStencilView::CreationRequest dsvCreationRequest(dsvDesc);
+        DepthStencilView::CreationRequest dsvCreationRequest(dsvDesc, textureNDProxyHandle);
 
         DepthStencilView::Binding binding;
         ResourceProxyMap          proxies;
         DependerTreeNodeList      hierarchy;
-
-        ResourceHandleList dependencyInjection ={textureNDProxyHandle};
-        
-        bool successful = ProxyTreeCreator<DepthStencilView>::create(proxyFactory, dsvCreationRequest, dependencyInjection, binding, proxies, hierarchy);
+              
+        bool successful = ProxyTreeCreator<DepthStencilView>::create(proxyFactory, dsvCreationRequest, binding, proxies, hierarchy);
 
         AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
         TextureNDDSVProxyPtr dsvProxy = (result.has_value() ? GFXAPIProxyCast<DepthStencilView>(result) : nullptr);
@@ -325,7 +319,6 @@ namespace Engine {
       static bool create(
         const Ptr<ResourceProxyFactory>  &proxyFactory,
         const Texture1D::CreationRequest &request,
-        ResourceHandleList               &inDependencyHandles,
         Texture1D::Binding               &outBinding,
         ResourceProxyMap                 &outProxies,
         DependerTreeNodeList             &outResourceHierarchy)
@@ -333,7 +326,7 @@ namespace Engine {
         // Down-cast to known type!
         const Texture1D::Descriptor& t1DDesc = request.resourceDescriptor();
         Ptr<IResourceProxy<Texture1D>> proxy
-          = proxyFactory->create<Texture1D>(EProxyType::Dynamic, request, inDependencyHandles);
+          = proxyFactory->create<Texture1D>(EProxyType::Dynamic, request);
 
         ResourceHandle handle(t1DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_1D);
         outProxies[handle] = AnyProxy(proxy);
@@ -378,14 +371,13 @@ namespace Engine {
       static bool create(
         const Ptr<ResourceProxyFactory>  &proxyFactory,
         const Texture2D::CreationRequest &request,
-        ResourceHandleList               &inDependencyHandles,
         Texture2D::Binding               &outBinding,
         ResourceProxyMap                 &outProxies,
         DependerTreeNodeList             &outResourceHierarchy)
       {
         const Texture2D::Descriptor& t2DDesc = request.resourceDescriptor();
         Ptr<IResourceProxy<Texture2D>> proxy
-          = proxyFactory->create<Texture2D>(EProxyType::Dynamic, request, inDependencyHandles);
+          = proxyFactory->create<Texture2D>(EProxyType::Dynamic, request);
 
         ResourceHandle handle(t2DDesc.name, EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D);
         outProxies[handle] = AnyProxy(proxy);
@@ -429,14 +421,13 @@ namespace Engine {
       static bool create(
         const Ptr<ResourceProxyFactory>  &proxyFactory,
         const Texture3D::CreationRequest &request,
-        ResourceHandleList               &inDependencyHandles,
         Texture3D::Binding               &outBinding,
         ResourceProxyMap                 &outProxies,
         DependerTreeNodeList             &outResourceHierarchy)
       {
         const Texture3D::Descriptor& t3DDesc = request.resourceDescriptor();
         Ptr<IResourceProxy<Texture3D>> proxy
-          = proxyFactory->create<Texture3D>(EProxyType::Dynamic, request, inDependencyHandles);
+          = proxyFactory->create<Texture3D>(EProxyType::Dynamic, request);
 
         ResourceHandle handle(t3DDesc.name, resource_type, resource_subtype);
         outProxies[handle] = AnyProxy(proxy);

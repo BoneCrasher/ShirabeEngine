@@ -25,7 +25,9 @@ namespace Engine {
        *
        * \brief	A depth stencil state descriptor implementation.
        **************************************************************************************************/
-      struct Descriptor {
+      struct Descriptor 
+        : public DescriptorImplBase<EResourceType::GAPI_STATE, EResourceSubType::DEPTH_STENCIL_STATE>
+      {
         enum class DepthWriteMask
           : uint8_t
         {

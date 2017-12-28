@@ -48,50 +48,11 @@ namespace Engine {
 			  ID3D11ShaderResourceView, ID3D11RenderTargetView, ID3D11DepthStencilView,					             		/* View-Types         */\
         ID3D11RasterizerState, ID3D11DepthStencilState, ID3D11BlendState,                                 /* State-Types        */\
 			  ID3D11VertexShader, ID3D11HullShader, ID3D11DomainShader, ID3D11GeometryShader, ID3D11PixelShader /* Shader-Types       */
-
-       /**********************************************************************************************//**
-        * \class	DX11ResourceTaskBuilderImplementation
-        *
-        * \brief	Default task builder implementation used by the DX11ResourceTaskBuilder!!!
-        *
-        * \tparam	TResource	Type of the resource.
-        **************************************************************************************************/
-      template <typename TResource>
-      class DX11ResourceTaskBuilderImplementation
-        : public ITaskBuilderImplementationBase<TResource>
-      {
-        inline Ptr<Task> build(
-          const ResourceDescriptor<GfxApiType> &descriptor,
-          const EResourceTaskType              &taskType)
-        {
-          using BuilderType = DX11ResourceBuilderBase<TResource, typename ResourceMapping<TResource>::mapped_resource_type>;
-          // using UpdaterType    = ...;
-          // using DestructorType = ...;
-          // using QueryType      = ...;
-
-          Ptr<Task> task = nullptr;
-
-          switch(taskType) {
-          case EResourceTaskType::Creation:
-            break;
-          case EResourceTaskType::Update:
-            break;
-          case EResourceTaskType::Destruction:
-            break;
-          case EResourceTaskType::Query:
-            break;
-          default:
-            break;
-          }
-
-          return task;
-        }
-      };
-
-#define ImplementTaskBuilder(Type)                                                                       \
-      EEngineStatus creationTask   (Type::CreationRequest    const& request, ResourceTaskFn_t &outTask); \
-      EEngineStatus updateTask     (Type::UpdateRequest      const& request, ResourceTaskFn_t &outTask); \
-      EEngineStatus destructionTask(Type::DestructionRequest const& request, ResourceTaskFn_t &outTask); \
+      
+#define ImplementTaskBuilder(Type)                                                                                                                                             \
+      EEngineStatus creationTask   (Type::CreationRequest    const& request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+      EEngineStatus updateTask     (Type::UpdateRequest      const& request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+      EEngineStatus destructionTask(Type::DestructionRequest const& request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
       EEngineStatus queryTask      (Type::Query              const& request, ResourceTaskFn_t &outTask); 
 
 

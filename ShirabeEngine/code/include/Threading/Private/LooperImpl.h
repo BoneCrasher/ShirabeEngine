@@ -359,6 +359,8 @@ namespace Engine{
       ::loop(const typename ILooper<TTaskResult>::Task&& runnable)
     {
       TTaskResult result = runnable.run();
+
+      // Handle issues and/or notify callback attached to it...
     }
 	}
 }

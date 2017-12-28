@@ -69,7 +69,9 @@ namespace Engine {
        *
        * \brief	A render target descriptor implementation.
        **************************************************************************************************/
-      struct Descriptor {
+      struct Descriptor 
+        : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>
+      {
         enum class EShaderResourceDimension {
           Texture,
           StructuredBuffer
@@ -92,14 +94,18 @@ namespace Engine {
        **************************************************************************************************/
       struct CreationRequest {
       public:
-        CreationRequest(Descriptor const&desc);
+        CreationRequest(
+          Descriptor     const&desc,
+          ResourceHandle const&underlyingBufferHandle);
 
-        const Descriptor& resourceDescriptor() const;
+        Descriptor     const& resourceDescriptor()     const;
+        ResourceHandle const& underlyingBufferHandle() const;
 
         std::string toString() const;
 
       private:
-        Descriptor _resourceDescriptor;
+        Descriptor     _resourceDescriptor;
+        ResourceHandle _underlyingBufferHandle;
       };
 
       struct UpdateRequest { };

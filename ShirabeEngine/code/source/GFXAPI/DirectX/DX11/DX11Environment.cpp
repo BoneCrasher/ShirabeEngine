@@ -20,7 +20,6 @@ namespace Engine {
         : m_dxgiFactory(nullptr)
         , m_selectedAdapter(nullptr)
         , m_selectedOutput(nullptr)
-        , m_swapChain(nullptr)
         , m_device(nullptr)
         , m_immediateContext(nullptr)
       {}

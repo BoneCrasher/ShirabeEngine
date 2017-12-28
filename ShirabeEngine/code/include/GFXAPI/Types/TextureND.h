@@ -120,10 +120,10 @@ namespace Engine {
       };
 
       struct Binding {
-        ResourceHandle            handle;
-        ShaderResourceViewBinding srvBinding;
-        RenderTargetViewBinding   rtvBinding;
-        DepthStencilViewBinding   dsvBinding;
+        ResourceHandle              handle;
+        ShaderResourceView::Binding srvBinding;
+        RenderTargetView::Binding   rtvBinding;
+        DepthStencilView::Binding   dsvBinding;
 
         inline Binding();
       };

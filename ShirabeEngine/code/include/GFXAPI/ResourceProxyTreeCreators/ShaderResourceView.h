@@ -23,12 +23,24 @@ namespace Engine {
 			static bool create(
 				const Ptr<ResourceProxyFactory>           &proxyFactory,
 				const ShaderResourceView::CreationRequest &request,
-				ResourceHandleList                        &inDependencyHandles,
         ShaderResourceView::Binding               &outBinding,
 				ResourceProxyMap                          &outProxyMap,
 				DependerTreeNodeList                      &outResourceHierarchy)
 			{
-				throw std::exception("Proxy creation undefined for unspecialized type and subtype.");
+        ShaderResourceView::Descriptor const& desc = request.resourceDescriptor();
+        Ptr<IResourceProxy<ShaderResourceView>> proxy
+          = proxyFactory->create<ShaderResourceView>(EProxyType::Dynamic, request);
+
+        ResourceHandle handle(desc.name, EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW);
+        outProxyMap[handle] = AnyProxy(proxy);
+
+        DependerTreeNode resourceNode;
+        resourceNode.resourceHandle = handle;
+
+        ShaderResourceView::Binding binding;
+        binding.handle = handle;
+
+        outResourceHierarchy.push_back(resourceNode);
 			}
 		};
 

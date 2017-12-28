@@ -26,7 +26,6 @@ namespace Engine {
 			static bool create(
 				const Ptr<ResourceProxyFactory>  &proxyFactory,
 				const SwapChain::CreationRequest &request,
-				ResourceHandleList               &inDependencyHandles,
 				SwapChain::Binding               &outBinding,
 				ResourceProxyMap                 &outProxyMap,
 				DependerTreeNodeList             &outResourceHierarchy)
@@ -40,7 +39,7 @@ namespace Engine {
 
 				ResourceHandle rootHandle(desc.name, SwapChain::resource_type, SwapChain::resource_subtype);
 				Ptr<IResourceProxy<SwapChain>> rootProxy
-					= proxyFactory->create<SwapChain>(EProxyType::Persistent, request, inDependencyHandles);
+					= proxyFactory->create<SwapChain>(EProxyType::Persistent, request);
 
 				outBinding.swapChainHandle = rootHandle;
 			}

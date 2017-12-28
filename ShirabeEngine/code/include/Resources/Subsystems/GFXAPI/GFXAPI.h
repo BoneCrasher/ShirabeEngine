@@ -25,6 +25,13 @@ namespace Engine {
 		using GFXAPIResourceHandle_t = uint64_t;
 		static const GFXAPIResourceHandle_t GFXAPIUninitializedResourceHandle = 0;
 
+    struct GFXAPIResourceHandleAssignment {
+      GFXAPIResourceHandle_t publicHandle;
+      Ptr<void>              internalHandle;
+
+      inline bool valid() const { return (publicHandle && internalHandle); }
+    };
+
 		DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 		DeclareMapType(ResourceHandle, GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 
@@ -32,24 +39,24 @@ namespace Engine {
       return (h > 0); // For now this is the only condition...
     }
 		
-	#define DefineStorageCondition(sz)                            \
-		template <typename T>	                                  \
-		struct u##sz##StorageCondition	                          \
-		{						                                  \
-			static constexpr bool value                           \
+	#define DefineStorageCondition(sz)                              \
+		template <typename T>	                                        \
+		struct u##sz##StorageCondition	                              \
+		{						                                                  \
+			static constexpr bool value                                 \
                 = std::is_integral<T>::value                      \
                   && sizeof(T) == sizeof(uint##sz##_t)            \
                   && std::is_convertible<T, uint##sz##_t>::value; \
 		};     
 
 
-	#define DefineSetter(sz)                                                              \
-		template <typename T>												              \
+	#define DefineSetter(sz)                                                            \
+		template <typename T>												                                      \
 		void setValue(const std::enable_if_t <u##sz##StorageCondition<T>::value, T >& in) \
-		{	                                                                              \
+		{	                                                                                \
 		    const std::type_info& info = typeid(T);                                       \
-			_typeInfo      = GFXAPIResourceHolder::RTTI(info);	    	 	              \
-			_handle._u##sz = static_cast<uint##sz##_t>(in);					              \
+			_typeInfo      = GFXAPIResourceHolder::RTTI(info);	    	 	                    \
+			_handle._u##sz = static_cast<uint##sz##_t>(in);					                        \
 		}
 
 	#define DefineField(sz) \
