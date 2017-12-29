@@ -157,6 +157,11 @@ namespace Engine {
         typename TResource::Binding               &binding
       );
 
+      template <typename TResource>
+      EEngineStatus createImpl(
+        typename TResource::CreationRequest const&inRequest,
+        Ptr<TResource>                           &out);
+
     public:
       ProxyBasedResourceManager(
         const Ptr<ResourceProxyFactory> &proxyFactory)
@@ -180,37 +185,19 @@ namespace Engine {
         return m_resourceBackend;
       }
 
-      EEngineStatus createSwapChain(
-        const SwapChain::CreationRequest &inRequest,
-        Ptr<SwapChain>                   &outSwapChain);
+#define DeclareCreator(Type)                    \
+      EEngineStatus create##Type(               \
+        Type::CreationRequest const&inRequest,  \
+        Ptr<Type>                  &out##Type);
 
-      EEngineStatus createTexture1D(
-        const Texture1D::CreationRequest &request,
-        Ptr<Texture1D>                   &outTexture1D);
-
-      EEngineStatus createTexture2D(
-        const Texture2D::CreationRequest &request,
-        Ptr<Texture2D>                   &outTexture2D);
-
-      EEngineStatus createTexture3D(
-        const Texture3D::CreationRequest &request,
-        Ptr<Texture3D>                   &outTexture3D);
-
-      EEngineStatus createRenderTargetView(
-        const RenderTargetView::CreationRequest &request,
-        Ptr<RenderTargetView>                   &out);
-
-      EEngineStatus createShaderResourceView(
-        const ShaderResourceView::CreationRequest &request,
-        Ptr<ShaderResourceView>                   &out);
-
-      EEngineStatus createDepthStencilView(
-        const DepthStencilView::CreationRequest &request,
-        Ptr<DepthStencilView>                   &out);
-
-      EEngineStatus createDepthStencilState(
-        const DepthStencilState::CreationRequest &request,
-        Ptr<DepthStencilState>                   &out);
+      DeclareCreator(SwapChain);
+      DeclareCreator(Texture1D);
+      DeclareCreator(Texture2D);
+      DeclareCreator(Texture3D);
+      DeclareCreator(RenderTargetView);
+      DeclareCreator(ShaderResourceView);
+      DeclareCreator(DepthStencilView);
+      DeclareCreator(DepthStencilState);
 
     private:
       inline AnyProxy getResourceProxy(const ResourceHandle& handle) {
@@ -610,6 +597,31 @@ namespace Engine {
 
       return status;
     }
+
+    template <typename TResource>
+    EEngineStatus ProxyBasedResourceManager
+      ::createImpl(
+        typename TResource::CreationRequest const&inRequest,
+        Ptr<TResource>                           &out)
+    {
+      typename TResource::Binding binding ={};
+
+      EEngineStatus status = createResource<TResource>(
+        inRequest,
+        false,
+        binding);
+
+      if(CheckEngineError(status)) {
+        Log::Error(logTag(), "Failed to create resource.");
+        return status;
+      }
+
+      const typename TResource::Descriptor& desc = inRequest.resourceDescriptor();
+      out = TResource::create(desc, binding);
+
+      return EEngineStatus::Ok;
+    }
+
   }
 }
 
