@@ -29,6 +29,11 @@ namespace Engine {
       GFXAPIResourceHandle_t publicHandle;
       Ptr<void>              internalHandle;
 
+      inline GFXAPIResourceHandleAssignment() 
+        : publicHandle(0)
+        , internalHandle(0) 
+      {}
+
       inline bool valid() const { return (publicHandle && internalHandle); }
     };
 

@@ -22,9 +22,15 @@ namespace Engine {
 			{
 			}
 
+      void DX11Renderer
+        ::setDX11Environment(Ptr<DX11Environment> const&pDx11Environment) {
+        assert(pDx11Environment != nullptr);
+
+        _dx11Environment = pDx11Environment;
+      }
+
 			EEngineStatus DX11Renderer::initialize(
 				ApplicationEnvironment const &environment,
-        DX11Environment        const &dx11Environment,
 				RendererConfiguration  const &configuration,
 				IResourceManagerPtr    const &resourceManager) 
       {
@@ -37,7 +43,7 @@ namespace Engine {
 				EEngineStatus status = EEngineStatus::Ok;
 				HRESULT       dxRes  = S_OK;
 
-        GAPIOutputMode const& outputMode = dx11Environment.getOutputMode();
+        GAPIOutputMode const& outputMode = _dx11Environment->getOutputMode();
 
 				static const std::size_t BACK_BUFFER_COUNT = 1;
 
@@ -93,11 +99,13 @@ namespace Engine {
           // Mimimi...
         }
 
-        ID3D11RenderTargetView *const d3d11SwapChainRTV = _resourceManager.getUnderlyingResourceHandle(swapChainRTV);
-        ID3D11DepthStencilView *const d3d11DSV          = _resourceManager.getUnderlyingResourceHandle(defaultDSView);
+    //    ID3D11RenderTargetView *const d3d11SwapChainRTV = nullptr;
+    //    ID3D11DepthStencilView *const d3d11DSV          = _resourceManager. (defaultDSView);
 
-				// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
-				dx11Environment.getImmediateContext()->OMSetRenderTargets(1, &d3d11SwapChainRTV, d3d11DSV);
+    //    _resourceManager->backend()->getUnderlyingHandle<ID3D11RenderTargetView>(_swapChain->binding.)
+
+				//// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
+				//dx11Environment.getImmediateContext()->OMSetRenderTargets(1, &d3d11SwapChainRTV, d3d11DSV);
 
 				// _createDepthStencilState:
 					// 
@@ -123,7 +131,7 @@ namespace Engine {
 				dsDesc.BackFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
 				dsDesc.BackFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
 
-				dxRes = tmpDevice->CreateDepthStencilState(&dsDesc, &tmpDefaultDepthStencilState);
+				dxRes = resourceManager->createDepthStencilState(&dsDesc, &tmpDefaultDepthStencilState);
 				if( FAILED(dxRes) ) {
 					status = EEngineStatus::DXDevice_DepthStencilStateCreationFailed;
 					goto _return_failed;

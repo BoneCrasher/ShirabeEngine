@@ -176,6 +176,10 @@ namespace Engine {
         m_resourceBackend = backend;
       }
 
+      Ptr<BasicGFXAPIResourceBackend>& backend() {
+        return m_resourceBackend;
+      }
+
       EEngineStatus createSwapChain(
         const SwapChain::CreationRequest &inRequest,
         Ptr<SwapChain>                   &outSwapChain);
@@ -191,6 +195,22 @@ namespace Engine {
       EEngineStatus createTexture3D(
         const Texture3D::CreationRequest &request,
         Ptr<Texture3D>                   &outTexture3D);
+
+      EEngineStatus createRenderTargetView(
+        const RenderTargetView::CreationRequest &request,
+        Ptr<RenderTargetView>                   &out);
+
+      EEngineStatus createShaderResourceView(
+        const ShaderResourceView::CreationRequest &request,
+        Ptr<ShaderResourceView>                   &out);
+
+      EEngineStatus createDepthStencilView(
+        const DepthStencilView::CreationRequest &request,
+        Ptr<DepthStencilView>                   &out);
+
+      EEngineStatus createDepthStencilState(
+        const DepthStencilState::CreationRequest &request,
+        Ptr<DepthStencilState>                   &out);
 
     private:
       inline AnyProxy getResourceProxy(const ResourceHandle& handle) {

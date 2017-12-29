@@ -55,14 +55,14 @@ namespace Engine {
           break;
         }
 
-        outTask = [=] () -> GFXAPIResourceHandleAssignment
+        outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
           Ptr<ID3D11Texture2D> underlyingTexture = std::static_pointer_cast<ID3D11Texture2D>(resolvedDependencies.at(request.underlyingTextureHandle()));
           
           GFXAPIResourceHandleAssignment assignment ={};
           
           ID3D11RenderTargetView *pResourceUnmanaged = nullptr;
-          HRESULT hres = m_device->CreateRenderTargetView(underlyingTexture.get(), &rtvDesc, &pResourceUnmanaged);
+          HRESULT hres = m_dx11Environment->getDevice()->CreateRenderTargetView(underlyingTexture.get(), &rtvDesc, &pResourceUnmanaged);
           if (FAILED(hres)) {
              EEngineStatus::DXDevice_AttachSwapChainToBackBuffer_CreateRTV_Failed;
           }

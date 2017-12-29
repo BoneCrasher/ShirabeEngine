@@ -21,7 +21,8 @@ namespace Engine {
   RenderTargetView,   \
   ShaderResourceView, \
   DepthStencilState,  \
-  SwapChain           
+  SwapChain,          \
+  SwapChainBuffer
   // ConstantBuffer,     \
   // ObjectBuffer,       \
   // StructuredBuffer,   \

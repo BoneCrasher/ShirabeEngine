@@ -43,6 +43,7 @@ namespace Engine {
 			DEVICE                = 501,
 			DEVICE_CONTEXT        = 502,
 			SWAP_CHAIN            = 503,
+      SWAP_CHAIN_BUFFER     = 504,
 			DEPTH_STENCIL_VIEW    = 601,
 			SHADER_RESOURCE_VIEW  = 602,
 			RENDER_TARGET_VIEW    = 603,

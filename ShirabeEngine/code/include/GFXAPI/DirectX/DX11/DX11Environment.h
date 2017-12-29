@@ -31,6 +31,8 @@ namespace Engine {
           RendererConfiguration  const& configuration);
         EEngineStatus deinitialize();
 
+        IDXGIFactoryPtr getDxgiFactory() const;
+
         ID3D11DevicePtr        getDevice()           const;
         ID3D11DeviceContextPtr getImmediateContext() const;
         

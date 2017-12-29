@@ -93,5 +93,29 @@ namespace Engine {
 			outTexture3D = MakeSharedPointerType<Texture3D>(desc, binding);
 			return EEngineStatus::Ok;
 		}
+
+    EEngineStatus ProxyBasedResourceManager::createRenderTargetView(
+      const RenderTargetView::CreationRequest &request,
+      Ptr<RenderTargetView>                   &out)
+    {
+    }
+
+    EEngineStatus ProxyBasedResourceManager::createShaderResourceView(
+      const ShaderResourceView::CreationRequest &request,
+      Ptr<ShaderResourceView>                   &out)
+    {
+    }
+
+    EEngineStatus ProxyBasedResourceManager::createDepthStencilView(
+      const DepthStencilView::CreationRequest &request,
+      Ptr<DepthStencilView>                   &out)
+    {
+    }
+
+    EEngineStatus ProxyBasedResourceManager::createDepthStencilState(
+      const DepthStencilState::CreationRequest &request,
+      Ptr<DepthStencilState>                   &out)
+    {
+    }
 	}
 }

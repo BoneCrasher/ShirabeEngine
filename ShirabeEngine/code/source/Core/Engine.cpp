@@ -105,7 +105,9 @@ namespace Engine {
     std::function<void()> fnCreateDefaultGFXAPI
       = [this, &rendererConfiguration] () -> void
     {
-      EEngineStatus status = _dx11Environment.initialize(_environment, rendererConfiguration);
+      _dx11Environment = MakeSharedPointerType<DX11Environment>();
+
+      EEngineStatus status = _dx11Environment->initialize(_environment, rendererConfiguration);
       HandleEngineStatusError(status, "DirectX11 initialization failed.");
     };
     
@@ -127,8 +129,8 @@ namespace Engine {
       Ptr<IGFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
 
       if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
-            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>();
-
+            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>(_dx11Environment);
+    
       resourceBackend->setResourceTaskBackend(resourceTaskBackend);
 
       _proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);

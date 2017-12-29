@@ -69,6 +69,7 @@ namespace Engine {
 
       struct Binding {
         ResourceHandle handle;
+        ResourceHandle internalUnderlyingTextureHandle;
 
         inline Binding();
       };

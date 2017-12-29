@@ -82,14 +82,14 @@ namespace Engine {
           srvDesc.Buffer.ElementWidth  = desc.shaderResourceDimension.structuredBuffer.elementWidthInBytes;
         }
 
-        outTask = [=] () -> GFXAPIResourceHandleAssignment
+        outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
           Ptr<ID3D11Resource> underlyingResource = std::static_pointer_cast<ID3D11Resource>(resolvedDependencies.at(request.underlyingBufferHandle()));
 
           GFXAPIResourceHandleAssignment assignment ={};
 
           ID3D11ShaderResourceView *pResourceUnmanaged = nullptr;
-          HRESULT hres = m_device->CreateShaderResourceView(underlyingResource.get(), &srvDesc, &pResourceUnmanaged);
+          HRESULT hres = m_dx11Environment->getDevice()->CreateShaderResourceView(underlyingResource.get(), &srvDesc, &pResourceUnmanaged);
           if (FAILED(hres)) {
             EEngineStatus::DXDevice_AttachSwapChainToBackBuffer_CreateRTV_Failed;
           }

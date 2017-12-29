@@ -25,11 +25,14 @@ namespace Engine {
         DX11Renderer();
         ~DX11Renderer();
 
+        void setDX11Environment(Ptr<DX11Environment> const&pDx11Environment);
+
         EEngineStatus initialize(
           ApplicationEnvironment const &environment,
-          DX11Environment        const &dx11Environment,
           RendererConfiguration  const &configuration,
           IResourceManagerPtr    const &resourceManager);
+
+
         EEngineStatus deinitialize();
         EEngineStatus reinitialize();
 
@@ -43,10 +46,11 @@ namespace Engine {
         RendererConfiguration _config;
         IResourceManagerPtr   _resourceManager;
 
+        Ptr<DX11Environment> _dx11Environment;
+
         // Fixed DX component handles and resources
         Ptr<SwapChain>             _swapChain;
-
-
+        
         ID3D11RenderTargetViewPtr  _backBufferRTV;
         ID3D11Texture2DPtr         _depthStencilTexture;
         ID3D11DepthStencilViewPtr  _depthStencilView;

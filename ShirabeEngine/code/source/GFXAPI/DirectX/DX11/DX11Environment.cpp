@@ -230,6 +230,12 @@ namespace Engine {
           .outputModes[m_caps.selectedConfig.outputIndex];
       }
 
+      IDXGIFactoryPtr 
+        DX11Environment::getDxgiFactory() const
+      {
+        return m_dxgiFactory;
+      }
+
       ID3D11DevicePtr
         DX11Environment::getDevice() const
       {

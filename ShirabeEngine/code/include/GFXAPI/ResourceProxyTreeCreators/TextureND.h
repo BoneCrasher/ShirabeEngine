@@ -20,12 +20,12 @@
 #include "GFXAPI/ResourceProxyTreeCreators/DepthStencilView.h"
 
 template <typename TKey, typename TValue>
-TValue& __map_get_if_contained(std::map<TKey, TValue> const& inMap, const TKey& inKey) {
-  typename std::map<TKey, TValue>::const_iterator it = inMap.find(inKey);
-  if(inKey == inMap.end())
-    return nullptr;
-  else
-    return it->second;
+TValue& __map_get_if_contained(std::map<TKey, TValue> &inMap, const TKey& inKey) {
+  for(typename std::map<TKey, TValue>::value_type &v : inMap)
+    if(inKey == v.first)
+      return v.second;
+
+  return TValue();
 }
 
 namespace Engine {
@@ -77,7 +77,7 @@ namespace Engine {
         // These will basically be the SRV and RTV implementations on the respective platforms.
         bool successful = ProxyTreeCreator<ShaderResourceView>::create(proxyFactory, srvCreationRequest, binding, proxies, hierarchy);
 
-        AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
+        AnyProxy& result = __map_get_if_contained<ResourceHandle, AnyProxy>(proxies, binding.handle);
         TextureNDSRVProxyPtr srvProxy = (result.has_value() ? GFXAPIProxyCast<ShaderResourceView>(result) : nullptr);
         // Verify?
 
@@ -115,7 +115,7 @@ namespace Engine {
       DependerTreeNode                  &outRTVHierarchy)
     {
       if((bindFlags & (std::underlying_type_t<BufferBinding>)BufferBinding::ShaderOutput_RenderTarget)) {
-        RenderTargetViewDescriptor rtvDesc ={};
+        RenderTargetView::Descriptor rtvDesc ={};
         rtvDesc.name          = String::format("%0_RTV", textureName);
         rtvDesc.textureFormat = textureFormat;
         rtvDesc.dimensionNb   = dimensionNb;
@@ -130,7 +130,7 @@ namespace Engine {
 
         bool successful = ProxyTreeCreator<RenderTargetView>::create(proxyFactory, rtvCreationRequest, binding, proxies, hierarchy);
 
-        AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
+        AnyProxy& result = __map_get_if_contained<ResourceHandle, AnyProxy>(proxies, binding.handle);
         TextureNDRTVProxyPtr rtvProxy = (result.has_value() ? GFXAPIProxyCast<RenderTargetView>(result) : nullptr);
 
         if(!(successful && rtvProxy)) {
@@ -184,7 +184,7 @@ namespace Engine {
               
         bool successful = ProxyTreeCreator<DepthStencilView>::create(proxyFactory, dsvCreationRequest, binding, proxies, hierarchy);
 
-        AnyProxy& result = __map_get_if_contained(proxies, binding.handle);
+        AnyProxy& result = __map_get_if_contained<ResourceHandle, AnyProxy>(proxies, binding.handle);
         TextureNDDSVProxyPtr dsvProxy = (result.has_value() ? GFXAPIProxyCast<DepthStencilView>(result) : nullptr);
 
         if(!(successful && dsvProxy)) {

@@ -39,6 +39,7 @@ namespace Engine {
 		GAPI_NoPrimaryAdapterOutputModes                                =  -50003,
 		GAPI_InvalidHandle                                              =  -50020,
 		GFXAPI_SubsystemThreadEnqueueFailed                             =  -50200, // GFXAPI-Subsystem
+    GFXAPI_SubsystemResourceCreationFailed                          =  -50201,
     GFXAPI_LoadResourceFailed                                       =  -50210,  
     GFXAPI_UnloadResourceFailed                                     =  -50211,
 		DXGI_FactoryCreationFailed                                      = -100300, // DXGI

@@ -49,9 +49,8 @@ namespace Engine {
 		IWindowPtr                       _mainWindow;
 
 #ifdef PLATFORM_WINDOWS
-    DX11Environment _dx11Environment;
+    Ptr<DX11Environment> _dx11Environment;
 #endif
-
 
 		Ptr<ResourceProxyFactory> _proxyFactory;
 		Ptr<IResourceManager>     _resourceManager;

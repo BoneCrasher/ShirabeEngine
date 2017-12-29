@@ -66,53 +66,34 @@ namespace Engine {
 
     using ResolvedDependencyCollection = std::map<ResourceHandle, Ptr<void>>;
 
-    template <typename TFirst, typename... TOther>
-    class IGFXAPIResourceTaskBackend
-      : public IGFXAPIResourceTaskBackend<TOther...>
+    template <typename T>
+    class IGFXAPIResourceTaskBackendDecl
     {
     public:
       virtual EEngineStatus creationTask(
-        typename TFirst::CreationRequest    const&inRequest,
-        ResolvedDependencyCollection        const&inDependencies,
-        ResourceTaskFn_t                         &outTask) = 0;
+        typename T::CreationRequest  const&inRequest,
+        ResolvedDependencyCollection const&inDependencies,
+        ResourceTaskFn_t                  &outTask) = 0;
 
       virtual EEngineStatus updateTask(
-        typename TFirst::UpdateRequest       const&inRequest,
-        ResolvedDependencyCollection         const&inDependencies,
-        ResourceTaskFn_t                          &outTask) = 0;
+        typename T::UpdateRequest    const&inRequest,
+        ResolvedDependencyCollection const&inDependencies,
+        ResourceTaskFn_t                  &outTask) = 0;
 
       virtual EEngineStatus destructionTask(
-        typename TFirst::DestructionRequest const&inRequest,
-        ResolvedDependencyCollection        const&inDependencies,
-        ResourceTaskFn_t                         &outTask) = 0;
+        typename T::DestructionRequest const&inRequest,
+        ResolvedDependencyCollection   const&inDependencies,
+        ResourceTaskFn_t                    &outTask) = 0;
 
       virtual EEngineStatus queryTask(
-        const typename TFirst::Query &inRequest,
-        ResourceTaskFn_t             &outTask) = 0;
+        const typename T::Query &inRequest,
+        ResourceTaskFn_t        &outTask) = 0;
     };
 
-    template <typename TLast>
-    class IGFXAPIResourceTaskBackend<TLast> {
-    public:
-      virtual EEngineStatus creationTask(
-        typename TLast::CreationRequest     const&inRequest,
-        ResolvedDependencyCollection        const&inDependencies,
-        ResourceTaskFn_t                         &outTask) = 0;
-
-      virtual EEngineStatus updateTask(
-        typename TLast::UpdateRequest       const&inRequest,
-        ResolvedDependencyCollection        const&inDependencies,
-        ResourceTaskFn_t                         &outTask) = 0;
-
-      virtual EEngineStatus destructionTask(
-        typename TLast::DestructionRequest  const&inRequest,
-        ResolvedDependencyCollection        const&inDependencies,
-        ResourceTaskFn_t                         &outTask) = 0;
-
-      virtual EEngineStatus queryTask(
-        const typename TLast::Query &inRequest,
-        ResourceTaskFn_t            &outTask) = 0;
-    };
+    template <typename... TSupportedTypes>
+    class IGFXAPIResourceTaskBackend
+      : public IGFXAPIResourceTaskBackendDecl<TSupportedTypes>...
+    {};
     
     /**********************************************************************************************//**
      * \struct	DeferredResourceCreationHandle
@@ -234,7 +215,7 @@ namespace Engine {
         const Ptr<IAsyncLoadCallback>             &inCallback,
         GFXAPIResourceHandle_t                    &outResourceHandle)
     {
-      ResourceTaskFn_t::result_type resourceHandle = 0;
+      ResourceTaskFn_t::result_type resourceHandle ={};
 
       DeferredResourceCreationHandle handle;
       EEngineStatus status = loadImpl<TResource>(inRequest, handle);

@@ -30,18 +30,75 @@ namespace Engine {
 				ResourceProxyMap                 &outProxyMap,
 				DependerTreeNodeList             &outResourceHierarchy)
 			{
-				const SwapChain::Descriptor desc = request.resourceDescriptor();
-
+        SwapChain::Descriptor const& desc = request.resourceDescriptor();
 				if( desc.backBufferCount < 1 ) {
 					Log::Error(logTag(), "Invalid swapchain back buffer count. Expected 'count >= 1'.");
 					return false; // Must be at least 1 for double buffering
 				}
 
-				ResourceHandle rootHandle(desc.name, SwapChain::resource_type, SwapChain::resource_subtype);
-				Ptr<IResourceProxy<SwapChain>> rootProxy
+				ResourceHandle swapChainHandle(desc.name, SwapChain::resource_type, SwapChain::resource_subtype);
+				Ptr<IResourceProxy<SwapChain>> swapChainProxy
 					= proxyFactory->create<SwapChain>(EProxyType::Persistent, request);
 
-				outBinding.swapChainHandle = rootHandle;
+        SwapChain::Binding binding   ={};
+        DependerTreeNode   hierarchy ={};
+        ResourceProxyMap   proxies   ={};
+
+        binding.swapChainHandle  = swapChainHandle;
+        hierarchy.resourceHandle = swapChainHandle;
+        proxies[swapChainHandle] = swapChainProxy;
+
+        binding.backBufferRenderTargetBindings.resize(desc.backBufferCount);
+
+        for(uint32_t k=0; k < desc.backBufferCount; ++k) {
+
+          SwapChainBuffer::Descriptor backBufferDesc    ={};
+          backBufferDesc.name    = desc.name + "_BackBuffer_" + (char)('0' + k);
+          backBufferDesc.texture = desc.texture;
+          SwapChainBuffer::CreationRequest backBufferCreationRequest(backBufferDesc, swapChainHandle);          
+
+          Ptr<IResourceProxy<SwapChainBuffer>> backBufferProxy
+            = proxyFactory->create<SwapChainBuffer>(EProxyType::Internal, backBufferCreationRequest);
+
+          ResourceHandle backBufferHandle(backBufferDesc.name, SwapChainBuffer::resource_type, SwapChainBuffer::resource_subtype);
+          proxies[backBufferHandle] = AnyProxy(backBufferProxy);
+
+          RenderTargetView::Descriptor backBufferRTVDesc ={};
+          backBufferRTVDesc.dimensionNb   = backBufferDesc.texture.dimensionNb;
+          backBufferRTVDesc.array         = backBufferDesc.texture.array;
+          backBufferRTVDesc.mipMap        = backBufferDesc.texture.mipMap;
+          backBufferRTVDesc.textureFormat = backBufferDesc.texture.textureFormat;
+          backBufferRTVDesc.name          = desc.name + "_BackBufferRTV_" + (char)('0' + k);
+          RenderTargetView::CreationRequest backBufferRTVCreationRequest(backBufferRTVDesc, backBufferHandle);       
+
+          Ptr<IResourceProxy<RenderTargetView>> backBufferRTVProxy
+            = proxyFactory->create<RenderTargetView>(EProxyType::Persistent, backBufferRTVCreationRequest);
+
+          ResourceHandle backBufferRTVHandle(backBufferRTVDesc.name, RenderTargetView::resource_type, RenderTargetView::resource_subtype);   
+          proxies[backBufferRTVHandle] = AnyProxy(backBufferRTVProxy);
+          
+          RenderTargetView::Binding backBufferRTVBinding ={};
+          backBufferRTVBinding.handle = backBufferRTVHandle;
+
+          SwapChainBuffer::Binding backBufferBinding={};
+          backBufferBinding.handle           = backBufferHandle;
+          backBufferBinding.renderTargetView = backBufferRTVBinding;
+
+          binding.backBufferRenderTargetBindings[k] = backBufferBinding;
+
+          DependerTreeNode backBufferNode={};   
+          DependerTreeNode backBufferRTVNode={};   
+          backBufferNode.resourceHandle    = backBufferHandle;
+          backBufferRTVNode.resourceHandle = backBufferRTVHandle;
+          backBufferNode.children.push_back(backBufferRTVNode);
+          hierarchy.children.push_back(backBufferNode);
+        }
+
+        outBinding           = binding;
+        outProxyMap          = proxies;
+        outResourceHierarchy.push_back(hierarchy);
+
+        return true;
 			}
 		};
 		 
