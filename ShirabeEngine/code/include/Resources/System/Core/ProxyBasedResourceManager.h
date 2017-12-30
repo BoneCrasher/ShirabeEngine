@@ -531,25 +531,57 @@ namespace Engine {
 #define SHIRABE_DEBUG
 #ifdef SHIRABE_DEBUG
 
-      // Verify returned state!
-      // Hierarchy -> Proxy
-      for(const DependerTreeNodeList::value_type &r : outDependerHierarchies) {
-        ResourceProxyMap::const_iterator it = outProxies.find(r.resourceHandle);
-        if(it == outProxies.end()) {
-          Log::Error(logTag(), String::format("Hierarchy <-> ProxyList mismatch. Missing proxy for hierarchy handle: %0", r.resourceHandle.type()));
-          return EEngineStatus::ResourceManager_ProxyCreationFailed; // Invalid: Proxy missing!
+      try {
+        std::function<void(DependerTreeNodeList const&, ResourceProxyMap const&)> fnVerifyHierarchyToProxyAvailability = nullptr;
+
+        // Verify returned state!
+        // Hierarchy -> Proxy: Are all proxies available, which are listed in the depender hierarchies?
+        fnVerifyHierarchyToProxyAvailability
+          = [] (DependerTreeNodeList const&hierachy, ResourceProxyMap const&proxies) -> void
+        {
+          for(const DependerTreeNodeList::value_type &r : hierachy) {
+            fnVerifyHierarchyToProxyAvailability(r.children, proxies);
+
+            ResourceProxyMap::const_iterator it = proxies.find(r.resourceHandle);
+            if(it == proxies.end()) {
+              std::string msg = String::format("Hierarchy <-> ProxyList mismatch. Missing proxy for hierarchy handle: %0", r.resourceHandle.type());
+              HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, msg);
+            }
+          }
+        };
+        fnVerifyHierarchyToProxyAvailability(outDependerHierarchies, outProxies);
+
+        std::function<bool(DependerTreeNodeList const&, ResourceProxyMap::value_type const&)> fnVerifyProxyToHierarchyAvailability = nullptr;
+
+        fnVerifyProxyToHierarchyAvailability
+          = [] (DependerTreeNodeList const&hierachy, ResourceProxyMap::value_type const&pair) -> bool
+        {
+          for(DependerTreeNodeList::value_type const& r : hierarchy)
+            if(fnVerifyProxyToHierarchyAvailability(r.children, pair))
+              return true;
+
+          // We have not yet found the proxy at this point, check the current level.
+          DependerTreeNodeList::const_iterator it = std::find(hierachy.begin(), hierachy.end(), pair.first);
+          return !(it == hierachy.end())
+        };
+
+        for(ResourceProxyMap::value_type const& pair : outProxies) {
+          if(!fnVerifyProxyToHierarchyAvailability(outDependerHierarchies, pair)) {
+            std::string msg = String::format("ProxyList <-> Hierarchy mismatch. Missing hierarchy entry for proxy: %0", pair.first.type());
+            HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, msg);
+          }
         }
+      } catch(EngineException &ee) {
+        Log::Error(logTag(), ee.message());
+      } catch(std::exception &stde) {
+        Log::Error(logTag(), stde.what());
+      } catch(...) {
+        Log::Error(logTag(), "Unknown error occurred during verification of created resource proxy environment.");
       }
 
-      // Proxy -> Hierarchy
-      for(ResourceProxyMap::value_type const& pair : outProxies) {
-        DependerTreeNodeList::const_iterator it = std::find(outDependerHierarchies.begin(), outDependerHierarchies.end(), pair.first);
-        if(it == outDependerHierarchies.end()) {
-          Log::Error(logTag(), String::format("ProxyList <-> Hierarchy mismatch. Missing hierarchy entry for proxy: %0", pair.first.type()));
-          return EEngineStatus::ResourceManager_ProxyCreationFailed; // Invalid: Proxy missing!
-        }
-      }
 #endif
+      // TODO: Recursive hierarchy access, as above!
+      asdfoi[uafkjl dsfkl jasdf kl;jwe  ]
 
       // Store all dependencies, roots and dependers, to have the loadProxy function 
       // work out well.
@@ -610,11 +642,7 @@ namespace Engine {
         inRequest,
         false,
         binding);
-
-      if(CheckEngineError(status)) {
-        Log::Error(logTag(), "Failed to create resource.");
-        return status;
-      }
+      HandleEngineStatusError(status, "Failed to create resource.");
 
       const typename TResource::Descriptor& desc = inRequest.resourceDescriptor();
       out = TResource::create(desc, binding);

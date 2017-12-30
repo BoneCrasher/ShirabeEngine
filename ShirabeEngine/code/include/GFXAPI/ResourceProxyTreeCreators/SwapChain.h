@@ -51,18 +51,30 @@ namespace Engine {
         binding.backBufferRenderTargetBindings.resize(desc.backBufferCount);
 
         for(uint32_t k=0; k < desc.backBufferCount; ++k) {
-
+          // Create BackBuffer resource proxy used to "Hook into" the swap chain's internal
+          // buffers (Pass the swapchain as dependency to the request...)
+          // As these buffers are not necessarily regular textures but can be 
+          // accessed as if, we can nonetheless store 'em in the manager as regular texture resources.
+          // The only difference is the load-mode (Persistent), since we have only one real chance
+          // (or it should appear as if) to fetch them.
+          // They may not be manually freed!
           SwapChainBuffer::Descriptor backBufferDesc    ={};
           backBufferDesc.name    = desc.name + "_BackBuffer_" + (char)('0' + k);
           backBufferDesc.texture = desc.texture;
           SwapChainBuffer::CreationRequest backBufferCreationRequest(backBufferDesc, swapChainHandle);          
 
           Ptr<IResourceProxy<SwapChainBuffer>> backBufferProxy
-            = proxyFactory->create<SwapChainBuffer>(EProxyType::Internal, backBufferCreationRequest);
+            = proxyFactory->create<SwapChainBuffer>(EProxyType::Persistent, backBufferCreationRequest);
 
           ResourceHandle backBufferHandle(backBufferDesc.name, SwapChainBuffer::resource_type, SwapChainBuffer::resource_subtype);
           proxies[backBufferHandle] = AnyProxy(backBufferProxy);
 
+          // Create an RTV for the swapchain back buffer, so that we can "render into it" as the final 
+          // per-frame render step!
+          // Since we stored the backbuffers as regular textures, we can simply register them as 
+          // underlying texture dependencies in the RTV.
+          // Here as well, we treat the RTV's as "immutable", so that we don't mess around with the 
+          // basic infrastructure, once created.
           RenderTargetView::Descriptor backBufferRTVDesc ={};
           backBufferRTVDesc.dimensionNb   = backBufferDesc.texture.dimensionNb;
           backBufferRTVDesc.array         = backBufferDesc.texture.array;
@@ -77,6 +89,7 @@ namespace Engine {
           ResourceHandle backBufferRTVHandle(backBufferRTVDesc.name, RenderTargetView::resource_type, RenderTargetView::resource_subtype);   
           proxies[backBufferRTVHandle] = AnyProxy(backBufferRTVProxy);
           
+          // Setup the public bindings of the engine resource objects to the resource manager.
           RenderTargetView::Binding backBufferRTVBinding ={};
           backBufferRTVBinding.handle = backBufferRTVHandle;
 
@@ -86,6 +99,7 @@ namespace Engine {
 
           binding.backBufferRenderTargetBindings[k] = backBufferBinding;
 
+          // Finally, setup the resource hierarchy for proper resource destruction!
           DependerTreeNode backBufferNode={};   
           DependerTreeNode backBufferRTVNode={};   
           backBufferNode.resourceHandle    = backBufferHandle;
