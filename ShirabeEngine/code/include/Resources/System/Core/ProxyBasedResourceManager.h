@@ -580,19 +580,32 @@ namespace Engine {
       }
 
 #endif
-      // TODO: Recursive hierarchy access, as above!
-      asdfoi[uafkjl dsfkl jasdf kl;jwe  ]
+      try {
+        // Store all dependencies, roots and dependers, to have the loadProxy function 
+        // work out well.
+        // Important: 
+        //   We will just access outProxies as below, since the ProxyTreeCreator<T>::create-call
+        //   is required to return a consistent state!
+        std::function<void(DependerTreeNodeList const&, ResourceProxyMap const&)> fnInsert = nullptr;
+        fnInsert
+          = [] (
+            DependerTreeNodeList const& hierarchy,
+            ResourceProxyMap     const& proxies) -> void
+        {
+          for(DependerTreeNodeList::value_type const& r : hierarchy) {
+            fnInsert(r.children, proxies);
 
-      // Store all dependencies, roots and dependers, to have the loadProxy function 
-      // work out well.
-      // Important: 
-      //   We will just access outProxies as below, since the ProxyTreeCreator<T>::create-call
-      //   is required to return a consistent state!
-      for(const DependerTreeNodeList::value_type& r : outDependerHierarchies) {
-        if(!storeResourceProxy(r.resourceHandle, outProxies[r.resourceHandle])) {
-          Log::Error(logTag(), "Failed to store resource proxy.");
-          // TODO: Release madness
-        }
+            if(!storeResourceProxy(r.resourceHandle, proxies[r.resourceHandle]))
+              HandleEngineStatusError(...); // Todo: Custom EEngineStatus for failed insertion + message.
+          }
+        };
+        fnInsert(outDependerHierarchies, outProxies);
+      } catch(EngineException &ee) {
+        Log::Error(logTag(), ee.message());
+      } catch(std::exception &stde) {
+        Log::Error(logTag(), stde.what());
+      } catch(...) {
+        Log::Error(logTag(), "Unknown error occurred during verification of created resource proxy environment.");
       }
 
       // Two hierarchy scenarios:
