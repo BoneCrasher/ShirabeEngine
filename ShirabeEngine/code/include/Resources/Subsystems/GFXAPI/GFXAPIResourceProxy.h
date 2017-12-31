@@ -65,8 +65,7 @@ namespace Engine {
 			{ }
 
 			EEngineStatus loadSync(
-				const ResourceHandle   &inHandle,
-				const ResourceProxyMap &inDependencies);
+				const ResourceHandle   &inHandle);
 
 			EEngineStatus unloadSync();
 
@@ -101,21 +100,9 @@ namespace Engine {
 		
 		template <typename TResource>
 		EEngineStatus GFXAPIResourceProxy<TResource>
-			::loadSync(
-				const ResourceHandle   &inHandle,
-				const ResourceProxyMap &inDependencies)
+			::loadSync(const ResourceHandle &inHandle)
 		{
 			this->setLoadState(ELoadState::LOADING);
-
-			// Make sure to extract the GFXAPI-resource handles from the dependencies
-			GFXAPIResourceHandleMap inDependencyHandles;
-			for( const ResourceProxyMap::value_type& pair : inDependencies ) {
-				Ptr<GFXAPIResourceProxy<TResource>> dependencyProxy = GFXAPIProxyCast<TResource>(pair.second);
-				if( !dependencyProxy )
-					continue;
-
-				inDependencyHandles[pair.first] = dependencyProxy->handle();
-			}
 			
 			// Request synchronous resource load and if successful, set the internal handle 
 			// and load state.
@@ -131,9 +118,7 @@ namespace Engine {
 				//           order to reflect UNLOADED or UNAVAILABLE state.
 				this->setLoadState(ELoadState::UNLOADED);
 
-				Log::Error(logTag(), String::format("Failed to load GFXAPI resource '%0'", rd.name));
-
-				return EEngineStatus::GFXAPI_LoadResourceFailed;
+				HandleEngineStatusError(EEngineStatus::GFXAPI_LoadResourceFailed, String::format("Failed to load GFXAPI resource '%0'", rd.name));
 			}
 
 			this->setHandle(handle);

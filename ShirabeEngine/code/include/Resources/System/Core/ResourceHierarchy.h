@@ -12,7 +12,9 @@ namespace Engine {
 
 			ResourceHandle resourceHandle;
 		};
+
 		DeclareListType(DependerTreeNode, DependerTreeNode);
+    DeclareMapType(ResourceHandle, DependerTreeNode, Depender);
 	}
 }
 

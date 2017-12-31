@@ -98,7 +98,7 @@ namespace Engine {
        *
        * \return	True if it succeeds, false if it fails.
        **************************************************************************************************/
-      bool loadDependenciesRecursively(const IResourceProxyBasePtr& base, ResourceProxyMap& outDependencies);
+      bool loadDependerHierarchyBottomToTop(DependerTreeNode const& base, ResourceProxyMap& outDependencies);
 
       /**********************************************************************************************//**
        * \fn	EEngineStatus ProxyBasedResourceManager::proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy)
@@ -122,7 +122,7 @@ namespace Engine {
        *
        * \return  True if it succeeds, false if it fails.
        **************************************************************************************************/
-      bool unloadDependenciesRecursively(const IResourceProxyBasePtr& base);
+      bool unloadDependerHierarchyBottomToTop(DependerTreeNode const& base);
 
       /**********************************************************************************************//**
        * \fn  EEngineStatus ProxyBasedResourceManager::proxyUnload(const ResourceHandle& handle);
@@ -165,12 +165,12 @@ namespace Engine {
     public:
       ProxyBasedResourceManager(
         const Ptr<ResourceProxyFactory> &proxyFactory)
-        : _gfxApiProxyFactory(proxyFactory)
+        : m_proxyFactory(proxyFactory)
       {}
 
       virtual ~ProxyBasedResourceManager() {
         // _resources->clear();
-        _gfxApiProxyFactory = nullptr;
+        m_proxyFactory = nullptr;
       };
 
       bool clear();
@@ -211,8 +211,12 @@ namespace Engine {
         return _resources->addResource(handle, proxy);
       }
 
-      Ptr<ResourceProxyFactory>       _gfxApiProxyFactory;
+      DependerTreeNode const& findHierarchyRoot(ResourceHandle const&handle) const;
+
+      Ptr<ResourceProxyFactory>       m_proxyFactory;
       Ptr<BasicGFXAPIResourceBackend> m_resourceBackend;
+
+      DependerMap m_hierarchyRoots;
 
       // Any kind of resources, abstracted away entirely.
       IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> _resources;
@@ -231,77 +235,71 @@ namespace Engine {
      * \return	True if it succeeds, false if it fails.
      **************************************************************************************************/
     bool ProxyBasedResourceManager
-      ::loadDependenciesRecursively(const IResourceProxyBasePtr& base, ResourceProxyMap& outDependencies)
+      ::loadDependerHierarchyBottomToTop(DependerTreeNode const& base, ResourceProxyMap& outDependencies)
     {
       bool result = true;
 
-      if(!base) {
-        Log::Error(logTag(), "loadDependenciesRecursively invoked with null-pointer base-proxy.");
+      // Bottom to Top: Children first.
+      for(DependerTreeNodeList::value_type const& c : base.children)
+        result = loadDependerHierarchyBottomToTop(c, outDependencies);
+
+      if(!result)
+        return result;
+
+      // The reason all proxies have to be created by the proxy-creator and 
+      // stored before this function call, can be seen below:
+      AnyProxy dependencyProxy = getResourceProxy(base.resourceHandle);
+      if(!dependencyProxy.has_value()) {
+        // Even if we dealt with an internal resource not to be 
+        // created here, having an empty proxy stored is a in-
+        // consistent state.
+        Log::Error(logTag(), String::format("Nullpointer proxy encountered in internal resource manager."));
         return false;
       }
 
-      // Holds all local depdencies
-      ResourceProxyMap inDependencies;
-
-      ResourceHandleList dependecyHandles = base->dependencies();
-      if(!dependecyHandles.empty()) {
-        for(const ResourceHandle& resourceHandle : dependecyHandles) {
-          // The reason all proxies have to be created by the proxy-creator and 
-          // stored before this function call, can be seen below:
-          AnyProxy dependencyProxy = getResourceProxy(resourceHandle);
-          if(!dependencyProxy.has_value()) {
-            // Even if we dealt with an internal resource not to be 
-            // created here, having an empty proxy stored is a in-
-            // consistent state.
-            Log::Error(logTag(), String::format("Nullpointer proxy encountered in internal resource manager."));
-            result |= false;
-            break;
-          }
-
-          IResourceProxyBasePtr dependencyBase = BaseProxyCast(dependencyProxy);
-          if(!dependencyBase) {
-            // MBT TODO: How to handle this case?
-          }
-
-          // Do we even hav to load the resource? If the resource type is internal, there won't 
-          // be any necessity to go deeper. Internal resources and all it's children will be created
-          // without any control from our side.		
-          if(dependencyBase->proxyType() == EProxyType::Internal
-             || dependencyBase->proxyType() == EProxyType::Unknown)
-          {
-            // Nothing to do...
-            continue;
-          }
-
-          // We need to handle the thing. First: load dependencies, then the resource.
-          result |= loadDependenciesRecursively(dependencyBase, inDependencies);
-          if(!result) {
-            Log::Error(logTag(), String::format("Failed to load dependencies of proxy."));
-            break;
-          }
-
-          EEngineStatus status = dependencyBase->loadSync(resourceHandle, inDependencies);
-          if(CheckEngineError(status)) {
-            Log::Error(logTag(), String::format("Failed to load resource of proxy."));
-            result |= false;
-            break;
-          }
-
-          if(dependencyBase->loadState() != ELoadState::LOADED) {
-            std::string msg =
-              "CRITICAL LOGIC ERROR: Resource should be loaded successfully "
-              "at this point, but isn't or state is not updated properly.";
-            Log::WTF(logTag(), String::format(msg));
-            break;
-          }
-
-          // Yay... Finally store the thing... (and it's dependencies as they need be persisted, too)!
-          outDependencies.insert(inDependencies.begin(), inDependencies.end());
-          outDependencies[resourceHandle] = dependencyProxy;
-        }
+      IResourceProxyBasePtr dependencyBase = BaseProxyCast(dependencyProxy);
+      if(!dependencyBase) {
+        // MBT TODO: How to handle this case?
       }
 
-      return result;
+      // Do we even hav to load the resource? If the resource type is internal, there won't 
+      // be any necessity to go deeper. Internal resources and all it's children will be created
+      // without any control from our side.		
+      if(dependencyBase->proxyType() == EProxyType::Internal
+         || dependencyBase->proxyType() == EProxyType::Unknown)
+      {
+        // Nothing to do...
+        return true;
+      }
+
+      EEngineStatus status = dependencyBase->loadSync(base.resourceHandle);
+      if(CheckEngineError(status)) {
+        Log::Error(logTag(), String::format("Failed to load resource of proxy."));
+        return false;
+      }
+
+      if(dependencyBase->loadState() != ELoadState::LOADED) {
+        std::string msg =
+          "CRITICAL LOGIC ERROR: Resource should be loaded successfully "
+          "at this point, but isn't or state is not updated properly.";
+        Log::WTF(logTag(), String::format(msg));
+        return false;
+      }
+
+      outDependencies[base.resourceHandle] = dependencyProxy;
+
+      return true;
+    }
+
+    DependerTreeNode const&
+      ProxyBasedResourceManager::findHierarchyRoot(ResourceHandle const&handle) const {
+      static DependerTreeNode gs_invalidNode = DependerTreeNode();
+
+      for(DependerMap::value_type const& d : m_hierarchyRoots)
+        if(d.first == handle)
+          return d.second;
+
+      return gs_invalidNode;
     }
 
     /**********************************************************************************************//**
@@ -322,11 +320,11 @@ namespace Engine {
 
       AnyProxy root = getResourceProxy(handle);
       if(!root.has_value())
-        return EEngineStatus::ResourceManager_RootProxyFetchFailed;
+        HandleEngineStatusError(EEngineStatus::ResourceManager_RootProxyFetchFailed, "Cannot find resource proxy for handle: " + handle.id());
 
       IResourceProxyBasePtr base = BaseProxyCast(root);
       if(!base) {
-        return EEngineStatus::ResourceManager_BaseProxyCastFailed;
+        HandleEngineStatusError(EEngineStatus::ResourceManager_BaseProxyCastFailed, "Found proxy, but it doesn't seem to be convertible to IResourceProxyBasePtr. Handle: " + handle.id());
       }
 
       // Store any to-be-created resource in here to iteratively store them in the 
@@ -338,7 +336,12 @@ namespace Engine {
       // loaded.
       typename ResourceProxyMap dependencyResources;
 
-      bool dependenciesLoadedSuccessfully = loadDependenciesRecursively(base, dependencyResources);
+      DependerTreeNode const& hierarchyRoot = findHierarchyRoot(handle);
+      if(hierarchyRoot.resourceHandle == ResourceHandle::Invalid()) {
+        // Error
+      }
+
+      bool dependenciesLoadedSuccessfully = loadDependerHierarchyBottomToTop(hierarchyRoot, dependencyResources);
       if(!dependenciesLoadedSuccessfully) {
         // Flag error, since the entire child resource tree was not loaded successfully.
         // Free anything created beforehand though!
@@ -361,23 +364,21 @@ namespace Engine {
           }
         }
 
-        Log::Error(logTag(), "Failed to load one or more dependencies of resource proxy.");
-        return EEngineStatus::ResourceManager_DependencyLoadFailed;
+        std::string msg = "Failed to load one or more dependencies of resource proxy.";
+        HandleEngineStatusError(EEngineStatus::ResourceManager_DependencyLoadFailed, msg);
       }
 
       // Finally load the root resource
       // 
       status = base->loadSync(handle, dependencyResources);
-      if(CheckEngineError(status)) {
-        Log::Error(logTag(), "Failed to load underlying resource of resource proxy.");
-        return EEngineStatus::ResourceManager_ResourceLoadFailed;
-      }
+      std::string msg = "Failed to load underlying resource of resource proxy.";
+      HandleEngineStatusError(status, msg);
 
       return EEngineStatus::Ok;
     }
 
     bool ProxyBasedResourceManager
-      ::unloadDependenciesRecursively(const IResourceProxyBasePtr& base)
+      ::unloadDependerHierarchyBottomToTop(DependerTreeNode const&)
     {
       bool result = true;
 
@@ -522,7 +523,7 @@ namespace Engine {
       ResourceProxyMap     outProxies;
       DependerTreeNodeList outDependerHierarchies;
 
-      bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(_gfxApiProxyFactory, request, binding, outProxies, outDependerHierarchies);
+      bool treeCreationSuccessful = ProxyTreeCreator<TResource>::create(m_proxyFactory, request, binding, outProxies, outDependerHierarchies);
       if(!treeCreationSuccessful) {
         Log::Error(logTag(), "Unable to create root resource proxy.");
         return EEngineStatus::ResourceManager_ProxyCreationFailed;
@@ -618,7 +619,6 @@ namespace Engine {
       // Cleanup would release it's leaves iteratively und till none are left and move up one step!
       // By returning dependency roots, we can make sure that no other parent-resource refers the node.
 
-
       // If creation is not deferred, immediately load the resources using the proxy.
       if(!creationDeferred) {
         ResourceHandleList loadedDependerHierarchies;
@@ -628,12 +628,12 @@ namespace Engine {
             // Free already loaded hierarchies
             for(ResourceHandle const& handle : loadedDependerHierarchies)
               if(CheckEngineError((status = proxyUnload(handle)))) {
-                Log::Error(logTag(), "Failed to load resources using proxy.");
-                // return EEngineStatus::ResourceManager_ProxyUnloadFailed;
+                std::string msg = "Failed to unload resources using proxy.";
+                HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyUnloadFailed, msg);
               }
 
-            Log::Error(logTag(), "Failed to load resources using proxy.");
-            return EEngineStatus::ResourceManager_ProxyLoadFailed;
+            std::string msg = "Failed to load resources using proxy.";
+            HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyLoadFailed, msg);
           }
 
           loadedDependerHierarchies.push_back(root.resourceHandle); // For freeing already loaded hierarchies
