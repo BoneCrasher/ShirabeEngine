@@ -151,12 +151,12 @@ namespace Engine {
 				rasterizerState.ScissorEnable         = false;
 				rasterizerState.SlopeScaledDepthBias  = 0.0f;
 
-				dxRes = tmpDevice->CreateRasterizerState(&rasterizerState, &tmpRasterizerState);
+				dxRes = _dx11Environment->getDevice()->CreateRasterizerState(&rasterizerState, &tmpRasterizerState);
 				if( FAILED(dxRes) ) {
 					status = EEngineStatus::DXDevice_RasterizerStateCreationFailed;
 					goto _return_failed;
 				}
-				tmpDeviceContext->RSSetState(tmpRasterizerState);
+        _dx11Environment->getImmediateContext()->RSSetState(tmpRasterizerState);
 
 				// _createDefaultViewPort:
 				D3D11_VIEWPORT vpDesc;
@@ -208,8 +208,8 @@ namespace Engine {
 
 				float clearColor[4] ={ 1.0f, 0.5f, 0.25f, 1.0f };
 
-				_deviceImmediateContext->ClearRenderTargetView(_backBufferRTV.get(), clearColor);
-				_deviceImmediateContext->ClearDepthStencilView(_depthStencilView.get(), D3D11_CLEAR_DEPTH, 1.0f, 0.0f);
+				_dx11Environment->getImmediateContext()->ClearRenderTargetView(_backBufferRTV.get(), clearColor);
+        _dx11Environment->getImmediateContext()->ClearDepthStencilView(_depthStencilView.get(), D3D11_CLEAR_DEPTH, 1.0f, 0.0f);
 
 				// _deviceImmediateContext->Begin(nullptr);
 

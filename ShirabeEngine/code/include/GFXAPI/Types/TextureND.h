@@ -6,13 +6,15 @@
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceTraits.h"
 
+#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+
 #include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/TextureNDDefinition.h"
+
+#include "TextureNDDefinition.h"
+#include "RequestDefaultImplementation.h"
 #include "GFXAPI/Types/RenderTargetView.h"
 #include "GFXAPI/Types/ShaderResourceView.h"
 #include "GFXAPI/Types/DepthStencilView.h"
-
-#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 namespace Engine {
   namespace Resources {
@@ -97,29 +99,38 @@ namespace Engine {
        *
        * \tparam  N Type of the n.
        **************************************************************************************************/
-      struct CreationRequest {
-
+      class CreationRequest 
+        : public BaseDeclaration::CreationRequestBase<Descriptor>
+      {
       public:
-        const Descriptor& resourceDescriptor() const;
-
-        inline CreationRequest(const Descriptor &desc);
+        CreationRequest(const Descriptor &desc);
 
         std::string toString() const;
-
-      private:
-        Descriptor _resourceDescriptor;
       };
 
-      struct DestructionRequest {
+      class UpdateRequest 
+        : public BaseDeclaration::UpdateRequestBase
+      {
+      public:
+        UpdateRequest(ResourceHandle const&);
       };
 
-      struct UpdateRequest {
+      class DestructionRequest
+        : public BaseDeclaration::DestructionRequestBase
+      {
+      public:
+        DestructionRequest(ResourceHandle const&);
       };
 
-      struct Query {
+      class Query
+        : public BaseDeclaration::QueryBase
+      {
+      public:
+        Query(ResourceHandle const&);
       };
 
-      struct Binding {
+      struct Binding
+        : public BaseDeclaration::BindingBase {
         ResourceHandle              handle;
         ShaderResourceView::Binding srvBinding;
         RenderTargetView::Binding   rtvBinding;
@@ -197,17 +208,9 @@ namespace Engine {
     TextureNDDeclaration<N>::CreationRequest
       ::CreationRequest(
         const Descriptor &desc)
-      : _resourceDescriptor(desc)
+      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
     {}
-
-    template <uint8_t N>
-    typename TextureNDDeclaration<N>::Descriptor const&
-      TextureNDDeclaration<N>::CreationRequest
-      ::resourceDescriptor() const
-    {
-      return _resourceDescriptor;
-    }
-
+    
     template <uint8_t N>
     std::string
       TextureNDDeclaration<N>::CreationRequest
@@ -218,7 +221,7 @@ namespace Engine {
       ss
         << "TextureNDCreationRequest<" << N << ">: \n"
         << "[\n"
-        << _resourceDescriptor.toString() << "\n"
+        << resourceDescriptor().toString() << "\n"
         << "]"
         << std::endl;
 
@@ -226,9 +229,27 @@ namespace Engine {
     }
 
     template <uint8_t N>
+    TextureNDDeclaration<N>::UpdateRequest
+      ::UpdateRequest(ResourceHandle const& handle)
+      : BaseDeclaration::UpdateRequestBase(handle)
+    {}
+
+    template <uint8_t N>
+    TextureNDDeclaration<N>::DestructionRequest
+      ::DestructionRequest(ResourceHandle const& handle)
+      : BaseDeclaration::DestructionRequestBase(handle)
+    {}
+
+    template <uint8_t N>
+    TextureNDDeclaration<N>::Query
+      ::Query(ResourceHandle const& handle)
+      : BaseDeclaration::QueryBase(handle)
+    {}
+
+    template <uint8_t N>
     TextureNDDeclaration<N>::Binding
       ::Binding()
-      : handle(ResourceHandle::Invalid())
+      : BaseDeclaration::BindingBase()
       , srvBinding()
       , rtvBinding()
       , dsvBinding()

@@ -5,11 +5,14 @@
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/ResourceDomainTransfer.h"
+#include "Resources/System/Core/ResourceTraits.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/TextureNDDefinition.h"
+
+#include "TextureNDDefinition.h"
+#include "RequestDefaultImplementation.h"
 
 namespace Engine {
   namespace GFXAPI {
@@ -74,32 +77,38 @@ namespace Engine {
       struct DepthStencilStateInfo {
       };
       
-      struct CreationRequest {
+      struct CreationRequest
+        : public BaseDeclaration::CreationRequestBase<Descriptor> {
       public:
         CreationRequest(Descriptor const&desc);
 
-        const Descriptor& resourceDescriptor() const;
-
         std::string toString() const;
-      private:
-        Descriptor _resourceDescriptor;
       };
 
-      struct UpdateRequest {
-
+      struct UpdateRequest 
+        : public BaseDeclaration::UpdateRequestBase
+      {
+      public:
+        UpdateRequest(ResourceHandle const&);
       };
 
-      struct DestructionRequest {
-
+      struct DestructionRequest
+        : public BaseDeclaration::DestructionRequestBase
+      {
+      public:
+        DestructionRequest(ResourceHandle const&);
       };
 
-      struct Query {
-
+      struct Query
+        : public BaseDeclaration::QueryBase
+      {
+      public:
+        Query(ResourceHandle const&);
       };
 
-      struct Binding {
-        ResourceHandle handle;
-
+      struct Binding
+        : public BaseDeclaration::BindingBase
+      {
         Binding();
       };
     };

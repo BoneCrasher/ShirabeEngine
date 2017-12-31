@@ -29,15 +29,8 @@ namespace Engine {
 
     DepthStencilStateDeclaration::CreationRequest
       ::CreationRequest(Descriptor const&desc)
-      : _resourceDescriptor(desc)
+      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
     {}
-
-    const DepthStencilStateDeclaration::Descriptor&
-      DepthStencilStateDeclaration::CreationRequest
-      ::resourceDescriptor() const
-    {
-      return _resourceDescriptor;
-    }
 
     std::string
       DepthStencilStateDeclaration::CreationRequest
@@ -48,16 +41,31 @@ namespace Engine {
       ss
         << "DepthStencilStateCreationRequest: \n"
         << "[\n"
-        << _resourceDescriptor.toString() << "\n"
+        << resourceDescriptor().toString() << "\n"
         << "]"
         << std::endl;
 
       return ss.str();
     }
 
+    DepthStencilStateDeclaration::UpdateRequest
+      ::UpdateRequest(ResourceHandle const& handle)
+      : BaseDeclaration::UpdateRequestBase(handle)
+    {}
+
+    DepthStencilStateDeclaration::DestructionRequest
+      ::DestructionRequest(ResourceHandle const& handle)
+      : BaseDeclaration::DestructionRequestBase(handle)
+    {}
+
+    DepthStencilStateDeclaration::Query
+      ::Query(ResourceHandle const& handle)
+      : BaseDeclaration::QueryBase(handle)
+    {}
+
     DepthStencilStateDeclaration::Binding
       ::Binding()
-      : handle(ResourceHandle::Invalid())
+      : BaseDeclaration::BindingBase()
     {}
 
     DepthStencilState

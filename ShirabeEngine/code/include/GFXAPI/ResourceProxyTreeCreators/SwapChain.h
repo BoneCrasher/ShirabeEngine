@@ -44,7 +44,7 @@ namespace Engine {
         DependerTreeNode   hierarchy ={};
         ResourceProxyMap   proxies   ={};
 
-        binding.swapChainHandle  = swapChainHandle;
+        binding.handle           = swapChainHandle;
         hierarchy.resourceHandle = swapChainHandle;
         proxies[swapChainHandle] = swapChainProxy;
 

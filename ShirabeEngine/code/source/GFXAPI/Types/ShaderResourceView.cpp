@@ -24,12 +24,7 @@ namespace Engine {
       : texture()
       , structuredBuffer()
     {}
-
-    ShaderResourceViewDeclaration::Binding
-      ::Binding()
-      : handle(ResourceHandle::Invalid())
-    {}
-
+  
     ShaderResourceViewDeclaration::Descriptor
       ::Descriptor()
       : name("")
@@ -40,7 +35,7 @@ namespace Engine {
       ::CreationRequest(
         Descriptor     const&desc,
         ResourceHandle const&underlyingBufferHandle)
-      : _resourceDescriptor(desc)
+      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
       , _underlyingBufferHandle(underlyingBufferHandle)
     {}
 
@@ -71,14 +66,6 @@ namespace Engine {
       return ss.str();
     }
 
-    ShaderResourceViewDeclaration::Descriptor const&
-      ShaderResourceViewDeclaration::CreationRequest
-      ::CreationRequest
-      ::resourceDescriptor() const
-    {
-      return _resourceDescriptor;
-    }
-
     ResourceHandle const&
       ShaderResourceViewDeclaration::CreationRequest
       ::underlyingBufferHandle() const
@@ -94,12 +81,31 @@ namespace Engine {
       ss
         << "ShaderResourceViewCreationRequest: \n"
         << "[\n"
-        << _resourceDescriptor.toString() << "\n"
+        << resourceDescriptor().toString() << "\n"
         << "]"
         << std::endl;
 
       return ss.str();
     }
+
+    ShaderResourceViewDeclaration::UpdateRequest
+      ::UpdateRequest(ResourceHandle const& handle)
+      : BaseDeclaration::UpdateRequestBase(handle)
+    {}
+
+    ShaderResourceViewDeclaration::DestructionRequest
+      ::DestructionRequest(ResourceHandle const& handle)
+      : BaseDeclaration::DestructionRequestBase(handle)
+    {}
+    ShaderResourceViewDeclaration::Query
+      ::Query(ResourceHandle const& handle)
+      : BaseDeclaration::QueryBase(handle)
+    {}
+
+    ShaderResourceViewDeclaration::Binding
+      ::Binding()
+      : BaseDeclaration::BindingBase()
+    {}
 
     ShaderResourceView
       ::ShaderResourceView(

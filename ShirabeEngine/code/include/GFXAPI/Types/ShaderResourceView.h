@@ -5,11 +5,15 @@
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/Handle.h"
 #include "Resources/System/Core/ResourceDomainTransfer.h"
-
-#include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/TextureNDDefinition.h"
+#include "Resources/System/Core/ResourceTraits.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+
+#include "GFXAPI/Definitions.h"
+
+#include "TextureNDDefinition.h"
+#include "RequestDefaultImplementation.h"
+
 
 namespace Engine {
   namespace Resources {
@@ -92,50 +96,46 @@ namespace Engine {
        *
        * \brief A creation request.
        **************************************************************************************************/
-      struct CreationRequest {
+      struct CreationRequest
+        : public BaseDeclaration::CreationRequestBase<Descriptor>
+      {
       public:
         CreationRequest(
           Descriptor     const&desc,
           ResourceHandle const&underlyingBufferHandle);
 
-        Descriptor     const& resourceDescriptor()     const;
         ResourceHandle const& underlyingBufferHandle() const;
 
         std::string toString() const;
 
       private:
-        Descriptor     _resourceDescriptor;
         ResourceHandle _underlyingBufferHandle;
       };
 
-      struct UpdateRequest { };
-
-      /**********************************************************************************************//**
-       * \struct  DestructionRequest
-       *
-       * \brief A destruction request.
-       **************************************************************************************************/
-      struct DestructionRequest {
-
+      struct UpdateRequest 
+        : public BaseDeclaration::UpdateRequestBase
+      {
+      public:
+        UpdateRequest(ResourceHandle const&);
       };
 
-      /**********************************************************************************************//**
-       * \struct  Query
-       *
-       * \brief A query.
-       **************************************************************************************************/
-      struct Query {
-
+      struct DestructionRequest
+        : public BaseDeclaration::DestructionRequestBase
+      {
+      public:
+        DestructionRequest(ResourceHandle const&);
       };
 
-      /**********************************************************************************************//**
-       * \struct  Binding
-       *
-       * \brief A binding.
-       **************************************************************************************************/
-      struct Binding {
-        ResourceHandle handle;
+      struct Query
+        : public BaseDeclaration::QueryBase
+      {
+      public:
+        Query(ResourceHandle const&);
+      };
 
+      struct Binding
+        : public BaseDeclaration::BindingBase
+      {
         Binding();
       };
     };

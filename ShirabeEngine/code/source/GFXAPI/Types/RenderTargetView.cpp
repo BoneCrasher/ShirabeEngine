@@ -27,17 +27,10 @@ namespace Engine {
       ::CreationRequest(
         Descriptor     const&desc,
         ResourceHandle const&underlyingTextureHandle)
-      : _resourceDescriptor(desc)
+      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
       , _underlyingTextureHandle(underlyingTextureHandle)
     {}
-
-    RenderTargetViewDeclaration::Descriptor const&
-      RenderTargetViewDeclaration::CreationRequest
-      ::resourceDescriptor() const
-    {
-      return  _resourceDescriptor;
-    }
-
+    
     ResourceHandle const&
       RenderTargetViewDeclaration::CreationRequest
       ::underlyingTextureHandle() const
@@ -52,16 +45,31 @@ namespace Engine {
       ss
         << "RenderTargetViewCreationRequest: \n"
         << "[\n"
-        << _resourceDescriptor.toString() << "\n"
+        << resourceDescriptor().toString() << "\n"
         << "]"
         << std::endl;
 
       return ss.str();
     }
 
+    RenderTargetViewDeclaration::UpdateRequest
+      ::UpdateRequest(ResourceHandle const& handle)
+      : BaseDeclaration::UpdateRequestBase(handle)
+    {}
+
+    RenderTargetViewDeclaration::DestructionRequest
+      ::DestructionRequest(ResourceHandle const& handle)
+      : BaseDeclaration::DestructionRequestBase(handle)
+    {}
+
+    RenderTargetViewDeclaration::Query
+      ::Query(ResourceHandle const& handle)
+      : BaseDeclaration::QueryBase(handle)
+    {}
+
     RenderTargetViewDeclaration::Binding
       ::Binding()
-      : handle(ResourceHandle::Invalid())
+      : BaseDeclaration::BindingBase()
     {}
 
     RenderTargetView::

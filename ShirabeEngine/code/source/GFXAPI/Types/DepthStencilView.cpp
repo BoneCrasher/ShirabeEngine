@@ -39,16 +39,9 @@ namespace Engine {
       ::CreationRequest(
         Descriptor     const&desc,
         ResourceHandle const&underlyingTextureHandle)
-      : _resourceDescriptor(desc)
+      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
       , _underlyingTextureHandle(underlyingTextureHandle)
     {}
-
-    DepthStencilViewDeclaration::Descriptor const&
-      DepthStencilViewDeclaration::CreationRequest
-      ::resourceDescriptor() const
-    {
-      return _resourceDescriptor;
-    }
 
     ResourceHandle const&
       DepthStencilViewDeclaration::CreationRequest
@@ -65,16 +58,31 @@ namespace Engine {
       ss
         << "DepthStencilViewCreationRequest: \n"
         << "[\n"
-        << _resourceDescriptor.toString() << "\n"
+        << resourceDescriptor().toString() << "\n"
         << "]"
         << std::endl;
 
       return ss.str();
     }
+    
+    DepthStencilViewDeclaration::UpdateRequest
+      ::UpdateRequest(ResourceHandle const& handle)
+      : BaseDeclaration::UpdateRequestBase(handle)
+    {}
+
+    DepthStencilViewDeclaration::DestructionRequest
+      ::DestructionRequest(ResourceHandle const& handle)
+      : BaseDeclaration::DestructionRequestBase(handle)
+    {}
+
+    DepthStencilViewDeclaration::Query
+      ::Query(ResourceHandle const& handle)
+      : BaseDeclaration::QueryBase(handle)
+    {}
 
     DepthStencilViewDeclaration::Binding
       ::Binding()
-      : handle(ResourceHandle::Invalid())
+      : BaseDeclaration::BindingBase()
     {}
     
     DepthStencilView
