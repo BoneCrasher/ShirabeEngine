@@ -277,12 +277,11 @@ namespace Engine {
       status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
       if(!CheckEngineError(status)) {
         GFXAPIResourceHandleAssignment const&assignment = handle.futureHandle.get(); // Wait for it ALWAYS!
-        if(assignment.publicHandle.valid()) {
+        if(assignment.internalHandle)) {
           status = EEngineStatus::GFXAPI_SubsystemResourceDestructionFailed;
         }
         else {
-          RemoveTheFuckOutOfIt(resourceHandle);
-
+          m_storage.erase(assignment.publicHandle);
           status = EEngineStatus::Ok;
         }
       }
