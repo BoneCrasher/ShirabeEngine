@@ -84,14 +84,22 @@ namespace Engine {
 
         outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
-          Ptr<ID3D11Resource> underlyingResource = std::static_pointer_cast<ID3D11Resource>(resolvedDependencies.at(request.underlyingBufferHandle()));
+
+          GFXAPIResourceHandle_t publicDependencyHandle  = resolvedDependencies.at(request.underlyingBufferHandle());
+          Ptr<void>              privateDependencyHandle = m_storage[publicDependencyHandle];
+          if(!privateDependencyHandle) {
+            m_storage.erase(publicDependencyHandle); // Remove default or inconsistent dependency.
+            HandleEngineStatusError(EEngineStatus::DXDevice_CreateSRV_Failed, "Failed to create SRV due to missing dependency.");
+          }
+
+          Ptr<ID3D11Resource> underlyingResource = std::static_pointer_cast<ID3D11Resource>(privateDependencyHandle);
 
           GFXAPIResourceHandleAssignment assignment ={};
 
           ID3D11ShaderResourceView *pResourceUnmanaged = nullptr;
           HRESULT hres = m_dx11Environment->getDevice()->CreateShaderResourceView(underlyingResource.get(), &srvDesc, &pResourceUnmanaged);
           if (FAILED(hres)) {
-            EEngineStatus::DXDevice_AttachSwapChainToBackBuffer_CreateRTV_Failed;
+            HandleEngineStatusError(EEngineStatus::DXDevice_CreateSRV_Failed, "Failed to create SRV in dx11 device.");
           }
           else {
             assignment.publicHandle   = reinterpret_cast<GFXAPIResourceHandle_t>(pResourceUnmanaged); // Just abuse the pointer target address of the handle...

@@ -43,6 +43,15 @@ namespace Engine {
 			GFXAPIResourceHandle_t _handle;
 		};
 
+    static Ptr<GFXAPIResourceAdapter> GFXAPIAdapterCast(const AnyProxy& proxy) {
+      try {
+        Ptr<GFXAPIResourceAdapter> tmp = std::any_cast<Ptr<GFXAPIResourceAdapter>>(proxy);
+        return tmp;
+      } catch( std::bad_any_cast& ) {
+        return nullptr;
+      }
+    }
+
 		/**********************************************************************************************//**
 		 * \class	PlatformResourceProxy
 		 *
@@ -65,7 +74,8 @@ namespace Engine {
 			{ }
 
 			EEngineStatus loadSync(
-				const ResourceHandle   &inHandle);
+				ResourceHandle               const&inHandle,
+        ResolvedDependencyCollection const&resolvedDependencies);
 
 			EEngineStatus unloadSync();
 
@@ -100,7 +110,9 @@ namespace Engine {
 		
 		template <typename TResource>
 		EEngineStatus GFXAPIResourceProxy<TResource>
-			::loadSync(const ResourceHandle &inHandle)
+			::loadSync(
+        ResourceHandle               const&inHandle,
+        ResolvedDependencyCollection const&resolvedDependencies)
 		{
 			this->setLoadState(ELoadState::LOADING);
 			
@@ -108,11 +120,11 @@ namespace Engine {
 			// and load state.
 			EEngineStatus status = EEngineStatus::Ok; 
 
-      const typename TResource::Descriptor& rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
+      typename TResource::Descriptor const&rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
 
 			GFXAPIResourceHandle_t handle = 0;
 
-			status = _backend->load<TResource>(static_cast<GenericProxyBase<TResource>*>(this)->creationRequest(), ETaskSynchronization::Sync, nullptr, handle);
+			status = _backend->load<TResource>(static_cast<GenericProxyBase<TResource>*>(this)->creationRequest(), resolvedDependencies, ETaskSynchronization::Sync, nullptr, handle);
 			if( CheckEngineError(status) ) {
 				// MBT TODO: Consider distinguishing the above returned status a little more in 
 				//           order to reflect UNLOADED or UNAVAILABLE state.
@@ -132,14 +144,12 @@ namespace Engine {
 			::unloadSync()
 		{
 			EEngineStatus status = EEngineStatus::Ok;
-			status = _backend->unload<TResource>(handle(), ETaskSynchronization::Sync);
+			status = _backend->unload<TResource>(handle());
 
 			if( CheckEngineError(status) ) {
 				this->setLoadState(ELoadState::UNKNOWN);
 
-				Log::Error(logTag(), String::format("Failed to unload GFXAPI resource '%0'", handle()));
-
-				return EEngineStatus::GFXAPI_UnloadResourceFailed;
+        HandleEngineStatusError(EEngineStatus::GFXAPI_UnloadResourceFailed, String::format("Failed to unload GFXAPI resource '%0'", handle()));
 			}
 
 			this->setLoadState(ELoadState::UNLOADED);

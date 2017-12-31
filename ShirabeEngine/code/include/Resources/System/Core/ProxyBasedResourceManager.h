@@ -98,7 +98,10 @@ namespace Engine {
        *
        * \return	True if it succeeds, false if it fails.
        **************************************************************************************************/
-      bool loadDependerHierarchyBottomToTop(DependerTreeNode const& base, ResourceProxyMap& outDependencies);
+      bool loadDependerHierarchyBottomToTop(
+        DependerTreeNode             const&base,
+        ResolvedDependencyCollection      &inResolvedDependencies,
+        ResourceProxyMap                  &outDependencies);
 
       /**********************************************************************************************//**
        * \fn	EEngineStatus ProxyBasedResourceManager::proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy)
@@ -152,15 +155,36 @@ namespace Engine {
        **************************************************************************************************/
       template <typename TResource>
       EEngineStatus createResource(
-        const typename TResource::CreationRequest &request,
-        bool                                       creationDeferred,
-        typename TResource::Binding               &binding
+        typename TResource::CreationRequest const&request,
+        bool                                      creationDeferred,
+        typename TResource::Binding              &binding
       );
+
+      template <typename TResource>
+      EEngineStatus updateResource(
+        typename TResource::UpdateRequest const&request,
+        ResourceHandle                    const&handle);
+
+      template <typename TResource>
+      EEngineStatus destroyResource(
+        typename TResource::DestructionRequest const&request,
+        ResourceHandle                         const&handle);
+
 
       template <typename TResource>
       EEngineStatus createImpl(
         typename TResource::CreationRequest const&inRequest,
         Ptr<TResource>                           &out);
+
+      template <typename TResource>
+      EEngineStatus updateImpl(
+        typename TResource::UpdateRequest const&inRequest,
+        ResourceHandle                    const&inHandle);
+
+      template <typename TResource>
+      EEngineStatus destroyImpl(
+        typename TResource::DestructionRequest const&inRequest,
+        ResourceHandle                         const&inHandle);
 
     public:
       ProxyBasedResourceManager(
@@ -185,19 +209,27 @@ namespace Engine {
         return m_resourceBackend;
       }
 
-#define DeclareCreator(Type)                    \
-      EEngineStatus create##Type(               \
-        Type::CreationRequest const&inRequest,  \
-        Ptr<Type>                  &out##Type);
+#define DeclareSupportedResource(Type)            \
+      EEngineStatus create##Type(                 \
+        Type::CreationRequest const&inRequest,    \
+        Ptr<Type>                  &out##Type);   \
+                                                  \
+      EEngineStatus update##Type(                 \
+        Type::UpdateRequest const&inRequest,      \
+        ResourceHandle      const&inHandle);      \
+                                                  \
+      EEngineStatus destroy##Type(                \
+        Type::DestructionRequest const&inRequest, \
+        ResourceHandle           const&inHandle);
 
-      DeclareCreator(SwapChain);
-      DeclareCreator(Texture1D);
-      DeclareCreator(Texture2D);
-      DeclareCreator(Texture3D);
-      DeclareCreator(RenderTargetView);
-      DeclareCreator(ShaderResourceView);
-      DeclareCreator(DepthStencilView);
-      DeclareCreator(DepthStencilState);
+      DeclareSupportedResource(SwapChain);
+      DeclareSupportedResource(Texture1D);
+      DeclareSupportedResource(Texture2D);
+      DeclareSupportedResource(Texture3D);
+      DeclareSupportedResource(RenderTargetView);
+      DeclareSupportedResource(ShaderResourceView);
+      DeclareSupportedResource(DepthStencilView);
+      DeclareSupportedResource(DepthStencilState);
 
     private:
       inline AnyProxy getResourceProxy(const ResourceHandle& handle) {
@@ -235,13 +267,16 @@ namespace Engine {
      * \return	True if it succeeds, false if it fails.
      **************************************************************************************************/
     bool ProxyBasedResourceManager
-      ::loadDependerHierarchyBottomToTop(DependerTreeNode const& base, ResourceProxyMap& outDependencies)
+      ::loadDependerHierarchyBottomToTop(
+        DependerTreeNode             const&base,
+        ResolvedDependencyCollection      &inResolvedDependencies,
+        ResourceProxyMap                  &outDependencies)
     {
       bool result = true;
 
       // Bottom to Top: Children first.
       for(DependerTreeNodeList::value_type const& c : base.children)
-        result = loadDependerHierarchyBottomToTop(c, outDependencies);
+        result = loadDependerHierarchyBottomToTop(c, inResolvedDependencies, outDependencies);
 
       if(!result)
         return result;
@@ -272,7 +307,7 @@ namespace Engine {
         return true;
       }
 
-      EEngineStatus status = dependencyBase->loadSync(base.resourceHandle);
+      EEngineStatus status = dependencyBase->loadSync(base.resourceHandle, inResolvedDependencies);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to load resource of proxy."));
         return false;
@@ -286,7 +321,8 @@ namespace Engine {
         return false;
       }
 
-      outDependencies[base.resourceHandle] = dependencyProxy;
+      outDependencies[base.resourceHandle]        = dependencyProxy;
+      inResolvedDependencies[base.resourceHandle] = GFXAPIAdapterCast(dependencyProxy)->handle();
 
       return true;
     }
@@ -341,7 +377,9 @@ namespace Engine {
         // Error
       }
 
-      bool dependenciesLoadedSuccessfully = loadDependerHierarchyBottomToTop(hierarchyRoot, dependencyResources);
+      ResolvedDependencyCollection resolvedDependencies={};
+
+      bool dependenciesLoadedSuccessfully = loadDependerHierarchyBottomToTop(hierarchyRoot, resolvedDependencies, dependencyResources);
       if(!dependenciesLoadedSuccessfully) {
         // Flag error, since the entire child resource tree was not loaded successfully.
         // Free anything created beforehand though!
@@ -370,7 +408,7 @@ namespace Engine {
 
       // Finally load the root resource
       // 
-      status = base->loadSync(handle);
+      status = base->loadSync(handle, resolvedDependencies);
       std::string msg = "Failed to load underlying resource of resource proxy.";
       HandleEngineStatusError(status, msg);
 
@@ -465,6 +503,7 @@ namespace Engine {
       if(CheckEngineError(status)) {
         HandleEngineStatusError(EEngineStatus::ResourceManager_ResourceLoadFailed, "Failed to unload underlying resource of resource proxy.");
       }
+
 
       return EEngineStatus::Ok;
     }
@@ -590,6 +629,11 @@ namespace Engine {
           }
         };
         fnInsert(outDependerHierarchies, outProxies);
+
+        // Also store hierarchy.
+        for(DependerTreeNodeList::value_type const& r : hierarchy)
+          m_hierarchyRoots[r.resourceHandle] = r;
+
       } catch(EngineException &ee) {
         Log::Error(logTag(), ee.message());
       } catch(std::exception &stde) {
@@ -634,6 +678,42 @@ namespace Engine {
 
     template <typename TResource>
     EEngineStatus ProxyBasedResourceManager
+      ::updateResource(
+        typename TResource::UpdateRequest const&request,
+        ResourceHandle                    const&handle)
+    {
+      return EEngineStatus::Ok;
+    }
+
+    template <typename TResource>
+    EEngineStatus ProxyBasedResourceManager
+      ::destroyResource(
+        typename TResource::DestructionRequest const&request,
+        ResourceHandle                         const&handle)
+    {
+      EEngineStatus status = proxyUnload(handle);
+      HandleEngineStatusError(status, String::format("Failed to unload proxy resource in backend (Handle: %0).", handle.id()));
+      
+      std::function<void(DependerTreeNode const&)> fnEraseRecursively = nullptr;
+
+      fnEraseRecursively
+        = [&, this] (DependerTreeNode const&root) -> void
+      {
+        for(DependerTreeNode::value_type const&c : root.children)
+          fnEraseRecursively(c);
+
+        _resources->removeResource(root.resourceHandle);
+      };
+      fnEraseRecursively(m_hierarchyRoots[handle]); // If not available, an empty default will be created, which is subsequently killed. Small overhead, easy algorithm.
+     
+      m_hierarchyRoots.erase(handle);
+
+      // Any further verification, e.g. with the backend to ensure proper deletion?
+      
+    }
+
+    template <typename TResource>
+    EEngineStatus ProxyBasedResourceManager
       ::createImpl(
         typename TResource::CreationRequest const&inRequest,
         Ptr<TResource>                           &out)
@@ -648,6 +728,26 @@ namespace Engine {
 
       const typename TResource::Descriptor& desc = inRequest.resourceDescriptor();
       out = TResource::create(desc, binding);
+
+      return EEngineStatus::Ok;
+    }
+
+    template <typename TResource>
+    EEngineStatus ProxyBasedResourceManager
+      ::updateImpl(
+        typename TResource::UpdateRequest const&inRequest,
+        ResourceHandle                    const&inHandle)
+    {
+    }
+
+    template <typename TResource>
+    EEngineStatus ProxyBasedResourceManager
+      ::destroyImpl(
+        typename TResource::DestructionRequest const&inRequest,
+        ResourceHandle                         const&inHandle)
+    {
+      EEngineStatus status = destroyResource<TResource>(inRequest, inHandle);
+      HandleEngineStatusError(status, "Failed to destroy resource.");
 
       return EEngineStatus::Ok;
     }

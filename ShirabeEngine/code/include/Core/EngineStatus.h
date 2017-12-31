@@ -40,6 +40,7 @@ namespace Engine {
 		GAPI_InvalidHandle                                              =  -50020,
 		GFXAPI_SubsystemThreadEnqueueFailed                             =  -50200, // GFXAPI-Subsystem
     GFXAPI_SubsystemResourceCreationFailed                          =  -50201,
+    GFXAPI_SubsystemResourceDestructionFailed                       =  -50202,
     GFXAPI_LoadResourceFailed                                       =  -50210,  
     GFXAPI_UnloadResourceFailed                                     =  -50211,
 		DXGI_FactoryCreationFailed                                      = -100300, // DXGI
@@ -54,7 +55,12 @@ namespace Engine {
 		DXDevice_Texture1DCreationFailed                                = -100370,
 		DXDevice_Texture2DCreationFailed                                = -100371,
 		DXDevice_Texture3DCreationFailed                                = -100372,
-		DXDevice_AttachSwapChainToBackBuffer_CreateRTV_Failed           = -100400,
+		DXDevice_CreateRTV_Failed                                       = -100400,
+    DXDevice_CreateSRV_Failed                                       = -100401,
+    DXDevice_CreateDSV_Failed                                       = -100402,
+    DXDevice_CreateDSS_Failed                                       = -100403,
+    DXDevice_CreateRS_Failed                                        = -100404,
+    DXDevice_CreateSwapChainBuffer_Failed                           = -100420,
 		DXDevice_SRVCreationFailed                                      = -100430,
 		DXDevice_DepthStencilTextureCreationFailed                      = -100501,
 		DXDevice_DepthStencilStateCreationFailed                        = -100502,

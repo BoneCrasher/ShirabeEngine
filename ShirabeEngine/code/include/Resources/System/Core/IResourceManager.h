@@ -16,26 +16,36 @@
 namespace Engine {
   namespace Resources {
 
-#define DeclareCreationMethod(resource)            \
-  virtual EEngineStatus create##resource(          \
-    const resource::CreationRequest &inRequest,    \
-    Ptr<resource>                   &out##resource \
+#define DeclareResourceMethods(resource)          \
+  virtual EEngineStatus create##resource(         \
+    resource::CreationRequest const&inRequest,    \
+    Ptr<resource>             const&out##resource \
+  ) = 0;                                          \
+                                                  \
+  virtual EEngineStatus update##resource(         \
+    resource::UpdateRequest const&inRequest,      \
+    ResourceHandle          const&inHandle        \
+  ) = 0;                                          \
+                                                  \
+  virtual EEngineStatus destroy##resource(        \
+    resource::DestructionRequest const&inRequest, \
+    ResourceHandle               const&inHandle   \
   ) = 0;
-
+  
     DeclareInterface(IResourceManager);
 
-    virtual bool clear() = 0;
+      virtual bool clear() = 0;
 
-    virtual Ptr<BasicGFXAPIResourceBackend>& backend() = 0;
+      virtual Ptr<BasicGFXAPIResourceBackend>& backend() = 0;
 
-    DeclareCreationMethod(SwapChain);
-    DeclareCreationMethod(Texture1D);
-    DeclareCreationMethod(Texture2D);
-    DeclareCreationMethod(Texture3D);
-    DeclareCreationMethod(RenderTargetView);
-    DeclareCreationMethod(ShaderResourceView);
-    DeclareCreationMethod(DepthStencilView);
-    DeclareCreationMethod(DepthStencilState);
+      DeclareResourceMethods(SwapChain);
+      DeclareResourceMethods(Texture1D);
+      DeclareResourceMethods(Texture2D);
+      DeclareResourceMethods(Texture3D);
+      DeclareResourceMethods(RenderTargetView);
+      DeclareResourceMethods(ShaderResourceView);
+      DeclareResourceMethods(DepthStencilView);
+      DeclareResourceMethods(DepthStencilState);
 
     DeclareInterfaceEnd(IResourceManager);
     DeclareSharedPointerType(IResourceManager);

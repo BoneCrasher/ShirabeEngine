@@ -108,7 +108,14 @@ namespace Engine {
 
         SwapChainBuffer::Descriptor const&desc = request.resourceDescriptor();
 
-        Ptr<IDXGISwapChain> swapChain = std::static_pointer_cast<IDXGISwapChain>(resolvedDependencies.at(request.swapChainHandle()));
+        GFXAPIResourceHandle_t publicDependencyHandle  = resolvedDependencies.at(request.swapChainHandle());
+        Ptr<void>              privateDependencyHandle = m_storage[publicDependencyHandle];
+        if(!privateDependencyHandle) {
+          m_storage.erase(publicDependencyHandle); // Remove default or inconsistent dependency.
+          HandleEngineStatusError(EEngineStatus::DXDevice_CreateSwapChainBuffer_Failed, "Failed to create SRV due to missing dependency.");
+        }
+        
+        Ptr<IDXGISwapChain> swapChain = std::static_pointer_cast<IDXGISwapChain>(privateDependencyHandle);
 
         DXGI_SWAP_CHAIN_DESC  swapChainDescriptor ={};
         ID3D11Texture2D      *backBufferUnmanaged = nullptr;
@@ -116,7 +123,7 @@ namespace Engine {
         outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
           HRESULT hres = swapChain->GetBuffer(desc.backBufferIndex, __uuidof(ID3D11Texture2D), (void **)&backBufferUnmanaged);
-          Platform::Windows::HandleWindowsError(hres, EEngineStatus::DXGI_SwapChainCreationFailed_BackBufferPointerAcquisition, "Failed to acquire and wrap back buffer pointer.");
+          Platform::Windows::HandleWindowsError(hres, EEngineStatus::DXDevice_CreateSwapChainBuffer_Failed, "Failed to acquire and wrap back buffer pointer.");
 
           GFXAPIResourceHandleAssignment assignment ={};
           assignment.publicHandle   = reinterpret_cast<GFXAPIResourceHandle_t>(backBufferUnmanaged); // Just abuse the pointer target address of the handle...

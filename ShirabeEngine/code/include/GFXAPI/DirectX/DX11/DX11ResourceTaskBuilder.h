@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_RESOURCES_DX11TASKBUILDER_H__
 #define __SHIRABE_RESOURCES_DX11TASKBUILDER_H__
 
+#include <map>
+
 #include "Resources/System/Core/ResourceTask.h"
 #include "Resources/System/Core/ResourceTaskBuilder.h"
 
@@ -14,6 +16,8 @@ namespace Engine {
     namespace _11 {
       using namespace Engine::Resources;
       using namespace Engine::GFXAPI;
+
+      using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
 
       /**********************************************************************************************//**
        * \struct	ResourceMapping
@@ -82,6 +86,8 @@ namespace Engine {
 
       private:
         Ptr<DX11Environment> m_dx11Environment;
+
+        PublicToPrivateBackendResourceMap m_storage;
       };
 
     }

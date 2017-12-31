@@ -57,14 +57,21 @@ namespace Engine {
 
         outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
-          Ptr<ID3D11Texture2D> underlyingTexture = std::static_pointer_cast<ID3D11Texture2D>(resolvedDependencies.at(request.underlyingTextureHandle()));
+          GFXAPIResourceHandle_t publicDependencyHandle  = resolvedDependencies.at(request.underlyingTextureHandle());
+          Ptr<void>              privateDependencyHandle = m_storage[publicDependencyHandle];
+          if(!privateDependencyHandle) {
+            m_storage.erase(publicDependencyHandle); // Remove default or inconsistent dependency.
+            HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV due to missing dependency.");
+          }
+
+          Ptr<ID3D11Texture2D> underlyingTexture = std::static_pointer_cast<ID3D11Texture2D>(privateDependencyHandle);
           
           GFXAPIResourceHandleAssignment assignment ={};
           
           ID3D11RenderTargetView *pResourceUnmanaged = nullptr;
           HRESULT hres = m_dx11Environment->getDevice()->CreateRenderTargetView(underlyingTexture.get(), &rtvDesc, &pResourceUnmanaged);
           if (FAILED(hres)) {
-             EEngineStatus::DXDevice_AttachSwapChainToBackBuffer_CreateRTV_Failed;
+            HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV using dx11 device.");
           }
           else {
             assignment.publicHandle   = reinterpret_cast<GFXAPIResourceHandle_t>(pResourceUnmanaged); // Just abuse the pointer target address of the handle...
