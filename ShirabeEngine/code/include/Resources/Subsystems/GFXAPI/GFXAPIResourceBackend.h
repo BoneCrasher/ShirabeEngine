@@ -102,7 +102,7 @@ namespace Engine {
      * \brief	Handle class to hold an asynchronous request.
      **************************************************************************************************/
     struct DeferredResourceOperationHandle {
-      std::future<ResourceTaskFn_t::result_type>& futureHandle;
+      std::future<ResourceTaskFn_t::result_type> futureHandle;
     };
 
     DeclareInterface(IAsyncLoadCallback);
@@ -186,8 +186,8 @@ namespace Engine {
         ResourceTaskFn_t                           &inTask,
         std::future<ResourceTaskFn_t::result_type> &outSharedFuture);
 
-      ResourceTaskBackendPtr m_resourceTaskBackend;
-      
+      ResourceTaskBackendPtr            m_resourceTaskBackend;
+      PublicToPrivateBackendResourceMap m_storage;
 
       Threading::Looper<ResourceTaskFn_t::result_type>           m_resourceThread;
       Threading::Looper<ResourceTaskFn_t::result_type>::Handler &m_resourceThreadHandler;
@@ -227,12 +227,12 @@ namespace Engine {
     {
       ResourceTaskFn_t::result_type resourceHandle ={};
 
-      DeferredResourceOperationHandle handle={};
+      DeferredResourceOperationHandle handle;
 
       // Resolve dependencies...
       ResolvedDependencyCollection resolvedDependencies={};
       for(GFXAPIResourceHandleMap::value_type const&h : dependencies)
-        resolvedDependencies[h.first] = m_store[h.second];
+        resolvedDependencies[h.first] = m_storage[h.second];
 
       EEngineStatus status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
       if(!CheckEngineError(status)) {
@@ -272,11 +272,12 @@ namespace Engine {
 
       ResolvedDependencyCollection resolvedDependencies={}; // Guarding the public API by passing in this empty map.
 
-      DeferredResourceOperationHandle handle={};
-      EEngineStatus status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
+      DeferredResourceOperationHandle handle;
+      
+      status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
       if(!CheckEngineError(status)) {
-        GFXAPIResourceHandle_t resourceHandle = handle.futureHandle.get(); // Wait for it ALWAYS!
-        if(resourceHandle.valid()) {
+        GFXAPIResourceHandleAssignment const&assignment = handle.futureHandle.get(); // Wait for it ALWAYS!
+        if(assignment.publicHandle.valid()) {
           status = EEngineStatus::GFXAPI_SubsystemResourceDestructionFailed;
         }
         else {

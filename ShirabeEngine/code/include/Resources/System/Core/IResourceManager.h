@@ -19,7 +19,7 @@ namespace Engine {
 #define DeclareResourceMethods(resource)          \
   virtual EEngineStatus create##resource(         \
     resource::CreationRequest const&inRequest,    \
-    Ptr<resource>             const&out##resource \
+    Ptr<resource>                  &out##resource \
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus update##resource(         \

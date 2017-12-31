@@ -17,7 +17,7 @@ namespace Engine {
       return createImpl<Type>(inRequest, out);            \
     }                                                     \
                                                           \
-      EEngineStatus ProxyBasedResourceManager             \
+    EEngineStatus ProxyBasedResourceManager             \
         ::update##Type(                                   \
         Type::UpdateRequest const&inRequest,              \
         ResourceHandle      const&inHandle)               \

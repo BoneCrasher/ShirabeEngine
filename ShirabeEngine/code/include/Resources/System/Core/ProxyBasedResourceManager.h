@@ -300,7 +300,7 @@ namespace Engine {
         return true;
       }
 
-      EEngineStatus status = dependencyBase->loadSync(base.resourceHandle, inOutDependencies);
+      EEngineStatus status = dependencyBase->loadSync(inOutDependencies);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to load resource of proxy."));
         return false;
@@ -408,7 +408,7 @@ namespace Engine {
 
       // Finally load the root resource
       // 
-      status = base->loadSync(handle, dependencies);
+      status = base->loadSync(dependencies);
       std::string msg = "Failed to load underlying resource of resource proxy.";
       HandleEngineStatusError(status, msg);
 

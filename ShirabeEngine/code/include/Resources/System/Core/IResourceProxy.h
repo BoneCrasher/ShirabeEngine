@@ -68,7 +68,6 @@ namespace Engine {
 		virtual const ResourceHandleList& dependencies() const = 0;
 
 		virtual EEngineStatus loadSync(
-      ResourceHandle          const&inHandle,
       GFXAPIResourceHandleMap const&inResolvedDependencies) = 0;
 		virtual EEngineStatus unloadSync() = 0;
 
@@ -151,6 +150,8 @@ namespace Engine {
 			{
 			}
 
+      inline ResourceHandle const& resourceHandle() const { return _handle; }
+
 			inline EProxyType proxyType() const { return _type; }
 			inline ELoadState loadState() const { return _loadState; }
 
@@ -162,6 +163,8 @@ namespace Engine {
 			inline void setLoadState(const ELoadState& newLoadState) { _loadState = newLoadState; }
 
 		private:
+      ResourceHandle _handle;
+
 			EProxyType _type;
 			ELoadState _loadState;
 
