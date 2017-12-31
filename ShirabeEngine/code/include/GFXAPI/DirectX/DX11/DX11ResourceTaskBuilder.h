@@ -17,7 +17,6 @@ namespace Engine {
       using namespace Engine::Resources;
       using namespace Engine::GFXAPI;
 
-      using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
 
       /**********************************************************************************************//**
        * \struct	ResourceMapping

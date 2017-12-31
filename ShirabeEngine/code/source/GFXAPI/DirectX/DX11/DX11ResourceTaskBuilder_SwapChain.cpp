@@ -108,10 +108,8 @@ namespace Engine {
 
         SwapChainBuffer::Descriptor const&desc = request.resourceDescriptor();
 
-        GFXAPIResourceHandle_t publicDependencyHandle  = resolvedDependencies.at(request.swapChainHandle());
-        Ptr<void>              privateDependencyHandle = m_storage[publicDependencyHandle];
+        Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.swapChainHandle());
         if(!privateDependencyHandle) {
-          m_storage.erase(publicDependencyHandle); // Remove default or inconsistent dependency.
           HandleEngineStatusError(EEngineStatus::DXDevice_CreateSwapChainBuffer_Failed, "Failed to create SRV due to missing dependency.");
         }
         

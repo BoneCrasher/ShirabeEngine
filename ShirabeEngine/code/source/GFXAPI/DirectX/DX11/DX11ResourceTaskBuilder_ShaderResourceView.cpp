@@ -84,11 +84,8 @@ namespace Engine {
 
         outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
-
-          GFXAPIResourceHandle_t publicDependencyHandle  = resolvedDependencies.at(request.underlyingBufferHandle());
-          Ptr<void>              privateDependencyHandle = m_storage[publicDependencyHandle];
+          Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.underlyingBufferHandle());
           if(!privateDependencyHandle) {
-            m_storage.erase(publicDependencyHandle); // Remove default or inconsistent dependency.
             HandleEngineStatusError(EEngineStatus::DXDevice_CreateSRV_Failed, "Failed to create SRV due to missing dependency.");
           }
 

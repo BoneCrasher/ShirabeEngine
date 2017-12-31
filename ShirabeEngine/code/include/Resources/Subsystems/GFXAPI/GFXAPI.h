@@ -25,6 +25,8 @@ namespace Engine {
 		using GFXAPIResourceHandle_t = uint64_t;
 		static const GFXAPIResourceHandle_t GFXAPIUninitializedResourceHandle = 0;
 
+    DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
+
     struct GFXAPIResourceHandleAssignment {
       GFXAPIResourceHandle_t publicHandle;
       Ptr<void>              internalHandle;

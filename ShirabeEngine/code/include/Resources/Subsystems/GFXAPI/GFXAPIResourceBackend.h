@@ -64,7 +64,8 @@ namespace Engine {
 
     using ResourceTaskFn_t = std::function<GFXAPIResourceHandleAssignment()>;
 
-    using ResolvedDependencyCollection = std::map<ResourceHandle, GFXAPIResourceHandle_t>;
+    using ResolvedDependencyCollection      = std::map<ResourceHandle, Ptr<void>>;
+    using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
 
     template <typename T>
     class IGFXAPIResourceTaskBackendDecl
@@ -137,7 +138,7 @@ namespace Engine {
       template <typename TResource>
       EEngineStatus load(
         typename TResource::CreationRequest const&inRequest,
-        ResolvedDependencyCollection        const&resolvedDependencies,
+        GFXAPIResourceHandleMap             const&dependencies,
         const ETaskSynchronization               &inRequestMode,
         const Ptr<IAsyncLoadCallback>            &inCallback,
         GFXAPIResourceHandle_t                   &outResourceHandle);
@@ -186,6 +187,7 @@ namespace Engine {
         std::future<ResourceTaskFn_t::result_type> &outSharedFuture);
 
       ResourceTaskBackendPtr m_resourceTaskBackend;
+      
 
       Threading::Looper<ResourceTaskFn_t::result_type>           m_resourceThread;
       Threading::Looper<ResourceTaskFn_t::result_type>::Handler &m_resourceThreadHandler;
@@ -218,7 +220,7 @@ namespace Engine {
       GFXAPIResourceBackend<TSupportedResourceTypes...>
       ::load(
         typename TResource::CreationRequest const&inRequest,
-        ResolvedDependencyCollection        const&resolvedDependencies,
+        GFXAPIResourceHandleMap             const&dependencies,
         const ETaskSynchronization               &inSynchronization,
         const Ptr<IAsyncLoadCallback>            &inCallback,
         GFXAPIResourceHandle_t                   &outResourceHandle)
@@ -226,6 +228,12 @@ namespace Engine {
       ResourceTaskFn_t::result_type resourceHandle ={};
 
       DeferredResourceOperationHandle handle={};
+
+      // Resolve dependencies...
+      ResolvedDependencyCollection resolvedDependencies={};
+      for(GFXAPIResourceHandleMap::value_type const&h : dependencies)
+        resolvedDependencies[h.first] = m_store[h.second];
+
       EEngineStatus status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
       if(!CheckEngineError(status)) {
         switch(inSynchronization) {

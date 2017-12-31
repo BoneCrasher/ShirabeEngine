@@ -98,9 +98,9 @@ namespace Engine {
        *
        * \return	True if it succeeds, false if it fails.
        **************************************************************************************************/
-      bool loadDependerHierarchyBottomToTop(
+      bool loadDependerHierarchyTopToBottom(
         DependerTreeNode             const&base,
-        ResolvedDependencyCollection      &inResolvedDependencies,
+        GFXAPIResourceHandleMap           &inResolvedDependencies,
         ResourceProxyMap                  &outDependencies);
 
       /**********************************************************************************************//**
@@ -267,20 +267,13 @@ namespace Engine {
      * \return	True if it succeeds, false if it fails.
      **************************************************************************************************/
     bool ProxyBasedResourceManager
-      ::loadDependerHierarchyBottomToTop(
+      ::loadDependerHierarchyTopToBottom(
         DependerTreeNode             const&base,
-        ResolvedDependencyCollection      &inResolvedDependencies,
+        GFXAPIResourceHandleMap           &inOutDependencies,
         ResourceProxyMap                  &outDependencies)
     {
       bool result = true;
-
-      // Bottom to Top: Children first.
-      for(DependerTreeNodeList::value_type const& c : base.children)
-        result = loadDependerHierarchyBottomToTop(c, inResolvedDependencies, outDependencies);
-
-      if(!result)
-        return result;
-
+      
       // The reason all proxies have to be created by the proxy-creator and 
       // stored before this function call, can be seen below:
       AnyProxy dependencyProxy = getResourceProxy(base.resourceHandle);
@@ -307,7 +300,7 @@ namespace Engine {
         return true;
       }
 
-      EEngineStatus status = dependencyBase->loadSync(base.resourceHandle, inResolvedDependencies);
+      EEngineStatus status = dependencyBase->loadSync(base.resourceHandle, inOutDependencies);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to load resource of proxy."));
         return false;
@@ -321,8 +314,15 @@ namespace Engine {
         return false;
       }
 
-      outDependencies[base.resourceHandle]        = dependencyProxy;
-      inResolvedDependencies[base.resourceHandle] = GFXAPIAdapterCast(dependencyProxy)->handle();
+      outDependencies[base.resourceHandle]   = dependencyProxy;
+      inOutDependencies[base.resourceHandle] = GFXAPIAdapterCast(dependencyProxy)->handle();
+      
+      // Top to Bottom: Children last.
+      for(DependerTreeNodeList::value_type const& c : base.children)
+        result = loadDependerHierarchyTopToBottom(c, inOutDependencies, outDependencies);
+
+      if(!result)
+        return result;
 
       return true;
     }
@@ -377,9 +377,9 @@ namespace Engine {
         // Error
       }
 
-      ResolvedDependencyCollection resolvedDependencies={};
+      GFXAPIResourceHandleMap dependencies={};
 
-      bool dependenciesLoadedSuccessfully = loadDependerHierarchyBottomToTop(hierarchyRoot, resolvedDependencies, dependencyResources);
+      bool dependenciesLoadedSuccessfully = loadDependerHierarchyTopToBottom(hierarchyRoot, dependencies, dependencyResources);
       if(!dependenciesLoadedSuccessfully) {
         // Flag error, since the entire child resource tree was not loaded successfully.
         // Free anything created beforehand though!
@@ -408,7 +408,7 @@ namespace Engine {
 
       // Finally load the root resource
       // 
-      status = base->loadSync(handle, resolvedDependencies);
+      status = base->loadSync(handle, dependencies);
       std::string msg = "Failed to load underlying resource of resource proxy.";
       HandleEngineStatusError(status, msg);
 

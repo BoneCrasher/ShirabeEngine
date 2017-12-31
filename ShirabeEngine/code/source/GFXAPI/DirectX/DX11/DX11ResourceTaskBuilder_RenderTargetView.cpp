@@ -57,10 +57,8 @@ namespace Engine {
 
         outTask = [&, this] () -> GFXAPIResourceHandleAssignment
         {
-          GFXAPIResourceHandle_t publicDependencyHandle  = resolvedDependencies.at(request.underlyingTextureHandle());
-          Ptr<void>              privateDependencyHandle = m_storage[publicDependencyHandle];
+          Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
           if(!privateDependencyHandle) {
-            m_storage.erase(publicDependencyHandle); // Remove default or inconsistent dependency.
             HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV due to missing dependency.");
           }
 

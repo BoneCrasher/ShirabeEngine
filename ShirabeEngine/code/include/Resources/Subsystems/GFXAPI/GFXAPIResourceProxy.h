@@ -74,8 +74,8 @@ namespace Engine {
 			{ }
 
 			EEngineStatus loadSync(
-				ResourceHandle               const&inHandle,
-        ResolvedDependencyCollection const&resolvedDependencies);
+				ResourceHandle          const&inHandle,
+        GFXAPIResourceHandleMap const&resolvedDependencies);
 
 			EEngineStatus unloadSync();
 
@@ -111,8 +111,8 @@ namespace Engine {
 		template <typename TResource>
 		EEngineStatus GFXAPIResourceProxy<TResource>
 			::loadSync(
-        ResourceHandle               const&inHandle,
-        ResolvedDependencyCollection const&resolvedDependencies)
+        ResourceHandle          const&inHandle,
+        GFXAPIResourceHandleMap const&resolvedDependencies)
 		{
 			this->setLoadState(ELoadState::LOADING);
 			
