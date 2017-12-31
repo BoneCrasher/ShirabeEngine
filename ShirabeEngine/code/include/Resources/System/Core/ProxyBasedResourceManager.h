@@ -370,7 +370,7 @@ namespace Engine {
 
       // Finally load the root resource
       // 
-      status = base->loadSync(handle, dependencyResources);
+      status = base->loadSync(handle);
       std::string msg = "Failed to load underlying resource of resource proxy.";
       HandleEngineStatusError(status, msg);
 
@@ -378,71 +378,59 @@ namespace Engine {
     }
 
     bool ProxyBasedResourceManager
-      ::unloadDependerHierarchyBottomToTop(DependerTreeNode const&)
+      ::unloadDependerHierarchyBottomToTop(DependerTreeNode const&base)
     {
       bool result = true;
 
-      if(!base) {
-        Log::Error(logTag(), "loadDependenciesRecursively invoked with null-pointer base-proxy.");
+      // Bottom to Top: Children first.
+      for(DependerTreeNodeList::value_type const& c : base.children)
+        result = unloadDependerHierarchyBottomToTop(c);
+
+      if(!result)
+        return result;
+
+      // The reason all proxies have to be created by the proxy-creator and 
+      // stored before this function call, can be seen below:
+      AnyProxy dependencyProxy = getResourceProxy(base.resourceHandle);
+      if(!dependencyProxy.has_value()) {
+        // Even if we dealt with an internal resource not to be 
+        // created here, having an empty proxy stored is a in-
+        // consistent state.
+        Log::Error(logTag(), String::format("Nullpointer proxy encountered in internal resource manager."));
         return false;
       }
 
-      // Release dependencies first
-      ResourceHandleList dependecyHandles = base->dependencies();
-      if(!dependecyHandles.empty()) {
-        for(const ResourceHandle& resourceHandle : dependecyHandles) {
-          // The reason all proxies have to be created by the proxy-creator and 
-          // stored before this function call, can be seen below:
-          AnyProxy dependencyProxy = getResourceProxy(resourceHandle);
-          if(!dependencyProxy.has_value()) {
-            // Even if we dealt with an internal resource not to be 
-            // created here, having an empty proxy stored is a in-
-            // consistent state.
-            Log::Error(logTag(), String::format("Nullpointer proxy encountered in internal resource manager."));
-            // result |= false;
-            // break;
-          }
-
-          IResourceProxyBasePtr dependencyBase = BaseProxyCast(dependencyProxy);
-          if(!dependencyBase) {
-            // MBT TODO: How to handle this case?
-          }
-
-          // Bottom to top release: Children first
-          result |= unloadDependenciesRecursively(dependencyBase);
-          if(!result) {
-            Log::Error(logTag(), String::format("Failed to load dependencies of proxy."));
-            break;
-          }
-
-          // Do we even hav to load the resource? If the resource type is internal, there won't 
-          // be any necessity to go deeper. Internal resources and all it's children will be created
-          // without any control from our side.		
-          if(dependencyBase->proxyType() == EProxyType::Internal
-             || dependencyBase->proxyType() == EProxyType::Unknown)
-          {
-            // Nothing to do...
-            continue;
-          }
-
-          EEngineStatus status = dependencyBase->unloadSync();
-          if(CheckEngineError(status)) {
-            Log::Error(logTag(), String::format("Failed to load resource of proxy."));
-            result |= false;
-            break;
-          }
-
-          if(dependencyBase->loadState() != ELoadState::UNLOADED) {
-            std::string msg =
-              "CRITICAL LOGIC ERROR: Resource should be unloaded successfully "
-              "at this point, but isn't or state is not updated properly.";
-            Log::WTF(logTag(), String::format(msg));
-            break;
-          }
-        }
+      IResourceProxyBasePtr dependencyBase = BaseProxyCast(dependencyProxy);
+      if(!dependencyBase) {
+        // MBT TODO: How to handle this case?
       }
 
-      return result;
+      // Do we even hav to load the resource? If the resource type is internal, there won't 
+      // be any necessity to go deeper. Internal resources and all it's children will be created
+      // without any control from our side.		
+      if(dependencyBase->proxyType() == EProxyType::Internal      // We don't have control anyway
+         || dependencyBase->proxyType() == EProxyType::Persistent // Just load, don't unload manually
+         || dependencyBase->proxyType() == EProxyType::Unknown)   // We don't know what we deal with, usually invalid state, don't touch.
+      {
+        // Nothing to do...
+        return true;
+      }
+
+      EEngineStatus status = dependencyBase->unloadSync();
+      if(CheckEngineError(status)) {
+        Log::Error(logTag(), String::format("Failed to load resource of proxy."));
+        return false;
+      }
+
+      if(dependencyBase->loadState() != ELoadState::UNLOADED) {
+        std::string msg =
+          "CRITICAL LOGIC ERROR: Resource should be unloaded successfully "
+          "at this point, but isn't or state is not updated properly.";
+        Log::WTF(logTag(), String::format(msg));
+        return false;
+      }
+
+      return true;
     }
 
     EEngineStatus ProxyBasedResourceManager
@@ -452,29 +440,30 @@ namespace Engine {
 
       AnyProxy root = getResourceProxy(handle);
       if(!root.has_value())
-        return EEngineStatus::ResourceManager_RootProxyFetchFailed;
+        HandleEngineStatusError(EEngineStatus::ResourceManager_RootProxyFetchFailed, "Cannot find resource proxy for handle: " + handle.id());
 
       IResourceProxyBasePtr base = BaseProxyCast(root);
       if(!base) {
-        return EEngineStatus::ResourceManager_BaseProxyCastFailed;
+        HandleEngineStatusError(EEngineStatus::ResourceManager_BaseProxyCastFailed, "Found proxy, but it doesn't seem to be convertible to IResourceProxyBasePtr. Handle: " + handle.id());
       }
 
       // Store any to-be-created resource in here to iteratively store them in the 
       // respective resource-pools and return the handle-list.
       ResourceProxyMap builtResources;
 
-      // Free all dependencies first.
-      bool dependenciesUnloadedSuccessfully = unloadDependenciesRecursively(base);
-      if(!dependenciesUnloadedSuccessfully) {
-        Log::Error(logTag(), "Failed to unload one or more dependencies of resource proxy.");
-        return EEngineStatus::ResourceManager_DependencyLoadFailed;
+      DependerTreeNode const& hierarchyRoot = findHierarchyRoot(handle);
+      if(hierarchyRoot.resourceHandle == ResourceHandle::Invalid()) {
+        // Error
+      }
+
+      if(!unloadDependerHierarchyBottomToTop(hierarchyRoot)) {
+        HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyUnloadFailed, "Failed to unload dependers first.");
       }
 
       // Finally unload the root resource
       status = base->unloadSync();
       if(CheckEngineError(status)) {
-        Log::Error(logTag(), "Failed to unload underlying resource of resource proxy.");
-        return EEngineStatus::ResourceManager_ResourceLoadFailed;
+        HandleEngineStatusError(EEngineStatus::ResourceManager_ResourceLoadFailed, "Failed to unload underlying resource of resource proxy.");
       }
 
       return EEngineStatus::Ok;

@@ -67,9 +67,7 @@ namespace Engine {
 
 		virtual const ResourceHandleList& dependencies() const = 0;
 
-		virtual EEngineStatus loadSync(
-			const ResourceHandle   &inHandle,
-			const ResourceProxyMap &inDependencies) = 0;
+		virtual EEngineStatus loadSync(const ResourceHandle   &inHandle) = 0;
 		virtual EEngineStatus unloadSync() = 0;
 
 		DeclareInterfaceEnd(IResourceProxyBase);
