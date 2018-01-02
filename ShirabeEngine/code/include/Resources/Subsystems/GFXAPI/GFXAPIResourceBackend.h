@@ -145,7 +145,7 @@ namespace Engine {
 
       template <typename TResource>
       EEngineStatus unload(
-        typename TResource::DestructionRequest const& inRequest);
+        typename TResource::DestructionRequest const&inRequest);
 
       template <typename TUnderlyingType>
       EEngineStatus getUnderlyingHandle(
@@ -277,7 +277,7 @@ namespace Engine {
       status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
       if(!CheckEngineError(status)) {
         GFXAPIResourceHandleAssignment const&assignment = handle.futureHandle.get(); // Wait for it ALWAYS!
-        if(assignment.internalHandle)) {
+        if(assignment.internalHandle) {
           status = EEngineStatus::GFXAPI_SubsystemResourceDestructionFailed;
         }
         else {
@@ -314,14 +314,14 @@ namespace Engine {
       EEngineStatus status = EEngineStatus::Ok;
 
       ResourceTaskFn_t task = nullptr;
-      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackend<TResource>::creationTask(inRequest, resolvedDependencies, task);
+      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackendDecl<TResource>::creationTask(inRequest, resolvedDependencies, task);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to create build task for resource '%0'", "..."));
         return status;
       }
 
       std::future<ResourceTaskFn_t::result_type> future;
-      status = enqueue<TResource>(task, future);
+      status = enqueue(task, future);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to enqueue resource creation task for resource '%0'", "..."));
         return status;
@@ -343,14 +343,14 @@ namespace Engine {
       EEngineStatus status = EEngineStatus::Ok;
 
       ResourceTaskFn_t task = nullptr;
-      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackend<TResource>::destructionTask(inRequest, resolvedDependencies, task);
+      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackendDecl<TResource>::destructionTask(inRequest, resolvedDependencies, task);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to create destruction task for resource '%0'", "..."));
         return status;
       }
 
       std::future<ResourceTaskFn_t::result_type> future;
-      status = enqueue<TResource>(task, future);
+      status = enqueue(task, future);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to enqueue resource creation task for resource '%0'", "..."));
         return status;

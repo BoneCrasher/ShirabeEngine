@@ -13,6 +13,17 @@
 #include <Windows.h>
 #endif
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
+#include <math.h>
+#include <cmath>
+
 // #include "Platform/ApplicationEnvironment.h"
 #include "Core/EngineTypeHelper.h"
 
@@ -184,7 +195,7 @@ namespace Engine {
 		}
 
 		if (CheckEnumFlag(Style::CENTRE, style)) {
-			unsigned int offset = max(0, ((lineWidth() / 2) - (message.size() / 2)));
+			unsigned int offset = std::max<uint64_t>(0, ((lineWidth() / 2) - (message.size() / 2)));
 			ss << std::setw(offset);
 		}
 		ss << message << "\n";

@@ -77,11 +77,7 @@ namespace Engine {
         GFXAPIResourceHandleMap const&resolvedDependencies);
 
 			EEngineStatus unloadSync();
-
-			virtual bool bind(
-				const GFXAPIResourceHandle_t &gfxApiHandle,
-				const ResourceProxyMap       &inDependencies) = 0;
-
+      
 		protected:
 		private:
 			Ptr<BasicGFXAPIResourceBackend> _backend;

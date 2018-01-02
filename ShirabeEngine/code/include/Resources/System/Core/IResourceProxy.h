@@ -88,10 +88,6 @@ namespace Engine {
 
 			virtual bool destroy() = 0;
 
-		private:
-			// friend class ProxyTreeCreator<type, subtype>;
-
-			virtual bool create(typename TResource::CreationRequest const&desc) = 0;
 		DeclareInterfaceEnd(IResourceProxy);
 
 		/**********************************************************************************************//**
