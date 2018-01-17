@@ -155,36 +155,58 @@ namespace Engine {
        **************************************************************************************************/
       template <typename TResource>
       EEngineStatus createResource(
+        PublicResourceId_t                  const&inId,
         typename TResource::CreationRequest const&request,
         bool                                      creationDeferred,
-        typename TResource::Binding              &binding
-      );
+        typename TResource::Binding              &binding);
 
       template <typename TResource>
       EEngineStatus updateResource(
-        typename TResource::UpdateRequest const&request,
-        ResourceHandle                    const&handle);
+        PublicResourceId_t                const&inId,
+        typename TResource::UpdateRequest const&request);
 
       template <typename TResource>
       EEngineStatus destroyResource(
-        typename TResource::DestructionRequest const&request,
-        ResourceHandle                         const&handle);
+        PublicResourceId_t                     const&inId,
+        typename TResource::DestructionRequest const&request);
 
+      template <typename TResource>
+      EEngineStatus getResourceInfo(
+        PublicResourceId_t             const&id,
+        typename TResource::Descriptor      &outDescriptor,
+        typename TResource::Binding         &outBinding);
+
+      template <typename TResource>
+      EEngineStatus storeResourceInfo(
+        PublicResourceId_t             const&id,
+        typename TResource::Descriptor const&outDescriptor,
+        typename TResource::Binding    const&outBinding);
 
       template <typename TResource>
       EEngineStatus createImpl(
+        PublicResourceId_t                  const&inId,
+        typename TResource::CreationRequest const&inRequest);
+
+      template <typename TResource>
+      EEngineStatus createDynamicImpl(
         typename TResource::CreationRequest const&inRequest,
-        Ptr<TResource>                           &out);
+        PublicResourceId_t                       &outId);
 
       template <typename TResource>
       EEngineStatus updateImpl(
-        typename TResource::UpdateRequest const&inRequest,
-        ResourceHandle                    const&inHandle);
+        PublicResourceId_t                const&inId,
+        typename TResource::UpdateRequest const&inRequest);
 
       template <typename TResource>
       EEngineStatus destroyImpl(
-        typename TResource::DestructionRequest const&inRequest,
-        ResourceHandle                         const&inHandle);
+        PublicResourceId_t                     const&inId,
+        typename TResource::DestructionRequest const&inRequest);
+
+      template <typename TResource>
+      EEngineStatus getResourceInfoImpl(
+        PublicResourceId_t             const&id,
+        typename TResource::Descriptor      &outDescriptor,
+        typename TResource::Binding         &outBinding);
 
     public:
       ProxyBasedResourceManager(
@@ -209,18 +231,27 @@ namespace Engine {
         return m_resourceBackend;
       }
 
-#define DeclareSupportedResource(Type)            \
-      EEngineStatus create##Type(                 \
-        Type::CreationRequest const&inRequest,    \
-        Ptr<Type>                  &out##Type);   \
-                                                  \
-      EEngineStatus update##Type(                 \
-        Type::UpdateRequest const&inRequest,      \
-        ResourceHandle      const&inHandle);      \
-                                                  \
-      EEngineStatus destroy##Type(                \
-        Type::DestructionRequest const&inRequest, \
-        ResourceHandle           const&inHandle);
+#define DeclareSupportedResource(Type)             \
+      EEngineStatus create##Type(                  \
+        PublicResourceId_t    const&inId,          \
+        Type::CreationRequest const&inRequest);    \
+                                                   \
+      EEngineStatus create##Type(                  \
+        Type::CreationRequest const&inRequest,     \
+        PublicResourceId_t         &outId);        \
+                                                   \
+      EEngineStatus update##Type(                  \
+        PublicResourceId_t  const&inId,            \
+        Type::UpdateRequest const&inRequest);      \
+                                                   \
+      EEngineStatus destroy##Type(                 \
+        PublicResourceId_t       const&inId,       \
+        Type::DestructionRequest const&inRequest); \
+                                                   \
+      EEngineStatus get##Type##Info(               \
+        PublicResourceId_t const&id,               \
+        Type::Descriptor        &outDescriptor,    \
+        Type::Binding           &outBinding);
 
       DeclareSupportedResource(SwapChain);
       DeclareSupportedResource(Texture1D);
@@ -273,7 +304,7 @@ namespace Engine {
         ResourceProxyMap                  &outDependencies)
     {
       bool result = true;
-      
+
       // The reason all proxies have to be created by the proxy-creator and 
       // stored before this function call, can be seen below:
       AnyProxy dependencyProxy = getResourceProxy(base.resourceHandle);
@@ -316,7 +347,7 @@ namespace Engine {
 
       outDependencies[base.resourceHandle]   = dependencyProxy;
       inOutDependencies[base.resourceHandle] = GFXAPIAdapterCast(dependencyProxy)->handle();
-      
+
       // Top to Bottom: Children last.
       for(DependerTreeNodeList::value_type const& c : base.children)
         result = loadDependerHierarchyTopToBottom(c, inOutDependencies, outDependencies);
@@ -526,9 +557,10 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus ProxyBasedResourceManager
       ::createResource(
-        const typename TResource::CreationRequest &request,
-        bool                                       creationDeferred,
-        typename TResource::Binding               &binding)
+        PublicResourceId_t                  const&inId,
+        typename TResource::CreationRequest const&request,
+        bool                                      creationDeferred,
+        typename TResource::Binding              &binding)
     {
       static const constexpr EResourceType    resource_type    = TResource::resource_type;
       static const constexpr EResourceSubType resource_subtype = TResource::resource_subtype;
@@ -566,9 +598,9 @@ namespace Engine {
         // Verify returned state!
         // Hierarchy -> Proxy: Are all proxies available, which are listed in the depender hierarchies?
         fnVerifyHierarchyToProxyAvailability
-          = [] (DependerTreeNodeList const&hierachy, ResourceProxyMap const&proxies) -> void
+          = [&] (DependerTreeNodeList const&hierarchy, ResourceProxyMap const&proxies) -> void
         {
-          for(const DependerTreeNodeList::value_type &r : hierachy) {
+          for(const DependerTreeNodeList::value_type &r : hierarchy) {
             fnVerifyHierarchyToProxyAvailability(r.children, proxies);
 
             ResourceProxyMap::const_iterator it = proxies.find(r.resourceHandle);
@@ -583,15 +615,15 @@ namespace Engine {
         std::function<bool(DependerTreeNodeList const&, ResourceProxyMap::value_type const&)> fnVerifyProxyToHierarchyAvailability = nullptr;
 
         fnVerifyProxyToHierarchyAvailability
-          = [] (DependerTreeNodeList const&hierachy, ResourceProxyMap::value_type const&pair) -> bool
+          = [&] (DependerTreeNodeList const&hierarchy, ResourceProxyMap::value_type const&pair) -> bool
         {
           for(DependerTreeNodeList::value_type const& r : hierarchy)
             if(fnVerifyProxyToHierarchyAvailability(r.children, pair))
               return true;
 
           // We have not yet found the proxy at this point, check the current level.
-          DependerTreeNodeList::const_iterator it = std::find(hierachy.begin(), hierachy.end(), pair.first);
-          return !(it == hierachy.end())
+          DependerTreeNodeList::const_iterator it = std::find(hierarchy.begin(), hierarchy.end(), pair.first);
+          return !(it == hierarchy.end());
         };
 
         for(ResourceProxyMap::value_type const& pair : outProxies) {
@@ -609,6 +641,7 @@ namespace Engine {
       }
 
 #endif
+
       try {
         // Store all dependencies, roots and dependers, to have the loadProxy function 
         // work out well.
@@ -617,21 +650,21 @@ namespace Engine {
         //   is required to return a consistent state!
         std::function<void(DependerTreeNodeList const&, ResourceProxyMap const&)> fnInsert = nullptr;
         fnInsert
-          = [] (
+          = [&, this] (
             DependerTreeNodeList const& hierarchy,
             ResourceProxyMap     const& proxies) -> void
         {
           for(DependerTreeNodeList::value_type const& r : hierarchy) {
             fnInsert(r.children, proxies);
 
-            if(!storeResourceProxy(r.resourceHandle, proxies[r.resourceHandle]))
+            if(!storeResourceProxy(r.resourceHandle, proxies.at(r.resourceHandle)))
               HandleEngineStatusError(...); // Todo: Custom EEngineStatus for failed insertion + message.
           }
         };
         fnInsert(outDependerHierarchies, outProxies);
 
         // Also store hierarchy.
-        for(DependerTreeNodeList::value_type const& r : hierarchy)
+        for(DependerTreeNodeList::value_type const& r : outDependerHierarchies)
           m_hierarchyRoots[r.resourceHandle] = r;
 
       } catch(EngineException &ee) {
@@ -679,8 +712,8 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus ProxyBasedResourceManager
       ::updateResource(
-        typename TResource::UpdateRequest const&request,
-        ResourceHandle                    const&handle)
+        PublicResourceId_t                const&inId,
+        typename TResource::UpdateRequest const&request)
     {
       return EEngineStatus::Ok;
     }
@@ -688,67 +721,116 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus ProxyBasedResourceManager
       ::destroyResource(
-        typename TResource::DestructionRequest const&request,
-        ResourceHandle                         const&handle)
+        PublicResourceId_t                     const&inId,
+        typename TResource::DestructionRequest const&request)
     {
+      // TODO:
+      // - Define "struct ResourceInfo<T> w/ ResourceHandle, Descriptor, Binding.
+      // - Make getResourceInfo return that struct
+      // - Have it be loaded at this point to forward the handle to the proxyLoad/Unload functions
       EEngineStatus status = proxyUnload(handle);
       HandleEngineStatusError(status, String::format("Failed to unload proxy resource in backend (Handle: %0).", handle.id()));
-      
+
       std::function<void(DependerTreeNode const&)> fnEraseRecursively = nullptr;
 
       fnEraseRecursively
         = [&, this] (DependerTreeNode const&root) -> void
       {
-        for(DependerTreeNode::value_type const&c : root.children)
+        for(DependerTreeNodeList::value_type const&c : root.children)
           fnEraseRecursively(c);
 
         _resources->removeResource(root.resourceHandle);
       };
       fnEraseRecursively(m_hierarchyRoots[handle]); // If not available, an empty default will be created, which is subsequently killed. Small overhead, easy algorithm.
-     
+
       m_hierarchyRoots.erase(handle);
 
       // Any further verification, e.g. with the backend to ensure proper deletion?
-      
+
     }
 
     template <typename TResource>
-    EEngineStatus ProxyBasedResourceManager
-      ::createImpl(
-        typename TResource::CreationRequest const&inRequest,
-        Ptr<TResource>                           &out)
+    EEngineStatus
+      ProxyBasedResourceManager::createImpl(
+        PublicResourceId_t                  const&inId,
+        typename TResource::CreationRequest const&inRequest)
     {
       typename TResource::Binding binding ={};
 
       EEngineStatus status = createResource<TResource>(
+        inId,
         inRequest,
         false,
         binding);
       HandleEngineStatusError(status, "Failed to create resource.");
 
       const typename TResource::Descriptor& desc = inRequest.resourceDescriptor();
-      out = TResource::create(desc, binding);
+
+      // Store binding internally.
+      storeResourceInfo<TResource>(inId, desc, binding);
 
       return EEngineStatus::Ok;
     }
 
     template <typename TResource>
-    EEngineStatus ProxyBasedResourceManager
-      ::updateImpl(
-        typename TResource::UpdateRequest const&inRequest,
-        ResourceHandle                    const&inHandle)
+    EEngineStatus
+      ProxyBasedResourceManager::createDynamicImpl(
+        typename TResource::CreationRequest const&inRequest,
+        PublicResourceId_t                       &outId)
     {
+      // Generate dynamic registry id and invoke createImpl
+      PublicResourceId_t id = 0;
+
+      EEngineStatus status = createImpl<TResource>(id, inRequest);
+      HandleEngineStatusError(status, "Failed to create dynamic resource.");
+
+      outId = id;
+      return status;
     }
 
     template <typename TResource>
-    EEngineStatus ProxyBasedResourceManager
-      ::destroyImpl(
-        typename TResource::DestructionRequest const&inRequest,
-        ResourceHandle                         const&inHandle)
+    EEngineStatus 
+      ProxyBasedResourceManager::updateImpl(
+        PublicResourceId_t                const&inId,
+        typename TResource::UpdateRequest const&inRequest)
     {
-      EEngineStatus status = destroyResource<TResource>(inRequest, inHandle);
+      EEngineStatus status = updateResource<TResource>(inId, inRequest);
+      HandleEngineStatusError(status, "Failed to update resource.");
+
+      return EEngineStatus::Ok;
+    }
+
+    template <typename TResource>
+    EEngineStatus 
+      ProxyBasedResourceManager::destroyImpl(
+        PublicResourceId_t                     const&inId,
+        typename TResource::DestructionRequest const&inRequest)
+    {
+      EEngineStatus status = destroyResource<TResource>(inId, inRequest);
       HandleEngineStatusError(status, "Failed to destroy resource.");
 
+      return EEngineStatus::Ok;
+    }
+    
+    template <typename TResource>
+    EEngineStatus
+      ProxyBasedResourceManager::getResourceInfoImpl(
+        PublicResourceId_t             const&id,
+        typename TResource::Descriptor      &outDescriptor,
+        typename TResource::Binding         &outBinding)
+    {
+      EEngineStatus status = getResourceInfo<TResource>(id, outDescriptor, outBinding);
+      HandleEngineStatusError(status, "Failed to determine resource info.");
+      return EEngineStatus::Ok;
+    }
+
+    template <typename TResource>
+    EEngineStatus 
+      ProxyBasedResourceManager::storeResourceInfo(
+      PublicResourceId_t             const&id,
+      typename TResource::Descriptor const&outDescriptor,
+      typename TResource::Binding    const&outBinding)
+    { 
       return EEngineStatus::Ok;
     }
 

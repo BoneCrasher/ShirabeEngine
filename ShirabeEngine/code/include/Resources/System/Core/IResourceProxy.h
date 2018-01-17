@@ -139,7 +139,7 @@ namespace Engine {
 				EProxyType                          const&proxyType,
 				typename TResource::CreationRequest const&request)
 				: Engine::Resources::IResourceProxy<TResource>()
-				, ResourceCreationRequestAdapter<TResource>(request)
+				, ResourceCreationRequestAdapter<typename TResource::CreationRequest>(request)
 				, _type(proxyType)
 				, _loadState(ELoadState::UNKNOWN)
 				, _dependencies()

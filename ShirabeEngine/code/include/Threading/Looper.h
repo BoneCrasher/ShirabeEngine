@@ -64,7 +64,7 @@ namespace Engine {
 
 				std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
 
-				inline TTaskResult run() {
+				void run() {
           _task(); // Return value is stored in the shared state wrapped by the future returned on bind!
 				}
 

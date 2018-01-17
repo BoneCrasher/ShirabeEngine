@@ -358,9 +358,19 @@ namespace Engine{
     bool Looper<TTaskResult>
       ::loop(typename ILooper<TTaskResult>::Task&& runnable)
     {
-      TTaskResult result = runnable.run();
-
-      // Handle issues and/or notify callback attached to it...
+       //TTaskResult result = runnable.run();
+      try {
+        runnable.run();
+        return true;
+      } 
+      catch(std::exception e) {
+        Log::Error(logTag(), std::string("Exception in Looper::loop(...): ") + e.what());
+        return false;
+      } 
+      catch(...) {
+        Log::Error(logTag(), "Unknown error in Looper::loop(...)...");
+        return false;
+      }
     }
 	}
 }

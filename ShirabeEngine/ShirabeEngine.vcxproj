@@ -333,6 +333,9 @@
     <ClInclude Include="code\include\ECWS\Entity.h" />
     <ClInclude Include="code\include\ECWS\IComponent.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="documentation\notes.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -16,21 +16,34 @@
 namespace Engine {
   namespace Resources {
 
+    typedef uint64_t PublicResourceId_t;
+
 #define DeclareResourceMethods(resource)          \
   virtual EEngineStatus create##resource(         \
+    PublicResourceId_t        const&inId,         \
+    resource::CreationRequest const&inRequest     \
+  ) = 0;                                          \
+                                                  \
+  virtual EEngineStatus create##resource(         \
     resource::CreationRequest const&inRequest,    \
-    Ptr<resource>                  &out##resource \
+    PublicResourceId_t             &outId         \
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus update##resource(         \
-    resource::UpdateRequest const&inRequest,      \
-    ResourceHandle          const&inHandle        \
+    PublicResourceId_t      const&inId,           \
+    resource::UpdateRequest const&inRequest       \
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus destroy##resource(        \
-    resource::DestructionRequest const&inRequest, \
-    ResourceHandle               const&inHandle   \
-  ) = 0;
+    PublicResourceId_t           const&inId,      \
+    resource::DestructionRequest const&inRequest  \
+  ) = 0;                                          \
+                                                  \
+  virtual EEngineStatus get##resource##Info(      \
+    PublicResourceId_t const&id,                  \
+    resource::Descriptor    &outDescriptor,       \
+    resource::Binding       &outBinding           \
+  ) =0;
   
     DeclareInterface(IResourceManager);
 

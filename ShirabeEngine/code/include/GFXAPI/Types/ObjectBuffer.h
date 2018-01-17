@@ -5,12 +5,11 @@ namespace Engine {
 	namespace Resources {
 
 		class VertexBuffer {
-		
+		  
 		};
 		
-		class IndexBuffer
-		{
-
+		class IndexBuffer {
+      
 		};
 
 	}

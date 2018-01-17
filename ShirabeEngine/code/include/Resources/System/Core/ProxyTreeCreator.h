@@ -22,9 +22,6 @@ namespace Engine {
 		template <typename TResource>
 		class ProxyTreeCreator {
 
-			using resource_type    = typename TResource::resource_type;
-			using resource_subtype = typename TResource::resource_subtype;
-			using binding_type     = typename TResource::binding_type;
 
 			/**********************************************************************************************//**
 			 * \fn	static bool ProxyTreeCreator::create( const Ptr<ResourceProxyFactory> &proxyFactory, const ResourceDescriptor<type, subtype> &desc, ResourceHandleList &inDependencyHandles, TResourceBinding &outBinding, ResourceProxyMap &outProxyMap, DependerTreeNodeList &outResourceHierarchy)
@@ -46,7 +43,7 @@ namespace Engine {
 				//
 				Ptr<ResourceProxyFactory>           const&proxyFactory,
 				typename TResource::CreationRequest const&request,
-				binding_type                             &outBinding,
+        typename TResource::Binding              &outBinding,
 				ResourceProxyMap                         &outProxyMap,
 				DependerTreeNodeList                     &outResourceHierarchy)
 			{

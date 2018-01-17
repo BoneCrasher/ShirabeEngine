@@ -67,9 +67,10 @@ namespace Engine {
 				swapChainDesc.fullscreen             = !configuration.requestFullscreen;
 				swapChainDesc.windowHandle           = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
 
+        PublicResourceId_t swapChainId = 0;
         SwapChain::CreationRequest swapChainCreationRequest(swapChainDesc);
 
-				status = resourceManager->createSwapChain(swapChainDesc, swapChain);
+				status = resourceManager->createSwapChain(swapChainDesc, swapChainId);
         HandleEngineStatusError(status, String::format("Failed to create swap chain:\n Desc:%0", swapChainDesc.toString()));
 
         _swapChain = swapChain;
@@ -91,7 +92,8 @@ namespace Engine {
 				dsTexDesc.multisampling.size    = 1;
 				dsTexDesc.multisampling.quality = 0;
 
-				status = resourceManager->createTexture2D(dsTexDesc, defaultDSTex);
+        PublicResourceId_t dsTexId   = 0;
+				status = resourceManager->createTexture2D(dsTexDesc, dsTexId);
         HandleEngineStatusError(status, String::format("Failed to create depth stencil view:\n Desc:%0", dsTexDesc.toString()));
 
         defaultDSView = defaultDSTex->depthStencilView();
@@ -131,7 +133,8 @@ namespace Engine {
 				dsDesc.BackFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
 				dsDesc.BackFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
 
-				dxRes = resourceManager->createDepthStencilState(&dsDesc, &tmpDefaultDepthStencilState);
+        PublicResourceId_t dssId = 0;
+				dxRes = resourceManager->createDepthStencilState(dsDesc, dssId);
 				if( FAILED(dxRes) ) {
 					status = EEngineStatus::DXDevice_DepthStencilStateCreationFailed;
 					goto _return_failed;
