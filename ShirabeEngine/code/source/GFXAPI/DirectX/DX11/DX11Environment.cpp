@@ -179,7 +179,7 @@ namespace Engine {
 
               //status = resourceManager->createSwapChain(swapChainDesc, swapChain);
               //if(CheckEngineError(status)) {
-              //  goto _return_failed;
+              //  goto m_return_failed;
               //}
             };
 

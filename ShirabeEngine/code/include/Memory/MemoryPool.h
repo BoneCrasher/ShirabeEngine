@@ -9,7 +9,7 @@ namespace ShirabeCORE {
 
 #if defined(PLATFORM_WINDOWS)
 #include <Windows.h>
-#define Malloc _aligned_malloc
+#define Malloc m_aligned_malloc
 #else 
 #define Malloc memalign
 #endif
@@ -37,7 +37,7 @@ namespace ShirabeCORE {
 		template <typename T, size_t chunk_size = sizeof(T)>
 		class MemoryPoolBase {
 		public:
-			typedef typename MemoryPoolBase<T> _MyT;
+			typedef typename MemoryPoolBase<T> m_MyT;
 
 		public:
 			MemoryPoolBase() : __size(0), __pStart(NULL), __pEnd(NULL)
@@ -189,7 +189,7 @@ namespace ShirabeCORE {
 			};
 
 		private:
-			static GlobalMemoryPool * _pInstance;
+			static GlobalMemoryPool * m_pInstance;
 		};
 	}
 }

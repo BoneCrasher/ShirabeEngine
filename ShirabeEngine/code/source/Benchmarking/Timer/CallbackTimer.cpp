@@ -10,38 +10,38 @@ namespace Engine {
             unsigned int          tickInMs,
             bool                  blockWhileRunning,
             bool                  once)
-        : _tickMs(tickInMs),
-          _once(once),
-          _blockWhileRunning(blockWhileRunning),
-          _elapsed(0.0),
-          _running(false),
-          _pause(false),
-          _interrupt(false),
-          _timerCallbackFunction(cbFn) {
+        : m_tickMs(tickInMs),
+          m_once(once),
+          m_blockWhileRunning(blockWhileRunning),
+          m_elapsed(0.0),
+          m_running(false),
+          m_pause(false),
+          m_interrupt(false),
+          m_timerCallbackFunction(cbFn) {
     }
 
     bool CallbackTimer::run()  {
         // Do not re-run a running timer.
-        if(_running.load())
+        if(m_running.load())
             return false;
 
-        _running.store(true);
-        _pause.store(false);
-        _interrupt.store(false);
+        m_running.store(true);
+        m_pause.store(false);
+        m_interrupt.store(false);
 
-        if(!_timerThread) {
-            _timerThread
+        if(!m_timerThread) {
+            m_timerThread
                     = std::shared_ptr<std::thread>(
                           new std::thread(&CallbackTimer::exec, this),
                           [] (std::thread *p) { if(p) { if(p->joinable()) p->join(); delete p; } }
                       );
 
-            if(_blockWhileRunning) {
-                _timerThread->join();
-                _timerThread = nullptr;
+            if(m_blockWhileRunning) {
+                m_timerThread->join();
+                m_timerThread = nullptr;
             }
             else
-                _timerThread->detach();
+                m_timerThread->detach();
         }
 
         return true;
@@ -52,25 +52,25 @@ namespace Engine {
         // having one thread unblock another.
         // Do not pause a not running timer.
         // Do not interfere if the timer is currently being interrupted.
-        if(_blockWhileRunning
-                || !_running.load()
-                || _interrupt.load())
+        if(m_blockWhileRunning
+                || !m_running.load()
+                || m_interrupt.load())
             return false;
 
-        _pause.store(true); // Will halt next frame!
+        m_pause.store(true); // Will halt next frame!
         return true;
     }
 
     bool CallbackTimer::resume() {
-        if(!_running.load()) // Implicit run feature.
+        if(!m_running.load()) // Implicit run feature.
             run();
         else {
             // Do not allow multithreaded execution corruption by
             // having one thread unblock another.
-            if(_blockWhileRunning)
+            if(m_blockWhileRunning)
                 return false;
 
-            _pause.store(false); // Will continue after Sleep!
+            m_pause.store(false); // Will continue after Sleep!
         }
 
         return true;
@@ -78,16 +78,16 @@ namespace Engine {
 
     bool CallbackTimer::stop() {
         // Do not pause a not running timer.
-        if(!_running.load())
+        if(!m_running.load())
             return false;
 
-        _interrupt.store(true); // Will stop next frame!
+        m_interrupt.store(true); // Will stop next frame!
 
         // MB20161205 - ATTENTION:
         //    Most likely this is the cause of timer related crashes currently occurring.
         //    The thread instance could be destroyed BEFORE the internal function has returned.
         //    UhOh... Manage this in existing custom deleter?
-        _timerThread = nullptr;
+        m_timerThread = nullptr;
 
         return true;
     }
@@ -100,7 +100,7 @@ namespace Engine {
 
         double ms = 0.0;
         while(true) {
-            if(_interrupt.load())
+            if(m_interrupt.load())
                 break;
 
             prev = curr;
@@ -110,23 +110,23 @@ namespace Engine {
             double step = ((float) (curr - prev) / CLOCKS_PER_SEC) * 1000.0;
             ms += step;
 
-            _elapsed.store(_elapsed.load() + ms);
+            m_elapsed.store(m_elapsed.load() + ms);
 
-            if(ms >= _tickMs) {
+            if(ms >= m_tickMs) {
                 // TODO: Instead of subtracting, do modulo if the timer stalled for whatever reason?
-                _elapsed.store((ms -= _tickMs)); // Store the previous cycle's overhead as the current elapsed.
+                m_elapsed.store((ms -= m_tickMs)); // Store the previous cycle's overhead as the current elapsed.
 
-                if(_timerCallbackFunction
-                        && !_pause.load())
-                    _timerCallbackFunction(); // Async management should be handled externally if necessary!
+                if(m_timerCallbackFunction
+                        && !m_pause.load())
+                    m_timerCallbackFunction(); // Async management should be handled externally if necessary!
 
-                if(_once)
+                if(m_once)
                     break;
             }
         }
 
-        _running.store(false);
-        _interrupt.store(false); // Will stop next frame!
+        m_running.store(false);
+        m_interrupt.store(false); // Will stop next frame!
     }
 
 }

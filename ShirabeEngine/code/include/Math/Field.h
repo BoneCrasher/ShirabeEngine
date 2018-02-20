@@ -31,8 +31,8 @@ namespace Engine {
 					(const std::size_t size  = N,
 					 const std::size_t stride = S)
 				{
-					//_field = new T[size];
-					memset(_field, 0, (bytesize * size));
+					//m_field = new T[size];
+					memset(m_field, 0, (bytesize * size));
 				};
 
 				Field<T, bytesize, N, S>
@@ -40,12 +40,12 @@ namespace Engine {
 					 const std::size_t             size  = N,
 					 const std::size_t             stride = S)
 				{
-					//_field = new T[size];
+					//m_field = new T[size];
 
 					size_t i = 0;
 					std::initializer_list<T>::iterator it;
 					for (it = source.begin(); it != source.end(); ++it) {
-						_field[i] = *it;
+						m_field[i] = *it;
 						++i;
 					}
 				};
@@ -53,13 +53,13 @@ namespace Engine {
 				Field<T, bytesize, N, S>
 					(const Field<T, bytesize, N, S>& cpy)
 				{
-					//this->_field = NULL;
+					//this->m_field = NULL;
 
 					this->assign(cpy);
 				}
 
 				~Field<T, bytesize, N, S>() {
-					//SAFE_DELETE_ARRAY<T>(&(this->_field));
+					//SAFE_DELETE_ARRAY<T>(&(this->m_field));
 				}
 
 			public:
@@ -74,7 +74,7 @@ namespace Engine {
 				const T& operator[] (const std::size_t i) const {
 					if (N > 0) {
 						if (N > i) {
-							return *(_field + i);
+							return *(m_field + i);
 						}
 					}
 
@@ -89,21 +89,21 @@ namespace Engine {
 				// There are no range checks and no clamping applied.
 				void operator+=(const class_type& r) {
 					for (size_t i = 0; i < N; ++i)
-						this->_field[i] += r[i];
+						this->m_field[i] += r[i];
 				}
 
 				// Subtract another vector from this instance.
 				// There are no range checks and no clamping applied.
 				void operator-=(const class_type& r) {
 					for (size_t i = 0; i < N; ++i)
-						this->_field[i] -= r[i];
+						this->m_field[i] -= r[i];
 				}
 
 				// Multiply this vector with the passed factor.
 				// There are no range checks and no clamping applied.
 				void operator*=(const T factor) {
 					for (size_t i = 0; i < N; ++i)
-						this->_field[i] *= factor;
+						this->m_field[i] *= factor;
 				}
 
 
@@ -119,20 +119,20 @@ namespace Engine {
 				// overriding the old data of this instance, if any!
 				inline void assign(const class_type& r) {
 					// Only recreate if NULL. Use available allocated memory instead!
-					//if (this->_field == NULL)
-						//this->_field = new T[N];
+					//if (this->m_field == NULL)
+						//this->m_field = new T[N];
 
-					memcpy_s(this->_field, (N * bytesize), r.const_ptr(), (N * bytesize));
+					memcpy_s(this->m_field, (N * bytesize), r.const_ptr(), (N * bytesize));
 				}
 
 			public:
 				// Return a const pointer to the internal data array.
 				// Used for read-only access.
-				inline const T *const_ptr() const { return &this->_field[0]; };
+				inline const T *const_ptr() const { return &this->m_field[0]; };
 
 				// Return a pointer to the internal data array.
 				// Used for read-write access.
-				inline T *ptr() { return this->_field; };
+				inline T *ptr() { return this->m_field; };
 
 				// Return the total number of elements in the field.
 				inline const std::size_t size() const { return N; };
@@ -151,7 +151,7 @@ namespace Engine {
 					for (size_t i = 0; i < N; i += S) {
 						for (size_t j = 0; j < S; ++j) {
 							ss << ((j) == 0) ? "" : ", ";
-							ss << _field[i + j];
+							ss << m_field[i + j];
 						}
 
 						ss << ",\n";
@@ -163,7 +163,7 @@ namespace Engine {
 				}
 
 			protected:
-				T _field[N * bytesize];
+				T m_field[N * bytesize];
 		};
 
 		template <

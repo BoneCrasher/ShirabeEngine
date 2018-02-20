@@ -2,9 +2,9 @@
 
 namespace Engine {
 	Transform::Transform()
-		: _localScale({}),
-		_localRotationQuaternion(0, 0, 0, 0),
-		_localTranslation({})
+		: m_localScale({})
+		, m_localRotationQuaternion(0, 0, 0, 0)
+		, m_localTranslation({})
 	{
 	}
 
@@ -23,7 +23,7 @@ namespace Engine {
 	}
 
 	Transform& Transform::rotate(const Quaternion& q) {
-		_localRotationQuaternion *= q;
+		m_localRotationQuaternion *= q;
 
 		setDirty();
 		return *this;
@@ -37,21 +37,21 @@ namespace Engine {
 		return this->resetRotation(Quaternion::quaternionFromAxisAngle(axis, phi));
 	}
 	Transform& Transform::resetRotation(const Quaternion& quaternionRotation) {
-		_localRotationQuaternion = quaternionRotation;
+		m_localRotationQuaternion = quaternionRotation;
 
 		setDirty();
 		return *this;
 	}
 
 	Transform& Transform::translate(const Vector3D& translation) {
-		_localTranslation += translation;
+		m_localTranslation += translation;
 
 		setDirty();
 		return *this;
 	}
 
 	Transform& Transform::resetTranslation(const Vector3D& translation) {
-		_localTranslation = translation;
+		m_localTranslation = translation;
 
 		setDirty();
 		return *this;
@@ -63,7 +63,7 @@ namespace Engine {
 
 	Transform& Transform::scale(const Vector3D& factors) {
 		for (int k=0; k < 3; ++k) {
-			_localScale[k] *= factors[k];
+			m_localScale[k] *= factors[k];
 		}
 
 		setDirty();
@@ -75,7 +75,7 @@ namespace Engine {
 	}
 
 	Transform& Transform::resetScale(const Vector3D& factors) {
-		_localScale = factors;
+		m_localScale = factors;
 
 		setDirty();
 		return *this;
@@ -92,31 +92,31 @@ namespace Engine {
 	const Matrix4x4& Transform::local() {
 		if (isDirty()) {
 			Matrix4x4 S = Matrix4x4::identity();
-			S.r00(_localScale.x());
-			S.r11(_localScale.y());
-			S.r22(_localScale.z());
+			S.r00(m_localScale.x());
+			S.r11(m_localScale.y());
+			S.r22(m_localScale.z());
 			S.r33(1.0);
 
 			Matrix4x4 T = Matrix4x4::identity();
-			T.r03(_localTranslation.x());
-			T.r13(_localTranslation.y());
-			T.r23(_localTranslation.z());
+			T.r03(m_localTranslation.x());
+			T.r13(m_localTranslation.y());
+			T.r23(m_localTranslation.z());
 
 			Matrix4x4 R = Matrix4x4::identity();
-			R = Quaternion::rotationMatrixFromQuaternion(_localRotationQuaternion);
+			R = Quaternion::rotationMatrixFromQuaternion(m_localRotationQuaternion);
 
-			_currentLocalTransform = SMMatrixMultiply(SMMatrixMultiply(S, R), T);
+			m_currentLocalTransform = SMMatrixMultiply(SMMatrixMultiply(S, R), T);
 		}
 
-		return _currentLocalTransform;
+		return m_currentLocalTransform;
 	}
 
 	const Matrix4x4& Transform::world() const {
-		return _currentWorldTransform;
+		return m_currentWorldTransform;
 	}
 
 	const Matrix4x4& Transform::updateWorldTransform(const Matrix4x4& parent) {
-		_currentWorldTransform = SMMatrixMultiply(parent, _currentLocalTransform);
-		return _currentWorldTransform;
+		m_currentWorldTransform = SMMatrixMultiply(parent, m_currentLocalTransform);
+		return m_currentWorldTransform;
 	}
 }

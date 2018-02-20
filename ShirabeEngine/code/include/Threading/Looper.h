@@ -46,31 +46,31 @@ namespace Engine {
 				Task& operator=(const Task&) = delete;
 
 				Task(Task&& t)
-					: _priority(t._priority)
-					, _task(std::move(t._task))
+					: m_priority(t.m_priority)
+					, m_task(std::move(t.m_task))
 				{}
 
 				Task& operator=(Task&& t) {
-					_priority = t._priority;
-					_task     = std::move(t._task);
+					_priority = t.m_priority;
+					_task     = std::move(t.m_task);
 
 					return *this;
 				}
 
-				inline Priority priority()       { return _priority; }
-				inline Priority priority() const { return _priority; }
+				inline Priority priority()       { return m_priority; }
+				inline Priority priority() const { return m_priority; }
 				
-				inline void setPriority(const Priority& priority) { _priority = priority; }
+				inline void setPriority(const Priority& priority) { m_priority = priority; }
 
 				std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
 
 				void run() {
-          _task(); // Return value is stored in the shared state wrapped by the future returned on bind!
+          m_task(); // Return value is stored in the shared state wrapped by the future returned on bind!
 				}
 
       private:
-				Priority                          _priority;
-				std::packaged_task<TTaskResult()> _task;
+				Priority                          m_priority;
+				std::packaged_task<TTaskResult()> m_task;
 			};
 			/**************************************************************************************************//**/
 			

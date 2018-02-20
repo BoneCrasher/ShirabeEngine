@@ -1,5 +1,5 @@
-#ifndef _IPROPERTYCHANGELISTENER_H_
-#define _IPROPERTYCHANGELISTENER_H_
+#ifndef m_IPROPERTYCHANGELISTENER_H_
+#define m_IPROPERTYCHANGELISTENER_H_
 
 #include <functional>
 #include "ValueChangedArguments.hpp"

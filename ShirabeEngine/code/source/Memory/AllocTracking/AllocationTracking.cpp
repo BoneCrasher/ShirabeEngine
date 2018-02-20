@@ -8,13 +8,13 @@ namespace Engine
 
 		AllocationTracker* AllocationTracker::getInstance()
 		{
-			if (_instance == NULL)
-				_instance = new AllocationTracker();
+			if (m_instance == NULL)
+				m_instance = new AllocationTracker();
 
-			return _instance;
+			return m_instance;
 		}
 
-		AllocationTracker *AllocationTracker::_instance = NULL;
+		AllocationTracker *AllocationTracker::m_instance = NULL;
 
 	}
 }

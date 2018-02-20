@@ -1,5 +1,5 @@
-#ifndef _IOCProperty_H_
-#define _IOCProperty_H_
+#ifndef m_IOCProperty_H_
+#define m_IOCProperty_H_
 
 #include <functional>
 #include <memory>
@@ -161,20 +161,20 @@ namespace DataBinding {
             typedef void(*func_ptr_type)(const char *, const_value_changed_argument_type_ref);
 
             IOCPropertyBase(const char *propertyName)
-                : _name(propertyName),
-                  _listeners(),
-                  _implicitlyCreatedListeners(),
-                  _filterFunc(nullptr),
-                  _postSetFunc(nullptr) {
+                : m_name(propertyName),
+                  m_listeners(),
+                  m_implicitlyCreatedListeners(),
+                  m_filterFunc(nullptr),
+                  m_postSetFunc(nullptr) {
             }
 
             IOCPropertyBase(const char *propertyName, const T& initialValue)
-                : _name(propertyName),
-                  _value(initialValue),
-                  _listeners(),
-                  _implicitlyCreatedListeners(),
-                  _filterFunc(nullptr),
-                  _postSetFunc(nullptr) {
+                : m_name(propertyName),
+                  m_value(initialValue),
+                  m_listeners(),
+                  m_implicitlyCreatedListeners(),
+                  m_filterFunc(nullptr),
+                  m_postSetFunc(nullptr) {
             }
 
             // Destroy this IOCProperty instance
@@ -182,24 +182,24 @@ namespace DataBinding {
             //			Since a property can create internal listeners, when a function callback
             //			or Lambda is provided as a listener-callback, they'll be deleted here finally.
             virtual ~IOCPropertyBase() {
-                _listeners.clear();
+                m_listeners.clear();
 
                 iterate<vector_type, typename vector_type::const_iterator>(
-                            _implicitlyCreatedListeners,
+                            m_implicitlyCreatedListeners,
                             [this] (typename vector_type::const_iterator it) -> void {
                     listener_type_pointer p = (*it);
                     delete p;
                 });
 
-                _implicitlyCreatedListeners.clear();
+                m_implicitlyCreatedListeners.clear();
             }
 
             inline void setFilterFunc(std::function<T(const T&)> filter) {
-                _filterFunc = filter;
+                m_filterFunc = filter;
             }
 
             inline void setPostSetFunc(std::function<void(const T&)> callback) {
-                _postSetFunc = callback;
+                m_postSetFunc = callback;
             }
 
             void setNoNotify(const T value) { set(value, false); }
@@ -209,28 +209,28 @@ namespace DataBinding {
                      bool    notify             = true,
                      bool    notifyOnChangeOnly = true) {
 
-                T oldValue = _value;
+                T oldValue = m_value;
                 T newValue = value;
                 if(_filterFunc)
-                    newValue = _filterFunc(value);
+                    newValue = m_filterFunc(value);
 
-                _value = newValue;
+                m_value = newValue;
                 if(notify
                         && (!notifyOnChangeOnly
                             || (notifyOnChangeOnly && (oldValue != newValue))))
-                    propertyChanged(_name, oldValue, _value);
+                    propertyChanged(_name, oldValue, m_value);
 
                 if(_postSetFunc) {
-                    _postSetFunc(_value);
+                    m_postSetFunc(_value);
                 }
             }
 
             T get() {
-                return _value;
+                return m_value;
             }
 
             const T get() const {
-                return _value;
+                return m_value;
             }
 
             T operator()() {
@@ -259,7 +259,7 @@ namespace DataBinding {
 
             bool listen(function_type func) {
                 listener_type_pointer listener = new FunctorPropertyChangeListener<T, function_type>(func);
-                _implicitlyCreatedListeners.push_back(listener);
+                m_implicitlyCreatedListeners.push_back(listener);
                 return listen(listener);
             }
 
@@ -274,11 +274,11 @@ namespace DataBinding {
                     // May not add nullptr as listener.
                     return false;
 
-                if (std::find(_listeners.begin(), _listeners.end(), listener) != _listeners.end())
+                if (std::find(_listeners.begin(), m_listeners.end(), listener) != m_listeners.end())
                     // Listener already added.
                     return false;
 
-                _listeners.push_back(listener);
+                m_listeners.push_back(listener);
                 return true;
             }
             // Remove a specific listener object and unregister it from value change notification.
@@ -293,8 +293,8 @@ namespace DataBinding {
                     return false;
 
                 typename vector_type::const_iterator it;
-                if ((it = std::find(_listeners.begin(), _listeners.end(), listener)) != _listeners.end())
-                    _listeners.erase(it);
+                if ((it = std::find(_listeners.begin(), m_listeners.end(), listener)) != m_listeners.end())
+                    m_listeners.erase(it);
 
                 return true;
             }
@@ -308,7 +308,7 @@ namespace DataBinding {
             //					The new value of the property.
             void propertyChanged(const char *propertyName, T oldValue, T newValue) const {
                 typename vector_type::const_iterator it;
-                for (it = _listeners.begin(); it != _listeners.end(); it++) {
+                for (it = m_listeners.begin(); it != m_listeners.end(); it++) {
                     const value_changed_argument_type args(oldValue, newValue);
 
                     (*it)->onPropertyChanged(propertyName, args);
@@ -316,12 +316,12 @@ namespace DataBinding {
             }
 
         private:
-            const char                   *_name;
-            T                             _value;
-            vector_type                   _listeners;
-            vector_type                   _implicitlyCreatedListeners;
-            std::function<T(const T&)>    _filterFunc;
-            std::function<void(const T&)> _postSetFunc;
+            const char                   *m_name;
+            T                             m_value;
+            vector_type                   m_listeners;
+            vector_type                   m_implicitlyCreatedListeners;
+            std::function<T(const T&)>    m_filterFunc;
+            std::function<void(const T&)> m_postSetFunc;
     };
 
     template<typename T, class enable = void>

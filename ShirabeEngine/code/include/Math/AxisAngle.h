@@ -19,18 +19,18 @@ namespace Engine {
 
 			~AxisAngle();
 
-			inline const value_type& x()   const { return _field[0]; }
-			inline const value_type& y()   const { return _field[1]; }
-			inline const value_type& z()   const { return _field[2]; }
+			inline const value_type& x()   const { return m_field[0]; }
+			inline const value_type& y()   const { return m_field[1]; }
+			inline const value_type& z()   const { return m_field[2]; }
 
 			inline const Vector3D axis() const {
 				return Vector3D({ x(), y(), z() });
 			}
-			inline const value_type& phi() const { return _field[3]; }
+			inline const value_type& phi() const { return m_field[3]; }
 
-			inline const value_type& x(const value_type& v)   { return (_field[0] = v); }
-			inline const value_type& y(const value_type& v)   { return (_field[1] = v); }
-			inline const value_type& z(const value_type& v)   { return (_field[2] = v); }
+			inline const value_type& x(const value_type& v)   { return (m_field[0] = v); }
+			inline const value_type& y(const value_type& v)   { return (m_field[1] = v); }
+			inline const value_type& z(const value_type& v)   { return (m_field[2] = v); }
 			inline const Vector3D    axis(const value_type& x,
 										  const value_type& y,
 										  const value_type& z)
@@ -39,7 +39,7 @@ namespace Engine {
 				return this->axis(); // Hope for copy elision to work... otherwise switch to move semantics.
 			}
 
-			inline const value_type& phi(const value_type& v) { return (_field[3] = v); }
+			inline const value_type& phi(const value_type& v) { return (m_field[3] = v); }
 		};
 		
 		Vector3D operator*(const AxisAngle&,

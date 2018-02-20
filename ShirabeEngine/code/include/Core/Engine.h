@@ -44,19 +44,19 @@ namespace Engine {
 	private:
 		DeclareLogTag(EngineInstance)
 
-		Platform::ApplicationEnvironment _environment;
-		WindowManagerPtr                 _windowManager;
-		IWindowPtr                       _mainWindow;
+		Platform::ApplicationEnvironment m_environment;
+		WindowManagerPtr                 m_windowManager;
+		IWindowPtr                       m_mainWindow;
 
 #ifdef PLATFORM_WINDOWS
-    Ptr<DX11Environment> _dx11Environment;
+    Ptr<DX11Environment> m_dx11Environment;
 #endif
 
-		Ptr<ResourceProxyFactory> _proxyFactory;
-		Ptr<IResourceManager>     _resourceManager;
+		Ptr<ResourceProxyFactory> m_proxyFactory;
+		Ptr<IResourceManager>     m_resourceManager;
 
-		IRendererPtr _renderer;
-		Scene        _scene;
+		IRendererPtr m_renderer;
+		Scene        m_scene;
 	};
 
 	DeclareSharedPointerType(EngineInstance)

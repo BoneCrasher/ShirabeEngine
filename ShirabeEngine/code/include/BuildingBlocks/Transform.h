@@ -36,22 +36,22 @@ namespace Engine {
 
 		Transform& reset();
 
-		inline Vector3D forward() const { return Quaternion::eulerFromQuaternion(_localRotationQuaternion * Vector3D::forward()); }
-		inline Vector3D right()   const { return Quaternion::eulerFromQuaternion(_localRotationQuaternion * Vector3D::right());   }
-		inline Vector3D up()      const { return Quaternion::eulerFromQuaternion(_localRotationQuaternion * Vector3D::up());      }
+		inline Vector3D forward() const { return Quaternion::eulerFromQuaternion(m_localRotationQuaternion * Vector3D::forward()); }
+		inline Vector3D right()   const { return Quaternion::eulerFromQuaternion(m_localRotationQuaternion * Vector3D::right());   }
+		inline Vector3D up()      const { return Quaternion::eulerFromQuaternion(m_localRotationQuaternion * Vector3D::up());      }
 
 		const Matrix4x4& local();
 		const Matrix4x4& world() const;
 
-		inline const Vector3D& localTranslation() const { return _localTranslation; }
-		inline const Vector3D  translation() const { return extractTranslationFromMatrix(_currentWorldTransform); }
+		inline const Vector3D& localTranslation() const { return m_localTranslation; }
+		inline const Vector3D  translation() const { return extractTranslationFromMatrix(m_currentWorldTransform); }
 
 		const Matrix4x4& updateWorldTransform(const Matrix4x4& parent);
 
 	private:
-		inline void setDirty() { _dirty.store(true);  }
-		inline void setClean() { _dirty.store(false); }
-		inline bool isDirty() const { return _dirty.load(); }
+		inline void setDirty() { m_dirty.store(true);  }
+		inline void setClean() { m_dirty.store(false); }
+		inline bool isDirty() const { return m_dirty.load(); }
 
 		inline const Vector3D extractTranslationFromMatrix(const Matrix4x4& m) const {
 			return Vector3D({
@@ -61,18 +61,18 @@ namespace Engine {
 			});
 		}
 
-		Vector3D   _localScale;
+		Vector3D   m_localScale;
 #ifndef __SHIRABE_USE_QUATERNION_ROTATIONS
-		Vector3D   _localEulerRotation;
+		Vector3D   m_localEulerRotation;
 #else 
-		Quaternion _localRotationQuaternion;
+		Quaternion m_localRotationQuaternion;
 #endif
-		Vector3D   _localTranslation;
+		Vector3D   m_localTranslation;
 
-		Matrix4x4 _currentLocalTransform;
-		Matrix4x4 _currentWorldTransform;
+		Matrix4x4 m_currentLocalTransform;
+		Matrix4x4 m_currentWorldTransform;
 	
-		std::atomic_bool _dirty;
+		std::atomic_bool m_dirty;
 	};
 
 }

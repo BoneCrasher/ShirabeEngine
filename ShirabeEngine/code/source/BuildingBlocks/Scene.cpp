@@ -9,10 +9,10 @@ namespace Engine {
 	DeclareLogTag(Scene);
 
 	Scene::Scene()
-		: _componentFactory(nullptr),
-		  _timer(),
-		  _primaryCamera(),
-		  _entities()
+		: m_componentFactory(nullptr),
+		  m_timer(),
+		  m_primaryCamera(),
+		  m_entities()
 	{		
 	}
 
@@ -21,15 +21,15 @@ namespace Engine {
 	}
 
 	EEngineStatus Scene::initialize() {
-		if (!_componentFactory)
+		if (!m_componentFactory)
 			return EEngineStatus::Ok;
 
-		IComponentPtr meshComponent = _componentFactory->createComponent(/* id */);
+		IComponentPtr meshComponent = m_componentFactory->createComponent(/* id */);
 
 		EntityPtr entity = MakeSharedPointerType<Entity>();
 		entity->addComponent(meshComponent);
 
-		_entities.push_back(entity);
+		m_entities.push_back(entity);
 
 		return EEngineStatus::Ok;
 	}
@@ -41,29 +41,26 @@ namespace Engine {
 	EEngineStatus Scene::update() {
 		EEngineStatus status = EEngineStatus::Ok;
 
-		if (CheckEngineError(status = _timer.update())) {
-			// Log::
-			goto _return;
-		}
+		if (CheckEngineError(status = m_timer.update()))
+      return status;
 
 		static double elapsed = 0;
 
-		elapsed += _timer.elapsed();
+		elapsed += m_timer.elapsed();
 		if (elapsed >= 1.0) {
-			Log::Status("Scene", String::format("Elapsed seconds: %0/%1 / FPS: %2", _timer.total_elapsed(), _timer.elapsed(), _timer.FPS()));
+			Log::Status("Scene", String::format("Elapsed seconds: %0/%1 / FPS: %2", m_timer.total_elapsed(), m_timer.elapsed(), m_timer.FPS()));
 			elapsed -= 1.0;
 		}
 
 		EEngineStatus entityUpdateStatus = EEngineStatus::Ok;
-		for (EntityPtr& e : _entities) {
-			entityUpdateStatus = e->update(_timer);
+		for (EntityPtr& e : m_entities) {
+			entityUpdateStatus = e->update(m_timer);
 			if (CheckEngineError(entityUpdateStatus)) {
 				Log::Error(logTag(), String::format("An error occurred updating entity '%0' [ErrorCode: %1]", e->name(), entityUpdateStatus));
 				continue;
 			}
 		}
 
-		_return:
 		return status;
 	}
 

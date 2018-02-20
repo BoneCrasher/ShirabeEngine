@@ -70,11 +70,11 @@ namespace Platform {
 
 			// Platform
 			inline
-				const Platform::Window::WindowHandleWrapper::Handle& handle() const { return _handleWrapper.handle();  }
+				const Platform::Window::WindowHandleWrapper::Handle& handle() const { return m_handleWrapper.handle();  }
 
 			// Properties
-			inline const std::string& name()   const { return _name;   }
-			inline const Rect&        bounds() const { return _bounds; }
+			inline const std::string& name()   const { return m_name;   }
+			inline const Rect&        bounds() const { return m_bounds; }
 
 			// Lifecycle
 			EEngineStatus show();
@@ -86,10 +86,10 @@ namespace Platform {
 
 			// Callbacks
 			inline EEngineStatus registerCallback(const IWindow::IEventCallbackPtr& cb) {
-				return _callbackAdapter.registerCallback(cb);
+				return m_callbackAdapter.registerCallback(cb);
 			}
 			inline EEngineStatus unregisterCallback(const IWindow::IEventCallbackPtr& cb) {
-				return _callbackAdapter.unregisterCallback(cb);
+				return m_callbackAdapter.unregisterCallback(cb);
 			}
 
 			//
@@ -110,13 +110,13 @@ namespace Platform {
 		private:
 			DeclareLogTag(WindowsWindow)
 
-			std::string _name;
-			Rect        _bounds;
+			std::string m_name;
+			Rect        m_bounds;
 
-			WindowHandleWrapper        _handleWrapper;
-			WindowEventCallbackAdapter _callbackAdapter;
+			WindowHandleWrapper        m_handleWrapper;
+			WindowEventCallbackAdapter m_callbackAdapter;
 
-			std::atomic_bool _active;
+			std::atomic_bool m_active;
 		};
 		DeclareSharedPointerType(WindowsWindow)
 	}

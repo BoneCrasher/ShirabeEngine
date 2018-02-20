@@ -51,22 +51,22 @@ namespace Engine {
 				typedef typename AllocT::size_type       size_type;
 
 			public:
-				MeasurementDataStore(const size_type max_capacity = DEFAULT_CAPACITY) {
-					_max_chunks = max_capacity;
-				}
+        MeasurementDataStore(const size_type max_capacity = DEFAULT_CAPACITY)
+          : m_max_chunks(max_capacity)
+        {}
 
 				virtual ~MeasurementDataStore() {
 					this->clear();
 				}
 
 				virtual void clear() {
-					if (_chunks.size() <= 0)
+					if (m_chunks.size() <= 0)
 						return;
 
-					for (size_type chunkIdx = 0; chunkIdx < _chunks.size(); ++chunkIdx)
-						this->_allocator.deallocate(_chunks.at(chunkIdx), 0);
+					for (size_type chunkIdx = 0; chunkIdx < m_chunks.size(); ++chunkIdx)
+						this->m_allocator.deallocate(m_chunks.at(chunkIdx), 0);
 
-					_chunks.clear();
+					m_chunks.clear();
 				}
 
 				template <typename ParamT, typename ValT>
@@ -74,18 +74,18 @@ namespace Engine {
 					/* Make sure that the chunklist is not null. */
 					this->__validateChunkList();
 
-					if (_chunks.size() == _max_chunks)
+					if (m_chunks.size() == m_max_chunks)
 						// first in, first out: pop first item in list.
-						_chunks.erase(_chunks.begin());
+						m_chunks.erase(m_chunks.begin());
 
 					// insert back,
-					_chunks.push_back(this->create<ParamT, ValT>(param, val));
+					m_chunks.push_back(this->create<ParamT, ValT>(param, val));
 				}
 
 				template <typename ParamT, typename ValT>
 				pointer create(const ParamT param, const ValT val) {
-					pointer p = this->_allocator.allocate(1);
-					this->_allocator.construct(p, param, val);
+					pointer p = this->m_allocator.allocate(1);
+					this->m_allocator.construct(p, param, val);
 
 					return p;
 				}
@@ -95,17 +95,17 @@ namespace Engine {
 
 					this->__validateChunkList();
 
-					if (_chunks.size() > index)
+					if (m_chunks.size() > index)
 					{
-						pChunk = _chunks.at(index);
+						pChunk = m_chunks.at(index);
 					} else
 						if (statusFlag) statusFlag = RESULT::INVALID_ARGUMENT;
 
 					return pChunk;
 				}
 
-				const size_type max_size() const { return _max_chunks; }
-				const size_type size()     const { return _chunks.size(); }
+				const size_type max_size() const { return m_max_chunks; }
+				const size_type size()     const { return m_chunks.size(); }
 
 				const typename chunk_type::param_type average(
 					difference_type off = 0,
@@ -114,21 +114,21 @@ namespace Engine {
 					typename chunk_type::param_type av = 0;
 					
 					/* At least two chunks required to calc average */
-					if (_chunks.size() >= 2)
+					if (m_chunks.size() >= 2)
 					{
 						// Make sure off is in a valid boundary
-						off = std::fminl((_chunks.size() - 1), std::fmaxl(0, off));
-						// Make sure to average _n entries at max or less
+						off = std::fminl((m_chunks.size() - 1), std::fmaxl(0, off));
+						// Make sure to average m_n entries at max or less
 						// if there are not enough chunks stored starting 
-						// from _off.
-						n = std::fminl((_chunks.size() - off - 1), n);
+						// from m_off.
+						n = std::fminl((m_chunks.size() - off - 1), n);
 
 						typename chunk_type::param_type interval = 0;
-						interval = _chunks.at(n - 1)->parameter() - _chunks.at(off)->parameter();
+						interval = m_chunks.at(n - 1)->parameter() - m_chunks.at(off)->parameter();
 						if (interval > 0)
 						{
-							for (size_type k = 0; k < _chunks.size(); ++k)
-								av += _chunks.at(k)->value();
+							for (size_type k = 0; k < m_chunks.size(); ++k)
+								av += m_chunks.at(k)->value();
 
 							av = (typename chunk_type::param_type) ((av / interval) + 0.5);
 						}
@@ -138,12 +138,12 @@ namespace Engine {
 				}
 
 			private:
-				void __validateChunkList() { /*if(_chunks == NULL) _chunks = new chunk_container_type();*/ }
+				void __validateChunkList() { /*if(m_chunks == NULL) m_chunks = new chunk_container_type();*/ }
 
 			private:
-				alloc_type            _allocator;
-				size_type             _max_chunks;
-				chunk_container_type  _chunks;
+				alloc_type            m_allocator;
+				size_type             m_max_chunks;
+				chunk_container_type  m_chunks;
 		};
 	}
 }

@@ -135,7 +135,7 @@ namespace Engine
 		virtual void requestSetConversionFactors(ConversionFactorMap& map) = 0;
 		
 		/** Summary: Container holding all valid mappings of <time unit> to <conversion factor>. */
-		ConversionFactorMap _conversionFactors;
+		ConversionFactorMap m_conversionFactors;
 	};
 
 	template <typename T>
@@ -147,8 +147,8 @@ namespace Engine
 
 	template <typename T>
 	double PlatformTime<T>::getConversionMask(ETimeUnit unit) {
-		ConversionFactorMap::iterator it = _conversionFactors.find(unit);
-		if (it != _conversionFactors.end())
+		ConversionFactorMap::iterator it = m_conversionFactors.find(unit);
+		if (it != m_conversionFactors.end())
 			return it->second;
 		else
 			return 1.0;

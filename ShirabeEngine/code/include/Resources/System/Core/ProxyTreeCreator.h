@@ -21,7 +21,7 @@ namespace Engine {
 		 **************************************************************************************************/
 		template <typename TResource>
 		class ProxyTreeCreator {
-
+    public:
 
 			/**********************************************************************************************//**
 			 * \fn	static bool ProxyTreeCreator::create( const Ptr<ResourceProxyFactory> &proxyFactory, const ResourceDescriptor<type, subtype> &desc, ResourceHandleList &inDependencyHandles, TResourceBinding &outBinding, ResourceProxyMap &outProxyMap, DependerTreeNodeList &outResourceHierarchy)

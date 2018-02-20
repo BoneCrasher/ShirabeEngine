@@ -6,7 +6,7 @@ namespace Engine
 	{
 
 		PreallocatingAllocatorBase::PreallocatingAllocatorBase() 
-			: AllocatorBase(), _pStart(NULL), _committed(0), _capacity(0)
+			: AllocatorBase(), m_pStart(NULL), m_committed(0), m_capacity(0)
 		{
 			this->__prealloc(PREALLOC_BYTE_SIZE);
 		}
@@ -38,12 +38,12 @@ namespace Engine
 
 		void PreallocatingAllocatorBase::__prealloc( size_t preallocSize)
 		{
-			this->_pStart = malloc(preallocSize);
-			if (this->_pStart == 0)
+			this->m_pStart = malloc(preallocSize);
+			if (this->m_pStart == 0)
 				throw new std::bad_alloc();
 
-			_capacity = preallocSize;
-			_committed = 0;
+			m_capacity = preallocSize;
+			m_committed = 0;
 		}
 
 
@@ -79,10 +79,10 @@ namespace Engine
 
 		void  PreallocatingAllocatorBase::__free()
 		{
-			if (this->_pStart)
-				free(_pStart);
+			if (this->m_pStart)
+				free(m_pStart);
 
-			_committed = _capacity = 0;
+			m_committed = m_capacity = 0;
 		}
 
 #pragma region Alignment

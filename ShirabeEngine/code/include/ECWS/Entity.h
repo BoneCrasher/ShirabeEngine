@@ -11,8 +11,8 @@ namespace Engine {
 		Entity();
 		~Entity();
 
-		inline const std::string& name() const { return _name; }
-		inline void  name(const std::string& name) { _name = name; }
+		inline const std::string& name() const { return m_name; }
+		inline void  name(const std::string& name) { m_name = name; }
 
 		EEngineStatus addComponent(const IComponentPtr& component);
 		EEngineStatus removeComponent(const IComponentPtr& component);
@@ -26,9 +26,9 @@ namespace Engine {
 		EEngineStatus update(const Timer& timer);
 		
 	private:
-		std::string _name;
+		std::string m_name;
 
-		IComponentList _components;
+		IComponentList m_components;
 	};
 	DeclareSharedPointerType(Entity);
 	DeclareListType(EntityPtr, Entity);

@@ -173,9 +173,9 @@ namespace Engine {
 			const Style_t     &style);
 
 		inline static unsigned int* lineWidthInternal() {
-			static unsigned int _lineWidth = 80;
+			static unsigned int m_lineWidth = 80;
 
-			return &_lineWidth;
+			return &m_lineWidth;
 		}
 	};
 

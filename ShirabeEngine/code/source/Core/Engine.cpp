@@ -22,7 +22,7 @@ namespace Engine {
 
 		void onBoundsChanged(const IWindowPtr&,
 							 const Rect& r) {
-			//Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r._position.x(), r._position.y(), r._size.x(), r._size.y()));
+			//Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
 		}
 
 		void onHide(const IWindowPtr&) {
@@ -41,17 +41,17 @@ namespace Engine {
 	};
 
 	EngineInstance::EngineInstance(const Platform::ApplicationEnvironment& environment)
-		: _environment(environment)
-		, _windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
-	  , _mainWindow(nullptr)
-    , _dx11Environment()
+		: m_environment(environment)
+		, m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
+	  , m_mainWindow(nullptr)
+    , m_dx11Environment()
   {
 	}
 
 	EngineInstance::~EngineInstance() {
 		// Fool-Proof redundant check
-		if (_windowManager)
-			_windowManager = nullptr;
+		if (m_windowManager)
+			m_windowManager = nullptr;
 	}
 
 	EEngineStatus EngineInstance::initialize() {
@@ -60,39 +60,39 @@ namespace Engine {
 
 		EEngineStatus status;
 
-    unsigned long const& windowWidth  = _environment.osDisplays[0]._bounds._size.x();
-    unsigned long const& windowHeight = _environment.osDisplays[0]._bounds._size.y();
+    unsigned long const& windowWidth  = m_environment.osDisplays[0].m_bounds.m_size.x();
+    unsigned long const& windowHeight = m_environment.osDisplays[0].m_bounds.m_size.y();
 
     std::function<void()> fnCreatePlatformWindowSystem
       = [&, this] () -> void
     {
       EEngineStatus status = EEngineStatus::Ok;
 
-      _windowManager = MakeSharedPointerType<WindowManager>();
-      if(!(_windowManager && !CheckWindowManagerError(_windowManager->initialize(_environment)))) {
+      m_windowManager = MakeSharedPointerType<WindowManager>();
+      if(!(m_windowManager && !CheckWindowManagerError(m_windowManager->initialize(m_environment)))) {
         status = EEngineStatus::EngineComponentInitializationError;
         HandleEngineStatusError(status, "Failed to create WindowManager.");
       }
 
-      _mainWindow = _windowManager->createWindow("MainWindow", Rect(0, 0, windowWidth, windowHeight));
-      if(!_mainWindow) {
+      m_mainWindow = m_windowManager->createWindow("MainWindow", Rect(0, 0, windowWidth, windowHeight));
+      if(!m_mainWindow) {
         status = EEngineStatus::WindowCreationError;
         HandleEngineStatusError(status, "Failed to create main window in WindowManager.");
       }
       else {
-        _environment.primaryWindowHandle = _mainWindow->handle();
+        m_environment.primaryWindowHandle = m_mainWindow->handle();
 
-        status = _mainWindow->resume();
+        status = m_mainWindow->resume();
         HandleEngineStatusError(status, "Failed to resume operation in main window.");
 
         if(!CheckEngineError(status)) {
-          status = _mainWindow->show();
+          status = m_mainWindow->show();
           HandleEngineStatusError(status, "Failed to show main window.");
         }
       }
 
       IWindow::IEventCallbackPtr dummy = MakeSharedPointerType<TestDummy>();
-      _mainWindow->registerCallback(dummy);
+      m_mainWindow->registerCallback(dummy);
     };
 
     RendererConfiguration rendererConfiguration;
@@ -105,9 +105,9 @@ namespace Engine {
     std::function<void()> fnCreateDefaultGFXAPI
       = [this, &rendererConfiguration] () -> void
     {
-      _dx11Environment = MakeSharedPointerType<DX11Environment>();
+      m_dx11Environment = MakeSharedPointerType<DX11Environment>();
 
-      EEngineStatus status = _dx11Environment->initialize(_environment, rendererConfiguration);
+      EEngineStatus status = m_dx11Environment->initialize(m_environment, rendererConfiguration);
       HandleEngineStatusError(status, "DirectX11 initialization failed.");
     };
     
@@ -129,16 +129,16 @@ namespace Engine {
       Ptr<IGFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
 
       if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
-            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>(_dx11Environment);
+            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>(m_dx11Environment);
     
       resourceBackend->setResourceTaskBackend(resourceTaskBackend);
 
-      _proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);
+      m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);
 
-      Ptr<ProxyBasedResourceManager> manager = MakeSharedPointerType<ProxyBasedResourceManager>(_proxyFactory);
+      Ptr<ProxyBasedResourceManager> manager = MakeSharedPointerType<ProxyBasedResourceManager>(m_proxyFactory);
       manager->setResourceBackend(resourceBackend);
 
-      _resourceManager = manager;
+      m_resourceManager = manager;
 
       // Renderer will have access to resourceBackend!
     };
@@ -146,10 +146,10 @@ namespace Engine {
     std::function<void()> fnCreatePlatformRenderer 
       = [&, this] () -> void
     {
-      _renderer = MakeSharedPointerType<DX11Renderer>();
-      status = _renderer->initialize(_environment, rendererConfiguration, nullptr);
+      m_renderer = MakeSharedPointerType<DX11Renderer>();
+      status = m_renderer->initialize(m_environment, rendererConfiguration, nullptr);
       if(!CheckEngineError(status)) {
-        status = _scene.initialize();
+        status = m_scene.initialize();
       }
     };
 
@@ -179,40 +179,40 @@ namespace Engine {
 	EEngineStatus EngineInstance::deinitialize() {
 		EEngineStatus status = EEngineStatus::Ok;
 
-		if( _resourceManager ) {
-			_resourceManager->clear(); // Will implicitely clear all subsystems!
-			_resourceManager = nullptr;
+		if( m_resourceManager ) {
+			m_resourceManager->clear(); // Will implicitely clear all subsystems!
+			m_resourceManager = nullptr;
 		}
 
-		if( _proxyFactory ) {
-			_proxyFactory = nullptr;
+		if( m_proxyFactory ) {
+			m_proxyFactory = nullptr;
 		}
 
-		if (_renderer) {
-			status = _renderer->deinitialize();
+		if (m_renderer) {
+			status = m_renderer->deinitialize();
 		}
 
-		if (_mainWindow) {
-			_mainWindow->hide();
-			_mainWindow->pause();
+		if (m_mainWindow) {
+			m_mainWindow->hide();
+			m_mainWindow->pause();
 			// TODO: Handle errors
-			_mainWindow = nullptr;
+			m_mainWindow = nullptr;
 		}
 
-		_windowManager = nullptr;
+		m_windowManager = nullptr;
 
 		return EEngineStatus::Ok;
 	}
 
 	EEngineStatus EngineInstance::update() {
 
-		if (CheckWindowManagerError(_windowManager->update())) {
+		if (CheckWindowManagerError(m_windowManager->update())) {
 			Log::Error(logTag(), "Failed to update window manager.");
 			return EEngineStatus::EngineComponentUpdateError;
 		}
 
-		_scene.update();
-		_renderer->render();
+		m_scene.update();
+		m_renderer->render();
 
 		return EEngineStatus::Ok;
 	}

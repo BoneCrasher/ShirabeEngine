@@ -81,20 +81,20 @@ namespace Engine {
 
 			// Return a copy of the stored x-component. Getter.
 			inline const value_type x() const {
-				return this->_field[0];
+				return this->m_field[0];
 			}
 
 			// Return a copy of the stored y-component. Getter.
 			inline const value_type y() const {
-				return this->_field[1];
+				return this->m_field[1];
 			}
 
 			// Return a FieldAccessor for the stored x-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void x(const value_type& val) { this->_field[0] = val; }
+			inline void x(const value_type& val) { this->m_field[0] = val; }
 			// Return a FieldAccessor for the stored y-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void y(const value_type& val) { this->_field[1] = val; }
+			inline void y(const value_type& val) { this->m_field[1] = val; }
 			
 			static inline Vector2D right() { return Vector2D({ 1, 0 }); }
 			static inline Vector2D up()    { return Vector2D({ 0, 1 }); }
@@ -160,26 +160,26 @@ namespace Engine {
 
 			// Return a copy of the stored x-component. Getter.
 			inline const value_type x() const {
-				return this->_field[0];
+				return this->m_field[0];
 			}
 			// Return a copy of the stored y-component. Getter.
 			inline const value_type y() const {
-				return this->_field[1];
+				return this->m_field[1];
 			}
 			// Return a copy of the stored z-component. Getter.
 			inline const value_type z() const {
-				return this->_field[2];
+				return this->m_field[2];
 			}
 
 			// Return a FieldAccessor for the stored x-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void x(const value_type& val) { this->_field[0] = val; }
+			inline void x(const value_type& val) { this->m_field[0] = val; }
 			// Return a FieldAccessor for the stored y-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void y(const value_type& val) { this->_field[1] = val; }
+			inline void y(const value_type& val) { this->m_field[1] = val; }
 			// Return a FieldAccessor for the stored z-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void z(const value_type& val) { this->_field[2] = val; }
+			inline void z(const value_type& val) { this->m_field[2] = val; }
 
 			static inline Vector3D forward() { return Vector3D({ 1, 0, 0 }); }
 			static inline Vector3D right()   { return Vector3D({ 0, 1, 0 }); }
@@ -223,33 +223,33 @@ namespace Engine {
 
 			// Return a copy of the stored x-component. Getter.
 			inline const value_type x() const {
-				return this->_field[0];
+				return this->m_field[0];
 			}
 			// Return a copy of the stored y-component. Getter.
 			inline const value_type y() const {
-				return this->_field[1];
+				return this->m_field[1];
 			}
 			// Return a copy of the stored z-component. Getter.
 			inline const value_type z() const {
-				return this->_field[2];
+				return this->m_field[2];
 			}
 			// Return a copy of the stored z-component. Getter.
 			inline const value_type w() const {
-				return this->_field[3];
+				return this->m_field[3];
 			}
 
 			// Return a FieldAccessor for the stored x-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void x(const value_type& val) { this->_field[0] = val; }
+			inline void x(const value_type& val) { this->m_field[0] = val; }
 			// Return a FieldAccessor for the stored y-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void y(const value_type& val) { this->_field[1] = val; }
+			inline void y(const value_type& val) { this->m_field[1] = val; }
 			// Return a FieldAccessor for the stored z-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void z(const value_type& val) { this->_field[2] = val; }
+			inline void z(const value_type& val) { this->m_field[2] = val; }
 			// Return a FieldAccessor for the stored z-component to safely assign a new value 
 			// using the assignment-operator. Setter.
-			inline void w(const value_type& val) { this->_field[3] = val; }
+			inline void w(const value_type& val) { this->m_field[3] = val; }
 		};
 
 

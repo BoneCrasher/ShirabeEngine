@@ -32,7 +32,7 @@ namespace Engine {
         Ptr<IResourceProxy<DepthStencilView>> proxy
           = proxyFactory->create<DepthStencilView>(EProxyType::Dynamic, request);
 
-        ResourceHandle handle(desc.name, EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW);
+        ResourceHandle handle(desc.name, resource_type, resource_subtype);
         outProxyMap[handle] = AnyProxy(proxy);
 
         DependerTreeNode resourceNode;

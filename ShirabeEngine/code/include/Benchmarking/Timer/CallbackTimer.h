@@ -51,7 +51,7 @@ namespace Engine {
          *          infinitely or for a limited amount of time,
          *          this entire duration is considered "one cycle".
          */
-        inline unsigned int elapsedMs() const { return _elapsed.load(); }
+        inline unsigned int elapsedMs() const { return m_elapsed.load(); }
 
         /**
          * @brief run Creates & initializes the timer runtime, if it was not
@@ -93,15 +93,15 @@ namespace Engine {
          */
         void exec();
 
-        unsigned int                 _tickMs;
-        bool                         _once;
-        bool                         _blockWhileRunning;
-        std::atomic<unsigned int>    _elapsed;
-        std::atomic<bool>            _running;
-        std::atomic<bool>            _pause;
-        std::atomic<bool>            _interrupt;
-        std::shared_ptr<std::thread> _timerThread;
-        std::function<void()>        _timerCallbackFunction;
+        unsigned int                 m_tickMs;
+        bool                         m_once;
+        bool                         m_blockWhileRunning;
+        std::atomic<unsigned int>    m_elapsed;
+        std::atomic<bool>            m_running;
+        std::atomic<bool>            m_pause;
+        std::atomic<bool>            m_interrupt;
+        std::shared_ptr<std::thread> m_timerThread;
+        std::function<void()>        m_timerCallbackFunction;
     };
     using CallbackTimerPtr = std::shared_ptr<CallbackTimer>;
 

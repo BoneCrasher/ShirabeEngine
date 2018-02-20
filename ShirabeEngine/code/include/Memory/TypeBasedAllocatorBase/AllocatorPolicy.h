@@ -71,9 +71,9 @@ namespace Engine {
 			return true;
 		};
 
-		template<typename T, typename _OtherAllocator>
+		template<typename T, typename m_OtherAllocator>
 		inline bool operator==(AllocatorPolicyBase<T> const&,
-							   _OtherAllocator const&) {
+							   m_OtherAllocator const&) {
 			return false;
 		};
 

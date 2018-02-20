@@ -63,7 +63,7 @@ namespace Engine {
           Descriptor     const& desc,
           ResourceHandle const& swapChainHandle)
           : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-          , _swapChainHandle(swapChainHandle)
+          , m_swapChainHandle(swapChainHandle)
         {}
 
         ResourceHandle const& swapChainHandle()    const;
@@ -81,7 +81,7 @@ namespace Engine {
           return ss.str();
         }
       private:
-        ResourceHandle _swapChainHandle;
+        ResourceHandle m_swapChainHandle;
       };
 
       class UpdateRequest 
@@ -163,7 +163,7 @@ namespace Engine {
       SwapChainBufferDeclaration::CreationRequest
       ::swapChainHandle() const
     {
-      return _swapChainHandle;
+      return m_swapChainHandle;
     }
 
     DeclareSharedPointerType(SwapChainBuffer);
@@ -290,14 +290,14 @@ namespace Engine {
       }
 
       Ptr<RenderTargetView> const& getBackBufferRenderTargetView(uint32_t const& index) {
-        if(index < 0 || index >= _backBufferRenderTargetViews.size())
+        if(index < 0 || index >= m_backBufferRenderTargetViews.size())
           return nullptr;
 
-        return _backBufferRenderTargetViews[index];
+        return m_backBufferRenderTargetViews[index];
       }
 
       Ptr<RenderTargetView> const& getCurrentBackBufferRenderTargetView() {
-        return getBackBufferRenderTargetView(_currentBackBufferIndex);
+        return getBackBufferRenderTargetView(m_currentBackBufferIndex);
       }
 
     private:
@@ -307,11 +307,11 @@ namespace Engine {
         : SwapChainDeclaration()
         , ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>(descriptor)
         , ResourceBindingAdapter<SwapChainDeclaration::Binding>(binding)
-        , _currentBackBufferIndex(0)
+        , m_currentBackBufferIndex(0)
       {}
 
-      std::size_t                        _currentBackBufferIndex;
-      std::vector<Ptr<RenderTargetView>> _backBufferRenderTargetViews;
+      std::size_t                        m_currentBackBufferIndex;
+      std::vector<Ptr<RenderTargetView>> m_backBufferRenderTargetViews;
     };
 
     DeclareSharedPointerType(SwapChain);

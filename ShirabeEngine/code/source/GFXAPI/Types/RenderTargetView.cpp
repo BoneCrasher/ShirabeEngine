@@ -28,14 +28,14 @@ namespace Engine {
         Descriptor     const&desc,
         ResourceHandle const&underlyingTextureHandle)
       : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-      , _underlyingTextureHandle(underlyingTextureHandle)
+      , m_underlyingTextureHandle(underlyingTextureHandle)
     {}
     
     ResourceHandle const&
       RenderTargetViewDeclaration::CreationRequest
       ::underlyingTextureHandle() const
     {
-      return _underlyingTextureHandle;
+      return m_underlyingTextureHandle;
     }
 
     std::string RenderTargetViewDeclaration::CreationRequest

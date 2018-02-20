@@ -47,55 +47,55 @@ namespace Engine {
   template <typename T, std::size_t N>
   struct VecND {
   protected:
-    std::array<T, N> _values;
+    std::array<T, N> m_values;
 
   public:
     VecND() { }
 
     VecND(const std::initializer_list<T>& init)
-      : _values() {
+      : m_values() {
 
       int k=0;
       for(const T& v : init) {
         if(k >= N)
           break;
 
-        _values[k++] = v;
+        m_values[k++] = v;
       }
     }
 
     template <typename U>
     VecND(const VecND<U, N>& other) {
-      this->operator=<U>(other);
+      this->operator=<U, N>(other);
     }
 
     template <typename U, std::size_t NU>
-    inline VecND(const VecND<U, NU>& other) {
+    VecND(const VecND<U, NU>& other) {
       this->operator=<U, NU>(other);
     }
 
     template <typename U>
     inline VecND<T, N>& operator =(const VecND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, N>& other) {
-      _values.fill(0);
-      std::copy(other.values().begin(), other.values().end(), _values.begin());
+      m_values.fill(0);
+      std::copy(other.values().begin(), other.values().end(), m_values.begin());
       return *this;
     }
 
 
     template <typename U, std::size_t NU>
     inline VecND<T, N>& operator =(const VecND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, NU>& other) {
-      _values.fill(0);
-      std::copy(other.values().begin(), other.values().begin() + (std::min(N, NU)), _values.begin());
+      m_values.fill(0);
+      std::copy(other.values().begin(), other.values().begin() + (std::min(N, NU)), m_values.begin());
       return *this;
     }
 
 
-    inline const T& operator[](const std::size_t& index) const { if(index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return _values[index]; }
-    inline       T& operator[](const std::size_t& index) { if(index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return _values[index]; }
-    inline bool     operator==(const VecND<T, N>& other) const { return (_values == other._values); }
+    inline const T& operator[](const std::size_t& index) const { if(index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return m_values[index]; }
+    inline       T& operator[](const std::size_t& index) { if(index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return m_values[index]; }
+    inline bool     operator==(const VecND<T, N>& other) const { return (m_values == other.m_values); }
 
     inline const std::array<T, N>& values() const {
-      return _values;
+      return m_values;
     }
   };
 
@@ -113,11 +113,11 @@ namespace Engine {
       : VecND<T, 1>(x) {}
 
     inline const T& x() const {
-      return _values[0];
+      return m_values[0];
     }
 
     inline T& x() {
-      return _values[0];
+      return m_values[0];
     }
   };
   DefineContainerSpecializations(Vec1D);
@@ -140,7 +140,7 @@ namespace Engine {
       : VecND<T, 2>({other.x(), T()}) {}
 
     inline const T& x() const {
-      return _values[0];
+      return m_values[0];
     }
 
     inline T& x() {
@@ -148,7 +148,7 @@ namespace Engine {
     }
 
     inline const T& y() const {
-      return _values[1];
+      return m_values[1];
     }
 
     inline T& y() {
@@ -182,21 +182,21 @@ namespace Engine {
       : VecND<T, 3>({other.xy(), other.y(), other.z()}) {}
 
     inline const T& x() const {
-      return _values[0];
+      return m_values[0];
     }
     inline T& x() {
       return const_cast<T&>(static_cast<const Vec3D<T>*>(this)->x());
     }
 
     inline const T& y() const {
-      return _values[1];
+      return m_values[1];
     }
     inline T& y() {
       return const_cast<T&>(static_cast<const Vec3D<T>*>(this)->y());
     }
 
     inline const T& z() const {
-      return _values[2];
+      return m_values[2];
     }
     inline T& z() {
       return const_cast<T&>(static_cast<const Vec3D<T>*>(this)->z());
@@ -239,28 +239,28 @@ namespace Engine {
       : VecND<T, 4>({other.x(), other.y(), other.z(), T()}) {}
 
     inline const T& x() const {
-      return _values[0];
+      return m_values[0];
     }
     inline T& x() {
       return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->x());
     }
 
     inline const T& y() const {
-      return _values[1];
+      return m_values[1];
     }
     inline T& y() {
       return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->y());
     }
 
     inline const T& z() const {
-      return _values[2];
+      return m_values[2];
     }
     inline T& z() {
       return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->z());
     }
 
     inline const T& w() const {
-      return _values[3];
+      return m_values[3];
     }
     inline T& w() {
       return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->w());
@@ -332,27 +332,27 @@ namespace Engine {
   DefineContainerSpecializations(Vec4D);
 
   struct Rect {
-    Vec2Dl _position;
-    Vec2Dl _size;
+    Vec2Dl m_position;
+    Vec2Dl m_size;
 
     Rect()
-      : _position(0, 0)
-      , _size(0, 0)
+      : m_position(0, 0)
+      , m_size(0, 0)
     {}
 
     Rect(const long &x,
          const long &y,
          const long &width,
          const long &height)
-      : _position(x, y)
-      , _size(width, height)
+      : m_position(x, y)
+      , m_size(width, height)
     {
     }
 
     explicit Rect(const Vec2Dl& pos,
                   const Vec2Dl& sz)
-      : _position(pos),
-      _size(sz)
+      : m_position(pos),
+      m_size(sz)
     {
     }
   };

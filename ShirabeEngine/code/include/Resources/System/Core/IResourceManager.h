@@ -10,13 +10,40 @@
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 
 #include "GFXAPI/Types/SwapChain.h"
-#include "GFXAPI/Types/ShaderResourceView.h"
 #include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/DepthStencilState.h"
+#include "GFXAPI/Types/RasterizerState.h"
 
 namespace Engine {
   namespace Resources {
 
     typedef uint64_t PublicResourceId_t;
+
+    template <typename TResource>
+    struct ResourceInfo {
+      PublicResourceId_t             resourceId;
+      ResourceHandle                 handle;
+      typename TResource::Descriptor descriptor;
+      typename TResource::Binding    binding;
+
+      ResourceInfo()
+        : resourceId(0)
+        , handle(ResourceHandle::Invalid())
+        , descriptor({})
+        , binding({})
+      {}
+
+      ResourceInfo(
+        PublicResourceId_t             inResourceId,
+        ResourceHandle                 inHandle,
+        typename TResource::Descriptor inDescriptor,
+        typename TResource::Binding    inBinding)
+        : resourceId(inResourceId)
+        , handle(inHandle)
+        , descriptor(inDescriptor)
+        , binding(inBinding)
+      {}
+    };
 
 #define DeclareResourceMethods(resource)          \
   virtual EEngineStatus create##resource(         \
@@ -40,9 +67,8 @@ namespace Engine {
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus get##resource##Info(      \
-    PublicResourceId_t const&id,                  \
-    resource::Descriptor    &outDescriptor,       \
-    resource::Binding       &outBinding           \
+    PublicResourceId_t     const&id,              \
+    ResourceInfo<resource>      &outInfo          \
   ) =0;
   
     DeclareInterface(IResourceManager);
@@ -59,6 +85,7 @@ namespace Engine {
       DeclareResourceMethods(ShaderResourceView);
       DeclareResourceMethods(DepthStencilView);
       DeclareResourceMethods(DepthStencilState);
+      DeclareResourceMethods(RasterizerState);
 
     DeclareInterfaceEnd(IResourceManager);
     DeclareSharedPointerType(IResourceManager);

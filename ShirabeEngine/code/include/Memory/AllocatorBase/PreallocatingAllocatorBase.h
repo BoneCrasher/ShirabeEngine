@@ -21,8 +21,8 @@ namespace Engine
 			virtual void* allocate(size_t size) = 0;
 			virtual void deallocate(void *ptr)  = 0;
 
-			inline size_t capacity() const { return _capacity; }
-			inline size_t committed() const { return _committed; }
+			inline size_t capacity() const { return m_capacity; }
+			inline size_t committed() const { return m_committed; }
 
 		protected:
 			virtual inline void __prealloc( size_t preallocSize);
@@ -33,9 +33,9 @@ namespace Engine
 			virtual inline void * __align( void *pAddr,  size_t alignment);
 			virtual inline size_t __getAlignmentOffset( void *pAddr,  size_t alignment);
 
-			void *_pStart;
-			size_t _committed;
-			size_t _capacity;
+			void *m_pStart;
+			size_t m_committed;
+			size_t m_capacity;
 		};
 	}
 }

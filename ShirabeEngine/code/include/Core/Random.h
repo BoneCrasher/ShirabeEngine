@@ -13,14 +13,14 @@ namespace Engine {
 			typedef std::uniform_int_distribution<rng_type::result_type> dist_type;
 
 			inline RandomState() {
-				_randomNumberGenerator.seed(std::random_device()());
+				m_randomNumberGenerator.seed(std::random_device()());
 			}
 
-			inline rng_type::result_type next() { return _distribution(_randomNumberGenerator); }
+			inline rng_type::result_type next() { return m_distribution(m_randomNumberGenerator); }
 
 		private:
-			rng_type  _randomNumberGenerator;
-			dist_type _distribution;
+			rng_type  m_randomNumberGenerator;
+			dist_type m_distribution;
 		};
 
 	}

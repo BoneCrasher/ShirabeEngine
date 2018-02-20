@@ -3,7 +3,7 @@
 namespace Engine {
 
 	Timer::Timer() {
-		_conversionConstant = _initial = _current = _elapsed = 0;
+		m_conversionConstant = m_initial = m_current = m_elapsed = 0;
 
 		if (!CheckEngineError(initialize()))
 			return;
@@ -18,7 +18,7 @@ namespace Engine {
 		if (!pInterface)
 			throw new std::invalid_argument("Cannot set time-interface to NULL.");
 
-		_timeInterface = pInterface;
+		m_timeInterface = pInterface;
 	};
 
 	EEngineStatus Timer::initialize()
@@ -27,27 +27,27 @@ namespace Engine {
 
 		setTimeInterface(MakeSharedPointerType<internal_time_type>());
 
-		if (!_timeInterface) {
+		if (!m_timeInterface) {
 			printf("FATAL_ERROR: Timer::initialize: Assigning by YTime::getInterface() failed. Interface-pointer is NULL.");
 			result = EEngineStatus::Timer_NoPlatformTimeInstance;
 		} else {
-			if (CheckEngineError(result = _timeInterface->initialize())) {
+			if (CheckEngineError(result = m_timeInterface->initialize())) {
 				// ...
 			}
 
 			// Get conversion constant
-			if (CheckEngineError(result = _timeInterface->getConversionConstant(_conversionConstant))) {
+			if (CheckEngineError(result = m_timeInterface->getConversionConstant(m_conversionConstant))) {
 				printf("FATAL_ERROR: Timer::initialize: An error occured on requesting the proprietary time interface conversion constant from the time interface.\nAt: %s:%s", __FILE__, __LINE__); // might cause exceptions
 			}
 			// get initial timestamp
-			if (CheckEngineError(result = _timeInterface->getTimestamp(_initial))) {
+			if (CheckEngineError(result = m_timeInterface->getTimestamp(m_initial))) {
 				printf("ERROR: Timer::initialize: An error occured on requesting the current timestamp from the time interface.\nAt: %s:%s", __FILE__, __LINE__); // might cause exceptions
 			} else
-				_current = _initial; // init current for calculation of elapsed in the subsequent frame.
+				m_current = m_initial; // init current for calculation of elapsed in the subsequent frame.
 		}
 
-		_frames = 0;
-		_chunkPushCounter = 0;
+		m_frames = 0;
+		m_chunkPushCounter = 0;
 
 		return result;
 	};
@@ -56,9 +56,9 @@ namespace Engine {
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-		_dataStore.clear();
+		m_dataStore.clear();
 
-		_timeInterface = NULL;
+		m_timeInterface = NULL;
 
 		return result;
 	};
@@ -66,26 +66,26 @@ namespace Engine {
 	EEngineStatus Timer::update() {
 		EEngineStatus result = EEngineStatus::Ok;
 
-		++_frames;
+		++m_frames;
 
 #ifdef _DEBUG
-		if (_conversionConstant && _timeInterface)
+		if (m_conversionConstant && m_timeInterface)
 #elif
 		if (m_pTimeInterface)
 #endif
 		{
-			_elapsed = _current; // Store in elapsed variable to save memory!
-			if (CheckEngineError(result = _timeInterface->getTimestamp(_current)))
+			m_elapsed = m_current; // Store in elapsed variable to save memory!
+			if (CheckEngineError(result = m_timeInterface->getTimestamp(m_current)))
 				printf("ERROR: Timer::update(): Failed at querying the current timestamp.\n%s: %s", __FILE__, __LINE__);
 			else {
-				_elapsed = _current - _elapsed;
+				m_elapsed = m_current - m_elapsed;
 
-				_chunkPushCounter += this->elapsed(ETimeUnit::Seconds);
-				if (_chunkPushCounter >= 1.0) {
-					_dataStore.push_chunk(this->total_elapsed(ETimeUnit::Seconds), _frames);
+				m_chunkPushCounter += this->elapsed(ETimeUnit::Seconds);
+				if (m_chunkPushCounter >= 1.0) {
+					m_dataStore.push_chunk(this->total_elapsed(ETimeUnit::Seconds), m_frames);
 
-					_frames = 0;
-					_chunkPushCounter -= 1.0;
+					m_frames = 0;
+					m_chunkPushCounter -= 1.0;
 				}
 			}
 		}
@@ -96,22 +96,22 @@ namespace Engine {
 	double Timer::elapsed(ETimeUnit unit) {
 		double factor = 1.0;
 
-		if (_timeInterface)
-			factor = _timeInterface->getConversionMask(unit);
+		if (m_timeInterface)
+			factor = m_timeInterface->getConversionMask(unit);
 
-		return (((double)_elapsed / (double)_conversionConstant) * factor);
+		return (((double)m_elapsed / (double)m_conversionConstant) * factor);
 	};
 
 	double Timer::total_elapsed(ETimeUnit unit) {
 		double factor = 1.0;
 
-		if (_timeInterface)
-			factor = _timeInterface->getConversionMask(unit);
+		if (m_timeInterface)
+			factor = m_timeInterface->getConversionMask(unit);
 
-		return (((_current - _initial) / (1.0*_conversionConstant))*factor);
+		return (((m_current - m_initial) / (1.0*m_conversionConstant))*factor);
 	};
 
 	float Timer::FPS() {
-		return (float)_dataStore.average(_dataStore.size() - 10, 10);
+		return (float)m_dataStore.average(m_dataStore.size() - 10, 10);
 	};
 }

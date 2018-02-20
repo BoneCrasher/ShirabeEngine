@@ -68,7 +68,7 @@ namespace Engine {
         std::string toString() const;
 
       private:
-        ResourceHandle _underlyingTextureHandle;
+        ResourceHandle m_underlyingTextureHandle;
       };
 
       class UpdateRequest 

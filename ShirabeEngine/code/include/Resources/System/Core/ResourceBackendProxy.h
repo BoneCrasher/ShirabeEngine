@@ -20,14 +20,14 @@ namespace Engine {
 				const Ptr<TBackend>                       &resourceBackend,
 				const typename TResource::CreationRequest &request)
 				: GenericProxyBase<TResource>(proxyType, request)
-				, _backend(resourceBackend)
+				, m_backend(resourceBackend)
 			{ }
 
 		protected:
-			TBackend resourceBackend() { return _backend; }
+			TBackend resourceBackend() { return m_backend; }
 
 		private:
-			Ptr<TBackend> _backend;
+			Ptr<TBackend> m_backend;
 		};
 
 		// template <typename TBackend, EResourceType type, EResourceSubType subtype>

@@ -18,11 +18,11 @@ namespace Platform {
 
 	struct OSDisplayDescriptor {
 #ifdef PLATFORM_WINDOWS
-		HMONITOR     _monitorHandle;
+		HMONITOR     m_monitorHandle;
 #endif
-		std::string  _name;
-		Engine::Rect _bounds;
-		bool         _isPrimary;
+		std::string  m_name;
+		Engine::Rect m_bounds;
+		bool         m_isPrimary;
 	};
 
 	DeclareListType(OSDisplayDescriptor, OSDisplayDescriptor);
@@ -45,19 +45,19 @@ namespace Platform {
 			} else {
 				OSDisplayDescriptor descriptor ={};
 
-				descriptor._monitorHandle = monitor;
-				descriptor._name          = String::toNarrowString(info.szDevice);
-				descriptor._bounds        = Rect(info.rcMonitor.left,
+				descriptor.m_monitorHandle = monitor;
+				descriptor.m_name          = String::toNarrowString(info.szDevice);
+				descriptor.m_bounds        = Rect(info.rcMonitor.left,
 												 info.rcMonitor.top,
 												 (info.rcMonitor.right - info.rcMonitor.left),
 												 (info.rcMonitor.bottom - info.rcMonitor.top));
-				descriptor._isPrimary     = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
+				descriptor.m_isPrimary     = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
 
 				Log::Status(logTag(), String::format("Found %0 monitor '%1' with display area: Location: %2, %3; Size: %4, %5",
-					(descriptor._isPrimary ? "[primary]" : "[additional]"),
-													 descriptor._name,
-													 descriptor._bounds._position.x(), descriptor._bounds._position.y(),
-													 descriptor._bounds._size.x(),     descriptor._bounds._size.y()));
+					(descriptor.m_isPrimary ? "[primary]" : "[additional]"),
+													 descriptor.m_name,
+													 descriptor.m_bounds.m_position.x(), descriptor.m_bounds.m_position.y(),
+													 descriptor.m_bounds.m_size.x(),     descriptor.m_bounds.m_size.y()));
 
 				pDescriptors->push_back(descriptor);
 

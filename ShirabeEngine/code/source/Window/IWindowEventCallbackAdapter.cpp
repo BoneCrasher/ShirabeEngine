@@ -18,7 +18,7 @@ namespace Engine {
 	}
 
 	WindowEventCallbackAdapter::WindowEventCallbackAdapter() 
-	    : _eventCallbacks()
+	    : m_eventCallbacks()
 	{}
 
 	WindowEventCallbackAdapter::~WindowEventCallbackAdapter() {
@@ -38,8 +38,8 @@ namespace Engine {
 		}
 
 		try {
-			std::lock_guard<std::mutex> guard(_eventCallbackMutex);
-			mutableCallbacks().insert(_eventCallbacks.end(), cb);
+			std::lock_guard<std::mutex> guard(m_eventCallbackMutex);
+			mutableCallbacks().insert(m_eventCallbacks.end(), cb);
 			return EEngineStatus::Ok;
 		} catch (...) {
 			return EEngineStatus::CollectionInsertException;
@@ -58,7 +58,7 @@ namespace Engine {
 		}
 
 		try {
-			std::lock_guard<std::mutex> guard(_eventCallbackMutex);
+			std::lock_guard<std::mutex> guard(m_eventCallbackMutex);
 			mutableCallbacks().erase(it);
 			return EEngineStatus::Ok;
 		} catch (...) {

@@ -17,7 +17,7 @@ namespace Engine {
 		public:
 			inline ResourceProxyFactory(
 				const Ptr<BasicGFXAPIResourceBackend>& backend)
-				: _gfxApiResourceBackend(backend)
+				: m_gfxApiResourceBackend(backend)
 			{ }
 
 			template <typename TResource>
@@ -36,7 +36,7 @@ namespace Engine {
 				case EResourceType::MESH:
 				case EResourceType::SHADER:
 				case EResourceType::TEXTURE:
-					proxy = MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(proxyType, _gfxApiResourceBackend, creationRequest);
+					proxy = MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(proxyType, m_gfxApiResourceBackend, creationRequest);
 					break;
 			    // Other
 				default:
@@ -47,7 +47,7 @@ namespace Engine {
 			}
 
 		private:
-			Ptr<BasicGFXAPIResourceBackend> _gfxApiResourceBackend;
+			Ptr<BasicGFXAPIResourceBackend> m_gfxApiResourceBackend;
 		};
 	}
 }

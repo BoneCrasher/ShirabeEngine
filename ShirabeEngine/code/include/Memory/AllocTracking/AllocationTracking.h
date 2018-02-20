@@ -14,12 +14,12 @@ namespace Engine {
 		// Used to track a call to new/new[] or delete/delete[]
 		class AllocLocationStamp {
 		public:
-			char const * const _pFile;
-			const size_t _line;
+			char const * const m_pFile;
+			const size_t m_line;
 
 		public:
 			AllocLocationStamp(const char *pFile, size_t line)
-				: _pFile(pFile), _line(line)
+				: m_pFile(pFile), m_line(line)
 			{ }
 
 			~AllocLocationStamp() { }
@@ -34,7 +34,7 @@ namespace Engine {
 
 		public:
 			~AllocationTracker();
-			static AllocationTracker *_instance;
+			static AllocationTracker *m_instance;
 
 		public:
 			template <typename T>

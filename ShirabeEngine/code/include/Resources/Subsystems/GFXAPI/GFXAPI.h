@@ -61,13 +61,13 @@ namespace Engine {
 		template <typename T>												                                      \
 		void setValue(const std::enable_if_t <u##sz##StorageCondition<T>::value, T >& in) \
 		{	                                                                                \
-		    const std::type_info& info = typeid(T);                                       \
-			_typeInfo      = GFXAPIResourceHolder::RTTI(info);	    	 	                    \
-			_handle._u##sz = static_cast<uint##sz##_t>(in);					                        \
+		  const std::type_info& info = typeid(T);                                         \
+			m_typeInfo      = GFXAPIResourceHolder::RTTI(info);	    	 	                    \
+			m_handle.m_u##sz = static_cast<uint##sz##_t>(in);					                      \
 		}
 
 	#define DefineField(sz) \
-		uint##sz##_t _u##sz;
+		uint##sz##_t m_u##sz;
 
 		DefineStorageCondition(32);
 		DefineStorageCondition(64);
@@ -83,8 +83,8 @@ namespace Engine {
 			};
 
 			GFXAPIResourceHolder()
-				: _handle((uint64_t)0)
-				, _typeInfo(typeid(uint8_t))
+				: m_handle((uint64_t)0)
+				, m_typeInfo(typeid(uint8_t))
 			{
 			}
 
@@ -103,7 +103,7 @@ namespace Engine {
 				if( !strcmp(_typeInfo.info->name, typeid(T).name) == 0 )
 					return std::optional<T>();
 
-				return std::optional<T>(static_cast<T>(reinterpret_cast<void *>(_handle._u64)));
+				return std::optional<T>(static_cast<T>(reinterpret_cast<void *>(_handle.m_u64)));
 			}
 
 			template <typename T>
@@ -112,7 +112,7 @@ namespace Engine {
 				if( !strcmp(_typeInfo.info->name, typeid(T).name) == 0 )
 					return std::optional<T>();
 
-				return  std::optional<T>(static_cast<T>(_handle._u32));
+				return  std::optional<T>(static_cast<T>(_handle.m_u32));
 			}
 
 			template <typename T>
@@ -121,7 +121,7 @@ namespace Engine {
 				if( !strcmp(_typeInfo.info->name, typeid(T).name) == 0 )
 					return std::optional<T>();
 
-				return  std::optional<T>(static_cast<T>(_handle._u64));
+				return  std::optional<T>(static_cast<T>(_handle.m_u64));
 			}
 
 		private:
@@ -130,13 +130,13 @@ namespace Engine {
 				DefineField(32); // GL-Handle type
 				DefineField(64); // Non 64-bit Vk handle or 64-bit system pointer size type.
 
-				HandleStorage()           : _u32(0) {}
-				HandleStorage(uint32_t v) : _u32(v) {}
-				HandleStorage(uint64_t v) : _u64(v) {}
+				HandleStorage()           : m_u32(0) {}
+				HandleStorage(uint32_t v) : m_u32(v) {}
+				HandleStorage(uint64_t v) : m_u64(v) {}
 
-			} _handle;
+			} m_handle;
 
-			RTTI _typeInfo;
+			RTTI m_typeInfo;
 		};
 
 		struct test

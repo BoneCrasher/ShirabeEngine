@@ -24,29 +24,29 @@ namespace Engine {
 	class Camera {
 	public:
 		struct FrustumParameters {
-			float _fovY;
-			float _width;
-			float _height;
-			float _nearPlaneDistance;
-			float _farPlaneDistance;
+			float m_fovY;
+			float m_width;
+			float m_height;
+			float m_nearPlaneDistance;
+			float m_farPlaneDistance;
 
 			static FrustumParameters Default() {
 				FrustumParameters p;
-				p._fovY              = (float)M_PI / 4.0f;
-				p._width             = 1;
-				p._height            = 1;
-				p._nearPlaneDistance = 0.0f;
-				p._farPlaneDistance  = 1.0f;
+				p.m_fovY              = (float)M_PI / 4.0f;
+				p.m_width             = 1;
+				p.m_height            = 1;
+				p.m_nearPlaneDistance = 0.0f;
+				p.m_farPlaneDistance  = 1.0f;
 				return p;
 			}
 		};
 
 		struct ProjectionParameters {
-			CameraProjectionType _projectionType;
+			CameraProjectionType m_projectionType;
 
 			static ProjectionParameters Default() {
 				ProjectionParameters p;
-				p._projectionType = CameraProjectionType::Perspective;
+				p.m_projectionType = CameraProjectionType::Perspective;
 				return p;
 			}
 		};
@@ -59,29 +59,29 @@ namespace Engine {
 			   const Vector3D& lookAt = Vector3D(0.0f, 0.0f, 0.0f));
 		~Camera();
 
-		const CameraViewType&       viewType()             const { return _viewType; }
-		const FrustumParameters&    frustumParameters()    const { return _frustumParameters; }
-		const ProjectionParameters& projectionParameters() const { return _projectionParameters; }
-		const Vector3D&             lookAtTarget()         const { return _lookAtTarget; }
+		const CameraViewType&       viewType()             const { return m_viewType; }
+		const FrustumParameters&    frustumParameters()    const { return m_frustumParameters; }
+		const ProjectionParameters& projectionParameters() const { return m_projectionParameters; }
+		const Vector3D&             lookAtTarget()         const { return m_lookAtTarget; }
 
-		inline const Matrix4x4& world()      const { return _transform.world(); }
-		inline const Matrix4x4& view()       const { return _viewMatrix; }
-		inline const Matrix4x4& projection() const { return _projectionMatrix; }
+		inline const Matrix4x4& world()      const { return m_transform.world(); }
+		inline const Matrix4x4& view()       const { return m_viewMatrix; }
+		inline const Matrix4x4& projection() const { return m_projectionMatrix; }
 
 	private:
 
 		void createViewMatrix();
 		void createProjectionMatrix();
 
-		CameraViewType       _viewType;
-		FrustumParameters    _frustumParameters;
-		ProjectionParameters _projectionParameters;
-		Vector3D             _lookAtTarget;
+		CameraViewType       m_viewType;
+		FrustumParameters    m_frustumParameters;
+		ProjectionParameters m_projectionParameters;
+		Vector3D             m_lookAtTarget;
 
-		Transform _transform;
+		Transform m_transform;
 
-		Matrix4x4 _viewMatrix;
-		Matrix4x4 _projectionMatrix;
+		Matrix4x4 m_viewMatrix;
+		Matrix4x4 m_projectionMatrix;
 	};
 }
 

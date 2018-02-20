@@ -15,17 +15,17 @@ namespace Engine {
 			using ResourceID_t = uint64_t;
 
 			inline ResourceHandle()
-				: _id(ResourceHandle::randomIdGenerator())
-				, _name("")
-				, _type(EResourceType::UNKNOWN)
-				, _subtype(EResourceSubType::UNKNOWN)
+				: m_id(ResourceHandle::randomIdGenerator())
+				, m_name("")
+				, m_type(EResourceType::UNKNOWN)
+				, m_subtype(EResourceSubType::UNKNOWN)
 			{}
 
 			inline ResourceHandle(const ResourceHandle& other)
-				: _id(other.id())
-				, _name(other.name())
-				, _type(other.type())
-				, _subtype(other.subtype())
+				: m_id(other.id())
+				, m_name(other.name())
+				, m_type(other.type())
+				, m_subtype(other.subtype())
 			{ }
 
 			inline ResourceHandle(
@@ -33,10 +33,10 @@ namespace Engine {
 				const EResourceType    &type,
 				const EResourceSubType &subtype
 			)
-				: _id(ResourceHandle::randomIdGenerator())
-				, _name(name)
-				, _type(type)
-				, _subtype(subtype)
+				: m_id(ResourceHandle::randomIdGenerator())
+				, m_name(name)
+				, m_type(type)
+				, m_subtype(subtype)
 			{ }
 
 			virtual inline ~ResourceHandle() { }
@@ -46,19 +46,19 @@ namespace Engine {
 			}
 
 			inline ResourceID_t id() const {
-				return _id;
+				return m_id;
 			}
 
 			inline std::string name() const {
-				return _name;
+				return m_name;
 			}
 
 			inline EResourceType type() const {
-				return _type;
+				return m_type;
 			}
 
 			inline EResourceSubType subtype() const {
-				return _subtype;
+				return m_subtype;
 			}
 
       static const ResourceHandle Invalid() {
@@ -75,14 +75,14 @@ namespace Engine {
 
 		private:
 			inline static ResourceID_t randomIdGenerator() {
-				static Random::RandomState _randomIdGenerator; // Todo: CRTP. dervie the random generator from something to make sure it is unique in a context, not system global.
-				return _randomIdGenerator.next();
+				static Random::RandomState m_randomIdGenerator; // Todo: CRTP. dervie the random generator from something to make sure it is unique in a context, not system global.
+				return m_randomIdGenerator.next();
 			}
   
-			ResourceID_t     _id;
-			std::string      _name;
-			EResourceType    _type;
-			EResourceSubType _subtype;
+			ResourceID_t     m_id;
+			std::string      m_name;
+			EResourceType    m_type;
+			EResourceSubType m_subtype;
 		};
 		DeclareListType(ResourceHandle, ResourceHandle);
 		

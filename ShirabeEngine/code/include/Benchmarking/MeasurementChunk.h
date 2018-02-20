@@ -28,14 +28,14 @@ namespace Engine {
 		public:
 			/* Return a const reference to the contained parameter to protect it
 			 * from being changed without having to copy it. */
-			virtual const param_type& parameter() const { return _parameter; }
+			virtual const param_type& parameter() const { return m_parameter; }
 			/* Return a const reference to the contained value to protect it
 			 * from being changed without having to copy it */
-			virtual const value_type&     value()     const { return _value; }
+			virtual const value_type&     value()     const { return m_value; }
 
 		protected:
-			param_type _parameter;
-			value_type     _value;
+			param_type m_parameter;
+			value_type     m_value;
 
 			/* Stream operators for printing to console or basic stream derivates. */
 			friend std::basic_ostream<char> operator<<(std::basic_ostream<char>&                       strm,

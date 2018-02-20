@@ -22,11 +22,11 @@ namespace Engine {
 				EEngineStatus deinitialize();
 
 				inline IDXDevice::InternalDevicePtr& internalDevice() {
-					return _internalDevice;
+					return m_internalDevice;
 				}
 
 			private:
-				IDXDevice::InternalDevicePtr _internalDevice;
+				IDXDevice::InternalDevicePtr m_internalDevice;
 			};
 		}
 	}

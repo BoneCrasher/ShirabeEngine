@@ -73,16 +73,16 @@ namespace Engine {
 
 		void setTimeInterface(const TimePtr&);
 
-		TimePtr                  _timeInterface;
-		internal_time_value_type _conversionConstant;
+		TimePtr                  m_timeInterface;
+		internal_time_value_type m_conversionConstant;
 
-		internal_time_value_type _initial;
-		internal_time_value_type _current;
-		internal_time_value_type _elapsed;
+		internal_time_value_type m_initial;
+		internal_time_value_type m_current;
+		internal_time_value_type m_elapsed;
 
-		FPSDataStore _dataStore;
-		double       _chunkPushCounter;
-		int          _frames;
+		FPSDataStore m_dataStore;
+		double       m_chunkPushCounter;
+		int          m_frames;
 	};
 
 }

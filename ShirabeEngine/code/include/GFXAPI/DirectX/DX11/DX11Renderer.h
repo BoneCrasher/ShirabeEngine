@@ -43,23 +43,17 @@ namespace Engine {
         EEngineStatus render(/* insert queue type*/);
 
       private:
-        RendererConfiguration _config;
-        IResourceManagerPtr   _resourceManager;
+        RendererConfiguration m_config;
+        IResourceManagerPtr   m_resourceManager;
 
-        Ptr<DX11Environment> _dx11Environment;
+        Ptr<DX11Environment> m_dx11Environment;
 
-        // Fixed DX component handles and resources
-        Ptr<SwapChain>             _swapChain;
-        
-        ID3D11RenderTargetViewPtr  _backBufferRTV;
-        ID3D11Texture2DPtr         _depthStencilTexture;
-        ID3D11DepthStencilViewPtr  _depthStencilView;
+        PublicResourceId_t
+          m_swapChainId,
+          m_defaultDepthStencilTextureId,
+          m_defaultDepthStencilStateId;
 
-        // Mutable DX component states
-        ID3D11DepthStencilStatePtr _depthStencilState;
-        ID3D11RasterizerStatePtr   _rasterizerState;
-
-        std::atomic_bool _paused;
+        std::atomic_bool m_paused;
       };
 
     }

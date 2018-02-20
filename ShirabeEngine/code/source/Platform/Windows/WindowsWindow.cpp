@@ -5,20 +5,20 @@ namespace Platform {
 	namespace Windows {
 
 		WindowsWindow::WindowsWindow(
-			const std::string                 &name,
-			const Rect                        &initialBounds
-		) : IWindow(),
-			IWinAPIAdapter(),
-			_name(name),
-			_bounds(initialBounds),
-			_handleWrapper((HWND) 0),
-			_active(false)
+			const std::string &name,
+			const Rect        &initialBounds
+		) : IWindow()
+			, IWinAPIAdapter()
+			, m_name(name)
+			, m_bounds(initialBounds)
+			, m_handleWrapper((HWND) 0)
+			, m_active(false)
 		{
 		}
 
 		WindowsWindow::~WindowsWindow() {
-			if (_active.load()) {
-				_active.store(false);
+			if (m_active.load()) {
+				m_active.store(false);
 			}
 		}
 		
@@ -49,9 +49,9 @@ namespace Platform {
 
 		EEngineStatus WindowsWindow::resume() {
 			try {
-				_active.store(true);
+				m_active.store(true);
 
-				_callbackAdapter.onResume(GetNonDeletingSelfPtrType(this));
+				m_callbackAdapter.onResume(GetNonDeletingSelfPtrType(this));
 				return EEngineStatus::Ok;
 			}
 			catch (...) {
@@ -61,13 +61,13 @@ namespace Platform {
 		}
 
 		EEngineStatus WindowsWindow::update() {
-			if (!_active.load())
+			if (!m_active.load())
 				return EEngineStatus::Ok;
 
 			MSG winAPIMessage;
 
 			try {
-				if (PeekMessage(&winAPIMessage, _handleWrapper.handle(), 0, 0, PM_REMOVE)) {
+				if (PeekMessage(&winAPIMessage, m_handleWrapper.handle(), 0, 0, PM_REMOVE)) {
 					TranslateMessage(&winAPIMessage);
 					DispatchMessage(&winAPIMessage);
 				}
@@ -83,9 +83,9 @@ namespace Platform {
 
 		EEngineStatus WindowsWindow::pause() {
 			try {
-				_active.store(false);
+				m_active.store(false);
 
-				_callbackAdapter.onPause(GetNonDeletingSelfPtrType(this));
+				m_callbackAdapter.onPause(GetNonDeletingSelfPtrType(this));
 				return EEngineStatus::Ok;
 			}
 			catch (...) {
@@ -98,7 +98,7 @@ namespace Platform {
 		// IWinAPIAdapter implementation
 		//
 		void WindowsWindow::onCreate(const HWND& handle) {
-			_handleWrapper = WindowHandleWrapper(handle);
+			m_handleWrapper = WindowHandleWrapper(handle);
 
 		}
 
@@ -107,11 +107,11 @@ namespace Platform {
 		}
 
 		void WindowsWindow::onShow() {
-			_callbackAdapter.onShow(GetNonDeletingSelfPtrType(this));
+			m_callbackAdapter.onShow(GetNonDeletingSelfPtrType(this));
 		}
 
 		void WindowsWindow::onHide() {
-			_callbackAdapter.onHide(GetNonDeletingSelfPtrType(this));
+			m_callbackAdapter.onHide(GetNonDeletingSelfPtrType(this));
 		}
 
 		void WindowsWindow::onDisabled() {
@@ -119,23 +119,23 @@ namespace Platform {
 		}
 
 		void WindowsWindow::onClose() {
-			_callbackAdapter.onClose(GetNonDeletingSelfPtrType(this));
+			m_callbackAdapter.onClose(GetNonDeletingSelfPtrType(this));
 		}
 
 
 		void WindowsWindow::onMove(const long& x,
 								   const long& y) {
-			_bounds._position.x() = x;
-			_bounds._position.y() = y;
+			m_bounds.m_position.x() = x;
+			m_bounds.m_position.y() = y;
 
-			_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), _bounds);
+			m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
 		}
 		void WindowsWindow::onResize(const long& width,
 									 const long& height) {
-			_bounds._size.x() = width;
-			_bounds._size.y() = height;
+			m_bounds.m_size.x() = width;
+			m_bounds.m_size.y() = height;
 
-			_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), _bounds);
+			m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
 		}
 		
 		//

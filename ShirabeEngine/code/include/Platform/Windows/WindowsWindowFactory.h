@@ -23,7 +23,7 @@ namespace Platform {
 				                    const Rect        &initialBounds);
 
 		private:
-			HINSTANCE _instanceHandle;
+			HINSTANCE m_instanceHandle;
 		};
 
 	}

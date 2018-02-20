@@ -9,18 +9,18 @@
 namespace Engine {
 
 	Camera::Camera()
-		: _viewType(CameraViewType::FreeCamera),
-		_frustumParameters(FrustumParameters::Default()),
-		_projectionParameters(ProjectionParameters::Default()),
-		_lookAtTarget({ 0, 0, 0 })
+		: m_viewType(CameraViewType::FreeCamera)
+		, m_frustumParameters(FrustumParameters::Default())
+		, m_projectionParameters(ProjectionParameters::Default())
+		, m_lookAtTarget({ 0, 0, 0 })
 	{
 	}
 
 	Camera::Camera(const Camera& cam)
-		: _viewType(cam.viewType()),
-		  _frustumParameters(cam.frustumParameters()),
-		  _projectionParameters(cam.projectionParameters()),
-		  _lookAtTarget(cam.lookAtTarget())
+		: m_viewType(cam.viewType())
+		, m_frustumParameters(cam.frustumParameters())
+		, m_projectionParameters(cam.projectionParameters())
+		, m_lookAtTarget(cam.lookAtTarget())
 	{
 	}
 
@@ -28,10 +28,10 @@ namespace Engine {
 				   const FrustumParameters&    frustumParameters,
 				   const ProjectionParameters& projectionParameters,
 				   const Vector3D&             lookAt)
-		: _viewType(viewType),
-		  _frustumParameters(frustumParameters),
-		  _projectionParameters(projectionParameters),
-		  _lookAtTarget(lookAt)
+		: m_viewType(viewType)
+		, m_frustumParameters(frustumParameters)
+		, m_projectionParameters(projectionParameters)
+		, m_lookAtTarget(lookAt)
 	{
 	}
 	
@@ -48,23 +48,23 @@ namespace Engine {
 		XMVECTOR position;
 		XMVECTOR up;
 
-		XMVectorFromVector4D(_transform.translation(), position);
-		XMVectorFromVector4D(_transform.up(), up);
+		XMVectorFromVector4D(m_transform.translation(), position);
+		XMVectorFromVector4D(m_transform.up(), up);
 
-		switch (_viewType) {
+		switch (m_viewType) {
 		case CameraViewType::TargetCamera:
 			XMVECTOR focus;
-			XMVectorFromVector4D(_lookAtTarget, focus);
+			XMVectorFromVector4D(m_lookAtTarget, focus);
 			mat = XMMatrixLookAtLH(position, focus, up);
 			break;
 		case CameraViewType::FreeCamera:
 			XMVECTOR dir;
-			XMVectorFromVector4D(_transform.forward(), dir);
+			XMVectorFromVector4D(m_transform.forward(), dir);
 			mat = XMMatrixLookToLH(position, dir, up);
 			break;
 		}
 
-		Matrix4x4FromXMMatrix(mat, _viewMatrix);
+		Matrix4x4FromXMMatrix(mat, m_viewMatrix);
 #endif
 	}
 
@@ -74,22 +74,22 @@ namespace Engine {
 		using namespace Platform::Math;
 
 		XMMATRIX mat;
-		switch (_projectionParameters._projectionType) {
+		switch (m_projectionParameters.m_projectionType) {
 		case CameraProjectionType::Perspective:
-			mat = XMMatrixPerspectiveFovLH(_frustumParameters._fovY,
-										   _frustumParameters._width / _frustumParameters._height,
-										   _frustumParameters._nearPlaneDistance,
-										   _frustumParameters._farPlaneDistance);
+			mat = XMMatrixPerspectiveFovLH(m_frustumParameters.m_fovY,
+										   m_frustumParameters.m_width / m_frustumParameters.m_height,
+										   m_frustumParameters.m_nearPlaneDistance,
+										   m_frustumParameters.m_farPlaneDistance);
 			break;
 		case CameraProjectionType::Orthographic:
-			mat = XMMatrixOrthographicLH(_frustumParameters._width, 
-										 _frustumParameters._height, 
-										 _frustumParameters._nearPlaneDistance,
-										 _frustumParameters._farPlaneDistance);
+			mat = XMMatrixOrthographicLH(m_frustumParameters.m_width, 
+										 m_frustumParameters.m_height, 
+										 m_frustumParameters.m_nearPlaneDistance,
+										 m_frustumParameters.m_farPlaneDistance);
 			break;
 		}
 
-		Matrix4x4FromXMMatrix(mat, _projectionMatrix);
+		Matrix4x4FromXMMatrix(mat, m_projectionMatrix);
 #endif
 	}
 }

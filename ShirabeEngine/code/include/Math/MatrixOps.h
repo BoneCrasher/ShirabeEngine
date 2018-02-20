@@ -142,7 +142,7 @@ namespace Engine {
 
 
 			template <typename val_type>
-			// Get the minor in _mat for the element a(i, j).
+			// Get the minor in m_mat for the element a(i, j).
 			inline void __shirabe_math__matrix_get_minor(
 				const val_type  *pMat,
 				const size_t     m,
@@ -189,7 +189,7 @@ namespace Engine {
 			};
 
 			template <typename val_type>
-			// Get the cofactor for the element a(i, j) of _mat.
+			// Get the cofactor for the element a(i, j) of m_mat.
 			inline void __shirabe_math__matrix_get_cofactor(
 				const val_type *pMat,
 				const size_t    m,
@@ -209,14 +209,14 @@ namespace Engine {
 				else
 					__shirabe_math__matrix_determinant_sarrus<val_type>(pMinor, &det);
 
-				//__shirabe_math__matrix_determinant_gauss_jordan<_m - 1, _n - 1, val_type>(minor, &det);
+				//__shirabe_math__matrix_determinant_gauss_jordan<_m - 1, m_n - 1, val_type>(minor, &det);
 
 				*pCofactor = powf(-1, (i + j))*det;
 
 			};
 
 			template <typename val_type, size_t m, size_t n>
-			// Get the cofactor matrix of _mat.
+			// Get the cofactor matrix of m_mat.
 			inline void __shirabe_math__matrix_get_cofactor_matrix(
 				const val_type *pMat,
 				val_type       *pCofactor_mat)
@@ -237,14 +237,14 @@ namespace Engine {
 
 
 			template <size_t m, size_t n, typename val_type>
-			// Apply the gauss-jordan-elimination-algorithm to _mat.
+			// Apply the gauss-jordan-elimination-algorithm to m_mat.
 			//
 			// By default the algorithm returns the echelon form of the upper triangle matrix.
-			// To return the reduced echelon form set _pivot to true.
+			// To return the reduced echelon form set m_pivot to true.
 			//
 			// Optionally the parity caused by elemental row transforms can be returned.
-			// If a pointer is passed for _inv, returning the inverse matrix of _mat, _pivot must be 
-			// set to true, as well as a pointer passed for _parity.
+			// If a pointer is passed for m_inv, returning the inverse matrix of m_mat, m_pivot must be 
+			// set to true, as well as a pointer passed for m_parity.
 			void __shirabe_math__matrix_gauss_jordan(
 				val_type *pMat, 
 				bool      pivot   = false,

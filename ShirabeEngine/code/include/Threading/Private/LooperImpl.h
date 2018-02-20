@@ -7,16 +7,16 @@ namespace Engine{
 		template <typename TTaskResult>
 		ILooper<TTaskResult>::Task
 			::Task()
-			: _priority(Priority::Normal)
-			, _task()
+			: m_priority(Priority::Normal)
+			, m_task()
 		{ }
 
 		template <typename TTaskResult>
 		std::future<TTaskResult> ILooper<TTaskResult>::Task
 			::bind(std::function<TTaskResult()>& fn)
 		{
-			_task = std::packaged_task<TTaskResult()>(fn);
-			return std::move(_task.get_future());
+			m_task = std::packaged_task<TTaskResult()>(fn);
+			return std::move(m_task.get_future());
 		}
 		
 		/**********************************************************************************************//**

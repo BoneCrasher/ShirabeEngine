@@ -15,12 +15,12 @@ namespace Platform {
 #endif
 
 			inline explicit WindowHandleWrapper(const Handle& handle)
-				: _handle(handle) {}
+				: m_handle(handle) {}
 
-			inline const Handle& handle() const { return _handle; }
+			inline const Handle& handle() const { return m_handle; }
 
 		private:
-			Handle _handle;
+			Handle m_handle;
 		};
 
 	}

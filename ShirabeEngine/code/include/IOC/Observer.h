@@ -61,7 +61,7 @@ namespace Engine {
 			using ObserverFwdFn = std::function<void(observer_type_ptr, Args&&...)>;
 
 			inline Subject() 
-				: _observers() {}
+				: m_observers() {}
 
 			/**********************************************************************************************//**
 			 * \fn	bool Subject::observe(TPtr observer)
@@ -73,8 +73,8 @@ namespace Engine {
 			 * \return	True if it succeeds, false if it fails.
 			 **************************************************************************************************/
 			bool observe(observer_type_ptr observer) {
-				typename observer_list::const_iterator it = std::find(_observers.begin(), _observers.end(), observer);
-				if (it != _observers.end())
+				typename observer_list::const_iterator it = std::find(_observers.begin(), m_observers.end(), observer);
+				if (it != m_observers.end())
 					return false;
 				else {
 					_observers.push_back(observer);
@@ -88,8 +88,8 @@ namespace Engine {
 			 * @return
 			 */
 			bool ignore(observer_type_ptr observer) {
-				typename observer_list::const_iterator it = std::find(_observers.begin(), _observers.end(), observer);
-				if (it == _observers.end())
+				typename observer_list::const_iterator it = std::find(_observers.begin(), m_observers.end(), observer);
+				if (it == m_observers.end())
 					return false;
 				else {
 					_observers.remove(observer);
@@ -105,12 +105,12 @@ namespace Engine {
 			void notify(ObserverFwdFn<Args...> fn, Args... args) {
 				if (!fn) return;
 
-				for (observer_type_ptr observer : _observers)
+				for (observer_type_ptr observer : m_observers)
 					fn(observer, std::forward<Args>(args)...);
 			}
 
 		private:
-			observer_list _observers;
+			observer_list m_observers;
 		};
 
 		/**********************************************************************************************//**

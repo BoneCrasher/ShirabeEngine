@@ -1,5 +1,5 @@
-#ifndef _TIMESPANUNIT_H_
-#define _TIMESPANUNIT_H_
+#ifndef __TIMESPANUNIT_H__
+#define __TIMESPANUNIT_H__
 
 #include <string>
 
@@ -51,23 +51,23 @@ namespace Engine {
             }
         }
 
-        operator int() const { return _value; }
-        operator std::string() const { return _name; }
+        operator int() const { return m_value; }
+        operator std::string() const { return m_name; }
 
-        int         _value;
-        std::string _name;
+        int         m_value;
+        std::string m_name;
     } eTimespanUnit;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function" // Deactivated since these functions are not used by all static-lib-linkers and might cause those warnings depending on where it's linked.
-    static bool operator<(ETimespanUnit l, ETimespanUnit r) { return l._value < r._value; }
-    static bool operator>(ETimespanUnit l, ETimespanUnit r) { return l._value > r._value; }
-    static bool operator==(ETimespanUnit l, ETimespanUnit r) { return l._value == r._value; }
+    static bool operator<(ETimespanUnit l, ETimespanUnit r) { return l.m_value < r.m_value; }
+    static bool operator>(ETimespanUnit l, ETimespanUnit r) { return l.m_value > r.m_value; }
+    static bool operator==(ETimespanUnit l, ETimespanUnit r) { return l.m_value == r.m_value; }
     static bool operator<=(ETimespanUnit l, ETimespanUnit r) { return l < r || l == r; }
     static bool operator>=(ETimespanUnit l, ETimespanUnit r) { return l > r || l == r; }
 #pragma GCC diagnostic pop
 
 }
 
-#endif // _TIMESPANUNIT_H_
+#endif // m_TIMESPANUNIT_H_
 

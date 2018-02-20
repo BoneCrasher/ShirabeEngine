@@ -1,5 +1,5 @@
-#ifndef _SHIRABE_CORE__TYPE_BASED_MEMORY_ALLOCATOR_H_
-#define _SHIRABE_CORE__TYPE_BASED_MEMORY_ALLOCATOR_H_
+#ifndef m_SHIRABE_CORE__TYPE_BASED_MEMORY_ALLOCATOR_H_
+#define m_SHIRABE_CORE__TYPE_BASED_MEMORY_ALLOCATOR_H_
 
 #include <stddef.h>
 #include <xmemory0>
@@ -80,9 +80,9 @@ namespace Engine {
 			return operator==(static_cast<PolicyT&>(lhs), static_cast<PolicyU&>(rhs));
 		};
 
-		template<typename T, typename PolicyT, typename TraitsT, typename _OtherAllocator>
+		template<typename T, typename PolicyT, typename TraitsT, typename m_OtherAllocator>
 		inline bool operator==(AllocatorBase<T, PolicyT, TraitsT> const& lhs,
-							   _OtherAllocator                    const& rhs)
+							   m_OtherAllocator                    const& rhs)
 		{
 			return operator==(static_cast<PolicyT&>(lhs), rhs);
 		};
@@ -102,9 +102,9 @@ namespace Engine {
 			return !operator==(lhs, rhs);
 		};
 
-		template<typename T, typename PolicyT, typename TraitsT, typename _OtherAllocator>
+		template<typename T, typename PolicyT, typename TraitsT, typename m_OtherAllocator>
 		inline bool operator!=(AllocatorBase<T, PolicyT, TraitsT> const& lhs,
-							   _OtherAllocator                    const& rhs)
+							   m_OtherAllocator                    const& rhs)
 		{
 			return !operator==(lhs, rhs);
 		};

@@ -25,7 +25,7 @@ namespace Engine {
 
 	EEngineStatus Entity::update(const Timer& timer) {
 		EEngineStatus componentUpdateStatus = EEngineStatus::Ok;
-		for (IComponentPtr component : _components) {
+		for (IComponentPtr component : m_components) {
 			componentUpdateStatus = component->update(timer);
 			if (CheckEngineError(componentUpdateStatus)) {
 				Log::Error(logTag(), 

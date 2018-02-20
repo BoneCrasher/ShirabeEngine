@@ -176,6 +176,7 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_TextureND.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\DepthStencilState.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\DepthStencilView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\RasterizerState.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\RenderTargetView.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\ShaderResourceView.cpp" />
     <ClCompile Include="code\source\Math\AxisAngle.cpp" />
@@ -228,9 +229,11 @@
     <ClInclude Include="code\include\GFXAPI\GFXAPIDeviceCapabilities.h" />
     <ClInclude Include="code\include\GFXAPI\IRenderer.h" />
     <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
+    <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilState.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilView.h" />
     <ClInclude Include="code\include\GFXAPI\Types\All.h" />
     <ClInclude Include="code\include\GFXAPI\Types\DepthStencilState.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\RasterizerState.h" />
     <ClInclude Include="code\include\GFXAPI\Types\RequestDefaultImplementation.h" />
     <ClInclude Include="code\include\GFXAPI\Types\TextureNDDefinition.h" />
     <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />

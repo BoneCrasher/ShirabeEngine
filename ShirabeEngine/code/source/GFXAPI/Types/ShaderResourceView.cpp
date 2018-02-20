@@ -36,7 +36,7 @@ namespace Engine {
         Descriptor     const&desc,
         ResourceHandle const&underlyingBufferHandle)
       : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-      , _underlyingBufferHandle(underlyingBufferHandle)
+      , m_underlyingBufferHandle(underlyingBufferHandle)
     {}
 
     std::string
@@ -70,7 +70,7 @@ namespace Engine {
       ShaderResourceViewDeclaration::CreationRequest
       ::underlyingBufferHandle() const
     {
-      return _underlyingBufferHandle;
+      return m_underlyingBufferHandle;
     }
 
     std::string

@@ -45,23 +45,23 @@ namespace Engine {
 				return iterator;
 
 					// Shallow cpy only. Do not separately define!
-					/*MatrixRowIterator<T, _n>(const class_type& cpy)
+					/*MatrixRowIterator<T, m_n>(const class_type& cpy)
 					{
 					}*/
 			}
 
-			inline value_type *ptr() { return _row; }
+			inline value_type *ptr() { return m_row; }
 			inline const_value_type const_ptr() const { return const_cast<const_value_type>(_row); }
 
 			inline const_value_type operator[](size_t index) {
-				if (index >= _n)
+				if (index >= m_n)
 					throw new std::invalid_argument("Index out of accessor bounds.");
 
 				return const_cast<const_value_type>(*(_row + index));
 			}
 		private:
-			value_type* _row;
-			size_t      _row_off;
+			value_type* m_row;
+			size_t      m_row_off;
 		};
 
 		template <size_t row_count = 4, size_t col_count = 4>
@@ -138,7 +138,7 @@ namespace Engine {
 
 		private:
 			// Algorithm: additions
-			void _matrix_op__add(value_type       *lptr, 
+			void m_matrix_op__add(value_type       *lptr, 
 								 const value_type *rptr) const {
 				size_t off = 0;
 
@@ -151,7 +151,7 @@ namespace Engine {
 			}
 
 			// Algorithm: inverse addition
-			void _matrix_op__subtract(value_type       *lptr, 
+			void m_matrix_op__subtract(value_type       *lptr, 
 									  const value_type *rptr) const
 			{
 				size_t off = 0;
@@ -166,7 +166,7 @@ namespace Engine {
 			}
 
 			// Algorithm: scalar multiplication
-			void _matrix_op__scale(value_type       *lptr, 
+			void m_matrix_op__scale(value_type       *lptr, 
 								   const value_type  rfactor) const
 			{
 				size_t off = 0;
@@ -274,8 +274,8 @@ namespace Engine {
 				: SquareMatrix<2>(source)
 			{}
 
-			Matrix2x2(const base_type& _basecpy) 
-				: base_type(_basecpy) 
+			Matrix2x2(const base_type& basecpy) 
+				: base_type(basecpy) 
 			{}
 
 			Matrix2x2(const Matrix2x2& cpy)
@@ -284,15 +284,15 @@ namespace Engine {
 
 			virtual ~Matrix2x2() {}
 
-			inline const value_type& r00() const { return _field[0]; }
-			inline const value_type& r01() const { return _field[1]; }
-			inline const value_type& r10() const { return _field[2]; }
-			inline const value_type& r11() const { return _field[3]; }
+			inline const value_type& r00() const { return m_field[0]; }
+			inline const value_type& r01() const { return m_field[1]; }
+			inline const value_type& r10() const { return m_field[2]; }
+			inline const value_type& r11() const { return m_field[3]; }
 
-			inline const value_type& r00(const value_type& v) { return (_field[0] = v); }
-			inline const value_type& r01(const value_type& v) { return (_field[1] = v); }
-			inline const value_type& r10(const value_type& v) { return (_field[2] = v); }
-			inline const value_type& r11(const value_type& v) { return (_field[3] = v); }
+			inline const value_type& r00(const value_type& v) { return (m_field[0] = v); }
+			inline const value_type& r01(const value_type& v) { return (m_field[1] = v); }
+			inline const value_type& r10(const value_type& v) { return (m_field[2] = v); }
+			inline const value_type& r11(const value_type& v) { return (m_field[3] = v); }
 		public:
 			virtual inline const_value_type determinant() const	{
 				value_type det = 0;
@@ -327,25 +327,25 @@ namespace Engine {
 			
 			virtual ~Matrix3x3() {}
 
-			inline const value_type& r00() const { return _field[0]; }
-			inline const value_type& r01() const { return _field[1]; }
-			inline const value_type& r02() const { return _field[2]; }
-			inline const value_type& r10() const { return _field[3]; }
-			inline const value_type& r11() const { return _field[4]; }
-			inline const value_type& r12() const { return _field[5]; }
-			inline const value_type& r20() const { return _field[6]; }
-			inline const value_type& r21() const { return _field[7]; }
-			inline const value_type& r22() const { return _field[8]; }
+			inline const value_type& r00() const { return m_field[0]; }
+			inline const value_type& r01() const { return m_field[1]; }
+			inline const value_type& r02() const { return m_field[2]; }
+			inline const value_type& r10() const { return m_field[3]; }
+			inline const value_type& r11() const { return m_field[4]; }
+			inline const value_type& r12() const { return m_field[5]; }
+			inline const value_type& r20() const { return m_field[6]; }
+			inline const value_type& r21() const { return m_field[7]; }
+			inline const value_type& r22() const { return m_field[8]; }
 
-			inline const value_type& r00(const value_type& v) { return (_field[0] = v); }
-			inline const value_type& r01(const value_type& v) { return (_field[1] = v); }
-			inline const value_type& r02(const value_type& v) { return (_field[2] = v); }
-			inline const value_type& r10(const value_type& v) { return (_field[3] = v); }
-			inline const value_type& r11(const value_type& v) { return (_field[4] = v); }
-			inline const value_type& r12(const value_type& v) { return (_field[5] = v); }
-			inline const value_type& r20(const value_type& v) { return (_field[6] = v); }
-			inline const value_type& r21(const value_type& v) { return (_field[7] = v); }
-			inline const value_type& r22(const value_type& v) { return (_field[8] = v); }
+			inline const value_type& r00(const value_type& v) { return (m_field[0] = v); }
+			inline const value_type& r01(const value_type& v) { return (m_field[1] = v); }
+			inline const value_type& r02(const value_type& v) { return (m_field[2] = v); }
+			inline const value_type& r10(const value_type& v) { return (m_field[3] = v); }
+			inline const value_type& r11(const value_type& v) { return (m_field[4] = v); }
+			inline const value_type& r12(const value_type& v) { return (m_field[5] = v); }
+			inline const value_type& r20(const value_type& v) { return (m_field[6] = v); }
+			inline const value_type& r21(const value_type& v) { return (m_field[7] = v); }
+			inline const value_type& r22(const value_type& v) { return (m_field[8] = v); }
 
 		public:
 			virtual inline const_value_type determinant() const {
@@ -382,39 +382,39 @@ namespace Engine {
 
 			virtual ~Matrix4x4() {}
 
-			inline const value_type& r00() const { return _field[0];  }
-			inline const value_type& r01() const { return _field[1];  }
-			inline const value_type& r02() const { return _field[2];  }
-			inline const value_type& r03() const { return _field[3];  }
-			inline const value_type& r10() const { return _field[4];  }
-			inline const value_type& r11() const { return _field[5];  }
-			inline const value_type& r12() const { return _field[6];  }
-			inline const value_type& r13() const { return _field[7];  }
-			inline const value_type& r20() const { return _field[8];  }
-			inline const value_type& r21() const { return _field[9];  }
-			inline const value_type& r22() const { return _field[10]; }
-			inline const value_type& r23() const { return _field[11]; }
-			inline const value_type& r30() const { return _field[12]; }
-			inline const value_type& r31() const { return _field[13]; }
-			inline const value_type& r32() const { return _field[14]; }
-			inline const value_type& r33() const { return _field[15]; }
+			inline const value_type& r00() const { return m_field[0];  }
+			inline const value_type& r01() const { return m_field[1];  }
+			inline const value_type& r02() const { return m_field[2];  }
+			inline const value_type& r03() const { return m_field[3];  }
+			inline const value_type& r10() const { return m_field[4];  }
+			inline const value_type& r11() const { return m_field[5];  }
+			inline const value_type& r12() const { return m_field[6];  }
+			inline const value_type& r13() const { return m_field[7];  }
+			inline const value_type& r20() const { return m_field[8];  }
+			inline const value_type& r21() const { return m_field[9];  }
+			inline const value_type& r22() const { return m_field[10]; }
+			inline const value_type& r23() const { return m_field[11]; }
+			inline const value_type& r30() const { return m_field[12]; }
+			inline const value_type& r31() const { return m_field[13]; }
+			inline const value_type& r32() const { return m_field[14]; }
+			inline const value_type& r33() const { return m_field[15]; }
 
-			inline const value_type& r00(const value_type& v) { return (_field[0]  = v); }
-			inline const value_type& r01(const value_type& v) { return (_field[1]  = v); }
-			inline const value_type& r02(const value_type& v) { return (_field[2]  = v); }
-			inline const value_type& r03(const value_type& v) { return (_field[3]  = v); }
-			inline const value_type& r10(const value_type& v) { return (_field[4]  = v); }
-			inline const value_type& r11(const value_type& v) { return (_field[5]  = v); }
-			inline const value_type& r12(const value_type& v) { return (_field[6]  = v); }
-			inline const value_type& r13(const value_type& v) { return (_field[7]  = v); }
-			inline const value_type& r20(const value_type& v) { return (_field[8]  = v); }
-			inline const value_type& r21(const value_type& v) { return (_field[9]  = v); }
-			inline const value_type& r22(const value_type& v) { return (_field[10] = v); }
-			inline const value_type& r23(const value_type& v) { return (_field[11] = v); }
-			inline const value_type& r30(const value_type& v) { return (_field[12] = v); }
-			inline const value_type& r31(const value_type& v) { return (_field[13] = v); }
-			inline const value_type& r32(const value_type& v) { return (_field[14] = v); }
-			inline const value_type& r33(const value_type& v) { return (_field[15] = v); }
+			inline const value_type& r00(const value_type& v) { return (m_field[0]  = v); }
+			inline const value_type& r01(const value_type& v) { return (m_field[1]  = v); }
+			inline const value_type& r02(const value_type& v) { return (m_field[2]  = v); }
+			inline const value_type& r03(const value_type& v) { return (m_field[3]  = v); }
+			inline const value_type& r10(const value_type& v) { return (m_field[4]  = v); }
+			inline const value_type& r11(const value_type& v) { return (m_field[5]  = v); }
+			inline const value_type& r12(const value_type& v) { return (m_field[6]  = v); }
+			inline const value_type& r13(const value_type& v) { return (m_field[7]  = v); }
+			inline const value_type& r20(const value_type& v) { return (m_field[8]  = v); }
+			inline const value_type& r21(const value_type& v) { return (m_field[9]  = v); }
+			inline const value_type& r22(const value_type& v) { return (m_field[10] = v); }
+			inline const value_type& r23(const value_type& v) { return (m_field[11] = v); }
+			inline const value_type& r30(const value_type& v) { return (m_field[12] = v); }
+			inline const value_type& r31(const value_type& v) { return (m_field[13] = v); }
+			inline const value_type& r32(const value_type& v) { return (m_field[14] = v); }
+			inline const value_type& r33(const value_type& v) { return (m_field[15] = v); }
 		};
 
 		// Transposition functions. Will always return copies and leave the passed matrix unchanged.

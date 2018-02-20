@@ -211,25 +211,25 @@ namespace Engine {
         }
 
         Timespan()
-            : _internalValue(0)
+            : m_internalValue(0)
         {
         }
 
         Timespan(const my_type& otherToCopy)
-            : _internalValue(otherToCopy.totalSubseconds()) {
+            : m_internalValue(otherToCopy.totalSubseconds()) {
         }
 
         Timespan(my_type&& otherToMove)
-            : _internalValue(otherToMove.totalSubseconds()) {
+            : m_internalValue(otherToMove.totalSubseconds()) {
         }
 
         template <intmax_t iOtherBaseDenominator>
         Timespan(const Timespan<iOtherBaseDenominator>& other)
-            : _internalValue(chrono_duration_type(other).size())
+            : m_internalValue(chrono_duration_type(other).size())
         {}
 
         explicit Timespan(intmax_t initialValue)
-            : _internalValue(initialValue) {
+            : m_internalValue(initialValue) {
         }
 
         explicit Timespan(int days,
@@ -242,7 +242,7 @@ namespace Engine {
                     + std::chrono::minutes(minutes)
                     + std::chrono::hours(hours)
                     + std::chrono::duration<int, std::ratio<86400, 1>>(days);
-            _internalValue = tmp;
+            m_internalValue = tmp;
         }
 
         inline Timespan<iSubsecondUnits> base() { return Factory::create(1); }
@@ -253,11 +253,11 @@ namespace Engine {
         inline int hours()   const { return  ((int) totalHours() % 24); }
         inline int days()    const { return  ((int) totalDays() % 365); }
 
-        inline double totalSubseconds() const { return (double) _internalValue.size(); }
-        inline double totalSeconds()    const { return (double) _internalValue.size() / (double)iSubsecondUnits; }
-        inline double totalMinutes()    const { return (double) _internalValue.size() / (double)(iSubsecondUnits * 60); }
-        inline double totalHours()      const { return (double) _internalValue.size() / (double)(iSubsecondUnits * 60 * 60); }
-        inline double totalDays()       const { return (double) _internalValue.size() / (double)(iSubsecondUnits * 60 * 60 * 24); }
+        inline double totalSubseconds() const { return (double) m_internalValue.size(); }
+        inline double totalSeconds()    const { return (double) m_internalValue.size() / (double)iSubsecondUnits; }
+        inline double totalMinutes()    const { return (double) m_internalValue.size() / (double)(iSubsecondUnits * 60); }
+        inline double totalHours()      const { return (double) m_internalValue.size() / (double)(iSubsecondUnits * 60 * 60); }
+        inline double totalDays()       const { return (double) m_internalValue.size() / (double)(iSubsecondUnits * 60 * 60 * 24); }
 
         inline int compare(const ITimespanPtr& other) const
         { return compareImpl(other); }
@@ -303,7 +303,7 @@ namespace Engine {
             double factor = Timespan<iSubsecondUnits>::unitConversionFactorForUnit(eTimespanUnit::SubsecondsUnit(), unit);
             double final = distance * factor;
 
-            _internalValue = chrono_duration_type((intmax_t) final);
+            m_internalValue = chrono_duration_type((intmax_t) final);
         }
 
     private:
@@ -342,7 +342,7 @@ namespace Engine {
             return UnitConversionFactorImpl(iSubsecondUnits, from, to);
         }
 
-        chrono_duration_type _internalValue;
+        chrono_duration_type m_internalValue;
     };
 
     typedef Timespan<100> Timespan_t;
@@ -389,5 +389,5 @@ namespace Engine {
     }
 }
 
-#endif // _TIMESPAN_H_
+#endif // m_TIMESPAN_H_
 

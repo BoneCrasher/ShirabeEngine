@@ -12,18 +12,18 @@
 namespace Engine {
 
 	WindowManager::WindowManager()
-		: _windows(),
-		  _windowFactory(nullptr)
+		: m_windows(),
+		  m_windowFactory(nullptr)
 	{
 		
 	}
 
 	WindowManager::~WindowManager() {
-		if (!_windows.empty()) {
-			for (const IWindowPtr& pWindow : _windows) {
+		if (!m_windows.empty()) {
+			for (const IWindowPtr& pWindow : m_windows) {
 				Log::Warning(logTag(), String::format("Pending, non-finalized window instance found with name '%0'", pWindow->name()));
 			}
-			_windows.clear();
+			m_windows.clear();
 		}
 	}
 
@@ -31,11 +31,11 @@ namespace Engine {
 		const Platform::ApplicationEnvironment& environment
 	) {
 #ifdef PLATFORM_WINDOWS
-		_windowFactory = MakeSharedPointerType<Platform::Windows::WindowsWindowFactory>(environment.instanceHandle);
+		m_windowFactory = MakeSharedPointerType<Platform::Windows::WindowsWindowFactory>(environment.instanceHandle);
 		// TODO: Create conditional "ApplicationEnvironment"-struct, which contains HINSTANCE as a member in csase  of MSC_VER
 #endif // PLATFORM_WINDOWS
 
-		if (!_windowFactory) {
+		if (!m_windowFactory) {
 			Log::Error(logTag(), "Failed to initialize the window factory.");
 			return EWindowManagerError::InitializationFailed;
 		}
@@ -45,7 +45,7 @@ namespace Engine {
 
 	WindowManager::EWindowManagerError WindowManager::deinitialize() {
 
-		_windowFactory = nullptr;
+		m_windowFactory = nullptr;
 		// if (!<condition>) {
 		// 	Log::Error(logTag(), "Failed to initialize the window factory.");
 		// 	return EWindowManagerError::InitializationFailed;
@@ -58,7 +58,7 @@ namespace Engine {
 	WindowManager::EWindowManagerError WindowManager::update() {
 		EWindowManagerError error = EWindowManagerError::Ok;
 
-		for (IWindowPtr pWindow : _windows)
+		for (IWindowPtr pWindow : m_windows)
 			if (CheckEngineError(pWindow->update())) {
 				Log::Warning(logTag(), String::format("Window '%0' failed to update.", pWindow->name()));
 				error = EWindowManagerError::UpdateFailed;
@@ -72,23 +72,23 @@ namespace Engine {
 		const std::string &name,
 		const Rect        &initialBounds) 
 	{
-		IWindowPtr pNewWindow = _windowFactory->createWindow(name, initialBounds);
+		IWindowPtr pNewWindow = m_windowFactory->createWindow(name, initialBounds);
 		if (!pNewWindow) {
 			Log::Warning(logTag(), String::format("Failed to create window '%0' with bounds x/y/w/h --> %1/%2/%3/%4",
 												  name.c_str(),
-												  initialBounds._position.x(), initialBounds._position.y(),
-												  initialBounds._size.x(), initialBounds._size.y())
+												  initialBounds.m_position.x(), initialBounds.m_position.y(),
+												  initialBounds.m_size.x(), initialBounds.m_size.y())
 			);
 			return nullptr;
 		}
 
-		_windows.push_back(pNewWindow);
+		m_windows.push_back(pNewWindow);
 
 		return pNewWindow;
 	}
 
 	IWindowPtr WindowManager::getWindowByName(const std::string& name) {
-		for (const IWindowPtr& pWindow : _windows) {
+		for (const IWindowPtr& pWindow : m_windows) {
 			if (pWindow->name().compare(name) == 0)
 				return pWindow;
 		}
@@ -102,15 +102,15 @@ namespace Engine {
 			= [&](const IWindowPtr& cmp) -> bool { return cmp->handle() == handle; };
 
 		IWindowList::iterator it 
-			= std::find_if(_windows.begin(), _windows.end(), pred);
+			= std::find_if(m_windows.begin(), m_windows.end(), pred);
 
-		return (it == _windows.end()) ? nullptr : (*it);
+		return (it == m_windows.end()) ? nullptr : (*it);
 
 		// One line version:
-		// return ((it = std::find_if(_windows.begin(), _windows.end(), [&](const IWindowPtr& cmp) -> bool { return cmp->handle() == handle; })) == _windows.end) ? nullptr : (*it);
+		// return ((it = std::find_if(_windows.begin(), m_windows.end(), [&](const IWindowPtr& cmp) -> bool { return cmp->handle() == handle; })) == m_windows.end) ? nullptr : (*it);
 
 		// Below code can also be used. But above is a educational demonstration of std::find_if.
-		// for (const IWindowPtr& pWindow : _windows) {
+		// for (const IWindowPtr& pWindow : m_windows) {
 		// 	if (pWindow->handle() == handle)
 		// 		return pWindow;
 		// }

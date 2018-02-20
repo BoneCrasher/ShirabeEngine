@@ -1,5 +1,5 @@
-#ifndef _FUNCTORPROPERTYCHANGELISTENER_H_
-#define _FUNCTORPROPERTYCHANGELISTENER_H_
+#ifndef m_FUNCTORPROPERTYCHANGELISTENER_H_
+#define m_FUNCTORPROPERTYCHANGELISTENER_H_
 
 #include "IPropertyChangeListener.hpp"
 #include "ValueChangedArguments.hpp"

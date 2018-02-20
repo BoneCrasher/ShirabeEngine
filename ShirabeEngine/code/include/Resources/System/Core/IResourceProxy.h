@@ -140,31 +140,31 @@ namespace Engine {
 				typename TResource::CreationRequest const&request)
 				: Engine::Resources::IResourceProxy<TResource>()
 				, ResourceCreationRequestAdapter<typename TResource::CreationRequest>(request)
-				, _type(proxyType)
-				, _loadState(ELoadState::UNKNOWN)
-				, _dependencies()
+				, m_type(proxyType)
+				, m_loadState(ELoadState::UNKNOWN)
+				, m_dependencies()
 			{
 			}
 
-      inline ResourceHandle const& resourceHandle() const { return _handle; }
+      inline ResourceHandle const& resourceHandle() const { return m_handle; }
 
-			inline EProxyType proxyType() const { return _type; }
-			inline ELoadState loadState() const { return _loadState; }
+			inline EProxyType proxyType() const { return m_type; }
+			inline ELoadState loadState() const { return m_loadState; }
 
-			inline const ResourceHandleList& dependencies() const { return _dependencies; }
+			inline const ResourceHandleList& dependencies() const { return m_dependencies; }
 
 			inline bool destroy() { return !CheckEngineError(unloadSync()); }
 
 		protected:
-			inline void setLoadState(const ELoadState& newLoadState) { _loadState = newLoadState; }
+			inline void setLoadState(const ELoadState& newLoadState) { m_loadState = newLoadState; }
 
 		private:
-      ResourceHandle _handle;
+      ResourceHandle m_handle;
 
-			EProxyType _type;
-			ELoadState _loadState;
+			EProxyType m_type;
+			ELoadState m_loadState;
 
-			ResourceHandleList _dependencies;
+			ResourceHandleList m_dependencies;
 		};
 
 	}

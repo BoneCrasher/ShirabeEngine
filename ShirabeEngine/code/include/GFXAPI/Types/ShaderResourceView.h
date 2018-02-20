@@ -109,7 +109,7 @@ namespace Engine {
         std::string toString() const;
 
       private:
-        ResourceHandle _underlyingBufferHandle;
+        ResourceHandle m_underlyingBufferHandle;
       };
 
       struct UpdateRequest 

@@ -36,8 +36,8 @@ namespace Engine {
 	private:
 		DeclareLogTag(WindowManager)
 
-		IWindowList       _windows;
-		IWindowFactoryPtr _windowFactory;
+		IWindowList       m_windows;
+		IWindowFactoryPtr m_windowFactory;
 	};
 	DeclareSharedPointerType(WindowManager)
 

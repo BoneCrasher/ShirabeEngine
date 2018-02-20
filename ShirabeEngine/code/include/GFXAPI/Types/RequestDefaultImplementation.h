@@ -19,15 +19,15 @@ namespace Engine {
       public:
         CreationRequestBase(
           TDescriptor    const&desc)
-          : _resourceDescriptor(desc)
+          : m_resourceDescriptor(desc)
         {}
 
-        TDescriptor const& resourceDescriptor() const { return _resourceDescriptor; }
+        TDescriptor const& resourceDescriptor() const { return m_resourceDescriptor; }
 
         virtual std::string toString() const = 0;
 
       private:
-        TDescriptor _resourceDescriptor;
+        TDescriptor m_resourceDescriptor;
       };
       
       class ExistingResourceRequestBase { 

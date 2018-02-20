@@ -26,21 +26,21 @@ namespace Engine {
 		class GFXAPIResourceAdapter
 		{
 		public:
-			inline const GFXAPIResourceHandle_t& handle() const { return _handle; }
+			inline const GFXAPIResourceHandle_t& handle() const { return m_handle; }
 
 		protected:
 			inline GFXAPIResourceAdapter(const GFXAPIResourceHandle_t& handle = GFXAPIUninitializedResourceHandle)
-				: _handle(handle)
+				: m_handle(handle)
 			{ }
 
 			inline bool setHandle(const GFXAPIResourceHandle_t& handle) {
-				if( _handle > 0 )
+				if( m_handle > 0 )
 					return false; // Overwrite not allowed!
-				_handle = handle;
+				m_handle = handle;
 			}
 
 		private:
-			GFXAPIResourceHandle_t _handle;
+			GFXAPIResourceHandle_t m_handle;
 		};
 
     static Ptr<GFXAPIResourceAdapter> GFXAPIAdapterCast(const AnyProxy& proxy) {
@@ -80,7 +80,7 @@ namespace Engine {
       
 		protected:
 		private:
-			Ptr<BasicGFXAPIResourceBackend> _backend;
+			Ptr<BasicGFXAPIResourceBackend> m_backend;
 		};
 
 		/**********************************************************************************************//**
@@ -118,7 +118,7 @@ namespace Engine {
 
 			GFXAPIResourceHandle_t handle = 0;
 
-			status = _backend->load<TResource>(static_cast<GenericProxyBase<TResource>*>(this)->creationRequest(), resolvedDependencies, ETaskSynchronization::Sync, nullptr, handle);
+			status = m_backend->load<TResource>(static_cast<GenericProxyBase<TResource>*>(this)->creationRequest(), resolvedDependencies, ETaskSynchronization::Sync, nullptr, handle);
 			if( CheckEngineError(status) ) {
 				// MBT TODO: Consider distinguishing the above returned status a little more in 
 				//           order to reflect UNLOADED or UNAVAILABLE state.
@@ -138,7 +138,7 @@ namespace Engine {
 			::unloadSync()
 		{
 			EEngineStatus status = EEngineStatus::Ok;
-			status = _backend->unload<TResource>(TResource::DestructionRequest(resourceHandle()));
+			status = m_backend->unload<TResource>(TResource::DestructionRequest(resourceHandle()));
 
 			if( CheckEngineError(status) ) {
 				this->setLoadState(ELoadState::UNKNOWN);

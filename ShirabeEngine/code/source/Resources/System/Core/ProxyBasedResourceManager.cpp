@@ -44,13 +44,11 @@ namespace Engine {
     EEngineStatus                                        \
       ProxyBasedResourceManager::get##Type##Info(        \
         PublicResourceId_t const&id,                     \
-        Type::Descriptor        &outDescriptor,          \
-        Type::Binding           &outBinding)             \
+        ResourceInfo<Type>      &outInfo)                \
     {                                                    \
       return getResourceInfoImpl<Type>(                  \
                 id,                                      \
-                outDescriptor,                           \
-                outBinding);                             \
+                outInfo);                                \
     }
 
     ImplementResourceMethods(SwapChain);
@@ -61,5 +59,6 @@ namespace Engine {
     ImplementResourceMethods(ShaderResourceView);
     ImplementResourceMethods(DepthStencilView);
     ImplementResourceMethods(DepthStencilState);
+    ImplementResourceMethods(RasterizerState);
   }
 }

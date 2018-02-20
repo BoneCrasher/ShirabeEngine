@@ -20,12 +20,12 @@ namespace Engine {
 
 		EEngineStatus update();
 	private:
-		IComponentFactoryPtr _componentFactory;
+		IComponentFactoryPtr m_componentFactory;
 		
-		Timer  _timer;
-		Camera _primaryCamera;
+		Timer  m_timer;
+		Camera m_primaryCamera;
 
-		EntityList _entities;
+		EntityList m_entities;
 		
 	};
 

@@ -5,9 +5,10 @@
 #include "Platform/Platform.h"
 #include "Core/EngineTypeHelper.h"
 
+#include "Resources/System/Core/IResourceManager.h"
+
 #include "Resources/System/Core/IResourcePool.h"
 #include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/IResourceManager.h"
 #include "Resources/System/Core/IResourceProxy.h"
 #include "Resources/System/Core/ProxyTreeCreator.h"
 #include "Resources/System/Core/ResourceProxyFactory.h"
@@ -16,6 +17,8 @@
 #include "GFXAPI/ResourceProxyTreeCreators/TextureND.h"
 #include "GFXAPI/ResourceProxyTreeCreators/RenderTargetView.h"
 #include "GFXAPI/ResourceProxyTreeCreators/ShaderResourceView.h"
+#include "GFXAPI/ResourceProxyTreeCreators/DepthStencilView.h"
+#include "GFXAPI/ResourceProxyTreeCreators/DepthStencilState.h"
 
 namespace Engine {
   namespace Resources {
@@ -172,15 +175,13 @@ namespace Engine {
 
       template <typename TResource>
       EEngineStatus getResourceInfo(
-        PublicResourceId_t             const&id,
-        typename TResource::Descriptor      &outDescriptor,
-        typename TResource::Binding         &outBinding);
+        PublicResourceId_t      const&id,
+        ResourceInfo<TResource>      &outInfo);
 
       template <typename TResource>
       EEngineStatus storeResourceInfo(
-        PublicResourceId_t             const&id,
-        typename TResource::Descriptor const&outDescriptor,
-        typename TResource::Binding    const&outBinding);
+        PublicResourceId_t      const&id,
+        ResourceInfo<TResource> const&inInfo);
 
       template <typename TResource>
       EEngineStatus createImpl(
@@ -204,9 +205,8 @@ namespace Engine {
 
       template <typename TResource>
       EEngineStatus getResourceInfoImpl(
-        PublicResourceId_t             const&id,
-        typename TResource::Descriptor      &outDescriptor,
-        typename TResource::Binding         &outBinding);
+        PublicResourceId_t      const&id,
+        ResourceInfo<TResource>      &outInfo);
 
     public:
       ProxyBasedResourceManager(
@@ -215,7 +215,7 @@ namespace Engine {
       {}
 
       virtual ~ProxyBasedResourceManager() {
-        // _resources->clear();
+        // m_resources->clear();
         m_proxyFactory = nullptr;
       };
 
@@ -250,8 +250,7 @@ namespace Engine {
                                                    \
       EEngineStatus get##Type##Info(               \
         PublicResourceId_t const&id,               \
-        Type::Descriptor        &outDescriptor,    \
-        Type::Binding           &outBinding);
+        ResourceInfo<Type>      &outInfo);
 
       DeclareSupportedResource(SwapChain);
       DeclareSupportedResource(Texture1D);
@@ -261,17 +260,18 @@ namespace Engine {
       DeclareSupportedResource(ShaderResourceView);
       DeclareSupportedResource(DepthStencilView);
       DeclareSupportedResource(DepthStencilState);
+      DeclareSupportedResource(RasterizerState);
 
     private:
       inline AnyProxy getResourceProxy(const ResourceHandle& handle) {
-        return _resources->getResource(handle);
+        return m_resources->getResource(handle);
       }
 
       inline bool storeResourceProxy(
         const ResourceHandle &handle,
         const AnyProxy       &proxy)
       {
-        return _resources->addResource(handle, proxy);
+        return m_resources->addResource(handle, proxy);
       }
 
       DependerTreeNode const& findHierarchyRoot(ResourceHandle const&handle) const;
@@ -282,7 +282,7 @@ namespace Engine {
       DependerMap m_hierarchyRoots;
 
       // Any kind of resources, abstracted away entirely.
-      IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> _resources;
+      IIndexedResourcePoolPtr<ResourceHandle, AnyProxy> m_resources;
     };
     DeclareSharedPointerType(ProxyBasedResourceManager);
 
@@ -658,7 +658,7 @@ namespace Engine {
             fnInsert(r.children, proxies);
 
             if(!storeResourceProxy(r.resourceHandle, proxies.at(r.resourceHandle)))
-              HandleEngineStatusError(...); // Todo: Custom EEngineStatus for failed insertion + message.
+              HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, "Failed to store resource proxy " + r.resourceHandle.name());
           }
         };
         fnInsert(outDependerHierarchies, outProxies);
@@ -724,12 +724,12 @@ namespace Engine {
         PublicResourceId_t                     const&inId,
         typename TResource::DestructionRequest const&request)
     {
-      // TODO:
-      // - Define "struct ResourceInfo<T> w/ ResourceHandle, Descriptor, Binding.
-      // - Make getResourceInfo return that struct
-      // - Have it be loaded at this point to forward the handle to the proxyLoad/Unload functions
-      EEngineStatus status = proxyUnload(handle);
-      HandleEngineStatusError(status, String::format("Failed to unload proxy resource in backend (Handle: %0).", handle.id()));
+      ResourceInfo<TResource> info ={};
+      EEngineStatus status = getResourceInfo<TResource>(inId, info);
+      HandleEngineStatusError(status, String::format("Failed to fetch resource information (Id: %0).", inId));
+
+      status = proxyUnload(info.handle);
+      HandleEngineStatusError(status, String::format("Failed to unload proxy resource in backend (Id: %0).", inId));
 
       std::function<void(DependerTreeNode const&)> fnEraseRecursively = nullptr;
 
@@ -739,11 +739,11 @@ namespace Engine {
         for(DependerTreeNodeList::value_type const&c : root.children)
           fnEraseRecursively(c);
 
-        _resources->removeResource(root.resourceHandle);
+        m_resources->removeResource(root.resourceHandle);
       };
-      fnEraseRecursively(m_hierarchyRoots[handle]); // If not available, an empty default will be created, which is subsequently killed. Small overhead, easy algorithm.
+      fnEraseRecursively(m_hierarchyRoots[info.handle]); // If not available, an empty default will be created, which is subsequently killed. Small overhead, easy algorithm.
 
-      m_hierarchyRoots.erase(handle);
+      m_hierarchyRoots.erase(info.handle);
 
       // Any further verification, e.g. with the backend to ensure proper deletion?
 
@@ -767,7 +767,8 @@ namespace Engine {
       const typename TResource::Descriptor& desc = inRequest.resourceDescriptor();
 
       // Store binding internally.
-      storeResourceInfo<TResource>(inId, desc, binding);
+      ResourceInfo<TResource> info = ResourceInfo<TResource>(inId, binding.handle, desc, binding);
+      storeResourceInfo<TResource>(inId, info);
 
       return EEngineStatus::Ok;
     }
@@ -815,11 +816,10 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus
       ProxyBasedResourceManager::getResourceInfoImpl(
-        PublicResourceId_t             const&id,
-        typename TResource::Descriptor      &outDescriptor,
-        typename TResource::Binding         &outBinding)
+        PublicResourceId_t      const&id,
+        ResourceInfo<TResource>      &outInfo)
     {
-      EEngineStatus status = getResourceInfo<TResource>(id, outDescriptor, outBinding);
+      EEngineStatus status = getResourceInfo<TResource>(id, outInfo);
       HandleEngineStatusError(status, "Failed to determine resource info.");
       return EEngineStatus::Ok;
     }
@@ -827,9 +827,8 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus 
       ProxyBasedResourceManager::storeResourceInfo(
-      PublicResourceId_t             const&id,
-      typename TResource::Descriptor const&outDescriptor,
-      typename TResource::Binding    const&outBinding)
+        PublicResourceId_t      const&id,
+        ResourceInfo<TResource> const&inInfo)
     { 
       return EEngineStatus::Ok;
     }
