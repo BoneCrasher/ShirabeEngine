@@ -1,8 +1,9 @@
 #include "ShaderResourceView.h"
 #include "RenderTargetView.h"
 #include "DepthStencilView.h"
-#include "TextureND.h"
 #include "DepthStencilState.h"
+#include "TextureND.h"
+#include "RasterizerState.h"
 #include "ConstantBuffer.h"
 #include "InstanceBuffer.h"
 #include "ObjectBuffer.h"
@@ -21,6 +22,7 @@ namespace Engine {
   RenderTargetView,   \
   ShaderResourceView, \
   DepthStencilState,  \
+  RasterizerState,    \
   SwapChain,          \
   SwapChainBuffer
   // ConstantBuffer,     \

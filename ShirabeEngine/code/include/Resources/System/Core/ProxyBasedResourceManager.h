@@ -19,6 +19,7 @@
 #include "GFXAPI/ResourceProxyTreeCreators/ShaderResourceView.h"
 #include "GFXAPI/ResourceProxyTreeCreators/DepthStencilView.h"
 #include "GFXAPI/ResourceProxyTreeCreators/DepthStencilState.h"
+#include "GFXAPI/ResourceProxyTreeCreators/RasterizerState.h"
 
 namespace Engine {
   namespace Resources {
@@ -605,7 +606,7 @@ namespace Engine {
 
             ResourceProxyMap::const_iterator it = proxies.find(r.resourceHandle);
             if(it == proxies.end()) {
-              std::string msg = String::format("Hierarchy <-> ProxyList mismatch. Missing proxy for hierarchy handle: %0", r.resourceHandle.type());
+              std::string msg = String::format("Hierarchy <-> ProxyList mismatch. Missing proxy for hierarchy handle: "); // , r.resourceHandle.type());
               HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, msg);
             }
           }
@@ -617,18 +618,18 @@ namespace Engine {
         fnVerifyProxyToHierarchyAvailability
           = [&] (DependerTreeNodeList const&hierarchy, ResourceProxyMap::value_type const&pair) -> bool
         {
-          for(DependerTreeNodeList::value_type const& r : hierarchy)
+          for(DependerTreeNodeList::value_type const& r : hierarchy) {
             if(fnVerifyProxyToHierarchyAvailability(r.children, pair))
               return true;
 
-          // We have not yet found the proxy at this point, check the current level.
-          DependerTreeNodeList::const_iterator it = std::find(hierarchy.begin(), hierarchy.end(), pair.first);
-          return !(it == hierarchy.end());
+            // We have not yet found the proxy at this point, check the current level.
+            return (r.resourceHandle == pair.first);
+          }
         };
 
         for(ResourceProxyMap::value_type const& pair : outProxies) {
           if(!fnVerifyProxyToHierarchyAvailability(outDependerHierarchies, pair)) {
-            std::string msg = String::format("ProxyList <-> Hierarchy mismatch. Missing hierarchy entry for proxy: %0", pair.first.type());
+            std::string msg = String::format("ProxyList <-> Hierarchy mismatch. Missing hierarchy entry for proxy:"); // % 0", pair.first.type());
             HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, msg);
           }
         }
@@ -746,7 +747,7 @@ namespace Engine {
       m_hierarchyRoots.erase(info.handle);
 
       // Any further verification, e.g. with the backend to ensure proper deletion?
-
+      return status;
     }
 
     template <typename TResource>

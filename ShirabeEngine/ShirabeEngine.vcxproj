@@ -231,6 +231,7 @@
     <ClInclude Include="code\include\GFXAPI\RendererConfiguration.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilState.h" />
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\DepthStencilView.h" />
+    <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\RasterizerState.h" />
     <ClInclude Include="code\include\GFXAPI\Types\All.h" />
     <ClInclude Include="code\include\GFXAPI\Types\DepthStencilState.h" />
     <ClInclude Include="code\include\GFXAPI\Types\RasterizerState.h" />

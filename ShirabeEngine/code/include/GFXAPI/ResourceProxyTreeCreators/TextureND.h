@@ -308,6 +308,8 @@ namespace Engine {
         inOutBinding.dsvBinding         = dsvBinding;
         inOutHierarchyRoot.children.push_back(dsvHierarchy);
       }
+
+      return result;
     }
 
     template <>
@@ -357,8 +359,10 @@ namespace Engine {
           outProxies,
           resourceNode))
         {
+          return false;
         }
-
+        
+        return true;
       }
     };
 
@@ -408,7 +412,10 @@ namespace Engine {
           outProxies,
           resourceNode))
         {
+          return false;
         }
+
+        return true;
       }
     };
 
@@ -458,8 +465,12 @@ namespace Engine {
           outProxies,
           resourceNode))
         {
+          return false;
         }
+
+        return true;
       }
+
     };
 
   }

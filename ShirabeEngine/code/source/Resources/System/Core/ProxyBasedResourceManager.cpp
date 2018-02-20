@@ -6,6 +6,7 @@ namespace Engine {
     bool ProxyBasedResourceManager
       ::clear()
     {
+      return true;
     }
 
 #define ImplementResourceMethods(Type)                   \

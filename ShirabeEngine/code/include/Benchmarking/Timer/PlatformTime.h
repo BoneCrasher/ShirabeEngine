@@ -140,7 +140,7 @@ namespace Engine
 
 	template <typename T>
 	EEngineStatus PlatformTime<T>::initialize() {
-		requestSetConversionFactors(_conversionFactors);
+		requestSetConversionFactors(m_conversionFactors);
 		return EEngineStatus::Ok;
 	}
 

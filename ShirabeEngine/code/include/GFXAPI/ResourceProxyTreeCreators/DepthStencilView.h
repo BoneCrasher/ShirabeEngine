@@ -42,6 +42,8 @@ namespace Engine {
         binding.handle = handle;
 
         outResourceHierarchy.push_back(resourceNode);
+
+        return true;
 			}
 		};
 		 

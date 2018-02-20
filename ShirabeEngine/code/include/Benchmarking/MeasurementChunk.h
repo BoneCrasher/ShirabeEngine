@@ -5,51 +5,53 @@
 #include <wchar.h>
 
 namespace Engine {
-	namespace Benchmarking {
-		template <typename ParameterT, typename ValueT>
-		class MeasurementChunk {
-		public:
-			typedef ParameterT param_type;
-			typedef ValueT     value_type;
+  namespace Benchmarking {
+    template <typename ParameterT, typename ValueT>
+    class MeasurementChunk {
+    public:
+      typedef ParameterT param_type;
+      typedef ValueT     value_type;
 
-			inline explicit MeasurementChunk(const param_type param = 0, const value_type value = 0) {
-				_parameter = param;
-				_value = value;
-			}
+      inline explicit MeasurementChunk(const param_type param = 0, const value_type value = 0) {
+        m_parameter = param;
+        m_value     = value;
+      }
 
-			template <typename ParamU, typename ValueU>
-			inline explicit MeasurementChunk(MeasurementChunk<ParamU, ValueU> const& instToCpy) {
-				_parameter = instToCpy.parameter();
-				_value = instToCpy.value();
-			}
+      template <typename ParamU, typename ValueU>
+      inline explicit MeasurementChunk(MeasurementChunk<ParamU, ValueU> const& instToCpy) {
+        m_parameter = instToCpy.parameter();
+        m_value     = instToCpy.value();
+      }
 
-			inline ~MeasurementChunk() {}
+      inline ~MeasurementChunk() {}
 
-		public:
-			/* Return a const reference to the contained parameter to protect it
-			 * from being changed without having to copy it. */
-			virtual const param_type& parameter() const { return m_parameter; }
-			/* Return a const reference to the contained value to protect it
-			 * from being changed without having to copy it */
-			virtual const value_type&     value()     const { return m_value; }
+    public:
+      /* Return a const reference to the contained parameter to protect it
+       * from being changed without having to copy it. */
+      virtual const param_type& parameter() const { return m_parameter; }
+      /* Return a const reference to the contained value to protect it
+       * from being changed without having to copy it */
+      virtual const value_type&     value()     const { return m_value; }
 
-		protected:
-			param_type m_parameter;
-			value_type     m_value;
+    protected:
+      param_type m_parameter;
+      value_type m_value;
 
-			/* Stream operators for printing to console or basic stream derivates. */
-			friend std::basic_ostream<char> operator<<(std::basic_ostream<char>&                       strm,
-													   const MeasurementChunk<param_type, value_type>& chunk)
-			{
-				return (strm << chunk.parameter() << ": " << chunk.value());
-			}
-			friend std::basic_ostream<wchar_t> operator<<(std::basic_ostream<wchar_t>&                    strm,
-														  const MeasurementChunk<param_type, value_type>& chunk)
-			{
-				return (strm << chunk.parameter() << L": " << chunk.value());
-			}
-		};
-	}
+      /* Stream operators for printing to console or basic stream derivates. */
+      friend std::basic_ostream<char> operator<<(
+        std::basic_ostream<char>&                       strm,
+        const MeasurementChunk<param_type, value_type>& chunk)
+      {
+        return (strm << chunk.parameter() << ": " << chunk.value());
+      }
+      friend std::basic_ostream<wchar_t> operator<<(
+        std::basic_ostream<wchar_t>&                       strm,
+        const MeasurementChunk<param_type, value_type>&    chunk)
+      {
+        return (strm << chunk.parameter() << L": " << chunk.value());
+      }
+    };
+  }
 }
 
 #endif

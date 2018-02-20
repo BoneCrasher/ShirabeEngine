@@ -80,6 +80,7 @@ namespace Engine {
         ImplementTaskBuilder(RenderTargetView);
         ImplementTaskBuilder(DepthStencilView);
         ImplementTaskBuilder(DepthStencilState);
+        ImplementTaskBuilder(RasterizerState);
         ImplementTaskBuilder(SwapChain);
         ImplementTaskBuilder(SwapChainBuffer);
 
