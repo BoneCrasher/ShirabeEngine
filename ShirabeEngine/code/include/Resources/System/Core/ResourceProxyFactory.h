@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_IRESOURCEPROXYFACTORY_H__
 #define __SHIRABE_IRESOURCEPROXYFACTORY_H__
 
+#include <variant>
+
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
 

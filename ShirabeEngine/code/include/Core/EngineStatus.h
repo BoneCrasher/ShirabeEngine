@@ -87,8 +87,8 @@ namespace Engine {
       , m_status(status)
     { }
 
-    EEngineStatus const& status()  const { return m_status;                  }
-    std::string   const& message() const { return std::string(this->what()); }
+    EEngineStatus const& status()  const { return m_status;     }
+    std::string   const& message() const { return this->what(); }
 
   private:
     EEngineStatus m_status;

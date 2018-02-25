@@ -4,7 +4,9 @@
 #include "Platform/OSDisplay.h"
 
 #ifdef PLATFORM_WINDOWS
-    #define STRICT              // Enhanced type safety including windows header
+    #ifndef STRICT 
+      #define STRICT // Enhanced type safety including windows header
+    #endif           
     #define WIN32_LEAN_AND_MEAN // Exclude unnecessary sh**
     #include <Windows.h>
 #endif 

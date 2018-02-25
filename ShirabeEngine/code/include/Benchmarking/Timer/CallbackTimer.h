@@ -96,7 +96,7 @@ namespace Engine {
         unsigned int                 m_tickMs;
         bool                         m_once;
         bool                         m_blockWhileRunning;
-        std::atomic<unsigned int>    m_elapsed;
+        std::atomic<double>          m_elapsed;
         std::atomic<bool>            m_running;
         std::atomic<bool>            m_pause;
         std::atomic<bool>            m_interrupt;

@@ -1,49 +1,57 @@
 #include "GFXAPI/DirectX/DX11/DX11ResourceTaskBuilder.h"
 
+
 namespace Engine {
-  namespace DX {
-    namespace _11 {
+  namespace GFXAPI {
+    using namespace Engine::Resources;
+    using namespace Engine::DX::_11;
 
-      EEngineStatus DX11ResourceTaskBuilder
-        ::creationTask(
-          DepthStencilView::CreationRequest   const&request,
-          ResolvedDependencyCollection        const&resolvedDependencies,
-          ResourceTaskFn_t                         &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
+    EEngineStatus
+      GFXAPIResourceTaskBackendImpl<DepthStencilView>::
+      creationTask(
+        DepthStencilView::CreationRequest   const&request,
+        ResolvedDependencyCollection        const&resolvedDependencies,
+        ResourceTaskFn_t                         &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-        return status;
-      }
+      return status;
+    }
 
-      EEngineStatus DX11ResourceTaskBuilder::updateTask(
+    EEngineStatus
+      GFXAPIResourceTaskBackendImpl<DepthStencilView>::
+      updateTask(
         DepthStencilView::UpdateRequest     const&request,
         ResolvedDependencyCollection        const&resolvedDependencies,
         ResourceTaskFn_t                         &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-        return status;
-      }
+      return status;
+    }
 
-      EEngineStatus DX11ResourceTaskBuilder::destructionTask(
+    EEngineStatus
+      GFXAPIResourceTaskBackendImpl<DepthStencilView>::
+      destructionTask(
         DepthStencilView::DestructionRequest const&request,
         ResolvedDependencyCollection         const&resolvedDependencies,
         ResourceTaskFn_t                          &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-        return status;
-      }
+      return status;
+    }
 
-      EEngineStatus DX11ResourceTaskBuilder::queryTask(
+    EEngineStatus
+      GFXAPIResourceTaskBackendImpl<DepthStencilView>::
+      queryTask(
         DepthStencilView::Query const&request,
         ResourceTaskFn_t             &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-        return status;
-      }
-
+      return status;
     }
+
   }
 }

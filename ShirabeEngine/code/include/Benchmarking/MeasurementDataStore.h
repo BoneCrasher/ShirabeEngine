@@ -4,6 +4,7 @@
 #include <cmath>
 #include <math.h>
 #include <vector>
+#include <algorithm>
 
 #include "Memory/TypeBasedAllocatorBase/Allocator.h"
 
@@ -117,11 +118,11 @@ namespace Engine {
 					if (m_chunks.size() >= 2)
 					{
 						// Make sure off is in a valid boundary
-						off = std::fminl((m_chunks.size() - 1), std::fmaxl(0, off));
+						off = std::min<uint32_t>((m_chunks.size() - 1u), std::max<uint32_t>(0u, off));
 						// Make sure to average m_n entries at max or less
 						// if there are not enough chunks stored starting 
 						// from m_off.
-						n = std::fminl((m_chunks.size() - off - 1), n);
+						n = std::min((m_chunks.size() - off - 1), n);
 
 						typename chunk_type::param_type interval = 0;
 						interval = m_chunks.at(n - 1)->parameter() - m_chunks.at(off)->parameter();

@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShirabeEngine", "ShirabeEngine.vcxproj", "{44532061-2211-490C-9696-CD637DDD7C95}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "..\Test\Test.vcxproj", "{A779B2CF-81D8-4C82-9C88-8EEB11A68C6E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PerformanceTests", "..\PerformanceTests\PerformanceTests.vcxproj", "{297C399F-A0E2-4709-9238-DDE05B930DE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +33,19 @@ Global
 		{A779B2CF-81D8-4C82-9C88-8EEB11A68C6E}.Release|x64.Build.0 = Release|x64
 		{A779B2CF-81D8-4C82-9C88-8EEB11A68C6E}.Release|x86.ActiveCfg = Release|Win32
 		{A779B2CF-81D8-4C82-9C88-8EEB11A68C6E}.Release|x86.Build.0 = Release|Win32
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Debug|x64.ActiveCfg = Debug|x64
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Debug|x64.Build.0 = Debug|x64
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Debug|x86.ActiveCfg = Debug|Win32
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Debug|x86.Build.0 = Debug|Win32
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Release|x64.ActiveCfg = Release|x64
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Release|x64.Build.0 = Release|x64
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Release|x86.ActiveCfg = Release|Win32
+		{297C399F-A0E2-4709-9238-DDE05B930DE6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C8058129-D2C9-42B4-8F0E-3449E9B4B0C3}
 	EndGlobalSection
 EndGlobal

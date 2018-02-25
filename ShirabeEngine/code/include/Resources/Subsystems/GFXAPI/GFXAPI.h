@@ -137,22 +137,7 @@ namespace Engine {
 			} m_handle;
 
 			RTTI m_typeInfo;
-		};
-
-		struct test
-		{
-
-		};
-
-		void foo()
-		{
-			test t;
-			GFXAPIResourceHolder holder;
-			holder.setValue<test *>(&t);
-		}
-
-
-		
+		};		
 	}
 }
 

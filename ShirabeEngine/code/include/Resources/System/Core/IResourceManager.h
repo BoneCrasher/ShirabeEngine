@@ -62,8 +62,7 @@ namespace Engine {
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus destroy##resource(        \
-    PublicResourceId_t           const&inId,      \
-    resource::DestructionRequest const&inRequest  \
+    PublicResourceId_t const&inId                 \
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus get##resource##Info(      \

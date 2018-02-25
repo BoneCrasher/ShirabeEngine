@@ -1,25 +1,7 @@
 #ifndef __SHIRABE_GFXAPIRESOURCEBACKEND_H__
 #define __SHIRABE_GFXAPIRESOURCEBACKEND_H__
 
-#include <type_traits>
-#include <typeinfo>
-#include <optional>
-#include <stdint.h>
-#include <functional>
-#include <future>
-#include <assert.h>
-#include <map>
-
-#include "Core/EngineTypeHelper.h"
-#include "Core/EngineStatus.h"
-#include "IOC/Observer.h"
-#include "Threading/Looper.h"
-
-#include "Resources/System/Core/ResourceDomainTransfer.h"
-#include "Resources/System/Core/ResourceTask.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPI.h"
-
-#include "GFXAPI/Types/All.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
 
 namespace Engine {
   namespace GFXAPI {
@@ -50,60 +32,60 @@ namespace Engine {
       Vulkan_
     };
 
-    enum class ETaskSynchronization {
-      Async = 1,
-      Sync  = 2
-    };
+    //enum class ETaskSynchronization {
+    //  Async = 1,
+    //  Sync  = 2
+    //};
 
-    enum class EResourceTaskType {
-      Create  = 1,
-      Query   = 2, // = Read Info
-      Update  = 4,
-      Destroy = 8
-    };
+    //enum class EResourceTaskType {
+    //  Create  = 1,
+    //  Query   = 2, // = Read Info
+    //  Update  = 4,
+    //  Destroy = 8
+    //};
 
-    using ResourceTaskFn_t = std::function<GFXAPIResourceHandleAssignment()>;
+    //using ResourceTaskFn_t = std::function<GFXAPIResourceHandleAssignment()>;
 
-    using ResolvedDependencyCollection      = std::map<ResourceHandle, Ptr<void>>;
-    using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
+    //using ResolvedDependencyCollection      = std::map<ResourceHandle, Ptr<void>>;
+    //using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
 
-    template <typename T>
-    class IGFXAPIResourceTaskBackendDecl
-    {
-    public:
-      virtual EEngineStatus creationTask(
-        typename T::CreationRequest  const&inRequest,
-        ResolvedDependencyCollection const&inDependencies,
-        ResourceTaskFn_t                  &outTask) = 0;
+    //template <typename T>
+    //class GFXAPIResourceTaskBackendImpl
+    //{
+    //public:
+    //  /*virtual EEngineStatus creationTask(
+    //    typename T::CreationRequest  const&inRequest,
+    //    ResolvedDependencyCollection const&inDependencies,
+    //    ResourceTaskFn_t                  &outTask) = 0;
 
-      virtual EEngineStatus updateTask(
-        typename T::UpdateRequest    const&inRequest,
-        ResolvedDependencyCollection const&inDependencies,
-        ResourceTaskFn_t                  &outTask) = 0;
+    //  virtual EEngineStatus updateTask(
+    //    typename T::UpdateRequest    const&inRequest,
+    //    ResolvedDependencyCollection const&inDependencies,
+    //    ResourceTaskFn_t                  &outTask) = 0;
 
-      virtual EEngineStatus destructionTask(
-        typename T::DestructionRequest const&inRequest,
-        ResolvedDependencyCollection   const&inDependencies,
-        ResourceTaskFn_t                    &outTask) = 0;
+    //  virtual EEngineStatus destructionTask(
+    //    typename T::DestructionRequest const&inRequest,
+    //    ResolvedDependencyCollection   const&inDependencies,
+    //    ResourceTaskFn_t                    &outTask) = 0;
 
-      virtual EEngineStatus queryTask(
-        const typename T::Query &inRequest,
-        ResourceTaskFn_t        &outTask) = 0;
-    };
+    //  virtual EEngineStatus queryTask(
+    //    const typename T::Query &inRequest,
+    //    ResourceTaskFn_t        &outTask) = 0;*/
+    //};
 
-    template <typename... TSupportedTypes>
-    class IGFXAPIResourceTaskBackend
-      : public IGFXAPIResourceTaskBackendDecl<TSupportedTypes>...
-    {};
+    //template <typename... TSupportedTypes>
+    //class GFXAPIResourceTaskBackend
+    //  : public GFXAPIResourceTaskBackendImpl<TSupportedTypes>...
+    //{};
 
-    /**********************************************************************************************//**
-     * \struct	DeferredResourceOperationHandle
-     *
-     * \brief	Handle class to hold an asynchronous request.
-     **************************************************************************************************/
-    struct DeferredResourceOperationHandle {
-      std::future<ResourceTaskFn_t::result_type> futureHandle;
-    };
+    ///**********************************************************************************************//**
+    // * \struct	DeferredResourceOperationHandle
+    // *
+    // * \brief	Handle class to hold an asynchronous request.
+    // **************************************************************************************************/
+    //struct DeferredResourceOperationHandle {
+    //  std::future<ResourceTaskFn_t::result_type> futureHandle;
+    //};
 
     DeclareInterface(IAsyncLoadCallback);
     /**********************************************************************************************//**
@@ -130,8 +112,8 @@ namespace Engine {
       DeclareLogTag(GFXAPIResourceBackend);
 
     public:
-      typedef IGFXAPIResourceTaskBackend<TSupportedResourceTypes...> ResourceTaskBackend_t;
-      typedef Ptr<ResourceTaskBackend_t>                             ResourceTaskBackendPtr;
+      typedef GFXAPIResourceTaskBackend<TSupportedResourceTypes...> ResourceTaskBackend_t;
+      typedef Ptr<ResourceTaskBackend_t>                            ResourceTaskBackendPtr;
 
       GFXAPIResourceBackend();
 
@@ -314,7 +296,7 @@ namespace Engine {
       EEngineStatus status = EEngineStatus::Ok;
 
       ResourceTaskFn_t task = nullptr;
-      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackendDecl<TResource>::creationTask(inRequest, resolvedDependencies, task);
+      status = m_resourceTaskBackend->GFXAPIResourceTaskBackendImpl<TResource>::creationTask(inRequest, resolvedDependencies, task);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to create build task for resource '%0'", "..."));
         return status;
@@ -343,7 +325,7 @@ namespace Engine {
       EEngineStatus status = EEngineStatus::Ok;
 
       ResourceTaskFn_t task = nullptr;
-      status = (*m_resourceTaskBackend).IGFXAPIResourceTaskBackendDecl<TResource>::destructionTask(inRequest, resolvedDependencies, task);
+      status = (*m_resourceTaskBackend).GFXAPIResourceTaskBackendImpl<TResource>::destructionTask(inRequest, resolvedDependencies, task);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to create destruction task for resource '%0'", "..."));
         return status;

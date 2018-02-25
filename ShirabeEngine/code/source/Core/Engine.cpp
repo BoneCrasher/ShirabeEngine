@@ -125,8 +125,8 @@ namespace Engine {
       EGFXAPI        gfxApi        = EGFXAPI::DirectX;
       EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::DirectX_11_0;
 
-      Ptr<BasicGFXAPIResourceBackend>              resourceBackend     = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
-      Ptr<IGFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
+      Ptr<BasicGFXAPIResourceBackend>             resourceBackend     = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
+      Ptr<GFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
 
       if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
             resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>(m_dx11Environment);

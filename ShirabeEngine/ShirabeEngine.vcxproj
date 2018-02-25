@@ -170,6 +170,7 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_DepthStencilState.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_DepthStencilView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_RasterizerState.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_RenderTargetView.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_ShaderResourceView.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_SwapChain.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="code\source\GFXAPI\Types\RasterizerState.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\RenderTargetView.cpp" />
     <ClCompile Include="code\source\GFXAPI\Types\ShaderResourceView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\SwapChain.cpp" />
     <ClCompile Include="code\source\Math\AxisAngle.cpp" />
     <ClCompile Include="code\source\BuildingBlocks\Camera.cpp" />
     <ClCompile Include="code\source\ApplicationMain.cpp" />
@@ -286,6 +288,7 @@
     <ClInclude Include="code\include\GFXAPI\ResourceProxyTreeCreators\TextureND.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceBackend.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceTaskBackend.h" />
     <ClInclude Include="code\include\Resources\System\Core\ProxyTreeCreator.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceTaskBuilder.h" />
     <ClInclude Include="code\include\Resources\System\Core\ResourceHierarchy.h" />

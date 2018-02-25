@@ -35,19 +35,9 @@ namespace Engine {
         Texture2D::Descriptor texture;
         uint32_t              backBufferIndex;
 
-        inline Descriptor()
-          : name("")
-          , texture()
-          , backBufferIndex(0)
-        {}
+        Descriptor();
 
-        std::string toString() const {
-          std::stringstream ss;
-          ss
-            << "SwapChainBufferDescriptor ('" << name << "'): ";
-
-          return ss.str();
-        }
+        std::string toString() const;
       };
 
       /**********************************************************************************************//**
@@ -55,60 +45,41 @@ namespace Engine {
        *
        * \brief	A swap chain creation request implementation.
        **************************************************************************************************/
-      struct CreationRequest 
+      struct CreationRequest
         : public BaseDeclaration::CreationRequestBase<Descriptor>
       {
       public:
         CreationRequest(
           Descriptor     const& desc,
-          ResourceHandle const& swapChainHandle)
-          : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-          , m_swapChainHandle(swapChainHandle)
-        {}
+          ResourceHandle const& swapChainHandle);
 
         ResourceHandle const& swapChainHandle()    const;
 
-        std::string toString() const {
-          std::stringstream ss;
+        std::string toString() const;
 
-          ss
-            << "SwapChainBufferCreationRequest: \n"
-            << "[\n"
-            << resourceDescriptor().toString() << "\n"
-            << "]"
-            << std::endl;
-
-          return ss.str();
-        }
       private:
         ResourceHandle m_swapChainHandle;
       };
 
-      class UpdateRequest 
+      class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&handle)
-          : BaseDeclaration::UpdateRequestBase(handle)
-        {}
+        UpdateRequest(ResourceHandle const&handle);
       };
 
       class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&handle)
-          : BaseDeclaration::DestructionRequestBase(handle)
-        {}
+        DestructionRequest(ResourceHandle const&handle);
       };
 
       class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&handle)
-          : BaseDeclaration::QueryBase(handle)
-        {}
+        Query(ResourceHandle const&handle);
       };
 
       struct Binding
@@ -116,10 +87,7 @@ namespace Engine {
       {
         RenderTargetView::Binding renderTargetView;
 
-        Binding()
-          : BaseDeclaration::BindingBase()
-          , renderTargetView()
-        {}
+        Binding();
       };
     };
 
@@ -145,26 +113,14 @@ namespace Engine {
 
       inline static Ptr<SwapChainBuffer> create(
         const SwapChainBuffer::Descriptor &desc,
-        const SwapChainBuffer::Binding    &binding) {
-        return Ptr<SwapChainBuffer>(new SwapChainBuffer(desc, binding));
-      }
+        const SwapChainBuffer::Binding    &binding);
 
     private:
       inline SwapChainBuffer(
         const SwapChainBuffer::Descriptor &descriptor,
-        const SwapChainBuffer::Binding    &binding)
-        : SwapChainBufferDeclaration()
-        , ResourceDescriptorAdapter<SwapChainBufferDeclaration::Descriptor>(descriptor)
-        , ResourceBindingAdapter<SwapChainBufferDeclaration::Binding>(binding)
-      {}
+        const SwapChainBuffer::Binding    &binding);
     };
 
-    ResourceHandle const&
-      SwapChainBufferDeclaration::CreationRequest
-      ::swapChainHandle() const
-    {
-      return m_swapChainHandle;
-    }
 
     DeclareSharedPointerType(SwapChainBuffer);
     DefineTraitsPublicTypes(SwapChainBuffer);
@@ -191,14 +147,7 @@ namespace Engine {
         unsigned int          refreshRateNumerator;
         unsigned int          refreshRateDenominator;
 
-        std::string toString() const {
-          std::stringstream ss;
-
-          ss
-            << "SwapChainDescriptor ('" << name << "'): ";
-
-          return ss.str();
-        }
+        std::string toString() const;
       };
 
       /**********************************************************************************************//**
@@ -210,52 +159,33 @@ namespace Engine {
         : public BaseDeclaration::CreationRequestBase<Descriptor> {
       public:
         CreationRequest(
-          Descriptor const& desc)
-          : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-        {}
+          Descriptor const& desc);
 
-        std::string toString() const {
-          std::stringstream ss;
-
-          ss
-            << "SwapChainCreationRequest: \n"
-            << "[\n"
-            << resourceDescriptor().toString() << "\n"
-            << "]"
-            << std::endl;
-
-          return ss.str();
-        }
+        std::string toString() const;
       };
 
-      class UpdateRequest 
+      class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&handle)
-          : BaseDeclaration::UpdateRequestBase(handle)
-        {}
+        UpdateRequest(ResourceHandle const&handle);
       };
 
       class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&handle)
-          : BaseDeclaration::DestructionRequestBase(handle)
-        {}
+        DestructionRequest(ResourceHandle const&handle);
       };
 
       class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&handle)
-          : BaseDeclaration::QueryBase(handle)
-        {}
+        Query(ResourceHandle const&handle);
       };
 
-      struct Binding 
+      struct Binding
         : public BaseDeclaration::BindingBase
       {
         std::vector<SwapChainBuffer::Binding> backBufferRenderTargetBindings;
@@ -285,30 +215,16 @@ namespace Engine {
 
       inline static Ptr<SwapChain> create(
         const SwapChain::Descriptor &desc,
-        const SwapChain::Binding    &binding) {
-        return Ptr<SwapChain>(new SwapChain(desc, binding));
-      }
+        const SwapChain::Binding    &binding);
 
-      Ptr<RenderTargetView> const& getBackBufferRenderTargetView(uint32_t const& index) {
-        if(index < 0 || index >= m_backBufferRenderTargetViews.size())
-          return nullptr;
+      Ptr<RenderTargetView> const& getBackBufferRenderTargetView(uint32_t const& index);
 
-        return m_backBufferRenderTargetViews[index];
-      }
-
-      Ptr<RenderTargetView> const& getCurrentBackBufferRenderTargetView() {
-        return getBackBufferRenderTargetView(m_currentBackBufferIndex);
-      }
+      Ptr<RenderTargetView> const& getCurrentBackBufferRenderTargetView();
 
     private:
       inline SwapChain(
         const SwapChain::Descriptor &descriptor,
-        const SwapChain::Binding    &binding)
-        : SwapChainDeclaration()
-        , ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>(descriptor)
-        , ResourceBindingAdapter<SwapChainDeclaration::Binding>(binding)
-        , m_currentBackBufferIndex(0)
-      {}
+        const SwapChain::Binding    &binding);
 
       std::size_t                        m_currentBackBufferIndex;
       std::vector<Ptr<RenderTargetView>> m_backBufferRenderTargetViews;
@@ -316,7 +232,7 @@ namespace Engine {
 
     DeclareSharedPointerType(SwapChain);
     DefineTraitsPublicTypes(SwapChain);
-    
+
   }
 }
 

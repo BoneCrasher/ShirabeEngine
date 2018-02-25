@@ -5,6 +5,7 @@
 
 #include "Resources/System/Core/ResourceTask.h"
 #include "Resources/System/Core/ResourceTaskBuilder.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
 
 #include "GFXAPI/Types/TextureND.h"
 #include "GFXAPI/DirectX/DX11/DX11Common.h"
@@ -47,7 +48,7 @@ namespace Engine {
        *
        * \brief	A macro that defines all supported DirectX11 types being used!
        **************************************************************************************************/
-#define DxTypes__ 																			    		                                          /*                    */\
+      #define DxTypes__ 																			    		                                          /*                    */\
 			  IDXGISwapChain, 																					                                        /* Components         */\
      	  ID3D11Texture1D, ID3D11Texture2D, ID3D11Texture3D, 											                          /* Texture-Types      */\
         ID3D11Buffer,                                                                                     /* Generic-Buffers    */\
@@ -55,12 +56,35 @@ namespace Engine {
         ID3D11RasterizerState, ID3D11DepthStencilState, ID3D11BlendState,                                 /* State-Types        */\
 			  ID3D11VertexShader, ID3D11HullShader, ID3D11DomainShader, ID3D11GeometryShader, ID3D11PixelShader /* Shader-Types       */
 
-#define ImplementTaskBuilder(Type)                                                                                                                                             \
-      EEngineStatus creationTask   (Type::CreationRequest    const& request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-      EEngineStatus updateTask     (Type::UpdateRequest      const& request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-      EEngineStatus destructionTask(Type::DestructionRequest const& request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-      EEngineStatus queryTask      (Type::Query              const& request, ResourceTaskFn_t &outTask); 
+    }
+  }
 
+  namespace GFXAPI {
+    #define DeclareTaskBuilderImplementation(Type)                                                                                                      \
+      template <>                                                                                                                                         \
+      class GFXAPIResourceTaskBackendImpl<Type> {                                                                                                         \
+      public:                                                                                                                                             \
+          EEngineStatus creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);                                               \
+      };
+
+    DeclareTaskBuilderImplementation(Texture1D);
+    DeclareTaskBuilderImplementation(Texture2D);
+    DeclareTaskBuilderImplementation(Texture3D);
+    DeclareTaskBuilderImplementation(ShaderResourceView);
+    DeclareTaskBuilderImplementation(RenderTargetView);
+    DeclareTaskBuilderImplementation(DepthStencilView);
+    DeclareTaskBuilderImplementation(DepthStencilState);
+    DeclareTaskBuilderImplementation(RasterizerState);
+    DeclareTaskBuilderImplementation(SwapChain);
+    DeclareTaskBuilderImplementation(SwapChainBuffer);
+  }
+
+  namespace DX {
+    namespace _11 {
+      using namespace Engine::GFXAPI;
 
       /**********************************************************************************************//**
        * \class	DX11ResourceTaskBuilder
@@ -68,21 +92,10 @@ namespace Engine {
        * \brief	Glue...
        **************************************************************************************************/
       class DX11ResourceTaskBuilder
-        : public IGFXAPIResourceTaskBackend<EngineTypes>
-      { 
+        : public GFXAPIResourceTaskBackend<EngineTypes>
+      {
       public:
         DX11ResourceTaskBuilder(Ptr<DX11Environment> const& device);
-
-        ImplementTaskBuilder(Texture1D);
-        ImplementTaskBuilder(Texture2D);
-        ImplementTaskBuilder(Texture3D);
-        ImplementTaskBuilder(ShaderResourceView);
-        ImplementTaskBuilder(RenderTargetView);
-        ImplementTaskBuilder(DepthStencilView);
-        ImplementTaskBuilder(DepthStencilState);
-        ImplementTaskBuilder(RasterizerState);
-        ImplementTaskBuilder(SwapChain);
-        ImplementTaskBuilder(SwapChainBuffer);
 
       private:
         Ptr<DX11Environment> m_dx11Environment;

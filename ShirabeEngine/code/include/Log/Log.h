@@ -195,7 +195,7 @@ namespace Engine {
 		}
 
 		if (CheckEnumFlag(Style::CENTRE, style)) {
-			unsigned int offset = std::max<uint64_t>(0, ((lineWidth() / 2) - (message.size() / 2)));
+			uint64_t offset = std::max<uint64_t>(0, ((lineWidth() / 2) - (message.size() / 2)));
 			ss << std::setw(offset);
 		}
 		ss << message << "\n";
