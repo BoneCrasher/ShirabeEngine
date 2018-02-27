@@ -1,9 +1,10 @@
 #include "Core/Engine.h"
 
-#include "Resources/System/Core/ProxyBasedResourceManager.h"
 
 #include "GFXAPI/DirectX/DX11/DX11Renderer.h"
-#include "GFXAPI/DirectX/DX11/DX11ResourceTaskBuilder.h"
+#include "GFXAPI/DirectX/DX11/DX11ResourceTaskBackend.h"
+
+#include "Resources/System/Core/ProxyBasedResourceManager.h"
 
 namespace Engine {
 
@@ -129,7 +130,7 @@ namespace Engine {
       Ptr<GFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
 
       if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
-            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBuilder>(m_dx11Environment);
+            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_dx11Environment);
     
       resourceBackend->setResourceTaskBackend(resourceTaskBackend);
 

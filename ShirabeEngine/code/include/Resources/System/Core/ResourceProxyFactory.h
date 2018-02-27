@@ -12,7 +12,7 @@
 
 namespace Engine {
 	namespace Resources {
-		using namespace GFXAPI;
+    using namespace Engine::GFXAPI;
 				
 		class ResourceProxyFactory
 		{

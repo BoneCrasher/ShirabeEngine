@@ -15,7 +15,9 @@ int WINAPI WinMain(
 {
 	using namespace Engine;
 
+  #ifdef _DEBUG
 	InitializeConsole();
+  #endif
 
 	Log::setLineWidth(80);
 	Log::Status(Main::logTag(), "SAE5300 - Application", Log::Style::CENTRE);
@@ -46,7 +48,9 @@ int WINAPI WinMain(
 	pEngine.reset();
 	pEngine = nullptr;
 
+  #ifdef _DEBUG
 	DeinitializeConsole();
+  #endif
 
 	return 0;
 }

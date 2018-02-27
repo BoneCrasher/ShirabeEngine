@@ -157,7 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceBackend.cpp" />
+    <ClCompile Include="code\source\Resources\Subsystems\GFXAPIResourceBackend.cpp" />
     <ClCompile Include="code\include\Threading\Looper.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\Timer.cpp" />
@@ -167,7 +167,7 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11DeviceCapabilities.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Environment.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11Renderer.cpp" />
-    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBackend.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_DepthStencilState.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_DepthStencilView.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder_RasterizerState.cpp" />
@@ -225,7 +225,7 @@
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Environment.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Linkage.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Renderer.h" />
-    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11ResourceTaskBuilder.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11ResourceTaskBackend.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DX11Types.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\IDXDevice.h" />
     <ClInclude Include="code\include\GFXAPI\GFXAPIDeviceCapabilities.h" />

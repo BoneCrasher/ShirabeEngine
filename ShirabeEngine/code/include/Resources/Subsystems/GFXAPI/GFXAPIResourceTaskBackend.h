@@ -27,7 +27,6 @@
 namespace Engine {
   namespace GFXAPI {
 
-
     enum class ETaskSynchronization {
       Async = 1,
       Sync  = 2
@@ -46,39 +45,40 @@ namespace Engine {
     using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
 
     template <typename T>
-    class GFXAPIResourceTaskBackendImpl
+    class GFXAPIResourceTaskBackendModule
     {
     public:
-      /*virtual EEngineStatus creationTask(
-      typename T::CreationRequest  const&inRequest,
-      ResolvedDependencyCollection const&inDependencies,
-      ResourceTaskFn_t                  &outTask) = 0;
+      virtual EEngineStatus creationTask(
+        typename T::CreationRequest  const&inRequest,
+        ResolvedDependencyCollection const&inDependencies,
+        ResourceTaskFn_t                  &outTask) = 0;
 
       virtual EEngineStatus updateTask(
-      typename T::UpdateRequest    const&inRequest,
-      ResolvedDependencyCollection const&inDependencies,
-      ResourceTaskFn_t                  &outTask) = 0;
+        typename T::UpdateRequest    const&inRequest,
+        ResolvedDependencyCollection const&inDependencies,
+        ResourceTaskFn_t                  &outTask) = 0;
 
       virtual EEngineStatus destructionTask(
-      typename T::DestructionRequest const&inRequest,
-      ResolvedDependencyCollection   const&inDependencies,
-      ResourceTaskFn_t                    &outTask) = 0;
+        typename T::DestructionRequest const&inRequest,
+        ResolvedDependencyCollection   const&inDependencies,
+        ResourceTaskFn_t                    &outTask) = 0;
 
       virtual EEngineStatus queryTask(
-      const typename T::Query &inRequest,
-      ResourceTaskFn_t        &outTask) = 0;*/
+        const typename T::Query &inRequest,
+        ResourceTaskFn_t        &outTask) = 0;
     };
 
     template <typename... TSupportedTypes>
     class GFXAPIResourceTaskBackend
-      : public GFXAPIResourceTaskBackendImpl<TSupportedTypes>...
-    {};
+      : public GFXAPIResourceTaskBackendModule<TSupportedTypes>...
+    {
+    };
 
     /**********************************************************************************************//**
-                                                                                                    * \struct	DeferredResourceOperationHandle
-                                                                                                    *
-                                                                                                    * \brief	Handle class to hold an asynchronous request.
-                                                                                                    **************************************************************************************************/
+      * \struct	DeferredResourceOperationHandle
+      *
+      * \brief	Handle class to hold an asynchronous request.
+      **************************************************************************************************/
     struct DeferredResourceOperationHandle {
       std::future<ResourceTaskFn_t::result_type> futureHandle;
     };
