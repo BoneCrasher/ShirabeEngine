@@ -129,18 +129,16 @@ namespace Engine {
       Ptr<BasicGFXAPIResourceBackend>             resourceBackend     = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
       Ptr<GFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
 
-      if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
-            resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_dx11Environment);
-    
-      resourceBackend->setResourceTaskBackend(resourceTaskBackend);
-
       m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);
 
       Ptr<ProxyBasedResourceManager> manager = MakeSharedPointerType<ProxyBasedResourceManager>(m_proxyFactory);
       manager->setResourceBackend(resourceBackend);
-
       m_resourceManager = manager;
 
+      if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
+        resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_dx11Environment);
+
+      resourceBackend->setResourceTaskBackend(resourceTaskBackend);
       // Renderer will have access to resourceBackend!
     };
 
@@ -148,7 +146,7 @@ namespace Engine {
       = [&, this] () -> void
     {
       m_renderer = MakeSharedPointerType<DX11Renderer>();
-      status = m_renderer->initialize(m_environment, rendererConfiguration, nullptr);
+      status = m_renderer->initialize(m_environment, rendererConfiguration, m_resourceManager->backend());
       if(!CheckEngineError(status)) {
         status = m_scene.initialize();
       }

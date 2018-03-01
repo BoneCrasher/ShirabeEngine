@@ -149,7 +149,7 @@ namespace Engine {
 			LooperType& operator=(LooperType&&)      = delete;
 
 			virtual bool initialize();
-			virtual bool cleanup();
+			virtual bool deinitialize();
 
 			bool run();
 			bool running();

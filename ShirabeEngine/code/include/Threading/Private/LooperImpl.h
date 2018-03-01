@@ -202,7 +202,7 @@ namespace Engine{
 		 **************************************************************************************************/
 		template <typename TTaskResult>
 		bool Looper<TTaskResult>
-			::cleanup()
+			::deinitialize()
 		{
 			if( running() ) {
 				Log::Error(logTag(), "Cannot cleanup while running. Abort looper first!");
@@ -350,6 +350,8 @@ namespace Engine{
 			// Otherwise: Do join!
 			if( m_thread.joinable() )
 				m_thread.join();
+      
+      // m_running.store(false);
 
 			return true;
 		}

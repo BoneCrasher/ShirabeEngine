@@ -61,6 +61,9 @@ namespace Engine {
 
       GFXAPIResourceBackend();
 
+      bool initialize();
+      bool deinitialize();
+
       template <typename TResource>
       EEngineStatus load(
         typename TResource::CreationRequest const&inRequest,
@@ -119,6 +122,35 @@ namespace Engine {
       : m_resourceThread()
       , m_resourceThreadHandler(m_resourceThread.getHandler())
     {}
+
+    template <typename... TSupportedResourceTypes>
+    bool
+      GFXAPIResourceBackend<TSupportedResourceTypes...>
+      ::initialize()
+    {
+      // Do not catch those as it will prevent all iteration.
+      if(!m_resourceThread.initialize()) {
+        throw EngineException(EEngineStatus::Error, "Cannot initialize resource backend thread.");
+      }
+
+      if(!m_resourceThread.run()) {
+        throw EngineException(EEngineStatus::Error, "Cannot run resource backend thread.");
+      }
+
+      return true;
+    }
+
+    template <typename... TSupportedResourceTypes>
+    bool
+      GFXAPIResourceBackend<TSupportedResourceTypes...>
+      ::deinitialize()
+    {
+      if(m_resourceThread.running()) {
+        m_resourceThread.abortAndJoin();
+      }
+
+      return m_resourceThread.deinitialize();
+    }
 
     /**********************************************************************************************//**
      * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
