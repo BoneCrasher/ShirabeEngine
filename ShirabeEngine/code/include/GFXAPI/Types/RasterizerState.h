@@ -1,11 +1,11 @@
 #ifndef __SHIRABE_RESOURCETYPES_RASTERIZER_STATE_H__
 #define __SHIRABE_RESOURCETYPES_RASTERIZER_STATE_H__
 
-#include "Resources/System/Core/EResourceType.h"
-#include "Resources/System/Core/IResource.h"
+#include "Resources/Core/EResourceType.h"
+#include "Resources/Core/IResource.h"
 
-#include "Resources/System/Core/ResourceDomainTransfer.h"
-#include "Resources/System/Core/ResourceTraits.h"
+#include "Resources/Core/ResourceDomainTransfer.h"
+#include "Resources/Core/ResourceTraits.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 

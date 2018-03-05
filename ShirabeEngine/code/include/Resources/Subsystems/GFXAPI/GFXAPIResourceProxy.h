@@ -10,7 +10,7 @@
 #include "Core/EngineStatus.h"
 #include "IOC/Observer.h"
 
-#include "Resources/System/Core/ResourceBackendProxy.h"
+#include "Resources/Core/ResourceBackendProxy.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 

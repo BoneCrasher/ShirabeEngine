@@ -1,10 +1,10 @@
 #include "Core/Engine.h"
 
 
-#include "GFXAPI/DirectX/DX11/DX11Renderer.h"
-#include "GFXAPI/DirectX/DX11/DX11ResourceTaskBackend.h"
+#include "GFXAPI/DirectX/DX11/Renderer/Renderer.h"
+#include "GFXAPI/DirectX/DX11/Resources/ResourceTaskBackend.h"
 
-#include "Resources/System/Core/ProxyBasedResourceManager.h"
+#include "Resources/Core/ProxyBasedResourceManager.h"
 
 namespace Engine {
 

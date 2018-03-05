@@ -18,7 +18,7 @@
 #include "IOC/Observer.h"
 #include "Threading/Looper.h"
 
-#include "Resources/System/Core/ResourceDomainTransfer.h"
+#include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Types/All.h"

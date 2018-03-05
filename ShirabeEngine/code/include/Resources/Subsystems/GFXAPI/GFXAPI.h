@@ -12,7 +12,7 @@
 #include "Core/EngineStatus.h"
 
 #include "IOC/Observer.h"
-#include "Resources/System/Core/ResourceDTO.h"
+#include "Resources/Core/ResourceDTO.h"
 
 namespace Engine {
 	namespace GFXAPI {

@@ -9,16 +9,16 @@
 
 #include "Window/WindowManager.h"
 
-#include "Resources/System/Core/IResourceManager.h"
-#include "Resources/System/Core/ResourceProxyFactory.h"
+#include "Resources/Core/IResourceManager.h"
+#include "Resources/Core/ResourceProxyFactory.h"
 
 #include "BuildingBlocks/Scene.h"
 
-#include "GFXAPI/IRenderer.h"
+#include "Renderer/IRenderer.h"
 
 #ifdef PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsError.h"
-#include "GFXAPI/DirectX/DX11/DX11Environment.h"
+#include "GFXAPI/DirectX/DX11/Environment.h"
 
 using namespace Platform::Windows;
 using namespace Engine::DX::_11;

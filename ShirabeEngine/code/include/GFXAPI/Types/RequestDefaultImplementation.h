@@ -1,11 +1,11 @@
 #ifndef __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 #define __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 
-#include "Resources/System/Core/ResourceDTO.h"
-#include "Resources/System/Core/EResourceType.h"
-#include "Resources/System/Core/IResource.h"
+#include "Resources/Core/ResourceDTO.h"
+#include "Resources/Core/EResourceType.h"
+#include "Resources/Core/IResource.h"
 
-#include "Resources/System/Core/ResourceDomainTransfer.h"
+#include "Resources/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
   namespace GFXAPI {

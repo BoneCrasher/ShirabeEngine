@@ -7,7 +7,7 @@
 #include "GFXAPI/Config.h"
 
 #ifdef GAPI_USE_DX
-#include "GFXAPI/DirectX/DX11/DX11Common.h"
+#include "GFXAPI/DirectX/DX11/Common.h"
 #else 
 
 #endif
@@ -15,8 +15,8 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/BasicTypes.h"
 
-#include "Resources/System/Core/EResourceType.h"
-#include "Resources/System/Core/ResourceDomainTransfer.h"
+#include "Resources/Core/EResourceType.h"
+#include "Resources/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
 	namespace GFXAPI {
