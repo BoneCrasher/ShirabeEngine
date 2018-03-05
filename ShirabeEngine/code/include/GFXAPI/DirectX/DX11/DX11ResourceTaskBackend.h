@@ -3,8 +3,6 @@
 
 #include <map>
 
-#include "Resources/System/Core/ResourceTask.h"
-#include "Resources/System/Core/ResourceTaskBuilder.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
 
 #include "GFXAPI/Types/TextureND.h"
@@ -91,8 +89,6 @@ namespace Engine {
 
       private:
         Ptr<DX11Environment> m_dx11Environment;
-
-        PublicToPrivateBackendResourceMap m_storage;
       };
 
     }

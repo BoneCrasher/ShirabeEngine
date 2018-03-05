@@ -37,13 +37,13 @@ namespace Engine {
 
     DepthStencilViewDeclaration::CreationRequest
       ::CreationRequest(
-        Descriptor     const&desc,
-        ResourceHandle const&underlyingTextureHandle)
+        Descriptor         const&desc,
+        PublicResourceId_t const&underlyingTextureHandle)
       : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
       , m_underlyingTextureHandle(underlyingTextureHandle)
     {}
 
-    ResourceHandle const&
+    PublicResourceId_t const&
       DepthStencilViewDeclaration::CreationRequest
       ::underlyingTextureHandle() const
     {
@@ -66,32 +66,31 @@ namespace Engine {
     }
     
     DepthStencilViewDeclaration::UpdateRequest
-      ::UpdateRequest(ResourceHandle const& handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      ::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     DepthStencilViewDeclaration::DestructionRequest
-      ::DestructionRequest(ResourceHandle const& handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      ::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     DepthStencilViewDeclaration::Query
-      ::Query(ResourceHandle const& handle)
-      : BaseDeclaration::QueryBase(handle)
+      ::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
-    DepthStencilViewDeclaration::Binding
-      ::Binding()
-      : BaseDeclaration::BindingBase()
-    {}
-    
     DepthStencilView
       ::DepthStencilView(
-      const DepthStencilView::Descriptor &descriptor,
-      const DepthStencilView::Binding    &binding)
+      const DepthStencilView::Descriptor &descriptor)
       : DepthStencilViewDeclaration()
       , ResourceDescriptorAdapter<DepthStencilViewDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<DepthStencilViewDeclaration::Binding>(binding)
     {}
 
   }

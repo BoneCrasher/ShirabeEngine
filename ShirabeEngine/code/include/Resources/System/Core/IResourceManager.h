@@ -4,9 +4,10 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
 
-#include "Handle.h"
+
 #include "ResourceDomainTransfer.h"
 
+#include "Resources/System/Core/ResourceDTO.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 
 #include "GFXAPI/Types/SwapChain.h"
@@ -17,43 +18,15 @@
 namespace Engine {
   namespace Resources {
 
-    typedef uint64_t PublicResourceId_t;
-
-    template <typename TResource>
-    struct ResourceInfo {
-      PublicResourceId_t             resourceId;
-      ResourceHandle                 handle;
-      typename TResource::Descriptor descriptor;
-      typename TResource::Binding    binding;
-
-      ResourceInfo()
-        : resourceId(0)
-        , handle(ResourceHandle::Invalid())
-        , descriptor({})
-        , binding({})
-      {}
-
-      ResourceInfo(
-        PublicResourceId_t             inResourceId,
-        ResourceHandle                 inHandle,
-        typename TResource::Descriptor inDescriptor,
-        typename TResource::Binding    inBinding)
-        : resourceId(inResourceId)
-        , handle(inHandle)
-        , descriptor(inDescriptor)
-        , binding(inBinding)
-      {}
-    };
-
-#define DeclareResourceMethods(resource)          \
-  virtual EEngineStatus create##resource(         \
-    PublicResourceId_t        const&inId,         \
-    resource::CreationRequest const&inRequest     \
-  ) = 0;                                          \
+    #define DeclareResourceMethods(resource)          \
                                                   \
   virtual EEngineStatus create##resource(         \
     resource::CreationRequest const&inRequest,    \
     PublicResourceId_t             &outId         \
+  ) = 0;                                          \
+                                                  \
+  virtual EEngineStatus load##resource(           \
+    PublicResourceId_t const&inId                 \
   ) = 0;                                          \
                                                   \
   virtual EEngineStatus update##resource(         \
@@ -61,14 +34,13 @@ namespace Engine {
     resource::UpdateRequest const&inRequest       \
   ) = 0;                                          \
                                                   \
-  virtual EEngineStatus destroy##resource(        \
+  virtual EEngineStatus unload##resource(         \
     PublicResourceId_t const&inId                 \
   ) = 0;                                          \
                                                   \
-  virtual EEngineStatus get##resource##Info(      \
-    PublicResourceId_t     const&id,              \
-    ResourceInfo<resource>      &outInfo          \
-  ) =0;
+  virtual EEngineStatus destroy##resource(        \
+    PublicResourceId_t const&inId                 \
+  ) = 0;                                   
   
     DeclareInterface(IResourceManager);
 

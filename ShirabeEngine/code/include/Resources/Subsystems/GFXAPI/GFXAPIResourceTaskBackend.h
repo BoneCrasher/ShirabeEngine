@@ -19,7 +19,6 @@
 #include "Threading/Looper.h"
 
 #include "Resources/System/Core/ResourceDomainTransfer.h"
-#include "Resources/System/Core/ResourceTask.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Types/All.h"
@@ -41,8 +40,7 @@ namespace Engine {
 
     using ResourceTaskFn_t = std::function<GFXAPIResourceHandleAssignment()>;
 
-    using ResolvedDependencyCollection      = std::map<ResourceHandle, Ptr<void>>;
-    using PublicToPrivateBackendResourceMap = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
+    using ResolvedDependencyCollection = std::map<GFXAPIResourceHandle_t, Ptr<void>>;
 
     template <typename T>
     class GFXAPIResourceTaskBackendModule

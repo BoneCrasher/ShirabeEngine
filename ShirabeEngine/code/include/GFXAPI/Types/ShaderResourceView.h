@@ -3,7 +3,7 @@
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
-#include "Resources/System/Core/Handle.h"
+#include "Resources/System/Core/ResourceDTO.h"
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceTraits.h"
 
@@ -81,7 +81,6 @@ namespace Engine {
           StructuredBuffer
         };
 
-        std::string              name;
         Format                   format;
         EShaderResourceDimension srvType;
         ShaderResourceDimension  shaderResourceDimension;
@@ -101,42 +100,42 @@ namespace Engine {
       {
       public:
         CreationRequest(
-          Descriptor     const&desc,
-          ResourceHandle const&underlyingBufferHandle);
+          Descriptor         const&desc,
+          PublicResourceId_t const&underlyingBufferHandle);
 
-        ResourceHandle const& underlyingBufferHandle() const;
+        PublicResourceId_t const& underlyingBufferHandle() const;
 
         std::string toString() const;
 
       private:
-        ResourceHandle m_underlyingBufferHandle;
+        PublicResourceId_t m_underlyingBufferHandle;
       };
 
-      struct UpdateRequest 
+      class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&);
+        UpdateRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
-      struct DestructionRequest
+      class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&);
+        DestructionRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
-      struct Query
+      class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&);
-      };
-
-      struct Binding
-        : public BaseDeclaration::BindingBase
-      {
-        Binding();
+        Query(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
     };
     
@@ -148,14 +147,12 @@ namespace Engine {
     class ShaderResourceView
       : public ShaderResourceViewDeclaration
       , public ResourceDescriptorAdapter<ShaderResourceViewDeclaration::Descriptor>
-      , public ResourceBindingAdapter<ShaderResourceViewDeclaration::Binding>
     {
     public:
       using my_type = ShaderResourceView;
 
       ShaderResourceView(
-        const ShaderResourceView::Descriptor &descriptor,
-        const ShaderResourceView::Binding    &binding);
+        const ShaderResourceView::Descriptor &descriptor);
     };
 
     DeclareSharedPointerType(ShaderResourceView);

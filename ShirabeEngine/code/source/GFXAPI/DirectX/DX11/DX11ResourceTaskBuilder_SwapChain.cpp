@@ -119,7 +119,7 @@ namespace Engine {
 
         SwapChainBuffer::Descriptor const&desc = request.resourceDescriptor();
 
-        Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.swapChainHandle());
+        Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.swapChainId());
         if(!privateDependencyHandle) {
           HandleEngineStatusError(EEngineStatus::DXDevice_CreateSwapChainBuffer_Failed, "Failed to create SRV due to missing dependency.");
         }

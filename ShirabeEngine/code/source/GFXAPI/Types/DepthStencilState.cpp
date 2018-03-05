@@ -49,32 +49,31 @@ namespace Engine {
     }
 
     DepthStencilStateDeclaration::UpdateRequest
-      ::UpdateRequest(ResourceHandle const& handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      ::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     DepthStencilStateDeclaration::DestructionRequest
-      ::DestructionRequest(ResourceHandle const& handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      ::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     DepthStencilStateDeclaration::Query
-      ::Query(ResourceHandle const& handle)
-      : BaseDeclaration::QueryBase(handle)
-    {}
-
-    DepthStencilStateDeclaration::Binding
-      ::Binding()
-      : BaseDeclaration::BindingBase()
+      ::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     DepthStencilState
       ::DepthStencilState(
-        DepthStencilState::Descriptor const &descriptor,
-        DepthStencilState::Binding    const &binding)
+        DepthStencilState::Descriptor const &descriptor)
       : DepthStencilStateDeclaration()
       , ResourceDescriptorAdapter<DepthStencilStateDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<DepthStencilStateDeclaration::Binding >(binding)
     {}
 
     /**********************************************************************************************//**

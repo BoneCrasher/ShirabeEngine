@@ -27,14 +27,14 @@ namespace Engine {
   
     ShaderResourceViewDeclaration::Descriptor
       ::Descriptor()
-      : name("")
+      : DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>()
       , shaderResourceDimension()
     {}
 
     ShaderResourceViewDeclaration::CreationRequest
       ::CreationRequest(
-        Descriptor     const&desc,
-        ResourceHandle const&underlyingBufferHandle)
+        Descriptor         const&desc,
+        PublicResourceId_t const&underlyingBufferHandle)
       : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
       , m_underlyingBufferHandle(underlyingBufferHandle)
     {}
@@ -66,7 +66,7 @@ namespace Engine {
       return ss.str();
     }
 
-    ResourceHandle const&
+    PublicResourceId_t const&
       ShaderResourceViewDeclaration::CreationRequest
       ::underlyingBufferHandle() const
     {
@@ -89,31 +89,30 @@ namespace Engine {
     }
 
     ShaderResourceViewDeclaration::UpdateRequest
-      ::UpdateRequest(ResourceHandle const& handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      ::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     ShaderResourceViewDeclaration::DestructionRequest
-      ::DestructionRequest(ResourceHandle const& handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      ::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
     ShaderResourceViewDeclaration::Query
-      ::Query(ResourceHandle const& handle)
-      : BaseDeclaration::QueryBase(handle)
+      ::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
-
-    ShaderResourceViewDeclaration::Binding
-      ::Binding()
-      : BaseDeclaration::BindingBase()
-    {}
-
+    
     ShaderResourceView
       ::ShaderResourceView(
-        const ShaderResourceView::Descriptor &descriptor,
-        const ShaderResourceView::Binding    &binding)
+        const ShaderResourceView::Descriptor &descriptor)
       : ShaderResourceViewDeclaration()
       , ResourceDescriptorAdapter<ShaderResourceViewDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<ShaderResourceViewDeclaration::Binding>(binding)
     {}
   }
 }

@@ -74,8 +74,8 @@ namespace Engine {
 			};
 			/**************************************************************************************************//**/
 			
-			virtual bool initialize() = 0;
-			virtual bool cleanup()    = 0;
+			virtual bool initialize()   = 0;
+			virtual bool deinitialize() = 0;
 
 			/**********************************************************************************************//**
 			 * \fn	virtual bool Looper::loop() = 0;

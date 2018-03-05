@@ -1,9 +1,10 @@
 #ifndef __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 #define __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 
+#include "Resources/System/Core/ResourceDTO.h"
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
-#include "Resources/System/Core/Handle.h"
+
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
@@ -18,29 +19,38 @@ namespace Engine {
       class CreationRequestBase {
       public:
         CreationRequestBase(
-          TDescriptor    const&desc)
+          TDescriptor const&desc)
           : m_resourceDescriptor(desc)
         {}
 
         TDescriptor const& resourceDescriptor() const { return m_resourceDescriptor; }
 
+        bool serializeOnDestruct() const { return m_serializeOnDestruct; }
+
         virtual std::string toString() const = 0;
 
       private:
         TDescriptor m_resourceDescriptor;
+
+        bool m_serializeOnDestruct;
       };
       
       class ExistingResourceRequestBase { 
       public:
         inline 
-          ExistingResourceRequestBase(ResourceHandle const& inHandle)
-          : m_handle(inHandle)
+          ExistingResourceRequestBase(
+            PublicResourceId_t    const& inPublicResourceId,
+            SubjacentResourceId_t const& inSubjacentResourceId)
+          : m_publicResourceId(inPublicResourceId)
+          , m_subjacentResouceId(inSubjacentResourceId)
         {}
 
-        inline ResourceHandle const& handle() const { return m_handle; }
+        inline PublicResourceId_t    const& publicResourceId()    const { return m_publicResourceId;   }
+        inline SubjacentResourceId_t const& subjacentResourceId() const { return m_subjacentResouceId; }
 
       private:
-        ResourceHandle m_handle;
+        PublicResourceId_t    m_publicResourceId;
+        SubjacentResourceId_t m_subjacentResouceId;
       };
 
 
@@ -48,8 +58,10 @@ namespace Engine {
         : public ExistingResourceRequestBase
       {
       public:
-        inline UpdateRequestBase(ResourceHandle const& handle = ResourceHandle::Invalid())
-          : ExistingResourceRequestBase(handle)
+        inline UpdateRequestBase(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId)
+          : ExistingResourceRequestBase(inPublicResourceId, inSubjacentResourceId)
         {}
       };
 
@@ -57,8 +69,10 @@ namespace Engine {
         : public ExistingResourceRequestBase
       {
       public:
-        inline DestructionRequestBase(ResourceHandle const& handle = ResourceHandle::Invalid())
-          : ExistingResourceRequestBase(handle)
+        inline DestructionRequestBase(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId)
+          : ExistingResourceRequestBase(inPublicResourceId, inSubjacentResourceId)
         {}
       };
 
@@ -66,16 +80,10 @@ namespace Engine {
         : public ExistingResourceRequestBase
       {
       public:
-        inline QueryBase(ResourceHandle const& handle = ResourceHandle::Invalid())
-          : ExistingResourceRequestBase(handle)
-        {}
-      };
-
-      struct BindingBase {
-        ResourceHandle handle;
-
-        inline BindingBase() 
-          : handle(ResourceHandle::Invalid()) 
+        inline QueryBase(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId)
+          : ExistingResourceRequestBase(inPublicResourceId, inSubjacentResourceId)
         {}
       };
     };

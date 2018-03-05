@@ -112,7 +112,7 @@ namespace Engine {
     //    ID3D11RenderTargetView *const d3d11SwapChainRTV = nullptr;
     //    ID3D11DepthStencilView *const d3d11DSV          = m_resourceManager. (defaultDepthStencilViewDescriptor);
 
-    //    m_resourceManager->backend()->getUnderlyingHandle<ID3D11RenderTargetView>(_swapChain->binding.)
+    //    m_resourceManager->backend()->getGfxApiResourceHandle<ID3D11RenderTargetView>(_swapChain->binding.)
 
 				//// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
 				//dx11Environment.getImmediateContext()->OMSetRenderTargets(1, &d3d11SwapChainRTV, d3d11DSV);

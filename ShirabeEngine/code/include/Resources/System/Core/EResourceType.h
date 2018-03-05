@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_IRESOURCETYPE_H__
 #define __SHIRABE_IRESOURCETYPE_H__
 
+#include <ostream>
+
 #include "Core/EngineTypeHelper.h"
 
 namespace Engine {
@@ -52,6 +54,16 @@ namespace Engine {
 			RASTERIZER_STATE      = 702,
 			BLEND_STATE           = 703
 		};
+
+    std::ostream& operator<<(std::ostream& s, EResourceType const&rt) {
+      s << static_cast<std::underlying_type<EResourceType>::type>(rt);
+      return s;
+    }
+
+    std::ostream& operator<<(std::ostream& s, EResourceSubType const&rt) {
+      s << static_cast<std::underlying_type<EResourceSubType>::type>(rt);
+      return s;
+    }
 	}
 }
 

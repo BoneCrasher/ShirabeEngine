@@ -24,18 +24,9 @@ namespace Engine {
 
     SwapChainBufferDeclaration::
       CreationRequest::CreationRequest(
-        Descriptor     const& desc,
-        ResourceHandle const& swapChainHandle)
+        Descriptor     const& desc)
       : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-      , m_swapChainHandle(swapChainHandle)
     {}
-
-    ResourceHandle const&
-      SwapChainBufferDeclaration::
-      CreationRequest::swapChainHandle() const
-    {
-      return m_swapChainHandle;
-    }
 
     std::string
       SwapChainBufferDeclaration::
@@ -53,41 +44,37 @@ namespace Engine {
     }
 
     SwapChainBufferDeclaration::
-      UpdateRequest::UpdateRequest(ResourceHandle const&handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      UpdateRequest::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     SwapChainBufferDeclaration::
-      DestructionRequest::DestructionRequest(ResourceHandle const&handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      DestructionRequest::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     SwapChainBufferDeclaration::
-      Query::Query(ResourceHandle const&handle)
-      : BaseDeclaration::QueryBase(handle)
+      Query::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
-
-    SwapChainBufferDeclaration::
-      Binding::Binding()
-      : BaseDeclaration::BindingBase()
-      , renderTargetView()
-    {}
-
-
+    
     Ptr<SwapChainBuffer>
       SwapChainBuffer::create(
-        const SwapChainBuffer::Descriptor &desc,
-        const SwapChainBuffer::Binding    &binding)
+        const SwapChainBuffer::Descriptor &desc)
     {
-      return Ptr<SwapChainBuffer>(new SwapChainBuffer(desc, binding));
+      return Ptr<SwapChainBuffer>(new SwapChainBuffer(desc));
     }
 
     SwapChainBuffer::SwapChainBuffer(
-      const SwapChainBuffer::Descriptor &descriptor,
-      const SwapChainBuffer::Binding    &binding)
+      const SwapChainBuffer::Descriptor &descriptor)
       : SwapChainBufferDeclaration()
       , ResourceDescriptorAdapter<SwapChainBufferDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<SwapChainBufferDeclaration::Binding>(binding)
     {}
 
 
@@ -139,27 +126,32 @@ namespace Engine {
 
 
     SwapChainDeclaration::
-      UpdateRequest::UpdateRequest(ResourceHandle const&handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      UpdateRequest::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     SwapChainDeclaration::
-      DestructionRequest::DestructionRequest(ResourceHandle const&handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      DestructionRequest::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
 
     SwapChainDeclaration::
-      Query::Query(ResourceHandle const&handle)
-      : BaseDeclaration::QueryBase(handle)
+      Query::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
 
     Ptr<SwapChain>
       SwapChain::create(
-        const SwapChain::Descriptor &desc,
-        const SwapChain::Binding    &binding) {
-      return Ptr<SwapChain>(new SwapChain(desc, binding));
+        const SwapChain::Descriptor &desc) {
+      return Ptr<SwapChain>(new SwapChain(desc));
     }
 
     Ptr<RenderTargetView> const&
@@ -178,11 +170,9 @@ namespace Engine {
     }
 
     SwapChain::SwapChain(
-      const SwapChain::Descriptor &descriptor,
-      const SwapChain::Binding    &binding)
+      const SwapChain::Descriptor &descriptor)
       : SwapChainDeclaration()
       , ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<SwapChainDeclaration::Binding>(binding)
       , m_currentBackBufferIndex(0)
     {}
   }

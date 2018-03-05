@@ -2,7 +2,7 @@
 #define __SHIRABE_SWAPCHAIN_H__
 
 #include "Resources/System/Core/EResourceType.h"
-#include "Resources/System/Core/Handle.h"
+
 #include "Resources/System/Core/IResource.h"
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceTraits.h"
@@ -10,6 +10,7 @@
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Definitions.h"
+#include "GFXAPI/Types/RequestDefaultImplementation.h"
 #include "GFXAPI/Types/TextureND.h"
 #include "GFXAPI/Types/RenderTargetView.h"
 #include "RequestDefaultImplementation.h"
@@ -49,46 +50,43 @@ namespace Engine {
         : public BaseDeclaration::CreationRequestBase<Descriptor>
       {
       public:
-        CreationRequest(
-          Descriptor     const& desc,
-          ResourceHandle const& swapChainHandle);
-
-        ResourceHandle const& swapChainHandle()    const;
+        CreationRequest(Descriptor const& desc);
 
         std::string toString() const;
+        
+        inline PublicResourceId_t swapChainId() const { return m_swapChainId; }
 
       private:
-        ResourceHandle m_swapChainHandle;
+        PublicResourceId_t m_swapChainId;
       };
 
       class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&handle);
+        UpdateRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&handle);
+        DestructionRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&handle);
+        Query(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
-      struct Binding
-        : public BaseDeclaration::BindingBase
-      {
-        RenderTargetView::Binding renderTargetView;
-
-        Binding();
-      };
     };
 
     /**********************************************************************************************//**
@@ -99,7 +97,6 @@ namespace Engine {
     class SwapChainBuffer
       : public SwapChainBufferDeclaration
       , public ResourceDescriptorAdapter<SwapChainBufferDeclaration::Descriptor>
-      , public ResourceBindingAdapter<SwapChainBufferDeclaration::Binding>
     {
     public:
       using my_type = SwapChainBuffer;
@@ -112,13 +109,11 @@ namespace Engine {
       // EEngineStatus present(bool verticallySynchronized = true);
 
       inline static Ptr<SwapChainBuffer> create(
-        const SwapChainBuffer::Descriptor &desc,
-        const SwapChainBuffer::Binding    &binding);
+        const SwapChainBuffer::Descriptor &desc);
 
     private:
       inline SwapChainBuffer(
-        const SwapChainBuffer::Descriptor &descriptor,
-        const SwapChainBuffer::Binding    &binding);
+        const SwapChainBuffer::Descriptor &descriptor);
     };
 
 
@@ -168,29 +163,28 @@ namespace Engine {
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&handle);
+        UpdateRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&handle);
+        DestructionRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&handle);
+        Query(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
-
-      struct Binding
-        : public BaseDeclaration::BindingBase
-      {
-        std::vector<SwapChainBuffer::Binding> backBufferRenderTargetBindings;
-      };
-
     };
 
     /**********************************************************************************************//**
@@ -201,7 +195,6 @@ namespace Engine {
     class SwapChain
       : public SwapChainDeclaration
       , public ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>
-      , public ResourceBindingAdapter<SwapChainDeclaration::Binding>
     {
     public:
       using my_type = SwapChain;
@@ -214,8 +207,7 @@ namespace Engine {
       // EEngineStatus present(bool verticallySynchronized = true);
 
       inline static Ptr<SwapChain> create(
-        const SwapChain::Descriptor &desc,
-        const SwapChain::Binding    &binding);
+        const SwapChain::Descriptor &desc);
 
       Ptr<RenderTargetView> const& getBackBufferRenderTargetView(uint32_t const& index);
 
@@ -223,8 +215,7 @@ namespace Engine {
 
     private:
       inline SwapChain(
-        const SwapChain::Descriptor &descriptor,
-        const SwapChain::Binding    &binding);
+        const SwapChain::Descriptor &descriptor);
 
       std::size_t                        m_currentBackBufferIndex;
       std::vector<Ptr<RenderTargetView>> m_backBufferRenderTargetViews;

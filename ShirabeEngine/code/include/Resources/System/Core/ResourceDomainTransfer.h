@@ -7,6 +7,7 @@
 
 #include "Core/EngineTypeHelper.h"
 #include "Resources/System/Core/EResourceType.h"
+#include "Resources/System/Core/ResourceDTO.h"
 
 namespace Engine {
   namespace Resources {
@@ -25,7 +26,22 @@ namespace Engine {
       
     public:
       EResourceType    type()    const { return resource_type;    }
-      EResourceSubType subtype() const { return resource_subtype; }      
+      EResourceSubType subtype() const { return resource_subtype; }   
+
+      std::string          name;
+      PublicResourceIdList dependencies;
+
+      virtual std::string toString() const {
+        std::stringstream ss;
+        ss
+          << "DescriptorImplementationBase<" << resource_type << ", " << resource_subtype << "> {\n"
+          << "  Name: " << name << "\n"
+          << "  Dependencies: \n";
+        for(PublicResourceId_t const&id : dependencies)
+          ss << id << ", \n";
+
+        return ss.str();
+      }
     };
 
     // An adapter class will hold the implementation of a DomainTransferObject, e.g.

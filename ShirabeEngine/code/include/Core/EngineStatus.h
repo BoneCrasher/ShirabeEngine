@@ -94,12 +94,14 @@ namespace Engine {
     EEngineStatus m_status;
   };
 
-  static inline void HandleEngineStatusError(
+  static inline EEngineStatus HandleEngineStatusError(
     EEngineStatus const& status,
     std::string   const& message)
   {
     if(CheckEngineError(status))
       throw EngineException(status, message);
+
+    return status;
   }
 
 	static inline std::ostream& operator<<(std::ostream& stream, const EEngineStatus& status) {

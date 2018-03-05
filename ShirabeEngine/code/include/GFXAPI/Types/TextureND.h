@@ -108,35 +108,31 @@ namespace Engine {
         std::string toString() const;
       };
 
-      class UpdateRequest 
+      class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&);
+        UpdateRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&);
+        DestructionRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&);
-      };
-
-      struct Binding
-        : public BaseDeclaration::BindingBase {
-        ResourceHandle              handle;
-        ShaderResourceView::Binding srvBinding;
-        RenderTargetView::Binding   rtvBinding;
-        DepthStencilView::Binding   dsvBinding;
-
-        inline Binding();
+        Query(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
     };
 
@@ -151,12 +147,10 @@ namespace Engine {
     class Texture
       : public TextureNDDeclaration<N>
       , public ResourceDescriptorAdapter<TextureNDDeclaration<N>::Descriptor>
-      , public ResourceBindingAdapter<TextureNDDeclaration<N>::Binding>
     {
     public:
       Texture(
-        const typename Texture<N>::Descriptor &descriptor,
-        const typename Texture<N>::Binding    &binding);
+        const typename Texture<N>::Descriptor &descriptor);
 
       inline Ptr<RenderTargetView>   renderTargetView()   const { return m_renderTargetView;   }
       inline Ptr<ShaderResourceView> shaderResourceView() const { return m_shaderResourceView; }
@@ -230,39 +224,34 @@ namespace Engine {
 
     template <uint8_t N>
     TextureNDDeclaration<N>::UpdateRequest
-      ::UpdateRequest(ResourceHandle const& handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      ::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     template <uint8_t N>
     TextureNDDeclaration<N>::DestructionRequest
-      ::DestructionRequest(ResourceHandle const& handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      ::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     template <uint8_t N>
     TextureNDDeclaration<N>::Query
-      ::Query(ResourceHandle const& handle)
-      : BaseDeclaration::QueryBase(handle)
-    {}
-
-    template <uint8_t N>
-    TextureNDDeclaration<N>::Binding
-      ::Binding()
-      : BaseDeclaration::BindingBase()
-      , srvBinding()
-      , rtvBinding()
-      , dsvBinding()
+      ::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     template <uint8_t N>
     Texture<N>
       ::Texture(
-        typename Texture<N>::Descriptor const&descriptor,
-        typename Texture<N>::Binding    const&binding)
+        typename Texture<N>::Descriptor const&descriptor)
       : TextureNDDeclaration<N>()
       , ResourceDescriptorAdapter<typename TextureNDDeclaration<N>::Descriptor>(descriptor)
-      , ResourceBindingAdapter<typename TextureNDDeclaration<N>::Binding>(binding)
     {}
 
 

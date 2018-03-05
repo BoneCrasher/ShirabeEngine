@@ -37,7 +37,6 @@ namespace Engine {
         static const constexpr EResourceSubType resource_subtype = subtype;
 
         typedef TClass              class_type;
-        typedef TBinding            binding_impl_type;
         typedef TDescriptor         descriptor_impl_type;
         typedef TCreationRequest    creation_request_impl_type;
         typedef TUpdateRequest      update_request_impl_type;
@@ -50,26 +49,24 @@ namespace Engine {
     class ResourcePublicTraits {
     public:
       typedef typename T::Descriptor         descriptor_public_type;
-      typedef typename T::Binding            binding_public_type;
       typedef typename T::CreationRequest    creation_request_public_type;
       typedef typename T::UpdateRequest      update_request_public_type;
       typedef typename T::Query              query_request_public_type;
       typedef typename T::DestructionRequest destruction_request_public_type;
     };
 
-#define DeclareResourceTraits(Prefix, Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction) \
+#define DeclareResourceTraits(Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction) \
     class Prefix##Traits                                                                                               \
-      : public ResourceTraits<Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction>         \
+      : public ResourceTraits<Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction>         \
     {};
 
-#define DeclareTemplatedResourceTraits(Tpl, Prefix, Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction) \
+#define DeclareTemplatedResourceTraits(Tpl, Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction) \
     Tpl                                                                                                                              \
     class Prefix##Traits                                                                                                             \
-      : public ResourceTraits<Class, Type, Subtype, Binding, Descriptor, Creation, Update, Query, Destruction>                       \
+      : public ResourceTraits<Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction>                       \
     {};
 
 #define DefineTraitsPublicTypes(Type)                                                               \
-    using Type##Binding              = ResourcePublicTraits<Type>::binding_public_type            ; \
     using Type##Descriptor           = ResourcePublicTraits<Type>::descriptor_public_type         ; \
     using Type##CreationRequest      = ResourcePublicTraits<Type>::creation_request_public_type   ; \
     using Type##UpdateRequest        = ResourcePublicTraits<Type>::update_request_public_type     ; \
@@ -77,7 +74,6 @@ namespace Engine {
     using Type##DesctructionRequest  = ResourcePublicTraits<Type>::destruction_request_public_type; 
 
 #define DefineTraitsPublicTemplateTypes(Tpl, Prefix, Type)                                                         \
-    Tpl using Prefix##Binding              = typename ResourcePublicTraits<Type>::binding_public_type            ; \
     Tpl using Prefix##Descriptor           = typename ResourcePublicTraits<Type>::descriptor_public_type         ; \
     Tpl using Prefix##CreationRequest      = typename ResourcePublicTraits<Type>::creation_request_public_type   ; \
     Tpl using Prefix##UpdateRequest        = typename ResourcePublicTraits<Type>::update_request_public_type     ; \

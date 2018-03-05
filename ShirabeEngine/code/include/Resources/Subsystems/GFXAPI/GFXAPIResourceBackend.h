@@ -67,7 +67,7 @@ namespace Engine {
       template <typename TResource>
       EEngineStatus load(
         typename TResource::CreationRequest const&inRequest,
-        GFXAPIResourceHandleMap             const&dependencies,
+        GFXAPIResourceHandleList            const&dependencies,
         const ETaskSynchronization               &inRequestMode,
         const Ptr<IAsyncLoadCallback>            &inCallback,
         GFXAPIResourceHandle_t                   &outResourceHandle);
@@ -77,8 +77,8 @@ namespace Engine {
         typename TResource::DestructionRequest const&inRequest);
 
       template <typename TUnderlyingType>
-      EEngineStatus getUnderlyingHandle(
-        GFXAPIResourceHandle_t const&handle,
+      EEngineStatus getGfxApiResourceHandle(
+        GFXAPIResourceHandle_t const&resourceId,
         Ptr<TUnderlyingType>        &outHandlePtr);
 
       void setResourceTaskBackend(ResourceTaskBackendPtr const& backend);
@@ -100,8 +100,8 @@ namespace Engine {
         ResourceTaskFn_t                           &inTask,
         std::future<ResourceTaskFn_t::result_type> &outSharedFuture);
 
-      ResourceTaskBackendPtr            m_resourceTaskBackend;
-      PublicToPrivateBackendResourceMap m_storage;
+      ResourceTaskBackendPtr       m_resourceTaskBackend;
+      ResolvedDependencyCollection m_storage;
 
       Threading::Looper<ResourceTaskFn_t::result_type>           m_resourceThread;
       Threading::Looper<ResourceTaskFn_t::result_type>::Handler &m_resourceThreadHandler;
@@ -172,7 +172,7 @@ namespace Engine {
       GFXAPIResourceBackend<TSupportedResourceTypes...>
       ::load(
         typename TResource::CreationRequest const&inRequest,
-        GFXAPIResourceHandleMap             const&dependencies,
+        GFXAPIResourceHandleList            const&dependencies,
         const ETaskSynchronization               &inSynchronization,
         const Ptr<IAsyncLoadCallback>            &inCallback,
         GFXAPIResourceHandle_t                   &outResourceHandle)
@@ -183,8 +183,8 @@ namespace Engine {
 
       // Resolve dependencies...
       ResolvedDependencyCollection resolvedDependencies={};
-      for(GFXAPIResourceHandleMap::value_type const&h : dependencies)
-        resolvedDependencies[h.first] = m_storage[h.second];
+      for(GFXAPIResourceHandleList::value_type const&h : dependencies)
+        resolvedDependencies[h] = m_storage[h];
 
       EEngineStatus status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
       if(!CheckEngineError(status)) {
@@ -352,7 +352,7 @@ namespace Engine {
     template <typename TUnderlyingType>
     EEngineStatus
       GFXAPIResourceBackend<TSupportedResourceTypes...>
-      ::getUnderlyingHandle(
+      ::getGfxApiResourceHandle(
         GFXAPIResourceHandle_t const&handle,
         Ptr<TUnderlyingType>        &outHandlePtr)
     {

@@ -47,32 +47,31 @@ namespace Engine {
     }
 
     RasterizerStateDeclaration::UpdateRequest
-      ::UpdateRequest(ResourceHandle const& handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      ::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     RasterizerStateDeclaration::DestructionRequest
-      ::DestructionRequest(ResourceHandle const& handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      ::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     RasterizerStateDeclaration::Query
-      ::Query(ResourceHandle const& handle)
-      : BaseDeclaration::QueryBase(handle)
-    {}
-
-    RasterizerStateDeclaration::Binding
-      ::Binding()
-      : BaseDeclaration::BindingBase()
+      ::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     RasterizerState
       ::RasterizerState(
-        RasterizerState::Descriptor const &descriptor,
-        RasterizerState::Binding    const &binding)
+        RasterizerState::Descriptor const &descriptor)
       : RasterizerStateDeclaration()
       , ResourceDescriptorAdapter<RasterizerState::Descriptor>(descriptor)
-      , ResourceBindingAdapter<RasterizerState::Binding >(binding)
     {}
   }
 }

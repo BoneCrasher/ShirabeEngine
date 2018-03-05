@@ -25,13 +25,13 @@ namespace Engine {
 
     RenderTargetViewDeclaration::CreationRequest
       ::CreationRequest(
-        Descriptor     const&desc,
-        ResourceHandle const&underlyingTextureHandle)
+        Descriptor         const&desc,
+        PublicResourceId_t const&underlyingTextureHandle)
       : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
       , m_underlyingTextureHandle(underlyingTextureHandle)
     {}
     
-    ResourceHandle const&
+    PublicResourceId_t const&
       RenderTargetViewDeclaration::CreationRequest
       ::underlyingTextureHandle() const
     {
@@ -53,32 +53,31 @@ namespace Engine {
     }
 
     RenderTargetViewDeclaration::UpdateRequest
-      ::UpdateRequest(ResourceHandle const& handle)
-      : BaseDeclaration::UpdateRequestBase(handle)
+      ::UpdateRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     RenderTargetViewDeclaration::DestructionRequest
-      ::DestructionRequest(ResourceHandle const& handle)
-      : BaseDeclaration::DestructionRequestBase(handle)
+      ::DestructionRequest(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     RenderTargetViewDeclaration::Query
-      ::Query(ResourceHandle const& handle)
-      : BaseDeclaration::QueryBase(handle)
-    {}
-
-    RenderTargetViewDeclaration::Binding
-      ::Binding()
-      : BaseDeclaration::BindingBase()
+      ::Query(
+        PublicResourceId_t    const& inPublicResourceId,
+        SubjacentResourceId_t const& inSubjacentResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
     RenderTargetView::
       RenderTargetView(
-        const RenderTargetView::Descriptor &descriptor,
-        const RenderTargetView::Binding    &binding)
+        const RenderTargetView::Descriptor &descriptor)
       : RenderTargetViewDeclaration()
       , ResourceDescriptorAdapter<RenderTargetViewDeclaration::Descriptor>(descriptor)
-      , ResourceBindingAdapter<RenderTargetViewDeclaration::Binding>(binding)
     {}
 
   }

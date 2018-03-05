@@ -3,7 +3,7 @@
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
-#include "Resources/System/Core/Handle.h"
+
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceTraits.h"
 
@@ -65,31 +65,31 @@ namespace Engine {
         std::string toString() const;
       };
 
-      struct UpdateRequest 
+      class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&);
+        UpdateRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
-      struct DestructionRequest
+      class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&);
+        DestructionRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
-      struct Query
+      class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&);
-      };
-
-      struct Binding
-        : public BaseDeclaration::BindingBase
-      {
-        Binding();
+        Query(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
     };
 
@@ -101,12 +101,10 @@ namespace Engine {
     class RasterizerState
       : public RasterizerStateDeclaration
       , public ResourceDescriptorAdapter<RasterizerStateDeclaration::Descriptor>
-      , public ResourceBindingAdapter<RasterizerStateDeclaration::Binding>
     {
     public:
       RasterizerState(
-        RasterizerState::Descriptor const &descriptor,
-        RasterizerState::Binding    const &binding);
+        RasterizerState::Descriptor const &descriptor);
     };
 
     DeclareSharedPointerType(RasterizerState);

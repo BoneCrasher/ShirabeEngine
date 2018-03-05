@@ -8,7 +8,6 @@ namespace Engine {
         ::DX11ResourceTaskBackend(Ptr<DX11Environment> const& device)
         : GFXAPIResourceTaskBackend<EngineTypes>()
         , m_dx11Environment(device)
-        , m_storage()
       {
         assert(device != nullptr);
       }

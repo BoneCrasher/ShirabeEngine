@@ -6,9 +6,10 @@
 #include <vector>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/EngineStatus.h"
+
 #include "Resources/System/Core/EResourceType.h"
-#include "Resources/System/Core/Handle.h"
-#include "Resources/System/Core/ResourceHierarchy.h"
+#include "Resources/System/Core/ResourceDTO.h"
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 
 namespace Engine {
@@ -22,7 +23,7 @@ namespace Engine {
 		 **************************************************************************************************/
 		using AnyProxy          = std::any;
 		using ResourceProxyList = std::vector<AnyProxy>;
-		using ResourceProxyMap  = std::map<ResourceHandle, AnyProxy>;
+		using ResourceProxyMap  = std::map<PublicResourceId_t, AnyProxy>;
 
 
 		/**********************************************************************************************//**
@@ -65,10 +66,10 @@ namespace Engine {
 		virtual EProxyType proxyType() const = 0;
 		virtual ELoadState loadState() const = 0;
 
-		virtual const ResourceHandleList& dependencies() const = 0;
-
+    virtual SubjacentResourceId_t subjacentResourceId() const = 0;
+    
 		virtual EEngineStatus loadSync(
-      GFXAPIResourceHandleMap const&inResolvedDependencies) = 0;
+      SubjacentResourceIdList const&inResolvedDependencies) = 0;
 		virtual EEngineStatus unloadSync() = 0;
 
 		DeclareInterfaceEnd(IResourceProxyBase);
@@ -142,16 +143,11 @@ namespace Engine {
 				, ResourceCreationRequestAdapter<typename TResource::CreationRequest>(request)
 				, m_type(proxyType)
 				, m_loadState(ELoadState::UNKNOWN)
-				, m_dependencies()
 			{
 			}
 
-      inline ResourceHandle const& resourceHandle() const { return m_handle; }
-
 			inline EProxyType proxyType() const { return m_type; }
 			inline ELoadState loadState() const { return m_loadState; }
-
-			inline const ResourceHandleList& dependencies() const { return m_dependencies; }
 
 			inline bool destroy() { return !CheckEngineError(unloadSync()); }
 
@@ -159,13 +155,19 @@ namespace Engine {
 			inline void setLoadState(const ELoadState& newLoadState) { m_loadState = newLoadState; }
 
 		private:
-      ResourceHandle m_handle;
-
 			EProxyType m_type;
 			ELoadState m_loadState;
-
-			ResourceHandleList m_dependencies;
 		};
+
+    template <typename TResource>
+    static Ptr<GenericProxyBase<TResource>> GenericProxyBaseCast(const AnyProxy& proxy) {
+      try {
+        Ptr<GenericProxyBase<TResource>> tmp = std::any_cast<Ptr<GenericProxyBase<TResource>>>(proxy);
+        return tmp;
+      } catch( std::bad_any_cast& ) {
+        return nullptr;
+      }
+    }
 
 	}
 }

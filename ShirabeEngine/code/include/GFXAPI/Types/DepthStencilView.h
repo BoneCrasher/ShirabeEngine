@@ -3,7 +3,7 @@
 
 #include "Resources/System/Core/EResourceType.h"
 #include "Resources/System/Core/IResource.h"
-#include "Resources/System/Core/Handle.h"
+
 #include "Resources/System/Core/ResourceDomainTransfer.h"
 #include "Resources/System/Core/ResourceTraits.h"
 
@@ -60,42 +60,42 @@ namespace Engine {
       {
       public:
         CreationRequest(
-          Descriptor     const&desc,
-          ResourceHandle const&underlyingTextureHandle);
+          Descriptor         const&desc,
+          PublicResourceId_t const&underlyingTextureHandle);
 
-        ResourceHandle const& underlyingTextureHandle() const;
+        PublicResourceId_t const& underlyingTextureHandle() const;
 
         std::string toString() const;
 
       private:
-        ResourceHandle m_underlyingTextureHandle;
+        PublicResourceId_t m_underlyingTextureHandle;
       };
 
-      class UpdateRequest 
+      class UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
-        UpdateRequest(ResourceHandle const&);
+        UpdateRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
-        DestructionRequest(ResourceHandle const&);
+        DestructionRequest(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
 
       class Query
         : public BaseDeclaration::QueryBase
       {
       public:
-        Query(ResourceHandle const&);
-      };
-
-      struct Binding
-        : public BaseDeclaration::BindingBase
-      {
-        Binding();
+        Query(
+          PublicResourceId_t    const& inPublicResourceId,
+          SubjacentResourceId_t const& inSubjacentResourceId);
       };
     };
 
@@ -107,14 +107,12 @@ namespace Engine {
     class DepthStencilView
       : public DepthStencilViewDeclaration
       , public ResourceDescriptorAdapter<DepthStencilViewDeclaration::Descriptor>
-      , public ResourceBindingAdapter<DepthStencilViewDeclaration::Binding>
     {
     public:
       using my_type = DepthStencilView;
 
       DepthStencilView(
-        const DepthStencilView::Descriptor &descriptor,
-        const DepthStencilView::Binding    &binding);
+        const DepthStencilView::Descriptor &descriptor);
     };
 
     DeclareSharedPointerType(DepthStencilView);

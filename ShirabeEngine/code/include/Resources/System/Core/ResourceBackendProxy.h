@@ -24,7 +24,7 @@ namespace Engine {
 			{ }
 
 		protected:
-			TBackend resourceBackend() { return m_backend; }
+			Ptr<TBackend> resourceBackend() { return m_backend; }
 
 		private:
 			Ptr<TBackend> m_backend;

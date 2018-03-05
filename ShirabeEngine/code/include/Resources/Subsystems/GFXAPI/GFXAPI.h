@@ -10,7 +10,9 @@
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/EngineStatus.h"
+
 #include "IOC/Observer.h"
+#include "Resources/System/Core/ResourceDTO.h"
 
 namespace Engine {
 	namespace GFXAPI {
@@ -22,7 +24,7 @@ namespace Engine {
 		 *
 		 * \brief	Defines an alias representing the platform resource handle t
 		 **************************************************************************************************/
-		using GFXAPIResourceHandle_t = uint64_t;
+		using GFXAPIResourceHandle_t = SubjacentResourceId_t;
 		static const GFXAPIResourceHandle_t GFXAPIUninitializedResourceHandle = 0;
 
     DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
@@ -40,7 +42,7 @@ namespace Engine {
     };
 
 		DeclareListType(GFXAPIResourceHandle_t, GFXAPIResourceHandle);
-		DeclareMapType(ResourceHandle, GFXAPIResourceHandle_t, GFXAPIResourceHandle);
+		DeclareMapType(PublicResourceId_t, GFXAPIResourceHandle_t, GFXAPIResourceHandle);
 
     static bool CheckValidHandle(GFXAPIResourceHandle_t const& h) {
       return (h > 0); // For now this is the only condition...
