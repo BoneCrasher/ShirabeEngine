@@ -19,27 +19,28 @@ namespace Engine {
   namespace Resources {
 
     #define DeclareResourceMethods(resource)          \
-                                                  \
-  virtual EEngineStatus create##resource(         \
-    resource::CreationRequest const&inRequest,    \
-    PublicResourceId_t             &outId         \
-  ) = 0;                                          \
-                                                  \
-  virtual EEngineStatus load##resource(           \
-    PublicResourceId_t const&inId                 \
-  ) = 0;                                          \
-                                                  \
-  virtual EEngineStatus update##resource(         \
-    PublicResourceId_t      const&inId,           \
-    resource::UpdateRequest const&inRequest       \
-  ) = 0;                                          \
-                                                  \
-  virtual EEngineStatus unload##resource(         \
-    PublicResourceId_t const&inId                 \
-  ) = 0;                                          \
-                                                  \
-  virtual EEngineStatus destroy##resource(        \
-    PublicResourceId_t const&inId                 \
+                                                      \
+  virtual EEngineStatus create##resource(             \
+    resource::CreationRequest const&inRequest,        \
+    PublicResourceId_t             &outId,            \
+    bool                            deferLoad = false \
+  ) = 0;                                              \
+                                                      \
+  virtual EEngineStatus load##resource(               \
+    PublicResourceId_t const&inId                     \
+  ) = 0;                                              \
+                                                      \
+  virtual EEngineStatus update##resource(             \
+    PublicResourceId_t      const&inId,               \
+    resource::UpdateRequest const&inRequest           \
+  ) = 0;                                              \
+                                                      \
+  virtual EEngineStatus unload##resource(             \
+    PublicResourceId_t const&inId                     \
+  ) = 0;                                              \
+                                                      \
+  virtual EEngineStatus destroy##resource(            \
+    PublicResourceId_t const&inId                     \
   ) = 0;                                   
   
     DeclareInterface(IResourceManager);

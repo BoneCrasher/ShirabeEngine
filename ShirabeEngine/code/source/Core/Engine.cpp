@@ -146,7 +146,7 @@ namespace Engine {
       = [&, this] () -> void
     {
       m_renderer = MakeSharedPointerType<DX11Renderer>();
-      status = m_renderer->initialize(m_environment, rendererConfiguration, m_resourceManager->backend());
+      //status = m_renderer->initialize(m_environment, rendererConfiguration, m_resourceManager->backend());
       if(!CheckEngineError(status)) {
         status = m_scene.initialize();
       }

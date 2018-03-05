@@ -55,12 +55,12 @@ namespace Engine {
 			BLEND_STATE           = 703
 		};
 
-    std::ostream& operator<<(std::ostream& s, EResourceType const&rt) {
+    static std::ostream& operator<<(std::ostream& s, EResourceType const&rt) {
       s << static_cast<std::underlying_type<EResourceType>::type>(rt);
       return s;
     }
 
-    std::ostream& operator<<(std::ostream& s, EResourceSubType const&rt) {
+    static std::ostream& operator<<(std::ostream& s, EResourceSubType const&rt) {
       s << static_cast<std::underlying_type<EResourceSubType>::type>(rt);
       return s;
     }
