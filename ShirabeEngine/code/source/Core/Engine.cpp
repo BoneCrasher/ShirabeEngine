@@ -1,6 +1,5 @@
 #include "Core/Engine.h"
 
-
 #include "GFXAPI/DirectX/DX11/Renderer/Renderer.h"
 #include "GFXAPI/DirectX/DX11/Resources/ResourceTaskBackend.h"
 

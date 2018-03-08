@@ -13,10 +13,13 @@ namespace Engine {
 	template <typename T>
 	using Ptr = std::shared_ptr<T>;
 
-	#define DeclareSharedPointerType(type) \
+  template <typename T>
+  using UniquePtr = std::unique_ptr<T>;
+
+	  #define DeclareSharedPointerType(type) \
             using type##Ptr = Ptr<type>;
 
-#define DeclarePrefixedSharedPointerType(prefix, type) \
+    #define DeclarePrefixedSharedPointerType(prefix, type) \
             using prefix##Ptr = Ptr<type>;
 
     #define DeclareSharedPointerTypeCustomDeleter(type) \
@@ -132,6 +135,12 @@ namespace Engine {
 		TUnderlying underlyingValue = static_cast<TUnderlying>(value);
 		return ((underlyingFlags & underlyingValue) == underlyingValue);
 	}
+
+  template <typename T>
+  using Vector = std::vector<T>;
+
+  template <typename TKey, typename TValue>
+  using Map = std::map<TKey, TValue>;
 
 #define DeclareListType(type, prefix) using prefix##List = std::vector<type>;
 #define DeclareMapType(keytype, valuetype, prefix) using prefix##Map = std::map<keytype, valuetype>;

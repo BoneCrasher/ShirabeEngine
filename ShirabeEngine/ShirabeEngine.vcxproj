@@ -101,7 +101,8 @@
       <EnablePREfast>false</EnablePREfast>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,6 +115,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,7 +135,8 @@
       <EnablePREfast>false</EnablePREfast>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +153,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,6 +175,7 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_ShaderResourceView.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_SwapChain.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_TextureND.cpp" />
+    <ClCompile Include="code\source\Renderer\GraphBuilder.cpp" />
     <ClCompile Include="code\source\Resources\Subsystems\GFXAPIResourceBackend.cpp" />
     <ClCompile Include="code\include\Threading\Looper.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
@@ -227,6 +234,9 @@
     <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Types.h" />
     <ClInclude Include="code\include\GFXAPI\DirectX\IDXDevice.h" />
     <ClInclude Include="code\include\GFXAPI\Capabilities.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\FrameGraph.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\GraphBuilder.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\Pass.h" />
     <ClInclude Include="code\include\Renderer\IRenderer.h" />
     <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
     <ClInclude Include="code\include\GFXAPI\Types\All.h" />
@@ -270,8 +280,6 @@
     <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Linkage.h" />
     <ClInclude Include="code\include\Renderer\DirectX\IDXDevice.h" />
     <ClInclude Include="code\include\Renderer\GAPIDeviceCapabilities.h" />
-    <ClInclude Include="code\include\Renderer\IRenderer.h" />
-    <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceBackend.h" />
     <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceTaskBackend.h" />
