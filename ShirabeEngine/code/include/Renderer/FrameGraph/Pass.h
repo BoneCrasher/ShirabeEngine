@@ -9,10 +9,14 @@
 
 namespace Engine {
   namespace FrameGraph {
+
+#include <string>
     
+    class GraphBuilder;
+
     class PassBase {
     public:
-      virtual bool setup() = 0;
+      virtual bool setup(GraphBuilder&graphBuilder) = 0;
       virtual bool execute() = 0;
     };
     DeclareSharedPointerType(PassBase);
@@ -25,8 +29,14 @@ namespace Engine {
     public:
       using PassImplementation_t = TPassImplementation;
 
-      bool setup() { return TPassImplementation::setup(); }
-      bool execute() { return TPassImplementation::execute(); }
+      bool setup(PassBuilder<TPassImplementation>&passBuilder) {
+        return TPassImplementation::setup(passBuilder);
+      }
+
+      bool execute() { 
+        return TPassImplementation::execute(); 
+      }
+
     };
 
 

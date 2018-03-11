@@ -13,6 +13,7 @@
 namespace Engine {
   namespace FrameGraph {
 
+    using FrameGraphResourceId_t = uint64_t;
 
     class FrameGraph {
       friend class GraphBuilder;
@@ -26,6 +27,12 @@ namespace Engine {
 
       PassBaseList m_passes;
     };
+    
+    bool
+      FrameGraph::execute()
+    {
+      static_assert(false, LOG_FUNCTION( FrameGraph::execute() :  Not implemented (FrameGraph.h Line __LINE__) ));
+    }
 
   }
 }
