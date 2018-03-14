@@ -7,6 +7,9 @@
 #include <vector>
 #include <map>
 
+#define STR(m) #m
+#define LOG_FUNCTION(...) STR( __VA_ARGS__)
+
 namespace Engine {
 
 
@@ -128,7 +131,7 @@ namespace Engine {
 	#define DeclareEnumClassUnderlyingType(enumName, typeName) \
             typedef std::underlying_type<enumName>::type typeName;
 
-	template <typename TEnum, typename TUnderlying = std::underlying_type<TEnum>::type>
+	template <typename TEnum, typename TUnderlying = typename std::underlying_type<TEnum>::type>
 	static inline bool CheckEnumFlag(
 		const TEnum       &value,
 		const TUnderlying &underlyingFlags) {

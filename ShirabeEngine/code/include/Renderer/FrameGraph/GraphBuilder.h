@@ -5,10 +5,11 @@
 #include <functional>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/Random.h"
 #include "Resources/Core/ResourceDTO.h"
 
-#include "Pass.h"
 #include "FrameGraph.h"
+#include "Pass.h"
 
 namespace Engine {
   namespace FrameGraph {
@@ -22,6 +23,8 @@ namespace Engine {
      **************************************************************************************************/
     class GraphBuilder {
     public:
+      GraphBuilder();
+
       bool initialize();
       bool deinitialize();
 
@@ -40,8 +43,12 @@ namespace Engine {
         compile();
 
     private:
-      inline UniquePtr<FrameGraph>&                graph()             { return m_frameGraph; }
+      FrameGraphResourceId_t generatePassUID();
+
+      inline UniquePtr<FrameGraph>&                graph() { return m_frameGraph; }
       inline Map<std::string, PublicResourceId_t>& importedResources() { return m_importedResources; }
+
+      Random::RandomState m_uidGenerator;
 
       UniquePtr<FrameGraph>                m_frameGraph;
       Map<std::string, PublicResourceId_t> m_importedResources;
@@ -69,10 +76,18 @@ namespace Engine {
         return false;
 
       try {
+        FrameGraphResourceId_t uid = generatePassUID();
+
+        UniquePtr<TPassImplementation>
+          passImplementation = MakeUniquePointerType<TPassImplementation>(std::forward<TPassCreationArgs>(args)...);
         Ptr<Pass<TPassImplementation>>
-          pass = MakeSharedPointerType<Pass<TPassImplementation>>(std::forward<TPassCreationArgs>(args)...);
+          pass = MakeSharedPointerType<Pass<TPassImplementation>>(uid, std::move(passImplementation));
         if (!pass)
           return false;
+
+        if (!pass->setup(*this)) {
+
+        }
 
         graph()->passes().push_back(std::static_pointer_cast<PassBase>(pass));
 
@@ -86,60 +101,6 @@ namespace Engine {
       }
     }
 
-    /**********************************************************************************************//**
-     * \class PassBuilder
-     *
-     * \brief A pass builder.
-     *
-     * \tparam  TPassImplementation Type of the pass implementation.
-     **************************************************************************************************/
-    template <typename TPassImplementation>
-    class PassBuilder {
-    public:
-      PassBuilder(Ptr<Pass<TPassImplementation>>&);
-
-      template <typename TResource>
-      FrameGraphResourceId_t
-        createResource(
-          typename TResource::Descriptor const&desc);
-
-
-    private:
-      Ptr<Pass<TPassImplementation>> m_pass;
-    };
-
-    /**********************************************************************************************//**
-     * \fn  template <typename TPassImplementation> PassBuilder<TPassImplementation>::PassBuilder( Ptr<Pass<TPassImplementation>> &pass)
-     *
-     * \brief Constructor
-     *
-     * \tparam  TPassImplementation Type of the pass implementation.
-     * \param [in,out]  pass  The pass.
-     **************************************************************************************************/
-    template <typename TPassImplementation>
-    PassBuilder<TPassImplementation>::PassBuilder(
-      Ptr<Pass<TPassImplementation>> &pass)
-      : m_pass(pass)
-    {}
-    
-    /**********************************************************************************************//**
-     * \fn  template <typename TResource> PublicResourceId_t GraphBuilder::createResource( typename TResource::Descriptor const&desc)
-     *
-     * \brief Creates a resource
-     *
-     * \tparam  TResource Type of the resource.
-     * \param desc  The description.
-     *
-     * \return  The new resource.
-     **************************************************************************************************/
-    template <typename TPassImplementation>
-    template <typename TResource>
-    FrameGraphResourceId_t
-      PassBuilder<TPassImplementation>::createResource(
-        typename TResource::Descriptor const&desc)
-    {
-      static_assert(false, LOG_FUNCTION(GraphBuilder::createResource(...) : Not implemented(GraphBuilder.cpp Line __LINE__)));
-    }
   }
 }
 

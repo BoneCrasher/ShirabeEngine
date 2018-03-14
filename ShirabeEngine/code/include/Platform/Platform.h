@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_PLATFORM_H__
 #define __SHIRABE_PLATFORM_H__
 
-#ifdef _WIN32
+#ifdef _WIN32 || _WINDOWS
     #define PLATFORM_WINDOWS
     #ifdef _WIN64
         #define TARGET_64BIT

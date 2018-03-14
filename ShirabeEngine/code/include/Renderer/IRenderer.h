@@ -12,22 +12,29 @@ namespace Engine {
     using namespace Platform;
     using namespace Engine::Resources;
 
-    DeclareInterface(IRenderer)
+    DeclareInterface(IRenderable);
+    DeclareInterfaceEnd(IRenderable);
+
+    DeclareInterface(IRenderContext);
+      virtual EEngineStatus render(Ptr<IRenderable> const&) = 0;
+    DeclareInterfaceEnd(IRenderContext);
+
+    DeclareInterface(IRenderer);
       virtual EEngineStatus initialize(
         const ApplicationEnvironment&,
         const RendererConfiguration&,
         const IResourceManagerPtr&) = 0;
 
-    virtual EEngineStatus deinitialize() = 0;
-    virtual EEngineStatus reinitialize() = 0;
-
-    virtual EEngineStatus pause()          = 0;
-    virtual EEngineStatus resume()         = 0;
-    virtual bool          isPaused() const = 0;
-
-    virtual EEngineStatus render(/* insert queue type*/) = 0;
-    DeclareInterfaceEnd(IRenderer)
-      DeclareSharedPointerType(IRenderer)
+      virtual EEngineStatus deinitialize() = 0;
+      virtual EEngineStatus reinitialize() = 0;
+      
+      virtual EEngineStatus pause()          = 0;
+      virtual EEngineStatus resume()         = 0;
+      virtual bool          isPaused() const = 0;
+      
+      virtual EEngineStatus render(/* insert queue type*/) = 0;
+    DeclareInterfaceEnd(IRenderer);
+    DeclareSharedPointerType(IRenderer);
   }
 }
 

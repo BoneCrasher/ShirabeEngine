@@ -53,17 +53,45 @@ namespace Engine {
 		 **************************************************************************************************/
 		//static std::string  toNarrowString(const std::wstring& in);
 
-		static std::wstring String::toWideString(const std::string& in) {
+		static std::wstring toWideString(const std::string& in) {
 			std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
 			std::wstring wide = converter.from_bytes(in);
 			return wide;
 		}
 
-		static std::string String::toNarrowString(const std::wstring& in) {
+    static std::wstring toWideString(char *in) {
+      std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
+      std::wstring wide = converter.from_bytes(in);
+      return wide;
+    }
+
+    static std::wstring toWideString(wchar_t *in) {
+      return std::wstring(in);
+    }
+
+    static std::wstring toWideString(std::wstring const&in) {
+      return std::wstring(in);
+    }
+
+		static std::string toNarrowString(const std::wstring& in) {
 			std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
 			std::string narrow = converter.to_bytes(in);
 			return narrow;
 		}
+
+    static std::string toNarrowString(wchar_t *in) {
+      std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
+      std::string narrow = converter.to_bytes(in);
+      return narrow;
+    }
+
+    static std::string toNarrowString(char *in) {
+      return std::string(in);
+    }
+
+    static std::string toNarrowString(std::string const&in) {
+      return std::string(in);
+    }
 
 	private:
 		template <typename TArg, typename enable = void>
