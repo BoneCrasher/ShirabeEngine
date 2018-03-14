@@ -62,7 +62,7 @@ namespace Engine {
         PublicResourceId_t const&resourceId)
     {
       try {
-        bool alreadyAvailableForId = importedResources().find(id) == importedResources().end();
+        bool alreadyAvailableForId = !(importedResources().find(id) == importedResources().end());
 
         if (!alreadyAvailableForId)
           importedResources()[id] = resourceId;

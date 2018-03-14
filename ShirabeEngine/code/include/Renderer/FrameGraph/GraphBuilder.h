@@ -69,8 +69,8 @@ namespace Engine {
     template <typename TPassImplementation, typename... TPassCreationArgs>
     Ptr<Pass<TPassImplementation>>
       GraphBuilder::spawnPass(
-        std::string      const&id,
-        TPassCreationArgs&&... args)
+        std::string       const&name,
+        TPassCreationArgs  &&...args)
     {
       if (!graph())
         return false;

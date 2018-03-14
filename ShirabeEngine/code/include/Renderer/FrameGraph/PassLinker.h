@@ -35,18 +35,18 @@ namespace Engine {
       PassOutput_t &output() { return m_outputData; }
 
       template <typename TResource>
-      FrameGraphResourceId_t
+      FrameGraphResource
         createResource(
           typename TResource::Descriptor const&desc);
 
-      FrameGraphResourceId_t
+      FrameGraphResource
         bindRenderTarget(
-          FrameGraphResourceId_t const&subjacentTargetResourceId,
-          uint64_t                     arrayIndex,
-          uint64_t                     elementCount = 1,
-          uint64_t                     mipIndex     = 0);
+          FrameGraphResource const&subjacentTargetResourceId,
+          uint64_t                 arrayIndex,
+          uint64_t                 elementCount = 1,
+          uint64_t                 mipIndex     = 0);
 
-      FrameGraphResourceId_t
+      FrameGraphResource
         importRenderables();
 
     private:
@@ -81,30 +81,30 @@ namespace Engine {
      **************************************************************************************************/
     template <typename TPassImplementation>
     template <typename TResource>
-    FrameGraphResourceId_t
+    FrameGraphResource
       PassLinker<TPassImplementation>::createResource(
         typename TResource::Descriptor const&desc)
     {
       // static_assert(false, LOG_FUNCTION(GraphBuilder::createResource(...) : Not implemented(GraphBuilder.cpp Line __LINE__)));
-      return FrameGraphResourceId_t();
+      return FrameGraphResource();
     }
 
     template <typename TPassImplementation>
-    FrameGraphResourceId_t
+    FrameGraphResource
       PassLinker<TPassImplementation>::bindRenderTarget(
-        FrameGraphResourceId_t const&subjacentTargetResourceId,
-        uint64_t                     arrayIndex,
-        uint64_t                     elementCount,
-        uint64_t                     mipIndex)
+        FrameGraphResource const&subjacentTargetResourceId,
+        uint64_t                 arrayIndex,
+        uint64_t                 elementCount,
+        uint64_t                 mipIndex)
     {
-      return FrameGraphResourceId_t();
+      return FrameGraphResource();
     }
 
     template <typename TPassImplementation>
-    FrameGraphResourceId_t
+    FrameGraphResource
       PassLinker<TPassImplementation>::importRenderables()
     {
-      return FrameGraphResourceId_t();
+      return FrameGraphResource();
     }
   }
 }

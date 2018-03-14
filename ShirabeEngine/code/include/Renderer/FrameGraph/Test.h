@@ -31,12 +31,12 @@ namespace Engine {
       ~GBufferPass();
 
       struct InputData {
-        Map<FrameGraphResourceId_t, Vector<Ptr<IRenderable>>>
+        Map<FrameGraphResource, Vector<Ptr<IRenderable>>>
           renderables;
       };
 
       struct OutputData {
-        FrameGraphRenderTarget
+        FrameGraphResource
           gbuffer0,
           gbuffer1,
           gbuffer2,
@@ -44,11 +44,11 @@ namespace Engine {
       };
 
       struct State {
-        FrameGraphResourceId_t
+        FrameGraphResource
           renderTargetTextureArray;
-        std::vector<FrameGraphResourceId_t>
-          renderTargetOutputs;
-        FrameGraphResourceId_t
+        std::vector<FrameGraphResource>
+          renderTargetBindings;
+        FrameGraphResource
           renderableQueryId;
       };
 
@@ -86,9 +86,9 @@ namespace Engine {
 
       // This will create a list of render targets for the texutre array to render to.
       // They'll be internally created and managed.
-      m_state.renderTargetOutputs.resize(renderTargetTextureDescriptor.array.size);
+      m_state.renderTargetBindings.resize(renderTargetTextureDescriptor.array.size);
       for (uint64_t const&k : Range(0, renderTargetTextureDescriptor.array.size))
-        m_state.renderTargetOutputs[k] = passLinker.bindRenderTarget(m_state.renderTargetTextureArray, k);
+        m_state.renderTargetBindings[k] = passLinker.bindRenderTarget(m_state.renderTargetTextureArray, k);
 
       // Import renderable objects based on selector, flags, or whatever should be supported...
       m_state.renderableQueryId = passLinker.importRenderables();
@@ -120,7 +120,7 @@ namespace Engine {
       };
 
       struct OutputData {
-        FrameGraphRenderTarget
+        FrameGraphResource
           lightAccumulationBuffer;
       };
 
