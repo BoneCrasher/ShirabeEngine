@@ -178,6 +178,8 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_TextureND.cpp" />
     <ClCompile Include="code\source\Renderer\FrameGraph\FrameGraph.cpp" />
     <ClCompile Include="code\source\Renderer\FrameGraph\GraphBuilder.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\Passes\GBufferGeneration.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\Passes\Lighting.cpp" />
     <ClCompile Include="code\source\Resources\Subsystems\GFXAPIResourceBackend.cpp" />
     <ClCompile Include="code\include\Threading\Looper.cpp" />
     <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
@@ -240,6 +242,8 @@
     <ClInclude Include="code\include\Renderer\FrameGraph\FrameGraphData.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\GraphBuilder.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\Pass.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\Passes\GBufferGeneration.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\Passes\Lighting.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\PassLinker.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\Test.h" />
     <ClInclude Include="code\include\Renderer\IRenderer.h" />

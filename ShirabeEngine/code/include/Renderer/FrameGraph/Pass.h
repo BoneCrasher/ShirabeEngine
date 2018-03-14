@@ -11,60 +11,77 @@
 #include "PassLinker.h"
 
 namespace Engine {
-  namespace FrameGraph {
-    using namespace Renderer;
-        
-    class GraphBuilder;
+	namespace FrameGraph {
+		using namespace Renderer;
 
-    class PassBase {
-    public:
-      virtual bool setup(GraphBuilder&graphBuilder) = 0;
-      virtual bool execute(Ptr<IRenderContext>&)    = 0;
-    };
+		class GraphBuilder;
 
-    DeclareSharedPointerType(PassBase);
-    DeclareListType(Ptr<PassBase>, PassBase);
+		class PassBase {
+		public:
+			virtual bool execute(Ptr<IRenderContext>&)    = 0;
+		};
 
-    template <typename TPassImplementation>
-    class Pass
-      : public PassBase
-    {
-    public:
-      using PassImplementation_t = TPassImplementation;
+		DeclareSharedPointerType(PassBase);
+		DeclareListType(Ptr<PassBase>, PassBase);
 
-      Pass(
-        FrameGraphResourceId_t         const&passUID,
-        UniquePtr<TPassImplementation>      &implementation)
-        : m_passUID(passUID)
-        , m_implementation(std::move(implementation))
-      {
-        assert(m_implementation != nullptr);
-      }
+		template <typename TPassImplementation>
+		class Pass
+			: public PassBase
+		{
+		public:
+			using PassImplementation_t = TPassImplementation;
+			using InputData_t          = typename PassImplementation_t::InputData;
+			using OutputData_t         = typename PassImplementation_t::OutputData;
 
-      FrameGraphResourceId_t const&passUID() const { return m_passUID; }
+			Pass(
+				FrameGraphResourceId_t         const&passUID,
+				UniquePtr<TPassImplementation>      &implementation)
+				: m_passUID(passUID)
+				, m_implementation(std::move(implementation))
+				, m_inputData()
+				, m_outputData()
+			{
+				assert(m_implementation != nullptr);
+			}
 
-      bool setup(GraphBuilder&graphBuilder) {
-        PassLinker<TPassImplementation> passLinker(passUID());
-        
-        typename PassImplementation_t::InputData  &input  = passLinker.input();
-        typename PassImplementation_t::OutputData &output = passLinker.output();
+			FrameGraphResourceId_t const&passUID() const { return m_passUID; }
 
-        bool setupSuccessful = m_implementation->setup(passLinker, input, output);
-      }
+			InputData_t  const&inputData()  const { return m_inputData; }
+			OutputData_t const&outputData() const { return m_outputData; }
 
-      bool execute(
-        Ptr<IRenderContext>&context) 
-      {
-        return true; // TPassImplementation::execute(context, input, output);
-      }
+			template <typename... TPassCreationArgs>
+			bool setup(
+				GraphBuilder          &graphBuilder, 
+				TPassCreationArgs &&...args) 
+			{
+				PassLinker<TPassImplementation> passLinker(passUID());
 
-    private:
-      FrameGraphResourceId_t         m_passUID;
-      UniquePtr<TPassImplementation> m_implementation;
-    };
+				InputData_t  inputData ={};
+				OutputData_t outputData={};
+
+				bool setupSuccessful = m_implementation->setup(passLinker, inputData, outputData, std::forward<TPassCreationArgs>(args)...);
+				if(setupSuccessful) {
+					m_inputData  = inputData;
+					m_outputData = outputData;
+				}
+			}
+
+			bool execute(
+				Ptr<IRenderContext>&context)
+			{
+				return true; // TPassImplementation::execute(context, input, output);
+			}
+
+		private:
+			FrameGraphResourceId_t         m_passUID;
+			UniquePtr<TPassImplementation> m_implementation;
+
+			InputData_t  m_inputData;
+			OutputData_t m_outputData;
+		};
 
 
-  }
+	}
 }
 
 #endif

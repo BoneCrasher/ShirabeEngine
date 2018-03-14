@@ -79,13 +79,13 @@ namespace Engine {
         FrameGraphResourceId_t uid = generatePassUID();
 
         UniquePtr<TPassImplementation>
-          passImplementation = MakeUniquePointerType<TPassImplementation>(std::forward<TPassCreationArgs>(args)...);
+          passImplementation = MakeUniquePointerType<TPassImplementation>();
         Ptr<Pass<TPassImplementation>>
           pass = MakeSharedPointerType<Pass<TPassImplementation>>(uid, std::move(passImplementation));
         if (!pass)
           return false;
 
-        if (!pass->setup(*this)) {
+        if (!pass->setup<TPassCreationArgs...>(*this, std::forward<TPassCreationArgs>(args)...)) {
 
         }
 

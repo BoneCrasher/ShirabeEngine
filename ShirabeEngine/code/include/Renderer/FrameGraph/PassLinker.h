@@ -24,15 +24,9 @@ namespace Engine {
     template <typename TPassImplementation>
     class PassLinker {
     public:
-      using PassInput_t  = typename TPassImplementation::InputData;
-      using PassOutput_t = typename TPassImplementation::OutputData;
-
       PassLinker(FrameGraphResourceId_t const&);
 
       FrameGraphResourceId_t const&assignedPassUID() const { return m_passUID; }
-
-      PassInput_t  &input()  { return m_inputData;  }
-      PassOutput_t &output() { return m_outputData; }
 
       template <typename TResource>
       FrameGraphResource
@@ -46,13 +40,15 @@ namespace Engine {
           uint64_t                 elementCount = 1,
           uint64_t                 mipIndex     = 0);
 
+	  FrameGraphResource
+		  bindInput(
+			  FrameGraphResource const&resourceId);
+
       FrameGraphResource
         importRenderables();
 
     private:
       FrameGraphResourceId_t m_passUID;
-      PassInput_t            m_inputData;
-      PassOutput_t           m_outputData;
     };
 
     /**********************************************************************************************//**
@@ -99,6 +95,14 @@ namespace Engine {
     {
       return FrameGraphResource();
     }
+
+	template <typename TPassImplementation>
+	FrameGraphResource
+		PassLinker<TPassImplementation>::bindInput(
+			FrameGraphResource const&subjacentTargetResourceId)
+	{
+		return FrameGraphResource();
+	}
 
     template <typename TPassImplementation>
     FrameGraphResource
