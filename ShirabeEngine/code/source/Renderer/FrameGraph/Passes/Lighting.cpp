@@ -25,9 +25,16 @@ namespace Engine {
 			input.gbuffer2 = passLinker.bindInput(gbuffer2);
 			input.gbuffer3 = passLinker.bindInput(gbuffer3);
 
-			Texture2D::Descriptor lightAccBufferDesc ={ };
-			// TODO: Fill desc
-			output.lightAccumulationBuffer = passLinker.createResource<Texture2D>(lightAccBufferDesc);
+			FrameGraphTexture lightAccBufferDesc ={ };
+      lightAccBufferDesc.width          = 1920;
+      lightAccBufferDesc.height         = 1080;
+      lightAccBufferDesc.depth          = 1;
+      lightAccBufferDesc.format         = FrameGraphFormat::R32_FLOAT;
+      lightAccBufferDesc.mipLevels      = 1;
+      lightAccBufferDesc.arraySize      = 1;
+      lightAccBufferDesc.initialState   = FrameGraphResourceInitState::Clear;
+
+			output.lightAccumulationBuffer = passLinker.createTexture(lightAccBufferDesc);
 			
 			m_state.renderTargetBinding = passLinker.bindRenderTarget(output.lightAccumulationBuffer, 0, 1, 0);
 

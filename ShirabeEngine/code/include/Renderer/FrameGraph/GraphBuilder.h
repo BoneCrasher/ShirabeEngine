@@ -28,6 +28,8 @@ namespace Engine {
       bool initialize();
       bool deinitialize();
 
+      Random::RandomState& resourceUIDGenerator() { return m_uidGenerator; }
+
       template <typename TPassImplementation, typename... TPassCreationArgs>
       Ptr<Pass<TPassImplementation>>
         spawnPass(

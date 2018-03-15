@@ -29,28 +29,44 @@ namespace Engine {
 
     enum class FrameGraphFormat {
       Undefined      = 0,
-      RGBA8_TYPELESS = 1,
+      R8_TYPELESS,
+      R8_SINT,
+      R8_UINT,
+      R8_SNORM,
+      R8_UNORM,
+      RGBA8_TYPELESS,
       RGBA8_SINT,
       RGBA8_UINT,
       RGBA8_SNORM,
       RGBA8_UNORM,
       RGBA8_UNORM_SRGB,
       RGBA8_FLOAT,
+      R16_TYPELESS,
+      R16_SINT,
+      R16_UINT,
+      R16_SNORM,
+      R16_UNORM, 
+      R16_FLOAT,
       RGBA16_TYPELESS,
       RGBA16_SINT,
       RGBA16_UINT,
       RGBA16_SNORM,
       RGBA16_UNORM,
       RGBA16_FLOAT,
+      R24_UNORM_X8_TYPELESS,
+      R32_TYPELESS,
+      R32_SINT,
+      R32_UINT,
+      R32_SNORM,
+      R32_UNORM,
+      R32_FLOAT,
+      R32_FLOAT_S8X24_TYPELESS,
       RGBA32_TYPELESS,
       RGBA32_SINT,
       RGBA32_UINT,
       D24_UNORM_S8_UINT,
       D32_FLOAT,
       D32_FLOAT_S8X24_UINT,
-      R24_UNORM_X8_TYPELESS,
-      R32_FLOAT,
-      R32_FLOAT_S8X24_TYPELESS
       // TODO: DXT Compression and Video formats
     };
 
@@ -144,9 +160,8 @@ namespace Engine {
         Read   = 2,
         Write  = 3
       };
-
-
-      asdfj ks; lf asklf j;l:==> Store all created resources in a plain list to allow their descriptors be accessed where necessary!
+      
+      // Store all created resources in a plain list to allow their descriptors be accessed where necessary!
       FrameGraphResourceId_t 
         resourceId;
       BitField<Type>
@@ -166,11 +181,6 @@ namespace Engine {
         arraySize; // At least 1 (basically everything is a vector...)
       FrameGraphResourceInitState
         initialState;
-      bool
-        enableCPURead,  // Can the CPU read the data currently stored on GPU? (Staging-Buffer)
-        enableCPUWrite, // Can the CPU write to the buffer dynamically? (Staging- or Dynamic-Buffer)
-        enableGPURead,  // Can the GPU read from the resource? If not, CPU only resource not synced with the GPU.
-        enableGPUWrite; // Can the GPU write (Default- or Staging-Buffer)
 
       inline
         FrameGraphTexture()
@@ -181,15 +191,11 @@ namespace Engine {
         , mipLevels(1)
         , arraySize(1)
         , initialState(FrameGraphResourceInitState::Undefined)
-        , enableCPURead(false)
-        , enableCPUWrite(false)
-        , enableGPURead(true)
-        , enableGPUWrite(false)
       {}
 
       virtual inline
       bool 
-        validate()
+        validate() const
       {
         bool dimensionsValid = (width == 0 || !(width == 0 || height == 0 || depth == 0));
         bool mipLevelsValid  = (mipLevels >= 1);

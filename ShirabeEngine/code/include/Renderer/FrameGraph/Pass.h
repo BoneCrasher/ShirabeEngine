@@ -51,10 +51,10 @@ namespace Engine {
 
 			template <typename... TPassCreationArgs>
 			bool setup(
-				GraphBuilder          &graphBuilder, 
+				GraphBuilder          &graphBuilder,
 				TPassCreationArgs &&...args) 
 			{
-				PassLinker<TPassImplementation> passLinker(passUID());
+				PassLinker<TPassImplementation> passLinker(passUID(), graphBuilder.resourceUIDGenerator());
 
 				InputData_t  inputData ={};
 				OutputData_t outputData={};

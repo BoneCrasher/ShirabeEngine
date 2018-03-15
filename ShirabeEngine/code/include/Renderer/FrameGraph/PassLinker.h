@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/Random.h"
 #include "Resources/Core/ResourceDTO.h"
 
 #include "FrameGraphData.h"
