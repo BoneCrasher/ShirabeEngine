@@ -224,6 +224,7 @@
     <ClInclude Include="code\include\Benchmarking\Timer\Timer.h" />
     <ClInclude Include="code\include\Benchmarking\Timer\WindowsTime.h" />
     <ClInclude Include="code\include\Benchmarking\Timer\TimespanUnit.h" />
+    <ClInclude Include="code\include\Core\BitField.h" />
     <ClInclude Include="code\include\Core\Random.h" />
     <ClInclude Include="code\include\ECWS\IComponentFactory.h" />
     <ClInclude Include="code\include\ECWS\MeshComponent.h" />

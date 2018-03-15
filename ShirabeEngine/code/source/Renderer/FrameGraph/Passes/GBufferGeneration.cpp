@@ -26,19 +26,23 @@ namespace Engine {
 				InputData              &input,
 				OutputData             &output)
 		{
-			Texture2D::Descriptor renderTargetTextureDescriptor ={ };
-			// TODO: Fill desc
-			renderTargetTextureDescriptor.array.size = 4;
+      FrameGraphTexture gbufferDesc={};
+      gbufferDesc.width        = 1920; // TODO: Load from config
+      gbufferDesc.height       = 1080;
+      gbufferDesc.depth        = 1;
+      gbufferDesc.format       = FrameGraphFormat::RGBA8_UNORM;
+      gbufferDesc.initialState = FrameGraphResourceInitState::Clear;
+      gbufferDesc.arraySize    = 1;
 
 			// Basic underlying output buffer to be linked
-			output.gbuffer0 = passLinker.createResource<Texture2D>(renderTargetTextureDescriptor);
-			output.gbuffer1 = passLinker.createResource<Texture2D>(renderTargetTextureDescriptor);
-			output.gbuffer2 = passLinker.createResource<Texture2D>(renderTargetTextureDescriptor);
-			output.gbuffer3 = passLinker.createResource<Texture2D>(renderTargetTextureDescriptor);
+			output.gbuffer0 = passLinker.createTexture(gbufferDesc);
+			output.gbuffer1 = passLinker.createTexture(gbufferDesc);
+			output.gbuffer2 = passLinker.createTexture(gbufferDesc);
+			output.gbuffer3 = passLinker.createTexture(gbufferDesc);
 
 			// This will create a list of render targets for the texutre array to render to.
 			// They'll be internally created and managed.
-			m_state.renderTargetBindings.resize(renderTargetTextureDescriptor.array.size);
+			m_state.renderTargetBindings.resize(gbufferDesc.arraySize);
 			m_state.renderTargetBindings[0] = passLinker.bindRenderTarget(output.gbuffer0, 0);
 			m_state.renderTargetBindings[1] = passLinker.bindRenderTarget(output.gbuffer1, 1);
 			m_state.renderTargetBindings[2] = passLinker.bindRenderTarget(output.gbuffer2, 2);

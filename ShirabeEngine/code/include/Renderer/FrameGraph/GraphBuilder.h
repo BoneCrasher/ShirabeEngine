@@ -85,11 +85,21 @@ namespace Engine {
         if (!pass)
           return false;
 
+        // Link the pass providing the input and output resources for the passes from the variadic argument list.
+        // This will declare all required resources:
+        //   - Create
+        //   - Read
+        //   - Write
+        //   - Import
         if (!pass->setup<TPassCreationArgs...>(*this, std::forward<TPassCreationArgs>(args)...)) {
 
         }
 
         graph()->passes().push_back(std::static_pointer_cast<PassBase>(pass));
+
+        // Read out the PassLinker state filled in by "setup(...)" and properly merge it with 
+        // the current graph builder state.
+        
 
         return pass;
       }

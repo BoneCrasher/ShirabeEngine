@@ -24,7 +24,7 @@ namespace Engine {
 
       GraphBuilder graph;
       graph.initialize();
-      graph.importPersistentResource("SwapChain", 1337);
+      graph.importPersistentResource("BackBuffer", 1337);
 
 	  // GBuffer
       Ptr<Pass<GBufferPass>>  gbufferPass  = graph.spawnPass<GBufferPass>("GBufferPass");
@@ -40,6 +40,8 @@ namespace Engine {
 			  gbufferOutputData.gbuffer3);
 
       UniquePtr<FrameGraph> frameGraph = graph.compile();
+
+	  // Renderer will call.
       if (frameGraph)
         frameGraph->execute();
     }

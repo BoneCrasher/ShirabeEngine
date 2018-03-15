@@ -60,10 +60,13 @@ namespace Engine {
 				OutputData_t outputData={};
 
 				bool setupSuccessful = m_implementation->setup(passLinker, inputData, outputData, std::forward<TPassCreationArgs>(args)...);
-				if(setupSuccessful) {
-					m_inputData  = inputData;
-					m_outputData = outputData;
-				}
+				if(!setupSuccessful)
+					throw std::exception("Failed to setup pass.");
+
+				m_inputData  = inputData;
+				m_outputData = outputData;
+
+				return true;
 			}
 
 			bool execute(

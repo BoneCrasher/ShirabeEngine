@@ -24,14 +24,13 @@ namespace Engine {
     template <typename TPassImplementation>
     class PassLinker {
     public:
-      PassLinker(FrameGraphResourceId_t const&);
+      PassLinker(FrameGraphResourceId_t const&, Random::RandomState&);
 
       FrameGraphResourceId_t const&assignedPassUID() const { return m_passUID; }
 
-      template <typename TResource>
       FrameGraphResource
-        createResource(
-          typename TResource::Descriptor const&desc);
+        createTexture(
+          FrameGraphTexture const&desc);
 
       FrameGraphResource
         bindRenderTarget(
@@ -48,7 +47,8 @@ namespace Engine {
         importRenderables();
 
     private:
-      FrameGraphResourceId_t m_passUID;
+      Random::RandomState    &m_resourceIdGenerator;
+      FrameGraphResourceId_t  m_passUID;
     };
 
     /**********************************************************************************************//**
@@ -61,8 +61,10 @@ namespace Engine {
      **************************************************************************************************/
     template <typename TPassImplementation>
     PassLinker<TPassImplementation>::PassLinker(
-      FrameGraphResourceId_t const&passId)
+      FrameGraphResourceId_t const&passId,
+      Random::RandomState         &resourceIdGenerator)
       : m_passUID(passId)
+      , m_resourceIdGenerator(resourceIdGenerator)
     {}
     
     /**********************************************************************************************//**
@@ -76,13 +78,50 @@ namespace Engine {
      * \return  The new resource.
      **************************************************************************************************/
     template <typename TPassImplementation>
-    template <typename TResource>
     FrameGraphResource
-      PassLinker<TPassImplementation>::createResource(
-        typename TResource::Descriptor const&desc)
+      PassLinker<TPassImplementation>::createTexture(
+        FrameGraphTexture const&desc)
     {
-      // static_assert(false, LOG_FUNCTION(GraphBuilder::createResource(...) : Not implemented(GraphBuilder.cpp Line __LINE__)));
-      return FrameGraphResource();
+      if(!desc.validate())
+        throw std::exception("Invalid texture descriptor.");
+
+      FrameGraphResourceId_t          resourceId;
+      FrameGraphResourceType          type;
+      FrameGraphResourceUsage         usage;
+      FrameGraphResourceAccessibility cpuAccessibility;
+      FrameGraphResourceAccessibility gpuAccessibility;
+
+      resourceId = m_resourceIdGenerator.next();
+
+      if(desc.width)
+        if(desc.height > 1)
+          if(desc.depth > 1)
+            if(desc.arraySize > 1)
+              type = FrameGraphResourceType::Texture3D;
+            else
+              type = FrameGraphResourceType::Texture3DArray;
+          else
+            if(desc.arraySize > 1)
+              type = FrameGraphResourceType::Texture2D;
+            else
+              type = FrameGraphResourceType::Texture2DArray;
+        else
+          if(desc.arraySize > 1)
+            type = FrameGraphResourceType::Texture1D;
+          else
+            type = FrameGraphResourceType::Texture1DArray;
+      else
+        throw std::exception("Invalid texture dimensions: Width is 0.");
+
+      usage            = FrameGraphResourceUsage::Undefined;
+      cpuAccessibility = FrameGraphResourceAccessibility::None;
+      gpuAccessibility = FrameGraphResourceAccessibility::None;
+
+      FrameGraphResource resource(resourceId, type, usage, cpuAccessibility, gpuAccessibility);
+
+      // Store appropriately...
+
+      return resource;
     }
 
     template <typename TPassImplementation>

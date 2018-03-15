@@ -2,7 +2,7 @@
 
 namespace Engine {
   namespace FrameGraph {
-    
+
     GraphBuilder::GraphBuilder()
       : m_uidGenerator()
       , m_frameGraph(nullptr)
@@ -40,7 +40,7 @@ namespace Engine {
     bool
       GraphBuilder::deinitialize()
     {
-      if (graph())
+      if(graph())
         graph() = nullptr;
 
       return true;
@@ -64,15 +64,15 @@ namespace Engine {
       try {
         bool alreadyAvailableForId = !(importedResources().find(id) == importedResources().end());
 
-        if (!alreadyAvailableForId)
+        if(!alreadyAvailableForId)
           importedResources()[id] = resourceId;
 
         return (!alreadyAvailableForId);
       }
-      catch (std::exception) {
+      catch(std::exception) {
         return false;
       }
-      catch (...) {
+      catch(...) {
         return false;
       }
     }
@@ -87,7 +87,10 @@ namespace Engine {
     UniquePtr<FrameGraph>
       GraphBuilder::compile()
     {
-      // static_assert(false, LOG_FUNCTION(GraphBuilder::compile() : Not implemented(GraphBuilder.cpp Line __LINE__)));
+      // Compilation is extremely tricky, as we possibly end up with 
+      // multiple graph root nodes.
+      
+
       return nullptr;
     }
   }
