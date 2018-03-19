@@ -12,19 +12,20 @@ namespace Engine {
 
 		bool 
 			LightingPass::setup(
-				PassLinker<LightingPass>&passLinker,
-				InputData               &input,
-				OutputData              &output,
-				FrameGraphResource const&gbuffer0,
-				FrameGraphResource const&gbuffer1,
-				FrameGraphResource const&gbuffer2,
-				FrameGraphResource const&gbuffer3)
+        Ptr<ApplicationEnvironment> const&environment,
+        PassLinker<LightingPass>         &passLinker,
+        InputData                        &input,
+        OutputData                       &output,
+        FrameGraphResource          const&gbuffer0,
+        FrameGraphResource          const&gbuffer1,
+        FrameGraphResource          const&gbuffer2,
+        FrameGraphResource          const&gbuffer3)
 		{
-			input.gbuffer0 = passLinker.bindInput(gbuffer0);
-			input.gbuffer1 = passLinker.bindInput(gbuffer1);
-			input.gbuffer2 = passLinker.bindInput(gbuffer2);
-			input.gbuffer3 = passLinker.bindInput(gbuffer3);
-
+			input.gbuffer0 = passLinker.bindInput(gbuffer0, Range(0, 1), Range(0, 1)); // For now: static config...
+			input.gbuffer1 = passLinker.bindInput(gbuffer1, Range(0, 1), Range(0, 1));
+			input.gbuffer2 = passLinker.bindInput(gbuffer2, Range(0, 1), Range(0, 1));
+			input.gbuffer3 = passLinker.bindInput(gbuffer3, Range(0, 1), Range(0, 1));
+      
 			FrameGraphTexture lightAccBufferDesc ={ };
       lightAccBufferDesc.width          = 1920;
       lightAccBufferDesc.height         = 1080;
@@ -36,7 +37,7 @@ namespace Engine {
 
 			output.lightAccumulationBuffer = passLinker.createTexture(lightAccBufferDesc);
 			
-			m_state.renderTargetBinding = passLinker.bindRenderTarget(output.lightAccumulationBuffer, 0, 1, 0);
+			m_state.renderTargetBinding = passLinker.bindRenderTarget(output.lightAccumulationBuffer, Range(0, 1), Range(0, 1));
 
 			return true;
 		}

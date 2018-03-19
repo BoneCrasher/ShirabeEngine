@@ -35,13 +35,14 @@ namespace Engine {
 			~LightingPass();
 
 			bool setup(
-				PassLinker<LightingPass>&passBuilder,
-				InputData               &input,
-				OutputData              &output,
-				FrameGraphResource const&gbuffer0,
-				FrameGraphResource const&gbuffer1,
-				FrameGraphResource const&gbuffer2,
-				FrameGraphResource const&gbuffer3);
+        Ptr<ApplicationEnvironment> const&environment,
+				PassLinker<LightingPass>         &passLinker,
+				InputData                        &input,
+				OutputData                       &output,
+				FrameGraphResource          const&gbuffer0,
+				FrameGraphResource          const&gbuffer1,
+				FrameGraphResource          const&gbuffer2,
+				FrameGraphResource          const&gbuffer3);
 
 			bool execute(
 				Ptr<IRenderContext>     &context,

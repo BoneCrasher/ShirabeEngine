@@ -127,17 +127,17 @@ namespace Engine {
     : VecND<T, 2> {
 
     Vec2D()
-      : VecND<T, 2>({T(), T()}) {}
+      : VecND<T, 2>({ T(), T() }) {}
 
     Vec2D(const Vec2D& other)
-      : VecND<T, 2>({other.x(), other.y()}) {}
+      : VecND<T, 2>({ other.x(), other.y() }) {}
 
     Vec2D(const T &x,
-          const T &y)
-      : VecND<T, 2>({x, y}) {}
+      const T &y)
+      : VecND<T, 2>({ x, y }) {}
 
     Vec2D(const Vec1D<T>& other)
-      : VecND<T, 2>({other.x(), T()}) {}
+      : VecND<T, 2>({ other.x(), T() }) {}
 
     inline const T& x() const {
       return m_values[0];
@@ -168,18 +168,18 @@ namespace Engine {
       : VecND<T, 3>(T(), T(), T()) {}
 
     Vec3D(const T &x,
-          const T &y,
-          const T &z)
-      : VecND<T, 3>({x, y, z}) {}
+      const T &y,
+      const T &z)
+      : VecND<T, 3>({ x, y, z }) {}
 
     Vec3D(const Vec1D<T>& other)
-      : VecND<T, 3>({other.x(), T(), T()}) {}
+      : VecND<T, 3>({ other.x(), T(), T() }) {}
 
     Vec3D(const Vec2D<T>& other)
-      : VecND<T, 3>({other.x(), other.y(), T()}) {}
+      : VecND<T, 3>({ other.x(), other.y(), T() }) {}
 
     Vec3D(const Vec3D<T>& other)
-      : VecND<T, 3>({other.xy(), other.y(), other.z()}) {}
+      : VecND<T, 3>({ other.xy(), other.y(), other.z() }) {}
 
     inline const T& x() const {
       return m_values[0];
@@ -222,21 +222,21 @@ namespace Engine {
   struct Vec4D
     : public VecND<T, 4> {
     Vec4D()
-      : VecND<T, 4>({T(), T(), T(), T()}) {}
+      : VecND<T, 4>({ T(), T(), T(), T() }) {}
 
     Vec4D(const T &x,
-          const T &y,
-          const T &z,
-          const T &w)
-      : VecND<T, 4>({x, y, z, T()}) {}
+      const T &y,
+      const T &z,
+      const T &w)
+      : VecND<T, 4>({ x, y, z, T() }) {}
     Vec4D(const Vec1D<T>& other)
-      : VecND<T, 4>({other.x(), T(), T(), T()}) {}
+      : VecND<T, 4>({ other.x(), T(), T(), T() }) {}
 
     Vec4D(const Vec2D<T>& other)
-      : VecND<T, 4>({other.x(), other.y(), T(), T()}) {}
+      : VecND<T, 4>({ other.x(), other.y(), T(), T() }) {}
 
     Vec4D(const Vec3D<T>& other)
-      : VecND<T, 4>({other.x(), other.y(), other.z(), T()}) {}
+      : VecND<T, 4>({ other.x(), other.y(), other.z(), T() }) {}
 
     inline const T& x() const {
       return m_values[0];
@@ -333,28 +333,67 @@ namespace Engine {
 
   struct Rect {
     Vec2Dl m_position;
-    Vec2Dl m_size;
+    Vec2Dl size;
 
     Rect()
       : m_position(0, 0)
-      , m_size(0, 0)
+      , size(0, 0)
     {}
 
     Rect(const long &x,
-         const long &y,
-         const long &width,
-         const long &height)
+      const long &y,
+      const long &width,
+      const long &height)
       : m_position(x, y)
-      , m_size(width, height)
+      , size(width, height)
     {
     }
 
     explicit Rect(const Vec2Dl& pos,
-                  const Vec2Dl& sz)
+      const Vec2Dl& sz)
       : m_position(pos),
-      m_size(sz)
+      size(sz)
     {
     }
+  };
+
+  struct Range {
+    inline
+      Range()
+      : offset(0)
+      , length(0)
+    {}
+
+    inline
+      Range(
+        uint32_t inOffset,
+        uint32_t inLength)
+      : offset(inOffset)
+      , length(inLength)
+    {}
+
+    inline
+      bool overlapsWith(Range const&other) const
+    {
+      // Pretest: Both ranges must be at least 1 unit in length to check anything...
+      if(!(length && other.length))
+        return false;
+
+      bool overlap = false;
+
+      if(offset == other.offset)
+        overlap = true;
+      else if(offset < other.offset)
+        overlap = ( (((int32_t)(offset + length)) - ((int32_t)other.offset)) > 0);
+      else
+        overlap = ( (((int32_t)(other.offset + other.length)) - ((int32_t)offset)) > 0);
+
+      return overlap;
+    }
+
+    uint32_t
+      offset,
+      length;
   };
 
 }

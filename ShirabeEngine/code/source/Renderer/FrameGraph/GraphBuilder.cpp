@@ -23,8 +23,12 @@ namespace Engine {
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
     bool
-      GraphBuilder::initialize()
+      GraphBuilder::initialize(
+        Ptr<ApplicationEnvironment> const&environment)
     {
+      assert(environment != nullptr);
+      m_applicationEnvironment = environment;
+
       graph() = MakeUniquePointerType<FrameGraph>();
 
       return true;

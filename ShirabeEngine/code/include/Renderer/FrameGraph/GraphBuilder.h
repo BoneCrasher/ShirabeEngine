@@ -25,7 +25,8 @@ namespace Engine {
     public:
       GraphBuilder();
 
-      bool initialize();
+      bool initialize(
+        Ptr<ApplicationEnvironment> const&environment);
       bool deinitialize();
 
       Random::RandomState& resourceUIDGenerator() { return m_uidGenerator; }
@@ -33,8 +34,8 @@ namespace Engine {
       template <typename TPassImplementation, typename... TPassCreationArgs>
       Ptr<Pass<TPassImplementation>>
         spawnPass(
-          std::string      const&id,
-          TPassCreationArgs&&... args);
+          std::string                 const&name,
+          TPassCreationArgs            &&...args);
 
       bool
         importPersistentResource(
@@ -54,6 +55,8 @@ namespace Engine {
 
       UniquePtr<FrameGraph>                m_frameGraph;
       Map<std::string, PublicResourceId_t> m_importedResources;
+
+      Ptr<ApplicationEnvironment>          m_applicationEnvironment;
     };
 
     /**********************************************************************************************//**
@@ -71,9 +74,9 @@ namespace Engine {
     template <typename TPassImplementation, typename... TPassCreationArgs>
     Ptr<Pass<TPassImplementation>>
       GraphBuilder::spawnPass(
-        std::string       const&name,
-        TPassCreationArgs  &&...args)
-    {
+        std::string                 const&name,
+        TPassCreationArgs            &&...args)
+    {                               
       if (!graph())
         return false;
 
@@ -93,7 +96,7 @@ namespace Engine {
         //   - Read
         //   - Write
         //   - Import
-        if (!pass->setup<TPassCreationArgs...>(*this, std::forward<TPassCreationArgs>(args)...)) {
+        if (!pass->setup<TPassCreationArgs...>(m_applicationEnvironment, *this, std::forward<TPassCreationArgs>(args)...)) {
 
         }
 

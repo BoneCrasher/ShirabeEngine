@@ -21,7 +21,7 @@ namespace Platform {
 		HMONITOR     m_monitorHandle;
 #endif
 		std::string  m_name;
-		Engine::Rect m_bounds;
+		Engine::Rect bounds;
 		bool         m_isPrimary;
 	};
 
@@ -47,17 +47,17 @@ namespace Platform {
 
 				descriptor.m_monitorHandle = monitor;
 				descriptor.m_name          = String::toNarrowString(info.szDevice);
-				descriptor.m_bounds        = Rect(info.rcMonitor.left,
+				descriptor.bounds        = Rect(info.rcMonitor.left,
 												 info.rcMonitor.top,
 												 (info.rcMonitor.right - info.rcMonitor.left),
 												 (info.rcMonitor.bottom - info.rcMonitor.top));
-				descriptor.m_isPrimary     = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
+				descriptor.m_isPrimary = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
 
 				Log::Status(logTag(), String::format("Found %0 monitor '%1' with display area: Location: %2, %3; Size: %4, %5",
 					(descriptor.m_isPrimary ? "[primary]" : "[additional]"),
 													 descriptor.m_name,
-													 descriptor.m_bounds.m_position.x(), descriptor.m_bounds.m_position.y(),
-													 descriptor.m_bounds.m_size.x(),     descriptor.m_bounds.m_size.y()));
+													 descriptor.bounds.m_position.x(), descriptor.bounds.m_position.y(),
+													 descriptor.bounds.size.x(),     descriptor.bounds.size.y()));
 
 				pDescriptors->push_back(descriptor);
 

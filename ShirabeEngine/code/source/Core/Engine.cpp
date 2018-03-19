@@ -60,8 +60,8 @@ namespace Engine {
 
 		EEngineStatus status;
 
-    unsigned long const& windowWidth  = m_environment.osDisplays[0].m_bounds.m_size.x();
-    unsigned long const& windowHeight = m_environment.osDisplays[0].m_bounds.m_size.y();
+    unsigned long const& windowWidth  = m_environment.osDisplays[0].bounds.size.x();
+    unsigned long const& windowHeight = m_environment.osDisplays[0].bounds.size.y();
 
     std::function<void()> fnCreatePlatformWindowSystem
       = [&, this] () -> void

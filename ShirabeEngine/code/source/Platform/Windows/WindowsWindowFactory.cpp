@@ -89,8 +89,8 @@ namespace Platform {
             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
             initialBounds.m_position.x(),  // Bounds::Location::X
             initialBounds.m_position.y(),  // Bounds::Location::Y
-            initialBounds.m_size.x(),      // Bounds::Size::X
-            initialBounds.m_size.y(),      // Bounds::Size::Y
+            initialBounds.size.x(),      // Bounds::Size::X
+            initialBounds.size.y(),      // Bounds::Size::Y
             NULL,                        // Parent HWND
             NULL,                        // Menu
             instanceHandle,              // App-Instance

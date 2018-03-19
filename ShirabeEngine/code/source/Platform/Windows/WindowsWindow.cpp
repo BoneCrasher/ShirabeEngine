@@ -132,8 +132,8 @@ namespace Platform {
 		}
 		void WindowsWindow::onResize(const long& width,
 									 const long& height) {
-			m_bounds.m_size.x() = width;
-			m_bounds.m_size.y() = height;
+			m_bounds.size.x() = width;
+			m_bounds.size.y() = height;
 
 			m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
 		}

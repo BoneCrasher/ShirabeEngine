@@ -23,32 +23,32 @@ namespace Engine {
         : m_bitField(0)
       {}
 
-      inline explicit
+      inline
         BitField(TEnum const&initial)
         : m_bitField(BitField<TEnum>::getValue(initial))
       {}
 
-      inline explicit
+      inline
         BitField(TEnum &&initial)
         : m_bitField(BitField<TEnum>::getValue(initial))
       {}
 
-      inline explicit
+      inline 
         BitField(Value_t const&initial)
         : m_bitField(initial)
       {}
 
-      inline explicit
+      inline 
         BitField(Value_t &&initial)
         : m_bitField(initial)
       {}
 
-      inline explicit
+      inline 
         BitField(BitField<TEnum> const&initial)
         : m_bitField(initial.value())
       {}
 
-      inline explicit
+      inline 
         BitField(BitField<TEnum> &&initial)
         : m_bitField(initial.value())
       {}
@@ -79,6 +79,26 @@ namespace Engine {
         value() const
       {
         return m_bitField;
+      }
+
+      BitField<TEnum> &operator=(TEnum const&other) {
+        m_bitField = BitField<TEnum>::getValue(other);
+        return (*this);
+      }
+
+      BitField<TEnum> &operator=(TEnum &&other) {
+        m_bitField = BitField<TEnum>::getValue(other);
+        return (*this);
+      }
+
+      BitField<TEnum> &operator=(Value_t const&other) {
+        m_bitField = other;
+        return (*this);
+      }
+
+      BitField<TEnum> &operator=(Value_t &&other) {
+        m_bitField = other;
+        return (*this);
       }
 
       BitField<TEnum> &operator=(BitField<TEnum> const&other) {

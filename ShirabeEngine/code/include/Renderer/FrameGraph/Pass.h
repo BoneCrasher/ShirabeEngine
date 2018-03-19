@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "Core/EngineTypeHelper.h"
+#include "Platform/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceDTO.h"
 #include "Renderer/IRenderer.h"
 
@@ -51,17 +52,20 @@ namespace Engine {
 
 			template <typename... TPassCreationArgs>
 			bool setup(
-				GraphBuilder          &graphBuilder,
-				TPassCreationArgs &&...args) 
+        Ptr<ApplicationEnvironment> const&environment,
+				GraphBuilder                     &graphBuilder,
+				TPassCreationArgs            &&...args) 
 			{
 				PassLinker<TPassImplementation> passLinker(passUID(), graphBuilder.resourceUIDGenerator());
 
 				InputData_t  inputData ={};
 				OutputData_t outputData={};
 
-				bool setupSuccessful = m_implementation->setup(passLinker, inputData, outputData, std::forward<TPassCreationArgs>(args)...);
+				bool setupSuccessful = m_implementation->setup(environment, passLinker, inputData, outputData, std::forward<TPassCreationArgs>(args)...);
 				if(!setupSuccessful)
 					throw std::exception("Failed to setup pass.");
+
+
 
 				m_inputData  = inputData;
 				m_outputData = outputData;

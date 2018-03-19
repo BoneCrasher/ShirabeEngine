@@ -77,7 +77,7 @@ namespace Engine {
 			Log::Warning(logTag(), String::format("Failed to create window '%0' with bounds x/y/w/h --> %1/%2/%3/%4",
 												  name.c_str(),
 												  initialBounds.m_position.x(), initialBounds.m_position.y(),
-												  initialBounds.m_size.x(), initialBounds.m_size.y())
+												  initialBounds.size.x(), initialBounds.size.y())
 			);
 			return nullptr;
 		}

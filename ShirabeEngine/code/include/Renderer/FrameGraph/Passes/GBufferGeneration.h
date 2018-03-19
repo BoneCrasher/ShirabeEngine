@@ -36,9 +36,10 @@ namespace Engine {
 			};
 
 			bool setup(
-				PassLinker<GBufferPass>&passBuilder,
-				InputData              &input,
-				OutputData             &output);
+        Ptr<ApplicationEnvironment> const&environment,
+        PassLinker<GBufferPass>          &passLinker,
+        InputData                        &input,
+        OutputData                       &output);
 			bool execute(
 				Ptr<IRenderContext>      &context,
 				InputData           const&input,

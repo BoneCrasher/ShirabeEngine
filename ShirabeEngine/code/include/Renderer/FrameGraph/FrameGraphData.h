@@ -34,25 +34,25 @@ namespace Engine {
       R8_UINT,
       R8_SNORM,
       R8_UNORM,
-      RGBA8_TYPELESS,
-      RGBA8_SINT,
-      RGBA8_UINT,
-      RGBA8_SNORM,
-      RGBA8_UNORM,
-      RGBA8_UNORM_SRGB,
-      RGBA8_FLOAT,
+      R8G8B8A8_TYPELESS,
+      R8G8B8A8_SINT,
+      R8G8B8A8_UINT,
+      R8G8B8A8_SNORM,
+      R8G8B8A8_UNORM,
+      R8G8B8A8_UNORM_SRGB,
+      R8G8B8A8_FLOAT,
       R16_TYPELESS,
       R16_SINT,
       R16_UINT,
       R16_SNORM,
-      R16_UNORM, 
+      R16_UNORM,
       R16_FLOAT,
-      RGBA16_TYPELESS,
-      RGBA16_SINT,
-      RGBA16_UINT,
-      RGBA16_SNORM,
-      RGBA16_UNORM,
-      RGBA16_FLOAT,
+      R16G16B16A16_TYPELESS,
+      R16G16B16A16_SINT,
+      R16G16B16A16_UINT,
+      R16G16B16A16_SNORM,
+      R16G16B16A16_UNORM,
+      R16G16B16A16_FLOAT,
       R24_UNORM_X8_TYPELESS,
       R32_TYPELESS,
       R32_SINT,
@@ -61,9 +61,9 @@ namespace Engine {
       R32_UNORM,
       R32_FLOAT,
       R32_FLOAT_S8X24_TYPELESS,
-      RGBA32_TYPELESS,
-      RGBA32_SINT,
-      RGBA32_UINT,
+      R32G32B32A32_TYPELESS,
+      R32G32B32A32_SINT,
+      R32G32B32A32_UINT,
       D24_UNORM_S8_UINT,
       D32_FLOAT,
       D32_FLOAT_S8X24_UINT,
@@ -154,19 +154,74 @@ namespace Engine {
       return (l.resourceId == r.resourceId);
     }
 
-    struct FrameGraphUsage {
+
+    struct FrameGraphResourceIndex {
+      Range
+        arraySliceRange,
+        mipSliceRange;
+
+      inline
+        FrameGraphResourceIndex(
+          Range const&inArraySliceRange,
+          Range const&inMipSliceRange)
+        : arraySliceRange(inArraySliceRange)
+        , mipSliceRange(inMipSliceRange)
+      {}
+
+    };
+
+    inline static
+      bool
+      operator<(
+        FrameGraphResourceIndex const&l,
+        FrameGraphResourceIndex const&r)
+    {
+      if(l.arraySliceRange.offset == r.arraySliceRange.offset)
+        if(l.arraySliceRange.length == r.arraySliceRange.length)
+          if(l.mipSliceRange.offset == r.mipSliceRange.offset)
+            if(l.mipSliceRange.length == r.mipSliceRange.length)
+              return true;
+            else
+              return (l.mipSliceRange.length < r.mipSliceRange.length);
+          else
+            return (l.mipSliceRange.offset < r.mipSliceRange.offset);
+        else
+          return (l.arraySliceRange.length < r.arraySliceRange.length);
+      else
+        return (l.arraySliceRange.offset < r.arraySliceRange.offset);
+    }
+
+    inline static
+      bool operator!=(
+        FrameGraphResourceIndex const&l,
+        FrameGraphResourceIndex const&r)
+    {
+      return !(
+        l.arraySliceRange.offset == r.arraySliceRange.offset &&
+        l.arraySliceRange.length == r.arraySliceRange.length &&
+        l.mipSliceRange.offset   == r.mipSliceRange.offset   &&
+        l.mipSliceRange.length   == r.mipSliceRange.length);
+    }
+
+    struct FrameGraphUsageInfo {
       enum class Type {
+        None   = 0,
         Create = 1,
         Read   = 2,
-        Write  = 3
+        Write  = 4
       };
-      
+
       // Store all created resources in a plain list to allow their descriptors be accessed where necessary!
-      FrameGraphResourceId_t 
+      FrameGraphResourceId_t
         resourceId;
+      // UsageInfo-global flat to determine different operations performed on this resource for a given pass.
       BitField<Type>
-        types;
+        usageTypes; 
+      // UsageInfo-per-subresource information on operations.
+      std::map<FrameGraphResourceIndex, Type>
+        resourceAccessors;
     };
+
 
     struct FrameGraphTexture {
       uint32_t
@@ -184,9 +239,9 @@ namespace Engine {
 
       inline
         FrameGraphTexture()
-        : width(0)    
-        , height(1)   
-        , depth(1)    
+        : width(0)
+        , height(1)
+        , depth(1)
         , format(FrameGraphFormat::Undefined)
         , mipLevels(1)
         , arraySize(1)
@@ -194,7 +249,7 @@ namespace Engine {
       {}
 
       virtual inline
-      bool 
+        bool
         validate() const
       {
         bool dimensionsValid = (width == 0 || !(width == 0 || height == 0 || depth == 0));

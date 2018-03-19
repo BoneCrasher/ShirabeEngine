@@ -16,33 +16,32 @@ namespace Engine {
   namespace FrameGraph {
     using namespace Engine::Resources;
     using namespace Engine::GFXAPI;
-
-
-
+    
     static void foo() {
-      Ptr<IRenderContext> context = nullptr;
+      Ptr<IRenderContext>         context     = nullptr;
+      Ptr<ApplicationEnvironment> environment = nullptr;
 
       GraphBuilder graph;
-      graph.initialize();
+      graph.initialize(environment);
       graph.importPersistentResource("BackBuffer", 1337);
 
-	  // GBuffer
+      // GBuffer
       Ptr<Pass<GBufferPass>>  gbufferPass  = graph.spawnPass<GBufferPass>("GBufferPass");
 
-	  // Lighting
-	  GBufferPass::OutputData const& gbufferOutputData = gbufferPass->outputData();
-      Ptr<Pass<LightingPass>> lightingPass 
-		  = graph.spawnPass<LightingPass>(
-			  "LightingPass", 
-			  gbufferOutputData.gbuffer0, 
-			  gbufferOutputData.gbuffer1, 
-			  gbufferOutputData.gbuffer2, 
-			  gbufferOutputData.gbuffer3);
+      // Lighting
+      GBufferPass::OutputData const& gbufferOutputData = gbufferPass->outputData();
+      Ptr<Pass<LightingPass>> lightingPass
+        = graph.spawnPass<LightingPass>(
+          "LightingPass",
+          gbufferOutputData.gbuffer0,
+          gbufferOutputData.gbuffer1,
+          gbufferOutputData.gbuffer2,
+          gbufferOutputData.gbuffer3);
 
       UniquePtr<FrameGraph> frameGraph = graph.compile();
 
-	  // Renderer will call.
-      if (frameGraph)
+      // Renderer will call.
+      if(frameGraph)
         frameGraph->execute();
     }
 
