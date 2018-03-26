@@ -64,9 +64,7 @@ namespace Engine {
 				bool setupSuccessful = m_implementation->setup(environment, passLinker, inputData, outputData, std::forward<TPassCreationArgs>(args)...);
 				if(!setupSuccessful)
 					throw std::exception("Failed to setup pass.");
-
-
-
+        
 				m_inputData  = inputData;
 				m_outputData = outputData;
 

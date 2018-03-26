@@ -28,7 +28,7 @@ namespace Engine {
 
 			struct State {
 				FrameGraphResource
-					renderTargetBinding;
+          lightAccumulationBufferTextureId;
 			};
 
 			LightingPass();

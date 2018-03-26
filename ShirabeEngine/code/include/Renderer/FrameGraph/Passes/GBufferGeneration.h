@@ -31,8 +31,8 @@ namespace Engine {
 			};
 
 			struct State {
-				std::vector<FrameGraphResource>
-					renderTargetBindings;
+        FrameGraphResource
+          gbufferTextureArrayId;
 			};
 
 			bool setup(
