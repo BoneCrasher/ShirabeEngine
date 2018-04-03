@@ -74,6 +74,13 @@ namespace Engine {
         return ((m_bitField & BitField<TEnum>::getValue(e)) == BitField<TEnum>::getValue(e));
       }
 
+      inline 
+        bool 
+        check(BitField<TEnum> const&bf) const
+      {
+        return ((m_bitField & bf.value()) == bf.value());
+      }
+
       inline
         Value_t const&
         value() const

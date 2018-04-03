@@ -25,8 +25,11 @@ namespace Engine {
      **************************************************************************************************/
     template <typename TPassImplementation>
     class PassLinker {
-      using ResourceMap_t            = std::map<FrameGraphResourceId_t, FrameGraphResource>;
-      using ResourcePrivateDataMap_t = std::map<FrameGraphResourceId_t, FrameGraphResourcePrivateData>;
+      DeclareMapType(FrameGraphResourceId_t, FrameGraphResourcePrivateData, ResourcePrivateData);
+      DeclareMapType(FrameGraphResourceId_t, FrameGraphTexture,     FrameGraphTexture);
+      DeclareMapType(FrameGraphResourceId_t, FrameGraphTextureView, FrameGraphTextureView);
+      DeclareMapType(FrameGraphResourceId_t, FrameGraphBuffer,      FrameGraphBuffer);
+      DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView,  FrameGraphBufferView);
     public:
       PassLinker(FrameGraphResourceId_t const&, Random::RandomState&);
 
@@ -48,10 +51,10 @@ namespace Engine {
 
       FrameGraphResource
         readTexture(
-          FrameGraphResource      const&subjacentTargetResourceId,
-          FrameGraphResourceFlags const&flags,
-          Range                   const&arraySliceRange = Range(0, 1),
-          Range                   const&mipSliceRange   = Range(0, 1));
+          FrameGraphResource         const&subjacentTargetResourceId,
+          FrameGraphReadTextureFlags const&flags,
+          Range                      const&arraySliceRange = Range(0, 1),
+          Range                      const&mipSliceRange   = Range(0, 1));
 
       FrameGraphResource
         importRenderables();
@@ -70,8 +73,11 @@ namespace Engine {
       Random::RandomState    &m_resourceIdGenerator;
       FrameGraphResourceId_t  m_passUID;
 
-      ResourceMap_t            m_resources;
-      ResourcePrivateDataMap_t m_resourcesPrivateData;
+      ResourcePrivateDataMap   m_resourcesPrivateData;
+      FrameGraphTextureMap     m_textures;
+      FrameGraphTextureViewMap m_textureViews;
+      FrameGraphBufferMap      m_buffers;
+      FrameGraphBufferViewMap  m_bufferViews;
     };
 
     /**********************************************************************************************//**
@@ -111,16 +117,15 @@ namespace Engine {
       // Basic abstract descriptor of resources being used.
       FrameGraphResource resource={};
       resource.resourceId           = m_resourceIdGenerator.next();
-      resource.parentResourceId     = FrameGraphResourceId_t;
-      resource.descriptor           = desc;
-      resource.type                 = FrameGraphResourceType::Texture;
-      resource.flags.requiredFormat = desc.format;
 
       FrameGraphResourcePrivateData privateData={};
-      privateData.usage = FrameGraphResourceUsage::Undefined;
+      privateData.parentResourceId     = FrameGraphResourceId_t{ };
+      privateData.type                 = FrameGraphResourceType::Texture;
+      privateData.flags.requiredFormat = desc.format;
+      privateData.usage                = FrameGraphResourceUsage::Undefined;
 
-      m_resources[resourceId]            = resource;
-      m_resourcesPrivateData[resourceId] = privateData;
+      m_textures[resource.resourceId]             = desc;
+      m_resourcesPrivateData[resource.resourceId] = privateData;
 
       return resource;
     }
@@ -150,7 +155,8 @@ namespace Engine {
       if(!isResourceRegistered(subjacentTargetResource))
         throw std::exception("Resource to be bound as rendertarget is not registered.");
 
-      FrameGraphResourcePrivateData &subjacentResourcePrivateData = m_resourcesPrivateData[subjacentTargetResource];
+      FrameGraphTexture             const&subjacentResource            = m_textures[subjacentTargetResource.resourceId];
+      FrameGraphResourcePrivateData      &subjacentResourcePrivateData = m_resourcesPrivateData[subjacentTargetResource.resourceId];
 
       if(isTextureBeingReadInSubresourceRange(subjacentResourcePrivateData.resourceViews, arraySliceRange, mipSliceRange))
         throw std::exception(
@@ -169,7 +175,7 @@ namespace Engine {
       case FrameGraphWriteTarget::Color:
         usage = FrameGraphResourceUsage::RenderTarget;
         break;
-      case FrameGraphWriteTarget::Color:
+      case FrameGraphWriteTarget::Depth:
         usage = FrameGraphResourceUsage::DepthTarget;
         break;
       default:
@@ -177,22 +183,40 @@ namespace Engine {
         break;
       }
 
-      FrameGraphResource resourceView ={};
-      resourceView.resourceId       = m_resourceIdGenerator.next();
-      resourceView.parentResourceId = subjacentTargetResource.resourceId;
-      resourceView.descriptor       = subjacentResource.descriptor;
-      resourceView.type             = FrameGraphResourceType::TextureView;
-      resourceView.flags            ={ flags.requiredFormat };
+      FrameGraphResource resource ={};
+      resource.resourceId         = m_resourceIdGenerator.next();
+
+      FrameGraphResourceFlags resourceViewFlags={};
+      resourceViewFlags.requiredFormat = flags.requiredFormat;
 
       FrameGraphResourcePrivateData privateData={};
-      privateData.usage = usage;
+      privateData.parentResourceId = subjacentTargetResource.resourceId;
+      privateData.type             = FrameGraphResourceType::TextureView;
+      privateData.flags            = resourceViewFlags;
+      privateData.usage            = usage;
 
-      subjacentResourcePrivateData.resourceViews.push_back(resourceView.resourceId);
+      FrameGraphTextureView view={};
+      view.arraySliceRange = arraySliceRange;
+      view.mipSliceRange   = mipSliceRange;
+      view.format          = subjacentResource.format;
+      if(flags.requiredFormat != FrameGraphFormat::Automatic) {
+        if(validateFormatCompatibility(subjacentResource.format, flags.requiredFormat)) {
+          view.format = flags.requiredFormat;
+        }
+        else
+          throw std::exception(
+            String::format("Incompatible formats for texture view detected [Subjacent: %0, View: %1].",
+              subjacentResource.format,
+              flags.requiredFormat).c_str());
+      }
+      view.mode.set(FrameGraphViewAccessMode::Write);
 
-      m_resources[resourceView.resourceId]            = resourceView;
-      m_resourcesPrivateData[resourceView.resourceId] = privateData;
+      subjacentResourcePrivateData.resourceViews.push_back(resource.resourceId);
 
-      return resourceView;
+      m_textureViews[resource.resourceId]         = view;
+      m_resourcesPrivateData[resource.resourceId] = privateData;
+
+      return resource;
     }
 
     /**********************************************************************************************//**
@@ -212,15 +236,16 @@ namespace Engine {
     template <typename TPassImplementation>
     FrameGraphResource
       PassLinker<TPassImplementation>::readTexture(
-        FrameGraphResource      const&subjacentTargetResource,
-        FrameGraphResourceFlags const&flags,
-        Range                   const&arraySliceRange,
-        Range                   const&mipSliceRange)
+        FrameGraphResource         const&subjacentTargetResource,
+        FrameGraphReadTextureFlags const&flags,
+        Range                      const&arraySliceRange,
+        Range                      const&mipSliceRange)
     {
       if(!isResourceRegistered(subjacentTargetResource))
         throw std::exception("Resource to be bound as rendertarget is not registered.");
 
-      FrameGraphResourcePrivateData &subjacentResourcePrivateData = m_resourcesPrivateData[subjacentTargetResource];
+      FrameGraphTexture             const&subjacentResource            = m_textures[subjacentTargetResource.resourceId];
+      FrameGraphResourcePrivateData      &subjacentResourcePrivateData = m_resourcesPrivateData[subjacentTargetResource.resourceId];
 
       // Reading overlapping subresources is no problem...
       /*if(isTextureBeingReadInSubresourceRange(subjacentResourcePrivateData.resourceViews, arraySliceRange, mipSliceRange))
@@ -234,23 +259,41 @@ namespace Engine {
           String::format(
             "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
             arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
+     
+      FrameGraphResource resource ={ };
+      resource.resourceId         = m_resourceIdGenerator.next();
 
-      FrameGraphResource resourceView ={ };
-      resourceView.resourceId       = m_resourceIdGenerator.next();
-      resourceView.parentResourceId = subjacentTargetResource.resourceId;
-      resourceView.descriptor       = subjacentResource.descriptor;
-      resourceView.type             = FrameGraphResourceType::TextureView;
-      resourceView.flags            = flags;
+      FrameGraphResourceFlags resourceViewFlags={ };
+      resourceViewFlags.requiredFormat = flags.requiredFormat;
 
       FrameGraphResourcePrivateData privateData={ };
-      privateData.usage = FrameGraphResourceUsage::ImageResource;
+      privateData.parentResourceId = subjacentTargetResource.resourceId;
+      privateData.type             = FrameGraphResourceType::TextureView;
+      privateData.flags            = resourceViewFlags;
+      privateData.usage            = FrameGraphResourceUsage::ImageResource;
 
-      subjacentResourcePrivateData.resourceViews.push_back(resourceView.resourceId);
+      FrameGraphTextureView view={ };
+      view.arraySliceRange = arraySliceRange;
+      view.mipSliceRange   = mipSliceRange;
+      view.format          = subjacentResource.format;
+      if(flags.requiredFormat != FrameGraphFormat::Automatic) {
+        if(validateFormatCompatibility(subjacentResource.format, flags.requiredFormat)) {
+          view.format = flags.requiredFormat;
+        }
+        else
+          throw std::exception(
+            String::format("Incompatible formats for texture view detected [Subjacent: %0, View: %1].",
+              subjacentResource.format,
+              flags.requiredFormat).c_str());
+      }
+      view.mode.set(FrameGraphViewAccessMode::Read);
 
-      m_resources[resourceView.resourceId]            = resourceView;
-      m_resourcesPrivateData[resourceView.resourceId] = privateData;
+      subjacentResourcePrivateData.resourceViews.push_back(resource.resourceId);
 
-      return resourceView;
+      m_textureViews[resource.resourceId]         = view;
+      m_resourcesPrivateData[resource.resourceId] = privateData;
+
+      return resource;
     }
 
     /**********************************************************************************************//**
@@ -284,7 +327,7 @@ namespace Engine {
       PassLinker<TPassImplementation>::isResourceRegistered(
         FrameGraphResource const&subjacentTargetResource) const
     {
-      return (m_resources.find(subjacentTargetResource.resourceId) == m_resources.end());
+      return (m_resourcesPrivateData.find(subjacentTargetResource.resourceId) == m_resourcesPrivateData.end());
     }
 
     /**********************************************************************************************//**
@@ -314,21 +357,20 @@ namespace Engine {
       //  as such are valid.
       // The whole operation setup is based on first come first serve.
       for(FrameGraphResourceId_t const&id : resourceViews) {
-        FrameGraphResource            const&r = m_resources[id];
         FrameGraphResourcePrivateData const&p = m_resourcesPrivateData[id];
+        FrameGraphTextureView         const&v = m_textureViews[id];
 
-        if(!(r.type == FrameGraphResourceType::TextureView
-          && p.usage == FrameGraphResourceUsage::ImageResource))
+        if(!(p.type == FrameGraphResourceType::TextureView
+          && p.usage.check(FrameGraphResourceUsage::ImageResource)))
           continue;
 
-        if(p.arraySliceRange.overlapsWith(arraySliceRange)
-          || p.mipSliceRange.overlapsWith(mipSliceRange))
+        if(v.arraySliceRange.overlapsWith(arraySliceRange)
+          || v.mipSliceRange.overlapsWith(mipSliceRange))
           return true;
       }
 
       return false;
     }
-
 
     /**********************************************************************************************//**
      * \fn  template <typename TPassImplementation> bool PassLinker<TPassImplementation>::checkReadWriteOverlap( FrameGraphUsageInfo const&usageInfo, Range const&arraySliceRange, Range const&mipSliceRange, BitField<FrameGraphUsageInfo::Type> const&checkedOps = (FrameGraphUsageInfo::Type::Read | FrameGraphUsageInfo::Type::Write))
@@ -357,16 +399,15 @@ namespace Engine {
       //  as such are valid.
       // The whole operation setup is based on first come first serve.
       for(FrameGraphResourceId_t const&id : resourceViews) {
-        FrameGraphResource            const&r = m_resources[id];
         FrameGraphResourcePrivateData const&p = m_resourcesPrivateData[id];
+        FrameGraphTextureView         const&v = m_textureViews[id];
 
-        if(!(r.type == FrameGraphResourceType::TextureView
-          && (p.usage == FrameGraphResourceUsage::RenderTarget
-            || p.usage == FrameGraphResourceUsage::DepthTarget)))
+        if(!(p.type == FrameGraphResourceType::TextureView
+          && (p.usage.check(FrameGraphResourceUsage::RenderTarget | FrameGraphResourceUsage::DepthTarget))))
           continue;
 
-        if(p.arraySliceRange.overlapsWith(arraySliceRange)
-          || p.mipSliceRange.overlapsWith(mipSliceRange))
+        if(v.arraySliceRange.overlapsWith(arraySliceRange)
+          || v.mipSliceRange.overlapsWith(mipSliceRange))
           return true;
       }
 

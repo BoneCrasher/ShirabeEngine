@@ -20,24 +20,31 @@ namespace Engine {
         FrameGraphResource          const&gbuffer1,
         FrameGraphResource          const&gbuffer2,
         FrameGraphResource          const&gbuffer3)
-		{
-			input.gbuffer0 = passLinker.bindInput(gbuffer0, Range(0, 1), Range(0, 1)); // For now: static config...
-			input.gbuffer1 = passLinker.bindInput(gbuffer1, Range(0, 1), Range(0, 1));
-			input.gbuffer2 = passLinker.bindInput(gbuffer2, Range(0, 1), Range(0, 1));
-			input.gbuffer3 = passLinker.bindInput(gbuffer3, Range(0, 1), Range(0, 1));
-      
+		{      
 			FrameGraphTexture lightAccBufferDesc ={ };
-      lightAccBufferDesc.width          = 1920;
-      lightAccBufferDesc.height         = 1080;
-      lightAccBufferDesc.depth          = 1;
-      lightAccBufferDesc.format         = FrameGraphFormat::R32_FLOAT;
-      lightAccBufferDesc.mipLevels      = 1;
-      lightAccBufferDesc.arraySize      = 1;
-      lightAccBufferDesc.initialState   = FrameGraphResourceInitState::Clear;
+      lightAccBufferDesc.width        = 1920;
+      lightAccBufferDesc.height       = 1080;
+      lightAccBufferDesc.depth        = 1;
+      lightAccBufferDesc.format       = FrameGraphFormat::R32_FLOAT;
+      lightAccBufferDesc.mipLevels    = 1;
+      lightAccBufferDesc.arraySize    = 1;
+      lightAccBufferDesc.initialState = FrameGraphResourceInitState::Clear;
 
-			output.lightAccumulationBuffer = passLinker.createTexture(lightAccBufferDesc);
-			
-			m_state.renderTargetBinding = passLinker.bindRenderTarget(output.lightAccumulationBuffer, Range(0, 1), Range(0, 1));
+			m_state.lightAccumulationBufferTextureId = passLinker.createTexture(lightAccBufferDesc);
+      
+      FrameGraphReadTextureFlags readFlags{};
+      readFlags.requiredFormat = FrameGraphFormat::Automatic;
+
+      input.gbuffer0 = passLinker.readTexture(gbuffer0, readFlags, Range(0, 1), Range(0, 1));
+      input.gbuffer1 = passLinker.readTexture(gbuffer1, readFlags, Range(0, 1), Range(0, 1));
+      input.gbuffer2 = passLinker.readTexture(gbuffer2, readFlags, Range(0, 1), Range(0, 1));
+      input.gbuffer3 = passLinker.readTexture(gbuffer3, readFlags, Range(0, 1), Range(0, 1));
+
+      FrameGraphWriteTextureFlags writeFlags{ };
+      writeFlags.requiredFormat = FrameGraphFormat::Automatic;
+      writeFlags.writeTarget    = FrameGraphWriteTarget::Color;
+
+			output.lightAccumulationBuffer = passLinker.writeTexture(output.lightAccumulationBuffer, writeFlags, Range(0, 1), Range(0, 1));
 
 			return true;
 		}

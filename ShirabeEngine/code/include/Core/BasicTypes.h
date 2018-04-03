@@ -357,6 +357,8 @@ namespace Engine {
     }
   };
 
+#define FRAMEGRAPH_RESOURCERANGE_REMAINING -1
+
   struct Range {
     inline
       Range()
@@ -367,7 +369,7 @@ namespace Engine {
     inline
       Range(
         uint32_t inOffset,
-        uint32_t inLength)
+        int32_t  inLength)
       : offset(inOffset)
       , length(inLength)
     {}
@@ -392,7 +394,8 @@ namespace Engine {
     }
 
     uint32_t
-      offset,
+      offset;
+    int32_t
       length;
   };
 

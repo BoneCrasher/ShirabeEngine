@@ -8,10 +8,12 @@
 #include <variant>
 
 #include "Core/BitField.h"
+#include "Core/BasicTypes.h"
 
 namespace Engine {
   namespace FrameGraph {
     using Core::BitField;
+    using Engine::Range;
 
     using FrameGraphResourceId_t = uint64_t;
 
@@ -82,6 +84,8 @@ namespace Engine {
       // TODO: DXT/BC Compression and Video formats
     };
 
+    static bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
+
     enum class FrameGraphResourceUsage
       : uint8_t
     {
@@ -109,9 +113,17 @@ namespace Engine {
       Mutable   = 2
     };
 
-    enum class FrameGraphResourceInitState {
+    enum class FrameGraphResourceInitState 
+      : uint8_t 
+    {
       Undefined = 0,
       Clear     = 1  // Resource will be cleared depending on the resource type.
+    };
+
+    enum class FrameGraphViewAccessMode {
+      Undefined = 0,
+      Read,
+      Write
     };
 
     struct FrameGraphBuffer
@@ -119,6 +131,19 @@ namespace Engine {
       uint32_t
         elementSize,
         elementCount;
+
+      FrameGraphBuffer();
+    };
+
+    struct FrameGraphBufferView {
+      Range
+        subrange;
+      FrameGraphFormat
+        format;
+      BitField<FrameGraphViewAccessMode>
+        mode;
+
+      FrameGraphBufferView();
     };
 
     struct FrameGraphTexture {
@@ -140,11 +165,23 @@ namespace Engine {
       virtual bool validate() const;
     };
 
-    struct FrameGraphResourceFlags {
-      FrameGraphResourceFlags();
+    struct FrameGraphTextureView {
+      Range
+        arraySliceRange,
+        mipSliceRange;
+      FrameGraphFormat
+        format;
+      BitField<FrameGraphViewAccessMode>
+        mode;
 
+      FrameGraphTextureView();
+    };
+
+    struct FrameGraphResourceFlags {
       FrameGraphFormat
         requiredFormat;
+
+      FrameGraphResourceFlags();
     };
 
     struct FrameGraphReadTextureFlags
@@ -160,28 +197,24 @@ namespace Engine {
     };
 
     struct FrameGraphResourcePrivateData {
-      FrameGraphResourcePrivateData();
-
-      BitField<FrameGraphResourceUsage>
-        usage;
-      std::vector<FrameGraphResourceId_t>
-        resourceViews;
-    };
-
-    struct FrameGraphResource {
-      FrameGraphResource();
-
       FrameGraphResourceId_t
-        resourceId,
         parentResourceId;
       FrameGraphResourceType
         type;
       FrameGraphResourceFlags
         flags;
-      std::variant<FrameGraphTexture, FrameGraphBuffer>
-        descriptor; 
+      BitField<FrameGraphResourceUsage>
+        usage;
+      std::vector<FrameGraphResourceId_t>
+        resourceViews;
 
-    public:
+      FrameGraphResourcePrivateData();
+    };
+
+    struct FrameGraphResource {
+      FrameGraphResourceId_t
+        resourceId;
+
       FrameGraphResource();
     };
 

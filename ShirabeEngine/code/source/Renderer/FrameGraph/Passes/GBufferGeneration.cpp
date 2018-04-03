@@ -43,21 +43,22 @@ namespace Engine {
       gbufferDesc.depth        = 1;
       gbufferDesc.format       = FrameGraphFormat::R8G8B8A8_UNORM;
       gbufferDesc.initialState = FrameGraphResourceInitState::Clear;
-      gbufferDesc.arraySize    = 1;
+      gbufferDesc.arraySize    = 4;
+      gbufferDesc.mipLevels    = 1;
 
 			// Basic underlying output buffer to be linked
-			output.gbuffer0 = passLinker.createTexture(gbufferDesc);
-			output.gbuffer1 = passLinker.createTexture(gbufferDesc);
-			output.gbuffer2 = passLinker.createTexture(gbufferDesc);
-			output.gbuffer3 = passLinker.createTexture(gbufferDesc);
+			m_state.gbufferTextureArrayId = passLinker.createTexture(gbufferDesc);
 
 			// This will create a list of render targets for the texutre array to render to.
 			// They'll be internally created and managed.
-			m_state.renderTargetBindings.resize(gbufferDesc.arraySize);
-			m_state.renderTargetBindings[0] = passLinker.bindRenderTarget(output.gbuffer0, Range(0, 1), Range(0, 1));
-			m_state.renderTargetBindings[1] = passLinker.bindRenderTarget(output.gbuffer1, Range(0, 1), Range(0, 1));
-			m_state.renderTargetBindings[2] = passLinker.bindRenderTarget(output.gbuffer2, Range(0, 1), Range(0, 1));
-			m_state.renderTargetBindings[3] = passLinker.bindRenderTarget(output.gbuffer3, Range(0, 1), Range(0, 1));
+      FrameGraphWriteTextureFlags flags{};
+      flags.requiredFormat = gbufferDesc.format;
+      flags.writeTarget    = FrameGraphWriteTarget::Color;
+
+      output.gbuffer0 = passLinker.writeTexture(m_state.gbufferTextureArrayId, flags, Range(0, 1), Range(0, 1));
+			output.gbuffer1 = passLinker.writeTexture(m_state.gbufferTextureArrayId, flags, Range(1, 1), Range(0, 1));
+			output.gbuffer2 = passLinker.writeTexture(m_state.gbufferTextureArrayId, flags, Range(2, 1), Range(0, 1));
+			output.gbuffer3 = passLinker.writeTexture(m_state.gbufferTextureArrayId, flags, Range(3, 1), Range(0, 1));
 
 			// Import renderable objects based on selector, flags, or whatever should be supported...
 			input.renderableQueryId = passLinker.importRenderables();

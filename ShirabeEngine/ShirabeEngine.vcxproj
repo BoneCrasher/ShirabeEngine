@@ -177,6 +177,7 @@
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_SwapChain.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_TextureND.cpp" />
     <ClCompile Include="code\source\Renderer\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\FrameGraphData.cpp" />
     <ClCompile Include="code\source\Renderer\FrameGraph\GraphBuilder.cpp" />
     <ClCompile Include="code\source\Renderer\FrameGraph\Passes\GBufferGeneration.cpp" />
     <ClCompile Include="code\source\Renderer\FrameGraph\Passes\Lighting.cpp" />
