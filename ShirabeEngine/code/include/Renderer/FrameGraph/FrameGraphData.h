@@ -7,8 +7,9 @@
 #include <vector>
 #include <variant>
 
-#include <better-enums/enum.h>
+// #include <better-enums/enum.h>
 
+#include "Platform/Platform.h"
 #include "Core/BitField.h"
 #include "Core/BasicTypes.h"
 
@@ -19,13 +20,12 @@ namespace Engine {
 
     using FrameGraphResourceId_t = uint64_t;
 
-    BETTER_ENUM(Test, uint8_t, A = 0);
-    
     /**********************************************************************************************//**
      * \enum  FrameGraphResourceType
      *
      * \brief Values that represent top-level frame graph resource types
      **************************************************************************************************/
+    
     enum class FrameGraphResourceType
       : uint8_t
     {
@@ -88,7 +88,7 @@ namespace Engine {
       // TODO: DXT/BC Compression and Video formats
     };
     
-    bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
+    SHIRABE_LIBRARY_EXPORT bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
 
     enum class FrameGraphResourceUsage
       : uint8_t
@@ -130,10 +130,10 @@ namespace Engine {
       Write
     };
     
-    std::ostream& operator<<(std::ostream &strm, FrameGraphFormat const&e);
-    std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e);
+    SHIRABE_LIBRARY_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphFormat const&e);
+    SHIRABE_LIBRARY_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e);
 
-    struct FrameGraphBuffer
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphBuffer
     {
       uint32_t
         elementSize,
@@ -142,7 +142,7 @@ namespace Engine {
       FrameGraphBuffer();
     };
 
-    struct FrameGraphBufferView {
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphBufferView {
       Range
         subrange;
       FrameGraphFormat
@@ -153,7 +153,7 @@ namespace Engine {
       FrameGraphBufferView();
     };
 
-    struct FrameGraphTexture {
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphTexture {
       uint32_t
         width,  // 0 - Undefined
         height, // At least 1
@@ -172,7 +172,7 @@ namespace Engine {
       virtual bool validate() const;
     };
 
-    struct FrameGraphTextureView {
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphTextureView {
       Range
         arraySliceRange,
         mipSliceRange;
@@ -184,26 +184,26 @@ namespace Engine {
       FrameGraphTextureView();
     };
 
-    struct FrameGraphResourceFlags {
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphResourceFlags {
       FrameGraphFormat
         requiredFormat;
 
       FrameGraphResourceFlags();
     };
 
-    struct FrameGraphReadTextureFlags
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphReadTextureFlags
       : public FrameGraphResourceFlags
     {
     };
 
-    struct FrameGraphWriteTextureFlags
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphWriteTextureFlags
       : public FrameGraphResourceFlags
     {
       FrameGraphWriteTarget
         writeTarget;
     };
 
-    struct FrameGraphResourcePrivateData {
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphResourcePrivateData {
       FrameGraphResourceId_t
         parentResourceId;
       FrameGraphResourceType
@@ -218,15 +218,15 @@ namespace Engine {
       FrameGraphResourcePrivateData();
     };
 
-    struct FrameGraphResource {
+    struct SHIRABE_LIBRARY_EXPORT FrameGraphResource {
       FrameGraphResourceId_t
         resourceId;
 
       FrameGraphResource();
     };
 
-    static bool operator<(FrameGraphResource const&l, FrameGraphResource const&r);
-    static bool operator!=(FrameGraphResource const&l, FrameGraphResource const&r);
+    SHIRABE_LIBRARY_EXPORT bool operator<(FrameGraphResource const&l, FrameGraphResource const&r);
+    SHIRABE_LIBRARY_EXPORT bool operator!=(FrameGraphResource const&l, FrameGraphResource const&r);
   }
 }
 

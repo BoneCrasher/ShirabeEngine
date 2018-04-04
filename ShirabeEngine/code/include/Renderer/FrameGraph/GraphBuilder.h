@@ -8,8 +8,8 @@
 #include "Core/Random.h"
 #include "Resources/Core/ResourceDTO.h"
 
-#include "FrameGraph.h"
-#include "Pass.h"
+#include "Renderer/FrameGraph/FrameGraph.h"
+#include "Renderer/FrameGraph/Pass.h"
 
 namespace Engine {
   namespace FrameGraph {

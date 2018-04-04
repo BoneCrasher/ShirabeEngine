@@ -7,8 +7,8 @@
 #include "Core/EngineTypeHelper.h"
 #include "Resources/Core/ResourceDTO.h"
 
-#include "Pass.h"
-#include "FrameGraphData.h"
+#include "Renderer/FrameGraph/Pass.h"
+#include "Renderer/FrameGraph/FrameGraphData.h"
 
 namespace Engine {
   namespace FrameGraph {
