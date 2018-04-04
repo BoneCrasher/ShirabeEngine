@@ -7,6 +7,8 @@
 #include <vector>
 #include <variant>
 
+#include <better-enums/enum.h>
+
 #include "Core/BitField.h"
 #include "Core/BasicTypes.h"
 
@@ -17,6 +19,8 @@ namespace Engine {
 
     using FrameGraphResourceId_t = uint64_t;
 
+    BETTER_ENUM(Test, uint8_t, A = 0);
+    
     /**********************************************************************************************//**
      * \enum  FrameGraphResourceType
      *
@@ -83,8 +87,8 @@ namespace Engine {
       D32_FLOAT_S8X24_UINT
       // TODO: DXT/BC Compression and Video formats
     };
-
-    static bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
+    
+    bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
 
     enum class FrameGraphResourceUsage
       : uint8_t
@@ -125,6 +129,9 @@ namespace Engine {
       Read,
       Write
     };
+    
+    std::ostream& operator<<(std::ostream &strm, FrameGraphFormat const&e);
+    std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e);
 
     struct FrameGraphBuffer
     {
