@@ -4,6 +4,8 @@
 *.sdf
 
 # Build directories
+build
+deploy
 /build
 /.gradle
 Debug
