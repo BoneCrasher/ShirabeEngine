@@ -56,7 +56,7 @@ namespace Platform {
 				Log::Status(logTag(), String::format("Found %0 monitor '%1' with display area: Location: %2, %3; Size: %4, %5",
 					(descriptor.m_isPrimary ? "[primary]" : "[additional]"),
 													 descriptor.m_name,
-													 descriptor.bounds.m_position.x(), descriptor.bounds.m_position.y(),
+													 descriptor.bounds.position.x(), descriptor.bounds.position.y(),
 													 descriptor.bounds.size.x(),     descriptor.bounds.size.y()));
 
 				pDescriptors->push_back(descriptor);

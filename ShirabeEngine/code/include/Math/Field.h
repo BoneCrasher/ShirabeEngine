@@ -1,9 +1,10 @@
-#ifndef __SHIRABE_SHIRABE_MATH_FIELD_H__
-#define __SHIRABE_SHIRABE_MATH_FIELD_H__
+#ifndef __SHIRABE_MATH_FIELD_H__
+#define __SHIRABE_MATH_FIELD_H__
 
 #include <iterator>
 #include <initializer_list>
 
+#include "Platform/Platform.h"
 #include "Core/EngineTypeHelper.h"
 
 namespace Engine {
@@ -14,12 +15,12 @@ namespace Engine {
 		template <
 			typename T,
 			std::size_t bytesize = sizeof(T),
-			std::size_t N = FIELD_DEFAULT_SIZE,
-			std::size_t S = 1
+			std::size_t N        = FIELD_DEFAULT_SIZE,
+			std::size_t S        = 1
 		>
 			// Defines a templated, non-growable field-type to hold certain type of data as 
 			// a vector-structure, internally stored as an array.
-			class Field
+			class SHIRABE_TEST_EXPORT Field
 			: public std::_Container_base 
 		{
 			public:
@@ -28,21 +29,21 @@ namespace Engine {
 				typedef typename const value_type         const_value_type;
 
 				Field<T, bytesize, N, S>
-					(const std::size_t size  = N,
-					 const std::size_t stride = S)
+					(std::size_t const size   = N,
+					 std::size_t const stride = S)
 				{
 					//m_field = new T[size];
 					memset(m_field, 0, (bytesize * size));
 				};
 
 				Field<T, bytesize, N, S>
-					(std::initializer_list<T> source,
-					 const std::size_t             size  = N,
-					 const std::size_t             stride = S)
+					(std::initializer_list<T> const&source,
+					 std::size_t const size   = N,
+					 std::size_t const stride = S)
 				{
 					//m_field = new T[size];
 
-					size_t i = 0;
+					std::size_t i = 0;
 					std::initializer_list<T>::iterator it;
 					for (it = source.begin(); it != source.end(); ++it) {
 						m_field[i] = *it;
@@ -51,10 +52,8 @@ namespace Engine {
 				};
 
 				Field<T, bytesize, N, S>
-					(const Field<T, bytesize, N, S>& cpy)
+					(Field<T, bytesize, N, S> const& cpy)
 				{
-					//this->m_field = NULL;
-
 					this->assign(cpy);
 				}
 
@@ -64,14 +63,14 @@ namespace Engine {
 
 			public:
 				// Assign another field and overwrite contained values.
-				class_type& operator= (const class_type& right) {
+				class_type& operator= (class_type const& right) {
 					this->assign(right);
 
 					return *this;
 				}
 
 				// Access the element at the given index.
-				const T& operator[] (const std::size_t i) const {
+				const T& operator[] (std::size_t const i) const {
 					if (N > 0) {
 						if (N > i) {
 							return *(m_field + i);
@@ -81,27 +80,27 @@ namespace Engine {
 					throw std::exception("Out of range");
 				}
 
-				T& operator[] (const std::size_t i) {
+				T& operator[] (std::size_t const i) {
 					return const_cast<T&>(static_cast<const class_type *>(this)->operator[](i));
 				}
 				
 				// Add another vector to this instance.
 				// There are no range checks and no clamping applied.
-				void operator+=(const class_type& r) {
+				void operator+=(class_type const& r) {
 					for (size_t i = 0; i < N; ++i)
 						this->m_field[i] += r[i];
 				}
 
 				// Subtract another vector from this instance.
 				// There are no range checks and no clamping applied.
-				void operator-=(const class_type& r) {
+				void operator-=(class_type const& r) {
 					for (size_t i = 0; i < N; ++i)
 						this->m_field[i] -= r[i];
 				}
 
 				// Multiply this vector with the passed factor.
 				// There are no range checks and no clamping applied.
-				void operator*=(const T factor) {
+				void operator*=(T const factor) {
 					for (size_t i = 0; i < N; ++i)
 						this->m_field[i] *= factor;
 				}
@@ -109,7 +108,7 @@ namespace Engine {
 
 				// Dividy this vector by the passed factor.
 				// There are no range checks and no clamping applied.
-				void operator/=(const T factor) {
+				void operator/=(T const factor) {
 					this->operator*=((1 / factor));
 				}
 
@@ -117,7 +116,7 @@ namespace Engine {
 				// Assign another matrix to this instance.
 				// Internally theres only a copy operation taking place 
 				// overriding the old data of this instance, if any!
-				inline void assign(const class_type& r) {
+				inline void assign(class_type const& r) {
 					// Only recreate if NULL. Use available allocated memory instead!
 					//if (this->m_field == NULL)
 						//this->m_field = new T[N];
@@ -128,22 +127,22 @@ namespace Engine {
 			public:
 				// Return a const pointer to the internal data array.
 				// Used for read-only access.
-				inline const T *const_ptr() const { return &this->m_field[0]; };
+				inline  T const*const_ptr() const { return &this->m_field[0]; };
 
 				// Return a pointer to the internal data array.
 				// Used for read-write access.
 				inline T *ptr() { return this->m_field; };
 
 				// Return the total number of elements in the field.
-				inline const std::size_t size() const { return N; };
+				inline std::size_t const size() const { return N; };
 
 				// Return the size of a single element of the field in bytes.
-				inline const std::size_t byte_size() const { return bytesize; };
+				inline std::size_t const byte_size() const { return bytesize; };
 
 				// Return the number of (imaginary) columns in the field.
 				// Dividing the size by the byte_stride should return the number of (imaginary) rows!
 				// If the field should contain an arbitrary number of elements, pass 1 for the byte_stride.
-				inline const std::size_t byte_stride() const { return S; };
+				inline std::size_t const byte_stride() const { return S; };
 
 			public:
 				std::string toString() {
@@ -169,24 +168,25 @@ namespace Engine {
 		template <
 			typename T,
 			size_t bytesize = sizeof(T),
-			size_t N = FIELD_DEFAULT_SIZE,
-			size_t S = 1
+			size_t N        = FIELD_DEFAULT_SIZE,
+			size_t S        = 1
 		>
 		// Return a copy of this vector which the passed vector was added to.
 		// There are no range checks and no clamping applied.
 		Field<T, bytesize, N, S>
-			operator+(const Field<T, bytesize, N, S>& l,
-					  const Field<T, bytesize, N, S>& r) {
+			operator+(
+        Field<T, bytesize, N, S> const& l,
+        Field<T, bytesize, N, S> const& r) 
+    {
 
-			Field<T, bytesize, N, S> cpy
-				= Field<T, bytesize, N, S>(l);
+			Field<T, bytesize, N, S> cpy = Field<T, bytesize, N, S>(l);
 		
 			T *field = cpy.ptr();
 
 			for (size_t i = 0; i < N; ++i)
 				field[i] += r[i];
 
-			field = NULL;
+      field = nullptr;
 
 			return cpy;
 		}
@@ -194,24 +194,24 @@ namespace Engine {
 		template <
 			typename T,
 			size_t bytesize = sizeof(T),
-			size_t N = FIELD_DEFAULT_SIZE,
-			size_t S = 1
+			size_t N        = FIELD_DEFAULT_SIZE,
+			size_t S        = 1
 		>
 		// Return a copy of this vector which the passed vector was subtracted from.
 		// There are no range checks and no clamping applied.
 			Field<T, bytesize, N, S>
-			operator-(const Field<T, bytesize, N, S>& l,
-					  const Field<T, bytesize, N, S>& r) {
-
-			Field<T, bytesize, N, S> cpy
-				= Field<T, bytesize, N, S>(l);
+			operator-(
+        Field<T, bytesize, N, S> const& l,
+        Field<T, bytesize, N, S> const& r)
+    {
+			Field<T, bytesize, N, S> cpy = Field<T, bytesize, N, S>(l);
 
 			T *field = cpy.ptr();
 
 			for (size_t i = 0; i < N; ++i)
 				field[i] -= r[i];
 
-			field = NULL;
+			field = nullptr;
 
 			return cpy;
 		}
@@ -219,24 +219,24 @@ namespace Engine {
 		template <
 			typename T,
 			size_t bytesize = sizeof(T),
-			size_t N = FIELD_DEFAULT_SIZE,
-			size_t S = 1
+			size_t N        = FIELD_DEFAULT_SIZE,
+			size_t S        = 1
 		>
 		// Return a multiplied copy of this vector applying the passed factor.
 		// There are no range checks and no clamping applied.
 			Field<T, bytesize, N, S>
-			operator*(const Field<T, bytesize, N, S>& l,
-					  const T factor) {
-
-			Field<T, bytesize, N, S> cpy
-				= Field<T, bytesize, N, S>(l);
+			operator*(
+        Field<T, bytesize, N, S> const& l,
+        T                        const  factor) 
+    {
+			Field<T, bytesize, N, S> cpy = Field<T, bytesize, N, S>(l);
 
 			T *field = cpy.ptr();
 		
 			for (size_t i = 0; i < N; ++i)
 				field[i] *= factor;
 
-			field = NULL;
+			field = nullptr;
 
 			return cpy;
 		}
@@ -244,43 +244,48 @@ namespace Engine {
 		template <
 			typename T,
 			size_t bytesize = sizeof(T),
-			size_t N = FIELD_DEFAULT_SIZE,
-			size_t S = 1
+			size_t N        = FIELD_DEFAULT_SIZE,
+			size_t S        = 1
 		>
 			// Return a multiplied copy of this vector applying the passed factor.
 			// There are no range checks and no clamping applied.
 			Field<T, bytesize, N, S>
-			operator*(const T factor, 
-					  const Field<T, bytesize, N, S>& l) {
-
+			operator*(
+        T                        const  factor,
+        Field<T, bytesize, N, S> const& l)
+    {
 			return operator*(l, factor);
 		}
 
 		template <
 			typename T,
 			size_t bytesize = sizeof(T),
-			size_t N = FIELD_DEFAULT_SIZE,
-			size_t S = 1
+			size_t N        = FIELD_DEFAULT_SIZE,
+			size_t S        = 1
 		>
 		// Return a divided copy of this vector applying the passed factor.
 		// There are no range checks and no clamping applied.
 			Field<T, bytesize, N, S>
-			operator/(const Field<T, bytesize, N, S>& field,
-					  const T factor) {
+			operator/(
+        Field<T, bytesize, N, S> const& field,
+			  T                        const  factor)
+    {
 			return operator*(field, (1 / factor));
 		}
 
 		template <
 			typename T,
 			size_t bytesize = sizeof(T),
-			size_t N = FIELD_DEFAULT_SIZE,
-			size_t S = 1
+			size_t N        = FIELD_DEFAULT_SIZE,
+			size_t S        = 1
 		>
 			// Return a divided copy of this vector applying the passed factor.
 			// There are no range checks and no clamping applied.
 			Field<T, bytesize, N, S>
-		operator/(const T factor,
-			      const Field<T, bytesize, N, S>& field) {
+		operator/(
+      T                        const  factor,
+			Field<T, bytesize, N, S> const& field)
+    {
 			return operator*(field, (1 / factor));
 		}
 

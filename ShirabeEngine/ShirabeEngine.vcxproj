@@ -438,6 +438,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\include\Renderer\FrameGraph\Test.cpp" />
+    <ClCompile Include="code\source\Core\BasicTypes.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Device.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DeviceCapabilities.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Environment.cpp" />
@@ -617,6 +618,8 @@
     <ClInclude Include="code\include\ECWS\IComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="code\include\Core\BasicTypes.tpp" />
+    <None Include="code\include\Math\Vector.tpp" />
     <None Include="documentation\notes.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

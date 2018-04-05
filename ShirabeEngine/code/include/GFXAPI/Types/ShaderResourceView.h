@@ -36,7 +36,7 @@ namespace Engine {
        **************************************************************************************************/
       struct Texture {
         unsigned int            dimensionNb; // 1..3
-        VecND<uint32_t, 3>      dimensions;
+        TVector3D<uint32_t>     dimensions;
         bool                    isCube; // Implies the dimensions[2] to be 6
         TextureArrayDescriptor  array;
         TextureMipMapDescriptor mipMap;

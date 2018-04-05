@@ -4,18 +4,19 @@
 #include <array>
 #include <math.h>
 #include <cmath>
+#include <stdint.h>
 
 #include "Platform/Platform.h"
 
 namespace Engine {
 
-#ifdef min 
-#undef min
-#endif
+  #ifdef min 
+  #undef min
+  #endif
 
-#ifdef max
-#undef max
-#endif
+  #ifdef max
+  #undef max
+  #endif
 
   // #define DefineContainerSpecializations(name)         \
 	// 	        typedef name<char>            name##c;   \
@@ -29,90 +30,56 @@ namespace Engine {
 	// 	        typedef name<unsigned int>    name##ui;  \
 	// 	        typedef name<unsigned long>   name##ul;  
 
-#define DefineContainerSpecializations(name)       \
-	        using name##c  = name<char>;           \
-	        using name##s  = name<short>;          \
-	        using name##i  = name<int>;            \
-	        using name##l  = name<long>;           \
-	        using name##f  = name<float>;          \
-	        using name##d  = name<double>;         \
-	        using name##uc = name<unsigned char>;  \
-	        using name##us = name<unsigned short>; \
-	        using name##ui = name<unsigned int>;   \
-	        using name##ul = name<unsigned long>;  
-
-#define DefinePermutationAccessor1D(a)          inline Vec1D<T> a()          const { return Vec1D<T>(a());          }
-#define DefinePermutationAccessor2D(a, b)       inline Vec2D<T> a##b()       const { return Vec2D<T>(a(), b());       }
-#define DefinePermutationAccessor3D(a, b, c)    inline Vec3D<T> a##b##c()    const { return Vec3D<T>(a(), b(), c());    }
-#define DefinePermutationAccessor4D(a, b, c, d) inline Vec4D<T> a##b##c##d() const { return Vec4D<T>(a(), b(), c(), d()); }
+  #define DefinePermutationAccessor1D(a)          inline TVector1D<T> a()          const { return TVector1D<T>(a());          }
+  #define DefinePermutationAccessor2D(a, b)       inline TVector2D<T> a##b()       const { return TVector2D<T>(a(), b());       }
+  #define DefinePermutationAccessor3D(a, b, c)    inline TVector3D<T> a##b##c()    const { return TVector3D<T>(a(), b(), c());    }
+  #define DefinePermutationAccessor4D(a, b, c, d) inline TVector4D<T> a##b##c##d() const { return TVector4D<T>(a(), b(), c(), d()); }
 
   template <typename T, std::size_t N>
-  struct VecND {
+  struct TVectorND {
   protected:
     std::array<T, N> m_values;
 
   public:
-    VecND() { }
-
-    VecND(const std::initializer_list<T>& init)
-      : m_values() {
-
-      int k=0;
-      for(const T& v : init) {
-        if(k >= N)
-          break;
-
-        m_values[k++] = v;
-      }
-    }
+    TVectorND();
+    TVectorND(const std::initializer_list<T>& init);
 
     template <typename U>
-    VecND(const VecND<U, N>& other) {
-      this->operator=<U, N>(other);
-    }
+    TVectorND(TVectorND<U, N> const& other);
 
     template <typename U, std::size_t NU>
-    VecND(const VecND<U, NU>& other) {
-      this->operator=<U, NU>(other);
-    }
+    TVectorND(TVectorND<U, NU> const& other);
 
     template <typename U>
-    inline VecND<T, N>& operator =(const VecND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, N>& other) {
-      m_values.fill(0);
-      std::copy(other.values().begin(), other.values().end(), m_values.begin());
-      return *this;
-    }
+    TVectorND<T, N>& operator =(TVectorND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, N> const&other);
 
 
     template <typename U, std::size_t NU>
-    inline VecND<T, N>& operator =(const VecND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, NU>& other) {
-      m_values.fill(0);
-      std::copy(other.values().begin(), other.values().begin() + (std::min(N, NU)), m_values.begin());
-      return *this;
-    }
+    TVectorND<T, N>& operator =(TVectorND<typename std::enable_if<std::is_convertible<U, T>::value, U>::type, NU> const&other);
+   
+    T const& operator[](std::size_t     const& index) const;
+    T &      operator[](std::size_t     const& index);
+    bool     operator==(TVectorND<T, N> const& other) const;
 
-
-    inline const T& operator[](const std::size_t& index) const { if(index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return m_values[index]; }
-    inline       T& operator[](const std::size_t& index) { if(index < 0 || index >= N) throw EEngineStatus::OutOfBounds; return m_values[index]; }
-    inline bool     operator==(const VecND<T, N>& other) const { return (m_values == other.m_values); }
-
-    inline const std::array<T, N>& values() const {
-      return m_values;
-    }
+    std::array<T, N> const& values() const;
   };
 
+  
   template <typename T>
-  struct Vec1D
-    : public VecND<T, 1> {
+  struct TVector1D
+    : public TVectorND<T, 1> {
 
-    explicit Vec1D()
-      : VecND<T, 1>(T()) {}
+    explicit TVector1D()
+      : TVectorND<T, 1>(T()) 
+    {}
 
-    explicit Vec1D(const Vec1D& other)
-      : VecND<T, 1>(other.x()) {}
+    explicit TVector1D(TVector1D<T> const& other)
+      : TVectorND<T, 1>(other.x()) 
+    {}
 
-    explicit Vec1D(const T &x)
-      : VecND<T, 1>(x) {}
+    explicit TVector1D(T const&x)
+      : TVectorND<T, 1>(x)
+    {}
 
     inline const T& x() const {
       return m_values[0];
@@ -122,31 +89,35 @@ namespace Engine {
       return m_values[0];
     }
   };
-  DefineContainerSpecializations(Vec1D);
 
   template <typename T>
-  struct Vec2D
-    : VecND<T, 2> {
+  struct TVector2D
+    : TVectorND<T, 2> {
 
-    Vec2D()
-      : VecND<T, 2>({ T(), T() }) {}
+    TVector2D()
+      : TVectorND<T, 2>({ T(), T() }) 
+    {}
 
-    Vec2D(const Vec2D& other)
-      : VecND<T, 2>({ other.x(), other.y() }) {}
+    TVector2D(const TVector2D<T>& other)
+      : TVectorND<T, 2>({ other.x(), other.y() }) 
+    {}
 
-    Vec2D(const T &x,
+    TVector2D(
+      const T &x,
       const T &y)
-      : VecND<T, 2>({ x, y }) {}
+      : TVectorND<T, 2>({ x, y }) 
+    {}
 
-    Vec2D(const Vec1D<T>& other)
-      : VecND<T, 2>({ other.x(), T() }) {}
+    TVector2D(const TVector1D<T>& other)
+      : TVectorND<T, 2>({ other.x(), T() }) 
+    {}
 
     inline const T& x() const {
       return m_values[0];
     }
 
     inline T& x() {
-      return const_cast<T&>(static_cast<const Vec2D<T>*>(this)->x());
+      return const_cast<T&>(static_cast<TVector2D<T> const*>(this)->x());
     }
 
     inline const T& y() const {
@@ -154,54 +125,58 @@ namespace Engine {
     }
 
     inline T& y() {
-      return const_cast<T&>(static_cast<const Vec2D<T>*>(this)->y());
+      return const_cast<T&>(static_cast<TVector2D<T> const*>(this)->y());
     }
 
     DefinePermutationAccessor2D(x, y);
     DefinePermutationAccessor2D(y, x);
   };
-  DefineContainerSpecializations(Vec2D);
 
   template <typename T>
-  struct Vec3D
-    : public VecND<T, 3> {
+  struct TVector3D
+    : public TVectorND<T, 3> {
 
-    Vec3D()
-      : VecND<T, 3>(T(), T(), T()) {}
+    TVector3D()
+      : TVectorND<T, 3>(T(), T(), T()) 
+    {}
 
-    Vec3D(const T &x,
+    TVector3D(const T &x,
       const T &y,
       const T &z)
-      : VecND<T, 3>({ x, y, z }) {}
+      : TVectorND<T, 3>({ x, y, z }) 
+    {}
 
-    Vec3D(const Vec1D<T>& other)
-      : VecND<T, 3>({ other.x(), T(), T() }) {}
+    TVector3D(const TVector1D<T>& other)
+      : TVectorND<T, 3>({ other.x(), T(), T() }) 
+    {}
 
-    Vec3D(const Vec2D<T>& other)
-      : VecND<T, 3>({ other.x(), other.y(), T() }) {}
+    TVector3D(const TVector2D<T>& other)
+      : TVectorND<T, 3>({ other.x(), other.y(), T() }) 
+    {}
 
-    Vec3D(const Vec3D<T>& other)
-      : VecND<T, 3>({ other.xy(), other.y(), other.z() }) {}
+    TVector3D(const TVector3D<T>& other)
+      : TVectorND<T, 3>({ other.xy(), other.y(), other.z() })
+    {}
 
     inline const T& x() const {
       return m_values[0];
     }
     inline T& x() {
-      return const_cast<T&>(static_cast<const Vec3D<T>*>(this)->x());
+      return const_cast<T&>(static_cast<TVector3D<T> const*>(this)->x());
     }
 
     inline const T& y() const {
       return m_values[1];
     }
     inline T& y() {
-      return const_cast<T&>(static_cast<const Vec3D<T>*>(this)->y());
+      return const_cast<T&>(static_cast<TVector3D<T> const*>(this)->y());
     }
 
     inline const T& z() const {
       return m_values[2];
     }
     inline T& z() {
-      return const_cast<T&>(static_cast<const Vec3D<T>*>(this)->z());
+      return const_cast<T&>(static_cast<TVector3D<T> const*>(this)->z());
     }
 
     DefinePermutationAccessor2D(x, y);
@@ -218,54 +193,59 @@ namespace Engine {
     DefinePermutationAccessor3D(z, x, y);
     DefinePermutationAccessor3D(z, y, x);
   };
-  DefineContainerSpecializations(Vec3D);
 
   template <typename T>
-  struct Vec4D
-    : public VecND<T, 4> {
-    Vec4D()
-      : VecND<T, 4>({ T(), T(), T(), T() }) {}
+  struct TVector4D
+    : public TVectorND<T, 4> {
+    TVector4D()
+      : VecND<T, 4>({ T(), T(), T(), T() })
+    {}
 
-    Vec4D(const T &x,
+    TVector4D(const T &x,
       const T &y,
       const T &z,
       const T &w)
-      : VecND<T, 4>({ x, y, z, T() }) {}
-    Vec4D(const Vec1D<T>& other)
-      : VecND<T, 4>({ other.x(), T(), T(), T() }) {}
+      : TVectorND<T, 4>({ x, y, z, T() })
+    {}
 
-    Vec4D(const Vec2D<T>& other)
-      : VecND<T, 4>({ other.x(), other.y(), T(), T() }) {}
+    TVector4D(const TVector1D<T>& other)
+      : TVectorND<T, 4>({ other.x(), T(), T(), T() }) 
+    {}
 
-    Vec4D(const Vec3D<T>& other)
-      : VecND<T, 4>({ other.x(), other.y(), other.z(), T() }) {}
+    TVector4D(const TVector2D<T>& other)
+      : TVectorND<T, 4>({ other.x(), other.y(), T(), T() }) 
+    {}
+
+    TVector4D(const TVector3D<T>& other)
+      : TVectorND<T, 4>({ other.x(), other.y(), other.z(), T() })
+    {}
 
     inline const T& x() const {
       return m_values[0];
     }
     inline T& x() {
-      return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->x());
+      return const_cast<T&>(static_cast<TVector4D<T> const*>(this)->x());
     }
 
     inline const T& y() const {
       return m_values[1];
     }
     inline T& y() {
-      return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->y());
+      return const_cast<T&>(static_cast<TVector4D<T> const*>(this)->y());
     }
 
     inline const T& z() const {
       return m_values[2];
     }
     inline T& z() {
-      return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->z());
+      return const_cast<T&>(static_cast<TVector4D<T> const*>(this)->z());
     }
 
     inline const T& w() const {
       return m_values[3];
     }
     inline T& w() {
-      return const_cast<T&>(static_cast<const Vec4D<T>*>(this)->w());
+      return const_cast<T&>(static_cast<TVector4D<T> const*>(this)->w());
     }
 
     DefinePermutationAccessor2D(x, y);
@@ -331,75 +311,46 @@ namespace Engine {
     DefinePermutationAccessor4D(w, z, x, y);
     DefinePermutationAccessor4D(w, z, y, x);
   };
-  DefineContainerSpecializations(Vec4D);
 
-  struct Rect {
-    Vec2Dl m_position;
-    Vec2Dl size;
+  using Vector1D = TVector1D<float>;
+  using Vector2D = TVector2D<float>;
+  using Vector3D = TVector3D<float>;
+  using Vector4D = TVector4D<float>;
 
-    Rect()
-      : m_position(0, 0)
-      , size(0, 0)
-    {}
+  struct SHIRABE_LIBRARY_EXPORT Rect {
+    TVector2D<uint16_t> position;
+    TVector2D<uint16_t> size;
 
-    Rect(const long &x,
-      const long &y,
-      const long &width,
-      const long &height)
-      : m_position(x, y)
-      , size(width, height)
-    {
-    }
+    Rect();
+    Rect(
+      long const&x,
+      long const&y,
+      long const&width,
+      long const&height);
 
-    explicit Rect(const Vec2Dl& pos,
-      const Vec2Dl& sz)
-      : m_position(pos),
-      size(sz)
-    {
-    }
+    explicit Rect(
+      TVector2D<uint16_t> const& pos,
+      TVector2D<uint16_t> const& sz);
   };
 
-#define FRAMEGRAPH_RESOURCERANGE_REMAINING -1
+  #define FRAMEGRAPH_RESOURCERANGE_REMAINING -1
 
   struct SHIRABE_LIBRARY_EXPORT Range {
-    inline
-      Range()
-      : offset(0)
-      , length(0)
-    {}
+    Range();
 
-    inline
-      Range(
-        uint32_t inOffset,
-        int32_t  inLength)
-      : offset(inOffset)
-      , length(inLength)
-    {}
+    Range(
+      uint32_t const&inOffset,
+      int32_t  const&inLength);
 
-    inline
-      bool overlapsWith(Range const&other) const
-    {
-      // Pretest: Both ranges must be at least 1 unit in length to check anything...
-      if(!(length && other.length))
-        return false;
-
-      bool overlap = false;
-
-      if(offset == other.offset)
-        overlap = true;
-      else if(offset < other.offset)
-        overlap = ( (((int32_t)(offset + length)) - ((int32_t)other.offset)) > 0);
-      else
-        overlap = ( (((int32_t)(other.offset + other.length)) - ((int32_t)offset)) > 0);
-
-      return overlap;
-    }
+    bool overlapsWith(Range const&other) const;
 
     uint32_t
       offset;
     int32_t
       length;
   };
+
+  #include "Core/BasicTypes.tpp" // Must be included from within namespace.
 
 }
 
