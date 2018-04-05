@@ -618,7 +618,6 @@
     <ClInclude Include="code\include\ECWS\IComponent.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="code\include\Core\BasicTypes.tpp" />
     <None Include="code\include\Math\Vector.tpp" />
     <None Include="documentation\notes.md" />
   </ItemGroup>

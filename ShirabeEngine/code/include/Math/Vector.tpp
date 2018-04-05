@@ -1,10 +1,23 @@
+#define DefineImmutableGetter(vec_type, component, index)                      \
+  template <typename T>                                                        \
+  typename vec_type<T>::value_type const                                       \
+    vec_type<T>::component() const {                                           \
+    return this->m_field[index];                                               \
+  }                                                                            
+#define DefineMutableGetter(vec_type, component)                               \
+  template <typename T>                                                        \
+  typename vec_type<T>::value_type                                             \
+    vec_type<T>::component() {                                                 \
+    return const_cast<T&>(static_cast<vec_type<T> const*>(this)->component()); \
+  }
+
 template <typename T, std::size_t N>
-Vector<T, N>::Vector()
+TVector<T, N>::TVector()
   : Field<T, sizeof(T), N, 1>
 { }
 
 template <typename T, std::size_t N>
-Vector<T, N>::Vector(
+TVector<T, N>::TVector(
   value_type const x,
   value_type const y)
   : Field<T, sizeof(T), N, 1>()
@@ -12,13 +25,13 @@ Vector<T, N>::Vector(
 }
 
 template <typename T, std::size_t N>
-Vector<T, N>::Vector(class_type const& cpy)
+TVector<T, N>::TVector(class_type const& cpy)
   : Field<T, sizeof(T), N, 1>()
 {}
 
 template <typename T, std::size_t N>
-typename Vector<T, N>::class_type
-Vector<T, N>::scale(value_type const factor)
+typename TVector<T, N>::class_type
+TVector<T, N>::scale(value_type const factor)
 {
   this->operator*=(factor);
 
@@ -26,15 +39,15 @@ Vector<T, N>::scale(value_type const factor)
 }
 
 template <typename T, std::size_t N>
-typename Vector<T, N>::value_type
-Vector<T, N>::length()
+typename TVector<T, N>::value_type
+TVector<T, N>::length()
 {
   return sqrt(this->squared_length());
 }
 
 template <typename T, std::size_t N>
-typename Vector<T, N>::value_type
-Vector<T, N>::squared_length()
+typename TVector<T, N>::value_type
+TVector<T, N>::squared_length()
 {
   value_type        len = 0;
   const value_type *ptr = this->const_ptr();
@@ -46,15 +59,15 @@ Vector<T, N>::squared_length()
 }
 
 template <typename T, std::size_t N>
-typename Vector<T, N>::value_type
-Vector<T, N>::abs()
+typename TVector<T, N>::value_type
+TVector<T, N>::abs()
 {
   return this->length();
 }
 
 template <typename T, std::size_t N>
-typename Vector<T, N>::class_type&
-Vector<T, N>::normalize()
+typename TVector<T, N>::class_type&
+TVector<T, N>::normalize()
 {
   // For now use the "paper-version" of normalization!
   this->operator/=(this->length());
@@ -63,111 +76,107 @@ Vector<T, N>::normalize()
 }
 
 template <typename T, std::size_t N>
-Vector<T, N> operator +(
-  Vector<T, N> const& l,
-  Vector<T, N> const& r)
+TVector<T, N> operator +(
+  TVector<T, N> const& l,
+  TVector<T, N> const& r)
 {
   return
     operator+(
-      static_cast<typename Vector<T, N>::base_type>(l),
-      static_cast<typename Vector<T, N>::base_type>(r));
+      static_cast<typename TVector<T, N>::base_type>(l),
+      static_cast<typename TVector<T, N>::base_type>(r));
 }
 
 template <typename T, std::size_t N>
-Vector<T, N> operator -(
-  Vector<T, N> const&l,
-  Vector<T, N> const&r)
+TVector<T, N> operator -(
+  TVector<T, N> const&l,
+  TVector<T, N> const&r)
 {
   return
     operator-(
-      static_cast<typename Vector<T, N>::base_type>(l),
-      static_cast<typename Vector<T, N>::base_type>(r));
+      static_cast<typename TVector<T, N>::base_type>(l),
+      static_cast<typename TVector<T, N>::base_type>(r));
 }
 
 template <typename T, std::size_t N>
-Vector<T, N> operator *(
-  Vector<T, N>                      const&l,
-  typename Vector<T, N>::value_type const&f)
+TVector<T, N> operator *(
+  TVector<T, N>                      const&l,
+  typename TVector<T, N>::value_type const&f)
 {
   return
     operator*(
-      static_cast<typename Vector<T, N>::base_type>(l),
+      static_cast<typename TVector<T, N>::base_type>(l),
       f);
 }
 
 template <typename T, std::size_t N>
-Vector<T, N> operator *(
-  typename Vector<T, N>::value_type const&f,
-  Vector<T, N>                      const&l)
+TVector<T, N> operator *(
+  typename TVector<T, N>::value_type const&f,
+  TVector<T, N>                      const&l)
 {
   return
     operator*(
-      static_cast<typename Vector<T, N>::base_type>(l),
+      static_cast<typename TVector<T, N>::base_type>(l),
       f);
 }
 
 template <typename T, std::size_t N>
-Vector<T, N> operator /(
-  Vector<T, N>                      const&l,
-  typename Vector<T, N>::value_type const&f)
+TVector<T, N> operator /(
+  TVector<T, N>                      const&l,
+  typename TVector<T, N>::value_type const&f)
 {
   return
     operator/(
-      static_cast<typename Vector<T, N>::base_type>(l),
+      static_cast<typename TVector<T, N>::base_type>(l),
       f);
 }
 
 template <typename T, std::size_t N>
-Vector<T, N> operator /(
-  typename Vector<T, N>::value_type const&f,
-  Vector<T, N>                      const&l)
+TVector<T, N> operator /(
+  typename TVector<T, N>::value_type const&f,
+  TVector<T, N>                      const&l)
 {
   return
     operator/(
-      static_cast<typename Vector<T, N>::base_type>(l),
+      static_cast<typename TVector<T, N>::base_type>(l),
       f);
 }
 
 template <typename T>
-Vector1D<T>::Vector1D()
-  : Vector<T, 1>()
+TVector1D<T>::TVector1D()
+  : TVector<T, 1>()
 {
   value_type *ptr = this->ptr();
   ptr[0] = 0.0f;
 }
 
 template <typename T>
-Vector1D<T>::Vector1D(
+TVector1D<T>::TVector1D(
   value_type const x)
-  : Vector<T, 1>({ x })
+  : TVector<T, 1>({ x })
 { }
 
 template <typename T>
-Vector1D<T>::Vector1D(class_type const& cpy)
-  : Vector<T, 1>(cpy)
+TVector1D<T>::TVector1D(class_type const& cpy)
+  : TVector<T, 1>(cpy)
 {}
 
-template <typename T>
-typename Vector1D<T>::value_type const
-Vector1D<T>::x() const
-{
-  return this->m_field[0];
-}
+DefineImmutableGetter(TVector1D, x);
+DefineMutableGetter(TVector1D, x);
 
 template <typename T>
 void
-Vector1D<T>::x(value_type const& val)
+TVector1D<T>::x(value_type const& val)
 {
   this->m_field[0] = val;
 }
 
 template <typename T>
-Vector1D<T>
-Vector1D<T>::right() { return Vector1D<T>({ static_cast<T>(1) }); }
+TVector1D<T>
+TVector1D<T>::right() { return TVector1D<T>({ static_cast<T>(1) }); }
 
 template <typename T>
-Vector2D()
-  : Vector<T, 2>()
+TVector2D()
+  : TVector<T, 2>()
 {
   value_type *ptr = this->ptr();
   ptr[0] = 0.0f;
@@ -175,119 +184,95 @@ Vector2D()
 }
 
 template <typename T>
-Vector2D(
+TVector2D(
   value_type const x,
   value_type const y)
-  : Vector<T, 2>({ x, y })
+  : TVector<T, 2>({ x, y })
 { }
 
 template <typename T>
-Vector2D<T>::Vector2D(class_type const& cpy)
-  : Vector<T, 2>(cpy)
+TVector2D<T>::TVector2D(class_type const& cpy)
+  : TVector<T, 2>(cpy)
 {}
 
-template <typename T>
-typename Vector2D<T>::value_type const
-Vector2D<T>::x() const
-{
-  return this->m_field[0];
-}
-
-template <typename T>
-typename Vector2D<T>::value_type const
-Vector2D<T>::y() const
-{
-  return this->m_field[1];
-}
+DefineImmutableGetter(TVector2D, x);
+DefineImmutableGetter(TVector2D, y);
+DefineMutableGetter(TVector2D, x);
+DefineMutableGetter(TVector2D, y);
 
 template <typename T>
 void
-Vector2D<T>::x(value_type const& val)
+TVector2D<T>::x(value_type const& val)
 {
   this->m_field[0] = val;
 }
 
 template <typename T>
 void
-Vector2D<T>::y(value_type const& val)
+TVector2D<T>::y(value_type const& val)
 {
   this->m_field[1] = val;
 }
 
 template <typename T>
-Vector2D<T>
-Vector2D<T>::right()
+TVector2D<T>
+TVector2D<T>::right()
 {
-  return Vector2D<T>({ 1, 0 });
+  return TVector2D<T>({ 1, 0 });
 }
 
 template <typename T>
-Vector2D<T>
-Vector2D<T>::up()
+TVector2D<T>
+TVector2D<T>::up()
 {
-  return Vector2D<T>({ 0, 1 });
+  return TVector2D<T>({ 0, 1 });
 }
 
 template <typename T>
-Vector3D<T>::Vector3D()
-  : Vector<3>({ 0.0f, 0.0f, 0.0f })
+TVector3D<T>::TVector3D()
+  : TVector<3>({ 0.0f, 0.0f, 0.0f })
 {
   value_type *ptr = this->ptr();
   ptr[2] = 0.0f;
 }
 
 template <typename T>
-Vector3D<T>::Vector3D(
+TVector3D<T>::TVector3D(
   value_type const x,
   value_type const y,
   value_type const z)
-  : Vector<T, 3>({ x, y, z })
+  : TVector<T, 3>({ x, y, z })
 {
 }
 
 template <typename T>
-Vector3D<T>::Vector3D(
-  Vector2D<T> const&v,
+TVector3D<T>::TVector3D(
+  TVector2D<T> const&v,
   T           const&z)
-  : Vector<T, 3>(v.x(), v.y(), z)
+  : TVector<T, 3>(v.x(), v.y(), z)
 {}
 
 template <typename T>
-Vector3D<T>::Vector3D(class_type const& cpy)
-  : Vector<T, 3>(cpy)
+TVector3D<T>::TVector3D(class_type const& cpy)
+  : TVector<T, 3>(cpy)
 {}
 
 // Return a copy of the stored x-component. Getter.
 
-template <typename T>
-typename Vector3D<T>::value_type const
-Vector3D<T>::x() const
-{
-  return this->m_field[0];
-}
-// Return a copy of the stored y-component. Getter.
 
-template <typename T>
-typename Vector3D<T>::value_type const
-Vector3D<T>::y() const
-{
-  return this->m_field[1];
-}
-// Return a copy of the stored z-component. Getter.
-
-template <typename T>
-typename Vector3D<T>::value_type const
-Vector3D<T>::z() const
-{
-  return this->m_field[2];
-}
+DefineImmutableGetter(TVector3D, x);
+DefineImmutableGetter(TVector3D, y);
+DefineImmutableGetter(TVector3D, z);
+DefineMutableGetter(TVector3D, x);
+DefineMutableGetter(TVector3D, y);
+DefineMutableGetter(TVector3D, z);
 
 // Return a FieldAccessor for the stored x-component to safely assign a new value 
 // using the assignment-operator. Setter.
 
 template <typename T>
 void
-Vector3D<T>::x(value_type const& val)
+TVector3D<T>::x(value_type const& val)
 {
   this->m_field[0] = val;
 }
@@ -296,7 +281,7 @@ Vector3D<T>::x(value_type const& val)
 
 template <typename T>
 void
-Vector3D<T>::y(value_type const& val)
+TVector3D<T>::y(value_type const& val)
 {
   this->m_field[1] = val;
 }
@@ -305,121 +290,166 @@ Vector3D<T>::y(value_type const& val)
 
 template <typename T>
 void
-Vector3D<T>::z(value_type const& val)
+TVector3D<T>::z(value_type const& val)
 {
   this->m_field[2] = val;
 }
 
 
 template <typename T>
-Vector3D<T>
-Vector3D<T>::forward()
+TVector3D<T>
+TVector3D<T>::forward()
 {
-  return Vector3D({ 1, 0, 0 });
+  return TVector3D({ 1, 0, 0 });
 }
 
 template <typename T>
-Vector3D<T>
-Vector3D<T>::right()
+TVector3D<T>
+TVector3D<T>::right()
 {
-  return Vector3D({ 0, 1, 0 });
+  return TVector3D({ 0, 1, 0 });
 }
 
 template <typename T>
-Vector3D<T>
-Vector3D<T>::up()
+TVector3D<T>
+TVector3D<T>::up()
 {
-  return Vector3D({ 0, 0, 1 });
+  return TVector3D({ 0, 0, 1 });
 }
 
 template <typename T>
-Vector4D<T>::Vector4D()
-  : Vector<T, 4>({ 0.0f, 0.0f, 0.0f, 0.0f })
+TVector4D<T>::TVector4D()
+  : TVector<T, 4>({ 0.0f, 0.0f, 0.0f, 0.0f })
 {
 }
 
 template <typename T>
-Vector4D<T>::Vector4D(
+TVector4D<T>::TVector4D(
   value_type const x,
   value_type const y,
   value_type const z,
   value_type const w)
-  : Vector<T, 4>({ x, y, z, w })
+  : TVector<T, 4>({ x, y, z, w })
 {
 }
 
 template <typename T>
-Vector4D<T>::Vector4D(class_type const& cpy)
-  : Vector<T, 4>(cpy)
+TVector4D<T>::TVector4D(class_type const& cpy)
+  : TVector<T, 4>(cpy)
 {}
 
 template <typename T>
-Vector4D<T>::Vector4D(
-  Vector3D<T> const& other,
+TVector4D<T>::TVector4D(
+  TVector3D<T> const& other,
   T           const& w)
-  : Vector<T, 4>({ other.x(), other.y(), other.z(), w })
+  : TVector<T, 4>({ other.x(), other.y(), other.z(), w })
 {}
 
 template <typename T>
-Vector4D<T>::Vector4D(
-  Vector2D<T> const&other,
+TVector4D<T>::TVector4D(
+  TVector2D<T> const&other,
   T           const&z,
   T           const&w)
-  : Vector<T, 4>({ other.x(), other.y(), z, w })
+  : TVector<T, 4>({ other.x(), other.y(), z, w })
 {}
 
-template <typename T>
-typename Vector4D<T>::value_type const
-Vector4D<T>::x() const
-{
-  return this->m_field[0];
-}
-
-template <typename T>
-typename Vector4D<T>::value_type const
-Vector4D<T>::y() const
-{
-  return this->m_field[1];
-}
-
-template <typename T>
-typename Vector4D<T>::value_type const
-Vector4D<T>::z() const
-{
-  return this->m_field[2];
-}
-
-template <typename T>
-typename Vector4D<T>::value_type const
-Vector4D<T>::w() const
-{
-  return this->m_field[3];
-}
+DefineImmutableGetter(TVector4D, x);
+DefineImmutableGetter(TVector4D, y);
+DefineImmutableGetter(TVector4D, z);
+DefineImmutableGetter(TVector4D, w);
+DefineMutableGetter(TVector4D, x);
+DefineMutableGetter(TVector4D, y);
+DefineMutableGetter(TVector4D, z);
+DefineMutableGetter(TVector4D, w);
 
 template <typename T>
 void
-Vector4D<T>::x(value_type const& val)
+TVector4D<T>::x(value_type const& val)
 {
   this->m_field[0] = val;
 }
 
 template <typename T>
 void
-Vector4D<T>::y(value_type const& val)
+TVector4D<T>::y(value_type const& val)
 {
   this->m_field[1] = val;
 }
 
 template <typename T>
 void
-Vector4D<T>::z(value_type const& val)
+TVector4D<T>::z(value_type const& val)
 {
   this->m_field[2] = val;
 }
 
 template <typename T>
 void
-Vector4D<T>::w(value_type const& val)
+TVector4D<T>::w(value_type const& val)
 {
   this->m_field[3] = val;
+}
+
+template <typename T>
+TVector2D<T>::value_type dot(const TVector2D<T> l, const TVector2D<T> r)
+{
+  return ((l.x() * r.x()) + (l.y() * r.y()));
+}
+
+template <typename T>
+TVector3D<T>::value_type dot(const TVector3D<T> l, const TVector3D<T> r)
+{
+  return ((l.x() * r.x())
+    + (l.y() * r.y())
+    + (l.z() * r.z()));
+}
+
+template <typename T>
+TVector4D<T>::value_type dot(TVector4D<T> const&l, TVector4D<T> const&r)
+{
+  return
+    ((l.x() * r.x()) +
+    (l.y() * r.y()) +
+      (l.z() * r.z()) +
+      (l.w() + r.w()));
+}
+
+template <typename T>
+TVector3D<T> cross(TVector3D<T> const&l, TVector3D<T> const&r)
+{
+  return
+    TVector3D<T>(
+    (l.y()*r.z() - l.z()*r.y()),
+      (l.z()*r.x() - l.x()*r.z()),
+      (l.x()*r.y() - l.y()*r.x()));
+}
+
+template <typename T>
+TVector2D<T> scale(
+  TVector2D<T>                      const&vec,
+  typename TVector2D<T>::value_type const&factor)
+{
+  return TVector2D<T>(vec).scale(factor);
+}
+
+template <typename T>
+TVector3D<T> scale(
+  TVector3D<T>             const&vec,
+  TVector3D<T>::value_type const&factor)
+{
+  return TVector3D<T>(vec).scale(factor);
+}
+
+template <typename T>
+TVector4D<T> scale(
+  TVector4D<T>                      const&vec,
+  typename TVector4D<T>::value_type const&factor)
+{
+  return TVector4D<T>(vec).scale(factor);
+}
+
+template <typename T, size_t N>
+inline TVector<T, N> normalize(TVector<T, N> const&vec)
+{
+  return *(TVector<T, N>(vec).normalize());
 }
