@@ -205,7 +205,7 @@ namespace Engine {
 #ifdef PLATFORM_WINDOWS
 		std::wstring wmsg = String::toWideString(msg);
 		DWORD       written = 0;
-		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), wmsg.c_str(), msg.size(), &written, nullptr);
+		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), wmsg.c_str(), ((DWORD)msg.size()), &written, nullptr);
 #else 
 		std::cout << msg << std::endl;
 #endif

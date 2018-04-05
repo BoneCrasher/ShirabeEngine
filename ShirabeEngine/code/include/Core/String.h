@@ -3,12 +3,16 @@
 
 #include <type_traits>
 #include <string>
-#include <locale>
+// codecvt: Safe due to http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html
+// "Move to Annex D, until safe replacement is provided"
+// #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include <codecvt>
+#include <locale>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <array>
+
 
 namespace Engine {
 

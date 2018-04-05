@@ -5,6 +5,8 @@
 #include <math.h>
 #include <cmath>
 
+#include "Platform/Platform.h"
+
 namespace Engine {
 
 #ifdef min 
@@ -359,7 +361,7 @@ namespace Engine {
 
 #define FRAMEGRAPH_RESOURCERANGE_REMAINING -1
 
-  struct Range {
+  struct SHIRABE_LIBRARY_EXPORT Range {
     inline
       Range()
       : offset(0)

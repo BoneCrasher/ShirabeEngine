@@ -7,7 +7,7 @@ namespace Engine {
   namespace Core {
 
     template <typename TEnum>
-    class BitField {
+    class SHIRABE_LIBRARY_EXPORT BitField {
       using Value_t = std::underlying_type_t<TEnum>;
 
       inline static

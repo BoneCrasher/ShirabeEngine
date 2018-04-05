@@ -27,7 +27,7 @@ namespace Engine {
         InputData                        &input,
         OutputData                       &output)
 		{
-      uint64_t
+      uint32_t
         width  = 1920,
         height = 1080;
 
