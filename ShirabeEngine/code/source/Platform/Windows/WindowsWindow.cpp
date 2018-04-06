@@ -123,17 +123,18 @@ namespace Platform {
 		}
 
 
-		void WindowsWindow::onMove(const long& x,
-								   const long& y) {
-			m_bounds.m_position.x() = x;
-			m_bounds.m_position.y() = y;
+		void WindowsWindow::onMove(
+      const long& x,
+			const long& y) {
+			m_bounds.position.x(x);
+			m_bounds.position.y(y);
 
 			m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
 		}
 		void WindowsWindow::onResize(const long& width,
 									 const long& height) {
-			m_bounds.size.x() = width;
-			m_bounds.size.y() = height;
+			m_bounds.size.x(width);
+			m_bounds.size.y(height);
 
 			m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
 		}

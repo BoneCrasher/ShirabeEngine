@@ -30,7 +30,7 @@ namespace Engine {
 		//
 
 		class Quaternion
-			: public Vector<4>
+			: public Vector4D
 		{
 			
 		public:
@@ -40,17 +40,7 @@ namespace Engine {
 			Quaternion(const AxisAngle&);
 			Quaternion(value_type w, value_type x, value_type y, value_type z);
 			~Quaternion();
-
-			inline const value_type& w() const { return m_field[0]; }
-			inline const value_type& x() const { return m_field[1]; }
-			inline const value_type& y() const { return m_field[2]; }
-			inline const value_type& z() const { return m_field[3]; }
-
-			inline const value_type& w(const value_type& v) { return (m_field[0] = v); }
-			inline const value_type& x(const value_type& v) { return (m_field[1] = v); }
-			inline const value_type& y(const value_type& v) { return (m_field[2] = v); }
-			inline const value_type& z(const value_type& v) { return (m_field[3] = v); }
-
+      
 			inline const Vector3D vector() const {
 				return Vector3D(x(), y(), z());
 			}

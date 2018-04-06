@@ -7,58 +7,58 @@
 
 namespace Engine {
 
-	class TestDummy 
-	    : public IWindow::IEventCallback {
-	public:
-		DeclareLogTag("TestDummy")
+  class TestDummy
+    : public IWindow::IEventCallback {
+  public:
+    DeclareLogTag("TestDummy")
 
-		void onResume(const IWindowPtr&) {
-			//Log::Status(logTag(), "OnResume");
-		}
+      void onResume(const IWindowPtr&) {
+      //Log::Status(logTag(), "OnResume");
+    }
 
-		void onShow(const IWindowPtr&) {
-			//Log::Status(logTag(), "onShow");
-		}
+    void onShow(const IWindowPtr&) {
+      //Log::Status(logTag(), "onShow");
+    }
 
-		void onBoundsChanged(const IWindowPtr&,
-							 const Rect& r) {
-			//Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
-		}
+    void onBoundsChanged(const IWindowPtr&,
+      const Rect& r) {
+      //Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
+    }
 
-		void onHide(const IWindowPtr&) {
-			//Log::Status(logTag(), "onHide");
-		}
+    void onHide(const IWindowPtr&) {
+      //Log::Status(logTag(), "onHide");
+    }
 
-		void onPause(const IWindowPtr&) {
-			//Log::Status(logTag(), "onPause");
-		}
+    void onPause(const IWindowPtr&) {
+      //Log::Status(logTag(), "onPause");
+    }
 
-		void onClose(const IWindowPtr&) {
-			//Log::Status(logTag(), "onClose");
-			PostQuitMessage(0);
-		}
+    void onClose(const IWindowPtr&) {
+      //Log::Status(logTag(), "onClose");
+      PostQuitMessage(0);
+    }
 
-	};
+  };
 
-	EngineInstance::EngineInstance(const Platform::ApplicationEnvironment& environment)
-		: m_environment(environment)
-		, m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
-	  , m_mainWindow(nullptr)
+  EngineInstance::EngineInstance(const Platform::ApplicationEnvironment& environment)
+    : m_environment(environment)
+    , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
+    , m_mainWindow(nullptr)
     , m_dx11Environment()
   {
-	}
+  }
 
-	EngineInstance::~EngineInstance() {
-		// Fool-Proof redundant check
-		if (m_windowManager)
-			m_windowManager = nullptr;
-	}
+  EngineInstance::~EngineInstance() {
+    // Fool-Proof redundant check
+    if(m_windowManager)
+      m_windowManager = nullptr;
+  }
 
-	EEngineStatus EngineInstance::initialize() {
-		using namespace Engine::DX::_11;
+  EEngineStatus EngineInstance::initialize() {
+    using namespace Engine::DX::_11;
 
 
-		EEngineStatus status;
+    EEngineStatus status;
 
     unsigned long const& windowWidth  = m_environment.osDisplays[0].bounds.size.x();
     unsigned long const& windowHeight = m_environment.osDisplays[0].bounds.size.y();
@@ -97,8 +97,8 @@ namespace Engine {
 
     RendererConfiguration rendererConfiguration;
     rendererConfiguration.enableVSync             = true;
-    rendererConfiguration.frustum                 = Vec4Dd(windowWidth, windowHeight, 0.1f, 1000.0f);
-    rendererConfiguration.preferredBackBufferSize = Vec2Dl(windowWidth, windowHeight);
+    rendererConfiguration.frustum                 ={ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f };
+    rendererConfiguration.preferredBackBufferSize ={ windowWidth, windowHeight };
     rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
     rendererConfiguration.requestFullscreen       = false;
 
@@ -110,8 +110,8 @@ namespace Engine {
       EEngineStatus status = m_dx11Environment->initialize(m_environment, rendererConfiguration);
       HandleEngineStatusError(status, "DirectX11 initialization failed.");
     };
-    
-    std::function<void()> fnCreatePlatformResourceSystem 
+
+    std::function<void()> fnCreatePlatformResourceSystem
       = [&, this] () -> void
     {
       // Instantiate the appropriate gfx api from engine config, BUT match it against 
@@ -141,7 +141,7 @@ namespace Engine {
       // Renderer will have access to resourceBackend!
     };
 
-    std::function<void()> fnCreatePlatformRenderer 
+    std::function<void()> fnCreatePlatformRenderer
       = [&, this] () -> void
     {
       m_renderer = MakeSharedPointerType<DX11Renderer>();
@@ -157,61 +157,65 @@ namespace Engine {
       fnCreatePlatformResourceSystem();
       fnCreatePlatformRenderer();
 
-    } catch(WindowsException const we) {
+    }
+    catch(WindowsException const we) {
       Log::Error(logTag(), we.message());
       return we.engineStatus();
-    } catch(EngineException const e) {
+    }
+    catch(EngineException const e) {
       Log::Error(logTag(), e.message());
       return e.status();
-    } catch(std::exception const stde) {
+    }
+    catch(std::exception const stde) {
       Log::Error(logTag(), stde.what());
       return EEngineStatus::Error;
-    } catch(...) {
+    }
+    catch(...) {
       Log::Error(logTag(), "Unknown error occurred.");
       return EEngineStatus::Error;
     }
 
-		return status;
-	}
+    return status;
+  }
 
-	EEngineStatus EngineInstance::deinitialize() {
-		EEngineStatus status = EEngineStatus::Ok;
+  EEngineStatus EngineInstance::deinitialize() {
+    EEngineStatus status = EEngineStatus::Ok;
 
-		if( m_resourceManager ) {
-			m_resourceManager->clear(); // Will implicitely clear all subsystems!
-			m_resourceManager = nullptr;
-		}
+    if(m_resourceManager) {
+      m_resourceManager->clear(); // Will implicitely clear all subsystems!
+      m_resourceManager = nullptr;
+    }
 
-		if( m_proxyFactory ) {
-			m_proxyFactory = nullptr;
-		}
+    if(m_proxyFactory) {
+      m_proxyFactory = nullptr;
+    }
 
-		if (m_renderer) {
-			status = m_renderer->deinitialize();
-		}
+    if(m_renderer) {
+      status = m_renderer->deinitialize();
+    }
 
-		if (m_mainWindow) {
-			m_mainWindow->hide();
-			m_mainWindow->pause();
-			// TODO: Handle errors
-			m_mainWindow = nullptr;
-		}
+    if(m_mainWindow) {
+      m_mainWindow->hide();
+      m_mainWindow->pause();
+      // TODO: Handle errors
+      m_mainWindow = nullptr;
+    }
 
-		m_windowManager = nullptr;
+    m_windowManager = nullptr;
 
-		return EEngineStatus::Ok;
-	}
+    return EEngineStatus::Ok;
+  }
 
-	EEngineStatus EngineInstance::update() {
+  EEngineStatus EngineInstance::update() {
 
-		if (CheckWindowManagerError(m_windowManager->update())) {
-			Log::Error(logTag(), "Failed to update window manager.");
-			return EEngineStatus::EngineComponentUpdateError;
-		}
+    if(CheckWindowManagerError(m_windowManager->update())) {
+      Log::Error(logTag(), "Failed to update window manager.");
+      return EEngineStatus::EngineComponentUpdateError;
+    }
 
-		m_scene.update();
-		m_renderer->render();
+    m_scene.update();
+    m_renderer->render();
 
-		return EEngineStatus::Ok;
-	}
+    return EEngineStatus::Ok;
+  }
 }

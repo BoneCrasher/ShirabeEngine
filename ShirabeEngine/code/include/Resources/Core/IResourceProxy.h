@@ -146,6 +146,8 @@ namespace Engine {
 			{
 			}
 
+      virtual ~GenericProxyBase() = default;
+
 			inline EProxyType proxyType() const { return m_type; }
 			inline ELoadState loadState() const { return m_loadState; }
 

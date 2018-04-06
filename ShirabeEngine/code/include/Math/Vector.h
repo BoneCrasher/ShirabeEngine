@@ -6,13 +6,14 @@
 namespace Engine {
   namespace Math {
 
-    #define DefinePermutationAccessor1D(a)          inline TVector1D a()          const { return TVector1D(a());                }
-    #define DefinePermutationAccessor2D(a, b)       inline TVector2D a##b()       const { return TVector2D(a(), b());           }
-    #define DefinePermutationAccessor3D(a, b, c)    inline TVector3D a##b##c()    const { return TVector3D(a(), b(), c());      }
-    #define DefinePermutationAccessor4D(a, b, c, d) inline TVector4D a##b##c##d() const { return TVector4D(a(), b(), c(), d()); }
+    #define DefinePermutationAccessor1D(a)          inline TVector1D<T> a()          const { return TVector1D<T>(a());                }
+    #define DefinePermutationAccessor2D(a, b)       inline TVector2D<T> a##b()       const { return TVector2D<T>(a(), b());           }
+    #define DefinePermutationAccessor3D(a, b, c)    inline TVector3D<T> a##b##c()    const { return TVector3D<T>(a(), b(), c());      }
+    #define DefinePermutationAccessor4D(a, b, c, d) inline TVector4D<T> a##b##c##d() const { return TVector4D<T>(a(), b(), c(), d()); }
 
-    #define DeclareImmutableGetter(vec_type, component) template <typename T> typename vec_type<T>::value_type const component() const;
-    #define DeclareMutableGetter(vec_type, component)   template <typename T> typename vec_type<T>::value_type       component();
+    #define DeclareImmutableGetter(vec_type, component) \
+    typename vec_type<T>::value_type const              \
+      component() const;    
 
     /**********************************************************************************************//**
      * \class TVector
@@ -26,7 +27,7 @@ namespace Engine {
     class TVector
       : public Field<
       std::enable_if_t<std::is_arithmetic_v<T>, T>,
-      sizeof(float), N, 1>
+      sizeof(T), N, 1>
     {
     public:
       typedef Field<T, sizeof(T), N, 1> base_type;
@@ -34,10 +35,11 @@ namespace Engine {
       typedef T                         value_type;
 
       TVector();
-      TVector(
-        value_type const x,
-        value_type const y);
+      TVector(std::initializer_list<T> const);
+      TVector(Field<T, sizeof(T), N, 1> const&);
       TVector(class_type const& cpy);
+
+      bool operator==(TVector<T, N> const&);
 
     public:
       class_type scale(value_type const factor);
@@ -172,10 +174,7 @@ namespace Engine {
       TVector1D(value_type const x);
       TVector1D(class_type const& cpy);
 
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector1D, x);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector1D, x);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -202,15 +201,8 @@ namespace Engine {
         value_type const y);
       TVector2D(class_type const& cpy);
 
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector2D, x);
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector2D, y);
-
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector2D, x);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector2D, y);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -242,19 +234,9 @@ namespace Engine {
         T           const&z = T(0));
       TVector3D(class_type const& cpy);
       
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector3D, x);
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector3D, y);
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector3D, z);
-
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector3D, x);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector3D, y);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector3D, z);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -304,23 +286,10 @@ namespace Engine {
         T           const&z = T(0),
         T           const&w = T(0));
 
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector4D, x);
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector4D, y);
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector4D, z);
-      // Return a copy of the stored x-component. Getter.
       DeclareImmutableGetter(TVector4D, w);
-
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector4D, z);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector4D, x);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector4D, y);
-      // Return a copy of the stored y-component. Getter.
-      DeclareMutableGetter(TVector4D, w);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -401,15 +370,15 @@ namespace Engine {
 
     // Returns a copy of the 2D dot product of two Vec2 instances.
     template <typename T>
-    TVector2D<T>::value_type dot(const TVector2D<T> l, const TVector2D<T> r);
+    typename TVector2D<T>::value_type dot(TVector2D<T> const&l, TVector2D<T> const&r);
 
     // Returns a copy of the 3D dot product of two Vec3 instances.
     template <typename T>
-    TVector3D<T>::value_type dot(const TVector3D<T> l, const TVector3D<T> r);
+    typename TVector3D<T>::value_type dot(TVector3D<T> const&l, TVector3D<T> const&r);
 
     // Returns a copy of the 4D dot product of two Vec4 instances.
     template <typename T>
-    TVector4D<T>::value_type dot(TVector4D<T> const&l, TVector4D<T> const&r);
+    typename TVector4D<T>::value_type dot(TVector4D<T> const&l, TVector4D<T> const&r);
 
     // Returns a copy of the 3D cross product of two Vec3 instances.
     template <typename T>
@@ -424,8 +393,8 @@ namespace Engine {
     // Returns a scaled copy of an arbitrary Vec3 instance.
     template <typename T>
     TVector3D<T> scale(
-      TVector3D<T>             const&vec,
-      TVector3D<T>::value_type const&factor);
+      TVector3D<T>                      const&vec,
+      typename TVector3D<T>::value_type const&factor);
 
     // Returns a scaled copy of an arbitrary Vec4 instance.
     template <typename T>
@@ -434,7 +403,7 @@ namespace Engine {
       typename TVector4D<T>::value_type const&factor);
 
     template <typename T, size_t N>
-    inline TVector<T, N> normalize(TVector<T, N> const&vec);
+    TVector<T, N> normalize(TVector<T, N> const&vec);
 
     #include "Math/Vector.tpp"
 

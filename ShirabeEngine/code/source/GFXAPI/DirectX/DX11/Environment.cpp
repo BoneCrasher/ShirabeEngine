@@ -332,9 +332,9 @@ namespace Engine {
                     GAPIOutputMode outAdapterOutputMode ={};
 
                     DXGI_MODE_DESC desc = outputModes[i];
-                    outAdapterOutputMode.size        = Vec2Dui(desc.Width, desc.Height);
+                    outAdapterOutputMode.size        = TVector2D<uint32_t>(desc.Width, desc.Height);
                     outAdapterOutputMode.format      = DX11DeviceCapsHelper::convertFormatDXGI2GAPI(desc.Format);
-                    outAdapterOutputMode.refreshRate = Vec2Dui(desc.RefreshRate.Numerator, desc.RefreshRate.Denominator);
+                    outAdapterOutputMode.refreshRate = TVector2D<uint32_t>(desc.RefreshRate.Numerator, desc.RefreshRate.Denominator);
 
                     outAdapterOutput.outputModes.push_back(outAdapterOutputMode);
                   };

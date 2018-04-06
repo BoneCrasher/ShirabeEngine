@@ -16,7 +16,7 @@ namespace Engine {
 		struct GAPIOutputMode {
       uint32_t modeIndex;
 			Format   format;
-			TVector3D<uint32_t> 
+			TVector2D<uint32_t> 
         size,
         refreshRate;
 		};

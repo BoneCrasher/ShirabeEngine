@@ -5,23 +5,23 @@ namespace Engine {
 	namespace Math {
 
 		AxisAngle::AxisAngle()
-			: Vector<4>({ 0, 0, 0, 0 })
+			: Vector4D({ 0, 0, 0, 0 })
 		{}
 
 		AxisAngle::AxisAngle(const Vector3D&   axis,
 							 const value_type& phi)
-			: Vector<4>({ axis.x(), axis.y(), axis.z(), phi })
+			: Vector4D({ axis.x(), axis.y(), axis.z(), phi })
 		{}
 
 		AxisAngle::AxisAngle(const AxisAngle& axisAngle) 
-			: Vector<4>({ })
+			: Vector4D({ })
 		{ }
 
 		AxisAngle::AxisAngle(const value_type& x,
 							 const value_type& y,
 							 const value_type& z,
 							 const value_type& phi) 
-			: Vector<4>({ x, y, z, phi })
+			: Vector4D({ x, y, z, phi })
 		{}
 
 		AxisAngle::~AxisAngle() {

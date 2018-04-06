@@ -51,7 +51,7 @@ namespace Engine {
     // The only thing of matter could be static downcasting and public Interface issues 
     // with knowing the capabilities of the underlying resource class.
 
-#define DeclareAdapter(type, alias, name)                    \
+    #define DeclareAdapter(type, alias, name)                    \
 		template <typename Impl>                                 \
 		class type##Adapter {								                     \
 		public:												                           \
@@ -61,6 +61,8 @@ namespace Engine {
 				const Impl& name)						                         \
 			  : _##name(name)					 			                       \
 			{}												                             \
+															                               \
+		  virtual ~type##Adapter() = default;                    \
 															                               \
 			inline const Impl        				                       \
 				name() const { return static_cast<Impl>(_##name); }  \

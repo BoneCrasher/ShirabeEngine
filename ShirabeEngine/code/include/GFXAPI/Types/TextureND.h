@@ -82,7 +82,7 @@ namespace Engine {
 
         std::string                    name;
         Format                         textureFormat;
-        TVectorND<uint32_t, N>         dimensions;
+        TVector<uint32_t, N>           dimensions;
         TextureMipMapDescriptor        mipMap;
         TextureArrayDescriptor         array;
         TextureMultisapmlingDescriptor multisampling;

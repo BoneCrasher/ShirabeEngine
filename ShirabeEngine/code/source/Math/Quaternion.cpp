@@ -6,12 +6,12 @@ namespace Engine {
 	namespace Math {
 
 		Quaternion::Quaternion()
-			: Vector<4>({ 0, 0, 0, 0 })
+			: Vector4D({ 0, 0, 0, 0 })
 		{
 		}
 
 		Quaternion::Quaternion(const Quaternion& other)
-			: Vector<4>(other)
+			: Vector4D(other)
 		{
 		}
 
@@ -20,12 +20,12 @@ namespace Engine {
 		{}
 
 		Quaternion::Quaternion(value_type w, const Vector3D& vec)
-			: Vector<4>({ w, vec.x(), vec.y(), vec.z() })
+			: Vector4D({ w, vec.x(), vec.y(), vec.z() })
 		{
 		}
 
 		Quaternion::Quaternion(value_type w, value_type x, value_type y, value_type z)
-			: Vector<4>({ w, x, y, z })
+			: Vector4D({ w, x, y, z })
 		{
 		}
 

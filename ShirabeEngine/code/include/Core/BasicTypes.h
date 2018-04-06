@@ -7,8 +7,10 @@
 #include <stdint.h>
 
 #include "Platform/Platform.h"
+#include "Math/Vector.h"
 
 namespace Engine {
+  using namespace Engine::Math;
 
   #ifdef min 
   #undef min
@@ -50,8 +52,6 @@ namespace Engine {
     int32_t
       length;
   };
-
-  #include "Core/BasicTypes.tpp" // Must be included from within namespace.
 
 }
 

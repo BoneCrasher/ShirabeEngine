@@ -87,8 +87,8 @@ namespace Platform {
             wc.lpszClassName,
             instanceName.c_str(),
             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-            initialBounds.m_position.x(),  // Bounds::Location::X
-            initialBounds.m_position.y(),  // Bounds::Location::Y
+            initialBounds.position.x(),  // Bounds::Location::X
+            initialBounds.position.y(),  // Bounds::Location::Y
             initialBounds.size.x(),      // Bounds::Size::X
             initialBounds.size.y(),      // Bounds::Size::Y
             NULL,                        // Parent HWND
