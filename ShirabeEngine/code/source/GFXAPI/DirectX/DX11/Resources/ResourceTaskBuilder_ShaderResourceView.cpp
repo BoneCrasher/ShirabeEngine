@@ -26,52 +26,53 @@ namespace Engine {
 
         // Map configuration to DX11 creation struct
         if(desc.srvType == ShaderResourceView::Descriptor::EShaderResourceDimension::Texture) {
-          switch(desc.shaderResourceDimension.texture.dimensionNb) {
+          ShaderResourceViewDeclaration::Texture texture = std::get<ShaderResourceViewDeclaration::Texture>(desc.shaderResourceDimension);
+          switch(texture.dimensionNb) {
           case 1:
-            if(desc.shaderResourceDimension.texture.array.isTextureArray) {
-              srvDesc.Texture1DArray.ArraySize       = desc.shaderResourceDimension.texture.array.size;
-              srvDesc.Texture1DArray.FirstArraySlice = desc.shaderResourceDimension.texture.array.firstArraySlice;
-              srvDesc.Texture1DArray.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-              srvDesc.Texture1DArray.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+            if(texture.array.isTextureArray) {
+              srvDesc.Texture1DArray.ArraySize       = texture.array.size;
+              srvDesc.Texture1DArray.FirstArraySlice = texture.array.firstArraySlice;
+              srvDesc.Texture1DArray.MipLevels       = texture.mipMap.mipLevels;
+              srvDesc.Texture1DArray.MostDetailedMip = texture.mipMap.firstMipMapLevel;
             }
             else {
-              srvDesc.Texture1D.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-              srvDesc.Texture1D.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+              srvDesc.Texture1D.MipLevels       = texture.mipMap.mipLevels;
+              srvDesc.Texture1D.MostDetailedMip = texture.mipMap.firstMipMapLevel;
             }
 
             break;
           case 2:
-            if(desc.shaderResourceDimension.texture.array.isTextureArray) {
-              srvDesc.Texture2DArray.ArraySize       = desc.shaderResourceDimension.texture.array.size;
-              srvDesc.Texture2DArray.FirstArraySlice = desc.shaderResourceDimension.texture.array.firstArraySlice;
-              srvDesc.Texture2DArray.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-              srvDesc.Texture2DArray.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+            if(texture.array.isTextureArray) {
+              srvDesc.Texture2DArray.ArraySize       = texture.array.size;
+              srvDesc.Texture2DArray.FirstArraySlice = texture.array.firstArraySlice;
+              srvDesc.Texture2DArray.MipLevels       = texture.mipMap.mipLevels;
+              srvDesc.Texture2DArray.MostDetailedMip = texture.mipMap.firstMipMapLevel;
             }
             else {
-              srvDesc.Texture2D.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-              srvDesc.Texture2D.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+              srvDesc.Texture2D.MipLevels       = texture.mipMap.mipLevels;
+              srvDesc.Texture2D.MostDetailedMip = texture.mipMap.firstMipMapLevel;
             }
 
             break;
           case 3:
-            if(desc.shaderResourceDimension.texture.isCube) {
-              if(desc.shaderResourceDimension.texture.array.isTextureArray) {
-                srvDesc.TextureCube.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-                srvDesc.TextureCube.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+            if(texture.isCube) {
+              if(texture.array.isTextureArray) {
+                srvDesc.TextureCube.MipLevels       = texture.mipMap.mipLevels;
+                srvDesc.TextureCube.MostDetailedMip = texture.mipMap.firstMipMapLevel;
               }
               else {
-                srvDesc.TextureCubeArray.NumCubes        = desc.shaderResourceDimension.texture.array.size;
-                srvDesc.TextureCubeArray.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-                srvDesc.TextureCubeArray.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+                srvDesc.TextureCubeArray.NumCubes        = texture.array.size;
+                srvDesc.TextureCubeArray.MipLevels       = texture.mipMap.mipLevels;
+                srvDesc.TextureCubeArray.MostDetailedMip = texture.mipMap.firstMipMapLevel;
               }
             }
             else {
-              if(desc.shaderResourceDimension.texture.array.isTextureArray) {
+              if(texture.array.isTextureArray) {
                 // ERROR: NO 3D Texture Arrays supported!
               }
               else {
-                srvDesc.Texture3D.MipLevels       = desc.shaderResourceDimension.texture.mipMap.mipLevels;
-                srvDesc.Texture3D.MostDetailedMip = desc.shaderResourceDimension.texture.mipMap.firstMipMapLevel;
+                srvDesc.Texture3D.MipLevels       = texture.mipMap.mipLevels;
+                srvDesc.Texture3D.MostDetailedMip = texture.mipMap.firstMipMapLevel;
               }
             }
             break;
@@ -80,8 +81,9 @@ namespace Engine {
           }
         }
         else { // Structured Buffer
-          srvDesc.Buffer.ElementOffset = desc.shaderResourceDimension.structuredBuffer.firstElementOffset;
-          srvDesc.Buffer.ElementWidth  = desc.shaderResourceDimension.structuredBuffer.elementWidthInBytes;
+          ShaderResourceViewDeclaration::StructuredBuffer structuredBuffer = std::get<ShaderResourceViewDeclaration::StructuredBuffer>(desc.shaderResourceDimension);
+          srvDesc.Buffer.ElementOffset = structuredBuffer.firstElementOffset;
+          srvDesc.Buffer.ElementWidth  = structuredBuffer.elementWidthInBytes;
         }
 
         outTask = [&, this] () -> GFXAPIResourceHandleAssignment

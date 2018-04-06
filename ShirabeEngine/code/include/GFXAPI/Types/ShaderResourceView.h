@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_RESOURCETYPES_SHADERRESOURCE_H__
 #define __SHIRABE_RESOURCETYPES_SHADERRESOURCE_H__
 
+#include <variant>
+
 #include "Resources/Core/EResourceType.h"
 #include "Resources/Core/IResource.h"
 #include "Resources/Core/ResourceDTO.h"
@@ -61,12 +63,7 @@ namespace Engine {
        *
        * \brief A shader resource dimension.
        **************************************************************************************************/
-      union ShaderResourceDimension {
-        Texture          texture;
-        StructuredBuffer structuredBuffer;
-
-        ShaderResourceDimension();
-      };
+      using ShaderResourceDimension = std::variant<Texture, StructuredBuffer>;
 
       /**********************************************************************************************//**
        * \struct	ShaderResourceDescriptorImpl

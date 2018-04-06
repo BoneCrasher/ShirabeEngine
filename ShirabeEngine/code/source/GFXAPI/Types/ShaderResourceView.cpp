@@ -18,17 +18,11 @@ namespace Engine {
       : firstElementOffset(0)
       , elementWidthInBytes(0)
     {}
-
-    ShaderResourceViewDeclaration::ShaderResourceDimension
-      ::ShaderResourceDimension()
-      : texture()
-      , structuredBuffer()
-    {}
-  
+      
     ShaderResourceViewDeclaration::Descriptor
       ::Descriptor()
       : DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::SHADER_RESOURCE_VIEW>()
-      , shaderResourceDimension()
+      , shaderResourceDimension(Texture())
     {}
 
     ShaderResourceViewDeclaration::CreationRequest
@@ -50,17 +44,19 @@ namespace Engine {
         << " Format:     " << (uint8_t)format << "\n,";
 
       if(srvType == EShaderResourceDimension::Texture) {
+        Texture texture = std::get<Texture>(shaderResourceDimension);
         ss
-          << " Dimensions:        " << (uint8_t)shaderResourceDimension.texture.dimensionNb << "\n,"
-          << " Array:             " << (uint8_t)shaderResourceDimension.texture.array.size << "\n,"
-          << " First array index: " << (uint8_t)shaderResourceDimension.texture.array.firstArraySlice << "\n,"
-          << " MipMap:            " << (uint8_t)shaderResourceDimension.texture.mipMap.mipLevels << "\n,"
-          << " Most Detailed MIP: " << (uint8_t)shaderResourceDimension.texture.mipMap.firstMipMapLevel << ";";
+          << " Dimensions:        " << (uint8_t)texture.dimensionNb << "\n,"
+          << " Array:             " << (uint8_t)texture.array.size << "\n,"
+          << " First array index: " << (uint8_t)texture.array.firstArraySlice << "\n,"
+          << " MipMap:            " << (uint8_t)texture.mipMap.mipLevels << "\n,"
+          << " Most Detailed MIP: " << (uint8_t)texture.mipMap.firstMipMapLevel << ";";
       }
       else { // StructuredBuffer
+        StructuredBuffer structuredBuffer = std::get<StructuredBuffer>(shaderResourceDimension);
         ss
-          << " First elem. off.: " << (uint8_t)shaderResourceDimension.structuredBuffer.firstElementOffset << ","
-          << " Elem. byte-size:  " << (uint8_t)shaderResourceDimension.structuredBuffer.elementWidthInBytes << ";";
+          << " First elem. off.: " << (uint8_t)structuredBuffer.firstElementOffset << ","
+          << " Elem. byte-size:  " << (uint8_t)structuredBuffer.elementWidthInBytes << ";";
       }
 
       return ss.str();
