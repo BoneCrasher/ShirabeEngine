@@ -26,6 +26,13 @@ TVector<T, N>::TVector(class_type const& cpy)
 {}
 
 template <typename T, std::size_t N>
+bool
+TVector<T, N>::operator==(TVector<T, N> const&other)
+{
+  return Field<T, sizeof(T), N, 1>::operator==(static_cast<Field<T, sizeof(T), N, 1>>(other));
+}
+
+template <typename T, std::size_t N>
 typename TVector<T, N>::class_type
 TVector<T, N>::scale(value_type const factor)
 {

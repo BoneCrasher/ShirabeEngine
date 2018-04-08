@@ -83,6 +83,10 @@ namespace Engine {
 				T& operator[] (std::size_t const i) {
 					return const_cast<T&>(static_cast<const class_type *>(this)->operator[](i));
 				}
+
+        bool operator==(class_type const&other) {
+          return (memcmp(m_field, other.m_field, sizeof(T) * N) == 0);
+        }
 				
 				// Add another vector to this instance.
 				// There are no range checks and no clamping applied.
