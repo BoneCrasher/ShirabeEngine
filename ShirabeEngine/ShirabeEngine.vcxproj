@@ -447,7 +447,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="code\include\Renderer\FrameGraph\Test.cpp" />
     <ClCompile Include="code\source\Core\BasicTypes.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Device.cpp" />
     <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DeviceCapabilities.cpp" />
@@ -532,7 +531,6 @@
     <ClInclude Include="code\include\Renderer\FrameGraph\Passes\GBufferGeneration.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\Passes\Lighting.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\PassLinker.h" />
-    <ClInclude Include="code\include\Renderer\FrameGraph\Test.h" />
     <ClInclude Include="code\include\Renderer\IRenderer.h" />
     <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
     <ClInclude Include="code\include\GFXAPI\Types\All.h" />

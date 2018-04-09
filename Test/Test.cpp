@@ -6,6 +6,8 @@
 #include <functional>
 #include <future>
 
+#include "Tests/Test_FrameGraph.h"
+
 class Task {
 public:
 
@@ -26,7 +28,7 @@ private:
 
 int main()
 {
-	uint32_t sleep = 6000;
+	/*uint32_t sleep = 6000;
 
 	std::vector<std::future<int>> futures;
 	std::vector<Task> tasks;
@@ -51,7 +53,10 @@ int main()
 	for(std::future<int>& future : futures)
 		std::cout << "Result: " << future.get() << std::endl;
 
-	thread.join();
+	thread.join();*/
+
+  Test::FrameGraph::Test__FrameGraph test_framegraph{};
+  test_framegraph.testAll();
 
 	system("Pause");
 }
