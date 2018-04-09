@@ -9,6 +9,12 @@ namespace Engine {
       , m_importedResources()
     {}
 
+    Random::RandomState&
+      GraphBuilder::resourceUIDGenerator()
+    {
+      return m_uidGenerator;
+    }
+
     FrameGraphResourceId_t
       GraphBuilder::generatePassUID()
     {
@@ -93,9 +99,21 @@ namespace Engine {
     {
       // Compilation is extremely tricky, as we possibly end up with 
       // multiple graph root nodes.
-      
+
 
       return nullptr;
+    }
+
+    UniquePtr<FrameGraph>&
+      GraphBuilder::graph()
+    {
+      return m_frameGraph;
+    }
+
+    Map<std::string, PublicResourceId_t>&
+      GraphBuilder::importedResources()
+    {
+      return m_importedResources;
     }
   }
 }

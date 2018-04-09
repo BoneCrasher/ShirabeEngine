@@ -11,11 +11,11 @@
 namespace Engine {
 	namespace FrameGraph {
 		
-		class GBufferPass {
+		class SHIRABE_TEST_EXPORT GBufferGenerationPass {
 		public:
 
-			GBufferPass();
-			~GBufferPass();
+			GBufferGenerationPass();
+			~GBufferGenerationPass();
 
 			struct InputData {
 				FrameGraphResource
@@ -37,7 +37,7 @@ namespace Engine {
 
 			bool setup(
         Ptr<ApplicationEnvironment> const&environment,
-        PassLinker<GBufferPass>          &passLinker,
+        PassLinker<GBufferGenerationPass>          &passLinker,
         InputData                        &input,
         OutputData                       &output);
 			bool execute(

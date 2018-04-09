@@ -216,6 +216,7 @@ namespace Engine {
         resourceViews;
 
       FrameGraphResourcePrivateData();
+      ~FrameGraphResourcePrivateData() = default;
     };
 
     struct SHIRABE_TEST_EXPORT FrameGraphResource {

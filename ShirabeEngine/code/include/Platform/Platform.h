@@ -4,7 +4,7 @@
 // #define SHIRABE_LIBRARY_EXPORT
 // #define SHIRABE_TEST_EXPORT
 
-#if defined _WIN32 && defined _WINDOWS
+#if defined _WIN32
 #  define PLATFORM_WINDOWS
 
 // Are we building a DLL?

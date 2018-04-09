@@ -13,15 +13,18 @@
 namespace Engine {
   namespace FrameGraph {
 
-    class FrameGraph {
+    class SHIRABE_TEST_EXPORT FrameGraph {
       friend class GraphBuilder;
 
     public:
+      FrameGraph()  = default;
+      ~FrameGraph() = default;
+
       bool
         execute();
 
     private:
-      inline PassBaseList & passes() { return m_passes; }
+      PassBaseList & passes();
 
       PassBaseList m_passes;
     };

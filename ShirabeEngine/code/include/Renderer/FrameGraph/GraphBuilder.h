@@ -21,15 +21,16 @@ namespace Engine {
      *
      * \brief A graph builder.
      **************************************************************************************************/
-    class GraphBuilder {
+    class SHIRABE_TEST_EXPORT GraphBuilder {
     public:
       GraphBuilder();
+      ~GraphBuilder() = default;
 
       bool initialize(
         Ptr<ApplicationEnvironment> const&environment);
       bool deinitialize();
 
-      Random::RandomState& resourceUIDGenerator() { return m_uidGenerator; }
+      Random::RandomState& resourceUIDGenerator();
 
       template <typename TPassImplementation, typename... TPassCreationArgs>
       Ptr<Pass<TPassImplementation>>
@@ -48,8 +49,8 @@ namespace Engine {
     private:
       FrameGraphResourceId_t generatePassUID();
 
-      inline UniquePtr<FrameGraph>&                graph() { return m_frameGraph; }
-      inline Map<std::string, PublicResourceId_t>& importedResources() { return m_importedResources; }
+      UniquePtr<FrameGraph>&                graph();
+      Map<std::string, PublicResourceId_t>& importedResources();
 
       Random::RandomState m_uidGenerator;
 

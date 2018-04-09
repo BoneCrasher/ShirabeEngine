@@ -11,7 +11,7 @@
 namespace Engine {
 	namespace FrameGraph {
 
-		class LightingPass {
+		class SHIRABE_TEST_EXPORT LightingPass {
 		public:
 			struct InputData {
 				FrameGraphResource

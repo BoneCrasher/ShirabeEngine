@@ -26,10 +26,10 @@ namespace Engine {
       graph.importPersistentResource("BackBuffer", 1337);
 
       // GBuffer
-      Ptr<Pass<GBufferPass>>  gbufferPass  = graph.spawnPass<GBufferPass>("GBufferPass");
+      Ptr<Pass<GBufferGenerationPass>>  gbufferPass  = graph.spawnPass<GBufferGenerationPass>("GBufferPass");
 
       // Lighting
-      GBufferPass::OutputData const& gbufferOutputData = gbufferPass->outputData();
+      GBufferGenerationPass::OutputData const& gbufferOutputData = gbufferPass->outputData();
       Ptr<Pass<LightingPass>> lightingPass
         = graph.spawnPass<LightingPass>(
           "LightingPass",

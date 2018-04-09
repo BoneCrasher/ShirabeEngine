@@ -19,7 +19,7 @@ namespace Engine {
 
 		class PassBase {
 		public:
-			virtual bool execute(Ptr<IRenderContext>&)    = 0;
+			virtual bool execute(Ptr<IRenderContext>&) = 0;
 		};
 
 		DeclareSharedPointerType(PassBase);
@@ -47,7 +47,7 @@ namespace Engine {
 
 			FrameGraphResourceId_t const&passUID() const { return m_passUID; }
 
-			InputData_t  const&inputData()  const { return m_inputData; }
+			InputData_t  const&inputData()  const { return m_inputData;  }
 			OutputData_t const&outputData() const { return m_outputData; }
 
 			template <typename... TPassCreationArgs>

@@ -13,19 +13,19 @@ namespace Engine {
 			return r;
 		}
 
-		GBufferPass::GBufferPass()
+		GBufferGenerationPass::GBufferGenerationPass()
 			: m_state()
 		{ }
 
-		GBufferPass::~GBufferPass()
+		GBufferGenerationPass::~GBufferGenerationPass()
 		{ }
 
 		bool
-			GBufferPass::setup(
-        Ptr<ApplicationEnvironment> const&environment,
-        PassLinker<GBufferPass>          &passLinker,
-        InputData                        &input,
-        OutputData                       &output)
+			GBufferGenerationPass::setup(
+        Ptr<ApplicationEnvironment>       const&environment,
+        PassLinker<GBufferGenerationPass>      &passLinker,
+        InputData                              &input,
+        OutputData                             &output)
 		{
       uint32_t
         width  = 1920,
@@ -67,7 +67,7 @@ namespace Engine {
 		}
 
 		bool
-			GBufferPass::execute(
+			GBufferGenerationPass::execute(
 				Ptr<IRenderContext>     &context,
 				InputData          const&input,
 				OutputData         const&output)
