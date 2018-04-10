@@ -135,6 +135,8 @@ namespace Engine {
 
     struct SHIRABE_TEST_EXPORT FrameGraphBuffer
     {
+      std::string
+        readableName;
       uint32_t
         elementSize,
         elementCount;
@@ -143,6 +145,8 @@ namespace Engine {
     };
 
     struct SHIRABE_TEST_EXPORT FrameGraphBufferView {
+      std::string
+        readableName;
       Range
         subrange;
       FrameGraphFormat
@@ -154,6 +158,8 @@ namespace Engine {
     };
 
     struct SHIRABE_TEST_EXPORT FrameGraphTexture {
+      std::string
+        readableName;
       uint32_t
         width,  // 0 - Undefined
         height, // At least 1
@@ -173,6 +179,8 @@ namespace Engine {
     };
 
     struct SHIRABE_TEST_EXPORT FrameGraphTextureView {
+      std::string
+        readableName;
       Range
         arraySliceRange,
         mipSliceRange;

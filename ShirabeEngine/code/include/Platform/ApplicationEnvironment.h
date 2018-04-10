@@ -19,6 +19,7 @@ namespace Platform {
 		HINSTANCE previousInstanceHandle;
 		HWND      primaryWindowHandle;
 #endif // PLATFORM_WINDOWS
+
     uint64_t                primaryDisplayIndex;
 		OSDisplayDescriptorList osDisplays;
 

@@ -30,6 +30,7 @@ namespace Engine {
       DeclareMapType(FrameGraphResourceId_t, FrameGraphTextureView, FrameGraphTextureView);
       DeclareMapType(FrameGraphResourceId_t, FrameGraphBuffer,      FrameGraphBuffer);
       DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView,  FrameGraphBufferView);
+
     public:
       PassLinker(FrameGraphResourceId_t const&, Random::RandomState&);
 
@@ -116,7 +117,7 @@ namespace Engine {
 
       // Basic abstract descriptor of resources being used.
       FrameGraphResource resource={};
-      resource.resourceId           = m_resourceIdGenerator.next();
+      resource.resourceId = m_resourceIdGenerator.next();
 
       FrameGraphResourcePrivateData privateData={};
       privateData.parentResourceId     = FrameGraphResourceId_t{ };
@@ -184,7 +185,7 @@ namespace Engine {
       }
 
       FrameGraphResource resource ={};
-      resource.resourceId         = m_resourceIdGenerator.next();
+      resource.resourceId = m_resourceIdGenerator.next();
 
       FrameGraphResourceFlags resourceViewFlags={};
       resourceViewFlags.requiredFormat = flags.requiredFormat;
@@ -196,6 +197,7 @@ namespace Engine {
       privateData.usage            = usage;
 
       FrameGraphTextureView view={};
+      view.readableName    = std::string(subjacentResource.readableName).append(" View - Write#").append(subjacentTargetResource.resourceId);
       view.arraySliceRange = arraySliceRange;
       view.mipSliceRange   = mipSliceRange;
       view.format          = subjacentResource.format;
@@ -261,7 +263,7 @@ namespace Engine {
             arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
      
       FrameGraphResource resource ={ };
-      resource.resourceId         = m_resourceIdGenerator.next();
+      resource.resourceId = m_resourceIdGenerator.next();
 
       FrameGraphResourceFlags resourceViewFlags={ };
       resourceViewFlags.requiredFormat = flags.requiredFormat;
@@ -273,6 +275,7 @@ namespace Engine {
       privateData.usage            = FrameGraphResourceUsage::ImageResource;
 
       FrameGraphTextureView view={ };
+      view.readableName    = std::string(subjacentResource.readableName).append(" View Read#").append(subjacentTargetResource.resourceId);
       view.arraySliceRange = arraySliceRange;
       view.mipSliceRange   = mipSliceRange;
       view.format          = subjacentResource.format;
@@ -327,7 +330,7 @@ namespace Engine {
       PassLinker<TPassImplementation>::isResourceRegistered(
         FrameGraphResource const&subjacentTargetResource) const
     {
-      return (m_resourcesPrivateData.find(subjacentTargetResource.resourceId) == m_resourcesPrivateData.end());
+      return (m_resourcesPrivateData.find(subjacentTargetResource.resourceId) != m_resourcesPrivateData.end());
     }
 
     /**********************************************************************************************//**

@@ -22,6 +22,7 @@ namespace Engine {
         FrameGraphResource          const&gbuffer3)
 		{      
 			FrameGraphTexture lightAccBufferDesc ={ };
+      lightAccBufferDesc.readableName = "Light Accumulation Buffer";
       lightAccBufferDesc.width        = 1920;
       lightAccBufferDesc.height       = 1080;
       lightAccBufferDesc.depth        = 1;

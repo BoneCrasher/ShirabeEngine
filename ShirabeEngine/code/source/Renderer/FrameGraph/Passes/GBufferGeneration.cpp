@@ -38,6 +38,7 @@ namespace Engine {
       }
 
       FrameGraphTexture gbufferDesc={};
+      gbufferDesc.readableName = "GBuffer Array Texture";
       gbufferDesc.width        = width;
       gbufferDesc.height       = height;
       gbufferDesc.depth        = 1;

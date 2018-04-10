@@ -9,17 +9,32 @@
 #include "Resources/Core/ResourceDTO.h"
 #include "Renderer/IRenderer.h"
 
+#include "FrameGraphSerialization.h"
+
 #include "PassLinker.h"
 
 namespace Engine {
 	namespace FrameGraph {
 		using namespace Renderer;
+    using namespace Serialization;
 
 		class GraphBuilder;
 
-		class PassBase {
+		class PassBase 
+      : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
+    {
 		public:
 			virtual bool execute(Ptr<IRenderContext>&) = 0;
+
+      inline void acceptSerializer(Ptr<IFrameGraphSerializer>&s)
+      {
+        s->serializePass(GetNonDeletingSelfPtrType(this));
+      }
+
+      inline void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
+      {
+        d->deserializePass(GetNonDeletingSelfPtrType(this));
+      }
 		};
 
 		DeclareSharedPointerType(PassBase);
@@ -77,6 +92,11 @@ namespace Engine {
 				return true; // TPassImplementation::execute(context, input, output);
 			}
 
+      std::string to_string() const {
+        std::string implementation_string = (m_implementation ? m_implementation->to_string() : "None");
+        std::string stringified           = String::format("Pass {\nUID: %1\nImplementation: %2\n}\n", m_passUID, implementation_string);
+      }
+
 		private:
 			FrameGraphResourceId_t         m_passUID;
 			UniquePtr<TPassImplementation> m_implementation;
@@ -84,8 +104,7 @@ namespace Engine {
 			InputData_t  m_inputData;
 			OutputData_t m_outputData;
 		};
-
-
+    
 	}
 }
 
