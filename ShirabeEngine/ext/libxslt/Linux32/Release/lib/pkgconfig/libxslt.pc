@@ -1,0 +1,12 @@
+prefix=/home/dotti/SmartRay/sr_3rdparty_sources/libXSLT/deploy/Linux32/Release
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+
+Name: libxslt
+Version: 1.1.26
+Description: XSLT library version 2.
+Requires: libxml-2.0
+Libs: -L${libdir} -lxslt -L/home/dotti/SmartRay/sr_3rdparty_sources/libXSLT/../libXML2/deploy/Linux32/Release/lib -L/home/dotti/SmartRay/sr_3rdparty_sources/libXML2/deploy/Linux32/Release/lib -lxml2 -L/home/dotti/SmartRay/sr_3rdparty_sources/libXML2/../zlib/deploy/Linux32/Release/lib -lz -lm -lm
+Cflags: -I${includedir}

@@ -1,0 +1,12 @@
+prefix=/home/dotti/SmartRay/sr_3rdparty_sources/libXSLT/deploy/Linux64/Debug
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+
+Name: libexslt
+Version: 0.8.15
+Description: EXSLT Extension library
+Requires: libxml-2.0
+Libs: -L${libdir} -lexslt -lxslt -L/home/dotti/SmartRay/sr_3rdparty_sources/libXSLT/../libXML2/deploy/Linux64/Debug/lib -L/home/dotti/SmartRay/sr_3rdparty_sources/libXML2/deploy/Linux64/Debug/lib -lxml2 -L/home/dotti/SmartRay/sr_3rdparty_sources/libXML2/../zlib/deploy/Linux64/Debug/lib -lz -lm -lm 
+Cflags: -I${includedir}
