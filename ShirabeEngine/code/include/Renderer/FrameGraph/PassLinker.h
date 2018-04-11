@@ -197,7 +197,7 @@ namespace Engine {
       privateData.usage            = usage;
 
       FrameGraphTextureView view={};
-      view.readableName    = std::string(subjacentResource.readableName).append(" View - Write#").append(subjacentTargetResource.resourceId);
+      view.readableName    = String::format("%1 View - Write#%2", subjacentResource.readableName, subjacentTargetResource.resourceId);
       view.arraySliceRange = arraySliceRange;
       view.mipSliceRange   = mipSliceRange;
       view.format          = subjacentResource.format;
@@ -275,7 +275,7 @@ namespace Engine {
       privateData.usage            = FrameGraphResourceUsage::ImageResource;
 
       FrameGraphTextureView view={ };
-      view.readableName    = std::string(subjacentResource.readableName).append(" View Read#").append(subjacentTargetResource.resourceId);
+      view.readableName    = String::format("%1 View - Read#%2", subjacentResource.readableName, subjacentTargetResource.resourceId);
       view.arraySliceRange = arraySliceRange;
       view.mipSliceRange   = mipSliceRange;
       view.format          = subjacentResource.format;

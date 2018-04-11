@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "SEPUtil/Documents/SR_SEPUtil_JSON.h"
+#include "SEPUtil/Documents/JSON.h"
 
 #include "SEPCore/ObjectModel/SR_SEPCore_Object.h"
 #include "SEPCore/ObjectModel/SR_SEPCore_Property.h"

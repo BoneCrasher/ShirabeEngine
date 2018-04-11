@@ -55,8 +55,8 @@ int main()
 
 	thread.join();*/
 
-  Test::FrameGraph::Test__FrameGraph test_framegraph{};
-  test_framegraph.testAll();
+  // Test::FrameGraph::Test__FrameGraph test_framegraph{};
+  // test_framegraph.testAll();
 
 	system("Pause");
 }

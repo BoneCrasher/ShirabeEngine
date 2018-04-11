@@ -232,14 +232,14 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Debug\include\;$(SolutionDir)ext\libxml2\Win32\Debug\include\libxml2\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -257,14 +257,14 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Debug\include\;$(SolutionDir)ext\libxml2\Win32\Debug\include\libxml2\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -282,14 +282,14 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\nclude\;$(SolutionDir)ext\;$(SolutionDir)ext\json\$(PlatformName)\$(Configuration)\include\;$(SolutionDir)ext\libxml2\$(PlatformName)\$(Configuration)\include\libxml2\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -302,15 +302,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Debug\include\;$(SolutionDir)ext\libxml2\Win64\Debug\include\libxml2\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -323,15 +323,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Debug\include\;$(SolutionDir)ext\libxml2\Win64\Debug\include\libxml2\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -344,15 +344,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\nclude\;$(SolutionDir)ext\;$(SolutionDir)ext\json\$(PlatformName)\$(Configuration)\include\;$(SolutionDir)ext\libxml2\$(PlatformName)\$(Configuration)\include\libxml2\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -372,7 +372,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Release\include\;$(SolutionDir)ext\libxml2\Win32\Release\include\libxml2\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -380,8 +380,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -401,7 +401,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Release\include\;$(SolutionDir)ext\libxml2\Win32\Release\include\libxml2\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -409,8 +409,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -425,7 +425,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Release\include\;$(SolutionDir)ext\libxml2\Win64\Release\include\libxml2\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -434,8 +434,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -450,7 +450,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Release\include\;$(SolutionDir)ext\libxml2\Win64\Release\include\libxml2\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -459,8 +459,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libxml2_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
@@ -508,8 +508,6 @@
     <ClCompile Include="code\source\Memory\New.cpp" />
     <ClCompile Include="code\source\Resources\Core\Handle.cpp" />
     <ClCompile Include="code\source\Resources\Core\ProxyBasedResourceManager.cpp" />
-    <ClCompile Include="code\source\Serialization\JSONObjectSerializer.cpp" />
-    <ClCompile Include="code\source\Serialization\XMLObjectSerializer.cpp" />
     <ClCompile Include="code\source\Util\Documents\JSON.cpp" />
     <ClCompile Include="code\source\Util\Documents\XML.cpp" />
     <ClCompile Include="code\source\Window\WindowManager.cpp" />
@@ -626,10 +624,8 @@
     <ClInclude Include="code\include\GFXAPI\Types\TextureND.h" />
     <ClInclude Include="code\include\GFXAPI\Types\Device.h" />
     <ClInclude Include="code\include\Resources\Core\ResourceTraits.h" />
-    <ClInclude Include="code\include\Serialization\JSONObjectSerializer.h" />
     <ClInclude Include="code\include\Renderer\FrameGraph\FrameGraphSerialization.h" />
     <ClInclude Include="code\include\Serialization\Serialization.h" />
-    <ClInclude Include="code\include\Serialization\XMLObjectSerializer.h" />
     <ClInclude Include="code\include\Threading\Looper.h" />
     <ClInclude Include="code\include\Threading\Private\LooperImpl.h" />
     <ClInclude Include="code\include\Util\Documents\JSON.h" />

@@ -5,6 +5,8 @@
 #include <stack>
 #include <nlohmann/json.hpp>
 
+#include "Platform/Platform.h"
+
 namespace Engine {
   namespace Documents {
 
@@ -17,7 +19,7 @@ namespace Engine {
       FILE_ERROR     = 4
     };
 
-    class JSONDocument {
+    class SHIRABE_TEST_EXPORT JSONDocument {
     public:
       JSONDocument()  = default;
       ~JSONDocument();
