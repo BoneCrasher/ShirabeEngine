@@ -232,7 +232,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -257,7 +257,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -282,7 +282,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -302,7 +302,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -323,7 +323,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -344,7 +344,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -372,7 +372,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -401,7 +401,7 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -425,7 +425,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -450,7 +450,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/;$(SolutionDir)ext/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)code/include/;$(SolutionDir)ext/;$(SolutionDir)ext/json/$(PlatformName)/$(Configuration)/include/;$(SolutionDir)ext/libxml2/$(PlatformName)/$(Configuration)/include/libxml2/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -510,6 +510,8 @@
     <ClCompile Include="code\source\Resources\Core\ProxyBasedResourceManager.cpp" />
     <ClCompile Include="code\source\Serialization\JSONObjectSerializer.cpp" />
     <ClCompile Include="code\source\Serialization\XMLObjectSerializer.cpp" />
+    <ClCompile Include="code\source\Util\Documents\JSON.cpp" />
+    <ClCompile Include="code\source\Util\Documents\XML.cpp" />
     <ClCompile Include="code\source\Window\WindowManager.cpp" />
     <ClCompile Include="code\source\Core\String.cpp" />
     <ClCompile Include="code\source\Platform\Windows\WindowsWindowFactory.cpp" />

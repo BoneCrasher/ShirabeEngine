@@ -33,11 +33,13 @@ namespace Test {
       using namespace Engine::GFXAPI;
       using namespace Engine::FrameGraph;
 
-      Ptr<IRenderContext>         context     = nullptr;
-      Ptr<ApplicationEnvironment> environment = nullptr;
+      Ptr<IRenderContext> context = nullptr;
+
+      Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
+      appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
 
       GraphBuilder graph;
-      graph.initialize(environment);
+      graph.initialize(appEnvironment);
       graph.importPersistentResource("BackBuffer", 1337);
 
       // GBuffer

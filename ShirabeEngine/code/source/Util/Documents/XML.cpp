@@ -1,10 +1,10 @@
 #include <sstream>
 #include <iostream>
 
-#include "SEPUtil/Documents/SR_SEPUtil_XML.h"
+#include "Util/Documents/XML.h"
 
-namespace sr {
-  namespace documents {
+namespace Engine {
+  namespace Documents {
 
     namespace xpath {
       enum class XPathType {
@@ -44,6 +44,18 @@ namespace sr {
 
     XMLDocument::~XMLDocument() {
       close();
+    }
+
+    XMLDocument::LibXml2State&
+      XMLDocument::xmlState()
+    {
+      return m_libXml2State;
+    }
+
+    XMLDocument::LibXml2State const&
+      XMLDocument::xmlState() const
+    {
+      return m_libXml2State;
     }
 
     XMLDocumentOpenState
@@ -97,19 +109,6 @@ namespace sr {
     {
       LibXml2State const& state = xmlState();
       return (state.document != nullptr);
-    }
-
-
-    XMLDocument::LibXml2State&
-      XMLDocument::xmlState()
-    {
-      return m_libXml2State;
-    }
-
-    XMLDocument::LibXml2State const&
-      XMLDocument::xmlState() const
-    {
-      return m_libXml2State;
     }
 
     bool

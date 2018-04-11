@@ -38,10 +38,7 @@ namespace Engine {
       // use within a std::unique_ptr.
       XMLDocument(XMLDocument const&)            = delete;
       XMLDocument& operator=(XMLDocument const&) = delete;
-
-      bool createInMemory();
-
-
+      
       XMLDocumentOpenState openFile(std::string const&filename);
       XMLDocumentOpenState openInMemory(std::string const&data);
 
