@@ -2,6 +2,7 @@
 #define __SHIRABE_JSON_H__
 
 #include <istream>
+#include <stack>
 #include <nlohmann/json.hpp>
 
 namespace Engine {
@@ -34,10 +35,18 @@ namespace Engine {
 
       bool isOpen() const;
 
+      bool focusedObjectContainsChild(std::string const&key);
+
+      nlohmann::json& focusChild(std::string const&key);
+      nlohmann::json& focusParent();
+
+      nlohmann::json& operator[](std::string const&key);
+
     private:
       struct JSONState {
         std::unique_ptr<std::istream, std::function<void(std::istream*)>> stream;
-        nlohmann::json                json;
+        nlohmann::json                                    &jsonRoot;
+        std::stack<std::reference_wrapper<nlohmann::json>> jsonPathStack;
       };
 
       JSONState&       jsonState();

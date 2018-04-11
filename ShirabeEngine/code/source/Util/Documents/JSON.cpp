@@ -35,7 +35,7 @@ namespace Engine {
     {
       using namespace nlohmann;
 
-      if(data.empty)
+      if(data.empty())
         return JSONDocumentOpenState::FILE_EMPTY;
 
       std::unique_ptr<std::istream> strm = std::make_unique<std::istringstream>(data);
@@ -63,7 +63,7 @@ namespace Engine {
         strm = nullptr;
         return JSONDocumentOpenState::FILE_EMPTY;
       }
-      
+
       jsonState().stream = std::move(strm);
 
       return openImpl();
@@ -75,9 +75,8 @@ namespace Engine {
       JSONDocumentOpenState state = JSONDocumentOpenState::FILE_OK;
 
       try {
-        json interpreted = json::parse(*(jsonState().stream.get()));
-
-        jsonState().json = interpreted;
+        jsonState().jsonRoot = nlohmann::json::parse(*(jsonState().stream.get()));
+        jsonState().jsonPathStack.push(std::reference_wrapper<nlohmann::json>(jsonState().jsonRoot));
       }
       catch(json::parse_error const&error) {
         state = JSONDocumentOpenState::FILE_ERROR;
@@ -94,7 +93,9 @@ namespace Engine {
       if(jsonState().stream)
         jsonState().stream = nullptr;
 
-      jsonState().json.clear();
+      jsonState().jsonRoot = nlohmann::json(nullptr);
+      while(!jsonState().jsonPathStack.empty())
+        jsonState().jsonPathStack.pop();
 
       return true;
     }
@@ -105,5 +106,43 @@ namespace Engine {
       return true; // No file in memory, just the JSON object...
     }
 
+    bool
+      JSONDocument::focusedObjectContainsChild(std::string const&key)
+    {
+      nlohmann::json::iterator node = jsonState().jsonPathStack.top().get().find(key);
+      return !(node == jsonState().jsonPathStack.top().get().end());
+    }
+
+    nlohmann::json&
+      JSONDocument::focusChild(std::string const&key)
+    {
+      if(!focusedObjectContainsChild(key))
+        throw std::out_of_range(key.c_str());
+
+      if(!(*this)[key].is_object())
+        throw std::exception("Selected node is no json object.");
+
+      jsonState().jsonPathStack.push(std::reference_wrapper<nlohmann::json>((*this)[key]));
+
+      return ((*this)[key]);
+    }
+
+    nlohmann::json&
+      JSONDocument::focusParent()
+    {
+      if(jsonState().jsonPathStack.size() > 1)
+        jsonState().jsonPathStack.pop();
+
+      return (jsonState().jsonPathStack.top().get());
+    }
+
+    nlohmann::json&
+      JSONDocument::operator[](std::string const&key)
+    {
+      if(!focusedObjectContainsChild(key))
+        jsonState().jsonPathStack.top().get()[key] = nullptr;
+
+      return jsonState().jsonPathStack.top().get()[key];
+    }
   }
 }
