@@ -11,7 +11,7 @@
 
 namespace Engine {
   namespace Documents {
-
+    
     JSONDocument::~JSONDocument() {
       close();
     }
@@ -78,7 +78,7 @@ namespace Engine {
         jsonState().jsonRoot = nlohmann::json::parse(*(jsonState().stream.get()));
         jsonState().jsonPathStack.push(std::reference_wrapper<nlohmann::json>(jsonState().jsonRoot));
       }
-      catch(json::parse_error const&error) {
+      catch(nlohmann::json::parse_error const&error) {
         state = JSONDocumentOpenState::FILE_ERROR;
       }
 
@@ -113,31 +113,37 @@ namespace Engine {
       return !(node == jsonState().jsonPathStack.top().get().end());
     }
 
-    nlohmann::json&
+    bool
       JSONDocument::focusChild(std::string const&key)
     {
       if(!focusedObjectContainsChild(key))
-        throw std::out_of_range(key.c_str());
+        return false;
+        // throw std::out_of_range(key.c_str());
+      
+      if(!jsonState().jsonPathStack.top().get()[key].is_object())
+        return false;
+        // throw std::exception("Selected node is no json object.");
 
-      if(!(*this)[key].is_object())
-        throw std::exception("Selected node is no json object.");
+      jsonState().jsonPathStack.push(
+        std::reference_wrapper<nlohmann::json>(
+          jsonState().jsonPathStack.top().get()[key]));
 
-      jsonState().jsonPathStack.push(std::reference_wrapper<nlohmann::json>((*this)[key]));
-
-      return ((*this)[key]);
+      return true;
     }
 
-    nlohmann::json&
+    bool
       JSONDocument::focusParent()
     {
-      if(jsonState().jsonPathStack.size() > 1)
+      if(jsonState().jsonPathStack.size() > 1) {
         jsonState().jsonPathStack.pop();
+        return true;
+      }
 
-      return (jsonState().jsonPathStack.top().get());
+      return false;
     }
 
-    nlohmann::json&
-      JSONDocument::operator[](std::string const&key)
+    bool
+      JSONDocument::set(std::string const&key, )
     {
       if(!focusedObjectContainsChild(key))
         jsonState().jsonPathStack.top().get()[key] = nullptr;

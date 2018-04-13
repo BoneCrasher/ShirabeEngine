@@ -3,14 +3,14 @@
 
 #include <istream>
 #include <stack>
-#include <nlohmann/json.hpp>
+
+#include "External/nlohmann/json.hpp"
 
 #include "Platform/Platform.h"
+#include "Core/EngineTypeHelper.h"
 
 namespace Engine {
   namespace Documents {
-
-    using namespace nlohmann;
 
     enum class JSONDocumentOpenState {
       FILE_OK        = 0,
@@ -18,6 +18,8 @@ namespace Engine {
       FILE_EMPTY     = 2,
       FILE_ERROR     = 4
     };
+
+    struct JSONState;
 
     class SHIRABE_TEST_EXPORT JSONDocument {
     public:
@@ -47,16 +49,16 @@ namespace Engine {
     private:
       struct JSONState {
         std::unique_ptr<std::istream, std::function<void(std::istream*)>> stream;
-        nlohmann::json                                    &jsonRoot;
+        nlohmann::json                                     jsonRoot;
         std::stack<std::reference_wrapper<nlohmann::json>> jsonPathStack;
       };
 
-      JSONState&       jsonState();
-      JSONState const& jsonState() const;
+      UniquePtr<JSONState>&       jsonState();
+      UniquePtr<JSONState> const& jsonState() const;
 
       JSONDocumentOpenState openImpl();
 
-      JSONState m_jsonState;
+      UniquePtr<JSONState> m_jsonState;
     };
 
   }

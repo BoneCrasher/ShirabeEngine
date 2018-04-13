@@ -8,6 +8,8 @@
 
 #include "Tests/Test_FrameGraph.h"
 
+#include <Util/Documents/JSON.h>
+
 class Task {
 public:
 
@@ -57,6 +59,11 @@ int main()
 
   // Test::FrameGraph::Test__FrameGraph test_framegraph{};
   // test_framegraph.testAll();
+  
+  using namespace Engine::Documents;
+
+  JSONDocument document;
+  document.openInMemory("{}");
 
 	system("Pause");
 }
