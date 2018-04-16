@@ -1,13 +1,17 @@
-function(linkOpenCV)
+function(linkLibrary)
     
     set(TARGET_DIR  ${SHIRABE_PLATFORM_PREFIX}${SHIRABE_PLATFORM_ADDRESS_SIZE}/${SHIRABE_PLATFORM_CONFIG})
-    set(OCV_DIR_INC ${THIRD_PARTY_DIR}/openCV/${TARGET_DIR}/include)
-    set(OCV_DIR     ${THIRD_PARTY_DIR}/openCV/${TARGET_DIR})
-
+    set(OCV_DIR     ${SHIRABE_THIRD_PARTY_DIR}/openCV/${TARGET_DIR})
+	
+	set(LIB_SUFFIX)
+	if(SHIRABE_DEBUG)
+		set(LIB_SUFFIX d)
+	endif()
+	
     # -I
     append_parentscope(
         SHIRABE_PROJECT_INCLUDEPATH
-        ${OCV_DIR_INC}
+        ${OCV_DIR}/include
         )
 
     if(MSVC)
@@ -19,9 +23,9 @@ function(linkOpenCV)
 		# -l
 		append_parentscope(
 			SHIRABE_PROJECT_LIBRARY_TARGETS
-			opencv_core2413${CONFIG}
-			opencv_imgproc2413${CONFIG}
-			opencv_highgui2413${CONFIG}
+			opencv_core2413${LIB_SUFFIX}
+			opencv_imgproc2413${LIB_SUFFIX}
+			opencv_highgui2413${LIB_SUFFIX}
 			)
 	elseif(UNIX AND NOT APPLE)
 		# -l
@@ -32,4 +36,4 @@ function(linkOpenCV)
 			${OCV_DIR}/lib/libopencv_highgui.so.2.4.13
 			)
 	endif()
-endfunction(linkOpenCV)
+endfunction(linkLibrary)

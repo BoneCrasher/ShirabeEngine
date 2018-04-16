@@ -54,8 +54,6 @@
 # QT5_COMPILE_DEFINITIONS            Qt5 defined preprocessor definitions specific for compilation
 #
 
-include(SHIRABE_CMake_Helper) # Includes macro: installHeadersStructured
-
 #-----------------------------------------------------------------------------------------
 # Prebuild Events?
 #-----------------------------------------------------------------------------------------
@@ -174,7 +172,38 @@ elseif(SHIRABE_BUILD_SHAREDLIB)
 		)
 	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LIBRARY_OUTPUT_DEBUG_DIRECTORY   ${SHIRABE_PROJECT_DEPLOY_DIR}/bin)
 	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LIBRARY_OUTPUT_RELEASE_DIRECTORY ${SHIRABE_PROJECT_DEPLOY_DIR}/bin)
+elseif(SHIRABE_HEADER_ONLY)
+	add_custom_target(${SHIRABE_MODULE_NAME})
 endif()
+
+#-----------------------------------------------------------------------------------------
+# Automatic export header generation.
+#
+# Will generate a header filename called "SHIRABE_<Module>_Export.h" containg a 
+# macro named SHIRABE_<Module>_LIBRARY_EXPORT defined empty, to __declspec(dllexport) or 
+# __declspec(dllimport) respectively.
+#-----------------------------------------------------------------------------------------
+include(GenerateExportHeader)
+generate_export_header(
+	${SHIRABE_MODULE_NAME}
+		BASE_NAME         ${SHIRABE_LIBRARY_KEY}
+		EXPORT_MACRO_NAME ${SHIRABE_LIBRARY_KEY}_LIBRARY_EXPORT
+		EXPORT_FILE_NAME  ${SHIRABE_PROJECT_GEN_DIR}/export_headers/protected/${SHIRABE_LIBRARY_KEY}_Export.h
+)
+
+LogStatus(MESSAGES "Test? ${SHIRABE_TEST}")
+if("${SHIRABE_TEST}" STREQUAL "ON")
+	generate_export_header(
+		${SHIRABE_MODULE_NAME}
+			BASE_NAME         ${SHIRABE_LIBRARY_KEY}
+			EXPORT_MACRO_NAME ${SHIRABE_LIBRARY_KEY}_TEST_EXPORT
+			EXPORT_FILE_NAME  ${SHIRABE_PROJECT_GEN_DIR}/export_headers/protected/${SHIRABE_LIBRARY_KEY}_TestExport.h
+	)
+endif()
+
+append(SHIRABE_PROJECT_INCLUDEPATH ${SHIRABE_PROJECT_GEN_DIR}/export_headers/protected)
+#-----------------------------------------------------------------------------------------
+
 
 #-----------------------------------------------------------------------------------------
 # Setup working directory of debugger
@@ -183,32 +212,21 @@ file(TO_NATIVE_PATH "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/" VSWORKINGDIR)
 set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${VSWORKINGDIR}")
 
 #-----------------------------------------------------------------------------------------
-# QT5 specific madness required for generated files!
-#-----------------------------------------------------------------------------------------
-if(LINK_QT5)
-	message(STATUS "Qt5-Autogen: ${AUTOGEN_BUILD_DIR}")
-	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES AUTOGEN_BUILD_DIR "${AUTOGEN_BUILD_DIR}")
-
-	LogStatus(MESSAGES "Compile Definitions for Qt5:" ${QT5_COMPILE_DEFINITIONS})
-
-	add_definitions(${SHIRABE_QT5_DEFINITIONS})
- 
-	if(SHIRABE_BUILD_APPLICATION)	
-		set(CMAKE_CFLAGS   
-				${CMAKE_CFLAGS}
-					${SHIRABE_QT5_EXECUTABLE_COMPILE_FLAGS})
-		set(CMAKE_CXX_FLAGS 
-				${CMAKE_CXX_FLAGS}
-					${SHIRABE_QT5_EXECUTABLE_COMPILE_FLAGS})
-	endif(SHIRABE_BUILD_APPLICATION)
-endif(LINK_QT5)
-#-----------------------------------------------------------------------------------------
 # Append the preprocessor defines to CMake
 #-----------------------------------------------------------------------------------------
 LogStatus(MESSAGES "Appending definitions...")
-target_compile_definitions(${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_DEFINES})
+if(NOT SHIRABE_HEADER_ONLY)
+	target_compile_definitions(
+		${SHIRABE_MODULE_NAME} 
+	PUBLIC 
+		${SHIRABE_PROJECT_PREPROCESSOR_DEFINITIONS}
+		${SHIRABE_PROJECT_LIBRARY_DEFINITIONS})
+endif()
 
-foreach(DEFINE ${SHIRABE_DEFINES})
+foreach(DEFINE ${SHIRABE_PROJECT_PREPROCESSOR_DEFINITIONS})
+	LogStatus(MESSAGES "${DEFINE}")
+endforeach(DEFINE)
+foreach(DEFINE ${SHIRABE_PROJECT_LIBRARY_DEFINITIONS})
 	LogStatus(MESSAGES "${DEFINE}")
 endforeach(DEFINE)
 #-----------------------------------------------------------------------------------------
@@ -242,7 +260,9 @@ if(SHIRABE_PROJECT_INCLUDEPATH)
 		)
 	endforeach()
 
-	target_include_directories(${SHIRABE_MODULE_NAME} BEFORE PUBLIC  ${SHIRABE_PROJECT_INCLUDEPATH})
+	if(NOT SHIRABE_HEADER_ONLY)
+		target_include_directories(${SHIRABE_MODULE_NAME} BEFORE PUBLIC  ${SHIRABE_PROJECT_INCLUDEPATH})
+	endif()
 endif()
 LogStatus(MESSAGES "-I:" ${SHIRABE_PROJECT_INCLUDEPATH})
 
@@ -254,7 +274,7 @@ LogStatus(MESSAGES "Include directories queried from target after set: " ${CURR_
 # Set -l flags
 #-----------------------------------------------------------------------------------------
 LogStatus(MESSAGES "Defining -l-flags...")
-if(SHIRABE_PROJECT_LIBRARY_TARGETS)
+if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
 	LogStatus(MESSAGES "-l:" ${SHIRABE_PROJECT_LIBRARY_TARGETS})
 	target_link_libraries(
 		${SHIRABE_MODULE_NAME}
@@ -332,9 +352,9 @@ if(SHIRABE_BUILD_APPLICATION)
 		)
 elseif(SHIRABE_BUILD_SHAREDLIB)
 	#
-	# PRIVATE EXPORT
+	# PROTECTED EXPORT
 	#
-	LogStatus(MESSAGES "Setting up PRIVATE EXPORT")
+	LogStatus(MESSAGES "Setting up PROTECTED EXPORT")
 
 	if(WIN32)
 		# DLL
@@ -364,7 +384,7 @@ elseif(SHIRABE_BUILD_SHAREDLIB)
 	installHeadersStructured(
 		${SHIRABE_PROJECT_DEPLOY_DIR}/include
 		${SHIRABE_PROJECT_INC_DIR}
-		SHIRABE_PROJECT_PRIVATE_EXPORTED_HEADERS
+		SHIRABE_PROJECT_PROTECTED_EXPORTED_HEADERS
 		)
 	installHeadersStructured(
 		${SHIRABE_PROJECT_DEPLOY_DIR}/include
@@ -404,7 +424,7 @@ elseif(SHIRABE_BUILD_SHAREDLIB)
 	installHeadersStructured(
 		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include
 		${SHIRABE_PROJECT_INC_DIR}
-		SHIRABE_PROJECT_PRIVATE_EXPORTED_HEADERS
+		SHIRABE_PROJECT_PROTECTED_EXPORTED_HEADERS
 		)
 	installHeadersStructured(
 		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include
@@ -421,15 +441,15 @@ elseif(SHIRABE_BUILD_SHAREDLIB)
 
 elseif(SHIRABE_BUILD_STATICLIB)
 	#
-	# PRIVATE EXPORT
+	# PROTECTED EXPORT
 	#
-	LogStatus(MESSAGES "Setting up PRIVATE EXPORT")
+	LogStatus(MESSAGES "Setting up PROTECTED EXPORT")
 
 	# Headers
 	installHeadersStructured(
 		${SHIRABE_PROJECT_DEPLOY_DIR}/include
 		${SHIRABE_PROJECT_INC_DIR}
-		SHIRABE_PROJECT_PRIVATE_EXPORTED_HEADERS
+		SHIRABE_PROJECT_PROTECTED_EXPORTED_HEADERS
 		)
 	installHeadersStructured(
 		${SHIRABE_PROJECT_DEPLOY_DIR}/include
@@ -439,9 +459,9 @@ elseif(SHIRABE_BUILD_STATICLIB)
 	# Static-Lib
 	install(
 		TARGETS
-		${SHIRABE_MODULE_NAME}
+			${SHIRABE_MODULE_NAME}
 		ARCHIVE DESTINATION
-		${SHIRABE_PROJECT_DEPLOY_DIR}/lib
+			${SHIRABE_PROJECT_DEPLOY_DIR}/lib
 		)
 
 	#
@@ -452,15 +472,36 @@ elseif(SHIRABE_BUILD_STATICLIB)
 	# Static-Lib
 	install(
 		TARGETS
-		${SHIRABE_MODULE_NAME}
+			${SHIRABE_MODULE_NAME}
 		ARCHIVE DESTINATION
-		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib
+			${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib
 		)
 		
 	installHeadersStructured(
 		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include
 		${SHIRABE_PROJECT_INC_DIR}
-		SHIRABE_PROJECT_PRIVATE_EXPORTED_HEADERS
+		SHIRABE_PROJECT_PROTECTED_EXPORTED_HEADERS
+		)
+	installHeadersStructured(
+		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include
+		${SHIRABE_PROJECT_INC_DIR}
+		SHIRABE_PROJECT_PUBLIC_EXPORTED_HEADERS
+		)
+elseif(SHIRABE_HEADER_ONLY)
+	installHeadersStructured(
+		${SHIRABE_PROJECT_DEPLOY_DIR}/include
+		${SHIRABE_PROJECT_INC_DIR}
+		SHIRABE_PROJECT_PROTECTED_EXPORTED_HEADERS
+		)
+	installHeadersStructured(
+		${SHIRABE_PROJECT_DEPLOY_DIR}/include
+		${SHIRABE_PROJECT_INC_DIR}
+		SHIRABE_PROJECT_PUBLIC_EXPORTED_HEADERS
+		)
+	installHeadersStructured(
+		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include
+		${SHIRABE_PROJECT_INC_DIR}
+		SHIRABE_PROJECT_PROTECTED_EXPORTED_HEADERS
 		)
 	installHeadersStructured(
 		${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include
@@ -468,31 +509,6 @@ elseif(SHIRABE_BUILD_STATICLIB)
 		SHIRABE_PROJECT_PUBLIC_EXPORTED_HEADERS
 		)
 endif()
-
-if(LINK_QT5)
-	if(SHIRABE_PROJECT_QT5_RCC_FILES)
-		install(
-			FILES
-				${SHIRABE_PROJECT_QT5_RCC_FILES}
-			DESTINATION
-				${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
-		)
-
-		install(
-			FILES
-				${SHIRABE_PROJECT_QT5_RCC_FILES}
-			DESTINATION
-				${SHIRABE_PROJECT_DEPLOY_DIR}/bin
-		)
-	endif(SHIRABE_PROJECT_QT5_RCC_FILES)
-
-	install(
-		DIRECTORY
-			${SHIRABE_PROJECT_INC_DIR}/protected/generated/include_${SHIRABE_PLATFORM_CONFIG}/
-		DESTINATION
-			${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include/protected
-	)
-endif(LINK_QT5)
 
 if(SHIRABE_LANGUAGE)
     set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_LANGUAGE})

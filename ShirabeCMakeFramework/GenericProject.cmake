@@ -29,6 +29,9 @@ set(SHIRABE_MODULE_TARGET_OUTPUT_NAME ${SHIRABE_PROJECT_ID})       # The module 
 set(SHIRABE_TEMPLATE                  ${SHIRABE_TEMPLATE})         # Application | StaticLib | SharedLib
 set(SHIRABE_LANGUAGE                  CXX)                         # Always assume C++
 
+# Take the upper case module name as library key for build related module aware macros.
+string(TOUPPER ${SHIRABE_MODULE_NAME} SHIRABE_LIBRARY_KEY)
+
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 # Basic environments
 #---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,6 +53,7 @@ LogStatus(
 set(SHIRABE_BUILD_APPLICATION OFF)
 set(SHIRABE_BUILD_STATICLIB   OFF)
 set(SHIRABE_BUILD_SHAREDLIB   OFF)
+set(SHIRABE_HEADER_ONLY       OFF)
 
 if("${SHIRABE_TEMPLATE}" STREQUAL "Application")
 	set(SHIRABE_BUILD_APPLICATION ON)
@@ -57,6 +61,8 @@ elseif("${SHIRABE_TEMPLATE}" STREQUAL "StaticLib")
 	set(SHIRABE_BUILD_STATICLIB  ON)
 elseif("${SHIRABE_TEMPLATE}" STREQUAL "SharedLib")
 	set(SHIRABE_BUILD_SHAREDLIB ON)
+elseif("${SHIRABE_TEMPLATE}" STREQUAL "HeaderOnly")
+	set(SHIRABE_HEADER_ONLY ON)
 endif()
 
 LogStatus(
@@ -87,7 +93,6 @@ endif(WIN32)
 #            it manually invoking CMake!
 #-----------------------------------------------------------------------------------------
 set(SHIRABE_DEBUG OFF)
-set(SHIRABE_TEST  OFF)
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	set(SHIRABE_DEBUG ON)
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
@@ -132,7 +137,7 @@ set(SHIRABE_PROJECT_UI_DIR           ${SHIRABE_PROJECT_DIR}/ui)
 set(SHIRABE_PROJECT_RES_DIR          ${SHIRABE_PROJECT_DIR}/resources)
 
 set(SHIRABE_PROJECT_BUILD_DIR        ${SHIRABE_PROJECT_DIR}/_build/${SHIRABE_PLATFORM_CONFIG_SUFFIX})
-set(SHIRABE_PROJECT_INTERMEDIATE_DIR ${SHIRABE_PROJECT_BUILD_DIR}/intermediate)
+set(SHIRABE_PROJECT_INTERMEDIATE_DIR ${SHIRABE_PUBLIC_BUILD_ROOT}/intermediate)
 set(SHIRABE_PROJECT_OBJECTS_DIR      ${SHIRABE_PROJECT_INTERMEDIATE_DIR}/obj)
 set(SHIRABE_PROJECT_GEN_DIR          ${SHIRABE_PROJECT_INTERMEDIATE_DIR}/gen)
 
@@ -140,7 +145,7 @@ set(SHIRABE_PROJECT_DEPLOY_DIR       ${SHIRABE_PROJECT_DIR}/_deploy/${SHIRABE_PL
 # Only used for public installation! (YES I know I should be consistent with the above "private" deploy dir...)
 set(SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR ${SHIRABE_PUBLIC_DEPLOY_ROOT}/${SHIRABE_PLATFORM_CONFIG_SUFFIX})
 if(CMAKE_INSTALL_PREFIX)
-	set(SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR ${CMAKE_INSTALL_PREFIX})
+	set(SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR ${CMAKE_INSTALL_PREFIX}/${SHIRABE_PLATFORM_CONFIG_SUFFIX})
 endif(CMAKE_INSTALL_PREFIX)
 
 set(EXECUTABLE_OUTPUT_PATH ${SHIRABE_PROJECT_DEPLOY_DIR})

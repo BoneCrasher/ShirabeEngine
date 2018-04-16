@@ -2,20 +2,6 @@ if(SHIRABE_CMAKE_DEBUG_LOG)
 	message(STATUS "BEGIN: Parsing SHIRABE_3rdPartyLibrary_Helper.cmake")
 endif()
 
-#
-# Include useful macros to handle filesystem and platform config
-#
-include(SHIRABE_CMake_Helper)
-
-#
-# Include all supported 3rd-party librarie's setup scripts
-#
-
-# Header only
-include(SHIRABE_LinkASIO)
-include(SHIRABE_LinkXML2)
-include(SHIRABE_LinkXSLT)
-
 function(linkLinuxOSEnvironment) 
 	# Define and register options, one and multi value argument keywords.
 	set(options)
@@ -115,30 +101,29 @@ endfunction(linkWindowsOSEnvironment)
 #
 function(link)
 	message(STATUS "Setting up 3rd party libraries for ${SHIRABE_MODULE_NAME}")
-	
-	if(LINK_OPENCV)
-		LogStatus(MESSAGES "Linking in OpenCV!")
-		linkOpenCV()
-	endif(LINK_OPENCV)
+	# Automated LINK-File inclusion and linkage
+	FILE(GLOB LINK_MODULES ${SHIRABE_CMAKE_FRAMEWORK_DIR}/Link*[.]cmake)
+	LogStatus(MESSAGES "Link modules found: " ${LINK_MODULES} "for expression" "${SHIRABE_CMAKE_FRAMEWORK_DIR}/Link*[.]cmake")
 
-	if(LINK_XML2)
-		LogStatus(MESSAGES "Linking in XML2")
-		linkXML2()
-	endif(LINK_XML2)
+	foreach(LINK_MODULE ${LINK_MODULES})
+		get_filename_component(LINK_MODULE_NAME ${LINK_MODULE} NAME_WE)
+		string(REPLACE "Link" "" LINK_MODULE_KEY ${LINK_MODULE_NAME})
+		string(TOUPPER ${LINK_MODULE_KEY} LINK_MODULE_KEY_UC)
+		if(${LINK_${LINK_MODULE_KEY_UC}})
+			include(${LINK_MODULE_NAME})
+			linkLibrary()
+		endif()
+	endforeach()
 
-	if(LINK_XSLT)
-		LogStatus(MESSAGES "Linking in XSLT")
-		linkXSLT()
-	endif(LINK_XSLT)
-	
-	if(LINK_ASIO)
-		LogStatus(MESSAGES "Linking in ASIO")
-		linkASIO()
-	endif(LINK_ASIO)
-
-	list(REMOVE_DUPLICATES SHIRABE_PROJECT_INCLUDEPATH)
-	list(REMOVE_DUPLICATES SHIRABE_PROJECT_LIBRARY_DIRECTORIES)
-	list(REMOVE_DUPLICATES SHIRABE_PROJECT_LIBRARY_TARGETS)
+	if(SHIRABE_PROJECT_INCLUDEPATH)
+		list(REMOVE_DUPLICATES SHIRABE_PROJECT_INCLUDEPATH)
+	endif()
+	if(SHIRABE_PROJECT_LIBRARY_DIRECTORIES)
+		list(REMOVE_DUPLICATES SHIRABE_PROJECT_LIBRARY_DIRECTORIES)
+	endif()
+	if(SHIRABE_PROJECT_LIBRARY_TARGETS)
+		list(REMOVE_DUPLICATES SHIRABE_PROJECT_LIBRARY_TARGETS)
+	endif()
 
 	#
 	# Append platform specific ext. library setup
@@ -159,12 +144,14 @@ function(link)
 	else() 
 		message(STATUS "Unknown platform")
 	endif()
-
+	
+	LogStatus(MESSAGES "link()::-D"   ${SR_PROJECT_LIBRARY_DEFINITIONS})
 	LogStatus(MESSAGES "link()::-I"   ${SHIRABE_PROJECT_INCLUDEPATH})
 	LogStatus(MESSAGES "link()::-L"   ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES})
 	LogStatus(MESSAGES "link()::-l"   ${SHIRABE_PROJECT_LIBRARY_TARGETS})
 
 	# Forward to parent scope making it usable for the generic build script
+	set(SHIRABE_PROJECT_LIBRARY_DEFINITIONS ${SHIRABE_PROJECT_LIBRARY_DEFINITIONS} PARENT_SCOPE)
 	set(SHIRABE_PROJECT_INCLUDEPATH         ${SHIRABE_PROJECT_INCLUDEPATH}         PARENT_SCOPE)
 	set(SHIRABE_PROJECT_LIBRARY_DIRECTORIES ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES} PARENT_SCOPE)
 	set(SHIRABE_PROJECT_LIBRARY_TARGETS     ${SHIRABE_PROJECT_LIBRARY_TARGETS}     PARENT_SCOPE)

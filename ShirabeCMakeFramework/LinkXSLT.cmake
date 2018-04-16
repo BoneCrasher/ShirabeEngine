@@ -1,4 +1,4 @@
-function(linkXSLT)
+function(linkLibrary)
     
     set(TARGET_DIR ${SHIRABE_PLATFORM_PREFIX}${SHIRABE_PLATFORM_ADDRESS_SIZE}/${SHIRABE_PLATFORM_CONFIG})
     set(XSLT_DIR   ${THIRD_PARTY_DIR}/libxslt/${TARGET_DIR})
@@ -29,4 +29,4 @@ function(linkXSLT)
 			xslt
 			)
 	endif()
-endfunction(linkXSLT)
+endfunction(linkLibrary)

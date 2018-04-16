@@ -1,7 +1,7 @@
-function(linkXML2)
+function(linkLibrary)
     
     set(TARGET_DIR ${SHIRABE_PLATFORM_PREFIX}${SHIRABE_PLATFORM_ADDRESS_SIZE}/${SHIRABE_PLATFORM_CONFIG})
-    set(XML2_DIR   ${THIRD_PARTY_DIR}/libxml2/${TARGET_DIR})
+    set(XML2_DIR   ${SHIRABE_THIRD_PARTY_DIR}/libxml2/${TARGET_DIR})
 
     # -I
     append_parentscope(
@@ -27,4 +27,4 @@ function(linkXML2)
 			xml2
 			)
 	endif()
-endfunction(linkXML2)
+endfunction(linkLibrary)
