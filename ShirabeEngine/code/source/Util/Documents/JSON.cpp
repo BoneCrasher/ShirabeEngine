@@ -2,8 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <Functional>
-#include <Memory>
+#include <functional>
+#include <memory>
+#include <optional>
 
 #include <nlohmann/json.hpp>
 
@@ -11,18 +12,90 @@
 
 namespace Engine {
   namespace Documents {
+
+    class NLohmannJSONNode 
+      : public IJSONNode
+    {
+    public:
+      NLohmannJSONNode(std::reference_wrapper<nlohmann::json> const&ref)
+        : m_ref(ref)
+      {}
+
+      operator int8_t  () const { return m_ref.get().operator int8_t  (); }
+      operator int16_t () const { return m_ref.get().operator int16_t (); }
+      operator int32_t () const { return m_ref.get().operator int32_t (); }
+      operator int64_t () const { return m_ref.get().operator int64_t (); }
+      operator uint8_t () const { return m_ref.get().operator uint8_t (); }
+      operator uint16_t() const { return m_ref.get().operator uint16_t(); }
+      operator uint32_t() const { return m_ref.get().operator uint32_t(); }
+      operator uint64_t() const { return m_ref.get().operator uint64_t(); }
+
+      operator float()  const { return m_ref.get().operator float();  }
+      operator double() const { return m_ref.get().operator double(); }
+
+      operator uint8_t const*() const { return m_ref.get().operator uint8_t const*(); }
+      operator std::string()    const { return m_ref.get().operator std::string();    }
+
+      UniquePtr<IJSONNode> operator=(int8_t   const& value);
+      UniquePtr<IJSONNode> operator=(int16_t  const& value);
+      UniquePtr<IJSONNode> operator=(int32_t  const& value);
+      UniquePtr<IJSONNode> operator=(int64_t  const& value);
+      UniquePtr<IJSONNode> operator=(uint8_t  const& value);
+      UniquePtr<IJSONNode> operator=(uint16_t const& value);
+      UniquePtr<IJSONNode> operator=(uint32_t const& value);
+      UniquePtr<IJSONNode> operator=(uint64_t const& value);
+
+      UniquePtr<IJSONNode> operator=(float  const& value);
+      UniquePtr<IJSONNode> operator=(double const& value);
+
+      UniquePtr<IJSONNode> operator=(uint8_t const* value);
+      UniquePtr<IJSONNode> operator=(std::string const& value);
+
+    private:
+      std::reference_wrapper<nlohmann::json> m_ref;
+    };
     
+    NLohmannJSONNode::operator int8_t  () const {}
+    NLohmannJSONNode::operator int16_t () const {}
+    NLohmannJSONNode::operator int32_t () const {}
+    NLohmannJSONNode::operator int64_t () const {}
+    NLohmannJSONNode::operator uint8_t () const {}
+    NLohmannJSONNode::operator uint16_t() const {}
+    NLohmannJSONNode::operator uint32_t() const {}
+    NLohmannJSONNode::operator uint64_t() const {}
+
+    NLohmannJSONNode::operator float()  const {}
+    NLohmannJSONNode::operator double() const {}
+
+    NLohmannJSONNode::operator uint8_t const*() const {}
+    NLohmannJSONNode::operator std::string()    const {}
+
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int8_t   const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int16_t  const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int32_t  const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int64_t  const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint8_t  const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint16_t const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint32_t const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint64_t const& value) {}
+
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(float  const& value) {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(double const& value) {}
+
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint8_t const* value)     {}
+    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(std::string const& value) {}
+
     JSONDocument::~JSONDocument() {
       close();
     }
 
-    JSONDocument::JSONState&
+    UniquePtr<JSONDocument::JSONState>&
       JSONDocument::jsonState()
     {
       return m_jsonState;
     }
 
-    JSONDocument::JSONState const&
+    UniquePtr<JSONDocument::JSONState> const&
       JSONDocument::jsonState() const
     {
       return m_jsonState;
@@ -39,7 +112,7 @@ namespace Engine {
         return JSONDocumentOpenState::FILE_EMPTY;
 
       std::unique_ptr<std::istream> strm = std::make_unique<std::istringstream>(data);
-      jsonState().stream = std::move(strm);
+      jsonState()->stream = std::move(strm);
 
       return openImpl();
     }
@@ -64,7 +137,7 @@ namespace Engine {
         return JSONDocumentOpenState::FILE_EMPTY;
       }
 
-      jsonState().stream = std::move(strm);
+      jsonState()->stream = std::move(strm);
 
       return openImpl();
     }
@@ -75,14 +148,14 @@ namespace Engine {
       JSONDocumentOpenState state = JSONDocumentOpenState::FILE_OK;
 
       try {
-        jsonState().jsonRoot = nlohmann::json::parse(*(jsonState().stream.get()));
-        jsonState().jsonPathStack.push(std::reference_wrapper<nlohmann::json>(jsonState().jsonRoot));
+        jsonState()->jsonRoot = nlohmann::json::parse(*(jsonState()->stream.get()));
+        jsonState()->jsonPathStack.push(std::reference_wrapper<nlohmann::json>(jsonState()->jsonRoot));
       }
       catch(nlohmann::json::parse_error const&error) {
         state = JSONDocumentOpenState::FILE_ERROR;
       }
 
-      jsonState().stream = nullptr;
+      jsonState()->stream = nullptr;
 
       return state;
     }
@@ -90,12 +163,12 @@ namespace Engine {
     bool
       JSONDocument::close()
     {
-      if(jsonState().stream)
-        jsonState().stream = nullptr;
+      if(jsonState()->stream)
+        jsonState()->stream = nullptr;
 
-      jsonState().jsonRoot = nlohmann::json(nullptr);
-      while(!jsonState().jsonPathStack.empty())
-        jsonState().jsonPathStack.pop();
+      jsonState()->jsonRoot = nlohmann::json(nullptr);
+      while(!jsonState()->jsonPathStack.empty())
+        jsonState()->jsonPathStack.pop();
 
       return true;
     }
@@ -109,46 +182,49 @@ namespace Engine {
     bool
       JSONDocument::focusedObjectContainsChild(std::string const&key)
     {
-      nlohmann::json::iterator node = jsonState().jsonPathStack.top().get().find(key);
-      return !(node == jsonState().jsonPathStack.top().get().end());
+      nlohmann::json::iterator node = jsonState()->jsonPathStack.top().get().find(key);
+      return !(node == jsonState()->jsonPathStack.top().get().end());
     }
 
-    bool
+    UniquePtr<IJSONNode>
       JSONDocument::focusChild(std::string const&key)
     {
       if(!focusedObjectContainsChild(key))
-        return false;
+        return UniquePtr<IJSONNode>();
         // throw std::out_of_range(key.c_str());
       
-      if(!jsonState().jsonPathStack.top().get()[key].is_object())
-        return false;
-        // throw std::exception("Selected node is no json object.");
+      if(!jsonState()->jsonPathStack.top().get()[key].is_object())
+        return UniquePtr<IJSONNode>();
 
-      jsonState().jsonPathStack.push(
+      jsonState()->jsonPathStack.push(
         std::reference_wrapper<nlohmann::json>(
-          jsonState().jsonPathStack.top().get()[key]));
-
-      return true;
+          jsonState()->jsonPathStack.top().get()[key]));
+      
+      return UniquePtr<IJSONNode>();
     }
 
-    bool
+    UniquePtr<IJSONNode>
       JSONDocument::focusParent()
     {
-      if(jsonState().jsonPathStack.size() > 1) {
-        jsonState().jsonPathStack.pop();
-        return true;
+      if(jsonState()->jsonPathStack.size() > 1) {
+        jsonState()->jsonPathStack.pop();
+
+        // Link to IJSONNode somehow?!
+        return UniquePtr<IJSONNode>();
       }
 
-      return false;
+      return UniquePtr<IJSONNode>();
     }
 
-    bool
-      JSONDocument::set(std::string const&key, )
+    UniquePtr<IJSONNode> 
+      JSONDocument::operator[](std::string const&key)
     {
       if(!focusedObjectContainsChild(key))
-        jsonState().jsonPathStack.top().get()[key] = nullptr;
+        return UniquePtr<IJSONNode>();
 
-      return jsonState().jsonPathStack.top().get()[key];
+      // Link to IJSONNode somehow?!
+      return UniquePtr<IJSONNode>();
     }
+
   }
 }

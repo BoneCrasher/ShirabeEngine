@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "SEPUtil/Documents/SR_SEPUtil_XML.h"
+#include "Util/Documents/SR_SEPUtil_XML.h"
 
 #include "SEPCore/ObjectModel/SR_SEPCore_Object.h"
 #include "SEPCore/ObjectModel/SR_SEPCore_Property.h"

@@ -1,18 +1,23 @@
 #ifndef __SHIRABE_PLATFORM_H__
 #define __SHIRABE_PLATFORM_H__
 
+#include "ShirabeEngine_Export.h"
+#include "ShirabeEngine_TestExport.h"
+
+#ifndef SHIRABE_TEST_EXPORT 
+  #define SHIRABE_TEST_EXPORT SHIRABEENGINE_TEST_EXPORT
+#endif
+
+#ifndef SHIRABE_LIBRARY_EXPORT 
+  #define SHIRABE_LIBRARY_EXPORT SHIRABEENGINE_LIBRARY_EXPORT
+#endif
+
 // #define SHIRABE_LIBRARY_EXPORT
 // #define SHIRABE_TEST_EXPORT
 
 #if defined _WIN32
 #  define PLATFORM_WINDOWS
 
-// Are we building a DLL?
-#  ifdef _WINDLL 
-#    ifndef SHIRABE_BUILD_DLL
-#     define SHIRABE_BUILD_DLL
-#    endif
-#  endif
 // Check for address model
 #  ifdef _WIN64
 #    define TARGET_64BIT
@@ -23,17 +28,6 @@
 #  ifdef _MSC_VER
 #    define COMPILER_MSVC
 // This is for public exports
-#    ifdef SHIRABE_BUILD_DLL
-#      define SHIRABE_LIBRARY_EXPORT __declspec(dllexport)
-#    else 
-#      define SHIRABE_LIBRARY_EXPORT __declspec(dllimport)
-#    endif
-// This is for test-only exports
-#    if defined SHIRABE_BUILD_DLL && defined SHIRABE_TEST
-#      define SHIRABE_TEST_EXPORT __declspec(dllexport)
-#    else 
-#      define SHIRABE_TEST_EXPORT __declspec(dllimport)
-#    endif
 #  else
 #    ifdef __linux__
 #      define PLATFORM_LINUX
