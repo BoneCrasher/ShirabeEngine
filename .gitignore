@@ -6,6 +6,8 @@
 # Build directories
 _build
 _deploy
+build
+deploy
 /.gradle
 Debug
 Release
