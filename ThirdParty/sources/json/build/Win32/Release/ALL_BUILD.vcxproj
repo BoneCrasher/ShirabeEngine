@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{D416D6A3-E727-318D-82A3-7485FA5FF473}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master -BF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release --check-stamp-file F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\feature_tests.cxx;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\ExternalProject.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\BasicConfigVersion-SameMajorVersion.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\cmake\config.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master -BF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release --check-stamp-file F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\feature_tests.cxx;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\ExternalProject.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\BasicConfigVersion-SameMajorVersion.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\cmake\config.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master -BF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release --check-stamp-file F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\feature_tests.cxx;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\ExternalProject.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\BasicConfigVersion-SameMajorVersion.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\cmake\config.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master -BF:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release --check-stamp-file F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/json_master/CMakeLists.txt;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\feature_tests.cxx;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\ExternalProject.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\BasicConfigVersion-SameMajorVersion.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\cmake\config.cmake.in;F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\ZERO_CHECK.vcxproj">
+      <Project>C97AB985-D8BF-3FE5-A9D3-B38A6886B6C9</Project>
+      <Name>ZERO_CHECK</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\catch_main.vcxproj">
+      <Project>C2C476D1-49D1-3E76-A88B-01FFD1E7A77C</Project>
+      <Name>catch_main</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-algorithms.vcxproj">
+      <Project>A824CEBC-D23B-388C-89CE-9C230E133804</Project>
+      <Name>test-algorithms</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-allocator.vcxproj">
+      <Project>6E5B4AAB-3D9B-3DA2-9AA8-763AFC07F030</Project>
+      <Name>test-allocator</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-alt-string.vcxproj">
+      <Project>BEC88F65-8B12-36FF-A23D-10862E8162A7</Project>
+      <Name>test-alt-string</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-capacity.vcxproj">
+      <Project>6746B025-44E5-3694-84C8-F85E8F32D700</Project>
+      <Name>test-capacity</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-cbor.vcxproj">
+      <Project>29CCE18F-8CDD-3EA6-8770-7142E46269C0</Project>
+      <Name>test-cbor</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-class_const_iterator.vcxproj">
+      <Project>494F1CA6-42C1-3413-BA36-7E2A08D0AA1C</Project>
+      <Name>test-class_const_iterator</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-class_iterator.vcxproj">
+      <Project>04EEBE5F-83C0-315E-912D-016B9DF56B03</Project>
+      <Name>test-class_iterator</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-class_lexer.vcxproj">
+      <Project>55FCEFEC-CDB2-31DC-BF50-DE922D97A75A</Project>
+      <Name>test-class_lexer</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-class_parser.vcxproj">
+      <Project>0BDD2965-5CDB-31CA-8089-A3EA640A0DCC</Project>
+      <Name>test-class_parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-comparison.vcxproj">
+      <Project>F918D7BE-C081-3264-9718-8FB97EC6BE1B</Project>
+      <Name>test-comparison</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-concepts.vcxproj">
+      <Project>BB11EA0B-0048-33F0-8D5D-1D747FB094B5</Project>
+      <Name>test-concepts</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-constructor1.vcxproj">
+      <Project>6F928196-FD9D-3483-A5B5-669746C4F16D</Project>
+      <Name>test-constructor1</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-constructor2.vcxproj">
+      <Project>3FCAC58B-2699-3D7A-B39F-98E251D3BE67</Project>
+      <Name>test-constructor2</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-convenience.vcxproj">
+      <Project>954646E5-945E-3D78-85DF-3683209B10E0</Project>
+      <Name>test-convenience</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-conversions.vcxproj">
+      <Project>C98898AA-B82D-37F0-BBFB-D71E2D61A1D1</Project>
+      <Name>test-conversions</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-deserialization.vcxproj">
+      <Project>89AF0C40-34F6-3A3E-9154-6D4EB7D79C02</Project>
+      <Name>test-deserialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-element_access1.vcxproj">
+      <Project>EE3EC5D6-F4F7-3B97-A280-ED8BE6BD3943</Project>
+      <Name>test-element_access1</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-element_access2.vcxproj">
+      <Project>60A557CB-7801-3EA2-A50B-6E4C85F04B05</Project>
+      <Name>test-element_access2</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-inspection.vcxproj">
+      <Project>8713A15B-DF97-350F-93A2-96555A34AC03</Project>
+      <Name>test-inspection</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-items.vcxproj">
+      <Project>1EB13410-A57D-35B6-B365-3C40AA527A77</Project>
+      <Name>test-items</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-iterators1.vcxproj">
+      <Project>3CF18BD1-5D26-30E1-A2C0-D512310B7C55</Project>
+      <Name>test-iterators1</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-iterators2.vcxproj">
+      <Project>ED05C9B5-CC22-3323-9C32-4B710BD0D47B</Project>
+      <Name>test-iterators2</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-json_patch.vcxproj">
+      <Project>1B955DDF-95BC-36F6-864B-B2944FCA857E</Project>
+      <Name>test-json_patch</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-json_pointer.vcxproj">
+      <Project>FE97162C-6A7C-3029-AD1E-4A899BA1AF5F</Project>
+      <Name>test-json_pointer</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-merge_patch.vcxproj">
+      <Project>AA945715-09EF-3F5B-935C-8954C39F75D6</Project>
+      <Name>test-merge_patch</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-meta.vcxproj">
+      <Project>31E6A102-262D-3CE2-ADA3-FADD48C3C64D</Project>
+      <Name>test-meta</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-modifiers.vcxproj">
+      <Project>AE2FDBD6-24B9-3031-AA96-1B7FEE9A4F36</Project>
+      <Name>test-modifiers</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-msgpack.vcxproj">
+      <Project>16752769-7211-3A56-B7FF-EA385D4A011F</Project>
+      <Name>test-msgpack</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-noexcept.vcxproj">
+      <Project>9CB91B03-FAEE-32F1-9F91-305EEB298BFA</Project>
+      <Name>test-noexcept</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-pointer_access.vcxproj">
+      <Project>EFD8C2FE-5188-3E82-8A0A-914507336919</Project>
+      <Name>test-pointer_access</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-readme.vcxproj">
+      <Project>48B404BC-B94E-3187-9640-63A0445091DB</Project>
+      <Name>test-readme</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-reference_access.vcxproj">
+      <Project>6DB614D8-3347-371C-86ED-43B1B5894E4D</Project>
+      <Name>test-reference_access</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-regression.vcxproj">
+      <Project>1C7B2F31-06EC-3178-ACAB-E1EEB4D92D76</Project>
+      <Name>test-regression</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-serialization.vcxproj">
+      <Project>B92F363C-F39E-3091-8C66-D2308FF3828F</Project>
+      <Name>test-serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-testsuites.vcxproj">
+      <Project>06B4EC9C-BDE2-3802-8C4A-89E1E3230064</Project>
+      <Name>test-testsuites</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-to_chars.vcxproj">
+      <Project>041D04B1-5E79-3CC0-B223-D5B39F5BE778</Project>
+      <Name>test-to_chars</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-ubjson.vcxproj">
+      <Project>97878465-35A2-3B3D-834A-9D0C7FB094F1</Project>
+      <Name>test-ubjson</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-udt.vcxproj">
+      <Project>81D045F8-1537-37AC-AD84-C2139757F4AE</Project>
+      <Name>test-udt</Name>
+    </ProjectReference>
+    <ProjectReference Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\test\test-unicode.vcxproj">
+      <Project>16BDC2A3-A7E1-3DA2-A466-91CF8E3FEFD7</Project>
+      <Name>test-unicode</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

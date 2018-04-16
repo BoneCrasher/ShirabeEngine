@@ -1,0 +1,338 @@
+The system is: Windows - 10.0.16299 - AMD64
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler:  
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:20:59.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CompilerIdCXX\CompilerIdCXX.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "Debug\".
+  Creating directory "Debug\CompilerIdCXX.tlog\".
+InitializeBuildStatus:
+  Creating "Debug\CompilerIdCXX.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /nologo /W0 /WX- /diagnostics:classic /Od /Oy- /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue CMakeCXXCompilerId.cpp
+  CMakeCXXCompilerId.cpp
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:".\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\CompilerIdCXX.lib" /MACHINE:X86 /SAFESEH Debug\CMakeCXXCompilerId.obj
+  CompilerIdCXX.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CompilerIdCXX\.\CompilerIdCXX.exe
+PostBuildEvent:
+  for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+  :VCEnd
+  CMAKE_CXX_COMPILER=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\Hostx86\x86\cl.exe
+FinalizeBuildStatus:
+  Deleting file "Debug\CompilerIdCXX.tlog\unsuccessfulbuild".
+  Touching "Debug\CompilerIdCXX.tlog\CompilerIdCXX.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CompilerIdCXX\CompilerIdCXX.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.50
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+
+The CXX compiler identification is MSVC, found in "F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/3.8.0/CompilerIdCXX/CompilerIdCXX.exe"
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community/MSBuild/15.0/Bin/MSBuild.exe" "cmTC_8d503.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=15.0"
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:21:01.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_8d503.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_8d503.dir\Debug\".
+  Creating directory "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_8d503.dir\Debug\cmTC_8d503.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_8d503.dir\Debug\cmTC_8d503.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_8d503.dir\Debug\\" /Fd"cmTC_8d503.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.12.25835 for x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_8d503.dir\Debug\\" /Fd"cmTC_8d503.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  testCXXCompiler.cxx
+  
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:"F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_8d503.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_8d503.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_8d503.lib" /MACHINE:X86 /SAFESEH   /machine:X86 cmTC_8d503.dir\Debug\testCXXCompiler.obj
+  cmTC_8d503.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_8d503.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_8d503.dir\Debug\cmTC_8d503.tlog\unsuccessfulbuild".
+  Touching "cmTC_8d503.dir\Debug\cmTC_8d503.tlog\cmTC_8d503.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_8d503.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.53
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community/MSBuild/15.0/Bin/MSBuild.exe" "cmTC_b3ed1.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=15.0"
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:21:03.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_b3ed1.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_b3ed1.dir\Debug\".
+  Creating directory "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_b3ed1.dir\Debug\cmTC_b3ed1.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_b3ed1.dir\Debug\cmTC_b3ed1.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_b3ed1.dir\Debug\\" /Fd"cmTC_b3ed1.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue "C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.12.25835 for x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_b3ed1.dir\Debug\\" /Fd"cmTC_b3ed1.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue "C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp"
+  CMakeCXXCompilerABI.cpp
+  
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:"F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_b3ed1.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_b3ed1.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_b3ed1.lib" /MACHINE:X86 /SAFESEH   /machine:X86 cmTC_b3ed1.dir\Debug\CMakeCXXCompilerABI.obj
+  cmTC_b3ed1.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_b3ed1.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_b3ed1.dir\Debug\cmTC_b3ed1.tlog\unsuccessfulbuild".
+  Touching "cmTC_b3ed1.dir\Debug\cmTC_b3ed1.tlog\cmTC_b3ed1.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_b3ed1.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.52
+
+
+The system is: Windows - 10.0.16299 - AMD64
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler:  
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:21:46.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CompilerIdCXX\CompilerIdCXX.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "Debug\".
+  Creating directory "Debug\CompilerIdCXX.tlog\".
+InitializeBuildStatus:
+  Creating "Debug\CompilerIdCXX.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /nologo /W0 /WX- /diagnostics:classic /Od /Oy- /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue CMakeCXXCompilerId.cpp
+  CMakeCXXCompilerId.cpp
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:".\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\CompilerIdCXX.lib" /MACHINE:X86 /SAFESEH Debug\CMakeCXXCompilerId.obj
+  CompilerIdCXX.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CompilerIdCXX\.\CompilerIdCXX.exe
+PostBuildEvent:
+  for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+  :VCEnd
+  CMAKE_CXX_COMPILER=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\Hostx86\x86\cl.exe
+FinalizeBuildStatus:
+  Deleting file "Debug\CompilerIdCXX.tlog\unsuccessfulbuild".
+  Touching "Debug\CompilerIdCXX.tlog\CompilerIdCXX.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\3.8.0\CompilerIdCXX\CompilerIdCXX.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.45
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+
+The CXX compiler identification is MSVC, found in "F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/3.8.0/CompilerIdCXX/CompilerIdCXX.exe"
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community/MSBuild/15.0/Bin/MSBuild.exe" "cmTC_339db.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=15.0"
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:21:48.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_339db.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_339db.dir\Debug\".
+  Creating directory "cmTC_339db.dir\Debug\cmTC_339db.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_339db.dir\Debug\cmTC_339db.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_339db.dir\Debug\\" /Fd"cmTC_339db.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.12.25835 for x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_339db.dir\Debug\\" /Fd"cmTC_339db.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  testCXXCompiler.cxx
+  
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:"F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_339db.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_339db.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_339db.lib" /MACHINE:X86 /SAFESEH   /machine:X86 cmTC_339db.dir\Debug\testCXXCompiler.obj
+  cmTC_339db.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_339db.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_339db.dir\Debug\cmTC_339db.tlog\unsuccessfulbuild".
+  Touching "cmTC_339db.dir\Debug\cmTC_339db.tlog\cmTC_339db.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_339db.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.59
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community/MSBuild/15.0/Bin/MSBuild.exe" "cmTC_3f25b.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=15.0"
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:21:50.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_3f25b.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_3f25b.dir\Debug\".
+  Creating directory "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_3f25b.dir\Debug\cmTC_3f25b.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_3f25b.dir\Debug\cmTC_3f25b.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_3f25b.dir\Debug\\" /Fd"cmTC_3f25b.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue "C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.12.25835 for x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_3f25b.dir\Debug\\" /Fd"cmTC_3f25b.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue "C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp"
+  CMakeCXXCompilerABI.cpp
+  
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:"F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_3f25b.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_3f25b.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_3f25b.lib" /MACHINE:X86 /SAFESEH   /machine:X86 cmTC_3f25b.dir\Debug\CMakeCXXCompilerABI.obj
+  cmTC_3f25b.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_3f25b.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_3f25b.dir\Debug\cmTC_3f25b.tlog\unsuccessfulbuild".
+  Touching "cmTC_3f25b.dir\Debug\cmTC_3f25b.tlog\cmTC_3f25b.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_3f25b.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.55
+
+
+
+
+Detecting CXX [] compiler features compiled with the following output:
+Change Dir: F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community/MSBuild/15.0/Bin/MSBuild.exe" "cmTC_781d0.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=15.0"
+Microsoft (R) Build Engine version 15.5.180.51428 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 10/04/2018 20:21:52.
+Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_781d0.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_781d0.dir\Debug\".
+  Creating directory "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_781d0.dir\Debug\cmTC_781d0.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_781d0.dir\Debug\cmTC_781d0.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\CL.exe /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_781d0.dir\Debug\\" /Fd"cmTC_781d0.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\feature_tests.cxx
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.12.25835 for x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /diagnostics:classic /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_781d0.dir\Debug\\" /Fd"cmTC_781d0.dir\Debug\vc141.pdb" /Gd /TP /analyze- /errorReport:queue F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\feature_tests.cxx
+  feature_tests.cxx
+  
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\HostX86\x86\link.exe /ERRORREPORT:QUEUE /OUT:"F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_781d0.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_781d0.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/ShirabeDevelopment/ShirabeEngine/ext/sources/json/build/Win32/Release/CMakeFiles/CMakeTmp/Debug/cmTC_781d0.lib" /MACHINE:X86 /SAFESEH   /machine:X86 cmTC_781d0.dir\Debug\feature_tests.obj
+  cmTC_781d0.vcxproj -> F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\Debug\cmTC_781d0.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_781d0.dir\Debug\cmTC_781d0.tlog\unsuccessfulbuild".
+  Touching "cmTC_781d0.dir\Debug\cmTC_781d0.tlog\cmTC_781d0.lastbuildstate".
+Done Building Project "F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Release\CMakeFiles\CMakeTmp\cmTC_781d0.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.56
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates

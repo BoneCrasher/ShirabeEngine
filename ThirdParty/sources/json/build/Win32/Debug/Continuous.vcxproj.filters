@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\CMakeLists.txt" />
+    <CustomBuild Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Debug\CMakeFiles\3dc77d705a5e0e95b3bed6830f80c4dd\Continuous.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Debug\CMakeFiles\Continuous" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{63C79546-FEB1-3AEC-AF21-FCBA17A7206B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

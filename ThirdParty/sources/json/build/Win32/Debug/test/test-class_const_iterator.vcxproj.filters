@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\test\src\unit-class_const_iterator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\json_master\nlohmann_json.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="F:\ShirabeDevelopment\ShirabeEngine\ext\sources\json\build\Win32\Debug\test\catch_main.dir\$(Configuration)\unit.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{83C99CCB-ACB9-37D5-96D6-96D5FB53971F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Files">
+      <UniqueIdentifier>{ED236BBF-0440-3954-95FD-44558B028704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{D5B69635-07D5-3FA5-9D3E-BA174BC5E649}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
