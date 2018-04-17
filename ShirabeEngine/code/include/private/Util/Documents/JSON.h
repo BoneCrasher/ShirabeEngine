@@ -33,23 +33,22 @@ namespace Engine {
       virtual operator float()  const = 0;
       virtual operator double() const = 0;
 
-      virtual operator uint8_t const*() const = 0;
       virtual operator std::string()    const = 0;
 
-      virtual Ptr<IJSONNode> operator=(int8_t   const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(int16_t  const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(int32_t  const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(int64_t  const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(uint8_t  const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(uint16_t const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(uint32_t const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(uint64_t const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(int8_t   const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(int16_t  const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(int32_t  const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(int64_t  const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(uint8_t  const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(uint16_t const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(uint32_t const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(uint64_t const& value) = 0;
 
-      virtual Ptr<IJSONNode> operator=(float  const& value) = 0;
-      virtual Ptr<IJSONNode> operator=(double const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(float  const& value) = 0;
+      virtual UniquePtr<IJSONNode> operator=(double const& value) = 0;
 
-      virtual Ptr<IJSONNode> operator=(uint8_t const* value) = 0;
-      virtual Ptr<IJSONNode> operator=(std::string const& value) = 0;      
+      virtual UniquePtr<IJSONNode> operator=(uint8_t const* value)     = 0;
+      virtual UniquePtr<IJSONNode> operator=(std::string const& value) = 0;      
      DeclareInterfaceEnd(JSONNode);
 
     class SHIRABE_TEST_EXPORT JSONDocument {
@@ -72,24 +71,24 @@ namespace Engine {
 
       bool focusedObjectContainsChild(std::string const&key);
 
-      Ptr<IJSONNode> focusChild(std::string const&key);
-      Ptr<IJSONNode> focusParent();
+      UniquePtr<IJSONNode> focusChild(std::string const&key);
+      UniquePtr<IJSONNode> focusParent();
 
-      Ptr<IJSONNode> operator[](std::string const&key);
+      UniquePtr<IJSONNode> operator[](std::string const&key);
 
     private:
       struct JSONState {
         std::unique_ptr<std::istream, std::function<void(std::istream*)>> stream;
         nlohmann::json                                     jsonRoot;
-        std::stack<std::reference_wrapper<nlohmann::json>> jsonPathStack
+        std::stack<std::reference_wrapper<nlohmann::json>> jsonPathStack;
       };
 
-      Ptr<JSONState>&       jsonState();
-      Ptr<JSONState> const& jsonState() const;
+      UniquePtr<JSONState>&       jsonState();
+      UniquePtr<JSONState> const& jsonState() const;
 
       JSONDocumentOpenState openImpl();
 
-      Ptr<JSONState> m_jsonState;
+      UniquePtr<JSONState> m_jsonState;
     };
 
   }

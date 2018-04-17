@@ -1,5 +1,8 @@
 @ECHO off
 
+SET CURRENTDIR="%cd%"
+echo %CURRENTDIR%
+	
 CALL :buildWinThirtyTwo
 
 CALL :buildOne Debug   Win32\Debug
@@ -13,20 +16,20 @@ CALL :buildOne Release Win64\Release
 GOTO :eof
 
 :buildOne
-	SET CURRENTDIR="%cd%"
 	SET OUT=%CURRENTDIR%\deploy\%2%
 	SET INCLUDE_PATHS=%CURRENTDIR%\..\libicu\deploy\%2\include
 	SET LIB_PATHS=%CURRENTDIR%\..\libicu\deploy\%2\lib
 	
 	SET DBG=no
-	SET CRT=/MT
+	SET CRT=/MD
 
 	if "%1"=="Debug" (
 		SET DBG=yes
-	    SET CRT=/MTd
+	    SET CRT=/MDd
 	)
 
-	cd libxml2-2.9.7/win32
+	cd /D %CURRENTDIR%\libxml2-2.9.7\win32
+	echo %cd%
 	
 	echo Building for %2%...
 	
@@ -47,7 +50,7 @@ GOTO :eof
 	nmake /f Makefile.msvc libxml install
 	nmake clean
 	
-	cd %CURRENTDIR%
+	cd /D %CURRENTDIR%
 GOTO :eof
 
 :buildWinThirtyTwo

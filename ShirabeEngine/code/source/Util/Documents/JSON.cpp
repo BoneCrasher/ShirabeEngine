@@ -33,8 +33,7 @@ namespace Engine {
       operator float()  const { return m_ref.get().operator float();  }
       operator double() const { return m_ref.get().operator double(); }
 
-      operator uint8_t const*() const { return m_ref.get().operator uint8_t const*(); }
-      operator std::string()    const { return m_ref.get().operator std::string();    }
+      operator std::string() const { return m_ref.get().operator std::string();    }
 
       UniquePtr<IJSONNode> operator=(int8_t   const& value);
       UniquePtr<IJSONNode> operator=(int16_t  const& value);
@@ -55,36 +54,6 @@ namespace Engine {
       std::reference_wrapper<nlohmann::json> m_ref;
     };
     
-    NLohmannJSONNode::operator int8_t  () const {}
-    NLohmannJSONNode::operator int16_t () const {}
-    NLohmannJSONNode::operator int32_t () const {}
-    NLohmannJSONNode::operator int64_t () const {}
-    NLohmannJSONNode::operator uint8_t () const {}
-    NLohmannJSONNode::operator uint16_t() const {}
-    NLohmannJSONNode::operator uint32_t() const {}
-    NLohmannJSONNode::operator uint64_t() const {}
-
-    NLohmannJSONNode::operator float()  const {}
-    NLohmannJSONNode::operator double() const {}
-
-    NLohmannJSONNode::operator uint8_t const*() const {}
-    NLohmannJSONNode::operator std::string()    const {}
-
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int8_t   const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int16_t  const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int32_t  const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(int64_t  const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint8_t  const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint16_t const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint32_t const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint64_t const& value) {}
-
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(float  const& value) {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(double const& value) {}
-
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(uint8_t const* value)     {}
-    UniquePtr<IJSONNode> NLohmannJSONNode::operator=(std::string const& value) {}
-
     JSONDocument::~JSONDocument() {
       close();
     }

@@ -130,7 +130,7 @@ function(link)
 	#
 	if(WIN32)
 		linkWindowsOSEnvironment(
-			SPECIFIC_LIBRARY_LINK_TARGETS 
+			OS_LIBRARY_LINK_TARGETS 
 				advapi32
 				Ws2_32
 				Iphlpapi
@@ -138,7 +138,7 @@ function(link)
 		)
 	elseif(UNIX AND NOT APPLE)
 		linkLinuxOSEnvironment(
-			SPECIFIC_LIBRARY_LINK_TARGETS
+			OS_LIBRARY_LINK_TARGETS
 				dl
 		)
 	else() 
