@@ -249,6 +249,7 @@ macro(
         MODULE_NAME
         IS_X64_BUILD
         PLATFORM_CONFIG
+		LINK_STATIC
         OUT_NAME
         )
     # BEGIN
@@ -271,7 +272,7 @@ macro(
     endif()
 
     # Finally, check for the static library suffix _a!
-    if(SHIRABE_BUILD_STATICLIB)
+    if(LINK_STATIC)
 	set(
 		TMP_MODULE_NAME
 		    "${TMP_MODULE_NAME}_a"
@@ -320,9 +321,9 @@ macro(setupTargetAndConfig MODULE_NAME)
     # Define SHIRABE_ADDRESSMODEL_64BIT
     #
     set(SHIRABE_ADDRESSMODEL_64BIT OFF)
-    if(SHIRABE_ADDRESSMODEL_64BIT_CFG} STREQUAL "ON")
+    if(${SHIRABE_ADDRESSMODEL_64BIT_CFG} STREQUAL "ON")
         set(SHIRABE_ADDRESSMODEL_64BIT ON)
-    endif(SHIRABE_ADDRESSMODEL_64BIT_CFG)
+    endif()
     LogStatus(MESSAGES "Building for 64-bit address model? ${SHIRABE_ADDRESSMODEL_64BIT}")
 
     #
@@ -368,6 +369,7 @@ macro(setupTargetAndConfig MODULE_NAME)
         ${MODULE_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
+		SHIRABE_BUILD_STATIC
         SHIRABE_MODULE_OUTPUT_NAME
         )
     LogStatus(MESSAGES "Determined new module name: ${SHIRABE_MODULE_OUTPUT_NAME}")

@@ -24,9 +24,10 @@ namespace Engine {
         execute();
 
     private:
-      PassBaseList & passes();
+      PassMap &passes();
+      bool addPass(std::string const&, Ptr<PassBase> const&);
 
-      PassBaseList m_passes;
+      PassMap m_passes;
     };
 
   }

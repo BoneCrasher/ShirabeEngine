@@ -30,13 +30,15 @@ namespace Engine {
         Ptr<ApplicationEnvironment> const&environment);
       bool deinitialize();
 
-      Random::RandomState& resourceUIDGenerator();
+      Ptr<Random::RandomState> resourceUIDGenerator();
 
-      template <typename TPassImplementation, typename... TPassCreationArgs>
-      Ptr<Pass<TPassImplementation>>
+      template <typename TPass, typename... TPassCreationArgs>
+      Ptr<TPass>
         spawnPass(
           std::string                 const&name,
           TPassCreationArgs            &&...args);
+
+      Ptr<ApplicationEnvironment> getApplicationEnvironment();
 
       bool
         importPersistentResource(
@@ -52,12 +54,12 @@ namespace Engine {
       UniquePtr<FrameGraph>&                graph();
       Map<std::string, PublicResourceId_t>& importedResources();
 
-      Random::RandomState m_uidGenerator;
+      Ptr<Random::RandomState> m_uidGenerator;
 
       UniquePtr<FrameGraph>                m_frameGraph;
       Map<std::string, PublicResourceId_t> m_importedResources;
 
-      Ptr<ApplicationEnvironment>          m_applicationEnvironment;
+      Ptr<ApplicationEnvironment> m_applicationEnvironment;
     };
 
     /**********************************************************************************************//**
@@ -72,8 +74,8 @@ namespace Engine {
      *
      * \return  A Ptr&lt;Pass&lt;TPassImplementation&gt;&gt;
      **************************************************************************************************/
-    template <typename TPassImplementation, typename... TPassCreationArgs>
-    Ptr<Pass<TPassImplementation>>
+    template <typename TPass, typename... TPassCreationArgs>
+    Ptr<TPass>
       GraphBuilder::spawnPass(
         std::string                 const&name,
         TPassCreationArgs            &&...args)
@@ -82,30 +84,30 @@ namespace Engine {
         return false;
 
       try {
-        FrameGraphResourceId_t uid = generatePassUID();
+        PassUID_t uid = generatePassUID();
 
-        UniquePtr<TPassImplementation>
-          passImplementation = MakeUniquePointerType<TPassImplementation>();
-        Ptr<Pass<TPassImplementation>>
-          pass = MakeSharedPointerType<Pass<TPassImplementation>>(uid, std::move(passImplementation));
+        Ptr<TPass>
+          pass = MakeSharedPointerType<TPass>(uid, std::forward<TPassCreationArgs>(args)...);
         if (!pass)
-          return false;
+          return nullptr;
 
-        // Link the pass providing the input and output resources for the passes from the variadic argument list.
+        // Link the pass providing the import and export resources for the passes from the variadic argument list.
         // This will declare all required resources:
         //   - Create
         //   - Read
         //   - Write
         //   - Import
-        if (!pass->setup<TPassCreationArgs...>(m_applicationEnvironment, *this, std::forward<TPassCreationArgs>(args)...)) {
-
+        PassBuilder passBuilder(uid, m_uidGenerator);
+        if (!pass->setup(passBuilder)) {
+          // TODO: Log
+          pass = nullptr;
+          return nullptr;
         }
 
-        graph()->passes().push_back(std::static_pointer_cast<PassBase>(pass));
+        graph()->addPass(name, std::static_pointer_cast<PassBase>(pass));
 
         // Read out the PassLinker state filled in by "setup(...)" and properly merge it with 
-        // the current graph builder state.
-        
+        // the current graph builder state.        
 
         return pass;
       }

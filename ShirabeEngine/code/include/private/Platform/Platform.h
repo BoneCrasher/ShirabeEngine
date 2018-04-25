@@ -2,13 +2,20 @@
 #define __SHIRABE_PLATFORM_H__
 
 #include "ShirabeEngine_Export.h"
-#include "ShirabeEngine_TestExport.h"
 
-#ifndef SHIRABE_TEST_EXPORT 
+#ifdef SHIRABE_TEST
+#include "ShirabeEngine_TestExport.h"
+#endif
+
+#ifndef SHIRABEENGINE_TEST_EXPORT 
+  #define SHIRABE_TEST_EXPORT
+#else 
   #define SHIRABE_TEST_EXPORT SHIRABEENGINE_TEST_EXPORT
 #endif
 
-#ifndef SHIRABE_LIBRARY_EXPORT 
+#ifdef SHIRABE_LIBRARY_EXPORT 
+  #define SHIRABE_LIBRARY_EXPORT
+#else 
   #define SHIRABE_LIBRARY_EXPORT SHIRABEENGINE_LIBRARY_EXPORT
 #endif
 

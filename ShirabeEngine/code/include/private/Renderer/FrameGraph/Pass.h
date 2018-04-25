@@ -3,28 +3,34 @@
 
 #include <string>
 #include <functional>
+#include <stdint.h>
 
 #include "Core/EngineTypeHelper.h"
 #include "Platform/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceDTO.h"
 #include "Renderer/IRenderer.h"
+#include "Renderer/FrameGraph/FrameGraphData.h"
 
 #include "FrameGraphSerialization.h"
 
-#include "PassLinker.h"
+#include "PassBuilder.h"
 
 namespace Engine {
-	namespace FrameGraph {
-		using namespace Renderer;
+  namespace FrameGraph {
+    using namespace Renderer;
     using namespace Serialization;
 
-		class GraphBuilder;
-
-		class PassBase 
+    class GraphBuilder;
+    
+    class PassBase
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
-		public:
-			virtual bool execute(Ptr<IRenderContext>&) = 0;
+    public:
+      inline PassBase(PassUID_t const&passUID)
+        : m_passUID(passUID)
+      {}
+
+      virtual bool execute(Ptr<IRenderContext>&) = 0;
 
       inline void acceptSerializer(Ptr<IFrameGraphSerializer>&s)
       {
@@ -35,77 +41,81 @@ namespace Engine {
       {
         d->deserializePass(GetNonDeletingSelfPtrType(this));
       }
-		};
 
-		DeclareSharedPointerType(PassBase);
-		DeclareListType(Ptr<PassBase>, PassBase);
+      inline PassUID_t passUID() const { return m_passUID; }
 
-		template <typename TPassImplementation>
-		class Pass
-			: public PassBase
-		{
-		public:
-			using PassImplementation_t = TPassImplementation;
-			using InputData_t          = typename PassImplementation_t::InputData;
-			using OutputData_t         = typename PassImplementation_t::OutputData;
+    private:
+      PassUID_t m_passUID;
+    };
 
-			Pass(
-				FrameGraphResourceId_t         const&passUID,
-				UniquePtr<TPassImplementation>      &implementation)
-				: m_passUID(passUID)
-				, m_implementation(std::move(implementation))
-				, m_inputData()
-				, m_outputData()
-			{
-				assert(m_implementation != nullptr);
-			}
+    DeclareSharedPointerType(PassBase);
+    DeclareListType(Ptr<PassBase>, PassBase);
+    DeclareMapType(std::string, Ptr<PassBase>, Pass);
 
-			FrameGraphResourceId_t const&passUID() const { return m_passUID; }
+    template <typename TPassData>
+    class CallbackPass
+      : public PassBase
+    {
+    public:
+      using SetupCallback_t = std::function<bool(PassBuilder&, TPassData&)>;
+      using ExecCallback_t  = std::function<bool(Ptr<IRenderContext>&)>;
 
-			InputData_t  const&inputData()  const { return m_inputData;  }
-			OutputData_t const&outputData() const { return m_outputData; }
+      CallbackPass(
+        PassUID_t       const&passId,
+        SetupCallback_t     &&setupCb,
+        ExecCallback_t      &&execCb);
 
-			template <typename... TPassCreationArgs>
-			bool setup(
-        Ptr<ApplicationEnvironment> const&environment,
-				GraphBuilder                     &graphBuilder,
-				TPassCreationArgs            &&...args) 
-			{
-				PassLinker<TPassImplementation> passLinker(passUID(), graphBuilder.resourceUIDGenerator());
+      bool setup(PassBuilder&builder);
+      bool execute(Ptr<IRenderContext>&);
 
-				InputData_t  inputData ={};
-				OutputData_t outputData={};
+      TPassData const&passData() const { return m_passData; }
 
-				bool setupSuccessful = m_implementation->setup(environment, passLinker, inputData, outputData, std::forward<TPassCreationArgs>(args)...);
-				if(!setupSuccessful)
-					throw std::exception("Failed to setup pass.");
-        
-				m_inputData  = inputData;
-				m_outputData = outputData;
+    private:
+      SetupCallback_t setupCallback;
+      ExecCallback_t  execCallback;
 
-				return true;
-			}
+      TPassData m_passData;
+    };
 
-			bool execute(
-				Ptr<IRenderContext>&context)
-			{
-				return true; // TPassImplementation::execute(context, input, output);
-			}
+    template <typename TPassData>
+    CallbackPass<TPassData>::CallbackPass(
+      PassUID_t       const&passUID,
+      SetupCallback_t     &&setupCb,
+      ExecCallback_t      &&execCb)
+      : PassBase(passUID)
+      , setupCallback(setupCb)
+      , execCallback(execCb)
+      , m_passData()
+    {
+      assert(passUID > 0);
+      assert(setupCb != nullptr);
+      assert(execCb  != nullptr);
+    }
 
-      std::string to_string() const {
-        std::string implementation_string = (m_implementation ? m_implementation->to_string() : "None");
-        std::string stringified           = String::format("Pass {\nUID: %1\nImplementation: %2\n}\n", m_passUID, implementation_string);
+    template <typename TPassData>
+    bool
+      CallbackPass<TPassData>::setup(PassBuilder&builder)
+    {
+      TPassData passData{ };
+      if(setupCallback(builder, passData)) {
+        m_passData = passData;
+        return true;
       }
+      else
+        return false;
+    }
 
-		private:
-			FrameGraphResourceId_t         m_passUID;
-			UniquePtr<TPassImplementation> m_implementation;
+    template <typename TPassData>
+    bool
+      CallbackPass<TPassData>::execute(Ptr<IRenderContext>&context)
+    {
+      if(execCallback)
+        return execCallback(context);
 
-			InputData_t  m_inputData;
-			OutputData_t m_outputData;
-		};
+      return false;
+    }
     
-	}
+  }
 }
 
 #endif

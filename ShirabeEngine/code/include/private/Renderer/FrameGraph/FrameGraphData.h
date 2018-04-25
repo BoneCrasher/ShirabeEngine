@@ -19,6 +19,7 @@ namespace Engine {
     using Engine::Range;
 
     using FrameGraphResourceId_t = uint64_t;
+    using PassUID_t              = uint64_t;
 
     /**********************************************************************************************//**
      * \enum  FrameGraphResourceType

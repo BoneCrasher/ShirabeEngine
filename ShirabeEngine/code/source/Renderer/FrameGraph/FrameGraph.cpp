@@ -10,10 +10,21 @@ namespace Engine {
       return true;
     }
 
-    PassBaseList&
+    PassMap&
       FrameGraph::passes()
     {
       return m_passes;
+    }
+
+    bool 
+      FrameGraph::addPass(std::string const&name, Ptr<PassBase> const&pass)
+    {
+      if(m_passes.find(name) != m_passes.end())
+        return false;
+
+      m_passes[name] = pass;
+
+      return true;
     }
 
   }

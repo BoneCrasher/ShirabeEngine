@@ -4,12 +4,12 @@ namespace Engine {
   namespace FrameGraph {
 
     GraphBuilder::GraphBuilder()
-      : m_uidGenerator()
+      : m_uidGenerator(std::make_shared<Random::RandomState>())
       , m_frameGraph(nullptr)
       , m_importedResources()
     {}
 
-    Random::RandomState&
+    Ptr<Random::RandomState>
       GraphBuilder::resourceUIDGenerator()
     {
       return m_uidGenerator;
@@ -18,7 +18,7 @@ namespace Engine {
     FrameGraphResourceId_t
       GraphBuilder::generatePassUID()
     {
-      return m_uidGenerator.next();
+      return m_uidGenerator->next();
     }
 
     /**********************************************************************************************//**
@@ -55,6 +55,13 @@ namespace Engine {
 
       return true;
     }
+
+    Ptr<ApplicationEnvironment>
+      GraphBuilder::getApplicationEnvironment()
+    {
+      return m_applicationEnvironment;
+    }
+
 
     /**********************************************************************************************//**
      * \fn  bool GraphBuilder::importPersistentResource( std::string const&id, PublicResourceId_t const&resourceId)
