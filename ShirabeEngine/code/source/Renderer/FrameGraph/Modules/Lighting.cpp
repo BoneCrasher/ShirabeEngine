@@ -27,20 +27,20 @@ namespace Engine {
         "GBufferGeneration",
         [&] (PassBuilder&builder, PassData&passData) -> bool
       {
-        FrameGraphTexture const&gbufferDescription = FrameGraphTexture{};// builder.getTexture(gbuffer0);
+        FrameGraphTexture gbufferTexture = graphBuilder.getTextureData(gbuffer0);
 
         FrameGraphTexture lightAccBufferDesc ={ };
         lightAccBufferDesc.readableName = "Light Accumulation Buffer";
-        lightAccBufferDesc.width        = gbufferDescription.width;
-        lightAccBufferDesc.height       = gbufferDescription.height;
+        lightAccBufferDesc.width        = gbufferTexture.width;
+        lightAccBufferDesc.height       = gbufferTexture.height;
         lightAccBufferDesc.depth        = 1;
         lightAccBufferDesc.format       = FrameGraphFormat::R32_FLOAT;
         lightAccBufferDesc.mipLevels    = 1;
         lightAccBufferDesc.arraySize    = 1;
         lightAccBufferDesc.initialState = FrameGraphResourceInitState::Clear;
-
+        
         passData.state.lightAccumulationBufferTextureId = builder.createTexture(lightAccBufferDesc);
-
+                
         FrameGraphReadTextureFlags readFlags{ };
         readFlags.requiredFormat = FrameGraphFormat::Automatic;
 

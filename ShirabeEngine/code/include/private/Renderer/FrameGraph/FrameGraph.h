@@ -25,6 +25,7 @@ namespace Engine {
 
     private:
       PassMap &passes();
+
       bool addPass(std::string const&, Ptr<PassBase> const&);
 
       PassMap m_passes;

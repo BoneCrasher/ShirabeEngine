@@ -6,6 +6,7 @@
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/Random.h"
+#include "Log/Log.h"
 #include "Resources/Core/ResourceDTO.h"
 
 #include "Renderer/FrameGraph/FrameGraph.h"
@@ -22,6 +23,8 @@ namespace Engine {
      * \brief A graph builder.
      **************************************************************************************************/
     class SHIRABE_TEST_EXPORT GraphBuilder {
+      DeclareLogTag(GraphBuilder);
+
     public:
       GraphBuilder();
       ~GraphBuilder() = default;
@@ -48,13 +51,21 @@ namespace Engine {
       UniquePtr<FrameGraph>
         compile();
 
+      FrameGraphTexture     const&getTextureData(FrameGraphResource const&resource) const;
+      FrameGraphTextureView const&getTextureViewData(FrameGraphResource const&resource) const;
+
     private:
       FrameGraphResourceId_t generatePassUID();
 
       UniquePtr<FrameGraph>&                graph();
       Map<std::string, PublicResourceId_t>& importedResources();
 
-      Ptr<Random::RandomState> m_uidGenerator;
+      bool collectPass(PassBuilder const&passBuilder);
+
+      Ptr<Random::RandomState>  m_uidGenerator;
+
+      FrameGraphResourceDataMap        m_resources;
+      FrameGraphResourcePrivateDataMap m_resourcesPrivateData;
 
       UniquePtr<FrameGraph>                m_frameGraph;
       Map<std::string, PublicResourceId_t> m_importedResources;
@@ -79,8 +90,8 @@ namespace Engine {
       GraphBuilder::spawnPass(
         std::string                 const&name,
         TPassCreationArgs            &&...args)
-    {                               
-      if (!graph())
+    {
+      if(!graph())
         return false;
 
       try {
@@ -88,7 +99,7 @@ namespace Engine {
 
         Ptr<TPass>
           pass = MakeSharedPointerType<TPass>(uid, std::forward<TPassCreationArgs>(args)...);
-        if (!pass)
+        if(!pass)
           return nullptr;
 
         // Link the pass providing the import and export resources for the passes from the variadic argument list.
@@ -98,26 +109,42 @@ namespace Engine {
         //   - Write
         //   - Import
         PassBuilder passBuilder(uid, m_uidGenerator);
-        if (!pass->setup(passBuilder)) {
-          // TODO: Log
+        if(!pass->setup(passBuilder)) {
+          Log::Error(logTag(), "Cannot setup pass instance.");
           pass = nullptr;
           return nullptr;
         }
 
-        graph()->addPass(name, std::static_pointer_cast<PassBase>(pass));
+        //
+        // IMPORTANT: Perform implicit collection at this point in order to provide
+        //            any subsequent pass spawn and setup to access already available
+        //            resource descriptions!
+        if(!collectPass(passBuilder)) {
+          Log::Error(logTag(), "Cannot collect pass after setup.");
+          pass = nullptr;
+          return nullptr;
+        }
+
+        // Passes are added to the graph on compilation!!! Move there once the environment is setup.
+        //if!(graph()->addPass(name, std::static_pointer_cast<PassBase>(pass))) {
+        //  // TODO: Log
+        //  pass = nullptr;
+        //  return nullptr;
+        //}
 
         // Read out the PassLinker state filled in by "setup(...)" and properly merge it with 
         // the current graph builder state.        
 
         return pass;
       }
-      catch (std::exception e) {
+      catch(std::exception e) {
         return nullptr;
       }
-      catch (...) {
+      catch(...) {
         return nullptr;
       }
     }
+
 
   }
 }

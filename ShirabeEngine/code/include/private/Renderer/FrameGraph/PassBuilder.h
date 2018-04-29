@@ -7,6 +7,7 @@
 #include "Core/BasicTypes.h"
 #include "Core/EngineTypeHelper.h"
 #include "Core/Random.h"
+#include "Log/Log.h"
 #include "Resources/Core/ResourceDTO.h"
 
 #include "FrameGraphData.h"
@@ -16,6 +17,34 @@ namespace Engine {
 
     using namespace Engine::Resources;
 
+    // Forward declare, so that we can friend this class for pass collection.
+    class GraphBuilder; 
+
+
+    enum PassResourceConstraintFlags {
+      None          = 0,
+      TextureWidth  = 1,
+      TextureHeight = 2,
+      TextureSize   = 3,
+    };
+
+    struct PassResourceConstraint {
+      FrameGraphResource
+        target,
+        source;
+      PassResourceConstraintFlags
+        flags;
+
+      PassResourceConstraint(
+        FrameGraphResource const&inTarget,
+        FrameGraphResource const&inSource,
+        PassResourceConstraintFlags const&inFlags)
+        : target(inTarget)
+        , source(inSource)
+        , flags(inFlags)
+      {}
+    };
+
     /**********************************************************************************************//**
      * \class PassBuilder
      *
@@ -24,13 +53,11 @@ namespace Engine {
      * \tparam  TPassImplementation Type of the pass implementation.
      **************************************************************************************************/
     class PassBuilder {
-      DeclareMapType(FrameGraphResourceId_t, FrameGraphResourcePrivateData, ResourcePrivateData);
-      DeclareMapType(FrameGraphResourceId_t, FrameGraphTexture,     FrameGraphTexture);
-      DeclareMapType(FrameGraphResourceId_t, FrameGraphTextureView, FrameGraphTextureView);
-      DeclareMapType(FrameGraphResourceId_t, FrameGraphBuffer,      FrameGraphBuffer);
-      DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView,  FrameGraphBufferView);
+      friend class GraphBuilder;
 
-    public:
+      DeclareLogTag(PassBuilder);
+     
+    public:      
       PassBuilder(PassUID_t const&passUID, Ptr<Random::RandomState>);
 
       PassUID_t const&assignedPassUID() const { return m_passUID; }
@@ -58,9 +85,8 @@ namespace Engine {
 
       FrameGraphResource
         importRenderables();
-
+    
     private:
-      bool isResourceRegistered(FrameGraphResource const&resourceId) const;
       bool isTextureBeingReadInSubresourceRange(
         std::vector<FrameGraphResourceId_t> const&resourceViews,
         Range                               const&arraySliceRange,
@@ -69,15 +95,14 @@ namespace Engine {
         std::vector<FrameGraphResourceId_t> const&resourceViews,
         Range                               const&arraySliceRange,
         Range                               const&mipSliceRange);
-
+      
       Ptr<Random::RandomState> m_resourceIdGenerator;
       PassUID_t                m_passUID;
 
-      ResourcePrivateDataMap   m_resourcesPrivateData;
-      FrameGraphTextureMap     m_textures;
-      FrameGraphTextureViewMap m_textureViews;
-      FrameGraphBufferMap      m_buffers;
-      FrameGraphBufferViewMap  m_bufferViews;
+      FrameGraphResourcePrivateDataMap m_resourcesPrivateData;
+      FrameGraphResourceDataMap        m_resources;
+
+      std::vector<PassResourceConstraint> m_constraints;
     };
 
   }

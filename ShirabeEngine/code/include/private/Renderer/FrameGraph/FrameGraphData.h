@@ -26,7 +26,7 @@ namespace Engine {
      *
      * \brief Values that represent top-level frame graph resource types
      **************************************************************************************************/
-    
+
     enum class FrameGraphResourceType
       : uint8_t
     {
@@ -88,7 +88,7 @@ namespace Engine {
       D32_FLOAT_S8X24_UINT
       // TODO: DXT/BC Compression and Video formats
     };
-    
+
     SHIRABE_TEST_EXPORT bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
 
     enum class FrameGraphResourceUsage
@@ -102,8 +102,8 @@ namespace Engine {
       BufferTarget   = 32
     };
 
-    enum class FrameGraphWriteTarget 
-      : uint8_t 
+    enum class FrameGraphWriteTarget
+      : uint8_t
     {
       Undefined = 0,
       Color,
@@ -118,8 +118,8 @@ namespace Engine {
       Mutable   = 2
     };
 
-    enum class FrameGraphResourceInitState 
-      : uint8_t 
+    enum class FrameGraphResourceInitState
+      : uint8_t
     {
       Undefined = 0,
       Clear     = 1  // Resource will be cleared depending on the resource type.
@@ -130,7 +130,7 @@ namespace Engine {
       Read,
       Write
     };
-    
+
     SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphFormat const&e);
     SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e);
 
@@ -227,16 +227,45 @@ namespace Engine {
       FrameGraphResourcePrivateData();
       ~FrameGraphResourcePrivateData() = default;
     };
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphResourcePrivateData, FrameGraphResourcePrivateData);
+
 
     struct SHIRABE_TEST_EXPORT FrameGraphResource {
       FrameGraphResourceId_t
         resourceId;
 
       FrameGraphResource();
+
+      inline operator FrameGraphResourceId_t() { return resourceId; }
     };
 
     SHIRABE_TEST_EXPORT bool operator<(FrameGraphResource const&l, FrameGraphResource const&r);
     SHIRABE_TEST_EXPORT bool operator!=(FrameGraphResource const&l, FrameGraphResource const&r);
+
+    using FrameGraphResourceData = std::variant<FrameGraphTexture, FrameGraphTextureView, FrameGraphBuffer, FrameGraphBufferView>;
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphResourceData, FrameGraphResourceData);
+
+    static bool isResourceRegistered(
+      FrameGraphResourcePrivateDataMap const&privateRegistry,
+      FrameGraphResource               const&subjacentTargetResource)
+    {
+      return (privateRegistry.find(subjacentTargetResource.resourceId) != privateRegistry.end());
+    }
+
+    static bool isResourceTexture(
+      FrameGraphResourcePrivateDataMap const&privateRegistry,
+      FrameGraphResource               const&resourceId)
+    {
+      return (isResourceRegistered(privateRegistry, resourceId) && privateRegistry.at(resourceId.resourceId).type == FrameGraphResourceType::Texture);
+    }
+
+    static bool isResourceTextureView(
+      FrameGraphResourcePrivateDataMap const&privateRegistry,
+      FrameGraphResource               const&resourceId)
+    {
+      return (isResourceRegistered(privateRegistry, resourceId) && privateRegistry.at(resourceId.resourceId).type == FrameGraphResourceType::TextureView);
+    }
+
   }
 }
 
