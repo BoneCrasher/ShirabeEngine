@@ -1,0 +1,661 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugTeste|Win32">
+      <Configuration>DebugTeste</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugTeste|x64">
+      <Configuration>DebugTeste</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugTest|Win32">
+      <Configuration>DebugTest</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugTest|x64">
+      <Configuration>DebugTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|Win32">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|x64">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{44532061-2211-490C-9696-CD637DDD7C95}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ShirabeEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)code/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\DXFX11\Bin\Desktop_2017_Win10\$(PlatformName)\$(Configuration);$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)deploy\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\intermediate\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Debug\include\;$(SolutionDir)ext\libxml2\Win32\Debug\include\libxml2\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Debug\include\;$(SolutionDir)ext\libxml2\Win32\Debug\include\libxml2\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\nclude\;$(SolutionDir)ext\;$(SolutionDir)ext\json\$(PlatformName)\$(Configuration)\include\;$(SolutionDir)ext\libxml2\$(PlatformName)\$(Configuration)\include\libxml2\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Debug\include\;$(SolutionDir)ext\libxml2\Win64\Debug\include\libxml2\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Debug\include\;$(SolutionDir)ext\libxml2\Win64\Debug\include\libxml2\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTeste|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\nclude\;$(SolutionDir)ext\;$(SolutionDir)ext\json\$(PlatformName)\$(Configuration)\include\;$(SolutionDir)ext\libxml2\$(PlatformName)\$(Configuration)\include\libxml2\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Release\include\;$(SolutionDir)ext\libxml2\Win32\Release\include\libxml2\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <EnablePREfast>false</EnablePREfast>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win32\Release\include\;$(SolutionDir)ext\libxml2\Win32\Release\include\libxml2\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win32\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Release\include\;$(SolutionDir)ext\libxml2\Win64\Release\include\libxml2\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHIRABE_TEST;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)code\include\;$(SolutionDir)ext\;$(SolutionDir)ext\json\Win64\Release\include\;$(SolutionDir)ext\libxml2\Win64\Release\include\libxml2\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>$(SolutionDir)deploy\$(Platform)\$(Configuration)\lib\$(ProjectName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)ext\libxml2\Win64\Release\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2_a.lib;Ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)code\include $(SolutionDir)deploy\$(Platform)\$(Configuration)\include\ /sey</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="code\source\Core\BasicTypes.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Device.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\DeviceCapabilities.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Environment.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Renderer\Renderer.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBackend.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_DepthStencilState.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_DepthStencilView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_RasterizerState.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_RenderTargetView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_ShaderResourceView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_SwapChain.cpp" />
+    <ClCompile Include="code\source\GFXAPI\DirectX\DX11\Resources\ResourceTaskBuilder_TextureND.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\FrameGraphData.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\GraphBuilder.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\Passes\GBufferGeneration.cpp" />
+    <ClCompile Include="code\source\Renderer\FrameGraph\Passes\Lighting.cpp" />
+    <ClCompile Include="code\source\Resources\Subsystems\GFXAPIResourceBackend.cpp" />
+    <ClCompile Include="code\include\Threading\Looper.cpp" />
+    <ClCompile Include="code\source\Benchmarking\Timer\CallbackTimer.cpp" />
+    <ClCompile Include="code\source\Benchmarking\Timer\Timer.cpp" />
+    <ClCompile Include="code\source\Benchmarking\Timer\WindowsTime.cpp" />
+    <ClCompile Include="code\source\ECWS\MeshComponent.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\DepthStencilState.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\DepthStencilView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\RasterizerState.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\RenderTargetView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\ShaderResourceView.cpp" />
+    <ClCompile Include="code\source\GFXAPI\Types\SwapChain.cpp" />
+    <ClCompile Include="code\source\Math\AxisAngle.cpp" />
+    <ClCompile Include="code\source\BuildingBlocks\Camera.cpp" />
+    <ClCompile Include="code\source\ApplicationMain.cpp" />
+    <ClCompile Include="code\source\Core\Engine.cpp" />
+    <ClCompile Include="code\source\Math\Matrix.cpp" />
+    <ClCompile Include="code\source\Memory\AllocatorBase\AllocatorBase.cpp" />
+    <ClCompile Include="code\source\Memory\AllocatorBase\PreallocatingAllocatorBase.cpp" />
+    <ClCompile Include="code\source\Memory\AllocTracking\AllocationTracking.cpp" />
+    <ClCompile Include="code\source\Memory\New.cpp" />
+    <ClCompile Include="code\source\Resources\Core\Handle.cpp" />
+    <ClCompile Include="code\source\Resources\Core\ProxyBasedResourceManager.cpp" />
+    <ClCompile Include="code\source\Util\Documents\JSON.cpp" />
+    <ClCompile Include="code\source\Util\Documents\XML.cpp" />
+    <ClCompile Include="code\source\Window\WindowManager.cpp" />
+    <ClCompile Include="code\source\Core\String.cpp" />
+    <ClCompile Include="code\source\Platform\Windows\WindowsWindowFactory.cpp" />
+    <ClCompile Include="code\source\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="code\source\Window\IWindowEventCallbackAdapter.cpp" />
+    <ClCompile Include="code\source\BuildingBlocks\Transform.cpp" />
+    <ClCompile Include="code\source\Math\Quaternion.cpp" />
+    <ClCompile Include="code\source\BuildingBlocks\Scene.cpp" />
+    <ClCompile Include="code\source\ECWS\Entity.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="code\Header.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\CallbackTimer.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\ITimespan.h" />
+    <ClInclude Include="code\include\Benchmarking\MeasurementChunk.h" />
+    <ClInclude Include="code\include\Benchmarking\MeasurementChunkTraits.h" />
+    <ClInclude Include="code\include\Benchmarking\MeasurementDataStore.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\PlatformTime.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\Timer.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\WindowsTime.h" />
+    <ClInclude Include="code\include\Benchmarking\Timer\TimespanUnit.h" />
+    <ClInclude Include="code\include\Core\BitField.h" />
+    <ClInclude Include="code\include\Core\Random.h" />
+    <ClInclude Include="code\include\ECWS\IComponentFactory.h" />
+    <ClInclude Include="code\include\ECWS\MeshComponent.h" />
+    <ClInclude Include="code\include\GFXAPI\Config.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Common.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Device.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\DeviceCapabilities.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Environment.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Linkage.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Renderer\Renderer.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Resources\ResourceTaskBackend.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\DX11\Types.h" />
+    <ClInclude Include="code\include\GFXAPI\DirectX\IDXDevice.h" />
+    <ClInclude Include="code\include\GFXAPI\Capabilities.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\FrameGraph.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\FrameGraphData.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\GraphBuilder.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\Pass.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\Passes\GBufferGeneration.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\Passes\Lighting.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\PassLinker.h" />
+    <ClInclude Include="code\include\Renderer\IRenderer.h" />
+    <ClInclude Include="code\include\Renderer\RendererConfiguration.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\All.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\DepthStencilState.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\RasterizerState.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\RequestDefaultImplementation.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\TextureNDDefinition.h" />
+    <ClInclude Include="code\include\IOC\FunctorPropertyChangeListener.hpp" />
+    <ClInclude Include="code\include\IOC\IOCProperty.hpp" />
+    <ClInclude Include="code\include\IOC\IPropertyChangeListener.hpp" />
+    <ClInclude Include="code\include\IOC\Observer.h" />
+    <ClInclude Include="code\include\IOC\ValueChangedArguments.hpp" />
+    <ClInclude Include="code\include\Math\AxisAngle.h" />
+    <ClInclude Include="code\include\BuildingBlocks\Camera.h" />
+    <ClInclude Include="code\include\Core\Engine.h" />
+    <ClInclude Include="code\include\Core\EngineStatus.h" />
+    <ClInclude Include="code\include\Core\EngineTypeHelper.h" />
+    <ClInclude Include="code\include\Functional\FunctionBinding.h" />
+    <ClInclude Include="code\include\Math\Common.h" />
+    <ClInclude Include="code\include\Math\Field.h" />
+    <ClInclude Include="code\include\Math\Math.h" />
+    <ClInclude Include="code\include\Math\Matrix.h" />
+    <ClInclude Include="code\include\Math\MatrixOps.h" />
+    <ClInclude Include="code\include\Math\Vector.h" />
+    <ClInclude Include="code\include\Memory\AllocatorBase\AllocatorBase.h" />
+    <ClInclude Include="code\include\Memory\AllocatorBase\PreallocatingAllocatorBase.h" />
+    <ClInclude Include="code\include\Memory\AllocTracking\AllocationTracking.h" />
+    <ClInclude Include="code\include\Memory\Memory.h" />
+    <ClInclude Include="code\include\Memory\MemoryPool.h" />
+    <ClInclude Include="code\include\Memory\New.h" />
+    <ClInclude Include="code\include\Memory\STLTypeBase.h" />
+    <ClInclude Include="code\include\Memory\TypeBasedAllocatorBase\Allocator.h" />
+    <ClInclude Include="code\include\Memory\TypeBasedAllocatorBase\AllocatorPolicy.h" />
+    <ClInclude Include="code\include\Memory\TypeBasedAllocatorBase\AllocatorTraits.h" />
+    <ClInclude Include="code\include\Memory\Types.h" />
+    <ClInclude Include="code\include\Platform\Platform.h" />
+    <ClInclude Include="code\include\Platform\OSDisplay.h" />
+    <ClInclude Include="code\include\Platform\MathAdapter.h" />
+    <ClInclude Include="code\include\Platform\Windows\WindowsError.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Common.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Linkage.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\IDXDevice.h" />
+    <ClInclude Include="code\include\Renderer\GAPIDeviceCapabilities.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceProxy.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceBackend.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPIResourceTaskBackend.h" />
+    <ClInclude Include="code\include\Resources\Core\ProxyTreeCreator.h" />
+    <ClInclude Include="code\include\Resources\Core\ResourceDTO.h" />
+    <ClInclude Include="code\include\Resources\Core\ResourceProxyFactory.h" />
+    <ClInclude Include="code\include\Resources\Core\ResourceBackendProxy.h" />
+    <ClInclude Include="code\include\Resources\Core\ProxyBasedResourceManager.h" />
+    <ClInclude Include="code\include\Resources\Core\EResourceType.h" />
+    <ClInclude Include="code\include\Resources\Core\IResourceProxy.h" />
+    <ClInclude Include="code\include\Resources\Subsystems\GFXAPI\GFXAPI.h" />
+    <ClInclude Include="code\include\Resources\Core\IResource.h" />
+    <ClInclude Include="code\include\Resources\Core\ResourceDomainTransfer.h" />
+    <ClInclude Include="code\include\Resources\Core\IResourceManager.h" />
+    <ClInclude Include="code\include\Resources\Core\IResourcePool.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\ConstantBuffer.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\DepthStencilView.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\InstanceBuffer.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\ObjectBuffer.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\RenderTargetView.h" />
+    <ClInclude Include="code\include\GFXAPI\Definitions.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\Shader.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\ShaderResourceView.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\StructuredBuffer.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\SwapChain.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\TextureND.h" />
+    <ClInclude Include="code\include\GFXAPI\Types\Device.h" />
+    <ClInclude Include="code\include\Resources\Core\ResourceTraits.h" />
+    <ClInclude Include="code\include\Renderer\FrameGraph\FrameGraphSerialization.h" />
+    <ClInclude Include="code\include\Serialization\Serialization.h" />
+    <ClInclude Include="code\include\Threading\Looper.h" />
+    <ClInclude Include="code\include\Threading\Private\LooperImpl.h" />
+    <ClInclude Include="code\include\Util\Documents\JSON.h" />
+    <ClInclude Include="code\include\Util\Documents\XML.h" />
+    <ClInclude Include="code\include\Window\IWindowFactory.h" />
+    <ClInclude Include="code\include\Compiler\MSVCWarnings.h" />
+    <ClInclude Include="code\include\Core\BasicTypes.h" />
+    <ClInclude Include="code\include\Window\IWindow.h" />
+    <ClInclude Include="code\include\Log\Log.h" />
+    <ClInclude Include="code\include\Window\WindowManager.h" />
+    <ClInclude Include="code\include\Core\String.h" />
+    <ClInclude Include="code\include\Platform\Windows\WindowsWindowFactory.h" />
+    <ClInclude Include="code\include\Platform\ApplicationEnvironment.h" />
+    <ClInclude Include="code\include\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="code\include\Platform\WindowHandleWrapper.h" />
+    <ClInclude Include="code\include\Window\IWindowEventCallbackAdapter.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Device.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11DeviceCapabilities.h" />
+    <ClInclude Include="code\include\Renderer\DirectX\DX11\DX11Renderer.h" />
+    <ClInclude Include="code\include\BuildingBlocks\Transform.h" />
+    <ClInclude Include="code\include\Math\Quaternion.h" />
+    <ClInclude Include="code\include\BuildingBlocks\Scene.h" />
+    <ClInclude Include="code\include\ECWS\Entity.h" />
+    <ClInclude Include="code\include\ECWS\IComponent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="code\include\Math\Vector.tpp" />
+    <None Include="documentation\notes.md" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
