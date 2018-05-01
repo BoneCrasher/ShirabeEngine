@@ -1,8 +1,0 @@
-- PublicAPI should receive:
---- Input:  ResourceHandle or Descriptor
---- Output: ResourceHandle
-- Internally, theres a static and a dynamic registry
-- Static is serialized from "ResourceFile"
-- Dynamic is everything done during execution
-- ResourceHandle stores type -> Dynamic|Static 
-- No fucking public wrapper classes anymore...

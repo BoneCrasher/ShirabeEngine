@@ -1,9 +1,0 @@
-
-
-namespace Engine {
-	namespace Resources {
-
-
-
-	}
-}
