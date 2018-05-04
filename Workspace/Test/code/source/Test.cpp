@@ -28,7 +28,7 @@ private:
 };
 
 
-int main()
+int main(int argc, char **argv)
 {
 	/*uint32_t sleep = 6000;
 

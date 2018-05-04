@@ -130,7 +130,13 @@ namespace Engine {
     {}
 
     FrameGraphResource::FrameGraphResource()
-      : resourceId(FrameGraphResourceId_t{})
+      : assignedPassUID(0)
+      , resourceId(FrameGraphResourceId_t{})
+      , parentResource(0)
+      , readableName("")
+      , type(FrameGraphResourceType::Undefined)
+      , data()
+      , isExternalResource(false)
     {}
 
     bool

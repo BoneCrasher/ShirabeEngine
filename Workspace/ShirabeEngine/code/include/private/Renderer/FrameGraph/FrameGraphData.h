@@ -31,6 +31,7 @@ namespace Engine {
       : uint8_t
     {
       Undefined = 0,
+      Imported  = 1,
       Texture,
       Buffer,
       TextureView,
@@ -46,13 +47,26 @@ namespace Engine {
       : uint8_t
     {
       Undefined = 0,
+      SpecialFormatRangeFlag      = 1,
       Automatic,
       Structured,
+      // 8-bit formats
+      Format8BitFormatRangeFlag   = 8,
       R8_TYPELESS,
       R8_SINT,
       R8_UINT,
       R8_SNORM,
       R8_UNORM,
+      // 16-bit formats
+      Format16BitFormatRangeFlag  = 16,
+      R16_TYPELESS,
+      R16_SINT,
+      R16_UINT,
+      R16_SNORM,
+      R16_UNORM,
+      R16_FLOAT,
+      // 32-bit formats
+      Format32BitFormatRangeFlag  = 32,
       R8G8B8A8_TYPELESS,
       R8G8B8A8_SINT,
       R8G8B8A8_UINT,
@@ -60,18 +74,6 @@ namespace Engine {
       R8G8B8A8_UNORM,
       R8G8B8A8_UNORM_SRGB,
       R8G8B8A8_FLOAT,
-      R16_TYPELESS,
-      R16_SINT,
-      R16_UINT,
-      R16_SNORM,
-      R16_UNORM,
-      R16_FLOAT,
-      R16G16B16A16_TYPELESS,
-      R16G16B16A16_SINT,
-      R16G16B16A16_UINT,
-      R16G16B16A16_SNORM,
-      R16G16B16A16_UNORM,
-      R16G16B16A16_FLOAT,
       R24_UNORM_X8_TYPELESS,
       R32_TYPELESS,
       R32_SINT,
@@ -79,13 +81,24 @@ namespace Engine {
       R32_SNORM,
       R32_UNORM,
       R32_FLOAT,
+      D24_UNORM_S8_UINT,
+      D32_FLOAT,
+      // 64-bit formats
+      Format64BitFormatRangeFlag  = 64,
+      R16G16B16A16_TYPELESS = 64,
+      R16G16B16A16_SINT,
+      R16G16B16A16_UINT,
+      R16G16B16A16_SNORM,
+      R16G16B16A16_UNORM,
+      R16G16B16A16_FLOAT,
       R32_FLOAT_S8X24_TYPELESS,
+      D32_FLOAT_S8X24_UINT,
+      // 128-bit formats
+      Format128BitFormatRangeFlag = 128,
       R32G32B32A32_TYPELESS,
       R32G32B32A32_SINT,
       R32G32B32A32_UINT,
-      D24_UNORM_S8_UINT,
-      D32_FLOAT,
-      D32_FLOAT_S8X24_UINT
+      Format256BitFormatRangeFlag = 256,
       // TODO: DXT/BC Compression and Video formats
     };
 
@@ -94,12 +107,12 @@ namespace Engine {
     enum class FrameGraphResourceUsage
       : uint8_t
     {
-      Undefined      =  1,
-      ImageResource  =  2,
-      BufferResource =  4,
-      RenderTarget   =  8,
-      DepthTarget    = 16,
-      BufferTarget   = 32
+      Undefined      =  0,
+      ImageResource  =  1,
+      BufferResource =  2,
+      RenderTarget   =  4,
+      DepthTarget    =  8,
+      BufferTarget   = 16
     };
 
     enum class FrameGraphWriteTarget
@@ -222,6 +235,8 @@ namespace Engine {
         type;
       FrameGraphResourceData
         data;
+      bool
+        isExternalResource;
 
       FrameGraphResource();
 

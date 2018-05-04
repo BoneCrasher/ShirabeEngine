@@ -5,7 +5,7 @@ include(DefaultProject.template)
 
 set(SHIRABE_TEMPLATE "Application")
 
-set(SR_COMPILER__SUBSYSTEM CONSOLE)
+set(SHIRABE_COMPILER__SUBSYSTEM CONSOLE)
 
 SET(LINK_SHIRABEENGINE TRUE)
 set(LINK_JSON          TRUE)

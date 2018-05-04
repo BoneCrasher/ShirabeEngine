@@ -51,8 +51,8 @@ namespace Engine {
     return "UNKNOWN";
   }
 
-  #ifdef _DEBUG
-  #ifdef LOG_USE_VERBOSE
+  #ifdef SHIRABE_DEBUG
+  #if defined LOG_USE_VERBOSE || defined SHIRABE_TEST
   #define MinimumLogLevel ELogLevel::Verbose
   #else 
   #define MinimumLogLevel ELogLevel::Debug 
@@ -172,7 +172,7 @@ namespace Engine {
     DWORD       written = 0;
     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), wmsg.c_str(), ((DWORD)msg.size()), &written, nullptr);
     #else 
-    std::cout << msg << std::endl;
+    std::cout << msg << std::endl; 
     #endif
   }
 

@@ -3,7 +3,9 @@
 
 #include <string>
 #include <functional>
+#include <vector>
 #include <map>
+#include <stack>
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/Random.h"
@@ -51,10 +53,10 @@ namespace Engine {
 
       Ptr<ApplicationEnvironment> getApplicationEnvironment();
 
-      bool
-        importPersistentResource(
-          std::string        const&id,
-          PublicResourceId_t const&resourceId);
+      FrameGraphResource
+        registerTexture(
+          std::string       const&readableName,
+          FrameGraphTexture const&texture);
 
       UniquePtr<FrameGraph>
         compile();
@@ -65,11 +67,19 @@ namespace Engine {
     private:
       FrameGraphResourceId_t generatePassUID();
 
-      UniquePtr<FrameGraph>&                graph();
-      Map<std::string, PublicResourceId_t>& importedResources();
+      UniquePtr<FrameGraph>& graph();
 
-      bool collectPass(PassBuilder const&passBuilder);
+      FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 
+      bool collectPass(PassBuilder&passBuilder);
+      bool topologicalSort(std::stack<PassUID_t>&outPassOrder);
+      bool validate(std::stack<PassUID_t> const&passOrder);
+      bool validateTextureView(FrameGraphTexture const&, FrameGraphTextureView const&);
+      bool validateTextureUsage(FrameGraphTexture const&);
+      bool validateTextureFormat(FrameGraphTexture const&, FrameGraphTextureView const&);
+      bool validateTextureSubresourceAccess(FrameGraphTexture const&, FrameGraphTextureView const&);
+      bool validateBufferView(FrameGraphBuffer const&, FrameGraphBufferView const&);
+      
       Ptr<ApplicationEnvironment> m_applicationEnvironment;
 
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_passUIDGenerator;

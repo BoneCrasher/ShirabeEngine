@@ -8,13 +8,14 @@
 #include <Renderer/FrameGraph/PassBuilder.h>
 #include <Renderer/FrameGraph/Modules/GBufferGeneration.h>
 #include <Renderer/FrameGraph/Modules/Lighting.h>
+#include <Renderer/FrameGraph/Modules/Compositing.h>
 
 #include "Tests/Test_FrameGraph.h"
 
 namespace Test {
-  namespace FrameGraph {    
+  namespace FrameGraph {
 
-    bool 
+    bool
       Test__FrameGraph::testAll()
     {
       bool ok = true;
@@ -24,7 +25,7 @@ namespace Test {
       return ok;
     }
 
-    bool 
+    bool
       Test__FrameGraph::testGraphBuilder()
     {
       using namespace Engine;
@@ -38,9 +39,27 @@ namespace Test {
       Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
       appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
 
+      OSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
+
+      uint32_t
+        width  = displayDesc.bounds.size.x(),
+        height = displayDesc.bounds.size.y();
+
       GraphBuilder graphBuilder{};
       graphBuilder.initialize(appEnvironment);
-      graphBuilder.importPersistentResource("BackBuffer", 1337);
+
+      FrameGraphTexture backBufferTextureDesc{};
+      backBufferTextureDesc.width          = width;
+      backBufferTextureDesc.height         = height;
+      backBufferTextureDesc.depth          = 1;
+      backBufferTextureDesc.format         = FrameGraphFormat::R8G8B8A8_UNORM;
+      backBufferTextureDesc.initialState   = FrameGraphResourceInitState::Clear;
+      backBufferTextureDesc.arraySize      = 1;
+      backBufferTextureDesc.mipLevels      = 1;
+      backBufferTextureDesc.permittedUsage = FrameGraphResourceUsage::RenderTarget;
+      
+      FrameGraphResource backBuffer{ };
+      backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
 
       // GBuffer
       FrameGraphModule<GBufferModuleTag_t> gbufferModule{};
@@ -56,6 +75,18 @@ namespace Test {
         gbufferExportData.gbuffer1,
         gbufferExportData.gbuffer2,
         gbufferExportData.gbuffer3);
+
+      // Compositing
+      FrameGraphModule<CompositingModuleTag_t> compositingModule{ };
+      FrameGraphModule<CompositingModuleTag_t>::ExportData compositingExportData{ };
+      compositingExportData = compositingModule.addDefaultCompositingPass(
+        graphBuilder,
+        gbufferExportData.gbuffer0,
+        gbufferExportData.gbuffer1,
+        gbufferExportData.gbuffer2,
+        gbufferExportData.gbuffer3,
+        lightingExportData.lightAccumulationBuffer,
+        backBuffer);
 
       UniquePtr<Engine::FrameGraph::FrameGraph> frameGraph = graphBuilder.compile();
 
