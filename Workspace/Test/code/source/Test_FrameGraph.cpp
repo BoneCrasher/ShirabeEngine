@@ -10,6 +10,8 @@
 #include <Renderer/FrameGraph/Modules/Lighting.h>
 #include <Renderer/FrameGraph/Modules/Compositing.h>
 
+#include <Renderer/FrameGraph/FrameGraphSerialization.h>
+
 #include "Tests/Test_FrameGraph.h"
 
 namespace Test {
@@ -88,8 +90,17 @@ namespace Test {
         lightingExportData.lightAccumulationBuffer,
         backBuffer);
 
-      UniquePtr<Engine::FrameGraph::FrameGraph> frameGraph = graphBuilder.compile();
+      UniquePtr<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
 
+      Ptr<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
+      serializer->initialize();
+
+      frameGraph->acceptSerializer(serializer);
+      serializer->writeToFile("FrameGraphTest");
+
+      serializer->deinitialize();
+      serializer = nullptr;
+    
       // Renderer will call.
       if(frameGraph)
         frameGraph->execute();

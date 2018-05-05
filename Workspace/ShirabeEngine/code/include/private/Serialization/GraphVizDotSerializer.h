@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_SERIALIZATION_JSONSERIALIZER_H__
-#define __SHIRABE_SERIALIZATION_JSONSERIALIZER_H__
+#ifndef __SHIRABE_SERIALIZATION_GRAPHVIZ_DOT_SERIALIZER_H__
+#define __SHIRABE_SERIALIZATION_GRAPHVIZ_DOT_SERIALIZER_H__
 
 #include "Core/EngineTypeHelper.h"
 
@@ -8,12 +8,12 @@
 namespace Engine {
   namespace Serialization {
 
-    struct JSONOutputTag_t {};
+    struct GraphVizDotOutputTag_t {};
 
     template <
       typename IInterfaceSerializer,
       typename IInterfaceDeserializer>
-      class Serializer<JSONOutputTag_t, IInterfaceSerializer, IInterfaceDeserializer>
+      class Serializer<GraphVizDotOutputTag_t, IInterfaceSerializer, IInterfaceDeserializer>
       : public IInterfaceSerializer
       , public IInterfaceDeserializer
       , public ISerializationResult

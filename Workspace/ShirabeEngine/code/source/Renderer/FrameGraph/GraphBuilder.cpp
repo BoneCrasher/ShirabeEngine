@@ -53,7 +53,10 @@ namespace Engine {
       assert(environment != nullptr);
       m_applicationEnvironment = environment;
 
-      graph() = MakeUniquePointerType<FrameGraph>();
+      graph() = MakeUniquePointerType<Graph>();
+
+      // Add dummy pass with UID#0
+      // m_passes[0] = spawnPass<PassBase>("Pre-Pass");
 
       return true;
     }
@@ -198,13 +201,13 @@ namespace Engine {
 
 
     /**********************************************************************************************//**
-     * \fn  UniquePtr<FrameGraph> GraphBuilder::compile()
+     * \fn  UniquePtr<Graph> GraphBuilder::compile()
      *
      * \brief Gets the compile
      *
-     * \return  An UniquePtr&lt;FrameGraph&gt;
+     * \return  An UniquePtr&lt;Graph&gt;
      **************************************************************************************************/
-    UniquePtr<FrameGraph>
+    UniquePtr<Graph>
       GraphBuilder::compile()
     {
       bool topologicalSortSuccessful = topologicalSort(graph()->m_passExecutionOrder);
@@ -223,17 +226,30 @@ namespace Engine {
 
       #endif
 
+      // Move out the current adjacency state to the frame graph, so that it can be used for further processing.
+      // It is no more needed at this point within the GraphBuilder.
+
+      std::stack<PassUID_t> order = graph()->m_passExecutionOrder;
+      while(!order.empty()) {
+        PassUID_t uid = order.top();
+        if(uid > 0)
+          graph()->addPass(m_passes.at(uid));
+        order.pop();
+      }
+
+      graph()->m_passAdjacency = std::move(this->m_passAdjacency);
+
       return std::move(graph());
     }
 
     /**********************************************************************************************//**
-     * \fn  UniquePtr<FrameGraph>& GraphBuilder::graph()
+     * \fn  UniquePtr<Graph>& GraphBuilder::graph()
      *
      * \brief Gets the graph
      *
-     * \return  A reference to an UniquePtr&lt;FrameGraph&gt;
+     * \return  A reference to an UniquePtr&lt;Graph&gt;
      **************************************************************************************************/
-    UniquePtr<FrameGraph>&
+    UniquePtr<Graph>&
       GraphBuilder::graph()
     {
       return m_frameGraph;

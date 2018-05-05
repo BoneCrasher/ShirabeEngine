@@ -269,6 +269,8 @@ namespace Engine {
       return (isResourceRegistered(registry, resourceId) && registry.at(resourceId.resourceId).type == FrameGraphResourceType::TextureView);
     }
 
+    template <typename TUnderlyingID>
+    using AdjacencyListMap = std::map<TUnderlyingID, std::vector<TUnderlyingID>>;
   }
 }
 

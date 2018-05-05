@@ -25,32 +25,42 @@ namespace Engine {
     class PassBase
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
+      friend class FrameGraphGraphVizSerializer;
+
     public:
-      inline PassBase(PassUID_t const&passUID)
+      inline PassBase(
+        PassUID_t   const&passUID,
+        std::string const&passName)
         : m_passUID(passUID)
+        , m_passName(passName)
       {}
 
-      virtual bool execute(Ptr<IRenderContext>&) = 0;
+      virtual bool setup(PassBuilder&)           { return true; }
+      virtual bool execute(Ptr<IRenderContext>&) { return true; }
 
-      inline void acceptSerializer(Ptr<IFrameGraphSerializer>&s)
+      inline std::string const&passName() const { return m_passName; }
+      inline PassUID_t   const&passUID()  const { return m_passUID;  }
+
+      virtual inline
+        void acceptSerializer(Ptr<IFrameGraphSerializer> s)
       {
-        s->serializePass(GetNonDeletingSelfPtrType(this));
+        s->serializePass(*this);
       }
 
-      inline void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
+      virtual inline
+        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
       {
-        d->deserializePass(GetNonDeletingSelfPtrType(this));
+        d->deserializePass(*this);
       }
-
-      inline PassUID_t passUID() const { return m_passUID; }
 
     private:
-      PassUID_t m_passUID;
+      PassUID_t   m_passUID;
+      std::string m_passName;
     };
 
     DeclareSharedPointerType(PassBase);
     DeclareListType(Ptr<PassBase>, PassBase);
-    DeclareMapType(std::string, Ptr<PassBase>, Pass);
+    DeclareMapType(PassUID_t, Ptr<PassBase>, Pass);
 
     template <typename TPassData>
     class CallbackPass
@@ -62,6 +72,7 @@ namespace Engine {
 
       CallbackPass(
         PassUID_t       const&passId,
+        std::string     const&passName,
         SetupCallback_t     &&setupCb,
         ExecCallback_t      &&execCb);
 
@@ -80,9 +91,10 @@ namespace Engine {
     template <typename TPassData>
     CallbackPass<TPassData>::CallbackPass(
       PassUID_t       const&passUID,
+      std::string     const&passName,
       SetupCallback_t     &&setupCb,
       ExecCallback_t      &&execCb)
-      : PassBase(passUID)
+      : PassBase(passUID, passName)
       , setupCallback(setupCb)
       , execCallback(execCb)
       , m_passData()

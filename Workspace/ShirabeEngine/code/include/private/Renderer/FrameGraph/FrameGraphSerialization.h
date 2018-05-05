@@ -1,27 +1,38 @@
 #ifndef __SR_SHIRABE_FRAMEGRAPH_SERIALIZATION_H__
 #define __SR_SHIRABE_FRAMEGRAPH_SERIALIZATION_H__
 
+#include <sstream>
+
 #include "Core/EngineTypeHelper.h"
 
 #include "Serialization/JSONObjectSerializer.h"
+#include "Serialization/GraphVizDotSerializer.h"
+
+#include "Renderer/FrameGraph/FrameGraphData.h"
 
 namespace Engine {
   // Forward declarations in proper namespaces
   namespace FrameGraph {
+    class Graph;
     class PassBase;
+    class FrameGraphResource;
   }
 
   namespace Serialization {
-    using namespace FrameGraph;
-
+    using FrameGraph::Graph;
+    using FrameGraph::PassBase;
+    using FrameGraph::FrameGraphResource;
+    using FrameGraph::PassUID_t;
+    
     /**********************************************************************************************//**
      * \class IObjectSerializer
      *
      * \brief A value tree serializer.
      **************************************************************************************************/
     DeclareInterface(IFrameGraphSerializer);
-
-      virtual bool serializePass(Ptr<PassBase> const&) = 0;
+      virtual bool serializeFrameGraph(Graph const&) = 0;
+      virtual bool serializePass(PassBase const&) = 0;
+      virtual bool serializeFrameGraphResource(FrameGraphResource const&) = 0;
     
     DeclareInterfaceEnd(IFrameGraphSerializer);
 
@@ -31,8 +42,9 @@ namespace Engine {
      * \brief A value tree deserializer.
      **************************************************************************************************/
     DeclareInterface(IFrameGraphDeserializer);
-
-      virtual bool deserializePass(Ptr<PassBase> &) = 0;
+      virtual bool deserializeFrameGraph(Graph &) = 0;
+      virtual bool deserializePass(PassBase &) = 0;
+      virtual bool deserializeFrameGraphResource(FrameGraphResource &) = 0;
 
     DeclareInterfaceEnd(IFrameGraphSerializer);
 
@@ -41,12 +53,33 @@ namespace Engine {
      *
      * \brief A frame graph JSON serializer.
      **************************************************************************************************/
-    class FrameGraphJSONSerializer
-      : public JSONObjectSerializer<IFrameGraphSerializer, IFrameGraphDeserializer>
+    class SHIRABE_TEST_EXPORT FrameGraphGraphVizSerializer
+      : public Serializer<GraphVizDotOutputTag_t, IFrameGraphSerializer, IFrameGraphDeserializer>
+      , public ISerializationResult
     {
-      bool serializePass(Ptr<PassBase> const&);
+    public:
+      bool initialize();
+      bool deinitialize();
 
-      bool deserializePass(Ptr<PassBase> &);
+      bool serializeFrameGraph(Graph const&);
+      bool serializePass(PassBase const&);
+      bool serializeFrameGraphResource(FrameGraphResource const&);
+      
+      bool deserializeFrameGraph(Graph &);
+      bool deserializePass(PassBase &);
+      bool deserializeFrameGraphResource(FrameGraphResource &);
+
+      bool writeToFile(std::string const&filename);
+
+      std::string serializeResultToString();
+
+    private:
+      void beginGraph();
+      void endGraph();
+      void writePass(PassBase const&pass);
+      void writePassEdge(PassUID_t const&source, PassUID_t const&target);
+
+      std::stringstream m_stream;
     };
   }
 }

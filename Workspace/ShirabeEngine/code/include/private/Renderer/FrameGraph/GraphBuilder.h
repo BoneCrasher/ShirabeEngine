@@ -30,11 +30,7 @@ namespace Engine {
      **************************************************************************************************/
     class SHIRABE_TEST_EXPORT GraphBuilder {
       DeclareLogTag(GraphBuilder);
-
-      template <typename TUnderlyingID>
-      using AdjacencyListMap = std::map<TUnderlyingID, std::vector<TUnderlyingID>>;
-
-
+      
     public:
       GraphBuilder();
       ~GraphBuilder() = default;
@@ -58,7 +54,7 @@ namespace Engine {
           std::string       const&readableName,
           FrameGraphTexture const&texture);
 
-      UniquePtr<FrameGraph>
+      UniquePtr<Graph>
         compile();
 
       FrameGraphTexture     const&getTextureData(FrameGraphResource const&resource) const;
@@ -67,7 +63,7 @@ namespace Engine {
     private:
       FrameGraphResourceId_t generatePassUID();
 
-      UniquePtr<FrameGraph>& graph();
+      UniquePtr<Graph>& graph();
 
       FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 
@@ -86,12 +82,14 @@ namespace Engine {
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceUIDGenerator;
 
       Map<std::string, PublicResourceId_t> m_importedResources;
-      FrameGraphResourceMap                m_resources;
+
+      PassMap               m_passes;
+      FrameGraphResourceMap m_resources;
 
       AdjacencyListMap<FrameGraphResourceId_t> m_resourceAdjacency;
       AdjacencyListMap<PassUID_t>              m_passAdjacency;
 
-      UniquePtr<FrameGraph> m_frameGraph;
+      UniquePtr<Graph> m_frameGraph;
 
     };
 
@@ -120,7 +118,7 @@ namespace Engine {
         PassUID_t uid = generatePassUID();
 
         Ptr<TPass>
-          pass = MakeSharedPointerType<TPass>(uid, std::forward<TPassCreationArgs>(args)...);
+          pass = MakeSharedPointerType<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
         if(!pass)
           return nullptr;
 
@@ -137,6 +135,8 @@ namespace Engine {
           return nullptr;
         }
 
+        m_passes[pass->passUID()] = pass;
+
         //
         // IMPORTANT: Perform implicit collection at this point in order to provide
         //            any subsequent pass spawn and setup to access already available
@@ -148,11 +148,11 @@ namespace Engine {
         }
 
         // Passes are added to the graph on compilation!!! Move there once the environment is setup.
-        //if!(graph()->addPass(name, std::static_pointer_cast<PassBase>(pass))) {
+        // if!(graph()->addPass(name, std::static_pointer_cast<PassBase>(pass))) {
         //  // TODO: Log
         //  pass = nullptr;
         //  return nullptr;
-        //}
+        // }
 
         // Read out the PassLinker state filled in by "setup(...)" and properly merge it with 
         // the current graph builder state.        

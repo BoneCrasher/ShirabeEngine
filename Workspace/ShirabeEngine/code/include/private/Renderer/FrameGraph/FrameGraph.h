@@ -9,32 +9,48 @@
 #include "Log/Log.h"
 #include "Resources/Core/ResourceDTO.h"
 
+#include "Renderer/FrameGraph/FrameGraphSerialization.h"
 #include "Renderer/FrameGraph/Pass.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
 
 namespace Engine {
   namespace FrameGraph {
 
-    class SHIRABE_TEST_EXPORT FrameGraph {
-      DeclareLogTag(FrameGraph);
+    class SHIRABE_TEST_EXPORT Graph
+      : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
+    {
+      DeclareLogTag(Graph);
 
       friend class GraphBuilder;
+      friend class Serialization::FrameGraphGraphVizSerializer;
 
     public:
-      FrameGraph()  = default;
-      ~FrameGraph() = default;
+      Graph()  = default;
+      ~Graph() = default;
 
       bool
         execute();
 
+      virtual inline
+        void acceptSerializer(Ptr<IFrameGraphSerializer> s)
+      {
+        s->serializeFrameGraph(*this);
+      }
+
+      virtual inline
+        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
+      {
+        d->deserializeFrameGraph(*this);
+      }
+
     private:
       PassMap &passes();
 
-      bool addPass(std::string const&, Ptr<PassBase> const&);
+      bool addPass(Ptr<PassBase> const&);
 
-      PassMap m_passes;
-
-      std::stack<PassUID_t> m_passExecutionOrder;
+      PassMap                     m_passes;
+      AdjacencyListMap<PassUID_t> m_passAdjacency;
+      std::stack<PassUID_t>       m_passExecutionOrder;
     };
 
   }

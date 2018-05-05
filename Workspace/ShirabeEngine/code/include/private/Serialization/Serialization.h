@@ -24,14 +24,26 @@ namespace Engine {
     };
 
     template <
-      typename TInterfaceSerialization,
-      typename TInterfaceDeserialization>
-    DeclareTemplatedInterface(ISerializable, Template(ISerializable<TInterfaceSerialization, TInterfaceDeserialization>));
+      typename IInterfaceSerialization,
+      typename IInterfaceDeserialization
+    >
+      DeclareTemplatedInterface(ISerializable, Template(ISerializable<IInterfaceSerialization, IInterfaceDeserialization>));
 
-        virtual void acceptSerializer(Ptr<TInterfaceSerialization>&)           = 0;
-        virtual void acceptDeserializer(Ptr<TInterfaceDeserialization> const&) = 0;
+    virtual void acceptSerializer(Ptr<IInterfaceSerialization>)            = 0;
+    virtual void acceptDeserializer(Ptr<IInterfaceDeserialization> const&) = 0;
 
     DeclareInterfaceEnd(ISerializable);
+
+    template <
+      typename OutputTag_t,
+      typename IInterfaceSerialization,
+      typename IInterfaceDeserialization
+    >
+      class Serializer
+    {
+    public:
+      virtual bool writeToFile(std::string const&) = 0;
+    };
 
   }
 }

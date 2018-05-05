@@ -4,9 +4,9 @@ namespace Engine {
   namespace FrameGraph {
 
     bool
-      FrameGraph::execute()
+      Graph::execute()
     {
-      // static_assert(false, LOG_FUNCTION( FrameGraph::execute() :  Not implemented (FrameGraph.h Line __LINE__) ));
+      // static_assert(false, LOG_FUNCTION( Graph::execute() :  Not implemented (Graph.h Line __LINE__) ));
       Log::Verbose(logTag(), "Executing passes in order:");
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
@@ -18,18 +18,18 @@ namespace Engine {
     }
 
     PassMap&
-      FrameGraph::passes()
+      Graph::passes()
     {
       return m_passes;
     }
 
     bool 
-      FrameGraph::addPass(std::string const&name, Ptr<PassBase> const&pass)
+      Graph::addPass(Ptr<PassBase> const&pass)
     {
-      if(m_passes.find(name) != m_passes.end())
+      if(m_passes.find(pass->passUID()) != m_passes.end())
         return false;
 
-      m_passes[name] = pass;
+      m_passes[pass->passUID()] = pass;
 
       return true;
     }

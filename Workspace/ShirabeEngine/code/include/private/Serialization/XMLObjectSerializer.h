@@ -6,6 +6,8 @@
 namespace Engine {
   namespace Serialization {
 
+    struct XMLOutputTag_t {};
+
     /**********************************************************************************************//**
      * \class XMLObjectSerializer
      *
@@ -15,11 +17,11 @@ namespace Engine {
      * \tparam  TInterfaceDeserializer  Type of the interface deserializer.
      **************************************************************************************************/
     template <
-      typename TInterfaceSerializer,
-      typename TInterfaceDeserializer>
-    class XMLObjectSerializer
-      : public TInterfaceSerializer
-      , public TInterfaceDeserializer
+      typename IInterfaceSerializer,
+      typename IInterfaceDeserializer>
+    class Serializer<XMLOutputTag_t, IInterfaceSerializer, IInterfaceDeserializer>
+      : public IInterfaceSerializer
+      , public IInterfaceDeserializer
       , public ISerializationResult
     {
     public:
