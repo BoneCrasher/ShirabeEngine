@@ -24,7 +24,7 @@ namespace Engine {
       };
 
       auto pass = graphBuilder.spawnPass<CallbackPass<PassData>>(
-        "GBufferGeneration",
+        "LightAccumulation",
         [&] (PassBuilder&builder, PassData&passData) -> bool
       {
         FrameGraphTexture gbufferTexture = graphBuilder.getTextureData(gbuffer0);
