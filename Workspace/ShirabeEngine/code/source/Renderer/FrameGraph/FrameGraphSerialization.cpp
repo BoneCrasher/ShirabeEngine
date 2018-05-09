@@ -43,13 +43,15 @@ namespace Engine {
 
           return (resources.at(id).type == type);
         });
+
+        return output;
       };
 
       beginGraph();
 
       AdjacencyListMap<PassUID_t>
         const&passAdjacency = graph.m_passAdjacency;
-      AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> 
+      AdjacencyListMap<PassUID_t, FrameGraphResourceId_t>
         const&passResourcesAdj = graph.m_passToResourceAdjacency;
 
       std::stack<PassUID_t>
@@ -72,32 +74,29 @@ namespace Engine {
 
         // Write out the passes' resources
         if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end()) {
-          std::vector<FrameGraphResourceId_t> passResources = passResourcesAdj.at(sourceUID);
+          PublicResourceIdList const&passResources = passResourcesAdj.at(sourceUID);
           // Create
-          try {
             std::vector<FrameGraphResourceId_t> creations = filter(passResources, FrameGraphResourceType::Texture);
-            for(FrameGraphResourceId_t const&id : creations) {
-              FrameGraphResource const&resource = graph.m_resources.at(id);
-              FrameGraphTexture  const&texture  = std::get<FrameGraphTexture>(resource.data);
-              writeTextureResource(id, resource, texture);
-            }
+            if(!creations.empty())
+              for(FrameGraphResourceId_t const&id : creations) {
+                FrameGraphResource const&resource = graph.m_resources.at(id);
+                FrameGraphTexture  const&texture  = std::get<FrameGraphTexture>(resource.data);
+                writeTextureResource(id, resource, texture);
+              }
             // Read/Write
             std::vector<FrameGraphResourceId_t> views = filter(passResources, FrameGraphResourceType::TextureView);
-            for(FrameGraphResourceId_t const&id : views) {
-              FrameGraphResource    const&resource       = graph.m_resources.at(id);
-              FrameGraphResource    const&parentResource = graph.m_resources.at(resource.parentResource);
-              FrameGraphTextureView const&view           = std::get<FrameGraphTextureView>(resource.data);
-              writeTextureResourceView(id, parentResource, resource, view);
-            }
-          }
-          catch(std::bad_variant_access const&bva) {
-            Log::Error(logTag(), "Internal resource type error.");
-          }
+            if(!views.empty())
+              for(FrameGraphResourceId_t const&id : views) {
+                FrameGraphResource    const&resource       = graph.m_resources.at(id);
+                FrameGraphResource    const&parentResource = graph.m_resources.at(resource.parentResource);
+                FrameGraphTextureView const&view           = std::get<FrameGraphTextureView>(resource.data);
+                writeTextureResourceView(id, parentResource, resource, view);
+              }
         }
 
         passOrderCopy.pop();
       }
-      
+
       endGraph();
 
       return true;
@@ -169,7 +168,7 @@ namespace Engine {
       FrameGraphGraphVizSerializer::writePass(
         PassBase const&pass)
     {
-      m_stream << "  Pass-" << pass.passUID() << " [shape=polygon,sides=6,label=\"" << pass.passName() << "\"];\n";
+      m_stream << "  Pass" << pass.passUID() << " [shape=polygon,sides=6,fontsize=20,label=\"" << pass.passName() << "\"];\n";
     }
 
     void
@@ -177,17 +176,17 @@ namespace Engine {
         PassUID_t const&source,
         PassUID_t const&target)
     {
-      m_stream << " Pass-" << source << " -> " << "Pass-" << target << ";\n";
+      m_stream << " Pass" << source << " -> " << "Pass" << target << ";\n";
     }
 
-    void 
+    void
       FrameGraphGraphVizSerializer::writeTextureResource(
         FrameGraphResourceId_t const&id,
         FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture)
     {
-      m_stream << "  Texture-" << id << " [shape=box,label=\"" << resource.readableName << "\"]\n";
-      m_stream << "  Pass-" << resource.assignedPassUID << " -> Texture-" << id << " [style=dotted]\n";
+      m_stream << "  Texture" << id << " [shape=box,label=\"<<" << "" << ">>\n" << resource.readableName << "\"];\n";
+      m_stream << "  Pass" << resource.assignedPassUID << " -> Texture" << id << " [style=dotted];\n";
     }
 
     void
@@ -196,20 +195,40 @@ namespace Engine {
         FrameGraphResource     const&parentResource,
         FrameGraphResource     const&resource,
         FrameGraphTextureView  const&view)
-    {
-      if(parentResource.type == FrameGraphResourceType::Texture)
-        m_stream << "  Texture-";
-      else if(parentResource.type == FrameGraphResourceType::TextureView)
-        m_stream << "  TextureView-" << parentResource.resourceId << " -> " << "TextureView-" << id << ";\n";
-
-      m_stream << parentResource.resourceId << " -> " << "TextureView-" << id;
+    {      
+      bool parentResourceIsTexture     = (parentResource.type == FrameGraphResourceType::Texture);
+      bool parentResourceIsTextureView = (parentResource.type == FrameGraphResourceType::TextureView);
+      bool viewIsReadMode              = view.mode.check(FrameGraphViewAccessMode::Read);
+      bool viewIsWriteMode             = view.mode.check(FrameGraphViewAccessMode::Write);
+      bool passTransition              = (parentResource.assignedPassUID != resource.assignedPassUID);
       
-      if(view.mode.check(FrameGraphViewAccessMode::Read))
-        m_stream << " [label=\"<<read>>\"]";
-      else if(view.mode.check(FrameGraphViewAccessMode::Write))
-        m_stream << " [label=\"<<write>>\"]";
+      if(viewIsReadMode && passTransition) {
+        m_stream << "TextureView" << id << " -> " << "Pass" << resource.assignedPassUID << " [style=dashed];\n";
+      } else 
+        m_stream << "Pass" << resource.assignedPassUID << " -> " << "TextureView" << id << " [style=dashed];\n";
 
-      m_stream << ";";
+      std::string lhs = "";
+      if(parentResourceIsTexture)
+        lhs = String::format("Texture%0", parentResource.resourceId);
+      else if(parentResourceIsTextureView)
+        lhs = String::format("TextureView%0", parentResource.resourceId);
+
+      bool lhsFirst = true;
+      std::string mode = "";
+      if(viewIsReadMode) {
+        mode     = "read";
+        lhsFirst = (parentResource.type == FrameGraphResourceType::TextureView);
+      }
+      else if(viewIsWriteMode) {
+        mode     = "write";
+        lhsFirst = (parentResource.type != FrameGraphResourceType::TextureView);
+      }
+
+      m_stream << "TextureView" << id << " [label=\"<<" << mode << ">>\n" << resource.readableName << "\"];\n";
+      if(lhsFirst)         
+        m_stream << lhs << " -> " << "TextureView" << id << "[shape=polygon,sides=4,skew=3,style=dotted];\n";
+      else
+        m_stream << "TextureView" << id << " -> " << lhs << "[shape=polygon,sides=4,skew=3,style=dotted];\n";
     }
 
   }

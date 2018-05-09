@@ -360,6 +360,10 @@ namespace Engine {
           case FrameGraphResourceType::Imported:
             break;
           case FrameGraphResourceType::Texture:
+            // And map the resources to it's pass appropriately
+            if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_passToResourceAdjacency[r.assignedPassUID], r.resourceId)) {
+              m_passToResourceAdjacency[r.assignedPassUID].push_back(r.resourceId);
+            }
             break;
           case FrameGraphResourceType::Buffer:
             break;
