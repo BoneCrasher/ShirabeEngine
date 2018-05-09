@@ -7,7 +7,7 @@ namespace Engine {
   namespace Serialization {
     using namespace Engine::FrameGraph;
 
-    bool 
+    bool
       FrameGraphGraphVizSerializer::initialize()
     {
       return true;
@@ -21,32 +21,83 @@ namespace Engine {
     }
 
     bool
-      FrameGraphGraphVizSerializer::serializeFrameGraph(Graph const&graph)
+      FrameGraphGraphVizSerializer::serializeGraph(Graph const&graph)
     {
+      std::function<std::vector<FrameGraphResourceId_t>(std::vector<FrameGraphResourceId_t> const&, FrameGraphResourceType const&)> filter =
+        [&] (std::vector<FrameGraphResourceId_t> const&ids, FrameGraphResourceType const&type) -> std::vector<FrameGraphResourceId_t>
+      {
+        std::vector<FrameGraphResourceId_t> output {};
+        if(ids.empty())
+          return output;
+
+        FrameGraphResourceMap const&resources = graph.m_resources;
+
+        std::copy_if(
+          ids.begin(),
+          ids.end(),
+          std::back_inserter(output),
+          [&] (FrameGraphResourceId_t const&id) -> bool
+        {
+          if(resources.find(id) == resources.end())
+            return false;
+
+          return (resources.at(id).type == type);
+        });
+      };
+
       beginGraph();
 
-      std::stack<PassUID_t>
-        orderCopy = graph.m_passExecutionOrder;
       AdjacencyListMap<PassUID_t>
-        const&adjacency = graph.m_passAdjacency;
+        const&passAdjacency = graph.m_passAdjacency;
+      AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> 
+        const&passResourcesAdj = graph.m_passToResourceAdjacency;
 
-      while(!orderCopy.empty()) {
-        PassUID_t sourceUID  = orderCopy.top();
+      std::stack<PassUID_t>
+        passOrderCopy = graph.m_passExecutionOrder;
+
+      while(!passOrderCopy.empty()) {
+        // Write all passes and their connections
+        PassUID_t sourceUID  = passOrderCopy.top();
         if(sourceUID > 0) {
           Ptr<PassBase> sourcePass = graph.m_passes.at(sourceUID);
 
-          writePass(*sourcePass);
+          sourcePass->acceptSerializer(GetNonDeletingSelfPtrType(this));
 
-          if(adjacency.find(sourceUID) != adjacency.end()) {
-            for(PassUID_t const&targetUID : adjacency.at(sourceUID)) {
+          if(passAdjacency.find(sourceUID) != passAdjacency.end()) {
+            for(PassUID_t const&targetUID : passAdjacency.at(sourceUID)) {
               writePassEdge(sourceUID, targetUID);
             }
           }
         }
 
-        orderCopy.pop();
-      }
+        // Write out the passes' resources
+        if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end()) {
+          std::vector<FrameGraphResourceId_t> passResources = passResourcesAdj.at(sourceUID);
+          // Create
+          try {
+            std::vector<FrameGraphResourceId_t> creations = filter(passResources, FrameGraphResourceType::Texture);
+            for(FrameGraphResourceId_t const&id : creations) {
+              FrameGraphResource const&resource = graph.m_resources.at(id);
+              FrameGraphTexture  const&texture  = std::get<FrameGraphTexture>(resource.data);
+              writeTextureResource(id, resource, texture);
+            }
+            // Read/Write
+            std::vector<FrameGraphResourceId_t> views = filter(passResources, FrameGraphResourceType::TextureView);
+            for(FrameGraphResourceId_t const&id : views) {
+              FrameGraphResource    const&resource       = graph.m_resources.at(id);
+              FrameGraphResource    const&parentResource = graph.m_resources.at(resource.parentResource);
+              FrameGraphTextureView const&view           = std::get<FrameGraphTextureView>(resource.data);
+              writeTextureResourceView(id, parentResource, resource, view);
+            }
+          }
+          catch(std::bad_variant_access const&bva) {
+            Log::Error(logTag(), "Internal resource type error.");
+          }
+        }
 
+        passOrderCopy.pop();
+      }
+      
       endGraph();
 
       return true;
@@ -55,17 +106,19 @@ namespace Engine {
     bool
       FrameGraphGraphVizSerializer::serializePass(PassBase const&pass)
     {
+      writePass(pass);
+
       return true;
     }
 
     bool
-      FrameGraphGraphVizSerializer::serializeFrameGraphResource(FrameGraphResource const&resource)
+      FrameGraphGraphVizSerializer::serializeResource(FrameGraphResource const&resource)
     {
       return true;
     }
 
     bool
-      FrameGraphGraphVizSerializer::deserializeFrameGraph(Graph &graph)
+      FrameGraphGraphVizSerializer::deserializeGraph(Graph &graph)
     {
       return true;
     }
@@ -77,12 +130,12 @@ namespace Engine {
     }
 
     bool
-      FrameGraphGraphVizSerializer::deserializeFrameGraphResource(FrameGraphResource &resource)
+      FrameGraphGraphVizSerializer::deserializeResource(FrameGraphResource &resource)
     {
       return true;
     }
 
-    bool 
+    bool
       FrameGraphGraphVizSerializer::writeToFile(
         std::string const&filename)
     {
@@ -98,7 +151,7 @@ namespace Engine {
       }
     }
 
-    std::string 
+    std::string
       FrameGraphGraphVizSerializer::serializeResultToString()
     {
       return m_stream.str();
@@ -116,7 +169,7 @@ namespace Engine {
       FrameGraphGraphVizSerializer::writePass(
         PassBase const&pass)
     {
-      m_stream << pass.passUID() << " [shape=box,label=\"" << pass.passName() << "\"];\n";
+      m_stream << "  Pass-" << pass.passUID() << " [shape=polygon,sides=6,label=\"" << pass.passName() << "\"];\n";
     }
 
     void
@@ -124,9 +177,40 @@ namespace Engine {
         PassUID_t const&source,
         PassUID_t const&target)
     {
-      m_stream << source << " -> " << target << ";\n";
+      m_stream << " Pass-" << source << " -> " << "Pass-" << target << ";\n";
     }
 
+    void 
+      FrameGraphGraphVizSerializer::writeTextureResource(
+        FrameGraphResourceId_t const&id,
+        FrameGraphResource     const&resource,
+        FrameGraphTexture      const&texture)
+    {
+      m_stream << "  Texture-" << id << " [shape=box,label=\"" << resource.readableName << "\"]\n";
+      m_stream << "  Pass-" << resource.assignedPassUID << " -> Texture-" << id << " [style=dotted]\n";
+    }
+
+    void
+      FrameGraphGraphVizSerializer::writeTextureResourceView(
+        FrameGraphResourceId_t const&id,
+        FrameGraphResource     const&parentResource,
+        FrameGraphResource     const&resource,
+        FrameGraphTextureView  const&view)
+    {
+      if(parentResource.type == FrameGraphResourceType::Texture)
+        m_stream << "  Texture-";
+      else if(parentResource.type == FrameGraphResourceType::TextureView)
+        m_stream << "  TextureView-" << parentResource.resourceId << " -> " << "TextureView-" << id << ";\n";
+
+      m_stream << parentResource.resourceId << " -> " << "TextureView-" << id;
+      
+      if(view.mode.check(FrameGraphViewAccessMode::Read))
+        m_stream << " [label=\"<<read>>\"]";
+      else if(view.mode.check(FrameGraphViewAccessMode::Write))
+        m_stream << " [label=\"<<write>>\"]";
+
+      m_stream << ";";
+    }
 
   }
 }

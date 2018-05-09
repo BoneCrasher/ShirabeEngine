@@ -513,14 +513,15 @@ endif()
 if(SHIRABE_LANGUAGE)
     set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_LANGUAGE})
 endif()
+
 #-----------------------------------------------------------------------------------------
 # Add custom INSTALL_~-task to allow "only build and install single target" instead of default "ALL"
 #-----------------------------------------------------------------------------------------
-ADD_CUSTOM_TARGET(INSTALL_${SHIRABE_MODULE_NAME}
+add_custom_target(INSTALL_${SHIRABE_MODULE_NAME}
 	${CMAKE_COMMAND}
 	-DBUILD_TYPE=${CMAKE_BUILD_TYPE}
 	-P ${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake)
-ADD_DEPENDENCIES(INSTALL_${SHIRABE_MODULE_NAME} ${SHIRABE_MODULE_NAME})
+add_dependencies(INSTALL_${SHIRABE_MODULE_NAME} ${SHIRABE_MODULE_NAME})
 #-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------

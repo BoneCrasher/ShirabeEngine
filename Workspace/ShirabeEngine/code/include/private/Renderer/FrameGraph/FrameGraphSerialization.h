@@ -2,8 +2,10 @@
 #define __SR_SHIRABE_FRAMEGRAPH_SERIALIZATION_H__
 
 #include <sstream>
+#include <optional>
 
 #include "Core/EngineTypeHelper.h"
+#include "Log/Log.h"
 
 #include "Serialization/JSONObjectSerializer.h"
 #include "Serialization/GraphVizDotSerializer.h"
@@ -23,6 +25,9 @@ namespace Engine {
     using FrameGraph::PassBase;
     using FrameGraph::FrameGraphResource;
     using FrameGraph::PassUID_t;
+    using FrameGraph::FrameGraphTexture;
+    using FrameGraph::FrameGraphTextureView;
+    using FrameGraph::FrameGraphResourceId_t;
     
     /**********************************************************************************************//**
      * \class IObjectSerializer
@@ -30,9 +35,9 @@ namespace Engine {
      * \brief A value tree serializer.
      **************************************************************************************************/
     DeclareInterface(IFrameGraphSerializer);
-      virtual bool serializeFrameGraph(Graph const&) = 0;
+      virtual bool serializeGraph(Graph const&) = 0;
       virtual bool serializePass(PassBase const&) = 0;
-      virtual bool serializeFrameGraphResource(FrameGraphResource const&) = 0;
+      virtual bool serializeResource(FrameGraphResource const&) = 0;
     
     DeclareInterfaceEnd(IFrameGraphSerializer);
 
@@ -42,9 +47,9 @@ namespace Engine {
      * \brief A value tree deserializer.
      **************************************************************************************************/
     DeclareInterface(IFrameGraphDeserializer);
-      virtual bool deserializeFrameGraph(Graph &) = 0;
+      virtual bool deserializeGraph(Graph &) = 0;
       virtual bool deserializePass(PassBase &) = 0;
-      virtual bool deserializeFrameGraphResource(FrameGraphResource &) = 0;
+      virtual bool deserializeResource(FrameGraphResource &) = 0;
 
     DeclareInterfaceEnd(IFrameGraphSerializer);
 
@@ -57,17 +62,19 @@ namespace Engine {
       : public Serializer<GraphVizDotOutputTag_t, IFrameGraphSerializer, IFrameGraphDeserializer>
       , public ISerializationResult
     {
+      DeclareLogTag(FrameGraphGraphVizSerializer);
+
     public:
       bool initialize();
       bool deinitialize();
 
-      bool serializeFrameGraph(Graph const&);
+      bool serializeGraph(Graph const&);
       bool serializePass(PassBase const&);
-      bool serializeFrameGraphResource(FrameGraphResource const&);
+      bool serializeResource(FrameGraphResource const&);
       
-      bool deserializeFrameGraph(Graph &);
+      bool deserializeGraph(Graph &);
       bool deserializePass(PassBase &);
-      bool deserializeFrameGraphResource(FrameGraphResource &);
+      bool deserializeResource(FrameGraphResource &);
 
       bool writeToFile(std::string const&filename);
 
@@ -78,6 +85,15 @@ namespace Engine {
       void endGraph();
       void writePass(PassBase const&pass);
       void writePassEdge(PassUID_t const&source, PassUID_t const&target);
+      void writeTextureResource(
+        FrameGraphResourceId_t const&id,
+        FrameGraphResource     const&resource,
+        FrameGraphTexture      const&texture);
+      void writeTextureResourceView(
+        FrameGraphResourceId_t const&id,
+        FrameGraphResource     const&parentResource,
+        FrameGraphResource     const&resource, 
+        FrameGraphTextureView const&view);
 
       std::stringstream m_stream;
     };

@@ -30,7 +30,7 @@ namespace Engine {
      **************************************************************************************************/
     class SHIRABE_TEST_EXPORT GraphBuilder {
       DeclareLogTag(GraphBuilder);
-      
+
     public:
       GraphBuilder();
       ~GraphBuilder() = default;
@@ -68,14 +68,16 @@ namespace Engine {
       FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 
       bool collectPass(PassBuilder&passBuilder);
-      bool topologicalSort(std::stack<PassUID_t>&outPassOrder);
+
+      template <typename TUID>
+      bool topologicalSort(std::stack<TUID>&outPassOrder);
       bool validate(std::stack<PassUID_t> const&passOrder);
       bool validateTextureView(FrameGraphTexture const&, FrameGraphTextureView const&);
       bool validateTextureUsage(FrameGraphTexture const&);
       bool validateTextureFormat(FrameGraphTexture const&, FrameGraphTextureView const&);
       bool validateTextureSubresourceAccess(FrameGraphTexture const&, FrameGraphTextureView const&);
       bool validateBufferView(FrameGraphBuffer const&, FrameGraphBufferView const&);
-      
+
       Ptr<ApplicationEnvironment> m_applicationEnvironment;
 
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_passUIDGenerator;
@@ -86,11 +88,11 @@ namespace Engine {
       PassMap               m_passes;
       FrameGraphResourceMap m_resources;
 
-      AdjacencyListMap<FrameGraphResourceId_t> m_resourceAdjacency;
-      AdjacencyListMap<PassUID_t>              m_passAdjacency;
+      AdjacencyListMap<FrameGraphResourceId_t>            m_resourceAdjacency;
+      AdjacencyListMap<PassUID_t>                         m_passAdjacency;
+      AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> m_passToResourceAdjacency;
 
       UniquePtr<Graph> m_frameGraph;
-
     };
 
     /**********************************************************************************************//**
@@ -166,6 +168,70 @@ namespace Engine {
       catch(...) {
         return nullptr;
       }
+    }
+
+
+    /**********************************************************************************************//**
+     * \fn  bool GraphBuilder::topologicalSort(std::stack<PassUID_t>&outPassOrder)
+     *
+     * \brief Topological sort
+     *
+     * \param [in,out]  outPassOrder  The out pass order.
+     *
+     * \return  True if it succeeds, false if it fails.
+     **************************************************************************************************/
+    template <typename TUID>
+    bool
+      GraphBuilder::topologicalSort(std::stack<TUID>&outPassOrder)
+    {
+      std::function<
+        void(
+          AdjacencyListMap<TUID> const&,
+          TUID const                  &,
+          std::map<TUID, bool>        &,
+          std::stack<TUID>            &)> DSFi;
+
+      DSFi = [&](
+        AdjacencyListMap<TUID> const&edges,
+        TUID const                  &v,
+        std::map<TUID, bool>        &visitedEdges,
+        std::stack<TUID>            &passOrder) -> void
+      {
+        if(visitedEdges[v])
+          return;
+
+        visitedEdges[v] = true;
+
+        // For each outgoing edge...
+        if(!(edges.find(v) == edges.end())) {
+          for(TUID const&adjacent : edges.at(v)) {
+            DSFi(edges, adjacent, visitedEdges, passOrder);
+          }
+        }
+
+        passOrder.push(v);
+      };
+
+      try {
+        std::map<TUID, bool> visitedEdges {};
+        for(typename AdjacencyListMap<TUID>::value_type &passAdjacency : m_passAdjacency) {
+          visitedEdges[passAdjacency.first] = false;
+        }
+
+        for(typename AdjacencyListMap<TUID>::value_type &passAdjacency : m_passAdjacency) {
+          DSFi(m_passAdjacency, passAdjacency.first, visitedEdges, outPassOrder);
+        }
+      }
+      catch(std::runtime_error const&rte) {
+        Log::Error(logTag(), String::format("Failed to perform topological sort: %0 ", rte.what()));
+        return false;
+      }
+      catch(...) {
+        Log::Error(logTag(), "Failed to perform topological sort. Unknown error.");
+        return false;
+      }
+
+      return true;
     }
 
 

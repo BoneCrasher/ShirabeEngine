@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.9)
 
-add_subdirectory(ShirabeEngine)
-add_subdirectory(Test)
+project(ShirabeDevelopment)
 
-add_dependencies(Test INSTALL_ShirabeEngine)
+add_subdirectory(ShirabeEngine)
+add_subdirectory(EngineTest)
+
+add_dependencies(EngineTest INSTALL_ShirabeEngine)
+        

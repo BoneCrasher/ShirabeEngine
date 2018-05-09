@@ -5,9 +5,10 @@
       "name": "x86-Debug",
       "generator": "Visual Studio 15 2017",
       "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x86" ],
       "buildRoot": "${projectDir}\\_build\\Win32\\Debug",
-      "cmakeCommandArgs": "",
       "installRoot": "${projectDir}\\_deploy\\Win32\\Debug",
+      "cmakeCommandArgs": "",
       "buildCommandArgs": "-m -v:diagnostic",
       "variables": [
         {
@@ -28,9 +29,10 @@
       "name": "x86-DebugTest",
       "generator": "Visual Studio 15 2017",
       "configurationType": "Debug",
-      "buildRoot": "${projectDir}\\_build\\Win32\\Debug",
-      "cmakeCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\_build\\Win32\\DebugTest",
       "installRoot": "${projectDir}\\_deploy\\Win32\\Debug",
+      "cmakeCommandArgs": "-v",
       "buildCommandArgs": "-m -v:diagnostic",
       "variables": [
         {
@@ -55,6 +57,7 @@
       "name": "x86-Release",
       "generator": "Visual Studio 15 2017",
       "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x86" ],
       "buildRoot": "${projectDir}\\_build\\Win32\\Release",
       "installRoot": "${projectDir}\\_deploy\\Win32\\Release",
       "cmakeCommandArgs": "",
@@ -66,7 +69,7 @@
         },
         {
           "name": "CMAKE_INSTALL_PREFIX",
-          "value": "${projectDir}\\_deploy\\Win32\\Debug"
+          "value": "${projectDir}\\_deploy\\Win32\\Release"
         },
         {
           "name": "SHIRABE_ADDRESSMODEL_64BIT_CFG",
@@ -78,7 +81,8 @@
       "name": "x86-ReleaseTest",
       "generator": "Visual Studio 15 2017",
       "configurationType": "Release",
-      "buildRoot": "${projectDir}\\_build\\Win32\\Release",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\_build\\Win32\\ReleaseTest",
       "installRoot": "${projectDir}\\_deploy\\Win32\\Release",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-m -v:diagnostic",
@@ -93,7 +97,7 @@
         },
         {
           "name": "CMAKE_INSTALL_PREFIX",
-          "value": "${projectDir}\\_deploy\\Win32\\Debug"
+          "value": "${projectDir}\\_deploy\\Win32\\Release"
         },
         {
           "name": "SHIRABE_ADDRESSMODEL_64BIT_CFG",
@@ -105,6 +109,7 @@
       "name": "x64-Debug",
       "generator": "Visual Studio 15 2017 Win64",
       "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64" ],
       "buildRoot": "${projectDir}\\_build\\Win64\\Debug",
       "installRoot": "${projectDir}\\_deploy\\Win64\\Debug",
       "cmakeCommandArgs": "",
@@ -128,7 +133,8 @@
       "name": "x64-DebugTest",
       "generator": "Visual Studio 15 2017 Win64",
       "configurationType": "Debug",
-      "buildRoot": "${projectDir}\\_build\\Win64\\Debug",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\_build\\Win64\\DebugTest",
       "installRoot": "${projectDir}\\_deploy\\Win64\\Debug",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-m -v:diagnostic",
@@ -155,6 +161,7 @@
       "name": "x64-Release",
       "generator": "Visual Studio 15 2017 Win64",
       "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x86" ],
       "buildRoot": "${projectDir}\\_build\\Win64\\Release",
       "installRoot": "${projectDir}\\_deploy\\Win64\\Release",
       "cmakeCommandArgs": "",
@@ -178,7 +185,8 @@
       "name": "x64-ReleaseTest",
       "generator": "Visual Studio 15 2017 Win64",
       "configurationType": "Release",
-      "buildRoot": "${projectDir}\\_build\\Win64\\Release",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\_build\\Win64\\ReleaseTest",
       "installRoot": "${projectDir}\\_deploy\\Win64\\Release",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-m -v:diagnostic",

@@ -25,22 +25,32 @@ namespace Engine {
       friend class Serialization::FrameGraphGraphVizSerializer;
 
     public:
-      Graph()  = default;
-      ~Graph() = default;
-
       bool
         execute();
 
       virtual inline
         void acceptSerializer(Ptr<IFrameGraphSerializer> s)
       {
-        s->serializeFrameGraph(*this);
+        s->serializeGraph(*this);
       }
 
       virtual inline
         void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
       {
-        d->deserializeFrameGraph(*this);
+        d->deserializeGraph(*this);
+      }
+
+      inline 
+        Graph& operator=(Graph const&other)
+      {
+        m_passes                  = other.m_passes;
+        m_passAdjacency           = other.m_passAdjacency;
+        m_passExecutionOrder      = other.m_passExecutionOrder;
+        m_resourceAdjacency       = other.m_resourceAdjacency;
+        m_resourceOrder           = other.m_resourceOrder;
+        m_passToResourceAdjacency = other.m_passToResourceAdjacency;
+
+        return (*this);
       }
 
     private:
@@ -51,6 +61,12 @@ namespace Engine {
       PassMap                     m_passes;
       AdjacencyListMap<PassUID_t> m_passAdjacency;
       std::stack<PassUID_t>       m_passExecutionOrder;
+
+      FrameGraphResourceMap                    m_resources;
+      AdjacencyListMap<FrameGraphResourceId_t> m_resourceAdjacency;
+      std::stack<FrameGraphResourceId_t>       m_resourceOrder;
+
+      AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> m_passToResourceAdjacency;
     };
 
   }

@@ -3,6 +3,13 @@
 namespace Engine {
   namespace FrameGraph {
 
+    template <typename TUID>
+    static std::function<bool(std::vector<TUID> const&, TUID const&)> alreadyRegisteredFn =
+      [] (std::vector<TUID> const&adjacency, TUID const&possiblyAdjacent)
+    {
+      return std::find(adjacency.begin(), adjacency.end(), possiblyAdjacent) != adjacency.end();
+    };
+
     class SequenceUIDGenerator
       : public IUIDGenerator<FrameGraphResourceId_t>
     {
@@ -210,9 +217,15 @@ namespace Engine {
     UniquePtr<Graph>
       GraphBuilder::compile()
     {
-      bool topologicalSortSuccessful = topologicalSort(graph()->m_passExecutionOrder);
-      if(!topologicalSortSuccessful) {
-        Log::Error(logTag(), "Failed to perform topologicalSort(...) on graph compilation.");
+      bool topologicalPassSortSuccessful = topologicalSort<PassUID_t>(graph()->m_passExecutionOrder);
+      if(!topologicalPassSortSuccessful) {
+        Log::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
+        return nullptr;
+      }
+
+      bool topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(graph()->m_resourceOrder);
+      if(!topologicalResourceSortSuccessful) {
+        Log::Error(logTag(), "Failed to perform topologicalSort(...) for resources on graph compilation.");
         return nullptr;
       }
 
@@ -237,7 +250,10 @@ namespace Engine {
         order.pop();
       }
 
-      graph()->m_passAdjacency = std::move(this->m_passAdjacency);
+      graph()->m_passAdjacency           = std::move(this->m_passAdjacency);
+      graph()->m_resources               = std::move(this->m_resources);
+      graph()->m_resourceAdjacency       = std::move(this->m_resourceAdjacency);
+      graph()->m_passToResourceAdjacency = std::move(this->m_passToResourceAdjacency);
 
       return std::move(graph());
     }
@@ -326,12 +342,6 @@ namespace Engine {
     bool
       GraphBuilder::collectPass(PassBuilder&passBuilder)
     {
-      std::function<bool(std::vector<PassUID_t> const&, PassUID_t const&)> alreadyRegisteredFn;
-      alreadyRegisteredFn =
-        [] (std::vector<PassUID_t> const&adjacency, PassUID_t const&possiblyAdjacent)
-      {
-        return std::find(adjacency.begin(), adjacency.end(), possiblyAdjacent) != adjacency.end();
-      };
 
       FrameGraphResourceMap &resources = passBuilder.m_resources;
       m_resources.insert(resources.begin(), resources.end());
@@ -357,16 +367,27 @@ namespace Engine {
         }
         // For each derived resource (views)
         else {
-          FrameGraphResource const&parentResource = m_resources.at(r.parentResource);
           // Avoid internal references for passes!
+          // If the edge from pass k to pass k+1 was not added yet.
+          // Create edge: Parent-->Source
+          FrameGraphResource const&parentResource = m_resources.at(r.parentResource);
           if(parentResource.assignedPassUID != r.assignedPassUID) {
-            // If the edge is not added yet.
-            if(!alreadyRegisteredFn(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
-              // Create edge: Parent-->Source
+            if(!alreadyRegisteredFn<PassUID_t>(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
               m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
             }
           }
+          
+          // Do the same for the resources!
+          if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_resourceAdjacency[parentResource.resourceId], r.resourceId)) {
+            m_resourceAdjacency[parentResource.resourceId].push_back(r.resourceId);
+          }
 
+          // And map the resources to it's pass appropriately
+          if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_passToResourceAdjacency[r.assignedPassUID], r.resourceId)) {
+            m_passToResourceAdjacency[r.assignedPassUID].push_back(r.resourceId);
+          }
+
+          // Further adjustments
           FrameGraphResourceId_t  subjacentResourceId = findSubjacentResource(m_resources, r);
           FrameGraphResource     &subjacentResource   = m_resources[subjacentResourceId];
 
@@ -394,6 +415,7 @@ namespace Engine {
         }
       }
 
+#ifdef SHIRABE_DEBUG
       Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", passBuilder.assignedPassUID()));
       for(AdjacencyListMap<PassUID_t>::value_type const&pa : m_passAdjacency) {
         Log::Verbose(logTag(), String::format("  Pass-UID: %0", pa.first));
@@ -401,71 +423,11 @@ namespace Engine {
           Log::Verbose(logTag(), String::format("    Adjacent Pass-UID: %0", puid));
         }
       }
+#endif
 
       return true;
     }
 
-    /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::topologicalSort(std::stack<PassUID_t>&outPassOrder)
-     *
-     * \brief Topological sort
-     *
-     * \param [in,out]  outPassOrder  The out pass order.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-    bool
-      GraphBuilder::topologicalSort(std::stack<PassUID_t>&outPassOrder)
-    {
-      std::function<
-        void(
-          AdjacencyListMap<PassUID_t> const&,
-          PassUID_t const                  &,
-          std::map<PassUID_t, bool>        &,
-          std::stack<PassUID_t>            &)> DSFi;
-
-      DSFi = [&](
-        AdjacencyListMap<PassUID_t> const&edges,
-        PassUID_t const                  &v,
-        std::map<PassUID_t, bool>        &visitedEdges,
-        std::stack<PassUID_t>            &passOrder) -> void
-      {
-        if(visitedEdges[v])
-          return;
-
-        visitedEdges[v] = true;
-
-        // For each outgoing edge...
-        if(!(edges.find(v) == edges.end())) {
-          for(PassUID_t const&adjacent : edges.at(v)) {
-            DSFi(edges, adjacent, visitedEdges, passOrder);
-          }
-        }
-
-        passOrder.push(v);
-      };
-
-      try {
-        std::map<PassUID_t, bool> visitedEdges{};
-        for(AdjacencyListMap<PassUID_t>::value_type &passAdjacency : m_passAdjacency) {
-          visitedEdges[passAdjacency.first] = false;
-        }
-
-        for(AdjacencyListMap<PassUID_t>::value_type &passAdjacency : m_passAdjacency) {
-          DSFi(m_passAdjacency, passAdjacency.first, visitedEdges, outPassOrder);
-        }
-      }
-      catch(std::runtime_error const&rte) {
-        Log::Error(logTag(), String::format("Failed to perform topological sort: %0 ", rte.what()));
-        return false;
-      }
-      catch(...) {
-        Log::Error(logTag(), "Failed to perform topological sort. Unknown error.");
-        return false;
-      }
-
-      return true;
-    }
 
     /**********************************************************************************************//**
      * \fn  bool GraphBuilder::validate(std::stack<PassUID_t> const&passOrder)
