@@ -1,4 +1,5 @@
 #include "Core/BasicTypes.h"
+#include "Core/String.h"
 
 namespace Engine {
 
@@ -55,5 +56,10 @@ namespace Engine {
       overlap = ((((int32_t)(other.offset + other.length)) - ((int32_t)offset)) > 0);
 
     return overlap;
+  }
+
+  template <>
+  std::string to_string<Range>(Range const&range) {
+    return String::format("[off:%0,len:%1]", range.offset, range.length);
   }
 }

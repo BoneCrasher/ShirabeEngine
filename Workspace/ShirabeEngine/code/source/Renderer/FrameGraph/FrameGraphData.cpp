@@ -3,63 +3,113 @@
 #include <string.h>
 
 namespace Engine {
-  namespace FrameGraph {
+  using namespace FrameGraph;
 
+  template <>
+  std::string to_string<FrameGraphResourceType>(FrameGraphResourceType const&type)
+  {
+    switch(type) {
+    default:
+    case FrameGraphResourceType::Undefined:   return "Undefined";
+    case FrameGraphResourceType::Texture:     return "Texture";
+    case FrameGraphResourceType::Buffer:      return "Buffer";
+    case FrameGraphResourceType::TextureView: return "TextureView";
+    case FrameGraphResourceType::BufferView:  return "BufferView";
+    }
+  }
+
+  template <>
+  std::string to_string<FrameGraphFormat>(FrameGraphFormat const&format)
+  {
+    switch(format) {
+    default:
+    case FrameGraphFormat::Undefined:                return "Undefined";
+    case FrameGraphFormat::Automatic:                return "Automatic";
+    case FrameGraphFormat::Structured:               return "Structured";
+    case FrameGraphFormat::R8_TYPELESS:              return "R8_TYPELESS";
+    case FrameGraphFormat::R8_SINT:                  return "R8_SINT";
+    case FrameGraphFormat::R8_UINT:                  return "R8_UINT";
+    case FrameGraphFormat::R8_SNORM:                 return "R8_SNORM";
+    case FrameGraphFormat::R8_UNORM:                 return "R8_UNORM";
+    case FrameGraphFormat::R8G8B8A8_TYPELESS:        return "R8G8B8A8_TYPELESS";
+    case FrameGraphFormat::R8G8B8A8_SINT:            return "R8G8B8A8_SINT";
+    case FrameGraphFormat::R8G8B8A8_UINT:            return "R8G8B8A8_UINT";
+    case FrameGraphFormat::R8G8B8A8_SNORM:           return "R8G8B8A8_SNORM";
+    case FrameGraphFormat::R8G8B8A8_UNORM:           return "R8G8B8A8_UNORM";
+    case FrameGraphFormat::R8G8B8A8_UNORM_SRGB:      return "R8G8B8A8_UNORM_SRGB";
+    case FrameGraphFormat::R8G8B8A8_FLOAT:           return "R8G8B8A8_FLOAT";
+    case FrameGraphFormat::R16_TYPELESS:             return "R16_TYPELESS";
+    case FrameGraphFormat::R16_SINT:                 return "R16_SINT";
+    case FrameGraphFormat::R16_UINT:                 return "R16_UINT";
+    case FrameGraphFormat::R16_SNORM:                return "R16_SNORM";
+    case FrameGraphFormat::R16_UNORM:                return "R16_UNORM";
+    case FrameGraphFormat::R16_FLOAT:                return "R16_FLOAT";
+    case FrameGraphFormat::R16G16B16A16_TYPELESS:    return "R16G16B16A16_TYPELESS";
+    case FrameGraphFormat::R16G16B16A16_SINT:        return "R16G16B16A16_SINT";
+    case FrameGraphFormat::R16G16B16A16_UINT:        return "R16G16B16A16_UINT";
+    case FrameGraphFormat::R16G16B16A16_SNORM:       return "R16G16B16A16_SNORM";
+    case FrameGraphFormat::R16G16B16A16_UNORM:       return "R16G16B16A16_UNORM";
+    case FrameGraphFormat::R16G16B16A16_FLOAT:       return "R16G16B16A16_FLOAT";
+    case FrameGraphFormat::R24_UNORM_X8_TYPELESS:    return "R24_UNORM_X8_TYPELESS";
+    case FrameGraphFormat::R32_TYPELESS:             return "R32_TYPELESS";
+    case FrameGraphFormat::R32_SINT:                 return "R32_SINT";
+    case FrameGraphFormat::R32_UINT:                 return "R32_UINT";
+    case FrameGraphFormat::R32_SNORM:                return "R32_SNORM";
+    case FrameGraphFormat::R32_UNORM:                return "R32_UNORM";
+    case FrameGraphFormat::R32_FLOAT:                return "R32_FLOAT";
+    case FrameGraphFormat::R32_FLOAT_S8X24_TYPELESS: return "R32_FLOAT_S8X24_TYPELESS";
+    case FrameGraphFormat::R32G32B32A32_TYPELESS:    return "R32G32B32A32_TYPELESS";
+    case FrameGraphFormat::R32G32B32A32_SINT:        return "R32G32B32A32_SINT";
+    case FrameGraphFormat::R32G32B32A32_UINT:        return "R32G32B32A32_UINT";
+    case FrameGraphFormat::D24_UNORM_S8_UINT:        return "D24_UNORM_S8_UINT";
+    case FrameGraphFormat::D32_FLOAT:                return "D32_FLOAT";
+    case FrameGraphFormat::D32_FLOAT_S8X24_UINT:     return "D32_FLOAT_S8X24_UINT";
+    }
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceUsage>(FrameGraph::FrameGraphResourceUsage const&usage) {
+    switch(usage) {
+    default:
+    case FrameGraphResourceUsage::Undefined:      return "Undefined";
+    case FrameGraphResourceUsage::BufferResource: return "BufferResource";
+    case FrameGraphResourceUsage::BufferTarget:   return "BufferTarget";
+    case FrameGraphResourceUsage::ImageResource:  return "ImageResource";
+    case FrameGraphResourceUsage::RenderTarget:   return "RenderTarget";
+    case FrameGraphResourceUsage::DepthTarget:    return "DepthTarget";
+    }
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphWriteTarget>(FrameGraph::FrameGraphWriteTarget const&target)
+  {
+    return "";
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceAccessibility>(FrameGraph::FrameGraphResourceAccessibility const&accessibility) { return ""; }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceInitState>(FrameGraph::FrameGraphResourceInitState const&state)
+  {
+    switch(state) {
+    default:
+    case FrameGraphResourceInitState::Undefined: return "Undefined";
+    case FrameGraphResourceInitState::Clear:     return "Clear";
+    }
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphViewAccessMode>(FrameGraph::FrameGraphViewAccessMode const&accessMode) { return ""; }
+
+  namespace FrameGraph {
     std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e) {
-      switch(e) {
-      case FrameGraphResourceType::Undefined:   strm << "FrameGraphResourceType::Undefined";   break;
-      case FrameGraphResourceType::Texture:     strm << "FrameGraphResourceType::Texture";     break;
-      case FrameGraphResourceType::Buffer:      strm << "FrameGraphResourceType::Buffer";      break;
-      case FrameGraphResourceType::TextureView: strm << "FrameGraphResourceType::TextureView"; break;
-      case FrameGraphResourceType::BufferView:  strm << "FrameGraphResourceType::BufferView";  break;
-      }
+      strm << to_string(e).c_str();
       return strm;
     }
 
     std::ostream& operator<<(std::ostream &strm, FrameGraphFormat const&e) {
-      switch(e) {
-      case FrameGraphFormat::Undefined:                strm << "FrameGraphFormat::Undefined";                break;
-      case FrameGraphFormat::Automatic:                strm << "FrameGraphFormat::Automatic";                break;
-      case FrameGraphFormat::Structured:               strm << "FrameGraphFormat::Structured";               break;
-      case FrameGraphFormat::R8_TYPELESS:              strm << "FrameGraphFormat::R8_TYPELESS";              break;
-      case FrameGraphFormat::R8_SINT:                  strm << "FrameGraphFormat::R8_SINT";                  break;
-      case FrameGraphFormat::R8_UINT:                  strm << "FrameGraphFormat::R8_UINT";                  break;
-      case FrameGraphFormat::R8_SNORM:                 strm << "FrameGraphFormat::R8_SNORM";                 break;
-      case FrameGraphFormat::R8_UNORM:                 strm << "FrameGraphFormat::R8_UNORM";                 break;
-      case FrameGraphFormat::R8G8B8A8_TYPELESS:        strm << "FrameGraphFormat::R8G8B8A8_TYPELESS";        break;
-      case FrameGraphFormat::R8G8B8A8_SINT:            strm << "FrameGraphFormat::R8G8B8A8_SINT";            break;
-      case FrameGraphFormat::R8G8B8A8_UINT:            strm << "FrameGraphFormat::R8G8B8A8_UINT";            break;
-      case FrameGraphFormat::R8G8B8A8_SNORM:           strm << "FrameGraphFormat::R8G8B8A8_SNORM";           break;
-      case FrameGraphFormat::R8G8B8A8_UNORM:           strm << "FrameGraphFormat::R8G8B8A8_UNORM";           break;
-      case FrameGraphFormat::R8G8B8A8_UNORM_SRGB:      strm << "FrameGraphFormat::R8G8B8A8_UNORM_SRGB";      break;
-      case FrameGraphFormat::R8G8B8A8_FLOAT:           strm << "FrameGraphFormat::R8G8B8A8_FLOAT";           break;
-      case FrameGraphFormat::R16_TYPELESS:             strm << "FrameGraphFormat::R16_TYPELESS";             break;
-      case FrameGraphFormat::R16_SINT:                 strm << "FrameGraphFormat::R16_SINT";                 break;
-      case FrameGraphFormat::R16_UINT:                 strm << "FrameGraphFormat::R16_UINT";                 break;
-      case FrameGraphFormat::R16_SNORM:                strm << "FrameGraphFormat::R16_SNORM";                break;
-      case FrameGraphFormat::R16_UNORM:                strm << "FrameGraphFormat::R16_UNORM";                break;
-      case FrameGraphFormat::R16_FLOAT:                strm << "FrameGraphFormat::R16_FLOAT";                break;
-      case FrameGraphFormat::R16G16B16A16_TYPELESS:    strm << "FrameGraphFormat::R16G16B16A16_TYPELESS";    break;
-      case FrameGraphFormat::R16G16B16A16_SINT:        strm << "FrameGraphFormat::R16G16B16A16_SINT";        break;
-      case FrameGraphFormat::R16G16B16A16_UINT:        strm << "FrameGraphFormat::R16G16B16A16_UINT";        break;
-      case FrameGraphFormat::R16G16B16A16_SNORM:       strm << "FrameGraphFormat::R16G16B16A16_SNORM";       break;
-      case FrameGraphFormat::R16G16B16A16_UNORM:       strm << "FrameGraphFormat::R16G16B16A16_UNORM";       break;
-      case FrameGraphFormat::R16G16B16A16_FLOAT:       strm << "FrameGraphFormat::R16G16B16A16_FLOAT";       break;
-      case FrameGraphFormat::R24_UNORM_X8_TYPELESS:    strm << "FrameGraphFormat::R24_UNORM_X8_TYPELESS";    break;
-      case FrameGraphFormat::R32_TYPELESS:             strm << "FrameGraphFormat::R32_TYPELESS";             break;
-      case FrameGraphFormat::R32_SINT:                 strm << "FrameGraphFormat::R32_SINT";                 break;
-      case FrameGraphFormat::R32_UINT:                 strm << "FrameGraphFormat::R32_UINT";                 break;
-      case FrameGraphFormat::R32_SNORM:                strm << "FrameGraphFormat::R32_SNORM";                break;
-      case FrameGraphFormat::R32_UNORM:                strm << "FrameGraphFormat::R32_UNORM";                break;
-      case FrameGraphFormat::R32_FLOAT:                strm << "FrameGraphFormat::R32_FLOAT";                break;
-      case FrameGraphFormat::R32_FLOAT_S8X24_TYPELESS: strm << "FrameGraphFormat::R32_FLOAT_S8X24_TYPELESS"; break;
-      case FrameGraphFormat::R32G32B32A32_TYPELESS:    strm << "FrameGraphFormat::R32G32B32A32_TYPELESS";    break;
-      case FrameGraphFormat::R32G32B32A32_SINT:        strm << "FrameGraphFormat::R32G32B32A32_SINT";        break;
-      case FrameGraphFormat::R32G32B32A32_UINT:        strm << "FrameGraphFormat::R32G32B32A32_UINT";        break;
-      case FrameGraphFormat::D24_UNORM_S8_UINT:        strm << "FrameGraphFormat::D24_UNORM_S8_UINT";        break;
-      case FrameGraphFormat::D32_FLOAT:                strm << "FrameGraphFormat::D32_FLOAT";                break;
-      case FrameGraphFormat::D32_FLOAT_S8X24_UINT:     strm << "FrameGraphFormat::D32_FLOAT_S8X24_UINT";     break;
-      }
+      strm << to_string(e).c_str();
       return strm;
     }
 
@@ -131,8 +181,9 @@ namespace Engine {
 
     FrameGraphResource::FrameGraphResource()
       : assignedPassUID(0)
-      , resourceId(FrameGraphResourceId_t{})
+      , resourceId(FrameGraphResourceId_t {})
       , parentResource(0)
+      , subjacentResource(0)
       , readableName("")
       , type(FrameGraphResourceType::Undefined)
       , data()

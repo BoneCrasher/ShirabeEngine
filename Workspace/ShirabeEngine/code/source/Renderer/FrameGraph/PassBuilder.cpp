@@ -94,12 +94,16 @@ namespace Engine {
         view.mode.set(FrameGraphViewAccessMode::Write);
 
         FrameGraphResource resource ={};
-        resource.assignedPassUID = m_passUID;
-        resource.resourceId      = m_resourceIdGenerator->generate();
-        resource.parentResource  = sourceResource.resourceId;
-        resource.readableName    = String::format("TextureView ID %0 - Write #%1", resource.resourceId, sourceResource.resourceId);
-        resource.type            = FrameGraphResourceType::TextureView;
-        resource.data            = view;
+        resource.assignedPassUID   = m_passUID;
+        resource.resourceId        = m_resourceIdGenerator->generate();
+        resource.parentResource    = sourceResource.resourceId;
+        resource.subjacentResource =
+          (sourceResource.type == FrameGraphResourceType::Texture
+            ? sourceResource.resourceId
+            : sourceResource.subjacentResource);
+        resource.readableName      = String::format("TextureView ID %0 - Write #%1", resource.resourceId, sourceResource.resourceId);
+        resource.type              = FrameGraphResourceType::TextureView;
+        resource.data              = view;
         
         m_resources[resource.resourceId] = resource;
 
@@ -156,12 +160,16 @@ namespace Engine {
         view.mode.set(FrameGraphViewAccessMode::Read);
 
         FrameGraphResource resource ={ };
-        resource.assignedPassUID = m_passUID;
-        resource.resourceId      = m_resourceIdGenerator->generate();
-        resource.parentResource  = sourceResource.resourceId;
-        resource.readableName    = String::format("TextureView ID %0 - Read #%1", resource.resourceId, sourceResource.resourceId);
-        resource.type            = FrameGraphResourceType::TextureView;
-        resource.data            = view;
+        resource.assignedPassUID   = m_passUID;
+        resource.resourceId        = m_resourceIdGenerator->generate();
+        resource.parentResource    = sourceResource.resourceId;
+        resource.subjacentResource = 
+          (sourceResource.type == FrameGraphResourceType::Texture
+            ? sourceResource.resourceId 
+            : sourceResource.subjacentResource);
+        resource.readableName      = String::format("TextureView ID %0 - Read #%1", resource.resourceId, sourceResource.resourceId);
+        resource.type              = FrameGraphResourceType::TextureView;
+        resource.data              = view;
         
         m_resources[resource.resourceId] = resource;
 

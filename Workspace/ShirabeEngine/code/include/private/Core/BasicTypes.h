@@ -53,6 +53,11 @@ namespace Engine {
       length;
   };
 
+  template <typename T>
+  std::string to_string(T const&input) { throw std::runtime_error("Unsupported type."); }
+
+  template <>
+  std::string to_string<Range>(Range const&range);
 }
 
 #endif

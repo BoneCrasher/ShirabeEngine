@@ -229,6 +229,8 @@ namespace Engine {
         resourceId;
       FrameGraphResourceId_t
         parentResource;
+      FrameGraphResourceId_t
+        subjacentResource;
       std::string
         readableName;
       FrameGraphResourceType
@@ -271,7 +273,34 @@ namespace Engine {
 
     template <typename TUnderlyingIDFrom, typename TUnderlyingIDTo = TUnderlyingIDFrom>
     using AdjacencyListMap = std::map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
+
   }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceType>(FrameGraph::FrameGraphResourceType const&type);
+  template <>
+  std::string to_string<FrameGraph::FrameGraphFormat>(FrameGraph::FrameGraphFormat const&format);
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceUsage>(FrameGraph::FrameGraphResourceUsage const&usage);
+  template <>
+  std::string to_string<FrameGraph::FrameGraphWriteTarget>(FrameGraph::FrameGraphWriteTarget const&target);
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceAccessibility>(FrameGraph::FrameGraphResourceAccessibility const&accessibility);
+  template <>
+  std::string to_string<FrameGraph::FrameGraphResourceInitState>(FrameGraph::FrameGraphResourceInitState const&state);
+  template <>
+  std::string to_string<FrameGraph::FrameGraphViewAccessMode>(FrameGraph::FrameGraphViewAccessMode const&accessMode);
+
+  /*FrameGraphBuffer
+    FrameGraphBufferView
+    FrameGraphTexture
+    FrameGraphTextureView
+    FrameGraphResourceFlags
+    FrameGraphReadTextureFlags
+    FrameGraphWriteTextureFlags
+    FrameGraphResource*/
+
+
 }
 
 #endif

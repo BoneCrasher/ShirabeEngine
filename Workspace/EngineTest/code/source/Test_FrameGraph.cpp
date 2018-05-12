@@ -101,6 +101,8 @@ namespace Test {
       serializer->deinitialize();
       serializer = nullptr;
     
+      system("makeGraphPNG.bat");
+
       // Renderer will call.
       if(frameGraph)
         frameGraph->execute();
