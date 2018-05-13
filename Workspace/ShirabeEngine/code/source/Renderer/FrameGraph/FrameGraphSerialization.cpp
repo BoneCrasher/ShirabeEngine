@@ -62,7 +62,7 @@ namespace Engine {
         PassUID_t sourceUID  = passOrderCopy.top();
         if(sourceUID > 0) {
           m_stream
-            << String::format("\n  subgraph cluster_pass%0 {\n", sourceUID);
+            << String::format("\n  subgraph pass%0 {\n", sourceUID);
 
           Ptr<PassBase> sourcePass = graph.m_passes.at(sourceUID);
           sourcePass->acceptSerializer(GetNonDeletingSelfPtrType(this));
@@ -189,7 +189,7 @@ namespace Engine {
       FrameGraphGraphVizSerializer::writePass(
         PassBase const&pass)
     {
-      static constexpr char const*passStyle = "shape=box,style=filled,color=\"lightsteelblue\",fontsize=20";
+      static constexpr char const*passStyle = "shape=box,style=filled,color=\"#429692\",fontsize=20";
       std::string passLabel = String::format("Pass #%0\n%1", pass.passUID(), pass.passName());
 
       m_stream << "    Pass" << pass.passUID() << " [" << passStyle << ",label=\"" << passLabel << "\"];\n";
@@ -213,7 +213,7 @@ namespace Engine {
       static constexpr char const*textureStyle = "shape=none";
       std::string textureLabel =
         String::format(
-          "<<table bgcolor=\"#DAA520\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"0\">"
+          "<<table bgcolor=\"#bca371\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">"
           "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"16\"><b>Texture #%0</b></font></td></tr>"
           "<tr><td align=\"left\">Name:</td><td align=\"left\">%1</td></tr>"
           "<tr><td align=\"left\">Sizes:</td><td align=\"left\">%2 x %3 x %4</td></tr>"
@@ -272,6 +272,7 @@ namespace Engine {
           "<tr><td align=\"left\">ArrayRange:</td><td align=\"left\">%5</td></tr>"
           "<tr><td align=\"left\">MipRange:</td><td align=\"left\">%6</td></tr>"
           "</table>>",
+          (viewIsReadMode ? "68a357" : "c97064"),
           resource.resourceId,
           resource.subjacentResource,
           (viewIsReadMode ? "Read" : "Write"),
