@@ -213,7 +213,7 @@ namespace Engine {
       static constexpr char const*textureStyle = "shape=none";
       std::string textureLabel =
         String::format(
-          "<<table bgcolor=\"#bca371\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">"
+          "<<table bgcolor=\"#bca371\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
           "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"16\"><b>Texture #%0</b></font></td></tr>"
           "<tr><td align=\"left\">Name:</td><td align=\"left\">%1</td></tr>"
           "<tr><td align=\"left\">Sizes:</td><td align=\"left\">%2 x %3 x %4</td></tr>"
@@ -264,7 +264,7 @@ namespace Engine {
       static constexpr char const*viewStyle = "shape=none";
       std::string viewLabel = 
         String::format(
-          "<<table bgcolor=\"#%0\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"0\">"
+          "<<table bgcolor=\"#%0\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
           "<tr><td colspan=\"2\"><font point-size=\"16\"><b>TextureView #%1</b></font></td></tr>"
           "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">%2</td></tr>"
           "<tr><td align=\"left\">Mode:</td><td align=\"left\">%3</td></tr>"
