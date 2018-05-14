@@ -4,6 +4,8 @@
 #include <GFXAPI/Types/All.h>
 
 #include <Resources/Core/IResourceManager.h>
+
+#include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
 #include <Renderer/FrameGraph/PassBuilder.h>
 #include <Renderer/FrameGraph/Modules/GBufferGeneration.h>
@@ -36,7 +38,7 @@ namespace Test {
       using namespace Engine::GFXAPI;
       using namespace Engine::FrameGraph;
 
-      // Ptr<IRenderContext> context = nullptr;
+      Ptr<IRenderContext> renderContext = nullptr;
 
       Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
       appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
@@ -105,7 +107,7 @@ namespace Test {
 
       // Renderer will call.
       if(frameGraph)
-        frameGraph->execute();
+        frameGraph->execute(renderContext);
 
       return true;
     }
