@@ -13,6 +13,8 @@
 #include "Core/BitField.h"
 #include "Core/BasicTypes.h"
 
+#include "Renderer/IRenderer.h"
+
 namespace Engine {
   namespace FrameGraph {
     using Core::BitField;
@@ -20,6 +22,8 @@ namespace Engine {
 
     using FrameGraphResourceId_t = uint64_t;
     using PassUID_t              = uint64_t;
+
+    DeclareListType(FrameGraphResourceId_t, FrameGraphResourceId);
 
     /**********************************************************************************************//**
      * \enum  FrameGraphResourceType
@@ -274,6 +278,17 @@ namespace Engine {
     template <typename TUnderlyingIDFrom, typename TUnderlyingIDTo = TUnderlyingIDFrom>
     using AdjacencyListMap = std::map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
+    class FrameGraphResources {
+    public:
+      FrameGraphTexture       const&getTexture(FrameGraphResource const&)     const;
+      FrameGraphTextureView   const&getTextureView(FrameGraphResource const&) const;
+      FrameGraphBuffer        const&getBuffer(FrameGraphResource const&)      const;
+      FrameGraphBuffer        const&getBufferView(FrameGraphResource const&)  const;
+      std::vector<Renderable> const&getRenderables(FrameGraphResource const&) const;
+
+    private:
+      FrameGraphResourceMap m_resources;
+    };
   }
 
   template <>
@@ -290,16 +305,6 @@ namespace Engine {
   std::string to_string<FrameGraph::FrameGraphResourceInitState>(FrameGraph::FrameGraphResourceInitState const&state);
   template <>
   std::string to_string<FrameGraph::FrameGraphViewAccessMode>(FrameGraph::FrameGraphViewAccessMode const&accessMode);
-
-  /*FrameGraphBuffer
-    FrameGraphBufferView
-    FrameGraphTexture
-    FrameGraphTextureView
-    FrameGraphResourceFlags
-    FrameGraphReadTextureFlags
-    FrameGraphWriteTextureFlags
-    FrameGraphResource*/
-
 
 }
 

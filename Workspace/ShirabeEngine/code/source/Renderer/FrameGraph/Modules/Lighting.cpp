@@ -1,8 +1,8 @@
 #include "Renderer/FrameGraph/Modules/Lighting.h"
 
 namespace Engine {
-	namespace FrameGraph {
-    
+  namespace FrameGraph {
+
     FrameGraphModule<LightingModuleTag_t>::LightingExportData
       FrameGraphModule<LightingModuleTag_t>::addLightingPass(
         GraphBuilder            &graphBuilder,
@@ -38,9 +38,9 @@ namespace Engine {
         lightAccBufferDesc.arraySize      = 1;
         lightAccBufferDesc.initialState   = FrameGraphResourceInitState::Clear;
         lightAccBufferDesc.permittedUsage = FrameGraphResourceUsage::ImageResource | FrameGraphResourceUsage::RenderTarget;
-        
+
         passData.state.lightAccumulationBufferTextureId = builder.createTexture("Light Accumulation Buffer", lightAccBufferDesc);
-                
+
         FrameGraphReadTextureFlags readFlags{ };
         readFlags.requiredFormat = FrameGraphFormat::Automatic;
 
@@ -57,13 +57,15 @@ namespace Engine {
 
         return true;
       },
-        [=] (Ptr<IRenderContext>&) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&context) -> bool
       {
+        Log::Verbose(logTag(), "Lighting");
+
         return true;
       });
 
       return pass->passData().exportData;
     }
 
-	}
+  }
 }

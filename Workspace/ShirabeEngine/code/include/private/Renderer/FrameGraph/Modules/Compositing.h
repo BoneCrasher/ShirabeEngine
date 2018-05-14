@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_FRAMEGRAPH_MODULE_COMPOSITING_H__
 #define __SHIRABE_FRAMEGRAPH_MODULE_COMPOSITING_H__
 
+#include "Log/Log.h"
+
 #include "Renderer/FrameGraph/GraphBuilder.h"
 #include "Renderer/FrameGraph/PassBuilder.h"
 #include "Renderer/FrameGraph/Modules/Module.h"
@@ -15,6 +17,7 @@ namespace Engine {
 
     template<>
     class SHIRABE_TEST_EXPORT FrameGraphModule<CompositingModuleTag_t> {
+      DeclareLogTag(FrameGraphModule<CompositingModuleTag_t>);
     public:
       struct ImportData {
         FrameGraphResource

@@ -12,11 +12,10 @@ namespace Engine {
     using namespace Platform;
     using namespace Engine::Resources;
 
-    DeclareInterface(IRenderable);
-    DeclareInterfaceEnd(IRenderable);
+    struct Renderable {};
 
     DeclareInterface(IRenderContext);
-      virtual EEngineStatus render(Ptr<IRenderable> const&) = 0;
+      virtual EEngineStatus render(Renderable const&) = 0;
     DeclareInterfaceEnd(IRenderContext);
 
     DeclareInterface(IRenderer);

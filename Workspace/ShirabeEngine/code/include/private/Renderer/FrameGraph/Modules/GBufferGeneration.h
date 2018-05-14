@@ -1,7 +1,9 @@
 #ifndef __SHIRABE_FRAMEGRAPH_MODULE_GBUFFERGENERATION_H__
 #define __SHIRABE_FRAMEGRAPH_MODULE_GBUFFERGENERATION_H__
 
-#include "Platform\Platform.h"
+#include "Platform/Platform.h"
+
+#include "Log/Log.h"
 
 #include "Renderer/FrameGraph/GraphBuilder.h"
 #include "Renderer/FrameGraph/PassBuilder.h"
@@ -17,6 +19,7 @@ namespace Engine {
 
     template<>
     class SHIRABE_TEST_EXPORT FrameGraphModule<GBufferModuleTag_t> {
+      DeclareLogTag(FrameGraphModule<GBufferModuleTag_t>);
     public:
       struct GBufferGenerationImportData {
         FrameGraphResource

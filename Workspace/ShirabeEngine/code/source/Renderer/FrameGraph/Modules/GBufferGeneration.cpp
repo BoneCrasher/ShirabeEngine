@@ -1,7 +1,7 @@
 #include "Renderer/FrameGraph/Modules/GBufferGeneration.h"
 
 namespace Engine {
-	namespace FrameGraph {
+  namespace FrameGraph {
 
     FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData
       FrameGraphModule<GBufferModuleTag_t>::addGBufferGenerationPass(
@@ -63,13 +63,23 @@ namespace Engine {
 
         return true;
       },
-        [=] (Ptr<IRenderContext>&) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&context) -> bool
       {
+        using namespace Engine::Renderer;
+
+        Log::Verbose(logTag(), "GBufferGeneration");
+
+        std::vector<Renderable> renderables = frameGraphResources.getRenderables(passData.importData.renderableQueryId);
+        for(Renderable const&renderable : renderables) {
+          EEngineStatus status = context->render(renderable);
+          HandleEngineStatusError(status, "Failed to render renderable.");
+        }
+
         return true;
       });
 
       return pass->passData().exportData;
     }
 
-	}
+  }
 }

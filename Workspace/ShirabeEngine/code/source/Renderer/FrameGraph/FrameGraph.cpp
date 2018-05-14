@@ -4,13 +4,21 @@ namespace Engine {
   namespace FrameGraph {
 
     bool
-      Graph::execute()
+      Graph::execute(Ptr<IRenderContext>&renderContext)
     {
-      // static_assert(false, LOG_FUNCTION( Graph::execute() :  Not implemented (Graph.h Line __LINE__) ));
-      Log::Verbose(logTag(), "Executing passes in order:");
+      assert(renderContext != nullptr);
+
+      FrameGraphResources resources(m_resources);
+
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
-        Log::Verbose(logTag(), String::format("  Pass %0", copy.top()));
+        PassUID_t     passUID = copy.top();
+        Ptr<PassBase> pass    = m_passes.at(passUID);
+
+        if(!pass->execute(resources, renderContext)) {
+          Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
+        }
+
         copy.pop();
       }
 

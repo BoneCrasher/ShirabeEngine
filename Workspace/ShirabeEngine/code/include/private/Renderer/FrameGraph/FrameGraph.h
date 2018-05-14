@@ -26,7 +26,7 @@ namespace Engine {
 
     public:
       bool
-        execute();
+        execute(Ptr<IRenderContext>&);
 
       virtual inline
         void acceptSerializer(Ptr<IFrameGraphSerializer> s)

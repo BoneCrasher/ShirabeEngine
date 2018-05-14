@@ -44,8 +44,10 @@ namespace Engine {
 
         return true;
       },
-        [=] (Ptr<IRenderContext>&) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&context) -> bool
       {
+        Log::Verbose(logTag(), "Compositing");
+
         return true;
       });
 

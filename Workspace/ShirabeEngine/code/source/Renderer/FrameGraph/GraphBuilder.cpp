@@ -14,12 +14,12 @@ namespace Engine {
       : public IUIDGenerator<FrameGraphResourceId_t>
     {
     public:
-      SequenceUIDGenerator()
-        : m_id(0)
+      SequenceUIDGenerator(FrameGraphResourceId_t const&initialID = 1)
+        : m_id(initialID)
       {};
 
       inline FrameGraphResourceId_t generate() {
-        return (++m_id);
+        return (m_id++);
       }
 
     private:
@@ -27,8 +27,8 @@ namespace Engine {
     };
 
     GraphBuilder::GraphBuilder()
-      : m_passUIDGenerator(std::make_shared<SequenceUIDGenerator>())
-      , m_resourceUIDGenerator(std::make_shared<SequenceUIDGenerator>())
+      : m_passUIDGenerator(std::make_shared<SequenceUIDGenerator>(0))
+      , m_resourceUIDGenerator(std::make_shared<SequenceUIDGenerator>(1))
       , m_frameGraph(nullptr)
       , m_importedResources()
     {
@@ -62,9 +62,12 @@ namespace Engine {
 
       graph() = MakeUniquePointerType<Graph>();
 
-      // Add dummy pass with UID#0
-      // m_passes[0] = spawnPass<PassBase>("Pre-Pass");
-
+      // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
+      spawnPass<CallbackPass<bool>>(
+        "Pseudo-Pass",
+        [] (PassBuilder const&, bool&)                                       -> bool { return true; },
+        [] (bool const&, FrameGraphResourceMap const&, Ptr<IRenderContext>&) -> bool { return true; });
+      
       return true;
     }
 
@@ -245,8 +248,7 @@ namespace Engine {
       std::stack<PassUID_t> order = graph()->m_passExecutionOrder;
       while(!order.empty()) {
         PassUID_t uid = order.top();
-        if(uid > 0)
-          graph()->addPass(m_passes.at(uid));
+        graph()->addPass(m_passes.at(uid));
         order.pop();
       }
 
@@ -342,7 +344,6 @@ namespace Engine {
     bool
       GraphBuilder::collectPass(PassBuilder&passBuilder)
     {
-
       FrameGraphResourceMap &resources = passBuilder.m_resources;
       m_resources.insert(resources.begin(), resources.end());
 
@@ -380,7 +381,7 @@ namespace Engine {
               m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
             }
           }
-          
+
           // Do the same for the resources!
           if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_resourceAdjacency[parentResource.resourceId], r.resourceId)) {
             m_resourceAdjacency[parentResource.resourceId].push_back(r.resourceId);
@@ -419,7 +420,7 @@ namespace Engine {
         }
       }
 
-#ifdef SHIRABE_DEBUG
+      #ifdef SHIRABE_DEBUG
       Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", passBuilder.assignedPassUID()));
       for(AdjacencyListMap<PassUID_t>::value_type const&pa : m_passAdjacency) {
         Log::Verbose(logTag(), String::format("  Pass-UID: %0", pa.first));
@@ -427,7 +428,7 @@ namespace Engine {
           Log::Verbose(logTag(), String::format("    Adjacent Pass-UID: %0", puid));
         }
       }
-#endif
+      #endif
 
       return true;
     }

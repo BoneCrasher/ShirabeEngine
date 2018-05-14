@@ -8,6 +8,7 @@
 #include "Core/EngineTypeHelper.h"
 #include "Platform/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceDTO.h"
+
 #include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
 
@@ -35,8 +36,8 @@ namespace Engine {
         , m_passName(passName)
       {}
 
-      virtual bool setup(PassBuilder&)           { return true; }
-      virtual bool execute(Ptr<IRenderContext>&) { return true; }
+      virtual bool setup(PassBuilder&) { return true; }
+      virtual bool execute(FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&) { return true; }
 
       inline std::string const&passName() const { return m_passName; }
       inline PassUID_t   const&passUID()  const { return m_passUID;  }
@@ -68,7 +69,7 @@ namespace Engine {
     {
     public:
       using SetupCallback_t = std::function<bool(PassBuilder&, TPassData&)>;
-      using ExecCallback_t  = std::function<bool(Ptr<IRenderContext>&)>;
+      using ExecCallback_t  = std::function<bool(TPassData const&, FrameGraphResources const&, Ptr<IRenderContext>&)>;
 
       CallbackPass(
         PassUID_t       const&passId,
@@ -77,7 +78,7 @@ namespace Engine {
         ExecCallback_t      &&execCb);
 
       bool setup(PassBuilder&builder);
-      bool execute(Ptr<IRenderContext>&);
+      bool execute(FrameGraphResources const&, Ptr<IRenderContext>&);
 
       TPassData const&passData() const { return m_passData; }
 
@@ -99,7 +100,6 @@ namespace Engine {
       , execCallback(execCb)
       , m_passData()
     {
-      assert(passUID > 0);
       assert(setupCb != nullptr);
       assert(execCb  != nullptr);
     }
@@ -119,10 +119,10 @@ namespace Engine {
 
     template <typename TPassData>
     bool
-      CallbackPass<TPassData>::execute(Ptr<IRenderContext>&context)
+      CallbackPass<TPassData>::execute(FrameGraphResources const&resources, Ptr<IRenderContext>&context)
     {
       if(execCallback)
-        return execCallback(context);
+        return execCallback(m_passData, resources, context);
 
       return false;
     }
