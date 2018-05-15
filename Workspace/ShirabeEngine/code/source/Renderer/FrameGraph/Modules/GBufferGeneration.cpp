@@ -5,7 +5,8 @@ namespace Engine {
 
     FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData
       FrameGraphModule<GBufferModuleTag_t>::addGBufferGenerationPass(
-        GraphBuilder &graphBuilder)
+        GraphBuilder            &graphBuilder,
+        FrameGraphResource const&renderableInput)
     {
       struct State {
         FrameGraphResource
@@ -59,7 +60,7 @@ namespace Engine {
         passData.exportData.gbuffer3 = builder.writeTexture(passData.state.gbufferTextureArrayId, flags, Range(3, 1), Range(0, 1));
 
         // Import renderable objects based on selector, flags, or whatever should be supported...
-        passData.importData.renderableQueryId = builder.importRenderables();
+        passData.importData.renderableListView = builder.importRenderables("SceneRenderables", renderableInput);
 
         return true;
       },
@@ -69,8 +70,12 @@ namespace Engine {
 
         Log::Verbose(logTag(), "GBufferGeneration");
 
-        RenderableList const&renderables = frameGraphResources.getRenderables(passData.importData.renderableQueryId);
-        for(Renderable const&renderable : renderables) {
+        FrameGraphRenderableListView const&renderableView = frameGraphResources.getRenderableListView(passData.importData.renderableListView.resourceId);
+        FrameGraphRenderableList     const&renderableList = frameGraphResources.getRenderableList(passData.importData.renderableListView.subjacentResource);
+
+        for(FrameGraphResourceId_t const&renderableId : renderableView.renderableRefIndices) {
+          FrameGraphRenderable const&renderable = renderableList.at(renderableId);
+
           EEngineStatus status = context->render(renderable);
           HandleEngineStatusError(status, "Failed to render renderable.");
         }

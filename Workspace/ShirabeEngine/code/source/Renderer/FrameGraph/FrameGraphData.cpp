@@ -220,93 +220,118 @@ namespace Engine {
     }
 
     FrameGraphTexture const&
-      FrameGraphResources::getTexture(FrameGraphResource const&resource) const
+      FrameGraphResources::getTexture(FrameGraphResourceId_t const&resource) const
     {
-      return m_textures.at(resource.resourceId);
+      return m_textures.at(resource);
     }
 
     FrameGraphTextureView const&
-      FrameGraphResources::getTextureView(FrameGraphResource const&resource) const
+      FrameGraphResources::getTextureView(FrameGraphResourceId_t const&resource) const
     {
-      return m_textureViews.at(resource.resourceId);
+      return m_textureViews.at(resource);
     }
 
     FrameGraphBuffer const&
-      FrameGraphResources::getBuffer(FrameGraphResource const&resource) const
+      FrameGraphResources::getBuffer(FrameGraphResourceId_t const&resource) const
     {
-      return m_buffers.at(resource.resourceId);
+      return m_buffers.at(resource);
     }
 
     FrameGraphBufferView const&
-      FrameGraphResources::getBufferView(FrameGraphResource const&resource) const
+      FrameGraphResources::getBufferView(FrameGraphResourceId_t const&resource) const
     {
-      return m_bufferViews.at(resource.resourceId);
+      return m_bufferViews.at(resource);
     }
 
-    Renderer::RenderableList const&
-      FrameGraphResources::getRenderables(FrameGraphResource const&resource) const
+    FrameGraphRenderableList const&
+      FrameGraphResources::getRenderableList(FrameGraphResourceId_t const&resource) const
     {
-      return m_renderables.at(resource.resourceId);
+      return m_renderableLists.at(resource);
+    }
+
+    FrameGraphRenderableListView const&
+      FrameGraphResources::getRenderableListView(FrameGraphResourceId_t const&resource) const
+    {
+      return m_renderableListViews.at(resource);
     }
 
 
     bool FrameGraphMutableResources::addTexture(
-      FrameGraphResource const&resource,
+      FrameGraphResourceId_t const&resource,
       FrameGraphTexture  const&texture)
     {
-      return addIfNotAdded(m_textures, resource.resourceId, texture);
+      return addIfNotAdded(m_textures, resource, texture);
     }
 
     bool FrameGraphMutableResources::addTextureView(
-      FrameGraphResource    const&resource,
+      FrameGraphResourceId_t    const&resource,
       FrameGraphTextureView const&view)
     {
-      return addIfNotAdded(m_textureViews, resource.resourceId, view);
+      return addIfNotAdded(m_textureViews, resource, view);
     }
 
     bool FrameGraphMutableResources::addBuffer(
-      FrameGraphResource const&resource,
+      FrameGraphResourceId_t const&resource,
       FrameGraphBuffer   const&buffer)
     {
-      return addIfNotAdded(m_buffers, resource.resourceId, buffer);
+      return addIfNotAdded(m_buffers, resource, buffer);
     }
 
     bool FrameGraphMutableResources::addBufferView(
-      FrameGraphResource   const&resource,
+      FrameGraphResourceId_t   const&resource,
       FrameGraphBufferView const&view)
     {
-      return addIfNotAdded(m_bufferViews, resource.resourceId, view);
+      return addIfNotAdded(m_bufferViews, resource, view);
+    }
+    
+    bool FrameGraphMutableResources::addRenderableList(
+      FrameGraphResourceId_t       const&resource,
+      FrameGraphRenderableList const&list)
+    {
+      return addIfNotAdded(m_renderableLists, resource, list);
     }
 
-    bool FrameGraphMutableResources::addRenderables(
-      FrameGraphResource       const&resource,
-      Renderer::RenderableList const&renderables)
+    bool FrameGraphMutableResources::addRenderableListView(
+      FrameGraphResourceId_t           const&resource,
+      FrameGraphRenderableListView const&view)
     {
-      return true;
+      return addIfNotAdded(m_renderableListViews, resource, view);
     }
 
     FrameGraphTexture&
-      FrameGraphMutableResources::getMutableTexture(FrameGraphResource const&resource)
+      FrameGraphMutableResources::getMutableTexture(FrameGraphResourceId_t const&resource)
     {
-      return m_textures.at(resource.resourceId);
+      return m_textures.at(resource);
     }
 
     FrameGraphTextureView&
-      FrameGraphMutableResources::getMutableTextureView(FrameGraphResource const&resource)
+      FrameGraphMutableResources::getMutableTextureView(FrameGraphResourceId_t const&resource)
     {
-      return m_textureViews.at(resource.resourceId);
+      return m_textureViews.at(resource);
     }
 
     FrameGraphBuffer&
-      FrameGraphMutableResources::getMutableBuffer(FrameGraphResource const&resource)
+      FrameGraphMutableResources::getMutableBuffer(FrameGraphResourceId_t const&resource)
     {
-      return m_buffers.at(resource.resourceId);
+      return m_buffers.at(resource);
     }
 
     FrameGraphBufferView&
-      FrameGraphMutableResources::getMutableBufferView(FrameGraphResource const&resource)
+      FrameGraphMutableResources::getMutableBufferView(FrameGraphResourceId_t const&resource)
     {
-      return m_bufferViews.at(resource.resourceId);
+      return m_bufferViews.at(resource);
+    }
+
+    FrameGraphRenderableList&
+      FrameGraphMutableResources::getMutableRenderableList(FrameGraphResourceId_t const&resource)
+    {
+      return m_renderableLists.at(resource);
+    }
+
+    FrameGraphRenderableListView&
+      FrameGraphMutableResources::getMutableRenderableListView(FrameGraphResourceId_t const&resource)
+    {
+      return m_renderableListViews.at(resource);
     }
 
     bool FrameGraphMutableResources::mergeIn(FrameGraphResources const&other)
@@ -319,6 +344,8 @@ namespace Engine {
         m_textureViews.insert(other.textureViews().begin(), other.textureViews().end());
         m_buffers.insert(other.buffers().begin(), other.buffers().end());
         m_bufferViews.insert(other.bufferViews().begin(), other.bufferViews().end());
+        m_renderableLists.insert(other.renderablesLists().begin(), other.renderablesLists().end());
+        m_renderableListViews.insert(other.renderableListViews().begin(), other.renderableListViews().end());
 
         return true;
 

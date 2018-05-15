@@ -40,7 +40,7 @@ namespace Engine {
         EEngineStatus resume();
         bool          isPaused() const;
 
-        EEngineStatus render(/* insert queue type*/);
+        EEngineStatus render(Renderable const&renderable);
 
       private:
         RendererConfiguration m_config;

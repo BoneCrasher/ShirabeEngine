@@ -214,7 +214,6 @@ namespace Engine {
     }
 
     m_scene.update();
-    m_renderer->render();
 
     return EEngineStatus::Ok;
   }

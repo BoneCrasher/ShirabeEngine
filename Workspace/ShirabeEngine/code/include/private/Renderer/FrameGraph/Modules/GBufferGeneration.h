@@ -13,8 +13,8 @@
 #include "GFXAPI/Types/All.h"
 
 namespace Engine {
-	namespace FrameGraph {
-		
+  namespace FrameGraph {
+
     struct GBufferModuleTag_t {};
 
     template<>
@@ -23,7 +23,7 @@ namespace Engine {
     public:
       struct GBufferGenerationImportData {
         FrameGraphResource
-          renderableQueryId;
+          renderableListView;
       };
 
       struct GBufferGenerationExportData {
@@ -34,12 +34,15 @@ namespace Engine {
           gbuffer3;
       };
 
-      GBufferGenerationExportData addGBufferGenerationPass(GraphBuilder &graphBuilder);
+      GBufferGenerationExportData
+        addGBufferGenerationPass(
+          GraphBuilder            &graphBuilder,
+          FrameGraphResource const&renderableInput);
 
     private:
     };
 
-	}
+  }
 }
 
 #endif

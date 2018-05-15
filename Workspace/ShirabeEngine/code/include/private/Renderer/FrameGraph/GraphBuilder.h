@@ -54,11 +54,17 @@ namespace Engine {
           std::string       const&readableName,
           FrameGraphTexture const&texture);
 
+      FrameGraphResource
+        registerRenderables(
+          std::string              const&readableIdentifier,
+          Renderer::RenderableList const&renderables);
+
       UniquePtr<Graph>
         compile();
 
-      FrameGraphTexture     const&getTextureData(FrameGraphResource const&resource) const;
-      FrameGraphTextureView const&getTextureViewData(FrameGraphResource const&resource) const;
+      FrameGraphTexture        const&getTextureData(FrameGraphResource const&resource)     const;
+      FrameGraphTextureView    const&getTextureViewData(FrameGraphResource const&resource) const;
+      FrameGraphRenderableList const&getRenderableList(FrameGraphResource const&resource)  const;
 
     private:
       FrameGraphResourceId_t generatePassUID();
@@ -88,7 +94,7 @@ namespace Engine {
       PassMap                    m_passes;
       FrameGraphResourceMap      m_resources;
       FrameGraphMutableResources m_resourceData;
-
+    
       AdjacencyListMap<FrameGraphResourceId_t>            m_resourceAdjacency;
       AdjacencyListMap<PassUID_t>                         m_passAdjacency;
       AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> m_passToResourceAdjacency;
@@ -131,7 +137,7 @@ namespace Engine {
         //   - Read
         //   - Write
         //   - Import
-        PassBuilder passBuilder(uid, m_resourceUIDGenerator);
+        PassBuilder passBuilder(uid, m_resourceUIDGenerator, *this);
         if(!pass->setup(passBuilder)) {
           Log::Error(logTag(), "Cannot setup pass instance.");
           pass = nullptr;
@@ -164,10 +170,7 @@ namespace Engine {
       }
       catch(std::exception e) {
         Log::Error(logTag(), e.what());
-        return nullptr;
-      }
-      catch(...) {
-        return nullptr;
+        throw;
       }
     }
 

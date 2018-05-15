@@ -18,6 +18,110 @@
 
 namespace Test {
   namespace FrameGraph {
+    using namespace Engine;
+    using namespace Engine::Renderer;
+
+    class MockRenderer
+      : public IRenderer
+    {
+      DeclareLogTag(MockRenderer);
+    public:
+      EEngineStatus initialize(
+        const ApplicationEnvironment&,
+        const RendererConfiguration&,
+        const IResourceManagerPtr&);
+
+      EEngineStatus deinitialize();
+      EEngineStatus reinitialize();
+
+      EEngineStatus pause();
+      EEngineStatus resume();
+      bool          isPaused() const;
+
+      EEngineStatus render(Renderable const&);
+    };
+
+      EEngineStatus 
+        MockRenderer::initialize(
+          const ApplicationEnvironment&,
+          const RendererConfiguration&,
+          const IResourceManagerPtr&)
+      {
+        return EEngineStatus::Ok;
+      }
+
+      EEngineStatus
+        MockRenderer::deinitialize()
+      {
+        return EEngineStatus::Ok;
+      }
+
+      EEngineStatus
+        MockRenderer::reinitialize()
+      {
+        return EEngineStatus::Ok;
+      }
+
+      EEngineStatus
+        MockRenderer::pause()
+      {
+        return EEngineStatus::Ok;
+      }
+
+      EEngineStatus
+        MockRenderer::resume()
+      { 
+        return EEngineStatus::Ok;
+      }
+
+      bool
+        MockRenderer::isPaused() const
+      { 
+        return false;
+      }
+
+      EEngineStatus
+        MockRenderer::render(Renderable const&renderable)
+      { 
+        std::string message =
+          String::format(
+            "Renderable: %0\n"
+            "  MeshId:     %1\n"
+            "  MaterialId: %2\n",
+            renderable.name,
+            renderable.meshId,
+            renderable.materialId);
+        Log::Verbose(logTag(), message);
+
+        return EEngineStatus::Ok;
+      }
+    
+
+    class MockRenderContext
+      : public IRenderContext
+    {
+      DeclareLogTag(MockRenderContext);
+    public:
+      static Ptr<IRenderContext> fromRenderer(Ptr<IRenderer> renderer) {
+        assert(renderer != nullptr);
+
+        Ptr<IRenderContext> context = Ptr<MockRenderContext>(new MockRenderContext(renderer));
+        if(!context)
+          Log::Error(logTag(), "Failed to create render context from renderer.");
+        return context;
+      }
+
+      EEngineStatus render(Renderable const&renderable) {
+          return m_renderer->render(renderable);
+      }
+
+    private:
+      MockRenderContext(Ptr<IRenderer> renderer)
+        : m_renderer(renderer)
+      {}
+
+      Ptr<IRenderer> m_renderer;
+    };
 
     bool
       Test__FrameGraph::testAll()
@@ -38,10 +142,14 @@ namespace Test {
       using namespace Engine::GFXAPI;
       using namespace Engine::FrameGraph;
 
-      Ptr<IRenderContext> renderContext = nullptr;
-
       Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
       appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
+
+      RendererConfiguration rendererConfiguration{};
+
+      Ptr<IRenderer> renderer = MakeSharedPointerType<MockRenderer>();
+      renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
+      Ptr<IRenderContext> renderContext = MockRenderContext::fromRenderer(renderer);
 
       OSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
 
@@ -61,14 +169,24 @@ namespace Test {
       backBufferTextureDesc.arraySize      = 1;
       backBufferTextureDesc.mipLevels      = 1;
       backBufferTextureDesc.permittedUsage = FrameGraphResourceUsage::RenderTarget;
-      
+
       FrameGraphResource backBuffer{ };
       backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
+
+      RenderableList renderableCollection ={
+        { "Cube",    0, 0 },
+        { "Sphere",  0, 0 },
+        { "Pyramid", 0, 0 }
+      };
+      FrameGraphResource renderables{ };
+      renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
       // GBuffer
       FrameGraphModule<GBufferModuleTag_t> gbufferModule{};
       FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData gbufferExportData{};
-      gbufferExportData = gbufferModule.addGBufferGenerationPass(graphBuilder);
+      gbufferExportData = gbufferModule.addGBufferGenerationPass(
+        graphBuilder, 
+        renderables);
 
       // Lighting
       FrameGraphModule<LightingModuleTag_t> lightingModule{};
@@ -102,7 +220,7 @@ namespace Test {
 
       serializer->deinitialize();
       serializer = nullptr;
-    
+
       system("makeGraphPNG.bat");
 
       // Renderer will call.

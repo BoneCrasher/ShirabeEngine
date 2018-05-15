@@ -59,7 +59,10 @@ namespace Engine {
       DeclareLogTag(PassBuilder);
      
     public:      
-      PassBuilder(PassUID_t const&passUID, Ptr<IUIDGenerator<FrameGraphResourceId_t>>);
+      PassBuilder(
+        PassUID_t                                  const&passUID,
+        Ptr<IUIDGenerator<FrameGraphResourceId_t>>       resourceUIDGenerator,
+        GraphBuilder                               const&graphBuilder);
 
       PassUID_t const&assignedPassUID() const { return m_passUID; }
 
@@ -86,21 +89,29 @@ namespace Engine {
           Range                      const&mipSliceRange   = Range(0, 1));
 
       FrameGraphResource
-        importRenderables();
+        importRenderables(
+          std::string        const&collectionName, 
+          FrameGraphResource const&renderableListResource);
     
     private:
       bool isTextureBeingReadInSubresourceRange(
-        std::vector<FrameGraphResourceId_t> const&resourceViews,
-        Range                               const&arraySliceRange,
-        Range                               const&mipSliceRange);
+        FrameGraphTextureViewMap const&resourceViews,
+        FrameGraphResourceMap    const&resources,
+        FrameGraphResource       const&sourceResource,
+        Range                    const&arraySliceRange,
+        Range                    const&mipSliceRange);
       bool isTextureBeingWrittenInSubresourceRange(
-        std::vector<FrameGraphResourceId_t> const&resourceViews,
-        Range                               const&arraySliceRange,
-        Range                               const&mipSliceRange);
-      
-      Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
+        FrameGraphTextureViewMap const&resourceViews,
+        FrameGraphResourceMap    const&resources,
+        FrameGraphResource       const&sourceResource,
+        Range                    const&arraySliceRange,
+        Range                    const&mipSliceRange);
 
       PassUID_t m_passUID;
+
+      Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
+
+      GraphBuilder const&m_graphBuilder;
 
       FrameGraphResourceMap      m_resources;
       FrameGraphMutableResources m_resourceData;

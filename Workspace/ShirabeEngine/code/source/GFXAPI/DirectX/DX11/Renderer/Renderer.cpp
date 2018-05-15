@@ -196,7 +196,7 @@ namespace Engine {
 				return true;
 			}
 
-			EEngineStatus DX11Renderer::render(/* insert queue type*/) {
+			EEngineStatus DX11Renderer::render(Renderable const&renderable) {
 				// if (isPaused())
 				// 	return EEngineStatus::Ok;
 

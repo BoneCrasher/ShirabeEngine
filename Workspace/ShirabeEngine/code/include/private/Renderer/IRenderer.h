@@ -12,7 +12,14 @@ namespace Engine {
     using namespace Platform;
     using namespace Engine::Resources;
 
-    struct Renderable {};
+    using MeshId_t     = uint64_t;
+    using MaterialId_t = uint64_t;
+
+    struct Renderable {
+      std::string  name;
+      MeshId_t     meshId;
+      MaterialId_t materialId;
+    };
     DeclareListType(Renderable, Renderable);
 
     DeclareInterface(IRenderContext);
@@ -32,7 +39,7 @@ namespace Engine {
       virtual EEngineStatus resume()         = 0;
       virtual bool          isPaused() const = 0;
       
-      virtual EEngineStatus render(/* insert queue type*/) = 0;
+      virtual EEngineStatus render(Renderable const&) = 0;
     DeclareInterfaceEnd(IRenderer);
     DeclareSharedPointerType(IRenderer);
   }

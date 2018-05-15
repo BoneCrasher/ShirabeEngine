@@ -39,7 +39,9 @@ namespace Engine {
       Texture,
       Buffer,
       TextureView,
-      BufferView
+      BufferView,
+      RenderableList,
+      RenderableListView // To support renderable filtering...
     };
 
     /**********************************************************************************************//**
@@ -228,7 +230,14 @@ namespace Engine {
         writeTarget;
     };
 
-    using FrameGraphResourceData = std::variant<FrameGraphTexture, FrameGraphTextureView, FrameGraphBuffer, FrameGraphBufferView>;
+    struct FrameGraphRenderableListView {
+      std::vector<uint64_t> renderableRefIndices;
+    };
+
+    using FrameGraphRenderable     = Renderer::Renderable;
+    using FrameGraphRenderableList = Renderer::RenderableList;
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableList, FrameGraphRenderableList);
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableListView, FrameGraphRenderableListView);
 
     struct SHIRABE_TEST_EXPORT FrameGraphResource {
       PassUID_t
@@ -283,42 +292,48 @@ namespace Engine {
     DeclareMapType(FrameGraphResourceId_t, Renderer::RenderableList, RenderableList);
     class FrameGraphResources {
     public:
-      FrameGraphTexture     const&getTexture(FrameGraphResource const&)     const;
-      FrameGraphTextureView const&getTextureView(FrameGraphResource const&) const;
-      FrameGraphBuffer      const&getBuffer(FrameGraphResource const&)      const;
-      FrameGraphBufferView  const&getBufferView(FrameGraphResource const&)  const;
+      FrameGraphTexture     const&getTexture(FrameGraphResourceId_t const&)     const;
+      FrameGraphTextureView const&getTextureView(FrameGraphResourceId_t const&) const;
+      FrameGraphBuffer      const&getBuffer(FrameGraphResourceId_t const&)      const;
+      FrameGraphBufferView  const&getBufferView(FrameGraphResourceId_t const&)  const;
 
-      Renderer::RenderableList const&getRenderables(FrameGraphResource const&) const;
+      FrameGraphRenderableList     const&getRenderableList(FrameGraphResourceId_t const&) const;
+      FrameGraphRenderableListView const&getRenderableListView(FrameGraphResourceId_t const&) const;
 
-      inline FrameGraphTextureMap     const&textures()     const { return m_textures; }
-      inline FrameGraphTextureViewMap const&textureViews() const { return m_textureViews; }
-      inline FrameGraphBufferMap      const&buffers()      const { return m_buffers; }
-      inline FrameGraphBufferViewMap  const&bufferViews()  const { return m_bufferViews; }
+      inline FrameGraphTextureMap            const&textures()            const { return m_textures; }
+      inline FrameGraphTextureViewMap        const&textureViews()        const { return m_textureViews; }
+      inline FrameGraphBufferMap             const&buffers()             const { return m_buffers; }
+      inline FrameGraphBufferViewMap         const&bufferViews()         const { return m_bufferViews; }
+      inline FrameGraphRenderableListMap     const&renderablesLists()    const { return m_renderableLists; }
+      inline FrameGraphRenderableListViewMap const&renderableListViews() const { return m_renderableListViews; }
 
     protected:
-      FrameGraphTextureMap     m_textures;
-      FrameGraphTextureViewMap m_textureViews;
-      FrameGraphBufferMap      m_buffers;
-      FrameGraphBufferViewMap  m_bufferViews;
-      RenderableListMap        m_renderables;
+      FrameGraphTextureMap            m_textures;
+      FrameGraphTextureViewMap        m_textureViews;
+      FrameGraphBufferMap             m_buffers;
+      FrameGraphBufferViewMap         m_bufferViews;
+      FrameGraphRenderableListMap     m_renderableLists;
+      FrameGraphRenderableListViewMap m_renderableListViews;
     };
 
     class FrameGraphMutableResources
       : public FrameGraphResources
     {
     public:
-      bool addTexture(FrameGraphResource const&, FrameGraphTexture const&);
-      bool addTextureView(FrameGraphResource const&, FrameGraphTextureView const&);
-      bool addBuffer(FrameGraphResource const&, FrameGraphBuffer const&);
-      bool addBufferView(FrameGraphResource const&, FrameGraphBufferView const&);
-      bool addRenderables(FrameGraphResource const&, Renderer::RenderableList const&);
+      bool addTexture(FrameGraphResourceId_t const&, FrameGraphTexture const&);
+      bool addTextureView(FrameGraphResourceId_t const&, FrameGraphTextureView const&);
+      bool addBuffer(FrameGraphResourceId_t const&, FrameGraphBuffer const&);
+      bool addBufferView(FrameGraphResourceId_t const&, FrameGraphBufferView const&);
+      bool addRenderableList(FrameGraphResourceId_t const&, FrameGraphRenderableList const&);
+      bool addRenderableListView(FrameGraphResourceId_t const&, FrameGraphRenderableListView const&);
 
-      FrameGraphTexture     &getMutableTexture(FrameGraphResource const&);
-      FrameGraphTextureView &getMutableTextureView(FrameGraphResource const&);
-      FrameGraphBuffer      &getMutableBuffer(FrameGraphResource const&);
-      FrameGraphBufferView  &getMutableBufferView(FrameGraphResource const&);
+      FrameGraphTexture     &getMutableTexture(FrameGraphResourceId_t const&);
+      FrameGraphTextureView &getMutableTextureView(FrameGraphResourceId_t const&);
+      FrameGraphBuffer      &getMutableBuffer(FrameGraphResourceId_t const&);
+      FrameGraphBufferView  &getMutableBufferView(FrameGraphResourceId_t const&);
 
-      Renderer::RenderableList const&getRenderables(FrameGraphResource const&) const;
+      FrameGraphRenderableList     &getMutableRenderableList(FrameGraphResourceId_t const&);
+      FrameGraphRenderableListView &getMutableRenderableListView(FrameGraphResourceId_t const&);
 
       bool mergeIn(FrameGraphResources const&other);
     };
