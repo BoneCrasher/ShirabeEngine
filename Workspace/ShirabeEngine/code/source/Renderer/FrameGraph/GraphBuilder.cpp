@@ -65,9 +65,9 @@ namespace Engine {
       // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
       spawnPass<CallbackPass<bool>>(
         "Pseudo-Pass",
-        [] (PassBuilder const&, bool&)                                       -> bool { return true; },
-        [] (bool const&, FrameGraphResourceMap const&, Ptr<IRenderContext>&) -> bool { return true; });
-      
+        [] (PassBuilder const&, bool&)                                     -> bool { return true; },
+        [] (bool const&, FrameGraphResources const&, Ptr<IRenderContext>&) -> bool { return true; });
+
       return true;
     }
 
@@ -117,10 +117,10 @@ namespace Engine {
         resource.parentResource     = 0; // No internal tree, has to be resolved differently.
         resource.type               = FrameGraphResourceType::Texture;
         resource.readableName       = readableName;
-        resource.data               = texture;
         resource.isExternalResource = true;
 
         m_resources[resource.resourceId] = resource;
+        m_resourceData.addTexture(resource, texture);
 
         return resource;
       }
@@ -153,27 +153,16 @@ namespace Engine {
       if(!(isTexture || isTextureView))
         throw std::runtime_error("Texture or TextureView not found!");
 
-      try {
-        FrameGraphResourceData const&data = m_resources.at(resource.resourceId).data;
+      if(isTexture)
+        return m_resourceData.getTexture(resource);
 
-        if(isTexture)
-          return std::get<FrameGraphTexture>(data);
+      if(isTextureView) {
+        FrameGraphResource parent = m_resources.at(resource.parentResource);
+        // Crawl back to the underlying resource of the view chain
+        while(parent.parentResource > 0)
+          parent = m_resources.at(parent.parentResource);
 
-        if(isTextureView) {
-          FrameGraphResource parent = m_resources.at(resource.parentResource);
-          // Crawl back to the underlying resource of the view chain
-          while(parent.parentResource > 0)
-            parent = m_resources.at(parent.parentResource);
-
-          return getTextureData(parent);
-        }
-      }
-      catch(std::bad_variant_access const&bve) {
-        Log::Error(logTag(),
-          "Inconsistent graph builder state."
-          "Tried to access texture or textureview as defined by private data, "
-          "but the data stored in the resource map is no texture or textureview.");
-        throw;
+        return getTextureData(parent);
       }
     }
 
@@ -196,17 +185,7 @@ namespace Engine {
       if(!isTextureView)
         throw std::runtime_error("TextureView not found!");
 
-      try {
-        FrameGraphResourceData const&data = m_resources.at(resource.resourceId).data;
-        return std::get<FrameGraphTextureView>(data);
-      }
-      catch(std::bad_variant_access const&bve) {
-        Log::Error(logTag(),
-          "Inconsistent graph builder state."
-          "Tried to access texture view as defined by private data, but the "
-          "data stored in the resource map is no texture or textureview.");
-        throw;
-      }
+      return m_resourceData.getTextureView(resource);
     }
 
 
@@ -256,6 +235,8 @@ namespace Engine {
       graph()->m_resources               = std::move(this->m_resources);
       graph()->m_resourceAdjacency       = std::move(this->m_resourceAdjacency);
       graph()->m_passToResourceAdjacency = std::move(this->m_passToResourceAdjacency);
+
+      graph()->m_resourceData.mergeIn(this->m_resourceData);
 
       return std::move(graph());
     }
@@ -346,6 +327,7 @@ namespace Engine {
     {
       FrameGraphResourceMap &resources = passBuilder.m_resources;
       m_resources.insert(resources.begin(), resources.end());
+      m_resourceData.mergeIn(passBuilder.m_resourceData);
 
       // Derive:
       // - Resource creation requests.
@@ -396,8 +378,8 @@ namespace Engine {
           FrameGraphResourceId_t  subjacentResourceId = findSubjacentResource(m_resources, r);
           FrameGraphResource     &subjacentResource   = m_resources[subjacentResourceId];
 
-          FrameGraphTexture     &texture     = std::get<FrameGraphTexture>(subjacentResource.data);
-          FrameGraphTextureView &textureView = std::get<FrameGraphTextureView>(r.data);
+          FrameGraphTexture     &texture     = m_resourceData.getMutableTexture(subjacentResource);
+          FrameGraphTextureView &textureView = m_resourceData.getMutableTextureView(r);
 
           switch(r.type) {
           case FrameGraphResourceType::TextureView:
@@ -414,7 +396,7 @@ namespace Engine {
 
             break;
           case FrameGraphResourceType::BufferView:
-            FrameGraphBuffer &buffer = std::get<FrameGraphBuffer>(subjacentResource.data);
+            FrameGraphBuffer &buffer = m_resourceData.getMutableBuffer(subjacentResource);
             break;
           }
         }
@@ -467,8 +449,8 @@ namespace Engine {
             allBindingsValid = false;
           }
 
-          FrameGraphTexture           &texture     = std::get<FrameGraphTexture>(subjacentResource.data);
-          FrameGraphTextureView const &textureView = std::get<FrameGraphTextureView>(r.data);
+          FrameGraphTexture     &texture     = m_resourceData.getMutableTexture(subjacentResource);
+          FrameGraphTextureView &textureView = m_resourceData.getMutableTextureView(r);
 
           bool viewBindingValid = validateTextureView(texture, textureView);
           allBindingsValid &= viewBindingValid;

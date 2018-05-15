@@ -22,7 +22,7 @@ namespace Engine {
     using namespace Serialization;
 
     class GraphBuilder;
-    
+
     class PassBase
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
@@ -40,7 +40,7 @@ namespace Engine {
       virtual bool execute(FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&) { return true; }
 
       inline std::string const&passName() const { return m_passName; }
-      inline PassUID_t   const&passUID()  const { return m_passUID;  }
+      inline PassUID_t   const&passUID()  const { return m_passUID; }
 
       virtual inline
         void acceptSerializer(Ptr<IFrameGraphSerializer> s)
@@ -100,8 +100,8 @@ namespace Engine {
       , execCallback(execCb)
       , m_passData()
     {
-      assert(setupCb != nullptr);
-      assert(execCb  != nullptr);
+      assert(setupCallback != nullptr);
+      assert(execCallback  != nullptr);
     }
 
     template <typename TPassData>
@@ -121,12 +121,14 @@ namespace Engine {
     bool
       CallbackPass<TPassData>::execute(FrameGraphResources const&resources, Ptr<IRenderContext>&context)
     {
-      if(execCallback)
+      try {
         return execCallback(m_passData, resources, context);
-
-      return false;
+      }
+      catch(...) {
+        return false;
+      }
     }
-    
+
   }
 }
 

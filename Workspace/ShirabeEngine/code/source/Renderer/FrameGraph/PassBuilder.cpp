@@ -43,9 +43,9 @@ namespace Engine {
       resource.parentResource  = 0;
       resource.readableName    = name;
       resource.type            = FrameGraphResourceType::Texture;
-      resource.data            = desc;
 
       m_resources[resource.resourceId] = resource;
+      m_resourceData.addTexture(resource, desc);
 
       return resource;
     }
@@ -74,7 +74,6 @@ namespace Engine {
       // if(!isResourceRegistered(m_resourcesPrivateData, sourceResource))
       //   throw std::runtime_error("Resource to be bound as rendertarget is not registered.");
 
-      try {
         // if(isTextureBeingReadInSubresourceRange(subjacentResourcePrivateData.resourceViews, arraySliceRange, mipSliceRange))
         //   throw std::exception(
         //     String::format(
@@ -87,32 +86,28 @@ namespace Engine {
         //       "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
         //       arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
 
-        FrameGraphTextureView view={ };
-        view.arraySliceRange = arraySliceRange;
-        view.mipSliceRange   = mipSliceRange;
-        view.format          = flags.requiredFormat;
-        view.mode.set(FrameGraphViewAccessMode::Write);
+      FrameGraphTextureView view={ };
+      view.arraySliceRange = arraySliceRange;
+      view.mipSliceRange   = mipSliceRange;
+      view.format          = flags.requiredFormat;
+      view.mode.set(FrameGraphViewAccessMode::Write);
 
-        FrameGraphResource resource ={};
-        resource.assignedPassUID    = m_passUID;
-        resource.resourceId         = m_resourceIdGenerator->generate();
-        resource.parentResource     = sourceResource.resourceId;
-        resource.subjacentResource  =
-          (sourceResource.type == FrameGraphResourceType::Texture
-            ? sourceResource.resourceId
-            : sourceResource.subjacentResource);
-        resource.readableName       = String::format("TextureView ID %0 - Write #%1", resource.resourceId, sourceResource.resourceId);
-        resource.type               = FrameGraphResourceType::TextureView;
-        resource.data               = view;
-        
-        m_resources[resource.resourceId] = resource;
+      FrameGraphResource resource ={};
+      resource.assignedPassUID    = m_passUID;
+      resource.resourceId         = m_resourceIdGenerator->generate();
+      resource.parentResource     = sourceResource.resourceId;
+      resource.subjacentResource  =
+        (sourceResource.type == FrameGraphResourceType::Texture
+          ? sourceResource.resourceId
+          : sourceResource.subjacentResource);
+      resource.readableName       = String::format("TextureView ID %0 - Write #%1", resource.resourceId, sourceResource.resourceId);
+      resource.type               = FrameGraphResourceType::TextureView;
 
-        return resource;
-      }
-      catch(std::bad_variant_access const&bva) {
-        Log::Error(logTag(), bva.what());
-        throw;
-      }
+      m_resources[resource.resourceId] = resource;
+      m_resourceData.addTextureView(resource, view);
+
+      return resource;
+
     }
 
     /**********************************************************************************************//**
@@ -139,7 +134,6 @@ namespace Engine {
       // if(!isResourceRegistered(m_resourcesPrivateData, sourceResource))
       //   throw std::runtime_error("Resource to be bound as rendertarget is not registered.");
 
-      try {
         // Reading overlapping subresources is no problem...
         /*if(isTextureBeingReadInSubresourceRange(subjacentResourcePrivateData.resourceViews, arraySliceRange, mipSliceRange))
           throw std::exception(
@@ -152,33 +146,29 @@ namespace Engine {
               //     String::format(
               //       "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
               //       arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
-        
-        FrameGraphTextureView view={ };
-        view.arraySliceRange = arraySliceRange;
-        view.mipSliceRange   = mipSliceRange;
-        view.format          = flags.requiredFormat;
-        view.mode.set(FrameGraphViewAccessMode::Read);
 
-        FrameGraphResource resource ={ };
-        resource.assignedPassUID   = m_passUID;
-        resource.resourceId        = m_resourceIdGenerator->generate();
-        resource.parentResource    = sourceResource.resourceId;
-        resource.subjacentResource = 
-          (sourceResource.type == FrameGraphResourceType::Texture
-            ? sourceResource.resourceId 
-            : sourceResource.subjacentResource);
-        resource.readableName      = String::format("TextureView ID %0 - Read #%1", resource.resourceId, sourceResource.resourceId);
-        resource.type              = FrameGraphResourceType::TextureView;
-        resource.data              = view;
-        
-        m_resources[resource.resourceId] = resource;
+      FrameGraphTextureView view={ };
+      view.arraySliceRange = arraySliceRange;
+      view.mipSliceRange   = mipSliceRange;
+      view.format          = flags.requiredFormat;
+      view.mode.set(FrameGraphViewAccessMode::Read);
 
-        return resource;
-      }
-      catch(std::bad_variant_access const&bve) {
-        Log::Error(logTag(), bve.what());
-        throw;
-      }
+      FrameGraphResource resource ={ };
+      resource.assignedPassUID   = m_passUID;
+      resource.resourceId        = m_resourceIdGenerator->generate();
+      resource.parentResource    = sourceResource.resourceId;
+      resource.subjacentResource =
+        (sourceResource.type == FrameGraphResourceType::Texture
+          ? sourceResource.resourceId
+          : sourceResource.subjacentResource);
+      resource.readableName      = String::format("TextureView ID %0 - Read #%1", resource.resourceId, sourceResource.resourceId);
+      resource.type              = FrameGraphResourceType::TextureView;
+
+      m_resources[resource.resourceId] = resource;
+      m_resourceData.addTextureView(resource, view);
+
+      return resource;
+
     }
 
     /**********************************************************************************************//**
@@ -215,34 +205,27 @@ namespace Engine {
         Range                               const&arraySliceRange,
         Range                               const&mipSliceRange)
     {
-      try {
-        // This test method can check for overlapping regions for array slices and mip slices
-        //  given a specific set of options to test against.
-        // If "Write" is checked, this is usually done due to read operations to take place.
-        // If a "Read" and "Write" of two subresources does not overlap, both operations 
-        //  as such are valid.
-        // The whole operation setup is based on first come first serve.
-        for(FrameGraphResourceId_t const&id : resourceViews) {
-          FrameGraphResource const&resource = m_resources[id];
-          if(!(resource.type == FrameGraphResourceType::TextureView))
-            continue;
+      // This test method can check for overlapping regions for array slices and mip slices
+      //  given a specific set of options to test against.
+      // If "Write" is checked, this is usually done due to read operations to take place.
+      // If a "Read" and "Write" of two subresources does not overlap, both operations 
+      //  as such are valid.
+      // The whole operation setup is based on first come first serve.
+      for(FrameGraphResourceId_t const&id : resourceViews) {
+        FrameGraphResource const&resource = m_resources[id];
+        if(!(resource.type == FrameGraphResourceType::TextureView))
+          continue;
 
-          FrameGraphTextureView const&v = std::get<FrameGraphTextureView>(resource.data);
-          if(!v.mode.check(FrameGraphViewAccessMode::Read))
-            continue;
+        FrameGraphTextureView const&v = m_resourceData.getTextureView(resource);
+        if(!v.mode.check(FrameGraphViewAccessMode::Read))
+          continue;
 
-          if(v.arraySliceRange.overlapsWith(arraySliceRange)
-            || v.mipSliceRange.overlapsWith(mipSliceRange))
-            return true;
-        }
-
-        return false;
-      }
-      catch(std::bad_variant_access const&bve) {
-        Log::Error(logTag(), bve.what());
-        throw;
+        if(v.arraySliceRange.overlapsWith(arraySliceRange)
+          || v.mipSliceRange.overlapsWith(mipSliceRange))
+          return true;
       }
 
+      return false;
     }
 
     /**********************************************************************************************//**
@@ -264,33 +247,27 @@ namespace Engine {
         Range                               const&arraySliceRange,
         Range                               const&mipSliceRange)
     {
-      try {
-        // This test method can check for overlapping regions for array slices and mip slices
-        //  given a specific set of options to test against.
-        // If "Write" is checked, this is usually done due to read operations to take place.
-        // If a "Read" and "Write" of two subresources does not overlap, both operations 
-        //  as such are valid.
-        // The whole operation setup is based on first come first serve.
-        for(FrameGraphResourceId_t const&id : resourceViews) {
-          FrameGraphResource const&resource = m_resources[id];
-          if(!(resource.type == FrameGraphResourceType::TextureView))
-            continue;
+      // This test method can check for overlapping regions for array slices and mip slices
+      //  given a specific set of options to test against.
+      // If "Write" is checked, this is usually done due to read operations to take place.
+      // If a "Read" and "Write" of two subresources does not overlap, both operations 
+      //  as such are valid.
+      // The whole operation setup is based on first come first serve.
+      for(FrameGraphResourceId_t const&id : resourceViews) {
+        FrameGraphResource const&resource = m_resources[id];
+        if(!(resource.type == FrameGraphResourceType::TextureView))
+          continue;
 
-          FrameGraphTextureView const&v = std::get<FrameGraphTextureView>(resource.data);
-          if(!v.mode.check(FrameGraphViewAccessMode::Write))
-            continue;
+        FrameGraphTextureView const&v = m_resourceData.getTextureView(resource);
+        if(!v.mode.check(FrameGraphViewAccessMode::Write))
+          continue;
 
-          if(v.arraySliceRange.overlapsWith(arraySliceRange)
-            || v.mipSliceRange.overlapsWith(mipSliceRange))
-            return true;
-        }
-
-        return false;
+        if(v.arraySliceRange.overlapsWith(arraySliceRange)
+          || v.mipSliceRange.overlapsWith(mipSliceRange))
+          return true;
       }
-      catch(std::bad_variant_access const&bve) {
-        Log::Error(logTag(), bve.what());
-        throw;
-      }
+
+      return false;
     }
 
   }

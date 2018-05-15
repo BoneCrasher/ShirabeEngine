@@ -12,7 +12,8 @@ set(
 		Serialization/XMLObjectSerializer.cpp
 )
 
-set(LINK_JSON TRUE)
-set(LINK_XML2 TRUE)
+set(LINK_FXGLTF TRUE)
+set(LINK_JSON   TRUE)
+set(LINK_XML2   TRUE)
 
 include(GenericProject)

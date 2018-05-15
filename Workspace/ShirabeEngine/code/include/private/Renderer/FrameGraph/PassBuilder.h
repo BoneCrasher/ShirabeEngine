@@ -100,8 +100,10 @@ namespace Engine {
       
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
 
-      PassUID_t             m_passUID;
-      FrameGraphResourceMap m_resources;
+      PassUID_t m_passUID;
+
+      FrameGraphResourceMap      m_resources;
+      FrameGraphMutableResources m_resourceData;
     };
 
   }

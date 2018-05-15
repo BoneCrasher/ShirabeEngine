@@ -181,12 +181,11 @@ namespace Engine {
 
     FrameGraphResource::FrameGraphResource()
       : assignedPassUID(0)
-      , resourceId(FrameGraphResourceId_t {})
+      , resourceId(FrameGraphResourceId_t{})
       , parentResource(0)
       , subjacentResource(0)
       , readableName("")
       , type(FrameGraphResourceType::Undefined)
-      , data()
       , isExternalResource(false)
     {}
 
@@ -200,6 +199,138 @@ namespace Engine {
       operator!=(FrameGraphResource const&l, FrameGraphResource const&r)
     {
       return (l.resourceId == r.resourceId);
+    }
+
+    template <typename TKey, typename TValue>
+    bool checkIfAdded(Map<TKey, TValue> const&map, TKey const&key) {
+      return (map.find(key) != map.end());
+    }
+
+    template <typename TKey, typename TValue>
+    bool addIfNotAdded(Map<TKey, TValue>&map, TKey const&key, TValue const&value) {
+      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+
+      if(checkIfAdded(map, key))
+        return false;
+
+      #endif
+
+      map[key] = value;
+      return true;
+    }
+
+    FrameGraphTexture const&
+      FrameGraphResources::getTexture(FrameGraphResource const&resource) const
+    {
+      return m_textures.at(resource.resourceId);
+    }
+
+    FrameGraphTextureView const&
+      FrameGraphResources::getTextureView(FrameGraphResource const&resource) const
+    {
+      return m_textureViews.at(resource.resourceId);
+    }
+
+    FrameGraphBuffer const&
+      FrameGraphResources::getBuffer(FrameGraphResource const&resource) const
+    {
+      return m_buffers.at(resource.resourceId);
+    }
+
+    FrameGraphBufferView const&
+      FrameGraphResources::getBufferView(FrameGraphResource const&resource) const
+    {
+      return m_bufferViews.at(resource.resourceId);
+    }
+
+    Renderer::RenderableList const&
+      FrameGraphResources::getRenderables(FrameGraphResource const&resource) const
+    {
+      return m_renderables.at(resource.resourceId);
+    }
+
+
+    bool FrameGraphMutableResources::addTexture(
+      FrameGraphResource const&resource,
+      FrameGraphTexture  const&texture)
+    {
+      return addIfNotAdded(m_textures, resource.resourceId, texture);
+    }
+
+    bool FrameGraphMutableResources::addTextureView(
+      FrameGraphResource    const&resource,
+      FrameGraphTextureView const&view)
+    {
+      return addIfNotAdded(m_textureViews, resource.resourceId, view);
+    }
+
+    bool FrameGraphMutableResources::addBuffer(
+      FrameGraphResource const&resource,
+      FrameGraphBuffer   const&buffer)
+    {
+      return addIfNotAdded(m_buffers, resource.resourceId, buffer);
+    }
+
+    bool FrameGraphMutableResources::addBufferView(
+      FrameGraphResource   const&resource,
+      FrameGraphBufferView const&view)
+    {
+      return addIfNotAdded(m_bufferViews, resource.resourceId, view);
+    }
+
+    bool FrameGraphMutableResources::addRenderables(
+      FrameGraphResource       const&resource,
+      Renderer::RenderableList const&renderables)
+    {
+      return true;
+    }
+
+    FrameGraphTexture&
+      FrameGraphMutableResources::getMutableTexture(FrameGraphResource const&resource)
+    {
+      return m_textures.at(resource.resourceId);
+    }
+
+    FrameGraphTextureView&
+      FrameGraphMutableResources::getMutableTextureView(FrameGraphResource const&resource)
+    {
+      return m_textureViews.at(resource.resourceId);
+    }
+
+    FrameGraphBuffer&
+      FrameGraphMutableResources::getMutableBuffer(FrameGraphResource const&resource)
+    {
+      return m_buffers.at(resource.resourceId);
+    }
+
+    FrameGraphBufferView&
+      FrameGraphMutableResources::getMutableBufferView(FrameGraphResource const&resource)
+    {
+      return m_bufferViews.at(resource.resourceId);
+    }
+
+    bool FrameGraphMutableResources::mergeIn(FrameGraphResources const&other)
+    {
+      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+      try {
+        #endif
+
+        m_textures.insert(other.textures().begin(), other.textures().end());
+        m_textureViews.insert(other.textureViews().begin(), other.textureViews().end());
+        m_buffers.insert(other.buffers().begin(), other.buffers().end());
+        m_bufferViews.insert(other.bufferViews().begin(), other.bufferViews().end());
+
+        return true;
+
+        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+      }
+      catch(std::runtime_error const&rte) {
+        return false;
+      }
+      catch(...) {
+        return false;
+      }
+      #endif
     }
 
   }

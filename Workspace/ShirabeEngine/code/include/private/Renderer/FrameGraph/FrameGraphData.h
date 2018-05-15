@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <type_traits>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <variant>
 
@@ -159,6 +159,7 @@ namespace Engine {
 
       FrameGraphBuffer();
     };
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphBuffer, FrameGraphBuffer);
 
     struct SHIRABE_TEST_EXPORT FrameGraphBufferView {
       Range
@@ -170,6 +171,7 @@ namespace Engine {
 
       FrameGraphBufferView();
     };
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView, FrameGraphBufferView);
 
     struct SHIRABE_TEST_EXPORT FrameGraphTexture {
       uint32_t
@@ -192,6 +194,7 @@ namespace Engine {
 
       virtual bool validate() const;
     };
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphTexture, FrameGraphTexture);
 
     struct SHIRABE_TEST_EXPORT FrameGraphTextureView {
       Range
@@ -204,6 +207,7 @@ namespace Engine {
 
       FrameGraphTextureView();
     };
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphTextureView, FrameGraphTextureView);
 
     struct SHIRABE_TEST_EXPORT FrameGraphResourceFlags {
       FrameGraphFormat
@@ -239,8 +243,6 @@ namespace Engine {
         readableName;
       FrameGraphResourceType
         type;
-      FrameGraphResourceData
-        data;
       bool
         isExternalResource;
 
@@ -276,18 +278,49 @@ namespace Engine {
     }
 
     template <typename TUnderlyingIDFrom, typename TUnderlyingIDTo = TUnderlyingIDFrom>
-    using AdjacencyListMap = std::map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
+    using AdjacencyListMap = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
+    DeclareMapType(FrameGraphResourceId_t, Renderer::RenderableList, RenderableList);
     class FrameGraphResources {
     public:
-      FrameGraphTexture       const&getTexture(FrameGraphResource const&)     const;
-      FrameGraphTextureView   const&getTextureView(FrameGraphResource const&) const;
-      FrameGraphBuffer        const&getBuffer(FrameGraphResource const&)      const;
-      FrameGraphBuffer        const&getBufferView(FrameGraphResource const&)  const;
-      std::vector<Renderable> const&getRenderables(FrameGraphResource const&) const;
+      FrameGraphTexture     const&getTexture(FrameGraphResource const&)     const;
+      FrameGraphTextureView const&getTextureView(FrameGraphResource const&) const;
+      FrameGraphBuffer      const&getBuffer(FrameGraphResource const&)      const;
+      FrameGraphBufferView  const&getBufferView(FrameGraphResource const&)  const;
 
-    private:
-      FrameGraphResourceMap m_resources;
+      Renderer::RenderableList const&getRenderables(FrameGraphResource const&) const;
+
+      inline FrameGraphTextureMap     const&textures()     const { return m_textures; }
+      inline FrameGraphTextureViewMap const&textureViews() const { return m_textureViews; }
+      inline FrameGraphBufferMap      const&buffers()      const { return m_buffers; }
+      inline FrameGraphBufferViewMap  const&bufferViews()  const { return m_bufferViews; }
+
+    protected:
+      FrameGraphTextureMap     m_textures;
+      FrameGraphTextureViewMap m_textureViews;
+      FrameGraphBufferMap      m_buffers;
+      FrameGraphBufferViewMap  m_bufferViews;
+      RenderableListMap        m_renderables;
+    };
+
+    class FrameGraphMutableResources
+      : public FrameGraphResources
+    {
+    public:
+      bool addTexture(FrameGraphResource const&, FrameGraphTexture const&);
+      bool addTextureView(FrameGraphResource const&, FrameGraphTextureView const&);
+      bool addBuffer(FrameGraphResource const&, FrameGraphBuffer const&);
+      bool addBufferView(FrameGraphResource const&, FrameGraphBufferView const&);
+      bool addRenderables(FrameGraphResource const&, Renderer::RenderableList const&);
+
+      FrameGraphTexture     &getMutableTexture(FrameGraphResource const&);
+      FrameGraphTextureView &getMutableTextureView(FrameGraphResource const&);
+      FrameGraphBuffer      &getMutableBuffer(FrameGraphResource const&);
+      FrameGraphBufferView  &getMutableBufferView(FrameGraphResource const&);
+
+      Renderer::RenderableList const&getRenderables(FrameGraphResource const&) const;
+
+      bool mergeIn(FrameGraphResources const&other);
     };
   }
 

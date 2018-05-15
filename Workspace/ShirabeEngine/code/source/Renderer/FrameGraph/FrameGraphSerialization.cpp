@@ -65,14 +65,14 @@ namespace Engine {
           writeTextureResource(
             assignment.first,
             assignment.second,
-            std::get<FrameGraphTexture>(assignment.second.data));
+            graph.m_resourceData.getTexture(assignment.second));
           break;
         case FrameGraphResourceType::TextureView:
           writeTextureResourceView(
             assignment.first,
             graph.m_resources.at(assignment.second.parentResource),
             assignment.second,
-            std::get<FrameGraphTextureView>(assignment.second.data));
+            graph.m_resourceData.getTextureView(assignment.second));
           break;
         }
       }
@@ -108,7 +108,7 @@ namespace Engine {
             if(!creations.empty())
               for(FrameGraphResourceId_t const&id : creations) {
                 FrameGraphResource const&resource = graph.m_resources.at(id);
-                FrameGraphTexture  const&texture  = std::get<FrameGraphTexture>(resource.data);
+                FrameGraphTexture  const&texture  = graph.m_resourceData.getTexture(resource);
                 writePass2TextureResourceEdge(id, resource, texture);
               }
             // Read/Write
@@ -119,7 +119,7 @@ namespace Engine {
               for(FrameGraphResourceId_t const&id : readViews) {
                 FrameGraphResource    const&resource       = graph.m_resources.at(id);
                 FrameGraphResource    const&parentResource = graph.m_resources.at(resource.parentResource);
-                FrameGraphTextureView const&view           = std::get<FrameGraphTextureView>(resource.data);
+                FrameGraphTextureView const&view           = graph.m_resourceData.getTextureView(resource);
                 writeTextureResourceViewEdge(id, parentResource, resource, view);
               }
             }

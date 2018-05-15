@@ -6,16 +6,14 @@ namespace Engine {
     bool
       Graph::execute(Ptr<IRenderContext>&renderContext)
     {
-      assert(renderContext != nullptr);
-
-      FrameGraphResources resources(m_resources);
-
+      // assert(renderContext != nullptr);
+      
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
         PassUID_t     passUID = copy.top();
         Ptr<PassBase> pass    = m_passes.at(passUID);
 
-        if(!pass->execute(resources, renderContext)) {
+        if(!pass->execute(m_resourceData, renderContext)) {
           Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
         }
 

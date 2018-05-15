@@ -69,7 +69,7 @@ namespace Engine {
 
         Log::Verbose(logTag(), "GBufferGeneration");
 
-        std::vector<Renderable> renderables = frameGraphResources.getRenderables(passData.importData.renderableQueryId);
+        RenderableList const&renderables = frameGraphResources.getRenderables(passData.importData.renderableQueryId);
         for(Renderable const&renderable : renderables) {
           EEngineStatus status = context->render(renderable);
           HandleEngineStatusError(status, "Failed to render renderable.");

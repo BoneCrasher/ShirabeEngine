@@ -13,6 +13,7 @@ namespace Engine {
     using namespace Engine::Resources;
 
     struct Renderable {};
+    DeclareListType(Renderable, Renderable);
 
     DeclareInterface(IRenderContext);
       virtual EEngineStatus render(Renderable const&) = 0;

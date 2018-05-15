@@ -5,7 +5,7 @@
 #include <memory>
 #include <functional>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #define STR(m) #m
 #define LOG_FUNCTION(...) STR( __VA_ARGS__)
@@ -143,10 +143,10 @@ namespace Engine {
   using Vector = std::vector<T>;
 
   template <typename TKey, typename TValue>
-  using Map = std::map<TKey, TValue>;
+  using Map = std::unordered_map<TKey, TValue>;
 
 #define DeclareListType(type, prefix) using prefix##List = std::vector<type>;
-#define DeclareMapType(keytype, valuetype, prefix) using prefix##Map = std::map<keytype, valuetype>;
+#define DeclareMapType(keytype, valuetype, prefix) using prefix##Map = std::unordered_map<keytype, valuetype>;
 
 #define DeclareTemplateListType(type, prefix) \
              template <typename type>         \

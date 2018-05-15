@@ -62,7 +62,9 @@ namespace Engine {
       AdjacencyListMap<PassUID_t> m_passAdjacency;
       std::stack<PassUID_t>       m_passExecutionOrder;
 
-      FrameGraphResourceMap                    m_resources;
+      FrameGraphResourceMap      m_resources;
+      FrameGraphMutableResources m_resourceData;
+
       AdjacencyListMap<FrameGraphResourceId_t> m_resourceAdjacency;
       std::stack<FrameGraphResourceId_t>       m_resourceOrder;
 
