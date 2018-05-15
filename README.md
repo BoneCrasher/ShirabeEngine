@@ -36,4 +36,5 @@ Copyright © 2013-2018 Niels Lohmann under MIT-License (https://opensource.org/l
 Reach out to me under:
 
 Email:   boehm.marc.anton@gmail.com
+
 Twitter: @DottiDeveloper
