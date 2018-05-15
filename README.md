@@ -30,3 +30,10 @@ Copyright (c) 2018 Jesse Yurkovich under MIT-License (https://opensource.org/lic
 The files from the nlohmann/json repository are used as-is and are subject to the MIT License as stated below:
 
 Copyright © 2013-2018 Niels Lohmann under MIT-License (https://opensource.org/licenses/MIT)
+
+# Contact
+
+Reach out to me under:
+
+Email:   boehm.marc.anton@gmail.com
+Twitter: @DottiDeveloper
