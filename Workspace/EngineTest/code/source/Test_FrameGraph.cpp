@@ -85,6 +85,7 @@ namespace Test {
       { 
         std::string message =
           String::format(
+            "operation -> render(Renderable const&):\n"
             "Renderable: %0\n"
             "  MeshId:     %1\n"
             "  MaterialId: %2\n",

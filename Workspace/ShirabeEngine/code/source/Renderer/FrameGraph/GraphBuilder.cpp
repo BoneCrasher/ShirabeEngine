@@ -381,27 +381,27 @@ namespace Engine {
         }
         // For each derived resource (views)
         else {
+          // Avoid internal references for passes!
+          // If the edge from pass k to pass k+1 was not added yet.
+          // Create edge: Parent-->Source
+          FrameGraphResource const&parentResource = m_resources.at(r.parentResource);
+          if(parentResource.assignedPassUID != r.assignedPassUID) {
+            if(!alreadyRegisteredFn<PassUID_t>(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
+              m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
+            }
+          }
+
+          // Do the same for the resources!
+          if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_resourceAdjacency[parentResource.resourceId], r.resourceId)) {
+            m_resourceAdjacency[parentResource.resourceId].push_back(r.resourceId);
+          }
+
+          // And map the resources to it's pass appropriately
+          if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_passToResourceAdjacency[r.assignedPassUID], r.resourceId)) {
+            m_passToResourceAdjacency[r.assignedPassUID].push_back(r.resourceId);
+          }
+
           if(r.type == FrameGraphResourceType::TextureView) {
-            // Avoid internal references for passes!
-            // If the edge from pass k to pass k+1 was not added yet.
-            // Create edge: Parent-->Source
-            FrameGraphResource const&parentResource = m_resources.at(r.parentResource);
-            if(parentResource.assignedPassUID != r.assignedPassUID) {
-              if(!alreadyRegisteredFn<PassUID_t>(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
-                m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
-              }
-            }
-
-            // Do the same for the resources!
-            if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_resourceAdjacency[parentResource.resourceId], r.resourceId)) {
-              m_resourceAdjacency[parentResource.resourceId].push_back(r.resourceId);
-            }
-
-            // And map the resources to it's pass appropriately
-            if(!alreadyRegisteredFn<FrameGraphResourceId_t>(m_passToResourceAdjacency[r.assignedPassUID], r.resourceId)) {
-              m_passToResourceAdjacency[r.assignedPassUID].push_back(r.resourceId);
-            }
-
             // Further adjustments
             FrameGraphResourceId_t  subjacentResourceId = findSubjacentResource(m_resources, r);
             FrameGraphResource     &subjacentResource   = m_resources[subjacentResourceId];

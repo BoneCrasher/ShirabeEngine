@@ -27,6 +27,8 @@ namespace Engine {
     using FrameGraph::PassUID_t;
     using FrameGraph::FrameGraphTexture;
     using FrameGraph::FrameGraphTextureView;
+    using FrameGraph::FrameGraphRenderableList;
+    using FrameGraph::FrameGraphRenderableListView;
     using FrameGraph::FrameGraphResourceId_t;
     
     /**********************************************************************************************//**
@@ -84,6 +86,22 @@ namespace Engine {
       void beginGraph();
       void endGraph();
       void writePass(PassBase const&pass);
+      void writeRenderableList(
+        FrameGraphResourceId_t   const&id,
+        FrameGraphResource       const&resource,
+        FrameGraphRenderableList const&texture);
+      void writeRenderableListView(
+        FrameGraphResourceId_t       const&id,
+        FrameGraphResource           const&parentResource,
+        FrameGraphResource           const&resource,
+        FrameGraphRenderableListView const&view);
+
+      void writeRenderableResourceViewEdge(
+        FrameGraphResourceId_t       const&id,
+        FrameGraphResource           const&parentResource,
+        FrameGraphResource           const&resource,
+        FrameGraphRenderableListView const&view);
+
       void writeTextureResource(
         FrameGraphResourceId_t const&id,
         FrameGraphResource     const&resource,
@@ -92,7 +110,8 @@ namespace Engine {
         FrameGraphResourceId_t const&id,
         FrameGraphResource     const&parentResource,
         FrameGraphResource     const&resource,
-        FrameGraphTextureView const&view);
+        FrameGraphTextureView  const&view);
+
       void writePassEdge(PassUID_t const&source, PassUID_t const&target);
       void writePass2TextureResourceEdge(
         FrameGraphResourceId_t const&id,

@@ -74,6 +74,19 @@ namespace Engine {
             assignment.second,
             graph.m_resourceData.getTextureView(assignment.second.resourceId));
           break;
+        case FrameGraphResourceType::RenderableList:
+          writeRenderableList(
+            assignment.first,
+            assignment.second,
+            graph.m_resourceData.getRenderableList(assignment.second.resourceId));
+          break;
+        case FrameGraphResourceType::RenderableListView:
+          writeRenderableListView(
+            assignment.first,
+            graph.m_resources.at(assignment.second.parentResource),
+            assignment.second,
+            graph.m_resourceData.getRenderableListView(assignment.second.resourceId));
+          break;
         }
       }
 
@@ -101,7 +114,7 @@ namespace Engine {
           // Write out the passes' resources
           if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end()) {
             PublicResourceIdList const&passResources = passResourcesAdj.at(sourceUID);
-            // Create
+            // Create Texture
             std::vector<FrameGraphResourceId_t> creations = filter(passResources, [] (FrameGraphResource const&r) -> bool {
               return (r.type == FrameGraphResourceType::Texture && r.assignedPassUID != 0);
             });
@@ -111,7 +124,7 @@ namespace Engine {
                 FrameGraphTexture  const&texture  = graph.m_resourceData.getTexture(resource.resourceId);
                 writePass2TextureResourceEdge(id, resource, texture);
               }
-            // Read/Write
+            // Read/Write Texture
             std::vector<FrameGraphResourceId_t> readViews = filter(passResources, [] (FrameGraphResource const&r) -> bool {
               return (r.type == FrameGraphResourceType::TextureView);
             });
@@ -121,6 +134,18 @@ namespace Engine {
                 FrameGraphResource    const&parentResource = graph.m_resources.at(resource.parentResource);
                 FrameGraphTextureView const&view           = graph.m_resourceData.getTextureView(resource.resourceId);
                 writeTextureResourceViewEdge(id, parentResource, resource, view);
+              }
+            }
+            // Use Renderables
+            std::vector<FrameGraphResourceId_t> renderableListViews = filter(passResources, [] (FrameGraphResource const&r) -> bool {
+              return (r.type == FrameGraphResourceType::RenderableListView);
+            });
+            if(!renderableListViews.empty()) {
+              for(FrameGraphResourceId_t const&id : renderableListViews) {
+                FrameGraphResource           const&resource       = graph.m_resources.at(id);
+                FrameGraphResource           const&parentResource = graph.m_resources.at(resource.parentResource);
+                FrameGraphRenderableListView const&view           = graph.m_resourceData.getRenderableListView(resource.resourceId);
+                writeRenderableResourceViewEdge(id, parentResource, resource, view);
               }
             }
           }
@@ -219,10 +244,10 @@ namespace Engine {
     {
       std::string passLabel = String::format(
         "<<table bgcolor=\"#429692\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
-        "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Pass #%0</b></font></td></tr>"
+        "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Pass (PID: %0)</b></font></td></tr>"
         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"16\">%1</font></td></tr>"
-        "</table>>", 
-        pass.passUID(), 
+        "</table>>",
+        pass.passUID(),
         pass.passName());
 
       m_stream << "    Pass" << pass.passUID() << " [shape=none, label=" << passLabel << "];\n";
@@ -235,6 +260,70 @@ namespace Engine {
     {
       static constexpr char const*passEdgeStyle = "style=bold,color=\"#d95d39\",tailport=e,headport=w";
       m_stream << "  Pass" << source << " -> " << "Pass" << target << " [" << passEdgeStyle << "];\n";
+    }
+
+    void
+      FrameGraphGraphVizSerializer::writeRenderableList(
+        FrameGraphResourceId_t   const&id,
+        FrameGraphResource       const&resource,
+        FrameGraphRenderableList const&list)
+    {
+      static constexpr char const*listStyle = "shape=none";
+      std::string listLabel =
+        String::format(
+          "<<table bgcolor=\"#edb036\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
+          "<tr><td colspan=\"2\"><font point-size=\"16\">&lt;&lt;%0&gt;&gt;</font></td></tr>"
+          "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>RenderableList (RID: %1)</b></font></td></tr>"
+          "</table>>",
+          "import",
+          resource.resourceId,
+          resource.readableName);
+
+      m_stream << "    RenderableList" << id << " [" << listStyle << ",label=" << listLabel << "];\n";
+    }
+
+    void
+      FrameGraphGraphVizSerializer::writeRenderableListView(
+        FrameGraphResourceId_t       const&id,
+        FrameGraphResource           const&parentResource,
+        FrameGraphResource           const&resource,
+        FrameGraphRenderableListView const&view)
+    {
+      std::string viewId   = String::format("RenderableListView%0", id);
+
+      static constexpr char const*viewStyle = "shape=none";
+      std::string viewLabel =
+        String::format(
+          "<<table bgcolor=\"#%0\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
+          "<tr><td colspan=\"2\"><font point-size=\"16\"><b>RenderableListView (RID: %1)</b></font></td></tr>"
+          "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">%2</td></tr>"
+          "</table>>",
+          "f46e5d",
+          resource.resourceId,
+          resource.subjacentResource);
+
+      m_stream << "    " << viewId << " [" << viewStyle << ",label=" << viewLabel << "];\n";
+    }
+
+    void
+      FrameGraphGraphVizSerializer::writeRenderableResourceViewEdge(
+        FrameGraphResourceId_t       const&id,
+        FrameGraphResource           const&parentResource,
+        FrameGraphResource           const&resource,
+        FrameGraphRenderableListView const&view)
+    {
+      std::string passId   = String::format("Pass%0", resource.assignedPassUID);
+      std::string viewId   = String::format("RenderableListView%0", id); std::string parentId = "";
+      if(parentResource.type == FrameGraphResourceType::RenderableList)
+        parentId = String::format("RenderableList%0", parentResource.resourceId);
+      else
+        parentId = String::format("RenderableListView%0", parentResource.resourceId);
+
+      static constexpr char const*pass2ViewEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
+      m_stream << "    " << viewId << " -> " << passId  << " [" << pass2ViewEdgeStyle << "];\n";
+
+      static constexpr char const*parent2ViewStyle = "tailport=e,headport=w,weight=1,color=\"#bbbbbb\"";
+      m_stream << "    " << parentId << " -> " << viewId << " [" << parent2ViewStyle << "];\n";
     }
 
     void
@@ -252,7 +341,7 @@ namespace Engine {
         String::format(
           "<<table bgcolor=\"#e0b867\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
           "<tr><td colspan=\"2\"><font point-size=\"16\">&lt;&lt;%0&gt;&gt;</font></td></tr>"
-          "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Texture #%1</b></font></td></tr>"
+          "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Texture (RID: %1)</b></font></td></tr>"
           "<tr><td align=\"left\">Name:</td><td align=\"left\">%2</td></tr>"
           "<tr><td align=\"left\">Sizes:</td><td align=\"left\">%3 x %4 x %5</td></tr>"
           "<tr><td align=\"left\">Format:</td><td align=\"left\">%6</td></tr>"
@@ -299,7 +388,7 @@ namespace Engine {
       std::string viewLabel =
         String::format(
           "<<table bgcolor=\"#%0\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
-          "<tr><td colspan=\"2\"><font point-size=\"16\"><b>TextureView #%1</b></font></td></tr>"
+          "<tr><td colspan=\"2\"><font point-size=\"16\"><b>TextureView (RID: %1)</b></font></td></tr>"
           "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">%2</td></tr>"
           "<tr><td align=\"left\">Mode:</td><td align=\"left\">%3</td></tr>"
           "<tr><td align=\"left\">Format:</td><td align=\"left\">%4</td></tr>"
