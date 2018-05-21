@@ -24,36 +24,40 @@ namespace Engine {
         D3D11_RENDER_TARGET_VIEW_DESC rtvDesc ={};
         rtvDesc.Format = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.textureFormat);
 
-        switch(desc.dimensionNb) {
+        uint8_t dimensionCount = 1;
+        dimensionCount += (desc.subjacentTexture.height > 1) ? 1 : 0;
+        dimensionCount += (desc.subjacentTexture.depth  > 1) ? 1 : 0;
+
+        switch(dimensionCount) {
         case 1:
-          if(desc.array.isTextureArray) {
+          if(desc.subjacentTexture.arraySize > 1) {
             rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
-            rtvDesc.Texture1DArray.FirstArraySlice = desc.array.firstArraySlice;
-            rtvDesc.Texture1DArray.ArraySize       = desc.array.size;
-            rtvDesc.Texture1DArray.MipSlice        = 0;
+            rtvDesc.Texture1DArray.FirstArraySlice = desc.arraySlices.offset;
+            rtvDesc.Texture1DArray.ArraySize       = desc.arraySlices.length;
+            rtvDesc.Texture1DArray.MipSlice        = desc.mipMapSlices.offset;
           }
           else {
             rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
-            rtvDesc.Texture1D.MipSlice = 0;
+            rtvDesc.Texture1D.MipSlice = desc.mipMapSlices.offset;
           }
           break;
         case 2:
-          if(desc.array.isTextureArray) {
+          if(desc.subjacentTexture.arraySize > 1) {
             rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-            rtvDesc.Texture2DArray.FirstArraySlice = 0;
-            rtvDesc.Texture2DArray.ArraySize       = desc.array.size;
-            rtvDesc.Texture2DArray.MipSlice        = 0;
+            rtvDesc.Texture2DArray.FirstArraySlice = desc.arraySlices.offset;
+            rtvDesc.Texture2DArray.ArraySize       = desc.arraySlices.length;
+            rtvDesc.Texture2DArray.MipSlice        = desc.mipMapSlices.offset;
           }
           else {
             rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-            rtvDesc.Texture2D.MipSlice = 0;
+            rtvDesc.Texture2D.MipSlice = desc.mipMapSlices.offset;
           }
           break;
         case 3:
           rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
           rtvDesc.Texture3D.FirstWSlice    = 0;
-          rtvDesc.Texture3D.WSize          = desc.array.size;
-          rtvDesc.Texture3D.MipSlice       = 0;
+          rtvDesc.Texture3D.WSize          = desc.subjacentTexture.depth;
+          rtvDesc.Texture3D.MipSlice       = desc.mipMapSlices.offset;
           break;
         }
 

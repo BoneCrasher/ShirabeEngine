@@ -7,7 +7,7 @@
 #include "GFXAPI/DirectX/DX11/DeviceCapabilities.h"
 
 #include "GFXAPI/Types/SwapChain.h"
-#include "GFXAPI/Types/TextureND.h" // Implies RTV, SRV, DSV
+#include "GFXAPI/Types/Texture.h" // Implies RTV, SRV, DSV
 #include "GFXAPI/Types/DepthStencilState.h"
 #include "GFXAPI/Types/RasterizerState.h"
 
@@ -74,17 +74,18 @@ namespace Engine {
 
 				// Get the swap chain.
 				SwapChain::Descriptor swapChainDescriptor ={};
-				swapChainDescriptor.name                   = "DefaultSwapChain";
-				swapChainDescriptor.backBufferCount        = BACK_BUFFER_COUNT;
-				swapChainDescriptor.texture.name           = "DefaultSwapChainTexture2D";
-				swapChainDescriptor.texture.textureFormat  = outputMode.format;
-				swapChainDescriptor.texture.dimensions[0]  = outputMode.size.x();
-				swapChainDescriptor.texture.dimensions[1]  = outputMode.size.y();
-				swapChainDescriptor.vsyncEnabled           = configuration.enableVSync;
-				swapChainDescriptor.refreshRateNumerator   = outputMode.refreshRate.x();
-				swapChainDescriptor.refreshRateDenominator = outputMode.refreshRate.y();
-				swapChainDescriptor.fullscreen             = !configuration.requestFullscreen;
-				swapChainDescriptor.windowHandle           = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
+				swapChainDescriptor.name                       = "DefaultSwapChain";
+				swapChainDescriptor.backBufferCount            = BACK_BUFFER_COUNT;
+				swapChainDescriptor.texture.name               = "DefaultSwapChainTexture2D";
+				swapChainDescriptor.texture.textureInfo.format = outputMode.format;
+				swapChainDescriptor.texture.textureInfo.width  = outputMode.size.x();
+				swapChainDescriptor.texture.textureInfo.height = outputMode.size.y();
+        swapChainDescriptor.texture.textureInfo.depth  = 1;
+				swapChainDescriptor.vsyncEnabled               = configuration.enableVSync;
+				swapChainDescriptor.refreshRateNumerator       = outputMode.refreshRate.x();
+				swapChainDescriptor.refreshRateDenominator     = outputMode.refreshRate.y();
+				swapChainDescriptor.fullscreen                 = !configuration.requestFullscreen;
+				swapChainDescriptor.windowHandle               = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
 
         PublicResourceId_t swapChainId = 0;
         SwapChain::CreationRequest swapChainCreationRequest(swapChainDescriptor);
@@ -92,20 +93,18 @@ namespace Engine {
 				status = resourceManager->createSwapChain(swapChainDescriptor, swapChainId);
         HandleEngineStatusError(status, String::format("Failed to create swap chain:\n Desc:%0", swapChainDescriptor.toString()));
       
-        Texture2D::Descriptor defaultDepthStencilTextureDescriptor ={};
-				defaultDepthStencilTextureDescriptor.dimensions            ={ outputMode.size.x(), outputMode.size.y() };
-				defaultDepthStencilTextureDescriptor.textureFormat         = Format::D24_UNORM_S8_UINT;
-				defaultDepthStencilTextureDescriptor.mipMap.useMipMaps     = false;
-				defaultDepthStencilTextureDescriptor.mipMap.mipLevels      = 1;
-				defaultDepthStencilTextureDescriptor.array.isTextureArray  = false;
-				defaultDepthStencilTextureDescriptor.array.size            = 1;
-				defaultDepthStencilTextureDescriptor.cpuGpuUsage           = ResourceUsage::CPU_None_GPU_ReadWrite;
-				defaultDepthStencilTextureDescriptor.gpuBinding            = EToUnderlying(BufferBinding::ShaderOutput_DepthStencil);
-				defaultDepthStencilTextureDescriptor.multisampling.size    = 1;
-				defaultDepthStencilTextureDescriptor.multisampling.quality = 0;
+        Texture::Descriptor defaultDepthStencilTextureDescriptor ={};
+        defaultDepthStencilTextureDescriptor.textureInfo                       = swapChainDescriptor.texture.textureInfo;
+				defaultDepthStencilTextureDescriptor.textureInfo.format                = Format::D24_UNORM_S8_UINT;
+        defaultDepthStencilTextureDescriptor.textureInfo.mipLevels             = 1;
+        defaultDepthStencilTextureDescriptor.textureInfo.arraySize             = 1;
+				defaultDepthStencilTextureDescriptor.textureInfo.multisampling.size    = 1;
+				defaultDepthStencilTextureDescriptor.textureInfo.multisampling.quality = 0;
+        defaultDepthStencilTextureDescriptor.cpuGpuUsage                       = ResourceUsage::CPU_None_GPU_ReadWrite;
+        defaultDepthStencilTextureDescriptor.gpuBinding                        = EToUnderlying(BufferBinding::ShaderOutput_DepthStencil);
 
         PublicResourceId_t defaultDepthStencilTextureId   = 0;
-				status = resourceManager->createTexture2D(defaultDepthStencilTextureDescriptor, defaultDepthStencilTextureId);
+				status = resourceManager->createTexture(defaultDepthStencilTextureDescriptor, defaultDepthStencilTextureId);
         HandleEngineStatusError(status, String::format("Failed to create depth stencil view:\n Desc:%0", defaultDepthStencilTextureDescriptor.toString()));
 
 
@@ -172,7 +171,7 @@ namespace Engine {
         
         status = m_resourceManager->destroyDepthStencilState(m_defaultDepthStencilStateId);
         HandleEngineStatusError(status, "Failed to destroy the default depth stencil state.");
-        status = m_resourceManager->destroyTexture2D(m_defaultDepthStencilTextureId);
+        status = m_resourceManager->destroyTexture(m_defaultDepthStencilTextureId);
         HandleEngineStatusError(status, "Failed to destroy the default depth stencil texture or one of its dependers.");
         status = m_resourceManager->destroySwapChain(m_swapChainId);
         HandleEngineStatusError(status, "Failed to destroy the swap chain.");

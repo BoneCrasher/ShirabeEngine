@@ -11,7 +11,6 @@
 
 #include "GFXAPI/Definitions.h"
 
-#include "TextureNDDefinition.h"
 #include "RequestDefaultImplementation.h"
 
 namespace Engine {

@@ -39,7 +39,7 @@ namespace Engine {
           using Engine::GFXAPI::Format;
 
           EEngineStatus status = EEngineStatus::Ok;
-          status = getDeviceCapabilities(Format::RGBA_8_UNORM, &m_caps);
+          status = getDeviceCapabilities(Format::R8G8B8A8_UNORM, &m_caps);
           HandleEngineStatusError(status, "Failed to retrieve device capabilities.");
         };
 
@@ -80,7 +80,7 @@ namespace Engine {
                   for(uint32_t m=0; m < output.outputModes.size(); ++m) {
                     GAPIOutputMode const&mode = output.outputModes[m];
 
-                    if(mode.format != Format::RGBA_8_UNORM) // Redundant test?
+                    if(mode.format != Format::R8G8B8A8_UNORM) // Redundant test?
                       // The format is mandatory!!! 
                       continue;
 

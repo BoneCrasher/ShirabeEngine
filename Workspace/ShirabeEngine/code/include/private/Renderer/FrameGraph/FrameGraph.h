@@ -12,6 +12,7 @@
 #include "Renderer/FrameGraph/FrameGraphSerialization.h"
 #include "Renderer/FrameGraph/Pass.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
+#include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
 namespace Engine {
   namespace FrameGraph {
@@ -26,7 +27,7 @@ namespace Engine {
 
     public:
       bool
-        execute(Ptr<IRenderContext>&);
+        execute(Ptr<IFrameGraphRenderContext>&);
 
       virtual inline
         void acceptSerializer(Ptr<IFrameGraphSerializer> s)
@@ -54,9 +55,22 @@ namespace Engine {
       }
 
     private:
+      bool initializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
+      bool initializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
+      bool initializeBuffers(Ptr<IFrameGraphRenderContext> renderContext);
+      bool initializeBufferViews(Ptr<IFrameGraphRenderContext> renderContext);
+     
+      bool deinitializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
+      bool deinitializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
+      bool deinitializeBufferViews(Ptr<IFrameGraphRenderContext> renderContext);
+      bool deinitializeBuffer(Ptr<IFrameGraphRenderContext> renderContext);
+      
+      // Pass Ops
       PassMap &passes();
-
       bool addPass(Ptr<PassBase> const&);
+
+      // 
+      Ptr<IResourceManager> m_resourceManager;
 
       PassMap                     m_passes;
       AdjacencyListMap<PassUID_t> m_passAdjacency;

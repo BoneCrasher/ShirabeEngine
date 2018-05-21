@@ -13,6 +13,9 @@
 #include "Core/BitField.h"
 #include "Core/BasicTypes.h"
 
+#include "Resources/Types/Definition.h"
+#include "Resources/Types/Texture.h"
+
 #include "Renderer/IRenderer.h"
 
 namespace Engine {
@@ -49,64 +52,7 @@ namespace Engine {
      *
      * \brief Values that represent texture and buffer formats
      **************************************************************************************************/
-    enum class FrameGraphFormat
-      : uint8_t
-    {
-      Undefined = 0,
-      SpecialFormatRangeFlag      = 1,
-      Automatic,
-      Structured,
-      // 8-bit formats
-      Format8BitFormatRangeFlag   = 8,
-      R8_TYPELESS,
-      R8_SINT,
-      R8_UINT,
-      R8_SNORM,
-      R8_UNORM,
-      // 16-bit formats
-      Format16BitFormatRangeFlag  = 16,
-      R16_TYPELESS,
-      R16_SINT,
-      R16_UINT,
-      R16_SNORM,
-      R16_UNORM,
-      R16_FLOAT,
-      // 32-bit formats
-      Format32BitFormatRangeFlag  = 32,
-      R8G8B8A8_TYPELESS,
-      R8G8B8A8_SINT,
-      R8G8B8A8_UINT,
-      R8G8B8A8_SNORM,
-      R8G8B8A8_UNORM,
-      R8G8B8A8_UNORM_SRGB,
-      R8G8B8A8_FLOAT,
-      R24_UNORM_X8_TYPELESS,
-      R32_TYPELESS,
-      R32_SINT,
-      R32_UINT,
-      R32_SNORM,
-      R32_UNORM,
-      R32_FLOAT,
-      D24_UNORM_S8_UINT,
-      D32_FLOAT,
-      // 64-bit formats
-      Format64BitFormatRangeFlag  = 64,
-      R16G16B16A16_TYPELESS = 64,
-      R16G16B16A16_SINT,
-      R16G16B16A16_UINT,
-      R16G16B16A16_SNORM,
-      R16G16B16A16_UNORM,
-      R16G16B16A16_FLOAT,
-      R32_FLOAT_S8X24_TYPELESS,
-      D32_FLOAT_S8X24_UINT,
-      // 128-bit formats
-      Format128BitFormatRangeFlag = 128,
-      R32G32B32A32_TYPELESS,
-      R32G32B32A32_SINT,
-      R32G32B32A32_UINT,
-      Format256BitFormatRangeFlag = 256,
-      // TODO: DXT/BC Compression and Video formats
-    };
+    using FrameGraphFormat = Engine::Resources::Format;
 
     SHIRABE_TEST_EXPORT bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
 
@@ -129,6 +75,14 @@ namespace Engine {
       Depth
     };
 
+    enum class FrameGraphReadSource
+      : uint8_t
+    {
+      Undefined = 0,
+      Color,
+      Depth
+    };
+
     enum class FrameGraphResourceAccessibility
       : uint8_t
     {
@@ -144,7 +98,17 @@ namespace Engine {
       Clear     = 1  // Resource will be cleared depending on the resource type.
     };
 
-    enum class FrameGraphViewAccessMode {
+    enum class FrameGraphViewSource
+      : uint8_t 
+    {
+      Undefined = 0,
+      Color,
+      Depth
+    };
+
+    enum class FrameGraphViewAccessMode 
+      : uint8_t 
+    {
       Undefined = 0,
       Read,
       Write
@@ -175,17 +139,9 @@ namespace Engine {
     };
     DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView, FrameGraphBufferView);
 
-    struct SHIRABE_TEST_EXPORT FrameGraphTexture {
-      uint32_t
-        width,  // 0 - Undefined
-        height, // At least 1
-        depth;  // At least 1
-      FrameGraphFormat
-        format;
-      uint16_t
-        mipLevels; // At least 1 (most detailed MIP)
-      uint16_t
-        arraySize; // At least 1 (basically everything is a vector...)
+    struct SHIRABE_TEST_EXPORT FrameGraphTexture
+      : public Resources::TextureInfo
+    {
       FrameGraphResourceInitState
         initialState;
       BitField<FrameGraphResourceUsage>
@@ -206,6 +162,8 @@ namespace Engine {
         format;
       BitField<FrameGraphViewAccessMode>
         mode;
+      FrameGraphViewSource
+        source;
 
       FrameGraphTextureView();
     };
@@ -221,6 +179,8 @@ namespace Engine {
     struct SHIRABE_TEST_EXPORT FrameGraphReadTextureFlags
       : public FrameGraphResourceFlags
     {
+      FrameGraphReadSource
+        source;
     };
 
     struct SHIRABE_TEST_EXPORT FrameGraphWriteTextureFlags

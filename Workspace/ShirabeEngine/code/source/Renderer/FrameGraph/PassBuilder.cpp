@@ -77,7 +77,7 @@ namespace Engine {
         Range                       const&mipSliceRange)
     {
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-      
+
       if(isTextureBeingReadInSubresourceRange(m_resourceData.textureViews(), m_resources, sourceResource, arraySliceRange, mipSliceRange))
         throw std::runtime_error(
           String::format(
@@ -97,6 +97,10 @@ namespace Engine {
       view.mipSliceRange   = mipSliceRange;
       view.format          = flags.requiredFormat;
       view.mode.set(FrameGraphViewAccessMode::Write);
+      if(flags.writeTarget == FrameGraphWriteTarget::Color)
+        view.source = FrameGraphViewSource::Color;
+      if(flags.writeTarget == FrameGraphWriteTarget::Depth)
+        view.source = FrameGraphViewSource::Depth;
 
       FrameGraphResource resource ={};
       resource.assignedPassUID    = m_passUID;
@@ -152,6 +156,10 @@ namespace Engine {
       view.mipSliceRange   = mipSliceRange;
       view.format          = flags.requiredFormat;
       view.mode.set(FrameGraphViewAccessMode::Read);
+      if(flags.source == FrameGraphReadSource::Color)
+        view.source = FrameGraphViewSource::Color;
+      if(flags.source == FrameGraphReadSource::Depth)
+        view.source = FrameGraphViewSource::Depth;
 
       FrameGraphResource resource ={ };
       resource.assignedPassUID   = m_passUID;
@@ -182,7 +190,7 @@ namespace Engine {
      **************************************************************************************************/
     FrameGraphResource
       PassBuilder::importRenderables(
-        std::string        const&collectionName, 
+        std::string        const&collectionName,
         FrameGraphResource const&renderableListResource)
     {
       FrameGraphResource resource{};

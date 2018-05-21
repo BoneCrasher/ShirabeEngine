@@ -1,8 +1,8 @@
 #include "Renderer/FrameGraph/Modules/Compositing.h"
 
 namespace Engine {
-	namespace FrameGraph {
-    
+  namespace FrameGraph {
+
     FrameGraphModule<CompositingModuleTag_t>::ExportData
       FrameGraphModule<CompositingModuleTag_t>::addDefaultCompositingPass(
         GraphBuilder            &graphBuilder,
@@ -29,11 +29,12 @@ namespace Engine {
       {
         FrameGraphReadTextureFlags readFlags{ };
         readFlags.requiredFormat = FrameGraphFormat::Automatic;
+        readFlags.source         = FrameGraphReadSource::Color;
 
-        passData.importData.gbuffer0                = builder.readTexture(gbuffer0,                readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer1                = builder.readTexture(gbuffer1,                readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer2                = builder.readTexture(gbuffer2,                readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer3                = builder.readTexture(gbuffer3,                readFlags, Range(0, 1), Range(0, 1));
+        passData.importData.gbuffer0                = builder.readTexture(gbuffer0, readFlags, Range(0, 1), Range(0, 1));
+        passData.importData.gbuffer1                = builder.readTexture(gbuffer1, readFlags, Range(0, 1), Range(0, 1));
+        passData.importData.gbuffer2                = builder.readTexture(gbuffer2, readFlags, Range(0, 1), Range(0, 1));
+        passData.importData.gbuffer3                = builder.readTexture(gbuffer3, readFlags, Range(0, 1), Range(0, 1));
         passData.importData.lightAccumulationBuffer = builder.readTexture(lightAccumulationBuffer, readFlags, Range(0, 1), Range(0, 1));
 
         FrameGraphWriteTextureFlags writeFlags{ };
@@ -44,7 +45,7 @@ namespace Engine {
 
         return true;
       },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&context) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&context) -> bool
       {
         Log::Verbose(logTag(), "Compositing");
 
@@ -54,5 +55,5 @@ namespace Engine {
       return pass->passData().exportData;
     }
 
-	}
+  }
 }

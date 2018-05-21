@@ -6,11 +6,8 @@ namespace Engine {
 
     ShaderResourceViewDeclaration::Texture
       ::Texture()
-      : dimensionNb(0)
-      , dimensions({0, 0, 0})
-      , isCube(false)
-      , array()
-      , mipMap()
+      : arraySlice(0, 0)
+      , mipSlice(0, 0)
     {}
 
     ShaderResourceViewDeclaration::StructuredBuffer
@@ -46,11 +43,10 @@ namespace Engine {
       if(srvType == EShaderResourceDimension::Texture) {
         Texture texture = std::get<Texture>(shaderResourceDimension);
         ss
-          << " Dimensions:        " << (uint8_t)texture.dimensionNb << "\n,"
-          << " Array:             " << (uint8_t)texture.array.size << "\n,"
-          << " First array index: " << (uint8_t)texture.array.firstArraySlice << "\n,"
-          << " MipMap:            " << (uint8_t)texture.mipMap.mipLevels << "\n,"
-          << " Most Detailed MIP: " << (uint8_t)texture.mipMap.firstMipMapLevel << ";";
+          << " Array:             " << (uint8_t)texture.arraySlice.length << "\n,"
+          << " First array index: " << (uint8_t)texture.arraySlice.offset << "\n,"
+          << " MipMap:            " << (uint8_t)texture.mipSlice.length << "\n,"
+          << " Most Detailed MIP: " << (uint8_t)texture.mipSlice.offset << ";";
       }
       else { // StructuredBuffer
         StructuredBuffer structuredBuffer = std::get<StructuredBuffer>(shaderResourceDimension);

@@ -11,7 +11,7 @@
 
 #include "GFXAPI/Definitions.h"
 #include "GFXAPI/Types/RequestDefaultImplementation.h"
-#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/Texture.h"
 #include "GFXAPI/Types/RenderTargetView.h"
 #include "RequestDefaultImplementation.h"
 
@@ -32,9 +32,9 @@ namespace Engine {
       struct Descriptor
         : public DescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN_BUFFER>
       {
-        std::string           name;
-        Texture2D::Descriptor texture;
-        uint32_t              backBufferIndex;
+        std::string         name;
+        Texture::Descriptor texture;
+        uint32_t            backBufferIndex;
 
         Descriptor();
 
@@ -133,14 +133,14 @@ namespace Engine {
       struct Descriptor
         : public DescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
       {
-        std::string           name;
-        Texture2D::Descriptor texture;
-        bool                  vsyncEnabled;
-        bool                  fullscreen;
-        unsigned int          windowHandle;
-        unsigned int          backBufferCount;
-        unsigned int          refreshRateNumerator;
-        unsigned int          refreshRateDenominator;
+        std::string         name;
+        Texture::Descriptor texture;
+        bool                vsyncEnabled;
+        bool                fullscreen;
+        unsigned int        windowHandle;
+        unsigned int        backBufferCount;
+        unsigned int        refreshRateNumerator;
+        unsigned int        refreshRateDenominator;
 
         std::string toString() const;
       };

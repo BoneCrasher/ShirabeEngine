@@ -9,6 +9,8 @@
 #include "Core/BitField.h"
 #include "Log/Log.h"
 
+#include "Resources/Types/Definition.h"
+
 #include "GFXAPI/Capabilities.h"
 
 namespace Engine {
@@ -16,6 +18,7 @@ namespace Engine {
 		namespace _11 {
 
 			using namespace GFXAPI;
+      using Engine::Resources::Format;
       using Engine::Core::BitField;
 
 			class DX11DeviceCapsHelper {

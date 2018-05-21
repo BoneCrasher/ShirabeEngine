@@ -8,12 +8,12 @@
 #include "Resources/Core/ResourceDTO.h"
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/ResourceTraits.h"
+#include "Resources/Types/Texture.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Definitions.h"
 
-#include "TextureNDDefinition.h"
 #include "RequestDefaultImplementation.h"
 
 
@@ -37,11 +37,8 @@ namespace Engine {
        * \brief A texture.
        **************************************************************************************************/
       struct Texture {
-        unsigned int            dimensionNb; // 1..3
-        TVector3D<uint32_t>     dimensions;
-        bool                    isCube; // Implies the dimensions[2] to be 6
-        TextureArrayDescriptor  array;
-        TextureMipMapDescriptor mipMap;
+        ArraySlices arraySlice;
+        MipSlices   mipSlice;
 
         Texture();          
       };
@@ -78,6 +75,7 @@ namespace Engine {
           StructuredBuffer
         };
 
+        TextureInfo              subjacentTexture;
         Format                   format;
         EShaderResourceDimension srvType;
         ShaderResourceDimension  shaderResourceDimension;

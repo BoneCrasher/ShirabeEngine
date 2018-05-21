@@ -46,9 +46,7 @@ namespace Engine {
         spawnPass(
           std::string                 const&name,
           TPassCreationArgs            &&...args);
-
-      Ptr<ApplicationEnvironment> getApplicationEnvironment();
-
+      
       FrameGraphResource
         registerTexture(
           std::string       const&readableName,
@@ -66,10 +64,12 @@ namespace Engine {
       FrameGraphTextureView    const&getTextureViewData(FrameGraphResource const&resource) const;
       FrameGraphRenderableList const&getRenderableList(FrameGraphResource const&resource)  const;
 
+      Ptr<ApplicationEnvironment>& env();
+
     private:
       FrameGraphResourceId_t generatePassUID();
 
-      UniquePtr<Graph>& graph();
+      UniquePtr<Graph>&            graph();
 
       FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 

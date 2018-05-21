@@ -131,28 +131,8 @@ namespace Engine {
       , mode(FrameGraphViewAccessMode::Undefined)
     {}
 
-    uint32_t
-      width,  // 0 - Undefined
-      height, // At least 1
-      depth;  // At least 1
-    FrameGraphFormat
-      format;
-    uint16_t
-      mipLevels; // At least 1 (most detailed MIP)
-    uint16_t
-      arraySize; // At least 1 (basically everything is a vector...)
-    FrameGraphResourceInitState
-      initialState;
-    BitField<FrameGraphResourceUsage>
-      permittedUsage,
-      requestedUsage;
     FrameGraphTexture::FrameGraphTexture()
-      : width(0)
-      , height(1)
-      , depth(1)
-      , format(FrameGraphFormat::Undefined)
-      , mipLevels(1)
-      , arraySize(1)
+      : TextureInfo()
       , initialState(FrameGraphResourceInitState::Undefined)
       , permittedUsage(FrameGraphResourceUsage::Undefined)
       , requestedUsage(FrameGraphResourceUsage::Undefined)

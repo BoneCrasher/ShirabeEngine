@@ -125,9 +125,7 @@ namespace Engine {
         PublicResourceId_t const&inId);            
 
       DeclareSupportedResource(SwapChain);
-      DeclareSupportedResource(Texture1D);
-      DeclareSupportedResource(Texture2D);
-      DeclareSupportedResource(Texture3D);
+      DeclareSupportedResource(Texture);
       DeclareSupportedResource(RenderTargetView);
       DeclareSupportedResource(ShaderResourceView);
       DeclareSupportedResource(DepthStencilView);

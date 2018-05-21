@@ -6,11 +6,11 @@
 
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/ResourceTraits.h"
+#include "Resources/Types/Texture.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Definitions.h"
 
-#include "TextureNDDefinition.h"
 #include "RequestDefaultImplementation.h"
 
 namespace Engine {
@@ -31,11 +31,11 @@ namespace Engine {
       struct Descriptor
         : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW> 
       {
-        std::string             name;
-        Format                  textureFormat;
-        unsigned int            dimensionNb;
-        TextureArrayDescriptor  array;
-        TextureMipMapDescriptor mipMap;
+        std::string name;
+        TextureInfo subjacentTexture;
+        Format      textureFormat;
+        ArraySlices arraySlices;
+        MipSlices   mipMapSlices;
 
         Descriptor();
 

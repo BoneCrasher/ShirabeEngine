@@ -6,12 +6,11 @@
 
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/ResourceTraits.h"
-
+#include "Resources/Types/Texture.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
 #include "GFXAPI/Definitions.h"
 
-#include "TextureNDDefinition.h"
 #include "RequestDefaultImplementation.h"
 
 namespace Engine {
@@ -23,39 +22,27 @@ namespace Engine {
 
       static const constexpr EResourceType    resource_type    = EResourceType::GAPI_VIEW;
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::DEPTH_STENCIL_VIEW;
-      
-      /**********************************************************************************************//**
-       * \struct	Texture
-       *
-       * \brief	Internal texture description to be filled according to the
-       * 			underlying resource properties.
-       **************************************************************************************************/
-      struct Texture {
-        uint8_t                 dimensionNb;
-        TextureArrayDescriptor  array;
-        TextureMipMapDescriptor mipMap;
-
-        Texture();
-      };
 
       /**********************************************************************************************//**
        * \struct	ShaderResourceDescriptorImpl
        *
        * \brief	A render target descriptor implementation.
        **************************************************************************************************/
-      struct Descriptor 
+      struct Descriptor
         : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::DEPTH_STENCIL_VIEW>
       {
         std::string name;
         Format      format;
-        Texture     texture;
+        TextureInfo subjacentTexture;
+        ArraySlices arraySlices;
+        MipSlices   mipSlices;
 
         Descriptor();
 
         std::string toString() const;
       };
 
-      class CreationRequest 
+      class CreationRequest
         : public BaseDeclaration::CreationRequestBase<Descriptor>
       {
       public:

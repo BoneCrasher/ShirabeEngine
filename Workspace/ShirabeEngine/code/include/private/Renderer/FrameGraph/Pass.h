@@ -11,8 +11,8 @@
 
 #include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
-
-#include "FrameGraphSerialization.h"
+#include "Renderer/FrameGraph/FrameGraphRenderContext.h"
+#include "Renderer/FrameGraph/FrameGraphSerialization.h"
 
 #include "PassBuilder.h"
 
@@ -37,7 +37,7 @@ namespace Engine {
       {}
 
       virtual bool setup(PassBuilder&) { return true; }
-      virtual bool execute(FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&) { return true; }
+      virtual bool execute(FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&) { return true; }
 
       inline std::string const&passName() const { return m_passName; }
       inline PassUID_t   const&passUID()  const { return m_passUID; }
@@ -69,7 +69,7 @@ namespace Engine {
     {
     public:
       using SetupCallback_t = std::function<bool(PassBuilder&, TPassData&)>;
-      using ExecCallback_t  = std::function<bool(TPassData const&, FrameGraphResources const&, Ptr<IRenderContext>&)>;
+      using ExecCallback_t  = std::function<bool(TPassData const&, FrameGraphResources const&, Ptr<IFrameGraphRenderContext>&)>;
 
       CallbackPass(
         PassUID_t       const&passId,
@@ -78,7 +78,7 @@ namespace Engine {
         ExecCallback_t      &&execCb);
 
       bool setup(PassBuilder&builder);
-      bool execute(FrameGraphResources const&, Ptr<IRenderContext>&);
+      bool execute(FrameGraphResources const&, Ptr<IFrameGraphRenderContext>&);
 
       TPassData const&passData() const { return m_passData; }
 
@@ -119,7 +119,7 @@ namespace Engine {
 
     template <typename TPassData>
     bool
-      CallbackPass<TPassData>::execute(FrameGraphResources const&resources, Ptr<IRenderContext>&context)
+      CallbackPass<TPassData>::execute(FrameGraphResources const&resources, Ptr<IFrameGraphRenderContext>&context)
     {
       try {
         return execCallback(m_passData, resources, context);

@@ -5,7 +5,7 @@
 
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
 
-#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/Texture.h"
 #include "GFXAPI/DirectX/DX11/Common.h"
 #include "GFXAPI/DirectX/DX11/Types.h"
 #include "GFXAPI/DirectX/DX11/Environment.h"
@@ -15,31 +15,6 @@ namespace Engine {
     namespace _11 {
       using namespace Engine::Resources;
       using namespace Engine::GFXAPI;
-
-
-      /**********************************************************************************************//**
-       * \struct	ResourceMapping
-       *
-       * \brief	A resource mapping used to map GFXAPI-model to real platform type.
-       *
-       * \tparam	TResource	Type of the resource.
-       **************************************************************************************************/
-      template <typename TResource>
-      struct ResourceMapping {
-      };
-
-      template <>
-      struct ResourceMapping<Texture1D> {
-        typedef ID3D11Texture1D mapped_resource_type;
-      };
-      template <>
-      struct ResourceMapping<Texture2D> {
-        typedef ID3D11Texture2D mapped_resource_type;
-      };
-      template <>
-      struct ResourceMapping<Texture3D> {
-        typedef ID3D11Texture3D mapped_resource_type;
-      };
 
       /**********************************************************************************************//**
        * \def	DxTypes__
@@ -76,9 +51,7 @@ namespace Engine {
       public:
         DX11ResourceTaskBackend(Ptr<DX11Environment> const& device);
 
-        DeclareTaskBuilderModule(Texture1D);
-        DeclareTaskBuilderModule(Texture2D);
-        DeclareTaskBuilderModule(Texture3D);
+        DeclareTaskBuilderModule(Texture);
         DeclareTaskBuilderModule(ShaderResourceView);
         DeclareTaskBuilderModule(RenderTargetView);
         DeclareTaskBuilderModule(DepthStencilView);

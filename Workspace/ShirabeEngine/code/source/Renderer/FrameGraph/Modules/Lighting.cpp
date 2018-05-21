@@ -43,6 +43,7 @@ namespace Engine {
 
         FrameGraphReadTextureFlags readFlags{ };
         readFlags.requiredFormat = FrameGraphFormat::Automatic;
+        readFlags.source         = FrameGraphReadSource::Color;
 
         passData.importData.gbuffer0 = builder.readTexture(gbuffer0, readFlags, Range(0, 1), Range(0, 1));
         passData.importData.gbuffer1 = builder.readTexture(gbuffer1, readFlags, Range(0, 1), Range(0, 1));
@@ -57,7 +58,7 @@ namespace Engine {
 
         return true;
       },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&context) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&context) -> bool
       {
         Log::Verbose(logTag(), "Lighting");
 

@@ -58,15 +58,14 @@ namespace Engine {
         Ptr<ApplicationEnvironment> const&environment)
     {
       assert(environment != nullptr);
-      m_applicationEnvironment = environment;
-
+      env()   = environment;
       graph() = MakeUniquePointerType<Graph>();
 
       // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
       spawnPass<CallbackPass<bool>>(
         "Pseudo-Pass",
-        [] (PassBuilder const&, bool&)                                     -> bool { return true; },
-        [] (bool const&, FrameGraphResources const&, Ptr<IRenderContext>&) -> bool { return true; });
+        [] (PassBuilder const&, bool&)                                               -> bool { return true; },
+        [] (bool const&, FrameGraphResources const&, Ptr<IFrameGraphRenderContext>&) -> bool { return true; });
 
       return true;
     }
@@ -81,14 +80,14 @@ namespace Engine {
     bool
       GraphBuilder::deinitialize()
     {
-      if(graph())
-        graph() = nullptr;
+      graph() = nullptr;
+      env()   = nullptr;
 
       return true;
     }
 
-    Ptr<ApplicationEnvironment>
-      GraphBuilder::getApplicationEnvironment()
+    Ptr<ApplicationEnvironment>&
+      GraphBuilder::env()
     {
       return m_applicationEnvironment;
     }

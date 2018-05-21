@@ -11,7 +11,7 @@
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 
 #include "GFXAPI/Types/SwapChain.h"
-#include "GFXAPI/Types/TextureND.h"
+#include "GFXAPI/Types/Texture.h"
 #include "GFXAPI/Types/DepthStencilState.h"
 #include "GFXAPI/Types/RasterizerState.h"
 
@@ -50,9 +50,7 @@ namespace Engine {
       virtual Ptr<BasicGFXAPIResourceBackend>& backend() = 0;
 
       DeclareResourceMethods(SwapChain);
-      DeclareResourceMethods(Texture1D);
-      DeclareResourceMethods(Texture2D);
-      DeclareResourceMethods(Texture3D);
+      DeclareResourceMethods(Texture);
       DeclareResourceMethods(RenderTargetView);
       DeclareResourceMethods(ShaderResourceView);
       DeclareResourceMethods(DepthStencilView);

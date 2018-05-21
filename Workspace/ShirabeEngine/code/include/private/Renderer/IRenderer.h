@@ -23,6 +23,9 @@ namespace Engine {
     DeclareListType(Renderable, Renderable);
 
     DeclareInterface(IRenderContext);
+    virtual EEngineStatus bindResource(PublicResourceId_t const&)   = 0;
+    virtual EEngineStatus unbindResource(PublicResourceId_t const&) = 0;
+
       virtual EEngineStatus render(Renderable const&) = 0;
     DeclareInterfaceEnd(IRenderContext);
 

@@ -6,8 +6,8 @@ namespace Engine {
     RenderTargetViewDeclaration::Descriptor
       ::Descriptor()
       : name("")
-      , textureFormat(Format::UNKNOWN)
-      , dimensionNb(0)
+      , subjacentTexture()
+      , textureFormat(Format::Undefined)
     {}
 
     std::string

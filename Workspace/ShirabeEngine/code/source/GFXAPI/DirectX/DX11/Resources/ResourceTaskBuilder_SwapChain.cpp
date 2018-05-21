@@ -27,9 +27,9 @@ namespace Engine {
         DXGI_SWAP_CHAIN_DESC swapChainDescription ={};
         // Setup backbuffer
         swapChainDescription.BufferCount                 = desc.backBufferCount;
-        swapChainDescription.BufferDesc.Width            = desc.texture.dimensions[0];
-        swapChainDescription.BufferDesc.Height           = desc.texture.dimensions[1];
-        swapChainDescription.BufferDesc.Format           = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.texture.textureFormat);
+        swapChainDescription.BufferDesc.Width            = desc.texture.textureInfo.width;
+        swapChainDescription.BufferDesc.Height           = desc.texture.textureInfo.height;
+        swapChainDescription.BufferDesc.Format           = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.texture.textureInfo.format);
         swapChainDescription.BufferDesc.Scaling          = DXGI_MODE_SCALING_UNSPECIFIED;
         swapChainDescription.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 

@@ -27,52 +27,57 @@ namespace Engine {
         // Map configuration to DX11 creation struct
         if(desc.srvType == ShaderResourceView::Descriptor::EShaderResourceDimension::Texture) {
           ShaderResourceViewDeclaration::Texture texture = std::get<ShaderResourceViewDeclaration::Texture>(desc.shaderResourceDimension);
-          switch(texture.dimensionNb) {
+
+          uint8_t dimensionCount = 1;
+          dimensionCount += (desc.subjacentTexture.height > 1) ? 1 : 0;
+          dimensionCount += (desc.subjacentTexture.depth  > 1) ? 1 : 0;
+
+          switch(dimensionCount) {
           case 1:
-            if(texture.array.isTextureArray) {
-              srvDesc.Texture1DArray.ArraySize       = texture.array.size;
-              srvDesc.Texture1DArray.FirstArraySlice = texture.array.firstArraySlice;
-              srvDesc.Texture1DArray.MipLevels       = texture.mipMap.mipLevels;
-              srvDesc.Texture1DArray.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+            if(desc.subjacentTexture.arraySize > 1) {
+              srvDesc.Texture1DArray.ArraySize       = texture.arraySlice.length;
+              srvDesc.Texture1DArray.FirstArraySlice = texture.arraySlice.offset;
+              srvDesc.Texture1DArray.MipLevels       = texture.mipSlice.length;
+              srvDesc.Texture1DArray.MostDetailedMip = texture.mipSlice.offset;
             }
             else {
-              srvDesc.Texture1D.MipLevels       = texture.mipMap.mipLevels;
-              srvDesc.Texture1D.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+              srvDesc.Texture1D.MipLevels       = texture.mipSlice.length;
+              srvDesc.Texture1D.MostDetailedMip = texture.mipSlice.offset;
             }
 
             break;
           case 2:
-            if(texture.array.isTextureArray) {
-              srvDesc.Texture2DArray.ArraySize       = texture.array.size;
-              srvDesc.Texture2DArray.FirstArraySlice = texture.array.firstArraySlice;
-              srvDesc.Texture2DArray.MipLevels       = texture.mipMap.mipLevels;
-              srvDesc.Texture2DArray.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+            if(desc.subjacentTexture.arraySize > 1) {
+              srvDesc.Texture2DArray.ArraySize       = texture.arraySlice.length;
+              srvDesc.Texture2DArray.FirstArraySlice = texture.arraySlice.offset;
+              srvDesc.Texture2DArray.MipLevels       = texture.mipSlice.length;
+              srvDesc.Texture2DArray.MostDetailedMip = texture.mipSlice.offset;
             }
             else {
-              srvDesc.Texture2D.MipLevels       = texture.mipMap.mipLevels;
-              srvDesc.Texture2D.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+              srvDesc.Texture2D.MipLevels       = texture.mipSlice.length;
+              srvDesc.Texture2D.MostDetailedMip = texture.mipSlice.offset;
             }
 
             break;
           case 3:
-            if(texture.isCube) {
-              if(texture.array.isTextureArray) {
-                srvDesc.TextureCube.MipLevels       = texture.mipMap.mipLevels;
-                srvDesc.TextureCube.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+            if(desc.subjacentTexture.arraySize % 6 == 0) {
+              if(desc.subjacentTexture.arraySize > 1) {
+                srvDesc.TextureCube.MipLevels       = texture.mipSlice.length;
+                srvDesc.TextureCube.MostDetailedMip = texture.mipSlice.offset;
               }
               else {
-                srvDesc.TextureCubeArray.NumCubes        = texture.array.size;
-                srvDesc.TextureCubeArray.MipLevels       = texture.mipMap.mipLevels;
-                srvDesc.TextureCubeArray.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+                srvDesc.TextureCubeArray.NumCubes        = desc.subjacentTexture.arraySize / 6;
+                srvDesc.TextureCubeArray.MipLevels       = texture.mipSlice.length;
+                srvDesc.TextureCubeArray.MostDetailedMip = texture.mipSlice.offset;
               }
             }
             else {
-              if(texture.array.isTextureArray) {
+              if(desc.subjacentTexture.arraySize > 1) {
                 // ERROR: NO 3D Texture Arrays supported!
               }
               else {
-                srvDesc.Texture3D.MipLevels       = texture.mipMap.mipLevels;
-                srvDesc.Texture3D.MostDetailedMip = texture.mipMap.firstMipMapLevel;
+                srvDesc.Texture3D.MipLevels       = texture.mipSlice.length;
+                srvDesc.Texture3D.MostDetailedMip = texture.mipSlice.offset;
               }
             }
             break;

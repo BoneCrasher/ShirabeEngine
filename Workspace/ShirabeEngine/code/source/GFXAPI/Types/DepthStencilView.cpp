@@ -3,18 +3,14 @@
 namespace Engine {
   namespace GFXAPI {
 
-    DepthStencilViewDeclaration::Texture
-      ::Texture()
-      : dimensionNb(0)
-      , array()
-      , mipMap()
-    {}
 
     DepthStencilViewDeclaration::Descriptor
       ::Descriptor()
       : name("")
-      , format(Format::UNKNOWN)
-      , texture()
+      , format(Format::Undefined)
+      , subjacentTexture()
+      , arraySlices()
+      , mipSlices()
     {}
 
     std::string
@@ -27,10 +23,10 @@ namespace Engine {
         << "RenderTargetDescriptor ('" << name << "'):                             \n"
         << " Format:            " << (uint8_t)format << "\n,"
         << " Dimensions:        " << 2 << "\n,"
-        << " Array:             " << (uint8_t)texture.array.size << "\n,"
-        << " First array index: " << (uint8_t)texture.array.firstArraySlice << "\n,"
-        << " MipMap:            " << (uint8_t)texture.mipMap.mipLevels << "\n,"
-        << " Most Detailed MIP: " << (uint8_t)texture.mipMap.firstMipMapLevel << ";";
+        << " Array:             " << (uint8_t)arraySlices.length << "\n,"
+        << " First array index: " << (uint8_t)arraySlices.offset << "\n,"
+        << " MipMap:            " << (uint8_t)mipSlices.length << "\n,"
+        << " Most Detailed MIP: " << (uint8_t)mipSlices.offset << ";";
 
       return ss.str();
     }

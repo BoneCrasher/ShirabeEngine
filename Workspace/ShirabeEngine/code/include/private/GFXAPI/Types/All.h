@@ -2,7 +2,7 @@
 #include "RenderTargetView.h"
 #include "DepthStencilView.h"
 #include "DepthStencilState.h"
-#include "TextureND.h"
+#include "Texture.h"
 #include "RasterizerState.h"
 #include "ConstantBuffer.h"
 #include "InstanceBuffer.h"
@@ -14,10 +14,8 @@
 namespace Engine {
   namespace GFXAPI {
 
-#define EngineTypes   \
-  Texture1D,          \
-  Texture2D,          \
-  Texture3D,          \
+    #define EngineTypes   \
+  Texture,            \
   DepthStencilView,   \
   RenderTargetView,   \
   ShaderResourceView, \
@@ -25,11 +23,11 @@ namespace Engine {
   RasterizerState,    \
   SwapChain,          \
   SwapChainBuffer
-  // ConstantBuffer,     \
-  // ObjectBuffer,       \
-  // StructuredBuffer,   \
-  // InstanceBuffer,     \
-  // Shader,             \
+    // ConstantBuffer,     \
+    // ObjectBuffer,       \
+    // StructuredBuffer,   \
+    // InstanceBuffer,     \
+    // Shader,             \
 
   }
 }

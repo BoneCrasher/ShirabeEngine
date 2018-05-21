@@ -55,9 +55,7 @@ namespace Engine {
 
 
     ImplementResourceMethods(SwapChain);
-    ImplementResourceMethods(Texture1D);
-    ImplementResourceMethods(Texture2D);
-    ImplementResourceMethods(Texture3D);
+    ImplementResourceMethods(Texture);
     ImplementResourceMethods(RenderTargetView);
     ImplementResourceMethods(ShaderResourceView);
     ImplementResourceMethods(DepthStencilView);

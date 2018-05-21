@@ -2,6 +2,7 @@
 #define __SHIRABE_ENGINETYPEHELPER_H__
 
 #include <any>
+#include <optional>
 #include <memory>
 #include <functional>
 #include <vector>
@@ -207,6 +208,10 @@ namespace Engine {
 
 	#define DeclareInterfaceEnd(name) };
 
+  using Any = std::any;
+
+  template <typename T>
+  using Optional = std::optional<T>;
 }
 
 #endif

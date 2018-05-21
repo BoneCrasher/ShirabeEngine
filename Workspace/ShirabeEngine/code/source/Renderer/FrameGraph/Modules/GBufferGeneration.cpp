@@ -28,7 +28,7 @@ namespace Engine {
           width  = 1920,
           height = 1080;
 
-        Ptr<ApplicationEnvironment> environment = graphBuilder.getApplicationEnvironment();
+        Ptr<ApplicationEnvironment> environment = graphBuilder.env();
         if(environment) {
           OSDisplayDescriptor const&displayDesc = environment->primaryDisplay();
           width  = displayDesc.bounds.size.x();
@@ -64,7 +64,7 @@ namespace Engine {
 
         return true;
       },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IRenderContext>&context) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&context) -> bool
       {
         using namespace Engine::Renderer;
 
