@@ -265,7 +265,7 @@ namespace Engine {
       graph()->m_passAdjacency           = std::move(this->m_passAdjacency);
       graph()->m_resourceAdjacency       = std::move(this->m_resourceAdjacency);
       graph()->m_passToResourceAdjacency = std::move(this->m_passToResourceAdjacency);
-
+      graph()->m_resources               = std::move(this->m_resources);
       graph()->m_resourceData.mergeIn(this->m_resourceData);
 
       return std::move(graph());
@@ -355,6 +355,7 @@ namespace Engine {
     bool
       GraphBuilder::collectPass(PassBuilder&passBuilder)
     {
+      m_resources.insert(passBuilder.m_resources.begin(), passBuilder.m_resources.end());
       m_resourceData.mergeIn(passBuilder.m_resourceData);
 
       // Derive:
