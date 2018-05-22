@@ -199,53 +199,71 @@ namespace Engine {
       return true;
     }
 
-    FrameGraphTexture const&
+    Optional<RefWrapper<FrameGraphTexture const>>
       FrameGraphResources::getTexture(FrameGraphResourceId_t const&resource) const
     {
-      return m_textures.at(resource);
+      if(m_textures.find(resource) == m_textures.end())
+        return {};
+
+      return RefWrapper<FrameGraphTexture const>(m_textures.at(resource));
     }
 
-    FrameGraphTextureView const&
+    Optional<RefWrapper<FrameGraphTextureView const>>
       FrameGraphResources::getTextureView(FrameGraphResourceId_t const&resource) const
     {
-      return m_textureViews.at(resource);
+      if(m_textureViews.find(resource) == m_textureViews.end())
+        return { };
+
+      return RefWrapper<FrameGraphTextureView const>(m_textureViews.at(resource));
     }
 
-    FrameGraphBuffer const&
+    Optional<RefWrapper<FrameGraphBuffer const>>
       FrameGraphResources::getBuffer(FrameGraphResourceId_t const&resource) const
     {
-      return m_buffers.at(resource);
+      if(m_buffers.find(resource) == m_buffers.end())
+        return { };
+
+      return RefWrapper<FrameGraphBuffer const>(m_buffers.at(resource));
     }
 
-    FrameGraphBufferView const&
+    Optional<RefWrapper<FrameGraphBufferView const>>
       FrameGraphResources::getBufferView(FrameGraphResourceId_t const&resource) const
     {
-      return m_bufferViews.at(resource);
+      if(m_bufferViews.find(resource) == m_bufferViews.end())
+        return { };
+
+      return RefWrapper<FrameGraphBufferView const>(m_bufferViews.at(resource));
     }
 
-    FrameGraphRenderableList const&
+    Optional<RefWrapper<FrameGraphRenderableList const>>
       FrameGraphResources::getRenderableList(FrameGraphResourceId_t const&resource) const
     {
-      return m_renderableLists.at(resource);
+      if(m_renderableLists.find(resource) == m_renderableLists.end())
+        return { };
+
+      return RefWrapper<FrameGraphRenderableList const>(m_renderableLists.at(resource));
     }
 
-    FrameGraphRenderableListView const&
+    Optional<RefWrapper<FrameGraphRenderableListView const>>
       FrameGraphResources::getRenderableListView(FrameGraphResourceId_t const&resource) const
     {
-      return m_renderableListViews.at(resource);
+      if(m_renderableListViews.find(resource) == m_renderableListViews.end())
+        return { };
+
+      return RefWrapper<FrameGraphRenderableListView const>(m_renderableListViews.at(resource));
     }
 
 
     bool FrameGraphMutableResources::addTexture(
       FrameGraphResourceId_t const&resource,
-      FrameGraphTexture  const&texture)
+      FrameGraphTexture      const&texture)
     {
       return addIfNotAdded(m_textures, resource, texture);
     }
 
     bool FrameGraphMutableResources::addTextureView(
-      FrameGraphResourceId_t    const&resource,
-      FrameGraphTextureView const&view)
+      FrameGraphResourceId_t const&resource,
+      FrameGraphTextureView  const&view)
     {
       return addIfNotAdded(m_textureViews, resource, view);
     }
@@ -263,7 +281,7 @@ namespace Engine {
     {
       return addIfNotAdded(m_bufferViews, resource, view);
     }
-    
+
     bool FrameGraphMutableResources::addRenderableList(
       FrameGraphResourceId_t       const&resource,
       FrameGraphRenderableList const&list)
@@ -278,40 +296,58 @@ namespace Engine {
       return addIfNotAdded(m_renderableListViews, resource, view);
     }
 
-    FrameGraphTexture&
+    Optional<RefWrapper<FrameGraphTexture>>
       FrameGraphMutableResources::getMutableTexture(FrameGraphResourceId_t const&resource)
     {
-      return m_textures.at(resource);
+      if(m_textures.find(resource) == m_textures.end())
+        return { };
+
+      return RefWrapper<FrameGraphTexture>(m_textures.at(resource));
     }
 
-    FrameGraphTextureView&
+    Optional<RefWrapper<FrameGraphTextureView>>
       FrameGraphMutableResources::getMutableTextureView(FrameGraphResourceId_t const&resource)
     {
-      return m_textureViews.at(resource);
+      if(m_textureViews.find(resource) == m_textureViews.end())
+        return { };
+
+      return RefWrapper<FrameGraphTextureView>(m_textureViews.at(resource));
     }
 
-    FrameGraphBuffer&
+    Optional<RefWrapper<FrameGraphBuffer>>
       FrameGraphMutableResources::getMutableBuffer(FrameGraphResourceId_t const&resource)
     {
-      return m_buffers.at(resource);
+      if(m_buffers.find(resource) == m_buffers.end())
+        return { };
+
+      return RefWrapper<FrameGraphBuffer>(m_buffers.at(resource));
     }
 
-    FrameGraphBufferView&
+    Optional<RefWrapper<FrameGraphBufferView>>
       FrameGraphMutableResources::getMutableBufferView(FrameGraphResourceId_t const&resource)
     {
-      return m_bufferViews.at(resource);
+      if(m_bufferViews.find(resource) == m_bufferViews.end())
+        return { };
+
+      return RefWrapper<FrameGraphBufferView>(m_bufferViews.at(resource));
     }
 
-    FrameGraphRenderableList&
+    Optional<RefWrapper<FrameGraphRenderableList>>
       FrameGraphMutableResources::getMutableRenderableList(FrameGraphResourceId_t const&resource)
     {
-      return m_renderableLists.at(resource);
+      if(m_renderableLists.find(resource) == m_renderableLists.end())
+        return { };
+
+      return RefWrapper<FrameGraphRenderableList>(m_renderableLists.at(resource));
     }
 
-    FrameGraphRenderableListView&
+    Optional<RefWrapper<FrameGraphRenderableListView>>
       FrameGraphMutableResources::getMutableRenderableListView(FrameGraphResourceId_t const&resource)
     {
-      return m_renderableListViews.at(resource);
+      if(m_renderableListViews.find(resource) == m_renderableListViews.end())
+        return { };
+
+      return RefWrapper<FrameGraphRenderableListView>(m_renderableListViews.at(resource));
     }
 
     bool FrameGraphMutableResources::mergeIn(FrameGraphResources const&other)

@@ -96,13 +96,13 @@ namespace Engine {
     private:
       bool isTextureBeingReadInSubresourceRange(
         FrameGraphTextureViewMap const&resourceViews,
-        FrameGraphResourceMap    const&resources,
+        FrameGraphResources      const&resources,
         FrameGraphResource       const&sourceResource,
         Range                    const&arraySliceRange,
         Range                    const&mipSliceRange);
       bool isTextureBeingWrittenInSubresourceRange(
         FrameGraphTextureViewMap const&resourceViews,
-        FrameGraphResourceMap    const&resources,
+        FrameGraphResources      const&resources,
         FrameGraphResource       const&sourceResource,
         Range                    const&arraySliceRange,
         Range                    const&mipSliceRange);
@@ -112,8 +112,7 @@ namespace Engine {
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
 
       GraphBuilder const&m_graphBuilder;
-
-      FrameGraphResourceMap      m_resources;
+      FrameGraphResourceRefMap   m_resources;
       FrameGraphMutableResources m_resourceData;
     };
 

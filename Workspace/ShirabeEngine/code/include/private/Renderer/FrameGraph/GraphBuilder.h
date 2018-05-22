@@ -92,7 +92,6 @@ namespace Engine {
       Map<std::string, PublicResourceId_t> m_importedResources;
 
       PassMap                    m_passes;
-      FrameGraphResourceMap      m_resources;
       FrameGraphMutableResources m_resourceData;
     
       AdjacencyListMap<FrameGraphResourceId_t>            m_resourceAdjacency;

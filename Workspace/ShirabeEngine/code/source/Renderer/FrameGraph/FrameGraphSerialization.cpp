@@ -30,49 +30,17 @@ namespace Engine {
     bool
       FrameGraphGraphVizSerializer::serializeGraph(Graph const&graph)
     {
-      FilterFunction_t filter = [&](
-        FrameGraphResourceIdList               const&ids,
-        FilterElementCompareCallbackFunction_t const&cb) -> FrameGraphResourceIdList
-      {
-        FrameGraphResourceIdList output{};
-        if(ids.empty())
-          return output;
-
-        FrameGraphResourceMap const&resources = graph.m_resources;
-
-        std::copy_if(
-          ids.begin(),
-          ids.end(),
-          std::back_inserter(output),
-          [&] (FrameGraphResourceId_t const&id) -> bool
-        {
-          if(resources.find(id) == resources.end())
-            return false;
-
-          if(cb)
-            cb(resources.at(id));
-        });
-
-        return output;
-      };
-
       beginGraph();
 
       // Write registered resources
-      for(FrameGraphResourceMap::value_type const&assignment : graph.m_resources) {
-        switch(assignment.second.type) {
-        case FrameGraphResourceType::Texture:
-          writeTextureResource(
-            assignment.first,
-            assignment.second,
-            graph.m_resourceData.getTexture(assignment.second.resourceId));
-          break;
-        case FrameGraphResourceType::TextureView:
+      for(FrameGraphTextureMap::value_type const&assignment : graph.m_resourceData.textures()) {
+        writeTextureResource(
+          *graph.m_resourceData.getTexture(assignment.second.resourceId));
+      }
+      for(FrameGraphTextureViewMap::value_type const&assignment : graph.m_resourceData.textureViews()) {
           writeTextureResourceView(
-            assignment.first,
-            graph.m_resources.at(assignment.second.parentResource),
-            assignment.second,
-            graph.m_resourceData.getTextureView(assignment.second.resourceId));
+            *graph.m_resourceData.at(assignment.second.parentResource),
+            *graph.m_resourceData.getTextureView(assignment.second.resourceId));
           break;
         case FrameGraphResourceType::RenderableList:
           writeRenderableList(
@@ -328,12 +296,10 @@ namespace Engine {
 
     void
       FrameGraphGraphVizSerializer::writeTextureResource(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
-        FrameGraphTexture      const&texture)
+        FrameGraphTexture const&texture)
     {
       std::string mode = "create";
-      if(resource.assignedPassUID == 0)
+      if(texture.assignedPassUID == 0)
         mode = "import";
 
       static constexpr char const*textureStyle = "shape=none";

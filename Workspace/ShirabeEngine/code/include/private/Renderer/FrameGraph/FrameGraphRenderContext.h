@@ -19,14 +19,10 @@ namespace Engine {
     DeclareInterface(IFrameGraphRenderContext);
 
     virtual EEngineStatus createTexture(
-      FrameGraphResourceId_t const&id,
-      FrameGraphResource     const&resource,
-      FrameGraphTexture      const&texture) = 0;
+      FrameGraphTexture const&texture) = 0;
     virtual EEngineStatus createTextureView(
-      FrameGraphResourceId_t const&id,
-      FrameGraphResource     const&resource,
-      FrameGraphTexture      const&texture,
-      FrameGraphTextureView  const&view) = 0;
+      FrameGraphTexture     const&texture,
+      FrameGraphTextureView const&view) = 0;
     virtual EEngineStatus createBuffer(FrameGraphResourceId_t      const&, FrameGraphResource const&, FrameGraphBuffer      const&) = 0;
     virtual EEngineStatus createBufferView(FrameGraphResourceId_t  const&, FrameGraphResource const&, FrameGraphBufferView  const&) = 0;
 
@@ -35,12 +31,12 @@ namespace Engine {
     virtual EEngineStatus loadMeshAsset(AssetId_t    const&) = 0;
 
     virtual EEngineStatus bindTextureView(
-      FrameGraphResourceId_t const&id) = 0;
+      FrameGraphTextureView const&view) = 0;
     virtual EEngineStatus bindBufferView(FrameGraphResourceId_t  const&) = 0;
     virtual EEngineStatus bindMesh(AssetId_t const&)                     = 0;
 
     virtual EEngineStatus unbindTextureView(
-      FrameGraphResourceId_t const&id) = 0;
+      FrameGraphTextureView const&view) = 0;
     virtual EEngineStatus unbindBufferView(FrameGraphResourceId_t  const&) = 0;
     virtual EEngineStatus unbindMesh(AssetId_t const&)                     = 0;
 
@@ -49,9 +45,8 @@ namespace Engine {
     virtual EEngineStatus unloadMeshAsset(AssetId_t    const&) = 0;
 
     virtual EEngineStatus destroyTexture(
-      FrameGraphResourceId_t const&) = 0;
+      FrameGraphTexture const&texture) = 0;
     virtual EEngineStatus destroyTextureView(
-      FrameGraphResourceId_t const&id,
       FrameGraphTextureView  const&view) = 0;
     virtual EEngineStatus destroyBuffer(FrameGraphResourceId_t      const&) = 0;
     virtual EEngineStatus destroyBufferView(FrameGraphResourceId_t  const&) = 0;
@@ -71,12 +66,8 @@ namespace Engine {
         Ptr<IRenderContext>   renderer);
 
       EEngineStatus createTexture(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture);
       EEngineStatus createTextureView(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture,
         FrameGraphTextureView  const&view);
       EEngineStatus createBuffer(FrameGraphResourceId_t const&, FrameGraphResource const&, FrameGraphBuffer      const&);
@@ -87,12 +78,12 @@ namespace Engine {
       EEngineStatus loadMeshAsset(AssetId_t    const&);
 
       EEngineStatus bindTextureView(
-        FrameGraphResourceId_t const&id);
+        FrameGraphTextureView  const&view);
       EEngineStatus bindBufferView(FrameGraphResourceId_t  const&);
       EEngineStatus bindMesh(AssetId_t const&);
 
       EEngineStatus unbindTextureView(
-        FrameGraphResourceId_t const&id);
+        FrameGraphTextureView  const&view);
       EEngineStatus unbindBufferView(FrameGraphResourceId_t  const&);
       EEngineStatus unbindMesh(AssetId_t const&);
 
@@ -101,9 +92,8 @@ namespace Engine {
       EEngineStatus unloadMeshAsset(AssetId_t    const&);
 
       EEngineStatus destroyTexture(
-        FrameGraphResourceId_t const&);
+        FrameGraphTexture const&texture);
       EEngineStatus destroyTextureView(
-        FrameGraphResourceId_t const&id,
         FrameGraphTextureView  const&view);
       EEngineStatus destroyBuffer(FrameGraphResourceId_t      const&);
       EEngineStatus destroyBufferView(FrameGraphResourceId_t  const&);
@@ -117,37 +107,31 @@ namespace Engine {
         Ptr<IRenderContext>   renderer);
 
       EEngineStatus createShaderResourceView(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture,
         FrameGraphTextureView  const&view);
       EEngineStatus createRenderTargetView(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture,
         FrameGraphTextureView  const&view);
       EEngineStatus createDepthStencilView(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture,
         FrameGraphTextureView  const&view);
 
       void
         mapFrameGraphToInternalResource(
-          FrameGraphResourceId_t const&,
-          PublicResourceId_t     const&);
+          std::string        const&,
+          PublicResourceId_t const&);
       Vector<PublicResourceId_t>
         getMappedInternalResourceIds(
-          FrameGraphResourceId_t const&) const;
+          std::string const&) const;
       void
         removeMappedInternalResourceIds(
-          FrameGraphResourceId_t const&);
+          std::string const&);
 
       Ptr<IAssetStorage>    m_assetStorage;
       Ptr<IResourceManager> m_resourceManager;
       Ptr<IRenderContext>   m_platformRendercontext;
 
-      Map<FrameGraphResourceId_t, Vector<PublicResourceId_t>> m_resourceMap;
+      Map<std::string, Vector<PublicResourceId_t>> m_resourceMap;
     };
 
   }

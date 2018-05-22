@@ -41,7 +41,7 @@ namespace Engine {
       //   throw std::exception("Invalid texture descriptor.");
 
       // Basic abstract descriptor of resources being used.
-      FrameGraphResource resource={};
+      FrameGraphTexture resource = desc;
       resource.assignedPassUID   = m_passUID;
       resource.resourceId        = m_resourceIdGenerator->generate();
       resource.parentResource    = 0;
@@ -49,8 +49,8 @@ namespace Engine {
       resource.readableName      = name;
       resource.type              = FrameGraphResourceType::Texture;
 
-      m_resources[resource.resourceId] = resource;
       m_resourceData.addTexture(resource, desc);
+      m_resources[resource.resourceId] = RefWrapper<FrameGraphResource>(*m_resourceData.getMutableTexture(resource.resourceId));
 
       return resource;
     }
@@ -78,13 +78,13 @@ namespace Engine {
     {
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
 
-      if(isTextureBeingReadInSubresourceRange(m_resourceData.textureViews(), m_resources, sourceResource, arraySliceRange, mipSliceRange))
+      if(isTextureBeingReadInSubresourceRange(m_resourceData.textureViews(), m_resourceData, sourceResource, arraySliceRange, mipSliceRange))
         throw std::runtime_error(
           String::format(
             "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
             arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
 
-      if(isTextureBeingWrittenInSubresourceRange(m_resourceData.textureViews(), m_resources, sourceResource, arraySliceRange, mipSliceRange))
+      if(isTextureBeingWrittenInSubresourceRange(m_resourceData.textureViews(), m_resourceData, sourceResource, arraySliceRange, mipSliceRange))
         throw std::runtime_error(
           String::format(
             "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
@@ -102,21 +102,20 @@ namespace Engine {
       if(flags.writeTarget == FrameGraphWriteTarget::Depth)
         view.source = FrameGraphViewSource::Depth;
 
-      FrameGraphResource resource ={};
-      resource.assignedPassUID    = m_passUID;
-      resource.resourceId         = m_resourceIdGenerator->generate();
-      resource.parentResource     = sourceResource.resourceId;
-      resource.subjacentResource  =
+      view.assignedPassUID    = m_passUID;
+      view.resourceId         = m_resourceIdGenerator->generate();
+      view.parentResource     = sourceResource.resourceId;
+      view.subjacentResource  =
         (sourceResource.type == FrameGraphResourceType::Texture
           ? sourceResource.resourceId
           : sourceResource.subjacentResource);
-      resource.readableName       = String::format("TextureView ID %0 - Write #%1", resource.resourceId, sourceResource.resourceId);
-      resource.type               = FrameGraphResourceType::TextureView;
+      view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
+      view.type               = FrameGraphResourceType::TextureView;
 
-      m_resources[resource.resourceId] = resource;
-      m_resourceData.addTextureView(resource, view);
+      m_resourceData.addTextureView(view.resourceId, view);
+      m_resources[view.resourceId] = RefWrapper<FrameGraphResource>(*m_resourceData.getMutableTextureView(view.resourceId));
 
-      return resource;
+      return view;
 
     }
 
@@ -143,7 +142,7 @@ namespace Engine {
     {
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
 
-      if(isTextureBeingWrittenInSubresourceRange(m_resourceData.textureViews(), m_resources, sourceResource, arraySliceRange, mipSliceRange))
+      if(isTextureBeingWrittenInSubresourceRange(m_resourceData.textureViews(), m_resourceData, sourceResource, arraySliceRange, mipSliceRange))
         throw std::runtime_error(
           String::format(
             "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
@@ -161,21 +160,20 @@ namespace Engine {
       if(flags.source == FrameGraphReadSource::Depth)
         view.source = FrameGraphViewSource::Depth;
 
-      FrameGraphResource resource ={ };
-      resource.assignedPassUID   = m_passUID;
-      resource.resourceId        = m_resourceIdGenerator->generate();
-      resource.parentResource    = sourceResource.resourceId;
-      resource.subjacentResource =
+      view.assignedPassUID   = m_passUID;
+      view.resourceId        = m_resourceIdGenerator->generate();
+      view.parentResource    = sourceResource.resourceId;
+      view.subjacentResource =
         (sourceResource.type == FrameGraphResourceType::Texture
           ? sourceResource.resourceId
           : sourceResource.subjacentResource);
-      resource.readableName      = String::format("TextureView ID %0 - Read #%1", resource.resourceId, sourceResource.resourceId);
-      resource.type              = FrameGraphResourceType::TextureView;
+      view.readableName      = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
+      view.type              = FrameGraphResourceType::TextureView;
 
-      m_resources[resource.resourceId] = resource;
-      m_resourceData.addTextureView(resource, view);
+      m_resourceData.addTextureView(view.resourceId, view);
+      m_resources[view.resourceId] = RefWrapper<FrameGraphResource>(*m_resourceData.getMutableTextureView(view.resourceId));
 
-      return resource;
+      return view;
 
     }
 
@@ -208,8 +206,7 @@ namespace Engine {
       for(uint64_t k=0; k<renderableList.size(); ++k)
         view.renderableRefIndices.push_back(k);
 
-      m_resources[resource.resourceId] = resource;
-      m_resourceData.addRenderableListView(resource, view);
+      m_resourceData.addRenderableListView(resource.resourceId, view);
 
       return resource;
     }
@@ -230,7 +227,7 @@ namespace Engine {
     bool
       PassBuilder::isTextureBeingReadInSubresourceRange(
         FrameGraphTextureViewMap const&resourceViews,
-        FrameGraphResourceMap    const&resources,
+        FrameGraphResources      const&resources,
         FrameGraphResource       const&sourceResource,
         Range                    const&arraySliceRange,
         Range                    const&mipSliceRange)
@@ -246,11 +243,9 @@ namespace Engine {
         FrameGraphTextureView const&view = viewAssignment.second;
         if(!view.mode.check(FrameGraphViewAccessMode::Read))
           continue;
-
-        FrameGraphResource const&viewResource = resources.at(viewAssignment.first);
-
+        
         if(
-          sourceResource.subjacentResource == viewResource.subjacentResource
+          sourceResource.subjacentResource == view.subjacentResource
           && view.arraySliceRange.overlapsWith(arraySliceRange)
           && view.mipSliceRange.overlapsWith(mipSliceRange))
           return true;
@@ -275,7 +270,7 @@ namespace Engine {
     bool
       PassBuilder::isTextureBeingWrittenInSubresourceRange(
         FrameGraphTextureViewMap const&resourceViews,
-        FrameGraphResourceMap    const&resources,
+        FrameGraphResources      const&resources,
         FrameGraphResource       const&sourceResource,
         Range                    const&arraySliceRange,
         Range                    const&mipSliceRange)
@@ -292,10 +287,8 @@ namespace Engine {
         if(!view.mode.check(FrameGraphViewAccessMode::Write))
           continue;
 
-        FrameGraphResource const&viewResource = resources.at(viewAssignment.first);
-
         if(
-          sourceResource.subjacentResource == viewResource.subjacentResource
+          sourceResource.subjacentResource == view.subjacentResource
           && view.arraySliceRange.overlapsWith(arraySliceRange)
           && view.mipSliceRange.overlapsWith(mipSliceRange))
           return true;

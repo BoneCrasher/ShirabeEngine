@@ -87,40 +87,26 @@ namespace Engine {
       void endGraph();
       void writePass(PassBase const&pass);
       void writeRenderableList(
-        FrameGraphResourceId_t   const&id,
-        FrameGraphResource       const&resource,
         FrameGraphRenderableList const&texture);
       void writeRenderableListView(
-        FrameGraphResourceId_t       const&id,
         FrameGraphResource           const&parentResource,
-        FrameGraphResource           const&resource,
         FrameGraphRenderableListView const&view);
 
       void writeRenderableResourceViewEdge(
-        FrameGraphResourceId_t       const&id,
         FrameGraphResource           const&parentResource,
-        FrameGraphResource           const&resource,
         FrameGraphRenderableListView const&view);
 
       void writeTextureResource(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture);
       void writeTextureResourceView(
-        FrameGraphResourceId_t const&id,
         FrameGraphResource     const&parentResource,
-        FrameGraphResource     const&resource,
         FrameGraphTextureView  const&view);
 
       void writePassEdge(PassUID_t const&source, PassUID_t const&target);
       void writePass2TextureResourceEdge(
-        FrameGraphResourceId_t const&id,
-        FrameGraphResource     const&resource,
         FrameGraphTexture      const&texture);
       void writeTextureResourceViewEdge(
-        FrameGraphResourceId_t const&id,
         FrameGraphResource     const&parentResource,
-        FrameGraphResource     const&resource,
         FrameGraphTextureView const&view);
 
       std::stringstream m_stream;

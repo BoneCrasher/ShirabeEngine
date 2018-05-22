@@ -38,10 +38,9 @@ namespace Engine {
       for(FrameGraphTextureMap::value_type const&textureAssignment : textures)
       {
         FrameGraphResourceId_t id       = textureAssignment.first;
-        FrameGraphResource     resource = m_resources.at(id);
         FrameGraphTexture      texture  = textureAssignment.second;
 
-        EEngineStatus status = renderContext->createTexture(id, resource, texture);
+        EEngineStatus status = renderContext->createTexture(id, texture, texture);
         HandleEngineStatusError(status, "Failed to load texture for FrameGraphExecution.");
       }
 

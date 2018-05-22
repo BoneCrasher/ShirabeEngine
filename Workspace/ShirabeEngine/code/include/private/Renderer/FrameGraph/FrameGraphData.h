@@ -116,8 +116,33 @@ namespace Engine {
 
     SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphFormat const&e);
     SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e);
+    
+    struct SHIRABE_TEST_EXPORT FrameGraphResource {
+      PassUID_t
+        assignedPassUID;
+      FrameGraphResourceId_t
+        resourceId;
+      FrameGraphResourceId_t
+        parentResource;
+      FrameGraphResourceId_t
+        subjacentResource;
+      std::string
+        readableName;
+      FrameGraphResourceType
+        type;
+      bool
+        isExternalResource;
+
+      FrameGraphResource();
+
+      inline operator FrameGraphResourceId_t() { return resourceId; }
+    };
+    DeclareMapType(FrameGraphResourceId_t, RefWrapper<FrameGraphResource>, FrameGraphResourceRef);
+
+    SHIRABE_TEST_EXPORT bool operator<(FrameGraphResource const&l, FrameGraphResource const&r);
 
     struct SHIRABE_TEST_EXPORT FrameGraphBuffer
+      : public FrameGraphResource
     {
       uint32_t
         elementSize,
@@ -127,7 +152,8 @@ namespace Engine {
     };
     DeclareMapType(FrameGraphResourceId_t, FrameGraphBuffer, FrameGraphBuffer);
 
-    struct SHIRABE_TEST_EXPORT FrameGraphBufferView {
+    struct SHIRABE_TEST_EXPORT FrameGraphBufferView
+      : public FrameGraphResource {
       Range
         subrange;
       FrameGraphFormat
@@ -140,7 +166,8 @@ namespace Engine {
     DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView, FrameGraphBufferView);
 
     struct SHIRABE_TEST_EXPORT FrameGraphTexture
-      : public Resources::TextureInfo
+      : public FrameGraphResource
+      , public Resources::TextureInfo
     {
       FrameGraphResourceInitState
         initialState;
@@ -154,7 +181,8 @@ namespace Engine {
     };
     DeclareMapType(FrameGraphResourceId_t, FrameGraphTexture, FrameGraphTexture);
 
-    struct SHIRABE_TEST_EXPORT FrameGraphTextureView {
+    struct SHIRABE_TEST_EXPORT FrameGraphTextureView
+      : public FrameGraphResource {
       Range
         arraySliceRange,
         mipSliceRange;
@@ -199,66 +227,23 @@ namespace Engine {
     DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableList, FrameGraphRenderableList);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableListView, FrameGraphRenderableListView);
 
-    struct SHIRABE_TEST_EXPORT FrameGraphResource {
-      PassUID_t
-        assignedPassUID;
-      FrameGraphResourceId_t
-        resourceId;
-      FrameGraphResourceId_t
-        parentResource;
-      FrameGraphResourceId_t
-        subjacentResource;
-      std::string
-        readableName;
-      FrameGraphResourceType
-        type;
-      bool
-        isExternalResource;
-
-      FrameGraphResource();
-
-      inline operator FrameGraphResourceId_t() { return resourceId; }
-    };
-
-    SHIRABE_TEST_EXPORT bool operator<(FrameGraphResource const&l, FrameGraphResource const&r);
     SHIRABE_TEST_EXPORT bool operator!=(FrameGraphResource const&l, FrameGraphResource const&r);
 
     DeclareMapType(FrameGraphResourceId_t, FrameGraphResource, FrameGraphResource);
-
-    static bool isResourceRegistered(
-      FrameGraphResourceMap const&registry,
-      FrameGraphResource    const&subjacentTargetResource)
-    {
-      return (registry.find(subjacentTargetResource.resourceId) != registry.end());
-    }
-
-    static bool isResourceTexture(
-      FrameGraphResourceMap const&registry,
-      FrameGraphResource        const&resourceId)
-    {
-      return (isResourceRegistered(registry, resourceId) && registry.at(resourceId.resourceId).type == FrameGraphResourceType::Texture);
-    }
-
-    static bool isResourceTextureView(
-      FrameGraphResourceMap const&registry,
-      FrameGraphResource    const&resourceId)
-    {
-      return (isResourceRegistered(registry, resourceId) && registry.at(resourceId.resourceId).type == FrameGraphResourceType::TextureView);
-    }
-
+    
     template <typename TUnderlyingIDFrom, typename TUnderlyingIDTo = TUnderlyingIDFrom>
     using AdjacencyListMap = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
     DeclareMapType(FrameGraphResourceId_t, Renderer::RenderableList, RenderableList);
     class FrameGraphResources {
     public:
-      FrameGraphTexture     const&getTexture(FrameGraphResourceId_t const&)     const;
-      FrameGraphTextureView const&getTextureView(FrameGraphResourceId_t const&) const;
-      FrameGraphBuffer      const&getBuffer(FrameGraphResourceId_t const&)      const;
-      FrameGraphBufferView  const&getBufferView(FrameGraphResourceId_t const&)  const;
-
-      FrameGraphRenderableList     const&getRenderableList(FrameGraphResourceId_t const&) const;
-      FrameGraphRenderableListView const&getRenderableListView(FrameGraphResourceId_t const&) const;
+      Optional<RefWrapper<FrameGraphTexture const>>     getTexture(FrameGraphResourceId_t const&)     const;
+      Optional<RefWrapper<FrameGraphTextureView const>> getTextureView(FrameGraphResourceId_t const&) const;
+      Optional<RefWrapper<FrameGraphBuffer const>>      getBuffer(FrameGraphResourceId_t const&)      const;
+      Optional<RefWrapper<FrameGraphBufferView const>>  getBufferView(FrameGraphResourceId_t const&)  const;
+      
+      Optional<RefWrapper<FrameGraphRenderableList const>>     getRenderableList(FrameGraphResourceId_t const&) const;
+      Optional<RefWrapper<FrameGraphRenderableListView const>> getRenderableListView(FrameGraphResourceId_t const&) const;
 
       inline FrameGraphTextureMap            const&textures()            const { return m_textures; }
       inline FrameGraphTextureViewMap        const&textureViews()        const { return m_textureViews; }
@@ -287,16 +272,17 @@ namespace Engine {
       bool addRenderableList(FrameGraphResourceId_t const&, FrameGraphRenderableList const&);
       bool addRenderableListView(FrameGraphResourceId_t const&, FrameGraphRenderableListView const&);
 
-      FrameGraphTexture     &getMutableTexture(FrameGraphResourceId_t const&);
-      FrameGraphTextureView &getMutableTextureView(FrameGraphResourceId_t const&);
-      FrameGraphBuffer      &getMutableBuffer(FrameGraphResourceId_t const&);
-      FrameGraphBufferView  &getMutableBufferView(FrameGraphResourceId_t const&);
+      Optional<RefWrapper<FrameGraphTexture>>     getMutableTexture(FrameGraphResourceId_t const&);
+      Optional<RefWrapper<FrameGraphTextureView>> getMutableTextureView(FrameGraphResourceId_t const&);
+      Optional<RefWrapper<FrameGraphBuffer>>      getMutableBuffer(FrameGraphResourceId_t const&);
+      Optional<RefWrapper<FrameGraphBufferView>>  getMutableBufferView(FrameGraphResourceId_t const&);
 
-      FrameGraphRenderableList     &getMutableRenderableList(FrameGraphResourceId_t const&);
-      FrameGraphRenderableListView &getMutableRenderableListView(FrameGraphResourceId_t const&);
+      Optional<RefWrapper<FrameGraphRenderableList>>     getMutableRenderableList(FrameGraphResourceId_t const&);
+      Optional<RefWrapper<FrameGraphRenderableListView>> getMutableRenderableListView(FrameGraphResourceId_t const&);
 
       bool mergeIn(FrameGraphResources const&other);
     };
+
   }
 
   template <>
