@@ -1,6 +1,7 @@
 #ifndef __SHIRABE_IRENDERER_H__
 #define __SHIRABE_IRENDERER_H__
 
+#include "Core/BasicTypes.h"
 #include "Core/EngineStatus.h"
 
 #include "Platform/ApplicationEnvironment.h"
@@ -45,6 +46,20 @@ namespace Engine {
       virtual EEngineStatus render(Renderable const&) = 0;
     DeclareInterfaceEnd(IRenderer);
     DeclareSharedPointerType(IRenderer);
+  }
+
+  template <>
+  inline std::string to_string<Renderer::Renderable>(Renderer::Renderable const&renderable) {
+
+    std::string message =
+      String::format(
+        "  Renderable: %0\n"
+        "    MeshId:     %1\n"
+        "    MaterialId: %2\n",
+        renderable.name,
+        renderable.meshId,
+        renderable.materialId);
+    return message;
   }
 }
 
