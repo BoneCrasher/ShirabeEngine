@@ -120,19 +120,33 @@ namespace Engine {
       return true;
     }
 
+    FrameGraphResource::FrameGraphResource()
+      : assignedPassUID(0)
+      , resourceId(FrameGraphResourceId_t{ })
+      , parentResource(0)
+      , subjacentResource(0)
+      , readableName("")
+      , type(FrameGraphResourceType::Undefined)
+      , isExternalResource(false)
+    {}
+
+
     FrameGraphBuffer::FrameGraphBuffer()
-      : elementSize(0)
+      : FrameGraphResource()
+      , elementSize(0)
       , elementCount(0)
     {}
 
     FrameGraphBufferView::FrameGraphBufferView()
-      : subrange(Range(0, 0))
+      : FrameGraphResource()
+      , subrange(Range(0, 0))
       , format(FrameGraphFormat::Undefined)
       , mode(FrameGraphViewAccessMode::Undefined)
     {}
 
     FrameGraphTexture::FrameGraphTexture()
-      : TextureInfo()
+      : FrameGraphResource()
+      , TextureInfo()
       , initialState(FrameGraphResourceInitState::Undefined)
       , permittedUsage(FrameGraphResourceUsage::Undefined)
       , requestedUsage(FrameGraphResourceUsage::Undefined)
@@ -149,7 +163,8 @@ namespace Engine {
     }
 
     FrameGraphTextureView::FrameGraphTextureView()
-      : arraySliceRange(Range(0, 0))
+      : FrameGraphResource()
+      , arraySliceRange(Range(0, 0))
       , mipSliceRange(Range(0, 0))
       , format(FrameGraphFormat::Undefined)
       , mode(FrameGraphViewAccessMode::Undefined)
@@ -157,16 +172,6 @@ namespace Engine {
 
     FrameGraphResourceFlags::FrameGraphResourceFlags()
       : requiredFormat(FrameGraphFormat::Undefined)
-    {}
-
-    FrameGraphResource::FrameGraphResource()
-      : assignedPassUID(0)
-      , resourceId(FrameGraphResourceId_t{})
-      , parentResource(0)
-      , subjacentResource(0)
-      , readableName("")
-      , type(FrameGraphResourceType::Undefined)
-      , isExternalResource(false)
     {}
 
     bool

@@ -40,7 +40,7 @@ namespace Engine {
         FrameGraphResourceId_t id       = textureAssignment.first;
         FrameGraphTexture      texture  = textureAssignment.second;
 
-        EEngineStatus status = renderContext->createTexture(id, texture, texture);
+        EEngineStatus status = renderContext->createTexture(texture);
         HandleEngineStatusError(status, "Failed to load texture for FrameGraphExecution.");
       }
 
@@ -53,10 +53,10 @@ namespace Engine {
       {
         FrameGraphResourceId_t id          = textureViewAssignment.first;
         FrameGraphResource     resource    = m_resources.at(id);
-        FrameGraphTexture      texture     = m_resourceData.getTexture(resource.subjacentResource);
+        FrameGraphTexture      texture     = *m_resourceData.getTexture(resource.subjacentResource);
         FrameGraphTextureView  textureView = textureViewAssignment.second;
 
-        EEngineStatus status = renderContext->createTextureView(id, resource, texture, textureView);
+        EEngineStatus status = renderContext->createTextureView(texture, textureView);
         HandleEngineStatusError(status, "Failed to load texture view for FrameGraphExecution.");
       }
 
@@ -70,7 +70,7 @@ namespace Engine {
         FrameGraphResourceId_t id          = textureViewAssignment.first;
         FrameGraphTextureView  textureView = textureViewAssignment.second;
 
-        EEngineStatus status = renderContext->destroyTextureView(id, textureView);
+        EEngineStatus status = renderContext->destroyTextureView(textureView);
         HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
       }
 
@@ -81,9 +81,7 @@ namespace Engine {
       FrameGraphTextureMap const&textures = m_resourceData.textures();
       for(FrameGraphTextureMap::value_type const&textureAssignment : textures)
       {
-        FrameGraphResourceId_t id       = textureAssignment.first;
-
-        EEngineStatus status = renderContext->destroyTexture(id);
+        EEngineStatus status = renderContext->destroyTexture(textureAssignment.second);
         HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
       }
 

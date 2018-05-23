@@ -365,7 +365,7 @@ namespace Engine {
       FrameGraphResourceRefMap &resources = passBuilder.m_resources;
       for(FrameGraphResourceRefMap::value_type&resource : resources)
       {
-        FrameGraphResource&r = resources[resource.first];
+        FrameGraphResource&r = resources.at(resource.first).get();
 
         // For each underlying OR imported resource (textures/buffers or whatever importable)
         if(r.parentResource == 0) {
@@ -387,7 +387,7 @@ namespace Engine {
           // Avoid internal references for passes!
           // If the edge from pass k to pass k+1 was not added yet.
           // Create edge: Parent-->Source
-          FrameGraphResource const&parentResource = resources.at(r.parentResource);
+          FrameGraphResource const&parentResource = m_resources.at(r.parentResource);
           if(parentResource.assignedPassUID != r.assignedPassUID) {
             if(!alreadyRegisteredFn<PassUID_t>(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
               m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
@@ -407,7 +407,7 @@ namespace Engine {
           if(r.type == FrameGraphResourceType::TextureView) {
             // Further adjustments
             FrameGraphResourceId_t  subjacentResourceId = r.subjacentResource;
-            FrameGraphResource     &subjacentResource   = resources[subjacentResourceId];
+            FrameGraphResource     &subjacentResource   = m_resources.at(subjacentResourceId);
 
             Optional<RefWrapper<FrameGraphTexture>>     texture     = m_resourceData.getMutableTexture(subjacentResource);
             Optional<RefWrapper<FrameGraphTextureView>> textureView = m_resourceData.getMutableTextureView(r);

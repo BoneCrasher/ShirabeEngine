@@ -70,8 +70,8 @@ namespace Engine {
 
         Log::Verbose(logTag(), "GBufferGeneration");
 
-        FrameGraphRenderableListView const&renderableView = frameGraphResources.getRenderableListView(passData.importData.renderableListView.resourceId);
-        FrameGraphRenderableList     const&renderableList = frameGraphResources.getRenderableList(passData.importData.renderableListView.subjacentResource);
+        FrameGraphRenderableListView const&renderableView = *frameGraphResources.getRenderableListView(passData.importData.renderableListView.resourceId);
+        FrameGraphRenderableList     const&renderableList = *frameGraphResources.getRenderableList(passData.importData.renderableListView.subjacentResource);
 
         for(FrameGraphResourceId_t const&renderableId : renderableView.renderableRefIndices) {
           FrameGraphRenderable const&renderable = renderableList.at(renderableId);

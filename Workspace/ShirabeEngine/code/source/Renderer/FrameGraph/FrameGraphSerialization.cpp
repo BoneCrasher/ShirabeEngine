@@ -30,6 +30,32 @@ namespace Engine {
     bool
       FrameGraphGraphVizSerializer::serializeGraph(Graph const&graph)
     {
+      FilterFunction_t filter =[&](
+        FrameGraphResourceIdList               const&ids,
+        FilterElementCompareCallbackFunction_t const&cb) -> FrameGraphResourceIdList
+      {
+        FrameGraphResourceIdList output{ };
+        if(ids.empty())
+          return output;
+
+        FrameGraphResourceRefMap const&resources = graph.m_resources;
+
+        std::copy_if(
+          ids.begin(),
+          ids.end(),
+          std::back_inserter(output),
+          [&] (FrameGraphResourceId_t const&id) -> bool
+        {
+          if(resources.find(id) == resources.end())
+            return false;
+
+          if(cb)
+            cb(resources.at(id));
+        });
+
+        return output;
+      };
+
       beginGraph();
 
       // Write registered resources
@@ -85,8 +111,8 @@ namespace Engine {
               return (r.type == FrameGraphResourceType::Texture && r.assignedPassUID != 0);
             });
             if(!creations.empty())
-              for(FrameGraphTextureMap::value_type const&texture : graph.m_resourceData.textures()) {
-                if(texture.second.assignedPassUID != sourceUID)
+              for(FrameGraphResourceId_t const&id : creations) {
+                FrameGraphTexture const&texture = *graph.m_resourceData.getTexture(id);
                 writePass2TextureResourceEdge(texture);
               }
             // Read/Write Texture
