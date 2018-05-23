@@ -50,6 +50,12 @@ namespace Engine {
       m_resourceMap.erase(id);
     }
 
+    EEngineStatus FrameGraphRenderContext::importTexture(
+      FrameGraphTexture const&texture)
+    {
+      return EEngineStatus::Ok;
+    }
+
     EEngineStatus FrameGraphRenderContext::createTexture(
       FrameGraphTexture const&texture)
     {

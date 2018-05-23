@@ -50,7 +50,7 @@ namespace Engine {
       resource.type              = FrameGraphResourceType::Texture;
 
       m_resourceData.addTexture(resource.resourceId, resource);
-      m_resources.insert(FrameGraphResourceRefMap::value_type(resource.resourceId, RefWrapper<FrameGraphResource>(*m_resourceData.getMutableTexture(resource.resourceId))));
+      m_resources[resource.resourceId] = *m_resourceData.getMutableTexture(resource.resourceId);
 
       return resource;
     }
@@ -113,7 +113,7 @@ namespace Engine {
       view.type               = FrameGraphResourceType::TextureView;
 
       m_resourceData.addTextureView(view.resourceId, view);
-      m_resources.insert(FrameGraphResourceRefMap::value_type(view.resourceId, RefWrapper<FrameGraphResource>(*m_resourceData.getMutableTextureView(view.resourceId))));
+      m_resources[view.resourceId] = *m_resourceData.getMutableTextureView(view.resourceId);
 
       return view;
 
@@ -171,10 +171,9 @@ namespace Engine {
       view.type              = FrameGraphResourceType::TextureView;
 
       m_resourceData.addTextureView(view.resourceId, view);
-      m_resources.insert(FrameGraphResourceRefMap::value_type(view.resourceId, RefWrapper<FrameGraphResource>(*m_resourceData.getMutableTextureView(view.resourceId))));
+      m_resources[view.resourceId] = *m_resourceData.getMutableTextureView(view.resourceId);
 
       return view;
-
     }
 
     /**********************************************************************************************//**
@@ -206,6 +205,7 @@ namespace Engine {
       for(uint64_t k=0; k<renderableList.size(); ++k)
         view.renderableRefIndices.push_back(k);
 
+      m_resources[resource.resourceId] = resource;
       m_resourceData.addRenderableListView(resource.resourceId, view);
 
       return resource;

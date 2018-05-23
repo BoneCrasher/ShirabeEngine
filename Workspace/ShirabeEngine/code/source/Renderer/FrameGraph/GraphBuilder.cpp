@@ -117,7 +117,8 @@ namespace Engine {
         resource.readableName       = readableName;
         resource.isExternalResource = true;
 
-        m_resourceData.addTexture(resource.resourceId, texture);
+        m_resourceData.addTexture(resource.resourceId, resource);
+        m_resources[resource.resourceId] = *m_resourceData.getTexture(resource.resourceId);
 
         return resource;
       }
@@ -141,7 +142,8 @@ namespace Engine {
         resource.readableName       = readableIdentifier;
         resource.isExternalResource = true;
 
-        m_resourceData.addRenderableList(resource, renderables);
+        m_resources[resource.resourceId] = resource;
+        m_resourceData.addRenderableList(resource.resourceId, renderables);
 
         return resource;
       }
@@ -362,10 +364,10 @@ namespace Engine {
       // - Resource creation requests.
       // - Edges: pass->pass and resource[view]->resource[view] for graph generation!
       // - ???
-      FrameGraphResourceRefMap &resources = passBuilder.m_resources;
-      for(FrameGraphResourceRefMap::value_type&resource : resources)
+      FrameGraphResourceMap &resources = passBuilder.m_resources;
+      for(FrameGraphResourceMap::value_type&resource : resources)
       {
-        FrameGraphResource&r = resources.at(resource.first).get();
+        FrameGraphResource&r = resource.second;
 
         // For each underlying OR imported resource (textures/buffers or whatever importable)
         if(r.parentResource == 0) {

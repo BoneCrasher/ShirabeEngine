@@ -38,7 +38,7 @@ namespace Engine {
         if(ids.empty())
           return output;
 
-        FrameGraphResourceRefMap const&resources = graph.m_resources;
+        FrameGraphResourceMap const&resources = graph.m_resources;
 
         std::copy_if(
           ids.begin(),
@@ -69,13 +69,13 @@ namespace Engine {
           *graph.m_resourceData.getTextureView(assignment.first));
       }
       for(FrameGraphRenderableListMap::value_type const&assignment : graph.m_resourceData.renderablesLists()) {
-        FrameGraphResource const&handle = graph.m_resources.at(assignment.first).get();
+        FrameGraphResource const&handle = graph.m_resources.at(assignment.first);
         writeRenderableList(
           handle,
           *graph.m_resourceData.getRenderableList(assignment.first));
       }
       for(FrameGraphRenderableListViewMap::value_type const&assignment : graph.m_resourceData.renderableListViews()) {
-        FrameGraphResource const&handle = graph.m_resources.at(assignment.first).get();
+        FrameGraphResource const&handle = graph.m_resources.at(assignment.first);
         writeRenderableListView(
           graph.m_resources.at(handle.parentResource),
           handle,

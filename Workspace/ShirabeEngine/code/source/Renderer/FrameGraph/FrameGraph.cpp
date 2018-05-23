@@ -40,7 +40,13 @@ namespace Engine {
         FrameGraphResourceId_t id       = textureAssignment.first;
         FrameGraphTexture      texture  = textureAssignment.second;
 
-        EEngineStatus status = renderContext->createTexture(texture);
+        EEngineStatus status = EEngineStatus::Ok;
+
+        if(texture.isExternalResource)
+          status = renderContext->importTexture(texture);
+        else
+          status = renderContext->createTexture(texture);
+
         HandleEngineStatusError(status, "Failed to load texture for FrameGraphExecution.");
       }
 
@@ -81,6 +87,9 @@ namespace Engine {
       FrameGraphTextureMap const&textures = m_resourceData.textures();
       for(FrameGraphTextureMap::value_type const&textureAssignment : textures)
       {
+        if(textureAssignment.second.isExternalResource)
+          continue;
+
         EEngineStatus status = renderContext->destroyTexture(textureAssignment.second);
         HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
       }

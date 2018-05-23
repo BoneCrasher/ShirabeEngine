@@ -18,6 +18,9 @@ namespace Engine {
 
     DeclareInterface(IFrameGraphRenderContext);
 
+    virtual EEngineStatus importTexture(
+      FrameGraphTexture const&texture) = 0;
+
     virtual EEngineStatus createTexture(
       FrameGraphTexture const&texture) = 0;
     virtual EEngineStatus createTextureView(
@@ -64,6 +67,9 @@ namespace Engine {
         Ptr<IAssetStorage>    assetStorage,
         Ptr<IResourceManager> resourceManager,
         Ptr<IRenderContext>   renderer);
+
+      EEngineStatus importTexture(
+        FrameGraphTexture const&texture);
 
       EEngineStatus createTexture(
         FrameGraphTexture      const&texture);

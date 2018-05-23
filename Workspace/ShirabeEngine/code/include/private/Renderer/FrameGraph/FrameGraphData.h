@@ -137,7 +137,7 @@ namespace Engine {
 
       inline operator FrameGraphResourceId_t() { return resourceId; }
     };
-    DeclareMapType(FrameGraphResourceId_t, RefWrapper<FrameGraphResource>, FrameGraphResourceRef);
+    DeclareMapType(FrameGraphResourceId_t, FrameGraphResource, FrameGraphResource);
 
     SHIRABE_TEST_EXPORT bool operator<(FrameGraphResource const&l, FrameGraphResource const&r);
 
@@ -286,19 +286,29 @@ namespace Engine {
   }
 
   template <>
-  std::string to_string<FrameGraph::FrameGraphResourceType>(FrameGraph::FrameGraphResourceType const&type);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphResourceType>(FrameGraph::FrameGraphResourceType const&type);
   template <>
-  std::string to_string<FrameGraph::FrameGraphFormat>(FrameGraph::FrameGraphFormat const&format);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphFormat>(FrameGraph::FrameGraphFormat const&format);
   template <>
-  std::string to_string<FrameGraph::FrameGraphResourceUsage>(FrameGraph::FrameGraphResourceUsage const&usage);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphResourceUsage>(FrameGraph::FrameGraphResourceUsage const&usage);
   template <>
-  std::string to_string<FrameGraph::FrameGraphWriteTarget>(FrameGraph::FrameGraphWriteTarget const&target);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphWriteTarget>(FrameGraph::FrameGraphWriteTarget const&target);
   template <>
-  std::string to_string<FrameGraph::FrameGraphResourceAccessibility>(FrameGraph::FrameGraphResourceAccessibility const&accessibility);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphResourceAccessibility>(FrameGraph::FrameGraphResourceAccessibility const&accessibility);
   template <>
-  std::string to_string<FrameGraph::FrameGraphResourceInitState>(FrameGraph::FrameGraphResourceInitState const&state);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphResourceInitState>(FrameGraph::FrameGraphResourceInitState const&state);
   template <>
-  std::string to_string<FrameGraph::FrameGraphViewAccessMode>(FrameGraph::FrameGraphViewAccessMode const&accessMode);
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphViewAccessMode>(FrameGraph::FrameGraphViewAccessMode const&accessMode);
+
+
+  template <>
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphTexture>(FrameGraph::FrameGraphTexture const&);
+  template <>
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphTextureView>(FrameGraph::FrameGraphTextureView const&);
+  template <>
+  SHIRABE_TEST_EXPORT std::string to_string<FrameGraph::FrameGraphBuffer>(FrameGraph::FrameGraphBuffer const&);
+  template <>
+  SHIRABE_TEST_EXPORT  std::string to_string<FrameGraph::FrameGraphBufferView>(FrameGraph::FrameGraphBufferView const&);
 
 }
 

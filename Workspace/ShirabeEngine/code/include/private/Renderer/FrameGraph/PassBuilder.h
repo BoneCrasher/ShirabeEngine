@@ -112,7 +112,7 @@ namespace Engine {
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
 
       GraphBuilder const&m_graphBuilder;
-      FrameGraphResourceRefMap   m_resources;
+      FrameGraphResourceMap      m_resources;
       FrameGraphMutableResources m_resourceData;
     };
 

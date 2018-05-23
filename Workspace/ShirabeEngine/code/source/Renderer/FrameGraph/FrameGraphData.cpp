@@ -382,4 +382,73 @@ namespace Engine {
     }
 
   }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphTexture>(FrameGraph::FrameGraphTexture const&texture)
+  {
+    std::string s =
+      String::format(
+        "  %0 (RID: %1)"
+        "\n    Name:          %2"
+        "\n    Sizes:         %3 x %4 x %5"
+        "\n    Format:        %6"
+        "\n    Array-Levels:  %7"
+        "\n    Mip-Levels:    %8"
+        "\n    Initial-State: %9",
+        "Texture",
+        texture.resourceId,
+        texture.readableName,
+        texture.width, texture.height, texture.depth,
+        to_string(texture.format),
+        texture.arraySize,
+        texture.mipLevels,
+        to_string(texture.initialState));
+    return s;
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphTextureView>(FrameGraph::FrameGraphTextureView const&view)
+  {
+    bool viewIsReadMode  = view.mode.check(FrameGraphViewAccessMode::Read);
+
+    std::string s =
+      String::format(
+        "  %0 (RID: %1)"
+        "\n    SubjacentResourceId: %2"
+        "\n    Mode:                %3"
+        "\n    Format:              %4"
+        "\n    ArrayRange:          %5"
+        "\n    MipRange:            %6",
+        "TextureView",
+        view.resourceId,
+        view.subjacentResource,
+        (viewIsReadMode ? "Read" : "Write"),
+        to_string(view.format),
+        to_string(view.arraySliceRange),
+        to_string(view.mipSliceRange));
+    return s;
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphBuffer>(FrameGraph::FrameGraphBuffer const&buffer)
+  {
+    std::string s =
+      String::format(
+        "  %0 (RID: %1)",
+        "Buffer",
+        buffer.resourceId);
+    return s;
+  }
+
+  template <>
+  std::string to_string<FrameGraph::FrameGraphBufferView>(FrameGraph::FrameGraphBufferView const&view)
+  {
+    std::string s =
+      String::format(
+        "  %0 (RID: %1)",
+        "BufferView",
+        view.resourceId);
+    return s;
+  }
+
 }
