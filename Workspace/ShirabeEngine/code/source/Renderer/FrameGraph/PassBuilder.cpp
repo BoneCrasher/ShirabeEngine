@@ -14,11 +14,9 @@ namespace Engine {
      * \param [in,out]  pass  The pass.
      **************************************************************************************************/
     PassBuilder::PassBuilder(
-      PassUID_t                                  const&passId,
-      Ptr<IUIDGenerator<FrameGraphResourceId_t>>       resourceUIDGenerator,
-      FrameGraphMutableResources                      &resourceData)
+      PassUID_t                  const&passId,
+      FrameGraphMutableResources      &resourceData)
       : m_passUID(passId)
-      , m_resourceIdGenerator(resourceUIDGenerator)
       , m_resourceData(resourceData)
     {}
 
@@ -66,28 +64,22 @@ namespace Engine {
       adjustedMipSliceRange   = mipSliceRange;
       if(sourceResource.type == FrameGraphResourceType::TextureView)
       {
-        Optional<Ptr<FrameGraphTexture>> const&subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.subjacentResource);
+        Ptr<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.subjacentResource);
         
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        if(!subjacentRef.has_value())
-          throw std::runtime_error("Subjacent resource handle not found.");
-
-        if(!(*subjacentRef))
-          throw std::runtime_error("Subjacent resource handle is empty.");
+        if(!subjacentRef)
+          throw std::runtime_error(String::format("Subjacent resource handle w/ id %0 is empty.", sourceResource.subjacentResource));
         #endif
 
-        Optional<Ptr<FrameGraphTextureView>> const&parentRef = resourceData.get<FrameGraphTextureView>(sourceResource.resourceId);
+        Ptr<FrameGraphTextureView> const parentRef = resourceData.get<FrameGraphTextureView>(sourceResource.resourceId);
 
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        if(!parentRef.has_value())
-          throw std::runtime_error("Parent resource handle not found.");
-
-        if(!(*parentRef))
-          throw std::runtime_error("Parent resource handle is empty.");
+        if(!parentRef)
+          throw std::runtime_error(String::format("Parent resource handle w/ id %0 is empty.", sourceResource.resourceId));
         #endif
 
-        FrameGraphTexture     const&subjacent = **subjacentRef;
-        FrameGraphTextureView const&parent    = **parentRef;
+        FrameGraphTexture     const&subjacent = *subjacentRef;
+        FrameGraphTextureView const&parent    = *parentRef;
 
         adjustedArraySliceRange.offset = (parent.arraySliceRange.offset + arraySliceRange.offset);
         adjustedMipSliceRange.offset   = (parent.mipSliceRange.offset   + mipSliceRange.offset);
@@ -104,9 +96,11 @@ namespace Engine {
       else {
 
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        Optional<Ptr<FrameGraphTexture>> const&subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.resourceId);
+        Ptr<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.resourceId);
+        if(!subjacentRef)
+          throw std::runtime_error(String::format("Subjacent resource handle w/ id %0 is empty.", sourceResource.subjacentResource));
 
-        FrameGraphTexture const&subjacent = **subjacentRef;
+        FrameGraphTexture const&subjacent = *subjacentRef;
 
         bool arraySliceRangeOutOfBounds = (adjustedArraySliceRange.offset + adjustedArraySliceRange.length) > subjacent.arraySize;
         bool mipSliceRangeOutOfBounds   = (adjustedMipSliceRange.offset   + adjustedMipSliceRange.length)   > subjacent.mipLevels;
@@ -235,7 +229,6 @@ namespace Engine {
         view.source = FrameGraphViewSource::Depth;
 
       view.assignedPassUID   = m_passUID;
-      view.resourceId        = m_resourceIdGenerator->generate();
       view.parentResource    = sourceResource.resourceId;
       view.subjacentResource =
         (sourceResource.type == FrameGraphResourceType::Texture
@@ -271,18 +264,19 @@ namespace Engine {
       resource.type               = FrameGraphResourceType::RenderableListView;
       resource.isExternalResource = false;
       
-      Optional<Ptr<FrameGraphRenderableList>> const&listRef = m_resourceData.get<FrameGraphRenderableList>(renderableListResource.resourceId);
+      Ptr<FrameGraphRenderableList> const listRef = m_resourceData.get<FrameGraphRenderableList>(renderableListResource.resourceId);
 
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-
+      if(!listRef)
+        throw std::runtime_error(String::format("Renderable list resource handle w/ id %0 is empty.", renderableListResource.resourceId));
       #endif
 
-      FrameGraphRenderableList const&list = **listRef;
+      FrameGraphRenderableList const&list = *listRef;
 
       for(uint64_t k=0; k<list.renderableList.size(); ++k)
         resource.renderableRefIndices.push_back(k);
 
-      m_resources[resource.resourceId] = resource;
+      m_resources.push_back(resource.resourceId);
 
       return resource;
     }
@@ -302,11 +296,11 @@ namespace Engine {
      **************************************************************************************************/
     bool
       PassBuilder::isTextureBeingReadInSubresourceRange(
-        FrameGraphResources::RefIndex const&resourceViews,
-        FrameGraphResources           const&resources,
-        FrameGraphResource            const&sourceResource,
-        Range                         const&arraySliceRange,
-        Range                         const&mipSliceRange)
+        RefIndex            const&resourceViews,
+        FrameGraphResources const&resources,
+        FrameGraphResource  const&sourceResource,
+        Range               const&arraySliceRange,
+        Range               const&mipSliceRange)
     {
       // This test method can check for overlapping regions for array slices and mip slices
       //  given a specific set of options to test against.
@@ -314,9 +308,9 @@ namespace Engine {
       // If a "Read" and "Write" of two subresources does not overlap, both operations 
       //  as such are valid.
       // The whole operation setup is based on first come first serve.
-      for(FrameGraphResources::RefIndex::value_type const&viewRef : resourceViews)
+      for(RefIndex::value_type const&viewRef : resourceViews)
       {
-        FrameGraphTextureView const&view = resources.get<FrameGraphTextureView>(viewRef.second);
+        FrameGraphTextureView const&view = *resources.get<FrameGraphTextureView>(viewRef);
         bool correctMode = view.mode.check(FrameGraphViewAccessMode::Read);
         if(!correctMode)
           continue;
@@ -356,11 +350,11 @@ namespace Engine {
      **************************************************************************************************/
     bool
       PassBuilder::isTextureBeingWrittenInSubresourceRange(
-        FrameGraphResources::RefIndex const&resourceViews,
-        FrameGraphResources           const&resources,
-        FrameGraphResource            const&sourceResource,
-        Range                         const&arraySliceRange,
-        Range                         const&mipSliceRange)
+        RefIndex            const&resourceViews,
+        FrameGraphResources const&resources,
+        FrameGraphResource  const&sourceResource,
+        Range               const&arraySliceRange,
+        Range               const&mipSliceRange)
     {
       // This test method can check for overlapping regions for array slices and mip slices
       //  given a specific set of options to test against.
@@ -368,9 +362,9 @@ namespace Engine {
       // If a "Read" and "Write" of two subresources does not overlap, both operations 
       //  as such are valid.
       // The whole operation setup is based on first come first serve.
-      for(FrameGraphResources::RefIndex::value_type const&viewRef : resourceViews)
+      for(RefIndex::value_type const&viewRef : resourceViews)
       {
-        FrameGraphTextureView const&view = resources.get<FrameGraphTextureView>(viewRef.second);
+        FrameGraphTextureView const&view = *resources.get<FrameGraphTextureView>(viewRef);
 
         bool correctMode = view.mode.check(FrameGraphViewAccessMode::Write);        
         if(!correctMode)

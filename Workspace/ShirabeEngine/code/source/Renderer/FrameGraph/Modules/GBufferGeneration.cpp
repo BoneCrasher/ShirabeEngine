@@ -70,22 +70,22 @@ namespace Engine {
 
         Log::Verbose(logTag(), "GBufferGeneration");
 
-        Optional<Ptr<FrameGraphRenderableListView>> const&renderableView = *frameGraphResources.get<FrameGraphRenderableListView>(passData.importData.renderableListView.resourceId);
+        Ptr<FrameGraphRenderableListView> const&renderableView = frameGraphResources.get<FrameGraphRenderableListView>(passData.importData.renderableListView.resourceId);
         
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        if(!renderableView.has_value())
+        if(!renderableView)
           throw std::runtime_error(String::format("Renderable view with id %0 not found.", passData.importData.renderableListView.resourceId));
         #endif
 
-        Optional<Ptr<FrameGraphRenderableList>> const&renderableList = *frameGraphResources.get<FrameGraphRenderableList>(passData.importData.renderableListView.subjacentResource);
+        Ptr<FrameGraphRenderableList> const&renderableList = frameGraphResources.get<FrameGraphRenderableList>(passData.importData.renderableListView.subjacentResource);
         
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        if(!renderableList.has_value())
+        if(!renderableList)
           throw std::runtime_error(String::format("Renderable list with id %0 not found.", passData.importData.renderableListView.subjacentResource));
         #endif
 
-        for(FrameGraphResourceId_t const&renderableId : (*renderableView)->renderableRefIndices) {
-          FrameGraphRenderable const&renderable = (*renderableList)->renderableList.at(renderableId);
+        for(FrameGraphResourceId_t const&renderableId : renderableView->renderableRefIndices) {
+          FrameGraphRenderable const&renderable = renderableList->renderableList.at(renderableId);
 
           EEngineStatus status = context->render(renderable);
           HandleEngineStatusError(status, "Failed to render renderable.");

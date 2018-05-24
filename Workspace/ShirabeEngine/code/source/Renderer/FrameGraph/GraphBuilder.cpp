@@ -297,7 +297,7 @@ namespace Engine {
       FrameGraphResourceIdList &resources = passBuilder.m_resources;
       for(FrameGraphResourceId_t const&resource : resources)
       {
-        FrameGraphResource&r = m_resourceData.getMutable<FrameGraphResource>(resource);
+        FrameGraphResource&r = *m_resourceData.getMutable<FrameGraphResource>(resource);
 
         // For each underlying OR imported resource (textures/buffers or whatever importable)
         if(r.parentResource == 0) {
@@ -319,7 +319,7 @@ namespace Engine {
           // Avoid internal references for passes!
           // If the edge from pass k to pass k+1 was not added yet.
           // Create edge: Parent-->Source
-          FrameGraphResource const&parentResource = m_resourceData.get<FrameGraphResource>(r.parentResource);
+          FrameGraphResource const&parentResource = *m_resourceData.get<FrameGraphResource>(r.parentResource);
           if(parentResource.assignedPassUID != r.assignedPassUID) {
             if(!alreadyRegisteredFn<PassUID_t>(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
               m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
@@ -338,24 +338,18 @@ namespace Engine {
 
           if(r.type == FrameGraphResourceType::TextureView) {
             // Further adjustments
-            FrameGraphResourceId_t  subjacentResourceId = r.subjacentResource;
-            FrameGraphResource     &subjacentResource   = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
-
-            Optional<RefWrapper<FrameGraphTexture>>     texture     = m_resourceData.getMutableTexture(subjacentResource);
-            Optional<RefWrapper<FrameGraphTextureView>> textureView = m_resourceData.getMutableTextureView(r);
-
-            FrameGraphTexture     &t = *texture;
-            FrameGraphTextureView &v = *textureView;
-
+            FrameGraphTexture     &texture     = *m_resourceData.getMutable<FrameGraphTexture>(r.subjacentResource);
+            FrameGraphTextureView &textureView = *m_resourceData.getMutable<FrameGraphTextureView>(r.resourceId);
+            
             // Auto adjust format if requested
-            if(v.format == FrameGraphFormat::Automatic)
-              v.format = texture->get().format;
+            if(textureView.format == FrameGraphFormat::Automatic)
+              textureView.format = texture.format;
 
             // Flag required usage flags, so that the subjacent texture is properly created.
-            if(v.mode.check(FrameGraphViewAccessMode::Read))
-              t.requestedUsage.set(FrameGraphResourceUsage::ImageResource);
+            if(textureView.mode.check(FrameGraphViewAccessMode::Read))
+              texture.requestedUsage.set(FrameGraphResourceUsage::ImageResource);
             else
-              t.requestedUsage.set(FrameGraphResourceUsage::RenderTarget);
+              texture.requestedUsage.set(FrameGraphResourceUsage::RenderTarget);
           }
           else if(r.type == FrameGraphResourceType::BufferView) {
             // TODO
@@ -394,16 +388,16 @@ namespace Engine {
     {
       bool allBindingsValid = true;
 
-      for(FrameGraphResources::RefIndex::value_type const&textureViewRef : m_resourceData.textureViews()) {
-        FrameGraphTextureView const&textureView = m_resourceData.getTextureView(textureViewRef.second); 
+      for(RefIndex::value_type const&textureViewRef : m_resourceData.textureViews()) {
+        FrameGraphTextureView const&textureView = *m_resourceData.get<FrameGraphTextureView>(textureViewRef); 
 
         // Adjust resource access flags in the subjacent resource to have the texture creation configure 
         // everything appropriately.
         FrameGraphResourceId_t subjacentResourceId = textureView.subjacentResource;
 
-        Optional<RefWrapper<FrameGraphTexture>> texture = m_resourceData.getMutableTexture(subjacentResourceId);
+        FrameGraphTexture const&texture = *m_resourceData.get<FrameGraphTexture>(subjacentResourceId);
 
-        bool viewBindingValid = validateTextureView(*texture, textureView);
+        bool viewBindingValid = validateTextureView(texture, textureView);
         allBindingsValid &= viewBindingValid;
 
       } // foreach TextureView

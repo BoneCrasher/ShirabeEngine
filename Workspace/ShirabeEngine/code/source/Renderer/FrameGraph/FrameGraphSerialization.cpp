@@ -38,7 +38,7 @@ namespace Engine {
         if(ids.empty())
           return output;
 
-        FrameGraphResourceMap const&resources = graph.m_resources;
+        FrameGraphResources const&resources = graph.m_resourceData;
 
         std::copy_if(
           ids.begin(),
@@ -46,11 +46,11 @@ namespace Engine {
           std::back_inserter(output),
           [&] (FrameGraphResourceId_t const&id) -> bool
         {
-          if(resources.find(id) == resources.end())
+          if(resources.resources().size() <= id)
             return false;
 
           if(cb)
-            cb(resources.at(id));
+            cb(*resources.get<FrameGraphResource>(id));
         });
 
         return output;
@@ -59,27 +59,27 @@ namespace Engine {
       beginGraph();
 
       // Write registered resources
-      for(FrameGraphTextureMap::value_type const&assignment : graph.m_resourceData.textures()) {
-        writeTextureResource(
-          *graph.m_resourceData.getTexture(assignment.first));
+      for(RefIndex::value_type const&textureRef : graph.m_resourceData.textures()) {
+        FrameGraphTexture const&texture = *graph.m_resourceData.get<FrameGraphTexture>(textureRef);
+        writeTextureResource(texture);
       }
-      for(FrameGraphTextureViewMap::value_type const&assignment : graph.m_resourceData.textureViews()) {
-        writeTextureResourceView(
-          graph.m_resources.at(assignment.second.parentResource),
-          *graph.m_resourceData.getTextureView(assignment.first));
+
+      for(RefIndex::value_type const&textureViewRef : graph.m_resourceData.textureViews()) {
+        FrameGraphTextureView const&view   = *graph.m_resourceData.get<FrameGraphTextureView>(textureViewRef);
+        FrameGraphResource    const&parent = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+
+        writeTextureResourceView(parent, view);
       }
-      for(FrameGraphRenderableListMap::value_type const&assignment : graph.m_resourceData.renderablesLists()) {
-        FrameGraphResource const&handle = graph.m_resources.at(assignment.first);
-        writeRenderableList(
-          handle,
-          *graph.m_resourceData.getRenderableList(assignment.first));
+
+      for(RefIndex::value_type const&renderableListRef : graph.m_resourceData.renderablesLists()) {
+        FrameGraphRenderableList const&list = *graph.m_resourceData.get<FrameGraphRenderableList>(renderableListRef);
+        writeRenderableList(list);
       }
-      for(FrameGraphRenderableListViewMap::value_type const&assignment : graph.m_resourceData.renderableListViews()) {
-        FrameGraphResource const&handle = graph.m_resources.at(assignment.first);
-        writeRenderableListView(
-          graph.m_resources.at(handle.parentResource),
-          handle,
-          *graph.m_resourceData.getRenderableListView(assignment.first));
+
+      for(RefIndex::value_type const&renderableListViewRef : graph.m_resourceData.renderableListViews()) {
+        FrameGraphRenderableListView const&view   = *graph.m_resourceData.get<FrameGraphRenderableListView>(renderableListViewRef);
+        FrameGraphResource           const&parent = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+        writeRenderableListView(parent, view);
       }
 
       // Write passes and adjacent resources
@@ -112,7 +112,7 @@ namespace Engine {
             });
             if(!creations.empty())
               for(FrameGraphResourceId_t const&id : creations) {
-                FrameGraphTexture const&texture = *graph.m_resourceData.getTexture(id);
+                FrameGraphTexture const&texture = *graph.m_resourceData.get<FrameGraphTexture>(id);
                 writePass2TextureResourceEdge(texture);
               }
             // Read/Write Texture
@@ -121,9 +121,8 @@ namespace Engine {
             });
             if(!readViews.empty()) {
               for(FrameGraphResourceId_t const&id : readViews) {
-                FrameGraphResource    const&resource       = graph.m_resources.at(id);
-                FrameGraphResource    const&parentResource = graph.m_resources.at(resource.parentResource);
-                FrameGraphTextureView const&view           = *graph.m_resourceData.getTextureView(resource.resourceId);
+                FrameGraphTextureView const&view           = *graph.m_resourceData.get<FrameGraphTextureView>(id);
+                FrameGraphResource    const&parentResource = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
                 writeTextureResourceViewEdge(parentResource, view);
               }
             }
@@ -133,10 +132,10 @@ namespace Engine {
             });
             if(!renderableListViews.empty()) {
               for(FrameGraphResourceId_t const&id : renderableListViews) {
-                FrameGraphResource           const&resource       = graph.m_resources.at(id);
-                FrameGraphResource           const&parentResource = graph.m_resources.at(resource.parentResource);
-                FrameGraphRenderableListView const&view           = *graph.m_resourceData.getRenderableListView(resource.resourceId);
-                writeRenderableResourceViewEdge(parentResource, resource, view);
+                FrameGraphRenderableListView const&view           = *graph.m_resourceData.get<FrameGraphRenderableListView>(id);
+                FrameGraphResource           const&parentResource = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+
+                writeRenderableResourceViewEdge(parentResource, view);
               }
             }
           }
@@ -255,7 +254,6 @@ namespace Engine {
 
     void
       FrameGraphGraphVizSerializer::writeRenderableList(
-        FrameGraphResource       const&resource,
         FrameGraphRenderableList const&list)
     {
       static constexpr char const*listStyle = "shape=none";
@@ -266,19 +264,18 @@ namespace Engine {
           "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>RenderableList (RID: %1)</b></font></td></tr>"
           "</table>>",
           "import",
-          resource.resourceId,
-          resource.readableName);
+          list.resourceId,
+          list.readableName);
 
-      m_stream << "    RenderableList" << resource.resourceId << " [" << listStyle << ",label=" << listLabel << "];\n";
+      m_stream << "    RenderableList" << list.resourceId << " [" << listStyle << ",label=" << listLabel << "];\n";
     }
 
     void
       FrameGraphGraphVizSerializer::writeRenderableListView(
         FrameGraphResource           const&parentResource,
-        FrameGraphResource           const&resource,
         FrameGraphRenderableListView const&view)
     {
-      std::string viewId   = String::format("RenderableListView%0", resource.resourceId);
+      std::string viewId   = String::format("RenderableListView%0", view.resourceId);
 
       static constexpr char const*viewStyle = "shape=none";
       std::string viewLabel =
@@ -288,8 +285,8 @@ namespace Engine {
           "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">%2</td></tr>"
           "</table>>",
           "f46e5d",
-          resource.resourceId,
-          resource.subjacentResource);
+          view.resourceId,
+          view.subjacentResource);
 
       m_stream << "    " << viewId << " [" << viewStyle << ",label=" << viewLabel << "];\n";
     }
@@ -297,11 +294,10 @@ namespace Engine {
     void
       FrameGraphGraphVizSerializer::writeRenderableResourceViewEdge(
         FrameGraphResource           const&parentResource,
-        FrameGraphResource           const&resource,
         FrameGraphRenderableListView const&view)
     {
-      std::string passId   = String::format("Pass%0", resource.assignedPassUID);
-      std::string viewId   = String::format("RenderableListView%0", resource.resourceId); std::string parentId = "";
+      std::string passId   = String::format("Pass%0", view.assignedPassUID);
+      std::string viewId   = String::format("RenderableListView%0", view.resourceId); std::string parentId = "";
       if(parentResource.type == FrameGraphResourceType::RenderableList)
         parentId = String::format("RenderableList%0", parentResource.resourceId);
       else

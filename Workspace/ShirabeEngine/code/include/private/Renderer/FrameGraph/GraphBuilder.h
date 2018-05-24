@@ -135,7 +135,7 @@ namespace Engine {
         //   - Read
         //   - Write
         //   - Import
-        PassBuilder passBuilder(uid, m_resourceUIDGenerator, m_resourceData);
+        PassBuilder passBuilder(uid, m_resourceData);
         if(!pass->setup(passBuilder)) {
           Log::Error(logTag(), "Cannot setup pass instance.");
           pass = nullptr;

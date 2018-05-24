@@ -87,16 +87,13 @@ namespace Engine {
       void endGraph();
       void writePass(PassBase const&pass);
       void writeRenderableList(
-        FrameGraphResource       const&resource,
         FrameGraphRenderableList const&list);
       void writeRenderableListView(
         FrameGraphResource           const&parentResource,
-        FrameGraphResource           const&resource,
         FrameGraphRenderableListView const&view);
 
       void writeRenderableResourceViewEdge(
         FrameGraphResource           const&parentResource,
-        FrameGraphResource           const&resource,
         FrameGraphRenderableListView const&view);
 
       void writeTextureResource(

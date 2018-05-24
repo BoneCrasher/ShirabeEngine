@@ -56,9 +56,8 @@ namespace Engine {
      
     public:      
       PassBuilder(
-        PassUID_t                                  const&passUID,
-        Ptr<IUIDGenerator<FrameGraphResourceId_t>>       resourceUIDGenerator,
-        FrameGraphMutableResources                      &resourceData);
+        PassUID_t                  const&passUID,
+        FrameGraphMutableResources      &resourceData);
 
       PassUID_t const&assignedPassUID() const { return m_passUID; }
 
@@ -108,21 +107,20 @@ namespace Engine {
         bool                      validateWrites = true);
 
       bool isTextureBeingReadInSubresourceRange(
-        FrameGraphResources::RefIndex const&resourceViews,
-        FrameGraphResources           const&resources,
-        FrameGraphResource            const&sourceResource,
-        Range                         const&arraySliceRange,
-        Range                         const&mipSliceRange);
+        RefIndex            const&resourceViews,
+        FrameGraphResources const&resources,
+        FrameGraphResource  const&sourceResource,
+        Range               const&arraySliceRange,
+        Range               const&mipSliceRange);
       bool isTextureBeingWrittenInSubresourceRange(
-        FrameGraphResources::RefIndex const&resourceViews,
-        FrameGraphResources           const&resources,
-        FrameGraphResource            const&sourceResource,
-        Range                         const&arraySliceRange,
-        Range                         const&mipSliceRange);
+        RefIndex            const&resourceViews,
+        FrameGraphResources const&resources,
+        FrameGraphResource  const&sourceResource,
+        Range               const&arraySliceRange,
+        Range               const&mipSliceRange);
 
       PassUID_t m_passUID;
 
-      Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
 
       FrameGraphResourceIdList    m_resources;
       FrameGraphMutableResources &m_resourceData;

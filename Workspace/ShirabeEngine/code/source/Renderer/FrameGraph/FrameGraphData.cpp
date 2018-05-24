@@ -211,12 +211,19 @@ namespace Engine {
         #endif
 
         appendToVector(m_resources, other.resources());
-        m_textures.insert(other.textures().begin(), other.textures().end());
-        m_textureViews.insert(other.textureViews().begin(), other.textureViews().end());
-        m_buffers.insert(other.buffers().begin(), other.buffers().end());
-        m_bufferViews.insert(other.bufferViews().begin(), other.bufferViews().end());
-        m_renderableLists.insert(other.renderablesLists().begin(), other.renderablesLists().end());
-        m_renderableListViews.insert(other.renderableListViews().begin(), other.textures().end());
+
+        for(RefIndex::value_type const&id : other.textures())
+          FrameGraphResourcesRef<FrameGraphTexture>::insert(id);
+        for(RefIndex::value_type const&id : other.textureViews())
+          FrameGraphResourcesRef<FrameGraphTextureView>::insert(id);
+        for(RefIndex::value_type const&id : other.buffers())
+          FrameGraphResourcesRef<FrameGraphBuffer>::insert(id);
+        for(RefIndex::value_type const&id : other.bufferViews())
+          FrameGraphResourcesRef<FrameGraphBufferView>::insert(id);
+        for(RefIndex::value_type const&id : other.renderablesLists())
+          FrameGraphResourcesRef<FrameGraphRenderableList>::insert(id);
+        for(RefIndex::value_type const&id : other.renderableListViews())
+          FrameGraphResourcesRef<FrameGraphRenderableListView>::insert(id);
 
         return true;
 

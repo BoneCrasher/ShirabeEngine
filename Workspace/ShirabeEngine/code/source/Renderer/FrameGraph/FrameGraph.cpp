@@ -34,11 +34,11 @@ namespace Engine {
     }
 
     bool Graph::initializeTextures(Ptr<IFrameGraphRenderContext> renderContext) {
-      FrameGraphTextureMap const&textures = m_resourceData.textures();
-      for(FrameGraphTextureMap::value_type const&textureAssignment : textures)
+      RefIndex const&textures = m_resourceData.textures();
+      for(RefIndex::value_type const&textureRef : textures)
       {
-        FrameGraphResourceId_t id       = textureAssignment.first;
-        FrameGraphTexture      texture  = textureAssignment.second;
+        FrameGraphResourceId_t       id       =  textureRef;
+        FrameGraphTexture      const&texture  = *m_resourceData.getMutable<FrameGraphTexture>(id);
 
         EEngineStatus status = EEngineStatus::Ok;
 
@@ -54,13 +54,12 @@ namespace Engine {
     }
 
     bool Graph::initializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext) {
-      FrameGraphTextureViewMap const&textureViews = m_resourceData.textureViews();
-      for(FrameGraphTextureViewMap::value_type const&textureViewAssignment : textureViews)
+      RefIndex const&textureViews = m_resourceData.textureViews();
+      for(RefIndex::value_type const&textureViewRef : textureViews)
       {
-        FrameGraphResourceId_t id          = textureViewAssignment.first;
-        FrameGraphResource     resource    = m_resources.at(id);
-        FrameGraphTexture      texture     = *m_resourceData.getTexture(resource.subjacentResource);
-        FrameGraphTextureView  textureView = textureViewAssignment.second;
+        FrameGraphResourceId_t id           = textureViewRef;
+        FrameGraphTextureView  &textureView = *m_resourceData.get<FrameGraphTextureView>(id);
+        FrameGraphTexture      &texture     = *m_resourceData.get<FrameGraphTexture>(textureView.subjacentResource);
 
         EEngineStatus status = renderContext->createTextureView(texture, textureView);
         HandleEngineStatusError(status, "Failed to load texture view for FrameGraphExecution.");
@@ -70,11 +69,11 @@ namespace Engine {
     }
 
     bool Graph::deinitializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext) {
-      FrameGraphTextureViewMap const&textureViews = m_resourceData.textureViews();
-      for(FrameGraphTextureViewMap::value_type const&textureViewAssignment : textureViews)
+      RefIndex const&textureViews = m_resourceData.textureViews();
+      for(RefIndex::value_type const&textureViewRef : textureViews)
       {
-        FrameGraphResourceId_t id          = textureViewAssignment.first;
-        FrameGraphTextureView  textureView = textureViewAssignment.second;
+        FrameGraphResourceId_t id           = textureViewRef;
+        FrameGraphTextureView  &textureView = *m_resourceData.get<FrameGraphTextureView>(id);
 
         EEngineStatus status = renderContext->destroyTextureView(textureView);
         HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
@@ -84,13 +83,16 @@ namespace Engine {
     }
 
     bool Graph::deinitializeTextures(Ptr<IFrameGraphRenderContext> renderContext) {
-      FrameGraphTextureMap const&textures = m_resourceData.textures();
-      for(FrameGraphTextureMap::value_type const&textureAssignment : textures)
+      RefIndex const&textures = m_resourceData.textures();
+      for(RefIndex::value_type const&textureRef : textures)
       {
-        if(textureAssignment.second.isExternalResource)
+        FrameGraphResourceId_t       id       =  textureRef;
+        FrameGraphTexture      const&texture  = *m_resourceData.getMutable<FrameGraphTexture>(id);
+
+        if(texture.isExternalResource)
           continue;
 
-        EEngineStatus status = renderContext->destroyTexture(textureAssignment.second);
+        EEngineStatus status = renderContext->destroyTexture(texture);
         HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
       }
 

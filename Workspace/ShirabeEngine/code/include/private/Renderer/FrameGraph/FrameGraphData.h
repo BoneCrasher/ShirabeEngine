@@ -252,81 +252,102 @@ namespace Engine {
 
     DeclareMapType(FrameGraphResourceId_t, Renderer::RenderableList, RenderableList);
 
-    class FrameGraphResources {
-    public:
-      using Index    = Vector<Ptr<FrameGraphResource>>;
-      using RefIndex = Map<uint64_t, FrameGraphResourceId_t>;
+    using Index    = Vector<Ptr<FrameGraphResource>>;
+    using RefIndex = Vector<FrameGraphResourceId_t>;
+  
+    template <typename T>
+    class FrameGraphResourcesRef {
+    protected:
+      void insert(FrameGraphResourceId_t const&ref) {
+        m_index.push_back(ref);
+      }
 
-      template <typename T, typename Enable = void>
-      Optional<Ptr<T>> const get(FrameGraphResourceId_t const&id) const;
+      RefIndex const&get() const  { return m_index; }
+      RefIndex      &getMutable() { return m_index; }
+
+    private:
+      RefIndex
+        m_index;
+    };
+
+    #define FrameGraphResources_SupportedTypes \
+      FrameGraphTexture, \
+      FrameGraphTextureView, \
+      FrameGraphBuffer, \
+      FrameGraphBufferView, \
+      FrameGraphRenderableList, \
+      FrameGraphRenderableListView
+
+    template <typename... T>
+    class FrameGraphResourcesRefContainer
+      : public FrameGraphResourcesRef<T>...
+    {};
+
+    class FrameGraphResources 
+      : public FrameGraphResourcesRefContainer<FrameGraphResources_SupportedTypes>
+    {
+    public:
+      template <typename T>
+      Ptr<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> const 
+        get(FrameGraphResourceId_t const&id) const
+      {
+        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+        if(m_resources.size() <= id)
+          throw std::runtime_error("Resource handle not found.");
+        #endif
+
+        Ptr<FrameGraphResource> resource = m_resources.at(id);
+        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+        if(nullptr == resource)
+          throw std::runtime_error("Resource handle is empty.");
+        #endif
+
+        Ptr<T> ptr = std::static_pointer_cast<T>(resource);
+
+        return ptr;
+      }
 
       inline Index    const&resources()           const { return m_resources; }
-      inline RefIndex const&textures()            const { return m_textures; }
-      inline RefIndex const&textureViews()        const { return m_textureViews; }
-      inline RefIndex const&buffers()             const { return m_buffers; }
-      inline RefIndex const&bufferViews()         const { return m_bufferViews; }
-      inline RefIndex const&renderablesLists()    const { return m_renderableLists; }
-      inline RefIndex const&renderableListViews() const { return m_renderableListViews; }
+      inline RefIndex const&textures()            const { return FrameGraphResourcesRef<FrameGraphTexture>::get(); }
+      inline RefIndex const&textureViews()        const { return FrameGraphResourcesRef<FrameGraphTextureView>::get(); }
+      inline RefIndex const&buffers()             const { return FrameGraphResourcesRef<FrameGraphBuffer>::get(); }
+      inline RefIndex const&bufferViews()         const { return FrameGraphResourcesRef<FrameGraphBufferView>::get(); }
+      inline RefIndex const&renderablesLists()    const { return FrameGraphResourcesRef<FrameGraphRenderableList>::get(); }
+      inline RefIndex const&renderableListViews() const { return FrameGraphResourcesRef<FrameGraphRenderableListView>::get(); }
 
     protected:
       Index
         m_resources;
-
-      RefIndex           
-        m_textures,
-        m_textureViews,
-        m_buffers,
-        m_bufferViews,
-        m_renderableLists,
-        m_renderableListViews;
     };
-
-    template <typename T> // with T : FrameGraphResource
-    Optional<Ptr<T>> const
-      FrameGraphResources::get<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>>(FrameGraphResourceId_t const&id) const {
-      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-      if(std::find(m_resources.begin(), m_resources.end(), id) == m_resources.end())
-        throw std::runtime_error("Resource handle not found.");
-      #endif
-
-      Ptr<FrameGraphResource> resource = m_resources.at(id);
-      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-      if(nullptr == resource)
-        throw std::runtime_error("Resource handle is empty.");
-      #endif
-
-      Ptr<T> ptr = std::static_pointer_cast<T>(resource);
-
-      return Optional<Ptr<T>>(ptr);
-    }
-
-
+        
     class FrameGraphMutableResources
       : public FrameGraphResources
     {
     public:
-      template <typename T, typename Enable = void>
-      T& spawnResource() { throw static_assert(false, "Unknown resource type."); }
+      template <typename T> // with T : FrameGraphResource
+      typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>& 
+        spawnResource()
+      {
+        Ptr<T> ptr = std::make_shared<T>();
+        ptr->resourceId = m_resources.size();
 
-      template <typename T, typename Enable = void>
-      T& getMutable(FrameGraphResourceId_t const&id);
+        m_resources.push_back(ptr);
+
+        FrameGraphResourcesRef<T>::insert(ptr->resourceId);
+
+        return (*ptr);
+      }
+
+      template <typename T> // with T : FrameGraphResource
+      Ptr<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> 
+        getMutable(FrameGraphResourceId_t const&id)
+      {
+        return *const_cast<Ptr<T>*>(&static_cast<FrameGraphResources*>(this)->get<T>(id));
+      }
 
       bool mergeIn(FrameGraphResources const&other);
     };
 
-    template <typename T, typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> // with T : FrameGraphResource
-    T& FrameGraphMutableResources::spawnResource() {
-      Ptr<T> ptr = std::make_shared<T>();
-      m_resources.push_back(ptr);
-      ptr->resourceId = m_resources.size() - 1;
-
-      return (*ptr);
-    }
-
-    template <typename T> // with T : FrameGraphResource
-    Optional<Ptr<T>> FrameGraphMutableResources::getMutable<T, typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>>(FrameGraphResourceId_t const&id) {
-      return const_cast<Optional<Ptr<T>>>(static_cast<FrameGraphResources*>(this)->get<T>(id));
-    }
   }
 
   template <>
