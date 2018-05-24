@@ -154,75 +154,6 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  FrameGraphTexture const& GraphBuilder::getTextureData(FrameGraphResource const&resource) const
-     *
-     * \brief Gets texture data
-     *
-     * \exception std::runtime_error      Raised when a runtime error condition occurs.
-     * \exception std::bad_variant_access Thrown when a bad variant access error condition occurs.
-     *
-     * \param resource  The resource.
-     *
-     * \return  The texture data.
-     **************************************************************************************************/
-    FrameGraphTexture const&
-      GraphBuilder::getTextureData(FrameGraphResource const&resource) const
-    {
-      Optional<RefWrapper<FrameGraphTexture const>>     texture     = m_resourceData.getTexture(resource.resourceId);
-      Optional<RefWrapper<FrameGraphTextureView const>> textureView = m_resourceData.getTextureView(resource.resourceId);
-
-      bool isTexture     = (texture.has_value());
-      bool isTextureView = (textureView.has_value());
-
-      if(!(isTexture || isTextureView))
-        throw std::runtime_error("Texture or TextureView not found!");
-
-      if(isTexture)
-        return *texture;
-
-      if(isTextureView) {
-        Optional<RefWrapper<FrameGraphTexture const>> subjacent = m_resourceData.getTexture(resource.subjacentResource);
-        if(!subjacent.has_value())
-          throw std::runtime_error("Subjacent texture not found.");
-
-        return *subjacent;
-      }
-    }
-
-    /**********************************************************************************************//**
-     * \fn  FrameGraphTextureView const& GraphBuilder::getTextureViewData(FrameGraphResource const&resource) const
-     *
-     * \brief Gets texture view data
-     *
-     * \exception std::runtime_error      Raised when a runtime error condition occurs.
-     * \exception std::bad_variant_access Thrown when a bad variant access error condition occurs.
-     *
-     * \param resource  The resource.
-     *
-     * \return  The texture view data.
-     **************************************************************************************************/
-    FrameGraphTextureView const&
-      GraphBuilder::getTextureViewData(FrameGraphResource const&resource) const
-    {
-      Optional<RefWrapper<FrameGraphTextureView const>> textureView = m_resourceData.getTextureView(resource.resourceId);
-
-      if(!(textureView.has_value()))
-        throw std::runtime_error("TextureView not found!");
-
-      return *textureView;
-    }
-
-    FrameGraphRenderableList const&
-      GraphBuilder::getRenderableList(FrameGraphResource const&resource) const
-    {
-      Optional<RefWrapper<FrameGraphRenderableList const>> list = m_resourceData.getRenderableList(resource.resourceId);
-      if(!(list.has_value()))
-        throw std::runtime_error("Renderable list not found!");
-
-      return *list;
-    }
-
-    /**********************************************************************************************//**
      * \fn  UniquePtr<Graph> GraphBuilder::compile()
      *
      * \brief Gets the compile
@@ -358,7 +289,6 @@ namespace Engine {
       GraphBuilder::collectPass(PassBuilder&passBuilder)
     {
       m_resources.insert(passBuilder.m_resources.begin(), passBuilder.m_resources.end());
-      m_resourceData.mergeIn(passBuilder.m_resourceData);
 
       // Derive:
       // - Resource creation requests.

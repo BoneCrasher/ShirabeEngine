@@ -59,12 +59,10 @@ namespace Engine {
 
       UniquePtr<Graph>
         compile();
-
-      FrameGraphTexture        const&getTextureData(FrameGraphResource const&resource)     const;
-      FrameGraphTextureView    const&getTextureViewData(FrameGraphResource const&resource) const;
-      FrameGraphRenderableList const&getRenderableList(FrameGraphResource const&resource)  const;
-
+      
       Ptr<ApplicationEnvironment>& env();
+
+      inline FrameGraphResources const&getResources() const { return m_resourceData; }
 
     private:
       FrameGraphResourceId_t generatePassUID();
@@ -137,7 +135,7 @@ namespace Engine {
         //   - Read
         //   - Write
         //   - Import
-        PassBuilder passBuilder(uid, m_resourceUIDGenerator, *this);
+        PassBuilder passBuilder(uid, m_resourceUIDGenerator, m_resourceData);
         if(!pass->setup(passBuilder)) {
           Log::Error(logTag(), "Cannot setup pass instance.");
           pass = nullptr;

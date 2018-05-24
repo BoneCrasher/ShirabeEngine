@@ -27,7 +27,7 @@ namespace Engine {
         "LightAccumulation",
         [&] (PassBuilder&builder, PassData&passData) -> bool
       {
-        FrameGraphTexture gbufferTexture = graphBuilder.getTextureData(gbuffer0);
+        FrameGraphTexture gbufferTexture = *graphBuilder.getResources().getTexture(gbuffer0.subjacentResource);
 
         FrameGraphTexture lightAccBufferDesc ={ };
         lightAccBufferDesc.width          = gbufferTexture.width;

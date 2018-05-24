@@ -16,10 +16,10 @@ namespace Engine {
     PassBuilder::PassBuilder(
       PassUID_t                                  const&passId,
       Ptr<IUIDGenerator<FrameGraphResourceId_t>>       resourceUIDGenerator,
-      GraphBuilder                               const&graphBuilder)
+      FrameGraphMutableResources                      &resourceData)
       : m_passUID(passId)
       , m_resourceIdGenerator(resourceUIDGenerator)
-      , m_graphBuilder(graphBuilder)
+      , m_resourceData(resourceData)
     {}
 
     /**********************************************************************************************//**
@@ -55,6 +55,69 @@ namespace Engine {
       return resource;
     }
 
+    void PassBuilder::adjustArrayAndMipSliceRanges(
+      FrameGraphResources const&resourceData,
+      FrameGraphResource  const&sourceResource,
+      Range const&arraySliceRange,
+      Range const&mipSliceRange,
+      Range      &adjustedArraySliceRange,
+      Range      &adjustedMipSliceRange) 
+    {
+      adjustedArraySliceRange = arraySliceRange;
+      adjustedMipSliceRange   = mipSliceRange;
+      if(sourceResource.type == FrameGraphResourceType::TextureView) {
+        FrameGraphTexture     const&subjacent = *resourceData.getTexture(sourceResource.subjacentResource);
+        FrameGraphTextureView const&parent    = *resourceData.getTextureView(sourceResource.resourceId);
+        adjustedArraySliceRange.offset = (parent.arraySliceRange.offset + arraySliceRange.offset);
+        adjustedMipSliceRange.offset   = (parent.mipSliceRange.offset   + mipSliceRange.offset);
+
+        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+        bool arraySliceRangeOutOfBounds = (adjustedArraySliceRange.length > parent.arraySliceRange.length) || (adjustedArraySliceRange.offset + adjustedArraySliceRange.length) > subjacent.arraySize;
+        bool mipSliceRangeOutOfBounds   = (adjustedMipSliceRange.length   > parent.mipSliceRange.length)   || (adjustedMipSliceRange.offset   + adjustedMipSliceRange.length)   > subjacent.mipLevels;
+
+        if(arraySliceRangeOutOfBounds || mipSliceRangeOutOfBounds)
+          throw std::runtime_error(String::format("Derived subresource range out of bounds (Array:%0, Mip:%1).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
+        #endif
+
+      }
+      else {
+
+        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+        FrameGraphTexture const&subjacent = *resourceData.getTexture(sourceResource.resourceId);
+        bool arraySliceRangeOutOfBounds = (adjustedArraySliceRange.offset + adjustedArraySliceRange.length) > subjacent.arraySize;
+        bool mipSliceRangeOutOfBounds   = (adjustedMipSliceRange.offset   + adjustedMipSliceRange.length)   > subjacent.mipLevels;
+
+        if(arraySliceRangeOutOfBounds || mipSliceRangeOutOfBounds)
+          throw std::runtime_error(String::format("Subresource range out of bounds (Array:%0, Mip:%1).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
+        #endif
+
+      }
+    }
+
+    void PassBuilder::validateArrayAndMipSliceRanges(
+      FrameGraphResources const&resourceData,
+      FrameGraphResource  const&sourceResource,
+      Range               const&arraySliceRange,
+      Range               const&mipSliceRange,
+      bool                      validateReads,
+      bool                      validateWrites)
+    {
+      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+      if(isTextureBeingReadInSubresourceRange(resourceData.textureViews(), resourceData, sourceResource, arraySliceRange, mipSliceRange))
+        throw std::runtime_error(
+          String::format(
+            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
+            arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
+
+      if(isTextureBeingWrittenInSubresourceRange(resourceData.textureViews(), resourceData, sourceResource, arraySliceRange, mipSliceRange))
+        throw std::runtime_error(
+          String::format(
+            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
+            arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
+      #endif
+
+    }
+
     /**********************************************************************************************//**
      * \fn  template <typename TPassImplementation> FrameGraphResource PassLinker<TPassImplementation>::bindRenderTarget( FrameGraphResource const&subjacentTargetResourceId, Range const&arraySliceRange, Range const&mipSliceRange)
      *
@@ -76,25 +139,16 @@ namespace Engine {
         Range                       const&arraySliceRange,
         Range                       const&mipSliceRange)
     {
-      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+      Range
+        adjustedArraySliceRange = arraySliceRange,
+        adjustedMipSliceRange   = mipSliceRange;
 
-      if(isTextureBeingReadInSubresourceRange(m_resourceData.textureViews(), m_resourceData, sourceResource, arraySliceRange, mipSliceRange))
-        throw std::runtime_error(
-          String::format(
-            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
-            arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
-
-      if(isTextureBeingWrittenInSubresourceRange(m_resourceData.textureViews(), m_resourceData, sourceResource, arraySliceRange, mipSliceRange))
-        throw std::runtime_error(
-          String::format(
-            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
-            arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
-
-      #endif
+      adjustArrayAndMipSliceRanges(m_resourceData, sourceResource, arraySliceRange, mipSliceRange, adjustedArraySliceRange, adjustedMipSliceRange);
+      validateArrayAndMipSliceRanges(m_resourceData, sourceResource, adjustedArraySliceRange, adjustedMipSliceRange, true, true);
 
       FrameGraphTextureView view={ };
-      view.arraySliceRange = arraySliceRange;
-      view.mipSliceRange   = mipSliceRange;
+      view.arraySliceRange = adjustedArraySliceRange;
+      view.mipSliceRange   = adjustedMipSliceRange;
       view.format          = flags.requiredFormat;
       view.mode.set(FrameGraphViewAccessMode::Write);
       if(flags.writeTarget == FrameGraphWriteTarget::Color)
@@ -119,6 +173,7 @@ namespace Engine {
 
     }
 
+
     /**********************************************************************************************//**
      * \fn  template <typename TPassImplementation> FrameGraphResource PassLinker<TPassImplementation>::bindInput( FrameGraphResource const&subjacentTargetResourceId, Range const&arraySliceRange, Range const&mipSliceRange)
      *
@@ -140,19 +195,16 @@ namespace Engine {
         Range                      const&arraySliceRange,
         Range                      const&mipSliceRange)
     {
-      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
+      Range
+        adjustedArraySliceRange = arraySliceRange,
+        adjustedMipSliceRange   = mipSliceRange;
 
-      if(isTextureBeingWrittenInSubresourceRange(m_resourceData.textureViews(), m_resourceData, sourceResource, arraySliceRange, mipSliceRange))
-        throw std::runtime_error(
-          String::format(
-            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
-            arraySliceRange.offset, arraySliceRange.length, mipSliceRange.offset, mipSliceRange.length).c_str());
-
-      #endif
+      adjustArrayAndMipSliceRanges(m_resourceData, sourceResource, arraySliceRange, mipSliceRange, adjustedArraySliceRange, adjustedMipSliceRange);
+      validateArrayAndMipSliceRanges(m_resourceData, sourceResource, adjustedArraySliceRange, adjustedMipSliceRange, false, true);
 
       FrameGraphTextureView view={ };
-      view.arraySliceRange = arraySliceRange;
-      view.mipSliceRange   = mipSliceRange;
+      view.arraySliceRange = adjustedArraySliceRange;
+      view.mipSliceRange   = adjustedMipSliceRange;
       view.format          = flags.requiredFormat;
       view.mode.set(FrameGraphViewAccessMode::Read);
       if(flags.source == FrameGraphReadSource::Color)
@@ -201,7 +253,7 @@ namespace Engine {
 
       FrameGraphRenderableListView view{};
 
-      Renderer::RenderableList const&renderableList = m_graphBuilder.getRenderableList(renderableListResource);
+      Renderer::RenderableList const&renderableList = *m_resourceData.getRenderableList(renderableListResource.resourceId);
       for(uint64_t k=0; k<renderableList.size(); ++k)
         view.renderableRefIndices.push_back(k);
 
@@ -238,17 +290,29 @@ namespace Engine {
       // If a "Read" and "Write" of two subresources does not overlap, both operations 
       //  as such are valid.
       // The whole operation setup is based on first come first serve.
-      for(FrameGraphTextureViewMap::value_type const&viewAssignment : resourceViews) {
-
+      for(FrameGraphTextureViewMap::value_type const&viewAssignment : resourceViews) 
+      {
         FrameGraphTextureView const&view = viewAssignment.second;
-        if(!view.mode.check(FrameGraphViewAccessMode::Read))
+
+        bool correctMode = view.mode.check(FrameGraphViewAccessMode::Read);
+        if(!correctMode)
           continue;
-        
-        if(
-          sourceResource.subjacentResource == view.subjacentResource
-          && view.arraySliceRange.overlapsWith(arraySliceRange)
-          && view.mipSliceRange.overlapsWith(mipSliceRange))
-          return true;
+
+        bool commonPass      = sourceResource.assignedPassUID   == view.assignedPassUID;
+        bool commonId        = sourceResource.resourceId        == view.resourceId;
+        bool commonSubjacent = sourceResource.subjacentResource == view.subjacentResource;
+        if(!(commonPass && commonId && commonSubjacent))
+          continue;
+
+        bool arraySliceOverlap = view.arraySliceRange.overlapsWith(arraySliceRange);
+        if(!arraySliceOverlap)
+          continue;
+
+        bool mipSliceOverlap = view.mipSliceRange.overlapsWith(mipSliceRange);
+        if(!mipSliceOverlap)
+          continue;
+
+        return true;
       }
 
       return false;
@@ -281,17 +345,29 @@ namespace Engine {
       // If a "Read" and "Write" of two subresources does not overlap, both operations 
       //  as such are valid.
       // The whole operation setup is based on first come first serve.
-      for(FrameGraphTextureViewMap::value_type const&viewAssignment : resourceViews) {
-
+      for(FrameGraphTextureViewMap::value_type const&viewAssignment : resourceViews) 
+      {
         FrameGraphTextureView const&view = viewAssignment.second;
-        if(!view.mode.check(FrameGraphViewAccessMode::Write))
+        
+        bool correctMode = view.mode.check(FrameGraphViewAccessMode::Write);        
+        if(!correctMode)
           continue;
 
-        if(
-          sourceResource.subjacentResource == view.subjacentResource
-          && view.arraySliceRange.overlapsWith(arraySliceRange)
-          && view.mipSliceRange.overlapsWith(mipSliceRange))
-          return true;
+        bool commonPass      = sourceResource.assignedPassUID   == view.assignedPassUID;
+        bool commonId        = sourceResource.resourceId        == view.resourceId;
+        bool commonSubjacent = sourceResource.subjacentResource == view.subjacentResource;
+        if(!(commonPass && !commonId && commonSubjacent))
+          continue;
+
+        bool arraySliceOverlap = view.arraySliceRange.overlapsWith(arraySliceRange);
+        if(!arraySliceOverlap)
+          continue;
+
+        bool mipSliceOverlap = view.mipSliceRange.overlapsWith(mipSliceRange);
+        if(!mipSliceOverlap)
+          continue;
+
+        return true;
       }
 
       return false;

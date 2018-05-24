@@ -17,11 +17,7 @@ namespace Engine {
   namespace FrameGraph {
     using Engine::Core::IUIDGenerator;
     using namespace Engine::Resources;
-
-    // Forward declare, so that we can friend this class for pass collection.
-    class GraphBuilder; 
-
-
+    
     enum PassResourceConstraintFlags {
       None          = 0,
       TextureWidth  = 1,
@@ -62,7 +58,7 @@ namespace Engine {
       PassBuilder(
         PassUID_t                                  const&passUID,
         Ptr<IUIDGenerator<FrameGraphResourceId_t>>       resourceUIDGenerator,
-        GraphBuilder                               const&graphBuilder);
+        FrameGraphMutableResources                      &resourceData);
 
       PassUID_t const&assignedPassUID() const { return m_passUID; }
 
@@ -94,6 +90,23 @@ namespace Engine {
           FrameGraphResource const&renderableListResource);
     
     private:
+
+      void adjustArrayAndMipSliceRanges(
+        FrameGraphResources const&resourceData,
+        FrameGraphResource  const&sourceResource,
+        Range const&arraySliceRange,
+        Range const&mipSliceRange,
+        Range      &adjustedArraySliceRange,
+        Range      &adjustedMipSliceRange);
+
+      void validateArrayAndMipSliceRanges(
+        FrameGraphResources const&resourceData,
+        FrameGraphResource  const&sourceResource,
+        Range               const&arraySliceRange,
+        Range               const&mipSliceRange,
+        bool                      validateReads  = true,
+        bool                      validateWrites = true);
+
       bool isTextureBeingReadInSubresourceRange(
         FrameGraphTextureViewMap const&resourceViews,
         FrameGraphResources      const&resources,
@@ -111,9 +124,8 @@ namespace Engine {
 
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
 
-      GraphBuilder const&m_graphBuilder;
-      FrameGraphResourceMap      m_resources;
-      FrameGraphMutableResources m_resourceData;
+      FrameGraphResourceMap       m_resources;
+      FrameGraphMutableResources &m_resourceData;
     };
 
   }
