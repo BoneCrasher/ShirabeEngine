@@ -108,23 +108,23 @@ namespace Engine {
         bool                      validateWrites = true);
 
       bool isTextureBeingReadInSubresourceRange(
-        FrameGraphTextureViewMap const&resourceViews,
-        FrameGraphResources      const&resources,
-        FrameGraphResource       const&sourceResource,
-        Range                    const&arraySliceRange,
-        Range                    const&mipSliceRange);
+        FrameGraphResources::RefIndex const&resourceViews,
+        FrameGraphResources           const&resources,
+        FrameGraphResource            const&sourceResource,
+        Range                         const&arraySliceRange,
+        Range                         const&mipSliceRange);
       bool isTextureBeingWrittenInSubresourceRange(
-        FrameGraphTextureViewMap const&resourceViews,
-        FrameGraphResources      const&resources,
-        FrameGraphResource       const&sourceResource,
-        Range                    const&arraySliceRange,
-        Range                    const&mipSliceRange);
+        FrameGraphResources::RefIndex const&resourceViews,
+        FrameGraphResources           const&resources,
+        FrameGraphResource            const&sourceResource,
+        Range                         const&arraySliceRange,
+        Range                         const&mipSliceRange);
 
       PassUID_t m_passUID;
 
       Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceIdGenerator;
 
-      FrameGraphResourceMap       m_resources;
+      FrameGraphResourceIdList    m_resources;
       FrameGraphMutableResources &m_resourceData;
     };
 

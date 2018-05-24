@@ -109,16 +109,15 @@ namespace Engine {
         FrameGraphTexture const&texture)
     {
       try {
-        FrameGraphTexture resource = texture;
+        FrameGraphTexture &resource = m_resourceData.spawnResource<FrameGraphTexture>();
         resource.assignedPassUID    = 0; // Pre-Pass
-        resource.resourceId         = m_resourceUIDGenerator->generate();
         resource.parentResource     = 0; // No internal tree, has to be resolved differently.
         resource.type               = FrameGraphResourceType::Texture;
         resource.readableName       = readableName;
         resource.isExternalResource = true;
+        resource.assignTextureParameters(texture);
 
-        m_resourceData.addTexture(resource.resourceId, resource);
-        m_resources[resource.resourceId] = *m_resourceData.getTexture(resource.resourceId);
+        m_resources.push_back(resource.resourceId);
 
         return resource;
       }
@@ -134,16 +133,15 @@ namespace Engine {
         Renderer::RenderableList const&renderables)
     {
       try {
-        FrameGraphResource resource{ };
+        FrameGraphRenderableList &resource = m_resourceData.spawnResource<FrameGraphRenderableList>();
         resource.assignedPassUID    = 0; // Pre-Pass
-        resource.resourceId         = m_resourceUIDGenerator->generate();
         resource.parentResource     = 0; // No internal tree, has to be resolved differently.
         resource.type               = FrameGraphResourceType::RenderableList;
         resource.readableName       = readableIdentifier;
         resource.isExternalResource = true;
+        resource.renderableList     = renderables;
 
-        m_resources[resource.resourceId] = resource;
-        m_resourceData.addRenderableList(resource.resourceId, renderables);
+        m_resources.push_back(resource.resourceId);
 
         return resource;
       }
@@ -288,16 +286,18 @@ namespace Engine {
     bool
       GraphBuilder::collectPass(PassBuilder&passBuilder)
     {
-      m_resources.insert(passBuilder.m_resources.begin(), passBuilder.m_resources.end());
+      m_resources.resize(m_resources.size() + passBuilder.m_resources.size());
+      for(FrameGraphResourceId_t const&id : passBuilder.m_resources)
+        m_resources.push_back(id);
 
       // Derive:
       // - Resource creation requests.
       // - Edges: pass->pass and resource[view]->resource[view] for graph generation!
       // - ???
-      FrameGraphResourceMap &resources = passBuilder.m_resources;
-      for(FrameGraphResourceMap::value_type&resource : resources)
+      FrameGraphResourceIdList &resources = passBuilder.m_resources;
+      for(FrameGraphResourceId_t const&resource : resources)
       {
-        FrameGraphResource&r = resource.second;
+        FrameGraphResource&r = m_resourceData.getMutable<FrameGraphResource>(resource);
 
         // For each underlying OR imported resource (textures/buffers or whatever importable)
         if(r.parentResource == 0) {
@@ -319,7 +319,7 @@ namespace Engine {
           // Avoid internal references for passes!
           // If the edge from pass k to pass k+1 was not added yet.
           // Create edge: Parent-->Source
-          FrameGraphResource const&parentResource = m_resources.at(r.parentResource);
+          FrameGraphResource const&parentResource = m_resourceData.get<FrameGraphResource>(r.parentResource);
           if(parentResource.assignedPassUID != r.assignedPassUID) {
             if(!alreadyRegisteredFn<PassUID_t>(m_passAdjacency[parentResource.assignedPassUID], r.assignedPassUID)) {
               m_passAdjacency[parentResource.assignedPassUID].push_back(r.assignedPassUID);
@@ -339,7 +339,7 @@ namespace Engine {
           if(r.type == FrameGraphResourceType::TextureView) {
             // Further adjustments
             FrameGraphResourceId_t  subjacentResourceId = r.subjacentResource;
-            FrameGraphResource     &subjacentResource   = m_resources.at(subjacentResourceId);
+            FrameGraphResource     &subjacentResource   = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
 
             Optional<RefWrapper<FrameGraphTexture>>     texture     = m_resourceData.getMutableTexture(subjacentResource);
             Optional<RefWrapper<FrameGraphTextureView>> textureView = m_resourceData.getMutableTextureView(r);
@@ -394,15 +394,16 @@ namespace Engine {
     {
       bool allBindingsValid = true;
 
-      for(FrameGraphTextureViewMap::value_type const&textureView : m_resourceData.textureViews()) {
+      for(FrameGraphResources::RefIndex::value_type const&textureViewRef : m_resourceData.textureViews()) {
+        FrameGraphTextureView const&textureView = m_resourceData.getTextureView(textureViewRef.second); 
 
         // Adjust resource access flags in the subjacent resource to have the texture creation configure 
         // everything appropriately.
-        FrameGraphResourceId_t  subjacentResourceId = textureView.second.subjacentResource;
+        FrameGraphResourceId_t subjacentResourceId = textureView.subjacentResource;
 
         Optional<RefWrapper<FrameGraphTexture>> texture = m_resourceData.getMutableTexture(subjacentResourceId);
 
-        bool viewBindingValid = validateTextureView(*texture, textureView.second);
+        bool viewBindingValid = validateTextureView(*texture, textureView);
         allBindingsValid &= viewBindingValid;
 
       } // foreach TextureView

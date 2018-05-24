@@ -28,6 +28,8 @@ namespace Engine {
         multisampling;
       
       TextureInfo();
+
+      void assignTextureInfoParameters(TextureInfo const&other);
     };
 
     using ArraySlices = Range;

@@ -26,6 +26,7 @@ namespace Engine {
     class PassBase
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
+      friend class GraphBuilder;
       friend class FrameGraphGraphVizSerializer;
 
     public:
@@ -57,6 +58,8 @@ namespace Engine {
     private:
       PassUID_t   m_passUID;
       std::string m_passName;
+
+      FrameGraphResourceIdList m_resourceReferences;
     };
 
     DeclareSharedPointerType(PassBase);

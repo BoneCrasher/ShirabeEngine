@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include <variant>
+#include <memory>
 
 // #include <better-enums/enum.h>
 
@@ -150,6 +151,7 @@ namespace Engine {
 
       FrameGraphBuffer();
     };
+    DeclareListType(FrameGraphBuffer, FrameGraphBuffer);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphBuffer, FrameGraphBuffer);
 
     struct SHIRABE_TEST_EXPORT FrameGraphBufferView
@@ -163,6 +165,7 @@ namespace Engine {
 
       FrameGraphBufferView();
     };
+    DeclareListType(FrameGraphBufferView, FrameGraphBufferView);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphBufferView, FrameGraphBufferView);
 
     struct SHIRABE_TEST_EXPORT FrameGraphTexture
@@ -177,8 +180,11 @@ namespace Engine {
 
       FrameGraphTexture();
 
+      void assignTextureParameters(FrameGraphTexture const&other);
+
       virtual bool validate() const;
     };
+    DeclareListType(FrameGraphTexture, FrameGraphTexture);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphTexture, FrameGraphTexture);
 
     struct SHIRABE_TEST_EXPORT FrameGraphTextureView
@@ -195,6 +201,7 @@ namespace Engine {
 
       FrameGraphTextureView();
     };
+    DeclareListType(FrameGraphTextureView, FrameGraphTextureView);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphTextureView, FrameGraphTextureView);
 
     struct SHIRABE_TEST_EXPORT FrameGraphResourceFlags {
@@ -218,13 +225,22 @@ namespace Engine {
         writeTarget;
     };
 
-    struct FrameGraphRenderableListView {
+    struct FrameGraphRenderableList
+      : public FrameGraphResource
+    {
+      Renderer::RenderableList renderableList;
+    };
+
+    struct FrameGraphRenderableListView 
+      : public FrameGraphResource
+    {
       std::vector<uint64_t> renderableRefIndices;
     };
 
-    using FrameGraphRenderable     = Renderer::Renderable;
-    using FrameGraphRenderableList = Renderer::RenderableList;
+    using FrameGraphRenderable = Renderer::Renderable;
+    DeclareListType(FrameGraphRenderableList, FrameGraphRenderableList);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableList, FrameGraphRenderableList);
+    DeclareListType(FrameGraphRenderableListView, FrameGraphRenderableListView);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableListView, FrameGraphRenderableListView);
 
     SHIRABE_TEST_EXPORT bool operator!=(FrameGraphResource const&l, FrameGraphResource const&r);
@@ -235,54 +251,82 @@ namespace Engine {
     using AdjacencyListMap = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
     DeclareMapType(FrameGraphResourceId_t, Renderer::RenderableList, RenderableList);
+
     class FrameGraphResources {
     public:
-      Optional<RefWrapper<FrameGraphTexture const>>     getTexture(FrameGraphResourceId_t const&)     const;
-      Optional<RefWrapper<FrameGraphTextureView const>> getTextureView(FrameGraphResourceId_t const&) const;
-      Optional<RefWrapper<FrameGraphBuffer const>>      getBuffer(FrameGraphResourceId_t const&)      const;
-      Optional<RefWrapper<FrameGraphBufferView const>>  getBufferView(FrameGraphResourceId_t const&)  const;
-      
-      Optional<RefWrapper<FrameGraphRenderableList const>>     getRenderableList(FrameGraphResourceId_t const&) const;
-      Optional<RefWrapper<FrameGraphRenderableListView const>> getRenderableListView(FrameGraphResourceId_t const&) const;
+      using Index    = Vector<Ptr<FrameGraphResource>>;
+      using RefIndex = Map<uint64_t, FrameGraphResourceId_t>;
 
-      inline FrameGraphTextureMap            const&textures()            const { return m_textures; }
-      inline FrameGraphTextureViewMap        const&textureViews()        const { return m_textureViews; }
-      inline FrameGraphBufferMap             const&buffers()             const { return m_buffers; }
-      inline FrameGraphBufferViewMap         const&bufferViews()         const { return m_bufferViews; }
-      inline FrameGraphRenderableListMap     const&renderablesLists()    const { return m_renderableLists; }
-      inline FrameGraphRenderableListViewMap const&renderableListViews() const { return m_renderableListViews; }
+      template <typename T, typename Enable = void>
+      Optional<Ptr<T>> const get(FrameGraphResourceId_t const&id) const;
+
+      inline Index    const&resources()           const { return m_resources; }
+      inline RefIndex const&textures()            const { return m_textures; }
+      inline RefIndex const&textureViews()        const { return m_textureViews; }
+      inline RefIndex const&buffers()             const { return m_buffers; }
+      inline RefIndex const&bufferViews()         const { return m_bufferViews; }
+      inline RefIndex const&renderablesLists()    const { return m_renderableLists; }
+      inline RefIndex const&renderableListViews() const { return m_renderableListViews; }
 
     protected:
-      FrameGraphTextureMap            m_textures;
-      FrameGraphTextureViewMap        m_textureViews;
-      FrameGraphBufferMap             m_buffers;
-      FrameGraphBufferViewMap         m_bufferViews;
-      FrameGraphRenderableListMap     m_renderableLists;
-      FrameGraphRenderableListViewMap m_renderableListViews;
+      Index
+        m_resources;
+
+      RefIndex           
+        m_textures,
+        m_textureViews,
+        m_buffers,
+        m_bufferViews,
+        m_renderableLists,
+        m_renderableListViews;
     };
+
+    template <typename T> // with T : FrameGraphResource
+    Optional<Ptr<T>> const
+      FrameGraphResources::get<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>>(FrameGraphResourceId_t const&id) const {
+      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+      if(std::find(m_resources.begin(), m_resources.end(), id) == m_resources.end())
+        throw std::runtime_error("Resource handle not found.");
+      #endif
+
+      Ptr<FrameGraphResource> resource = m_resources.at(id);
+      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+      if(nullptr == resource)
+        throw std::runtime_error("Resource handle is empty.");
+      #endif
+
+      Ptr<T> ptr = std::static_pointer_cast<T>(resource);
+
+      return Optional<Ptr<T>>(ptr);
+    }
+
 
     class FrameGraphMutableResources
       : public FrameGraphResources
     {
     public:
-      bool addTexture(FrameGraphResourceId_t const&, FrameGraphTexture const&);
-      bool addTextureView(FrameGraphResourceId_t const&, FrameGraphTextureView const&);
-      bool addBuffer(FrameGraphResourceId_t const&, FrameGraphBuffer const&);
-      bool addBufferView(FrameGraphResourceId_t const&, FrameGraphBufferView const&);
-      bool addRenderableList(FrameGraphResourceId_t const&, FrameGraphRenderableList const&);
-      bool addRenderableListView(FrameGraphResourceId_t const&, FrameGraphRenderableListView const&);
+      template <typename T, typename Enable = void>
+      T& spawnResource() { throw static_assert(false, "Unknown resource type."); }
 
-      Optional<RefWrapper<FrameGraphTexture>>     getMutableTexture(FrameGraphResourceId_t const&);
-      Optional<RefWrapper<FrameGraphTextureView>> getMutableTextureView(FrameGraphResourceId_t const&);
-      Optional<RefWrapper<FrameGraphBuffer>>      getMutableBuffer(FrameGraphResourceId_t const&);
-      Optional<RefWrapper<FrameGraphBufferView>>  getMutableBufferView(FrameGraphResourceId_t const&);
-
-      Optional<RefWrapper<FrameGraphRenderableList>>     getMutableRenderableList(FrameGraphResourceId_t const&);
-      Optional<RefWrapper<FrameGraphRenderableListView>> getMutableRenderableListView(FrameGraphResourceId_t const&);
+      template <typename T, typename Enable = void>
+      T& getMutable(FrameGraphResourceId_t const&id);
 
       bool mergeIn(FrameGraphResources const&other);
     };
 
+    template <typename T, typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> // with T : FrameGraphResource
+    T& FrameGraphMutableResources::spawnResource() {
+      Ptr<T> ptr = std::make_shared<T>();
+      m_resources.push_back(ptr);
+      ptr->resourceId = m_resources.size() - 1;
+
+      return (*ptr);
+    }
+
+    template <typename T> // with T : FrameGraphResource
+    Optional<Ptr<T>> FrameGraphMutableResources::getMutable<T, typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>>(FrameGraphResourceId_t const&id) {
+      return const_cast<Optional<Ptr<T>>>(static_cast<FrameGraphResources*>(this)->get<T>(id));
+    }
   }
 
   template <>

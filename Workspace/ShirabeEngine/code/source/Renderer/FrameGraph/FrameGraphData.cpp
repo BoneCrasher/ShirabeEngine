@@ -152,6 +152,17 @@ namespace Engine {
       , requestedUsage(FrameGraphResourceUsage::Undefined)
     {}
 
+
+    void
+      FrameGraphTexture::assignTextureParameters(FrameGraphTexture const&other)
+    {
+      this->assignTextureInfoParameters(other);
+
+      initialState   = other.initialState;
+      permittedUsage = other.permittedUsage;
+      requestedUsage = other.requestedUsage;
+    }
+
     bool
       FrameGraphTexture::validate() const
     {
@@ -186,187 +197,26 @@ namespace Engine {
       return (l.resourceId == r.resourceId);
     }
 
-    template <typename TKey, typename TValue>
-    bool checkIfAdded(Map<TKey, TValue> const&map, TKey const&key) {
-      return (map.find(key) != map.end());
+    template <typename T>
+    void appendToVector(std::vector<T> &inOutTarget, std::vector<T> const&inSource) {
+      inOutTarget.resize(inOutTarget.size() + inSource.size());
+      for(T const&s : inSource)
+        inOutTarget.push_back(s);
     }
-
-    template <typename TKey, typename TValue>
-    bool addIfNotAdded(Map<TKey, TValue>&map, TKey const&key, TValue const&value) {
-      #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-
-      if(checkIfAdded(map, key))
-        return false;
-
-      #endif
-
-      map[key] = value;
-      return true;
-    }
-
-    Optional<RefWrapper<FrameGraphTexture const>>
-      FrameGraphResources::getTexture(FrameGraphResourceId_t const&resource) const
-    {
-      if(m_textures.find(resource) == m_textures.end())
-        return {};
-
-      return RefWrapper<FrameGraphTexture const>(m_textures.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphTextureView const>>
-      FrameGraphResources::getTextureView(FrameGraphResourceId_t const&resource) const
-    {
-      if(m_textureViews.find(resource) == m_textureViews.end())
-        return { };
-
-      return RefWrapper<FrameGraphTextureView const>(m_textureViews.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphBuffer const>>
-      FrameGraphResources::getBuffer(FrameGraphResourceId_t const&resource) const
-    {
-      if(m_buffers.find(resource) == m_buffers.end())
-        return { };
-
-      return RefWrapper<FrameGraphBuffer const>(m_buffers.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphBufferView const>>
-      FrameGraphResources::getBufferView(FrameGraphResourceId_t const&resource) const
-    {
-      if(m_bufferViews.find(resource) == m_bufferViews.end())
-        return { };
-
-      return RefWrapper<FrameGraphBufferView const>(m_bufferViews.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphRenderableList const>>
-      FrameGraphResources::getRenderableList(FrameGraphResourceId_t const&resource) const
-    {
-      if(m_renderableLists.find(resource) == m_renderableLists.end())
-        return { };
-
-      return RefWrapper<FrameGraphRenderableList const>(m_renderableLists.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphRenderableListView const>>
-      FrameGraphResources::getRenderableListView(FrameGraphResourceId_t const&resource) const
-    {
-      if(m_renderableListViews.find(resource) == m_renderableListViews.end())
-        return { };
-
-      return RefWrapper<FrameGraphRenderableListView const>(m_renderableListViews.at(resource));
-    }
-
-
-    bool FrameGraphMutableResources::addTexture(
-      FrameGraphResourceId_t const&resource,
-      FrameGraphTexture      const&texture)
-    {
-      return addIfNotAdded(m_textures, resource, texture);
-    }
-
-    bool FrameGraphMutableResources::addTextureView(
-      FrameGraphResourceId_t const&resource,
-      FrameGraphTextureView  const&view)
-    {
-      return addIfNotAdded(m_textureViews, resource, view);
-    }
-
-    bool FrameGraphMutableResources::addBuffer(
-      FrameGraphResourceId_t const&resource,
-      FrameGraphBuffer   const&buffer)
-    {
-      return addIfNotAdded(m_buffers, resource, buffer);
-    }
-
-    bool FrameGraphMutableResources::addBufferView(
-      FrameGraphResourceId_t   const&resource,
-      FrameGraphBufferView const&view)
-    {
-      return addIfNotAdded(m_bufferViews, resource, view);
-    }
-
-    bool FrameGraphMutableResources::addRenderableList(
-      FrameGraphResourceId_t       const&resource,
-      FrameGraphRenderableList const&list)
-    {
-      return addIfNotAdded(m_renderableLists, resource, list);
-    }
-
-    bool FrameGraphMutableResources::addRenderableListView(
-      FrameGraphResourceId_t           const&resource,
-      FrameGraphRenderableListView const&view)
-    {
-      return addIfNotAdded(m_renderableListViews, resource, view);
-    }
-
-    Optional<RefWrapper<FrameGraphTexture>>
-      FrameGraphMutableResources::getMutableTexture(FrameGraphResourceId_t const&resource)
-    {
-      if(m_textures.find(resource) == m_textures.end())
-        return { };
-
-      return RefWrapper<FrameGraphTexture>(m_textures.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphTextureView>>
-      FrameGraphMutableResources::getMutableTextureView(FrameGraphResourceId_t const&resource)
-    {
-      if(m_textureViews.find(resource) == m_textureViews.end())
-        return { };
-
-      return RefWrapper<FrameGraphTextureView>(m_textureViews.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphBuffer>>
-      FrameGraphMutableResources::getMutableBuffer(FrameGraphResourceId_t const&resource)
-    {
-      if(m_buffers.find(resource) == m_buffers.end())
-        return { };
-
-      return RefWrapper<FrameGraphBuffer>(m_buffers.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphBufferView>>
-      FrameGraphMutableResources::getMutableBufferView(FrameGraphResourceId_t const&resource)
-    {
-      if(m_bufferViews.find(resource) == m_bufferViews.end())
-        return { };
-
-      return RefWrapper<FrameGraphBufferView>(m_bufferViews.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphRenderableList>>
-      FrameGraphMutableResources::getMutableRenderableList(FrameGraphResourceId_t const&resource)
-    {
-      if(m_renderableLists.find(resource) == m_renderableLists.end())
-        return { };
-
-      return RefWrapper<FrameGraphRenderableList>(m_renderableLists.at(resource));
-    }
-
-    Optional<RefWrapper<FrameGraphRenderableListView>>
-      FrameGraphMutableResources::getMutableRenderableListView(FrameGraphResourceId_t const&resource)
-    {
-      if(m_renderableListViews.find(resource) == m_renderableListViews.end())
-        return { };
-
-      return RefWrapper<FrameGraphRenderableListView>(m_renderableListViews.at(resource));
-    }
-
+        
     bool FrameGraphMutableResources::mergeIn(FrameGraphResources const&other)
     {
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
       try {
         #endif
 
+        appendToVector(m_resources, other.resources());
         m_textures.insert(other.textures().begin(), other.textures().end());
         m_textureViews.insert(other.textureViews().begin(), other.textureViews().end());
         m_buffers.insert(other.buffers().begin(), other.buffers().end());
         m_bufferViews.insert(other.bufferViews().begin(), other.bufferViews().end());
         m_renderableLists.insert(other.renderablesLists().begin(), other.renderablesLists().end());
-        m_renderableListViews.insert(other.renderableListViews().begin(), other.renderableListViews().end());
+        m_renderableListViews.insert(other.renderableListViews().begin(), other.textures().end());
 
         return true;
 
