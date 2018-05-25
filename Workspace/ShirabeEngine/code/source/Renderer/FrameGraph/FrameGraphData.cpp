@@ -196,10 +196,16 @@ namespace Engine {
     {
       return (l.resourceId == r.resourceId);
     }
+    
+    FrameGraphResources::FrameGraphResources() {
+      m_resources.push_back(std::make_shared<FrameGraphResource>());
+    }
 
     template <typename T>
     void appendToVector(std::vector<T> &inOutTarget, std::vector<T> const&inSource) {
       inOutTarget.resize(inOutTarget.size() + inSource.size());
+      
+
       for(T const&s : inSource)
         inOutTarget.push_back(s);
     }
@@ -209,8 +215,8 @@ namespace Engine {
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
       try {
         #endif
-
-        appendToVector(m_resources, other.resources());
+        
+        m_resources = other.resources();
 
         for(RefIndex::value_type const&id : other.textures())
           FrameGraphResourcesRef<FrameGraphTexture>::insert(id);

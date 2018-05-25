@@ -287,6 +287,8 @@ namespace Engine {
       : public FrameGraphResourcesRefContainer<FrameGraphResources_SupportedTypes>
     {
     public:
+      FrameGraphResources();
+
       template <typename T>
       Ptr<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> const 
         get(FrameGraphResourceId_t const&id) const

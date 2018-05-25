@@ -89,7 +89,10 @@ namespace Engine {
       SetupCallback_t setupCallback;
       ExecCallback_t  execCallback;
 
-      TPassData m_passData;
+      FrameGraphResourceIdList
+        m_resources;
+      TPassData
+        m_passData;
     };
 
     template <typename TPassData>
