@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <stack>
+#include <utility>
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/Random.h"
@@ -71,7 +72,7 @@ namespace Engine {
 
       FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 
-      bool collectPass(PassBuilder&passBuilder);
+      bool collectPass(Ptr<PassBase> pass);
 
       template <typename TUID>
       bool topologicalSort(std::stack<TUID>&outPassOrder);
@@ -124,8 +125,8 @@ namespace Engine {
       try {
         PassUID_t uid = generatePassUID();
 
-        Ptr<TPass>
-          pass = MakeSharedPointerType<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
+        Ptr<TPass> pass =
+          graph()->createPass<TPass, TPassCreationArgs...>(uid, name, std::forward<TPassCreationArgs>(args)...);
         if(!pass)
           return nullptr;
 
@@ -135,7 +136,7 @@ namespace Engine {
         //   - Read
         //   - Write
         //   - Import
-        PassBuilder passBuilder(uid, m_resourceData);
+        PassBuilder passBuilder(uid, pass, m_resourceData);
         if(!pass->setup(passBuilder)) {
           Log::Error(logTag(), "Cannot setup pass instance.");
           pass = nullptr;
@@ -148,11 +149,11 @@ namespace Engine {
         // IMPORTANT: Perform implicit collection at this point in order to provide
         //            any subsequent pass spawn and setup to access already available
         //            resource descriptions!
-        if(!collectPass(passBuilder)) {
+        /*if(!collectPass(passBuilder)) {
           Log::Error(logTag(), "Cannot collect pass after setup.");
           pass = nullptr;
           return nullptr;
-        }
+        }*/
 
         // Passes are added to the graph on compilation!!! Move there once the environment is setup.
         // if!(graph()->addPass(name, std::static_pointer_cast<PassBase>(pass))) {

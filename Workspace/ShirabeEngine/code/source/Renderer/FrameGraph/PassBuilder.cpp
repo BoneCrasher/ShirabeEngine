@@ -1,6 +1,7 @@
 #include "Renderer/FrameGraph/PassBuilder.h"
 #include "Core/String.h"
 
+#include "Renderer/FrameGraph/Pass.h"
 #include "Renderer/FrameGraph/GraphBuilder.h"
 
 namespace Engine {
@@ -15,8 +16,10 @@ namespace Engine {
      **************************************************************************************************/
     PassBuilder::PassBuilder(
       PassUID_t                  const&passId,
+      Ptr<PassBase>                    pass,
       FrameGraphMutableResources      &resourceData)
       : m_passUID(passId)
+      , m_pass(pass)
       , m_resourceData(resourceData)
     {}
 
@@ -47,7 +50,7 @@ namespace Engine {
       resource.type              = FrameGraphResourceType::Texture;
       resource.assignTextureParameters(desc);
 
-      m_resources.push_back(resource.resourceId);
+      m_pass->registerResource(resource.resourceId);
 
       return resource;
     }
@@ -183,7 +186,7 @@ namespace Engine {
       view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
       view.type               = FrameGraphResourceType::TextureView;
 
-      m_resources.push_back(view.resourceId);
+      m_pass->registerResource(view.resourceId);
 
       return view;
 
@@ -237,7 +240,7 @@ namespace Engine {
       view.readableName      = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
       view.type              = FrameGraphResourceType::TextureView;
 
-      m_resources.push_back(view.resourceId);
+      m_pass->registerResource(view.resourceId);
 
       return view;
     }
@@ -276,7 +279,7 @@ namespace Engine {
       for(uint64_t k=0; k<list.renderableList.size(); ++k)
         resource.renderableRefIndices.push_back(k);
 
-      m_resources.push_back(resource.resourceId);
+      m_pass->registerResource(resource.resourceId);
 
       return resource;
     }

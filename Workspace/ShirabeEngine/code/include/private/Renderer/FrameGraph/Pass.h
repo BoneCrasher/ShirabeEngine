@@ -26,6 +26,7 @@ namespace Engine {
     class PassBase
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
+      friend class PassBuilder;
       friend class GraphBuilder;
       friend class FrameGraphGraphVizSerializer;
 
@@ -56,6 +57,12 @@ namespace Engine {
       }
 
     private:
+      inline 
+        bool registerResource(FrameGraphResourceId_t const&id) {
+        m_resourceReferences.push_back(id);
+        return true;
+      }
+
       PassUID_t   m_passUID;
       std::string m_passName;
 

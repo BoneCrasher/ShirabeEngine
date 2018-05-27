@@ -55,6 +55,17 @@ namespace Engine {
       }
 
     private:
+      template <typename TPass, typename... TPassCreationArgs>
+      Ptr<TPass> createPass(PassUID_t const&uid, std::string const&name, TPassCreationArgs &&... args) {
+        Ptr<TPass> pass = MakeSharedPointerType<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
+        if(!pass) {
+          //...
+        }
+
+        this->addPass(pass);
+        return pass;
+      }
+      
       bool initializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
       bool initializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
       bool initializeBuffers(Ptr<IFrameGraphRenderContext> renderContext);

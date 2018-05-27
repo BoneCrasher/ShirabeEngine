@@ -161,6 +161,9 @@ namespace Engine {
     UniquePtr<Graph>
       GraphBuilder::compile()
     {
+      for(PassMap::value_type const&assignment : graph()->m_passes)
+        assert(true == collectPass(assignment.second));
+
       bool topologicalPassSortSuccessful = topologicalSort<PassUID_t>(graph()->m_passExecutionOrder);
       if(!topologicalPassSortSuccessful) {
         Log::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
@@ -185,14 +188,6 @@ namespace Engine {
 
       // Move out the current adjacency state to the frame graph, so that it can be used for further processing.
       // It is no more needed at this point within the GraphBuilder.
-
-      std::stack<PassUID_t> order = graph()->m_passExecutionOrder;
-      while(!order.empty()) {
-        PassUID_t uid = order.top();
-        graph()->addPass(m_passes.at(uid));
-        order.pop();
-      }
-
       graph()->m_passAdjacency           = std::move(this->m_passAdjacency);
       graph()->m_resourceAdjacency       = std::move(this->m_resourceAdjacency);
       graph()->m_passToResourceAdjacency = std::move(this->m_passToResourceAdjacency);
@@ -284,17 +279,18 @@ namespace Engine {
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
     bool
-      GraphBuilder::collectPass(PassBuilder&passBuilder)
+      GraphBuilder::collectPass(Ptr<PassBase> pass)
     {
-      m_resources.resize(m_resources.size() + passBuilder.m_resources.size());
-      for(FrameGraphResourceId_t const&id : passBuilder.m_resources)
+      assert(nullptr != pass);
+
+      for(FrameGraphResourceId_t const&id : pass->m_resourceReferences)
         m_resources.push_back(id);
 
       // Derive:
       // - Resource creation requests.
       // - Edges: pass->pass and resource[view]->resource[view] for graph generation!
       // - ???
-      FrameGraphResourceIdList &resources = passBuilder.m_resources;
+      FrameGraphResourceIdList &resources = pass->m_resourceReferences;
       for(FrameGraphResourceId_t const&resource : resources)
       {
         FrameGraphResource&r = *m_resourceData.getMutable<FrameGraphResource>(resource);
@@ -361,7 +357,7 @@ namespace Engine {
       }
 
       #ifdef SHIRABE_DEBUG
-      Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", passBuilder.assignedPassUID()));
+      Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", pass->m_passUID));
       for(AdjacencyListMap<PassUID_t>::value_type const&pa : m_passAdjacency) {
         Log::Verbose(logTag(), String::format("  Pass-UID: %0", pa.first));
         for(PassUID_t const&puid : pa.second) {

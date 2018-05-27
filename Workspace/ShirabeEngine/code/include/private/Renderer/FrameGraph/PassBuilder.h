@@ -15,6 +15,9 @@
 
 namespace Engine {
   namespace FrameGraph {
+
+    class PassBase;
+
     using Engine::Core::IUIDGenerator;
     using namespace Engine::Resources;
     
@@ -57,6 +60,7 @@ namespace Engine {
     public:      
       PassBuilder(
         PassUID_t                  const&passUID,
+        Ptr<PassBase>                    pass,
         FrameGraphMutableResources      &resourceData);
 
       PassUID_t const&assignedPassUID() const { return m_passUID; }
@@ -119,10 +123,9 @@ namespace Engine {
         Range               const&arraySliceRange,
         Range               const&mipSliceRange);
 
-      PassUID_t m_passUID;
+      PassUID_t     m_passUID;
+      Ptr<PassBase> m_pass;
 
-
-      FrameGraphResourceIdList    m_resources;
       FrameGraphMutableResources &m_resourceData;
     };
 
