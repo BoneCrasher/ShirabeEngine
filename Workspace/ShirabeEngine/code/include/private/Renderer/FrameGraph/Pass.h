@@ -65,6 +65,9 @@ namespace Engine {
       UniquePtr<MutableAccessor>
         getMutableAccessor(PassKey<PassBuilder>&&);
 
+      UniquePtr<Accessor>
+        getAccessor(PassKey<Graph>&&) const;
+
       PassBase(
         PassUID_t   const&passUID,
         std::string const&passName);

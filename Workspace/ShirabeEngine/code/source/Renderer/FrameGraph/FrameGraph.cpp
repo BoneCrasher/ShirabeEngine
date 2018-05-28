@@ -136,8 +136,12 @@ namespace Engine {
 
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
-        PassUID_t     passUID = copy.top();
-        Ptr<PassBase> pass    = m_passes.at(passUID);
+        PassUID_t                     passUID  = copy.top();
+        Ptr<PassBase>                 pass     = m_passes.at(passUID);
+        UniquePtr<PassBase::Accessor> accessor = pass->getAccessor(PassKey<Graph>());
+
+        FrameGraphResourceIdList const&passResources = accessor->resourceReferences();
+        initializeResources(passResources);
 
         if(!pass->execute(m_resourceData, renderContext)) {
           Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
