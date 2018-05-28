@@ -52,7 +52,7 @@ namespace Engine {
             return false;
 
           if(cb)
-            cb(*resources.get<FrameGraphResource>(id));
+            return cb(*resources.get<FrameGraphResource>(id));
         });
 
         return output;
@@ -86,7 +86,7 @@ namespace Engine {
 
       // Write passes and adjacent resources
       AdjacencyListMap<PassUID_t>
-        const&passAdjacency = accessor->resourceAdjacency();
+        const&passAdjacency = accessor->passAdjacency();
       AdjacencyListMap<PassUID_t, FrameGraphResourceId_t>
         const&passResourcesAdj = accessor->passToResourceAdjacency();
 
