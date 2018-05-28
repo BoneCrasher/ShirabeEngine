@@ -96,14 +96,33 @@ namespace Engine {
 
     private:
 
-      bool initializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
-      bool initializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
-      bool initializeBuffers(Ptr<IFrameGraphRenderContext> renderContext);
-      bool initializeBufferViews(Ptr<IFrameGraphRenderContext> renderContext);
+      bool initializeResources(
+        Ptr<IFrameGraphRenderContext>       renderContext,
+        FrameGraphResourceIdList      const&resourceIds);
 
-      bool deinitializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
-      bool deinitializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
-      bool deinitializeBufferViews(Ptr<IFrameGraphRenderContext> renderContext);
+      bool deinitializeResources(
+        Ptr<IFrameGraphRenderContext>       renderContext,
+        FrameGraphResourceIdList      const&resourceIds);
+
+      bool initializeTexture(
+        Ptr<IFrameGraphRenderContext> renderContext,
+        Ptr<FrameGraphTexture>        texture);
+      bool initializeTextureView(
+        Ptr<IFrameGraphRenderContext> renderContext,
+        Ptr<FrameGraphTexture>        texture,
+        Ptr<FrameGraphTextureView>    textureView);
+      bool initializeBuffer(Ptr<IFrameGraphRenderContext> renderContext);
+      bool initializeBufferView(Ptr<IFrameGraphRenderContext> renderContext);
+
+
+      bool deinitializeTexture(
+        Ptr<IFrameGraphRenderContext> renderContext,
+        Ptr<FrameGraphTexture>        texture);
+      bool deinitializeTextureView(
+        Ptr<IFrameGraphRenderContext> renderContext,
+        Ptr<FrameGraphTexture>        texture,
+        Ptr<FrameGraphTextureView>    textureView);
+      bool deinitializeBufferView(Ptr<IFrameGraphRenderContext> renderContext);
       bool deinitializeBuffer(Ptr<IFrameGraphRenderContext> renderContext);
 
       bool addPass(Ptr<PassBase> const&);

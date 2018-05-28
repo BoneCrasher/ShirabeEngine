@@ -43,7 +43,6 @@ namespace Engine {
       return std::move(std::make_unique<PassBase::MutableAccessor>(this));
     }
 
-
     UniquePtr<PassBase::Accessor>
       PassBase::getAccessor(PassKey<PassBuilder>&&) const
     {
@@ -54,6 +53,12 @@ namespace Engine {
       PassBase::getMutableAccessor(PassKey<PassBuilder>&&)
     {
       return std::move(std::make_unique<PassBase::MutableAccessor>(this));
+    }
+
+    UniquePtr<PassBase::Accessor>
+      PassBase::getAccessor(PassKey<Graph>&&) const
+    {
+      return std::move(std::make_unique<PassBase::Accessor>(this));
     }
 
     PassBase::PassBase(

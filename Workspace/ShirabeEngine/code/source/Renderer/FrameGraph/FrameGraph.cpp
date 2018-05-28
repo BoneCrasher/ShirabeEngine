@@ -131,8 +131,6 @@ namespace Engine {
       assert(renderContext != nullptr);
 
       // Don't care about explicit lifetimes for now. Keep it all up during execution and shutdown afterward.
-      initializeTextures(renderContext);
-      initializeTextureViews(renderContext);
 
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
@@ -141,83 +139,152 @@ namespace Engine {
         UniquePtr<PassBase::Accessor> accessor = pass->getAccessor(PassKey<Graph>());
 
         FrameGraphResourceIdList const&passResources = accessor->resourceReferences();
-        initializeResources(passResources);
 
-        if(!pass->execute(m_resourceData, renderContext)) {
+        bool initialized = initializeResources(renderContext, passResources);
+        if(!initialized) {
+
+        }
+
+        bool executed = pass->execute(m_resourceData, renderContext);
+        if(!executed) {
           Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
+        }
+
+        bool deinitialized = deinitializeResources(renderContext, passResources);
+        if(!deinitialized) {
+
         }
 
         copy.pop();
       }
 
-      deinitializeTextureViews(renderContext);
-      deinitializeTextures(renderContext);
+      return true;
+    }
+
+    bool Graph::initializeResources(
+      Ptr<IFrameGraphRenderContext>       renderContext,
+      FrameGraphResourceIdList      const&resourceIds)
+    {
+      bool initialized = true;
+
+      for(FrameGraphResourceId_t const&id : resourceIds)
+      {
+        Ptr<FrameGraphResource>    subjacent   = nullptr;
+        Ptr<FrameGraphTexture>     texture     = nullptr;
+        Ptr<FrameGraphTextureView> textureView = nullptr;
+
+        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        switch(resource->type) {
+        case FrameGraphResourceType::Texture:
+          texture = std::static_pointer_cast<FrameGraphTexture>(resource);
+          initialized |=
+            initializeTexture(
+              renderContext,
+              texture);
+          break;
+        case FrameGraphResourceType::TextureView:
+          subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
+          texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
+          textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+          initialized |=
+            initializeTextureView(
+              renderContext,
+              texture,
+              textureView);
+          break;
+        }
+      }
+
+      return initialized;
+    }
+
+    bool Graph::deinitializeResources(
+      Ptr<IFrameGraphRenderContext>       renderContext,
+      FrameGraphResourceIdList      const&resourceIds)
+    {
+      bool deinitialized = true;
+
+      for(FrameGraphResourceId_t const&id : resourceIds)
+      {
+        Ptr<FrameGraphResource>    subjacent   = nullptr;
+        Ptr<FrameGraphTexture>     texture     = nullptr;
+        Ptr<FrameGraphTextureView> textureView = nullptr;
+
+        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        switch(resource->type) {
+        case FrameGraphResourceType::Texture:
+          texture = std::static_pointer_cast<FrameGraphTexture>(resource);
+          deinitialized |=
+            deinitializeTexture(
+              renderContext,
+              texture);
+          break;
+        case FrameGraphResourceType::TextureView:
+          subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
+          texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
+          textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+          deinitialized |=
+            deinitializeTextureView(
+              renderContext,
+              texture,
+              textureView);
+          break;
+        }
+      }
+
+      return deinitialized;
+    }
+
+    bool Graph::initializeTexture(
+      Ptr<IFrameGraphRenderContext> renderContext,
+      Ptr<FrameGraphTexture>        texture)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      if(texture->isExternalResource)
+        status = renderContext->importTexture(*texture);
+      else
+        status = renderContext->createTexture(*texture);
+
+      HandleEngineStatusError(status, "Failed to load texture for FrameGraphExecution.");
 
       return true;
     }
 
-    bool Graph::initializeTextures(Ptr<IFrameGraphRenderContext> renderContext) {
-      RefIndex const&textures = m_resourceData.textures();
-      for(RefIndex::value_type const&textureRef : textures)
-      {
-        FrameGraphResourceId_t       id       =  textureRef;
-        FrameGraphTexture      const&texture  = *m_resourceData.getMutable<FrameGraphTexture>(id);
+    bool Graph::initializeTextureView(
+      Ptr<IFrameGraphRenderContext> renderContext,
+      Ptr<FrameGraphTexture>        texture,
+      Ptr<FrameGraphTextureView>    textureView)
+    {
+      FrameGraphResourceId_t id           = textureView->resourceId;
 
-        EEngineStatus status = EEngineStatus::Ok;
-
-        if(texture.isExternalResource)
-          status = renderContext->importTexture(texture);
-        else
-          status = renderContext->createTexture(texture);
-
-        HandleEngineStatusError(status, "Failed to load texture for FrameGraphExecution.");
-      }
+      EEngineStatus status = renderContext->createTextureView(*texture, *textureView);
+      HandleEngineStatusError(status, "Failed to load texture view for FrameGraphExecution.");
 
       return true;
     }
 
-    bool Graph::initializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext) {
-      RefIndex const&textureViews = m_resourceData.textureViews();
-      for(RefIndex::value_type const&textureViewRef : textureViews)
-      {
-        FrameGraphResourceId_t id           = textureViewRef;
-        FrameGraphTextureView  &textureView = *m_resourceData.get<FrameGraphTextureView>(id);
-        FrameGraphTexture      &texture     = *m_resourceData.get<FrameGraphTexture>(textureView.subjacentResource);
+    bool Graph::deinitializeTextureView(
+      Ptr<IFrameGraphRenderContext> renderContext,
+      Ptr<FrameGraphTexture>        texture,
+      Ptr<FrameGraphTextureView>    textureView)
+    {
+      EEngineStatus status = renderContext->destroyTextureView(*textureView);
+      HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
 
-        EEngineStatus status = renderContext->createTextureView(texture, textureView);
-        HandleEngineStatusError(status, "Failed to load texture view for FrameGraphExecution.");
-      }
 
       return true;
     }
 
-    bool Graph::deinitializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext) {
-      RefIndex const&textureViews = m_resourceData.textureViews();
-      for(RefIndex::value_type const&textureViewRef : textureViews)
-      {
-        FrameGraphResourceId_t id           = textureViewRef;
-        FrameGraphTextureView  &textureView = *m_resourceData.get<FrameGraphTextureView>(id);
+    bool Graph::deinitializeTexture(
+      Ptr<IFrameGraphRenderContext> renderContext,
+      Ptr<FrameGraphTexture>        texture)
+    {
+      if(texture->isExternalResource)
+        return true;
 
-        EEngineStatus status = renderContext->destroyTextureView(textureView);
-        HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
-      }
-
-      return true;
-    }
-
-    bool Graph::deinitializeTextures(Ptr<IFrameGraphRenderContext> renderContext) {
-      RefIndex const&textures = m_resourceData.textures();
-      for(RefIndex::value_type const&textureRef : textures)
-      {
-        FrameGraphResourceId_t       id       =  textureRef;
-        FrameGraphTexture      const&texture  = *m_resourceData.getMutable<FrameGraphTexture>(id);
-
-        if(texture.isExternalResource)
-          continue;
-
-        EEngineStatus status = renderContext->destroyTexture(texture);
-        HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
-      }
+      EEngineStatus status = renderContext->destroyTexture(*texture);
+      HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
 
       return true;
     }
