@@ -53,8 +53,6 @@ namespace Engine {
      * \tparam  TPassImplementation Type of the pass implementation.
      **************************************************************************************************/
     class PassBuilder {
-      friend class GraphBuilder;
-
       DeclareLogTag(PassBuilder);
      
     public:      

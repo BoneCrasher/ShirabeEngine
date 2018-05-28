@@ -21,12 +21,7 @@ namespace Engine {
   namespace FrameGraph {
     using namespace Renderer;
     using namespace Serialization;
-
-    // friend class PassBuilder;
-    // friend class GraphBuilder;
-    // friend class Graph;
-    // friend class FrameGraphGraphVizSerializer;
-
+    
     class GraphBuilder;
     class Graph;
 
