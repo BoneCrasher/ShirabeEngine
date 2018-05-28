@@ -121,7 +121,8 @@ namespace Engine {
     }
 
     FrameGraphResource::FrameGraphResource()
-      : assignedPassUID(0)
+      : referenceCount(0)
+      , assignedPassUID(0)
       , resourceId(FrameGraphResourceId_t{ })
       , parentResource(0)
       , subjacentResource(0)
@@ -252,12 +253,13 @@ namespace Engine {
     std::string s =
       String::format(
         "  %0 (RID: %1)"
-        "\n    Name:          %2"
-        "\n    Sizes:         %3 x %4 x %5"
-        "\n    Format:        %6"
-        "\n    Array-Levels:  %7"
-        "\n    Mip-Levels:    %8"
-        "\n    Initial-State: %9",
+        "\n    Name:            %2"
+        "\n    Sizes:           %3 x %4 x %5"
+        "\n    Format:          %6"
+        "\n    Array-Levels:    %7"
+        "\n    Mip-Levels:      %8"
+        "\n    Initial-State:   %9"
+        "\n    Reference-Count: %10",
         "Texture",
         texture.resourceId,
         texture.readableName,
@@ -265,7 +267,8 @@ namespace Engine {
         to_string(texture.format),
         texture.arraySize,
         texture.mipLevels,
-        to_string(texture.initialState));
+        to_string(texture.initialState),
+        texture.referenceCount);
     return s;
   }
 
@@ -281,14 +284,16 @@ namespace Engine {
         "\n    Mode:                %3"
         "\n    Format:              %4"
         "\n    ArrayRange:          %5"
-        "\n    MipRange:            %6",
+        "\n    MipRange:            %6"
+        "\n    Reference-Count:     %7",
         "TextureView",
         view.resourceId,
         view.subjacentResource,
         (viewIsReadMode ? "Read" : "Write"),
         to_string(view.format),
         to_string(view.arraySliceRange),
-        to_string(view.mipSliceRange));
+        to_string(view.mipSliceRange),
+        view.referenceCount);
     return s;
   }
 

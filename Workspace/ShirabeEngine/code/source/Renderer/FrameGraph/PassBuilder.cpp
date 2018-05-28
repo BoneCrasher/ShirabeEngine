@@ -189,6 +189,11 @@ namespace Engine {
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(view.resourceId);
+      
+      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(view.subjacentResource);
+      ++subjacent->referenceCount;
+      Ptr<FrameGraphResource> parent = m_resourceData.getMutable<FrameGraphResource>(view.parentResource);
+      ++parent->referenceCount;
 
       return view;
 
@@ -244,6 +249,12 @@ namespace Engine {
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(view.resourceId);
+
+      ++view.referenceCount;
+      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(view.subjacentResource);
+      ++subjacent->referenceCount;
+      Ptr<FrameGraphResource> parent = m_resourceData.getMutable<FrameGraphResource>(view.parentResource);
+      ++parent->referenceCount;
 
       return view;
     }

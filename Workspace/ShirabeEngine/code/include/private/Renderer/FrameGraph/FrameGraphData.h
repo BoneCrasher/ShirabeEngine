@@ -119,6 +119,8 @@ namespace Engine {
     SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphResourceType const&e);
     
     struct SHIRABE_TEST_EXPORT FrameGraphResource {
+      uint32_t
+        referenceCount;
       PassUID_t
         assignedPassUID;
       FrameGraphResourceId_t

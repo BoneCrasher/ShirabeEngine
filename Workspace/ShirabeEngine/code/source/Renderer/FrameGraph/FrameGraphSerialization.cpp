@@ -332,6 +332,7 @@ namespace Engine {
           "<tr><td align=\"left\">Array-Levels:</td><td align=\"left\">%7</td></tr>"
           "<tr><td align=\"left\">Mip-Levels:</td><td align=\"left\">%8</td></tr>"
           "<tr><td align=\"left\">Initial-State:</td><td align=\"left\">%9</td></tr>"
+          "<tr><td align=\"left\">Reference-Count:</td><td align=\"left\">%10</td></tr>"
           "</table>>",
           mode,
           texture.resourceId,
@@ -340,7 +341,8 @@ namespace Engine {
           to_string(texture.format),
           texture.arraySize,
           texture.mipLevels,
-          to_string(texture.initialState));
+          to_string(texture.initialState),
+          texture.referenceCount);
 
       m_stream << "    Texture" << texture.resourceId << " [" << textureStyle << ",label=" << textureLabel << "];\n";
     }
@@ -374,6 +376,7 @@ namespace Engine {
           "<tr><td align=\"left\">Format:</td><td align=\"left\">%4</td></tr>"
           "<tr><td align=\"left\">ArrayRange:</td><td align=\"left\">%5</td></tr>"
           "<tr><td align=\"left\">MipRange:</td><td align=\"left\">%6</td></tr>"
+          "<tr><td align=\"left\">Reference-Count:</td><td align=\"left\">%7</td></tr>"
           "</table>>",
           (viewIsReadMode ? "68a357" : "c97064"),
           view.resourceId,
@@ -381,7 +384,8 @@ namespace Engine {
           (viewIsReadMode ? "Read" : "Write"),
           to_string(view.format),
           to_string(view.arraySliceRange),
-          to_string(view.mipSliceRange));
+          to_string(view.mipSliceRange),
+          view.referenceCount);
 
       m_stream << "    " << viewId << " [" << viewStyle << ",label=" << viewLabel << "];\n";
     }
