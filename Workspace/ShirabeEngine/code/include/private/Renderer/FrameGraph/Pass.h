@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/PassKey.h"
 #include "Platform/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceDTO.h"
 
@@ -21,47 +22,74 @@ namespace Engine {
     using namespace Renderer;
     using namespace Serialization;
 
+    // friend class PassBuilder;
+    // friend class GraphBuilder;
+    // friend class Graph;
+    // friend class FrameGraphGraphVizSerializer;
+
     class GraphBuilder;
+    class Graph;
 
     class PassBase
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
-      friend class PassBuilder;
-      friend class GraphBuilder;
-      friend class FrameGraphGraphVizSerializer;
-
     public:
-      inline PassBase(
+      class Accessor {
+      public:
+        Accessor(PassBase const*);
+
+        FrameGraphResourceIdList const&resourceReferences() const;
+
+      private:
+        PassBase const*m_pass;
+      };
+
+      class MutableAccessor
+        : public Accessor
+      {
+      public:
+        MutableAccessor(PassBase *);
+
+        FrameGraphResourceIdList &mutableResourceReferences();
+
+        bool registerResource(FrameGraphResourceId_t const&id);
+
+      private:
+        PassBase *m_pass;
+      };
+
+      UniquePtr<Accessor>
+        getAccessor(PassKey<GraphBuilder>&&) const;
+
+      UniquePtr<MutableAccessor>
+        getMutableAccessor(PassKey<GraphBuilder>&&);
+
+      UniquePtr<Accessor>
+        getAccessor(PassKey<PassBuilder>&&) const;
+
+      UniquePtr<MutableAccessor>
+        getMutableAccessor(PassKey<PassBuilder>&&);
+
+      PassBase(
         PassUID_t   const&passUID,
-        std::string const&passName)
-        : m_passUID(passUID)
-        , m_passName(passName)
-      {}
+        std::string const&passName);
+      
+      virtual bool setup(PassBuilder&);
+      virtual bool execute(
+        FrameGraphResources           const&frameGraphResources,
+        Ptr<IFrameGraphRenderContext>      &context);
 
-      virtual bool setup(PassBuilder&) { return true; }
-      virtual bool execute(FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&) { return true; }
+      std::string const&passName() const;
+      PassUID_t   const&passUID()  const;
 
-      inline std::string const&passName() const { return m_passName; }
-      inline PassUID_t   const&passUID()  const { return m_passUID; }
+      virtual
+        void acceptSerializer(Ptr<IFrameGraphSerializer> s);
 
-      virtual inline
-        void acceptSerializer(Ptr<IFrameGraphSerializer> s)
-      {
-        s->serializePass(*this);
-      }
-
-      virtual inline
-        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
-      {
-        d->deserializePass(*this);
-      }
+      virtual
+        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d);
 
     private:
-      inline 
-        bool registerResource(FrameGraphResourceId_t const&id) {
-        m_resourceReferences.push_back(id);
-        return true;
-      }
+      bool registerResource(FrameGraphResourceId_t const&id);
 
       PassUID_t   m_passUID;
       std::string m_passName;

@@ -123,10 +123,12 @@ namespace Engine {
         return false;
 
       try {
+        UniquePtr<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<GraphBuilder>());
+
         PassUID_t uid = generatePassUID();
 
         Ptr<TPass> pass =
-          graph()->createPass<TPass, TPassCreationArgs...>(uid, name, std::forward<TPassCreationArgs>(args)...);
+          accessor->createPass<TPass, TPassCreationArgs...>(uid, name, std::forward<TPassCreationArgs>(args)...);
         if(!pass)
           return nullptr;
 

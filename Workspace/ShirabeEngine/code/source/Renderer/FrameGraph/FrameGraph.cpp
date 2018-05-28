@@ -6,6 +6,125 @@
 namespace Engine {
   namespace FrameGraph {
 
+    Graph::Accessor::Accessor(Graph const*graph)
+      : m_graph(graph)
+    { }
+
+    AdjacencyListMap<PassUID_t> const&
+      Graph::Accessor::passAdjacency() const
+    {
+      return m_graph->m_passAdjacency;
+    }
+
+    std::stack<PassUID_t> const&
+      Graph::Accessor::passExecutionOrder() const
+    {
+      return m_graph->m_passExecutionOrder;
+    }
+
+    FrameGraphResourceIdList const&
+      Graph::Accessor::resources() const
+    {
+      return m_graph->m_resources;
+    }
+
+    FrameGraphMutableResources const&
+      Graph::Accessor::resourceData() const
+    {
+      return m_graph->m_resourceData;
+    }
+
+    AdjacencyListMap<FrameGraphResourceId_t> const&
+      Graph::Accessor::resourceAdjacency() const
+    {
+      return m_graph->m_resourceAdjacency;
+    }
+
+    std::stack<FrameGraphResourceId_t> const&
+      Graph::Accessor::resourceOrder() const
+    {
+      return m_graph->m_resourceOrder;
+    }
+
+    AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> const&
+      Graph::Accessor::passToResourceAdjacency() const
+    {
+      return m_graph->m_passToResourceAdjacency;
+    }
+
+    Graph::MutableAccessor::MutableAccessor(Graph *graph)
+      : Accessor(graph)
+      , m_graph(graph)
+    {}
+
+    AdjacencyListMap<PassUID_t>&
+      Graph::MutableAccessor::mutablePassAdjacency()
+    {
+      return m_graph->m_passAdjacency;
+    }
+
+    std::stack<PassUID_t>&
+      Graph::MutableAccessor::mutablePassExecutionOrder()
+    {
+      return m_graph->m_passExecutionOrder;
+    }
+
+    FrameGraphResourceIdList&
+      Graph::MutableAccessor::mutableResources()
+    {
+      return m_graph->m_resources;
+    }
+
+    FrameGraphMutableResources&
+      Graph::MutableAccessor::mutableResourceData()
+    {
+      return m_graph->m_resourceData;
+    }
+
+    AdjacencyListMap<FrameGraphResourceId_t>&
+      Graph::MutableAccessor::mutableResourceAdjacency()
+    {
+      return m_graph->m_resourceAdjacency;
+    }
+
+    std::stack<FrameGraphResourceId_t>&
+      Graph::MutableAccessor::mutableResourceOrder()
+    {
+      return m_graph->m_resourceOrder;
+    }
+
+    AdjacencyListMap<PassUID_t, FrameGraphResourceId_t>&
+      Graph::MutableAccessor::mutablePassToResourceAdjacency()
+    {
+      return m_graph->m_passToResourceAdjacency;
+    }
+
+    void
+      Graph::acceptSerializer(Ptr<IFrameGraphSerializer> s)
+    {
+      s->serializeGraph(*this);
+    }
+
+
+    void
+      Graph::acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
+    {
+      d->deserializeGraph(*this);
+    }
+
+    Graph&
+      Graph::operator=(Graph const&other)
+    {
+      m_passes                  = other.m_passes;
+      m_passAdjacency           = other.m_passAdjacency;
+      m_passExecutionOrder      = other.m_passExecutionOrder;
+      m_resourceAdjacency       = other.m_resourceAdjacency;
+      m_resourceOrder           = other.m_resourceOrder;
+      m_passToResourceAdjacency = other.m_passToResourceAdjacency;
+
+      return (*this);
+    }
+
     bool
       Graph::execute(Ptr<IFrameGraphRenderContext>&renderContext)
     {
@@ -99,8 +218,8 @@ namespace Engine {
       return true;
     }
 
-    PassMap&
-      Graph::passes()
+    PassMap const&
+      Graph::passes() const
     {
       return m_passes;
     }

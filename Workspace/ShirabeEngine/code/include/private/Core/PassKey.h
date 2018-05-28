@@ -1,0 +1,17 @@
+#ifndef __SHIRABE_DESIGN_PASSKEY_H__
+#define __SHIRABE_DESIGN_PASSKEY_H__
+
+namespace Engine {
+
+  template <typename TAccessor>
+  class PassKey {
+  private:
+    friend TAccessor;
+    PassKey()                          = default;
+    PassKey(PassKey const&)            = default;
+    PassKey& operator=(PassKey const&) = delete;
+  };
+
+}
+
+#endif

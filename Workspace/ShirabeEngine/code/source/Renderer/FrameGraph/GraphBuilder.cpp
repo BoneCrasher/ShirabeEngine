@@ -161,16 +161,18 @@ namespace Engine {
     UniquePtr<Graph>
       GraphBuilder::compile()
     {
-      for(PassMap::value_type const&assignment : graph()->m_passes)
+      UniquePtr<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<GraphBuilder>());
+
+      for(PassMap::value_type const&assignment : graph()->passes())
         assert(true == collectPass(assignment.second));
 
-      bool topologicalPassSortSuccessful = topologicalSort<PassUID_t>(graph()->m_passExecutionOrder);
+      bool topologicalPassSortSuccessful = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
       if(!topologicalPassSortSuccessful) {
         Log::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
         return nullptr;
       }
 
-      bool topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(graph()->m_resourceOrder);
+      bool topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(accessor->mutableResourceOrder());
       if(!topologicalResourceSortSuccessful) {
         Log::Error(logTag(), "Failed to perform topologicalSort(...) for resources on graph compilation.");
         return nullptr;
@@ -178,7 +180,7 @@ namespace Engine {
 
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
 
-      bool validationSuccessful = validate(graph()->m_passExecutionOrder);
+      bool validationSuccessful = validate(accessor->passExecutionOrder());
       if(!validationSuccessful) {
         Log::Error(logTag(), "Failed to perform validation(...) on graph compilation.");
         return nullptr;
@@ -188,11 +190,11 @@ namespace Engine {
 
       // Move out the current adjacency state to the frame graph, so that it can be used for further processing.
       // It is no more needed at this point within the GraphBuilder.
-      graph()->m_passAdjacency           = std::move(this->m_passAdjacency);
-      graph()->m_resourceAdjacency       = std::move(this->m_resourceAdjacency);
-      graph()->m_passToResourceAdjacency = std::move(this->m_passToResourceAdjacency);
-      graph()->m_resources               = std::move(this->m_resources);
-      graph()->m_resourceData.mergeIn(this->m_resourceData);
+      accessor->mutablePassAdjacency()           = std::move(this->m_passAdjacency);
+      accessor->mutableResourceAdjacency()       = std::move(this->m_resourceAdjacency);
+      accessor->mutablePassToResourceAdjacency() = std::move(this->m_passToResourceAdjacency);
+      accessor->mutableResources()               = std::move(this->m_resources);
+      accessor->mutableResourceData().mergeIn(this->m_resourceData);
 
       return std::move(graph());
     }
@@ -283,14 +285,15 @@ namespace Engine {
     {
       assert(nullptr != pass);
 
-      for(FrameGraphResourceId_t const&id : pass->m_resourceReferences)
+      UniquePtr<PassBase::MutableAccessor> accessor = pass->getMutableAccessor(PassKey<GraphBuilder>());
+      for(FrameGraphResourceId_t const&id : accessor->resourceReferences())
         m_resources.push_back(id);
 
       // Derive:
       // - Resource creation requests.
       // - Edges: pass->pass and resource[view]->resource[view] for graph generation!
       // - ???
-      FrameGraphResourceIdList &resources = pass->m_resourceReferences;
+      FrameGraphResourceIdList &resources = accessor->mutableResourceReferences();
       for(FrameGraphResourceId_t const&resource : resources)
       {
         FrameGraphResource&r = *m_resourceData.getMutable<FrameGraphResource>(resource);
@@ -357,7 +360,7 @@ namespace Engine {
       }
 
       #ifdef SHIRABE_DEBUG
-      Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", pass->m_passUID));
+      Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", pass->passUID()));
       for(AdjacencyListMap<PassUID_t>::value_type const&pa : m_passAdjacency) {
         Log::Verbose(logTag(), String::format("  Pass-UID: %0", pa.first));
         for(PassUID_t const&puid : pa.second) {

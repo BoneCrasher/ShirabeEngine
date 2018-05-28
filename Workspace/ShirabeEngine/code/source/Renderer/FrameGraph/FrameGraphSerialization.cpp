@@ -30,6 +30,10 @@ namespace Engine {
     bool
       FrameGraphGraphVizSerializer::serializeGraph(Graph const&graph)
     {
+      UniquePtr<Graph::Accessor> accessor = graph.getAccessor(PassKey<FrameGraphGraphVizSerializer>());
+
+      FrameGraphResources const&resources = accessor->resourceData();
+
       FilterFunction_t filter =[&](
         FrameGraphResourceIdList               const&ids,
         FilterElementCompareCallbackFunction_t const&cb) -> FrameGraphResourceIdList
@@ -37,8 +41,6 @@ namespace Engine {
         FrameGraphResourceIdList output{ };
         if(ids.empty())
           return output;
-
-        FrameGraphResources const&resources = graph.m_resourceData;
 
         std::copy_if(
           ids.begin(),
@@ -59,37 +61,37 @@ namespace Engine {
       beginGraph();
 
       // Write registered resources
-      for(RefIndex::value_type const&textureRef : graph.m_resourceData.textures()) {
-        FrameGraphTexture const&texture = *graph.m_resourceData.get<FrameGraphTexture>(textureRef);
+      for(RefIndex::value_type const&textureRef : resources.textures()) {
+        FrameGraphTexture const&texture = *resources.get<FrameGraphTexture>(textureRef);
         writeTextureResource(texture);
       }
 
-      for(RefIndex::value_type const&textureViewRef : graph.m_resourceData.textureViews()) {
-        FrameGraphTextureView const&view   = *graph.m_resourceData.get<FrameGraphTextureView>(textureViewRef);
-        FrameGraphResource    const&parent = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+      for(RefIndex::value_type const&textureViewRef : resources.textureViews()) {
+        FrameGraphTextureView const&view   = *resources.get<FrameGraphTextureView>(textureViewRef);
+        FrameGraphResource    const&parent = *resources.get<FrameGraphResource>(view.parentResource);
 
         writeTextureResourceView(parent, view);
       }
 
-      for(RefIndex::value_type const&renderableListRef : graph.m_resourceData.renderablesLists()) {
-        FrameGraphRenderableList const&list = *graph.m_resourceData.get<FrameGraphRenderableList>(renderableListRef);
+      for(RefIndex::value_type const&renderableListRef : resources.renderablesLists()) {
+        FrameGraphRenderableList const&list = *resources.get<FrameGraphRenderableList>(renderableListRef);
         writeRenderableList(list);
       }
 
-      for(RefIndex::value_type const&renderableListViewRef : graph.m_resourceData.renderableListViews()) {
-        FrameGraphRenderableListView const&view   = *graph.m_resourceData.get<FrameGraphRenderableListView>(renderableListViewRef);
-        FrameGraphResource           const&parent = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+      for(RefIndex::value_type const&renderableListViewRef : resources.renderableListViews()) {
+        FrameGraphRenderableListView const&view   = *resources.get<FrameGraphRenderableListView>(renderableListViewRef);
+        FrameGraphResource           const&parent = *resources.get<FrameGraphResource>(view.parentResource);
         writeRenderableListView(parent, view);
       }
 
       // Write passes and adjacent resources
       AdjacencyListMap<PassUID_t>
-        const&passAdjacency = graph.m_passAdjacency;
+        const&passAdjacency = accessor->resourceAdjacency();
       AdjacencyListMap<PassUID_t, FrameGraphResourceId_t>
-        const&passResourcesAdj = graph.m_passToResourceAdjacency;
+        const&passResourcesAdj = accessor->passToResourceAdjacency();
 
       std::stack<PassUID_t>
-        passOrderCopy = graph.m_passExecutionOrder;
+        passOrderCopy = accessor->passExecutionOrder();
 
       while(!passOrderCopy.empty()) {
         // Write all passes and their connections
@@ -100,7 +102,7 @@ namespace Engine {
           m_stream
             << String::format("\n  subgraph pass%0 {\n", sourceUID);
 
-          Ptr<PassBase> sourcePass = graph.m_passes.at(sourceUID);
+          Ptr<PassBase> sourcePass = graph.passes().at(sourceUID);
           sourcePass->acceptSerializer(GetNonDeletingSelfPtrType(this));
 
           // Write out the passes' resources
@@ -112,7 +114,7 @@ namespace Engine {
             });
             if(!creations.empty())
               for(FrameGraphResourceId_t const&id : creations) {
-                FrameGraphTexture const&texture = *graph.m_resourceData.get<FrameGraphTexture>(id);
+                FrameGraphTexture const&texture = *resources.get<FrameGraphTexture>(id);
                 writePass2TextureResourceEdge(texture);
               }
             // Read/Write Texture
@@ -121,8 +123,8 @@ namespace Engine {
             });
             if(!readViews.empty()) {
               for(FrameGraphResourceId_t const&id : readViews) {
-                FrameGraphTextureView const&view           = *graph.m_resourceData.get<FrameGraphTextureView>(id);
-                FrameGraphResource    const&parentResource = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+                FrameGraphTextureView const&view           = *resources.get<FrameGraphTextureView>(id);
+                FrameGraphResource    const&parentResource = *resources.get<FrameGraphResource>(view.parentResource);
                 writeTextureResourceViewEdge(parentResource, view);
               }
             }
@@ -132,8 +134,8 @@ namespace Engine {
             });
             if(!renderableListViews.empty()) {
               for(FrameGraphResourceId_t const&id : renderableListViews) {
-                FrameGraphRenderableListView const&view           = *graph.m_resourceData.get<FrameGraphRenderableListView>(id);
-                FrameGraphResource           const&parentResource = *graph.m_resourceData.get<FrameGraphResource>(view.parentResource);
+                FrameGraphRenderableListView const&view           = *resources.get<FrameGraphRenderableListView>(id);
+                FrameGraphResource           const&parentResource = *resources.get<FrameGraphResource>(view.parentResource);
 
                 writeRenderableResourceViewEdge(parentResource, view);
               }

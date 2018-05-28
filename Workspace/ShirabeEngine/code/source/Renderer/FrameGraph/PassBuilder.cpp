@@ -50,7 +50,8 @@ namespace Engine {
       resource.type              = FrameGraphResourceType::Texture;
       resource.assignTextureParameters(desc);
 
-      m_pass->registerResource(resource.resourceId);
+      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      accessor->registerResource(resource.resourceId);
 
       return resource;
     }
@@ -186,7 +187,8 @@ namespace Engine {
       view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
       view.type               = FrameGraphResourceType::TextureView;
 
-      m_pass->registerResource(view.resourceId);
+      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      accessor->registerResource(view.resourceId);
 
       return view;
 
@@ -240,7 +242,8 @@ namespace Engine {
       view.readableName      = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
       view.type              = FrameGraphResourceType::TextureView;
 
-      m_pass->registerResource(view.resourceId);
+      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      accessor->registerResource(view.resourceId);
 
       return view;
     }
@@ -279,7 +282,8 @@ namespace Engine {
       for(uint64_t k=0; k<list.renderableList.size(); ++k)
         resource.renderableRefIndices.push_back(k);
 
-      m_pass->registerResource(resource.resourceId);
+      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      accessor->registerResource(resource.resourceId);
 
       return resource;
     }

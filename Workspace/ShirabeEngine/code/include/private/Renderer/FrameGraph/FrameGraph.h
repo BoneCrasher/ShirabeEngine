@@ -6,6 +6,7 @@
 #include <stack>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/PassKey.h"
 #include "Log/Log.h"
 #include "Resources/Core/ResourceDTO.h"
 
@@ -22,63 +23,96 @@ namespace Engine {
     {
       DeclareLogTag(Graph);
 
-      friend class GraphBuilder;
-      friend class Serialization::FrameGraphGraphVizSerializer;
-
     public:
+      class SHIRABE_TEST_EXPORT Accessor {
+      public:
+        Accessor(Graph const*graph);
+
+        AdjacencyListMap<PassUID_t>                         const&passAdjacency()           const;
+        std::stack<PassUID_t>                               const&passExecutionOrder()      const;
+        FrameGraphResourceIdList                            const&resources()               const;
+        FrameGraphMutableResources                          const&resourceData()            const;
+        AdjacencyListMap<FrameGraphResourceId_t>            const&resourceAdjacency()       const;
+        std::stack<FrameGraphResourceId_t>                  const&resourceOrder()           const;
+        AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> const&passToResourceAdjacency() const;
+
+      private:
+        Graph const*m_graph;
+      };
+      
+      class SHIRABE_TEST_EXPORT MutableAccessor
+        : public Accessor
+      {
+      public:
+        MutableAccessor(Graph *graph);
+        
+        AdjacencyListMap<PassUID_t>                         &mutablePassAdjacency();
+        std::stack<PassUID_t>                               &mutablePassExecutionOrder();
+        FrameGraphResourceIdList                            &mutableResources();
+        FrameGraphMutableResources                          &mutableResourceData();
+        AdjacencyListMap<FrameGraphResourceId_t>            &mutableResourceAdjacency();
+        std::stack<FrameGraphResourceId_t>                  &mutableResourceOrder();
+        AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> &mutablePassToResourceAdjacency();
+
+        template <typename TPass, typename... TPassCreationArgs>
+        Ptr<TPass> createPass(
+          PassUID_t         const&uid,
+          std::string       const&name,
+          TPassCreationArgs &&... args);
+
+      private:
+        Graph *m_graph;
+      };
+
+      UniquePtr<Accessor> getAccessor(PassKey<class GraphBuilder> &&key) const {
+        return std::move(std::make_unique<Accessor>(this));
+      }
+
+      UniquePtr<MutableAccessor> getMutableAccessor(PassKey<class GraphBuilder> &&key) {
+        return std::move(std::make_unique<MutableAccessor>(this));
+      }
+
+      UniquePtr<Accessor> getAccessor(PassKey<FrameGraphGraphVizSerializer> &&key) const {
+        return std::move(std::make_unique<Accessor>(this));
+      }
+      
+      UniquePtr<MutableAccessor> getMutableAccessor(PassKey<FrameGraphGraphVizSerializer> &&key) {
+        return std::move(std::make_unique<MutableAccessor>(this));
+      }
+
       bool
         execute(Ptr<IFrameGraphRenderContext>&);
 
-      virtual inline
-        void acceptSerializer(Ptr<IFrameGraphSerializer> s)
-      {
-        s->serializeGraph(*this);
-      }
+      virtual
+        void acceptSerializer(Ptr<IFrameGraphSerializer> s);
 
-      virtual inline
-        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
-      {
-        d->deserializeGraph(*this);
-      }
+      virtual
+        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d);
 
-      inline 
-        Graph& operator=(Graph const&other)
-      {
-        m_passes                  = other.m_passes;
-        m_passAdjacency           = other.m_passAdjacency;
-        m_passExecutionOrder      = other.m_passExecutionOrder;
-        m_resourceAdjacency       = other.m_resourceAdjacency;
-        m_resourceOrder           = other.m_resourceOrder;
-        m_passToResourceAdjacency = other.m_passToResourceAdjacency;
+      inline
+        Graph& operator=(Graph const&other);
 
-        return (*this);
-      }
+      PassMap const&passes() const;
 
     private:
-      template <typename TPass, typename... TPassCreationArgs>
-      Ptr<TPass> createPass(PassUID_t const&uid, std::string const&name, TPassCreationArgs &&... args) {
-        Ptr<TPass> pass = MakeSharedPointerType<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
-        if(!pass) {
-          //...
-        }
 
-        this->addPass(pass);
-        return pass;
-      }
-      
       bool initializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
       bool initializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
       bool initializeBuffers(Ptr<IFrameGraphRenderContext> renderContext);
       bool initializeBufferViews(Ptr<IFrameGraphRenderContext> renderContext);
-     
+
       bool deinitializeTextureViews(Ptr<IFrameGraphRenderContext> renderContext);
       bool deinitializeTextures(Ptr<IFrameGraphRenderContext> renderContext);
       bool deinitializeBufferViews(Ptr<IFrameGraphRenderContext> renderContext);
       bool deinitializeBuffer(Ptr<IFrameGraphRenderContext> renderContext);
-      
-      // Pass Ops
-      PassMap &passes();
+
       bool addPass(Ptr<PassBase> const&);
+
+      template <typename TPass, typename... TPassCreationArgs>
+      Ptr<TPass> createPass(
+        PassUID_t         const&uid,
+        std::string       const&name,
+        TPassCreationArgs &&... args);
 
       // 
       Ptr<IResourceManager> m_resourceManager;
@@ -95,7 +129,32 @@ namespace Engine {
 
       AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> m_passToResourceAdjacency;
     };
+    
+    template <typename TPass, typename... TPassCreationArgs>
+    Ptr<TPass>
+      Graph::MutableAccessor::createPass(
+        PassUID_t         const&uid,
+        std::string       const&name,
+        TPassCreationArgs &&... args)
+    {
+      return m_graph->createPass<TPass, TPassCreationArgs...>(uid, name, std::forward<TPassCreationArgs>(args)...);
+    }
 
+    template <typename TPass, typename... TPassCreationArgs>
+    Ptr<TPass>
+      Graph::createPass(
+        PassUID_t         const&uid, 
+        std::string       const&name, 
+        TPassCreationArgs &&... args)
+    {
+      Ptr<TPass> pass = MakeSharedPointerType<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
+      if(!pass) {
+        //...
+      }
+
+      this->addPass(pass);
+      return pass;
+    }
   }
 }
 
