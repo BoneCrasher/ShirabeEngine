@@ -202,35 +202,64 @@ namespace Engine {
       Ptr<IFrameGraphRenderContext>       renderContext,
       FrameGraphResourceIdList      const&resourceIds)
     {
-      bool deinitialized = true;
-
-      for(FrameGraphResourceId_t const&id : resourceIds)
+      std::function<bool(FrameGraphResourceId_t const&)> recurse = nullptr;
+      recurse = [&, this] (FrameGraphResourceId_t const&id) -> bool
       {
+        bool deinitialized = true;
+
+        Ptr<FrameGraphResource> resource = m_resourceData.getMutable<FrameGraphResource>(id);
+
         Ptr<FrameGraphResource>    subjacent   = nullptr;
         Ptr<FrameGraphTexture>     texture     = nullptr;
         Ptr<FrameGraphTextureView> textureView = nullptr;
 
-        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
-          texture = std::static_pointer_cast<FrameGraphTexture>(resource);
-          deinitialized |=
-            deinitializeTexture(
-              renderContext,
-              texture);
+          if(resource->referenceCount == 0) {
+            texture = std::static_pointer_cast<FrameGraphTexture>(resource);
+            deinitialized |=
+              deinitializeTexture(
+                renderContext,
+                texture);
+          }
           break;
         case FrameGraphResourceType::TextureView:
-          subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
-          texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
-          textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
-          deinitialized |=
-            deinitializeTextureView(
-              renderContext,
-              texture,
-              textureView);
+          // Decrease the texture view's count
+          --(resource->referenceCount);
+          std::cout
+            << String::format("Resource Id %0 -> RefCount: %1\n", resource->resourceId, resource->referenceCount);
+
+          if(resource->referenceCount == 0) {
+            subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
+            texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
+            textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+            deinitialized |=
+              deinitializeTextureView(
+                renderContext,
+                texture,
+                textureView);
+
+            // Traverse the tree upward.
+            if(resource->parentResource > 0 && !(resource->parentResource == resource->subjacentResource)) {
+              deinitialized &= recurse(resource->parentResource);
+            }
+
+            --(texture->referenceCount);
+            if(texture->referenceCount == 0) {
+              deinitialized &= recurse(texture->resourceId);
+            }
+          }
+
           break;
         }
-      }
+
+        return deinitialized;
+      };
+      
+      bool deinitialized = true;
+
+      for(FrameGraphResourceId_t const&id : resourceIds)
+        deinitialized &= recurse(id);
 
       return deinitialized;
     }

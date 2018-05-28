@@ -52,6 +52,8 @@ namespace Engine {
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(resource.resourceId);
+      // Add a self reference for the initial recursive destruction cycle to work properly.
+      ++resource.referenceCount;
 
       return resource;
     }
@@ -186,6 +188,8 @@ namespace Engine {
           : sourceResource.subjacentResource);
       view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
       view.type               = FrameGraphResourceType::TextureView;
+      // Add a self reference for the initial recursive destruction cycle to work properly.
+      ++view.referenceCount;
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(view.resourceId);
@@ -199,7 +203,6 @@ namespace Engine {
       }
 
       return view;
-
     }
 
 
@@ -249,6 +252,8 @@ namespace Engine {
           : sourceResource.subjacentResource);
       view.readableName      = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
       view.type              = FrameGraphResourceType::TextureView;
+      // Add a self reference for the initial recursive destruction cycle to work properly.
+      //++view.referenceCount;
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(view.resourceId);
