@@ -244,15 +244,15 @@ namespace Engine {
         view.subjacentResource  = subjacentResourceId;
         view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
         view.type               = FrameGraphResourceType::TextureView;
+        
+        Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
+        ++subjacent->referenceCount;
 
         ref = view;
       }
 
       accessor->registerResource(ref->get().resourceId);
       ++(ref->get().referenceCount);
-
-      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
-      ++subjacent->referenceCount;
 
       return *ref;
     }
@@ -334,15 +334,15 @@ namespace Engine {
         view.subjacentResource  = subjacentResourceId;
         view.readableName       = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
         view.type               = FrameGraphResourceType::TextureView;
+        
+        Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
+        ++subjacent->referenceCount;
 
         ref = view;
       }
 
       accessor->registerResource(ref->get().resourceId);
       ++(ref->get().referenceCount);
-
-      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
-      ++subjacent->referenceCount;
 
       return *ref;
     }
