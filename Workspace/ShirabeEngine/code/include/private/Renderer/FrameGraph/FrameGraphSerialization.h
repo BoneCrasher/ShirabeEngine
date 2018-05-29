@@ -106,6 +106,7 @@ namespace Engine {
       void writePass2TextureResourceEdge(
         FrameGraphTexture      const&texture);
       void writeTextureResourceViewEdge(
+        PassUID_t              const&passUID,
         FrameGraphResource     const&parentResource,
         FrameGraphTextureView const&view);
 

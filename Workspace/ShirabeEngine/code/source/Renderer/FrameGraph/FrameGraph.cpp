@@ -202,32 +202,34 @@ namespace Engine {
       Ptr<IFrameGraphRenderContext>       renderContext,
       FrameGraphResourceIdList      const&resourceIds)
     {
-      std::function<bool(FrameGraphResourceId_t const&)> recurse = nullptr;
-      recurse = [&, this] (FrameGraphResourceId_t const&id) -> bool
+      std::function<bool(FrameGraphResourceId_t const&, bool)> recurse = nullptr;
+      recurse = [&, this] (FrameGraphResourceId_t const&id, bool includeSubjacent) -> bool
       {
         bool deinitialized = true;
 
         Ptr<FrameGraphResource> resource = m_resourceData.getMutable<FrameGraphResource>(id);
-
+        
         Ptr<FrameGraphResource>    subjacent   = nullptr;
         Ptr<FrameGraphTexture>     texture     = nullptr;
         Ptr<FrameGraphTextureView> textureView = nullptr;
 
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
-          if(resource->referenceCount == 0) {
-            texture = std::static_pointer_cast<FrameGraphTexture>(resource);
-            deinitialized |=
-              deinitializeTexture(
-                renderContext,
-                texture);
+          if(includeSubjacent) {
+            if(resource->referenceCount == 0) {
+              texture = std::static_pointer_cast<FrameGraphTexture>(resource);
+              deinitialized |=
+                deinitializeTexture(
+                  renderContext,
+                  texture);
+            }
           }
           break;
         case FrameGraphResourceType::TextureView:
           // Decrease the texture view's count
           --(resource->referenceCount);
           std::cout
-            << String::format("Resource Id %0 -> RefCount: %1\n", resource->resourceId, resource->referenceCount);
+            << String::format("TextureView Id %0 -> RefCount: %1\n", resource->resourceId, resource->referenceCount);
 
           if(resource->referenceCount == 0) {
             subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
@@ -239,14 +241,12 @@ namespace Engine {
                 texture,
                 textureView);
 
-            // Traverse the tree upward.
-            if(resource->parentResource > 0 && !(resource->parentResource == resource->subjacentResource)) {
-              deinitialized &= recurse(resource->parentResource);
-            }
-
             --(texture->referenceCount);
+            std::cout
+              << String::format("Texture Id %0 -> RefCount: %1\n", texture->resourceId, texture->referenceCount);
+
             if(texture->referenceCount == 0) {
-              deinitialized &= recurse(texture->resourceId);
+              deinitialized &= recurse(texture->resourceId, true);
             }
           }
 
@@ -259,7 +259,7 @@ namespace Engine {
       bool deinitialized = true;
 
       for(FrameGraphResourceId_t const&id : resourceIds)
-        deinitialized &= recurse(id);
+        deinitialized &= recurse(id, false);
 
       return deinitialized;
     }

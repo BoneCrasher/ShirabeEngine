@@ -52,10 +52,36 @@ namespace Engine {
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(resource.resourceId);
-      // Add a self reference for the initial recursive destruction cycle to work properly.
-      ++resource.referenceCount;
 
       return resource;
+    }
+
+    FrameGraphResourceId_t
+      PassBuilder::findDuplicateTextureView(
+        FrameGraphResourceId_t             const&subjacentResource,
+        FrameGraphFormat                   const&format,
+        FrameGraphViewSource               const&viewSource,
+        Range                              const&arraySliceRange,
+        Range                              const&mipSliceRange,
+        BitField<FrameGraphViewAccessMode> const&mode)
+    {
+      for(FrameGraphResourceId_t const&viewId : m_resourceData.textureViews()) {
+        FrameGraphTextureView const&compareView = *m_resourceData.get<FrameGraphTextureView>(viewId);
+
+        bool equal =
+          (compareView.arraySliceRange   == arraySliceRange) &&
+          (compareView.mipSliceRange     == mipSliceRange)   &&
+          (format == FrameGraphFormat::Automatic ||
+            (compareView.format == format))                  &&
+          (compareView.source            == viewSource)      &&
+          (compareView.mode.check(mode))                     &&
+          (compareView.subjacentResource == subjacentResource);
+
+        if(equal)
+          return compareView.resourceId;
+      }
+
+      return 0;
     }
 
     void PassBuilder::adjustArrayAndMipSliceRanges(
@@ -64,14 +90,14 @@ namespace Engine {
       Range const&arraySliceRange,
       Range const&mipSliceRange,
       Range      &adjustedArraySliceRange,
-      Range      &adjustedMipSliceRange) 
+      Range      &adjustedMipSliceRange)
     {
       adjustedArraySliceRange = arraySliceRange;
       adjustedMipSliceRange   = mipSliceRange;
       if(sourceResource.type == FrameGraphResourceType::TextureView)
       {
         Ptr<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.subjacentResource);
-        
+
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
         if(!subjacentRef)
           throw std::runtime_error(String::format("Subjacent resource handle w/ id %0 is empty.", sourceResource.subjacentResource));
@@ -170,39 +196,65 @@ namespace Engine {
       adjustArrayAndMipSliceRanges(m_resourceData, sourceResource, arraySliceRange, mipSliceRange, adjustedArraySliceRange, adjustedMipSliceRange);
       validateArrayAndMipSliceRanges(m_resourceData, sourceResource, adjustedArraySliceRange, adjustedMipSliceRange, true, true);
 
-      FrameGraphTextureView &view = m_resourceData.spawnResource<FrameGraphTextureView>();
-      view.arraySliceRange = adjustedArraySliceRange;
-      view.mipSliceRange   = adjustedMipSliceRange;
-      view.format          = flags.requiredFormat;
-      view.mode.set(FrameGraphViewAccessMode::Write);
-      if(flags.writeTarget == FrameGraphWriteTarget::Color)
-        view.source = FrameGraphViewSource::Color;
-      if(flags.writeTarget == FrameGraphWriteTarget::Depth)
-        view.source = FrameGraphViewSource::Depth;
-
-      view.assignedPassUID    = m_passUID;
-      view.parentResource     = sourceResource.resourceId;
-      view.subjacentResource  =
+      FrameGraphResourceId_t subjacentResourceId =
         (sourceResource.type == FrameGraphResourceType::Texture
           ? sourceResource.resourceId
           : sourceResource.subjacentResource);
-      view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
-      view.type               = FrameGraphResourceType::TextureView;
-      // Add a self reference for the initial recursive destruction cycle to work properly.
-      ++view.referenceCount;
+
+      FrameGraphViewAccessMode mode = FrameGraphViewAccessMode::Write;
+
+      FrameGraphViewSource source = FrameGraphViewSource::Undefined;
+      if(flags.writeTarget == FrameGraphWriteTarget::Color)
+        source = FrameGraphViewSource::Color;
+      if(flags.writeTarget == FrameGraphWriteTarget::Depth)
+        source = FrameGraphViewSource::Depth;
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
-      accessor->registerResource(view.resourceId);
 
-      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(view.subjacentResource);
-      ++subjacent->referenceCount;
+      Optional<RefWrapper<FrameGraphTextureView>> ref;
 
-      if(view.subjacentResource != view.parentResource) {
-        Ptr<FrameGraphResource> parent = m_resourceData.getMutable<FrameGraphResource>(view.parentResource);
-        ++parent->referenceCount;
+      bool duplicateFound = false;
+      if(sourceResource.type == FrameGraphResourceType::TextureView) {
+        FrameGraphResourceId_t duplicateViewId =
+          findDuplicateTextureView(
+            subjacentResourceId,
+            flags.requiredFormat,
+            source,
+            adjustedArraySliceRange,
+            adjustedMipSliceRange,
+            mode);
+
+        duplicateFound = (duplicateViewId > 0);
+        if(duplicateFound) {
+          FrameGraphTextureView &view = *m_resourceData.getMutable<FrameGraphTextureView>(duplicateViewId);
+
+          ref = view;
+        }
       }
 
-      return view;
+      if(!duplicateFound) {
+        FrameGraphTextureView &view = m_resourceData.spawnResource<FrameGraphTextureView>();
+        view.arraySliceRange = adjustedArraySliceRange;
+        view.mipSliceRange   = adjustedMipSliceRange;
+        view.format          = flags.requiredFormat;
+        view.mode.set(mode);
+        view.source             = source;
+        view.assignedPassUID    = m_passUID;
+        view.parentResource     = sourceResource.resourceId;
+        view.subjacentResource  = subjacentResourceId;
+        view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
+        view.type               = FrameGraphResourceType::TextureView;
+
+        ref = view;
+      }
+
+      accessor->registerResource(ref->get().resourceId);
+      ++(ref->get().referenceCount);
+
+      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
+      ++subjacent->referenceCount;
+
+      return *ref;
     }
 
 
@@ -234,41 +286,65 @@ namespace Engine {
       adjustArrayAndMipSliceRanges(m_resourceData, sourceResource, arraySliceRange, mipSliceRange, adjustedArraySliceRange, adjustedMipSliceRange);
       validateArrayAndMipSliceRanges(m_resourceData, sourceResource, adjustedArraySliceRange, adjustedMipSliceRange, false, true);
 
-      FrameGraphTextureView &view = m_resourceData.spawnResource<FrameGraphTextureView>();
-      view.arraySliceRange = adjustedArraySliceRange;
-      view.mipSliceRange   = adjustedMipSliceRange;
-      view.format          = flags.requiredFormat;
-      view.mode.set(FrameGraphViewAccessMode::Read);
-      if(flags.source == FrameGraphReadSource::Color)
-        view.source = FrameGraphViewSource::Color;
-      if(flags.source == FrameGraphReadSource::Depth)
-        view.source = FrameGraphViewSource::Depth;
-
-      view.assignedPassUID   = m_passUID;
-      view.parentResource    = sourceResource.resourceId;
-      view.subjacentResource =
+      FrameGraphResourceId_t subjacentResourceId =
         (sourceResource.type == FrameGraphResourceType::Texture
           ? sourceResource.resourceId
           : sourceResource.subjacentResource);
-      view.readableName      = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
-      view.type              = FrameGraphResourceType::TextureView;
-      // Add a self reference for the initial recursive destruction cycle to work properly.
-      //++view.referenceCount;
+
+      FrameGraphViewAccessMode mode = FrameGraphViewAccessMode::Read;
+
+      FrameGraphViewSource source = FrameGraphViewSource::Undefined;
+      if(flags.source == FrameGraphReadSource::Color)
+        source = FrameGraphViewSource::Color;
+      if(flags.source == FrameGraphReadSource::Depth)
+        source = FrameGraphViewSource::Depth;
 
       UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
-      accessor->registerResource(view.resourceId);
 
-      ++view.referenceCount;
+      Optional<RefWrapper<FrameGraphTextureView>> ref;
 
-      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(view.subjacentResource);
-      ++subjacent->referenceCount;
+      bool duplicateFound = false;
+      if(sourceResource.type == FrameGraphResourceType::TextureView) {
+        FrameGraphResourceId_t duplicateViewId =
+          findDuplicateTextureView(
+            subjacentResourceId,
+            flags.requiredFormat,
+            source,
+            adjustedArraySliceRange,
+            adjustedMipSliceRange,
+            mode);
 
-      if(view.subjacentResource != view.parentResource) {
-        Ptr<FrameGraphResource> parent = m_resourceData.getMutable<FrameGraphResource>(view.parentResource);
-        ++parent->referenceCount;
+        duplicateFound = (duplicateViewId > 0);
+        if(duplicateFound) {
+          FrameGraphTextureView &view = *m_resourceData.getMutable<FrameGraphTextureView>(duplicateViewId);
+
+          ref = view;
+        }
       }
 
-      return view;
+      if(!duplicateFound) {
+        FrameGraphTextureView &view = m_resourceData.spawnResource<FrameGraphTextureView>();
+        view.arraySliceRange = adjustedArraySliceRange;
+        view.mipSliceRange   = adjustedMipSliceRange;
+        view.format          = flags.requiredFormat;
+        view.mode.set(mode);
+        view.source             = source;
+        view.assignedPassUID    = m_passUID;
+        view.parentResource     = sourceResource.resourceId;
+        view.subjacentResource  = subjacentResourceId;
+        view.readableName       = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
+        view.type               = FrameGraphResourceType::TextureView;
+
+        ref = view;
+      }
+
+      accessor->registerResource(ref->get().resourceId);
+      ++(ref->get().referenceCount);
+
+      Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
+      ++subjacent->referenceCount;
+
+      return *ref;
     }
 
     /**********************************************************************************************//**
@@ -292,7 +368,7 @@ namespace Engine {
       resource.subjacentResource  = renderableListResource.resourceId;
       resource.type               = FrameGraphResourceType::RenderableListView;
       resource.isExternalResource = false;
-      
+
       Ptr<FrameGraphRenderableList> const listRef = m_resourceData.get<FrameGraphRenderableList>(renderableListResource.resourceId);
 
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
@@ -396,7 +472,7 @@ namespace Engine {
       {
         FrameGraphTextureView const&view = *resources.get<FrameGraphTextureView>(viewRef);
 
-        bool correctMode = view.mode.check(FrameGraphViewAccessMode::Write);        
+        bool correctMode = view.mode.check(FrameGraphViewAccessMode::Write);
         if(!correctMode)
           continue;
 

@@ -125,7 +125,7 @@ namespace Engine {
               for(FrameGraphResourceId_t const&id : readViews) {
                 FrameGraphTextureView const&view           = *resources.get<FrameGraphTextureView>(id);
                 FrameGraphResource    const&parentResource = *resources.get<FrameGraphResource>(view.parentResource);
-                writeTextureResourceViewEdge(parentResource, view);
+                writeTextureResourceViewEdge(sourceUID, parentResource, view);
               }
             }
             // Use Renderables
@@ -392,6 +392,7 @@ namespace Engine {
 
     void
       FrameGraphGraphVizSerializer::writeTextureResourceViewEdge(
+        PassUID_t              const&passUID,
         FrameGraphResource     const&parentResource,
         FrameGraphTextureView  const&view)
     {
@@ -400,7 +401,7 @@ namespace Engine {
       bool viewIsReadMode              = view.mode.check(FrameGraphViewAccessMode::Read);
       bool viewIsWriteMode             = view.mode.check(FrameGraphViewAccessMode::Write);
 
-      std::string passId   = String::format("Pass%0", view.assignedPassUID);
+      std::string passId   = String::format("Pass%0", passUID);
       std::string viewId   = String::format("TextureView%0", view.resourceId);
       std::string parentId = "";
       if(parentResourceIsTexture)

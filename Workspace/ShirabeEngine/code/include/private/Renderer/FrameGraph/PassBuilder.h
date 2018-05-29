@@ -92,6 +92,14 @@ namespace Engine {
     
     private:
 
+      FrameGraphResourceId_t findDuplicateTextureView(
+        FrameGraphResourceId_t            const&subjacentResourceId,
+        FrameGraphFormat                  const&format,
+        FrameGraphViewSource              const&viewSource,
+        Range                             const&arrayRange,
+        Range                             const&mipRange,
+        BitField<FrameGraphViewAccessMode> const&mode);
+
       void adjustArrayAndMipSliceRanges(
         FrameGraphResources const&resourceData,
         FrameGraphResource  const&sourceResource,

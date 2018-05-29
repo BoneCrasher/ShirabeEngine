@@ -53,6 +53,12 @@ namespace Engine {
       length;
   };
 
+  static bool operator==(Range const&lhs, Range const&rhs) {
+    return
+      ((lhs.offset == rhs.offset) &&
+      (lhs.length == rhs.length));
+  }
+
   template <typename T>
   std::string to_string(T const&input) { throw std::runtime_error("Unsupported type."); }
 

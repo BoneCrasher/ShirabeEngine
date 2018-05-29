@@ -73,7 +73,7 @@ namespace Engine {
       FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 
       bool collectPass(Ptr<PassBase> pass);
-
+     
       template <typename TUID>
       bool topologicalSort(std::stack<TUID>&outPassOrder);
       bool validate(std::stack<PassUID_t> const&passOrder);
