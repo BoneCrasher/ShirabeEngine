@@ -172,25 +172,38 @@ namespace Engine {
         Ptr<FrameGraphResource>    subjacent   = nullptr;
         Ptr<FrameGraphTexture>     texture     = nullptr;
         Ptr<FrameGraphTextureView> textureView = nullptr;
+        
+        FrameGraphResourceIdList::const_iterator it = m_instantiatedResources.end();
 
         Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
           texture = std::static_pointer_cast<FrameGraphTexture>(resource);
-          initialized |=
-            initializeTexture(
-              renderContext,
-              texture);
+
+          it = std::find(m_instantiatedResources.begin(), m_instantiatedResources.end(), texture->resourceId);
+          if(it == m_instantiatedResources.end()) {
+            initialized |=
+              initializeTexture(
+                renderContext,
+                texture);
+            m_instantiatedResources.push_back(texture->resourceId);
+          }
+
           break;
         case FrameGraphResourceType::TextureView:
           subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
           texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
           textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
-          initialized |=
-            initializeTextureView(
-              renderContext,
-              texture,
-              textureView);
+
+          it = std::find(m_instantiatedResources.begin(), m_instantiatedResources.end(), textureView->resourceId);
+          if(it == m_instantiatedResources.end()) {
+            initialized |=
+              initializeTextureView(
+                renderContext,
+                texture,
+                textureView);
+            m_instantiatedResources.push_back(textureView->resourceId);
+          }
           break;
         }
       }
@@ -222,6 +235,7 @@ namespace Engine {
                 deinitializeTexture(
                   renderContext,
                   texture);
+              std::remove_if(m_instantiatedResources.begin(), m_instantiatedResources.end(), [&] (FrameGraphResourceId_t const&id) -> bool { return (id == texture->resourceId); });
             }
           }
           break;
@@ -240,6 +254,7 @@ namespace Engine {
                 renderContext,
                 texture,
                 textureView);
+            std::remove_if(m_instantiatedResources.begin(), m_instantiatedResources.end(), [&] (FrameGraphResourceId_t const&id) -> bool { return (id == textureView->resourceId); });
 
             --(texture->referenceCount);
             std::cout

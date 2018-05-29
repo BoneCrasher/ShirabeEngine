@@ -147,6 +147,8 @@ namespace Engine {
       std::stack<FrameGraphResourceId_t>       m_resourceOrder;
 
       AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> m_passToResourceAdjacency;
+
+      FrameGraphResourceIdList m_instantiatedResources;
     };
     
     template <typename TPass, typename... TPassCreationArgs>
