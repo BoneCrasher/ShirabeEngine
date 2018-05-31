@@ -22,12 +22,12 @@ namespace Test {
 
       return EEngineStatus::Ok;
     }
-    
+
     MockFrameGraphRenderContext::MockFrameGraphRenderContext(Ptr<IRenderContext> renderer)
       : m_renderer(renderer)
     {}
 
-    Ptr<IFrameGraphRenderContext> 
+    Ptr<IFrameGraphRenderContext>
       MockFrameGraphRenderContext::fromRenderer(Ptr<IRenderContext> renderer)
     {
       assert(renderer != nullptr);
@@ -170,5 +170,49 @@ namespace Test {
       std::cout << "Render(...):\n" << to_string(renderable) << "\n";
       return EEngineStatus::Ok;
     }
+
+
+    #define Mock_DefineResourceMethods(resource)              \
+                                                              \
+      EEngineStatus MockResourceManager::create##resource(    \
+        resource::CreationRequest const&inRequest,            \
+        PublicResourceId_t             &outId,                \
+        bool                            deferLoad = false     \
+      ) {                                                     \
+        std::cout << "create" << #resource << "(...);\n";     \
+        load##resource(outId);                                \
+      }                                                       \
+                                                              \
+      EEngineStatus MockResourceManager::load##resource(      \
+        PublicResourceId_t const&inId                         \
+      ) { std::cout << "load" << #resource << "(...);\n"; }   \
+                                                              \
+      EEngineStatus MockResourceManager::update##resource(    \
+        PublicResourceId_t      const&inId,                   \
+        resource::UpdateRequest const&inRequest               \
+      ) { std::cout << "update" << #resource << "(...);\n"; } \
+                                                              \
+      EEngineStatus MockResourceManager::unload##resource(    \
+        PublicResourceId_t const&inId                         \
+      ) { std::cout << "unload" << #resource << "(...);\n"; } \
+                                                              \
+      EEngineStatus MockResourceManager::destroy##resource(   \
+        PublicResourceId_t const&inId                         \
+      ) {                                                     \
+        unload##resource(inId);                               \
+        std::cout << "destroy" << #resource << "(...);\n";    \
+      }
+
+    Mock_DefineResourceMethods(SwapChain);
+    Mock_DefineResourceMethods(Texture);
+    Mock_DefineResourceMethods(RenderTargetView);
+    Mock_DefineResourceMethods(ShaderResourceView);
+    Mock_DefineResourceMethods(DepthStencilView);
+    Mock_DefineResourceMethods(DepthStencilState);
+    Mock_DefineResourceMethods(RasterizerState);
+
+    bool MockResourceManager::clear() { std::cout << "Cleared resource manager \n"; }
+
+    Ptr<BasicGFXAPIResourceBackend>& MockResourceManager::backend() { assert(false); }
   }
 }

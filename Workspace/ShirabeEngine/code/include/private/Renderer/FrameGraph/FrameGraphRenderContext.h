@@ -135,7 +135,7 @@ namespace Engine {
 
       Ptr<IAssetStorage>    m_assetStorage;
       Ptr<IResourceManager> m_resourceManager;
-      Ptr<IRenderContext>   m_platformRendercontext;
+      Ptr<IRenderContext>   m_platformRenderContext;
 
       Map<std::string, Vector<PublicResourceId_t>> m_resourceMap;
     };

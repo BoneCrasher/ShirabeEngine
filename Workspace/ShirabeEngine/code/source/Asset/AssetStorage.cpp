@@ -5,7 +5,28 @@
 
 namespace Engine {
   namespace Asset {
-    using namespace Resources;
+    using namespace Resources;    
+
+    /**********************************************************************************************//**
+     * \fn  Ptr<AssetBinaryData> AssetBinaryData::fromMemory(int8_t const*const data, uint64_t const size)
+     *
+     * \brief From memory
+     *
+     * \param data  The data.
+     * \param size  The size.
+     *
+     * \return  A Ptr&lt;AssetBinaryData&gt;
+     **************************************************************************************************/
+    Ptr<AssetBinaryData>
+      AssetBinaryData::fromMemory(
+        int8_t   const*const data,
+        uint64_t const       size)
+    {
+      // Any prevalidation?
+      Ptr<AssetBinaryData> result = MakeSharedPointerType<AssetBinaryData>(data, size);
+      return result;
+    }
+
 
     /**********************************************************************************************//**
      * \fn  AssetStorage::AssetStorage(Ptr<IResourceManager> const manager)
@@ -34,10 +55,12 @@ namespace Engine {
     {
       AssetId_t aid = 0;
       Asset asset{};
-      asset.id     = aid;
-      asset.path   = "";
-      asset.source = AssetSource::Runtime;
-      asset.type   = AssetType::Texture;
+      asset.id = aid;
+
+      AssetDataReference assetData{};
+      assetData.URI    = "";
+      assetData.source = AssetSource::Runtime;
+      assetData.type   = AssetType::Texture;
 
       TextureAsset textureAsset{ };
       textureAsset.name        = name;
@@ -47,24 +70,6 @@ namespace Engine {
       m_textureAssets.addAsset(aid, textureAsset);
 
       return aid;
-    }
-
-    /**********************************************************************************************//**
-     * \fn  Ptr<AssetBinaryData> AssetBinaryData::fromMemory(int8_t const*const data, uint64_t const size)
-     *
-     * \brief From memory
-     *
-     * \param data  The data.
-     * \param size  The size.
-     *
-     * \return  A Ptr&lt;AssetBinaryData&gt;
-     **************************************************************************************************/
-    Ptr<AssetBinaryData>
-      AssetBinaryData::fromMemory(int8_t const*const data, uint64_t const size)
-    {
-      Ptr<AssetBinaryData> result = nullptr;
-
-      return result;
     }
 
     /**********************************************************************************************//**

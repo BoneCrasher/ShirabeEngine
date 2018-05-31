@@ -85,10 +85,17 @@ namespace Engine {
 
     class AssetBinaryData {
     public:
-      static Ptr<AssetBinaryData> fromMemory(int8_t const*const data, uint64_t const size);
+      static Ptr<AssetBinaryData> fromMemory(
+        int8_t   const*const data,
+        uint64_t const       size);
 
     private:
-      AssetBinaryData();
+      AssetBinaryData(
+        int8_t   const*const data,
+        uint64_t const       size);
+
+      int8_t   const* m_data;
+      uint64_t const  m_size;
     };
 
     /**********************************************************************************************//**
@@ -103,8 +110,8 @@ namespace Engine {
       std::string            const&,
       Resources::TextureInfo const&) = 0;
 
-    virtual Ptr<AssetBinaryData> loadAsset(AssetId_t const&)   = 0;
-    virtual void                 unloadAsset(AssetId_t const&) = 0;
+    virtual Asset                loadAsset(AssetId_t const&)              = 0;
+    virtual Ptr<AssetBinaryData> loadAssetData(AssetDataReference const&) = 0;
     DeclareInterfaceEnd(IAssetStorage);
 
     DeclareSharedPointerType(IAssetStorage);
@@ -127,8 +134,8 @@ namespace Engine {
         std::string            const&,
         Resources::TextureInfo const&);
 
-      Ptr<AssetBinaryData> loadAsset(AssetId_t const&);
-      void                 unloadAsset(AssetId_t const&);
+      Asset                loadAsset(AssetId_t const&);
+      Ptr<AssetBinaryData> loadAssetData(AssetDataReference const&);
 
     private:
       Ptr<AssetBinaryData> loadBufferAsset(Asset const&);

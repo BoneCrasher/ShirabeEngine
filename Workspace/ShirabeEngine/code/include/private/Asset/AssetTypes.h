@@ -22,11 +22,17 @@ namespace Engine {
       Buffer  = 2,
     };
 
-    struct Asset {
-      AssetId_t   id;
+    struct AssetDataReference {
       AssetSource source;
-      std::string path;
+      std::string URI;
       AssetType   type;
+    };
+
+    struct Asset {
+      AssetId_t             
+        id;
+      Vector<AssetDataReference> 
+        dataReferences;
     };
 
     struct TextureAsset {

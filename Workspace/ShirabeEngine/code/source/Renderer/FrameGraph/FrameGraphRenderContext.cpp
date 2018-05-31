@@ -25,7 +25,7 @@ namespace Engine {
       Ptr<IRenderContext>   renderer)
       : m_assetStorage(assetStorage)
       , m_resourceManager(resourceManager)
-      , m_platformRendercontext(renderer)
+      , m_platformRenderContext(renderer)
     {}
 
     void FrameGraphRenderContext::mapFrameGraphToInternalResource(
@@ -209,7 +209,7 @@ namespace Engine {
     {
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
       for(PublicResourceId_t const&pid : subjacentResources)
-        m_platformRendercontext->unbindResource(pid);
+        m_platformRenderContext->unbindResource(pid);
 
       return EEngineStatus::Ok;
     }
@@ -222,7 +222,7 @@ namespace Engine {
     {
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
       for(PublicResourceId_t const&pid : subjacentResources)
-        m_platformRendercontext->unbindResource(pid);
+        m_platformRenderContext->unbindResource(pid);
 
       return EEngineStatus::Ok;
     }

@@ -46,11 +46,13 @@ namespace Test {
       Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
       appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
 
+      Ptr<IResourceManager> resourceManager = MakeSharedPointerType<MockResourceManager>();
+
       RendererConfiguration rendererConfiguration{};
 
       Ptr<IRenderContext> renderer = MakeSharedPointerType<MockRenderContext>();
       // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
-      Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(nullptr, nullptr, renderer);
+      Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(nullptr, resourceManager, renderer);
 
       OSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
 

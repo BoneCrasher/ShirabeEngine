@@ -18,7 +18,6 @@
 #include <Renderer/FrameGraph/FrameGraphRenderContext.h>
 #include <Renderer/FrameGraph/FrameGraphSerialization.h>
 
-
 namespace Test {
   namespace FrameGraph {
     using namespace Engine;
@@ -87,6 +86,49 @@ namespace Test {
       Ptr<IRenderContext> m_renderer;
     };
 
+	 
+    #define Mock_DeclareResourceMethods(resource)         \
+                                                          \
+      EEngineStatus create##resource(                     \
+        resource::CreationRequest const&inRequest,        \
+        PublicResourceId_t             &outId,            \
+        bool                            deferLoad = false \
+      );                                                  \
+                                                          \
+      EEngineStatus load##resource(                       \
+        PublicResourceId_t const&inId                     \
+      );                                                  \
+                                                          \
+      EEngineStatus update##resource(                     \
+        PublicResourceId_t      const&inId,               \
+        resource::UpdateRequest const&inRequest           \
+      );                                                  \
+                                                          \
+      EEngineStatus unload##resource(                     \
+        PublicResourceId_t const&inId                     \
+      );                                                  \
+                                                          \
+      EEngineStatus destroy##resource(                    \
+        PublicResourceId_t const&inId                     \
+      );                                   
+
+    class MockResourceManager
+      : public IResourceManager
+    {
+    public:
+      bool clear();
+
+      Ptr<BasicGFXAPIResourceBackend>& backend();
+
+      Mock_DeclareResourceMethods(SwapChain);
+      Mock_DeclareResourceMethods(Texture);
+      Mock_DeclareResourceMethods(RenderTargetView);
+      Mock_DeclareResourceMethods(ShaderResourceView);
+      Mock_DeclareResourceMethods(DepthStencilView);
+      Mock_DeclareResourceMethods(DepthStencilState);
+      Mock_DeclareResourceMethods(RasterizerState);
+    };
+	
   }
 }
 
