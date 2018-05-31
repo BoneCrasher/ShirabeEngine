@@ -215,7 +215,7 @@ namespace Engine {
 
     void FrameGraphGraphVizSerializer::beginGraph() {
       m_stream
-        << "digraph FrameGraph {\n"
+        << "strict digraph FrameGraph {\n"
         << "  rankdir=LR;\n"
         << "  colorscheme=svg;\n"
         << "  overlap=false;\n"
