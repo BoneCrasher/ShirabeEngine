@@ -1,3 +1,7 @@
+#define STB_IMAGE_STATIC
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include "Asset/AssetStorage.h"
 
 #include "Core/EngineTypeHelper.h"
@@ -5,28 +9,7 @@
 
 namespace Engine {
   namespace Asset {
-    using namespace Resources;    
-
-    /**********************************************************************************************//**
-     * \fn  Ptr<AssetBinaryData> AssetBinaryData::fromMemory(int8_t const*const data, uint64_t const size)
-     *
-     * \brief From memory
-     *
-     * \param data  The data.
-     * \param size  The size.
-     *
-     * \return  A Ptr&lt;AssetBinaryData&gt;
-     **************************************************************************************************/
-    Ptr<AssetBinaryData>
-      AssetBinaryData::fromMemory(
-        int8_t   const*const data,
-        uint64_t const       size)
-    {
-      // Any prevalidation?
-      Ptr<AssetBinaryData> result = MakeSharedPointerType<AssetBinaryData>(data, size);
-      return result;
-    }
-
+    using namespace Resources;
 
     /**********************************************************************************************//**
      * \fn  AssetStorage::AssetStorage(Ptr<IResourceManager> const manager)
@@ -81,34 +64,28 @@ namespace Engine {
      *
      * \return  The asset.
      **************************************************************************************************/
-    Ptr<AssetBinaryData>
+    Asset
       AssetStorage::loadAsset(AssetId_t const&id)
     {
-      Ptr<AssetBinaryData> data = 0;
-
       Optional<Asset> asset = m_assetIndex.getAsset(id);
-      if(asset.has_value()) {
-        switch(asset->type) {
-        case AssetType::Texture: data = loadTextureAsset(*asset); break;
-        case AssetType::Buffer:  data = loadBufferAsset(*asset);  break;
-        default:                 data = nullptr;                  break;
-        }
-      }
+      if(!asset.has_value())
+        throw std::runtime_error("Asset not found.");
 
-      return data;
+      return *asset;
     }
 
-    /**********************************************************************************************//**
-     * \fn  void AssetStorage::unloadAsset(AssetId_t const&id)
-     *
-     * \brief Unload asset
-     *
-     * \param id  The identifier.
-     **************************************************************************************************/
-    void
-      AssetStorage::unloadAsset(AssetId_t const&id)
+    AssetBinaryData
+      AssetStorage::loadAssetData(AssetDataReference const&ref)
     {
-      return;
+      AssetBinaryData data;
+
+      switch(ref.type) {
+      case AssetType::Texture: data = loadTextureAsset(ref); break;
+      case AssetType::Buffer:  data = loadBufferAsset(ref);  break;
+      default:                                               break;
+      }
+
+      return std::move(data);
     }
 
     /**********************************************************************************************//**
@@ -120,10 +97,10 @@ namespace Engine {
      *
      * \return  The buffer asset.
      **************************************************************************************************/
-    Ptr<AssetBinaryData>
-      AssetStorage::loadBufferAsset(Asset const&asset)
+    AssetBinaryData
+      AssetStorage::loadBufferAsset(AssetDataReference const&asset)
     {
-      Ptr<AssetBinaryData> data = nullptr;
+      AssetBinaryData data;
 
       /*Optional<TextureAsset> textureAsset = getTextureAsset(asset.id);
 
@@ -140,6 +117,32 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
+     * \fn  void loadImage( std::string const&filename, Image &image)
+     *
+     * \brief Loads an image
+     *
+     * \param           filename  Filename of the file.
+     * \param [in,out]  image     The image.
+     **************************************************************************************************/
+    void loadImageFromFile(
+      std::string const&filename,
+      Image            &image)
+    {
+      int w = 0, h = 0, c = 0;
+      unsigned char* stbuc = stbi_load(filename.c_str(), &w, &h, &c, 4);
+
+      uint64_t size = (w * h * 4 * sizeof(int8_t));
+      image.data     = std::move(AssetBinaryData::DataArrayFromSize(size));
+      image.width    = w;
+      image.height   = h;
+      image.channels = c;
+
+      memcpy(image.data.mutableData(), stbuc, image.data.size());
+
+      stbi_image_free(stbuc);
+    }
+
+    /**********************************************************************************************//**
      * \fn  Ptr<AssetBinaryData> AssetStorage::loadTextureAsset(Asset const&asset)
      *
      * \brief Loads texture asset
@@ -148,16 +151,31 @@ namespace Engine {
      *
      * \return  The texture asset.
      **************************************************************************************************/
-    Ptr<AssetBinaryData>
-      AssetStorage::loadTextureAsset(Asset const&asset)
+    AssetBinaryData
+      AssetStorage::loadTextureAsset(AssetDataReference const&asset)
     {
-      Ptr<AssetBinaryData> data = nullptr;
+      Image image{};
 
-      Optional<TextureAsset> textureAsset = m_textureAssets.getAsset(asset.id);
-
-      return data;
+      switch(asset.source) {
+      case AssetSource::Local:
+        loadImageFromFile(asset.URI, image);
+        break;
+      case AssetSource::Runtime:
+        // loadImageFromCache(asset.URI, image);
+        // break;
+      case AssetSource::URL:
+        // downloadImage(asset.URI, ...);
+        //
+        // TODO !!! 
+        // Consider:
+        //   Should the knowledge of "URL" be hidden entirely, i.e. it is commonly 
+        //   assumed that the file is loaded from disk/cache and will  be looked up 
+        //   online by default if missing?
+        break;
+      }
+      
+      return std::move(image.data);
     }
-
 
   }
 }

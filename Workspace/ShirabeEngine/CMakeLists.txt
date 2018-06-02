@@ -12,6 +12,7 @@ set(
 		Serialization/XMLObjectSerializer.cpp
 )
 
+set(LINK_STBI   TRUE)
 set(LINK_FXGLTF TRUE)
 set(LINK_JSON   TRUE)
 set(LINK_XML2   TRUE)

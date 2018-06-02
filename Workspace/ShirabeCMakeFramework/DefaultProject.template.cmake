@@ -19,7 +19,7 @@ cmake_minimum_required(VERSION 3.9)
 # include(SHIRABE_CommonProject.template.cmake)
 
 # Use Unicode Charset?
-set(SHIRABE_UNICODE_ENABLED TRUE)
+set(SHIRABE_UNICODE_ENABLED FALSE)
 
 # Please see SHIRABE_CMake_HandleCompilerOptions_Defaults.cmake for all available 
 # SHIRABE_COMPILER__~-Flags!
