@@ -38,12 +38,9 @@ namespace Engine {
     {
       AssetId_t aid = 0;
       Asset asset{};
-      asset.id = aid;
-
-      AssetDataReference assetData{};
-      assetData.URI    = "";
-      assetData.source = AssetSource::Runtime;
-      assetData.type   = AssetType::Texture;
+      asset.id     = aid;
+      asset.URI    = "";
+      asset.type   = AssetType::Texture;
 
       TextureAsset textureAsset{ };
       textureAsset.name        = name;
@@ -75,7 +72,7 @@ namespace Engine {
     }
 
     AssetBinaryData
-      AssetStorage::loadAssetData(AssetDataReference const&ref)
+      AssetStorage::loadAssetData(Asset const&ref)
     {
       AssetBinaryData data;
 
@@ -98,7 +95,7 @@ namespace Engine {
      * \return  The buffer asset.
      **************************************************************************************************/
     AssetBinaryData
-      AssetStorage::loadBufferAsset(AssetDataReference const&asset)
+      AssetStorage::loadBufferAsset(Asset const&asset)
     {
       AssetBinaryData data;
 
@@ -152,27 +149,13 @@ namespace Engine {
      * \return  The texture asset.
      **************************************************************************************************/
     AssetBinaryData
-      AssetStorage::loadTextureAsset(AssetDataReference const&asset)
+      AssetStorage::loadTextureAsset(Asset const&asset)
     {
       Image image{};
 
-      switch(asset.source) {
-      case AssetSource::Local:
-        loadImageFromFile(asset.URI, image);
-        break;
-      case AssetSource::Runtime:
-        // loadImageFromCache(asset.URI, image);
-        // break;
-      case AssetSource::URL:
-        // downloadImage(asset.URI, ...);
-        //
-        // TODO !!! 
-        // Consider:
-        //   Should the knowledge of "URL" be hidden entirely, i.e. it is commonly 
-        //   assumed that the file is loaded from disk/cache and will  be looked up 
-        //   online by default if missing?
-        break;
-      }
+      // Default for now... 
+      // Will check cache and download from server if necessary
+      loadImageFromFile(asset.URI, image);
       
       return std::move(image.data);
     }

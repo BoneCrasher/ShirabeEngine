@@ -139,49 +139,54 @@ namespace Engine {
 		std::array<std::string, sizeof...(args)> formattedArguments;
 		formatArguments(formattedArguments, std::forward<TArgs>(args)...);
 
-    uint32_t number     = 0;
-    bool     readNumber = false;
-
-		std::ostringstream stream;
-		for (std::size_t k = 0; k < format.size(); ++k) {
-			switch (format[k]) {
-			case '%':
-        readNumber = true;
-        break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        if(readNumber) { 
-          number *= 10;
-          number += (uint32_t) (format[k] - '0');
-          break;
-        } // If not, fall through to default handling...
-			default:
-        if(readNumber) {
-          stream << formattedArguments[std::size_t(number)];
-          readNumber = false;
-          number     = 0;
-        }
-
-				stream << format[k];
-				break;
-			}
-		}
-
-    if(readNumber) {
-      stream << formattedArguments[std::size_t(number)];
-      readNumber = false;
-      number     = 0;
+    if constexpr (sizeof...(args) == 0) {
+      return format;
     }
+    else {
+      uint32_t number     = 0;
+      bool     readNumber = false;
 
-		return stream.str();
+      std::ostringstream stream;
+      for(std::size_t k = 0; k < format.size(); ++k) {
+        switch(format[k]) {
+        case '%':
+          readNumber = true;
+          break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          if(readNumber) {
+            number *= 10;
+            number += (uint32_t)(format[k] - '0');
+            break;
+          } // If not, fall through to default handling...
+        default:
+          if(readNumber) {
+            stream << formattedArguments[std::size_t(number)];
+            readNumber = false;
+            number     = 0;
+          }
+
+          stream << format[k];
+          break;
+        }
+      }
+
+      if(readNumber) {
+        stream << formattedArguments[std::size_t(number)];
+        readNumber = false;
+        number     = 0;
+      }
+
+      return stream.str();
+    }
 	}
 }
 

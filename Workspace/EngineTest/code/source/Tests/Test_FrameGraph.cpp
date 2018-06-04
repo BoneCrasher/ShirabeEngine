@@ -1,8 +1,11 @@
 #include <vector>
 
 #include <Core/EngineTypeHelper.h>
-#include <GFXAPI/Types/All.h>
 
+#include <Asset/AssetIndex.h>
+#include <Asset/AssetStorage.h>
+
+#include <GFXAPI/Types/All.h>
 #include <Resources/Core/IResourceManager.h>
 
 #include <Renderer/IRenderer.h>
@@ -46,6 +49,12 @@ namespace Test {
       Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
       appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
 
+      //
+      // ASSET STORAGE
+      // 
+      namespace asset = Engine::Asset;
+      asset::AssetRegistry<asset::Asset> registry = asset::AssetIndex::loadIndexById("Default");
+      
       Ptr<IResourceManager> resourceManager = MakeSharedPointerType<MockResourceManager>();
 
       RendererConfiguration rendererConfiguration{};

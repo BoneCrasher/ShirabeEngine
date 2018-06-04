@@ -56,8 +56,8 @@ namespace Platform {
         const Rect             &initialBounds
         // TODO: Fullscreen
       ) {
-        std::wstring className    = String::toWideString(TWindowType::ClassName);
-        std::wstring instanceName = String::toWideString(name);
+        std::string className    = TWindowType::ClassName;
+        std::string instanceName = name;
 
         HWND hwnd;
 

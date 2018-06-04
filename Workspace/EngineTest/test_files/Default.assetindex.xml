@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <Index>
-  <Asset aid="1">
-      <Ref>
-        
-      </Ref>
-  </Asset>
+  <Asset aid="1" type="Mesh"     uri="sphere.mesh" />
+  <Asset aid="2" type="Material" uri="sphere_default.material" />
+  <Asset aid="3" type="Texture"  uri="sphere_default_diffuse.texture" />
+  <Asset aid="4" type="Texture"  uri="sphere_default_spec_gloss.texture" />
+  <Asset aid="5" type="Texture"  uri="sphere_default_normal.texture" />
 </Index>

@@ -58,7 +58,7 @@ namespace Engine {
 
     DeclareInterfaceEnd(IFrameGraphRenderContext);
 
-    class FrameGraphRenderContext
+    class SHIRABE_TEST_EXPORT FrameGraphRenderContext
       : public IFrameGraphRenderContext
     {
       DeclareLogTag(FrameGraphRenderContext);

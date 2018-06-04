@@ -60,7 +60,27 @@ namespace Engine {
   }
 
   template <typename T>
-  std::string to_string(T const&input) { throw std::runtime_error("Unsupported type."); }
+  T from_string(std::string const&input) {
+    T output{ };
+
+    std::stringstream ss;
+    ss << input;
+    ss >> output;
+
+    return output;
+  }
+
+  template <typename T>
+  std::string to_string(T const&input)
+  {
+    std::string output{ };
+
+    std::stringstream ss;
+    ss << input;
+    output = ss.str();
+
+    return output;
+  }
 
   template <>
   std::string to_string<Range>(Range const&range);

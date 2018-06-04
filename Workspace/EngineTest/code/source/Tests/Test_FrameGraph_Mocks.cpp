@@ -177,30 +177,41 @@ namespace Test {
       EEngineStatus MockResourceManager::create##resource(    \
         resource::CreationRequest const&inRequest,            \
         PublicResourceId_t             &outId,                \
-        bool                            deferLoad = false     \
+        bool                            deferLoad             \
       ) {                                                     \
         std::cout << "create" << #resource << "(...);\n";     \
         load##resource(outId);                                \
+        return EEngineStatus::Ok;                             \
       }                                                       \
                                                               \
       EEngineStatus MockResourceManager::load##resource(      \
         PublicResourceId_t const&inId                         \
-      ) { std::cout << "load" << #resource << "(...);\n"; }   \
+      ) {                                                     \
+        std::cout << "load" << #resource << "(...);\n";       \
+        return EEngineStatus::Ok;                             \
+      }                                                       \
                                                               \
       EEngineStatus MockResourceManager::update##resource(    \
         PublicResourceId_t      const&inId,                   \
         resource::UpdateRequest const&inRequest               \
-      ) { std::cout << "update" << #resource << "(...);\n"; } \
+      ) {                                                     \
+        std::cout << "update" << #resource << "(...);\n";     \
+        return EEngineStatus::Ok;                             \
+      }                                                       \
                                                               \
       EEngineStatus MockResourceManager::unload##resource(    \
         PublicResourceId_t const&inId                         \
-      ) { std::cout << "unload" << #resource << "(...);\n"; } \
+      ) {                                                     \
+        std::cout << "unload" << #resource << "(...);\n";     \
+        return EEngineStatus::Ok;                             \
+      }                                                       \
                                                               \
       EEngineStatus MockResourceManager::destroy##resource(   \
         PublicResourceId_t const&inId                         \
       ) {                                                     \
         unload##resource(inId);                               \
         std::cout << "destroy" << #resource << "(...);\n";    \
+        return EEngineStatus::Ok;                             \
       }
 
     Mock_DefineResourceMethods(SwapChain);
@@ -211,8 +222,8 @@ namespace Test {
     Mock_DefineResourceMethods(DepthStencilState);
     Mock_DefineResourceMethods(RasterizerState);
 
-    bool MockResourceManager::clear() { std::cout << "Cleared resource manager \n"; }
+    bool MockResourceManager::clear() { std::cout << "Cleared resource manager \n"; return true; }
 
-    Ptr<BasicGFXAPIResourceBackend>& MockResourceManager::backend() { assert(false); }
+    Ptr<BasicGFXAPIResourceBackend>& MockResourceManager::backend() { throw std::exception("Don't call me..."); }
   }
 }

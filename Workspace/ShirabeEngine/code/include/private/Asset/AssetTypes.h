@@ -8,33 +8,25 @@
 
 #include "Resources/Types/Texture.h"
 
+#include "Asset/AssetError.h"
+
 namespace Engine {
   namespace Asset {
 
     using AssetId_t = uint64_t;
-
-    enum class AssetSource {
-      Runtime = 1,
-      Local   = 2,
-      URL     = 4
-    };
-
+  
     enum class AssetType {
-      Texture = 1,
-      Buffer  = 2,
+      Undefined = 0,
+      Mesh      = 1,
+      Material  = 2,
+      Texture   = 3,
+      Buffer    = 4,
     };
-
-    struct AssetDataReference {
-      AssetSource source;
-      std::string URI;
-      AssetType   type;
-    };
-
+        
     struct Asset {
-      AssetId_t             
-        id;
-      Vector<AssetDataReference> 
-        dataReferences;
+      AssetId_t   id;
+      AssetType   type;
+      std::string URI;
     };
 
     struct TextureAsset {
@@ -45,7 +37,39 @@ namespace Engine {
     struct BufferAsset {
       std::string name;
     };
+        
+    /**********************************************************************************************//**
+     * \class AssetBinaryData
+     *
+     * \brief An asset binary data.
+     **************************************************************************************************/
+    class AssetBinaryData;
 
+    class AssetBinaryData {
+      friend class AssetStorage;
+
+    public:
+      AssetBinaryData() = default;
+
+      static AssetBinaryData DataArrayFromSize(
+        uint64_t const size);
+
+      inline
+        int8_t const*const data() const { return m_data.data(); }
+      inline
+        int8_t *const mutableData()  { return m_data.data(); }
+      inline
+        uint64_t const size() const { return m_size; }
+
+    private:
+      AssetBinaryData(
+        std::vector<int8_t>     &&data,
+        uint64_t            const size);
+
+      std::vector<int8_t> m_data;
+      uint64_t           m_size;
+    };
+    
     struct Image {
       AssetBinaryData
         data;
@@ -119,39 +143,10 @@ namespace Engine {
     }
 
     
-    /**********************************************************************************************//**
-     * \class AssetBinaryData
-     *
-     * \brief An asset binary data.
-     **************************************************************************************************/
-    class AssetBinaryData;
-
-    class AssetBinaryData {
-      friend class AssetStorage;
-
-    public:
-      AssetBinaryData() = default;
-
-      static AssetBinaryData DataArrayFromSize(
-        uint64_t const size);
-
-      inline
-        int8_t const*const data() const { return m_data.data(); }
-      inline
-        int8_t *const mutableData()  { return m_data.data(); }
-      inline
-        uint64_t const size() const { return m_size; }
-
-    private:
-      AssetBinaryData(
-        std::vector<int8_t>     &&data,
-        uint64_t            const size);
-
-      std::vector<int8_t> m_data;
-      uint64_t           m_size;
-    };
-
   }
+
+  template <>
+  Asset::AssetType from_string<Asset::AssetType>(std::string const&input);
 }
 
 #endif

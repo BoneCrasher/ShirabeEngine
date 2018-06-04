@@ -1,3 +1,6 @@
+#ifndef __SHIRABE_ASSET_ERROR_H__
+#define __SHIRABE_ASSET_ERROR_H__
+
 #include <exception>
 #include <string>
 
@@ -30,3 +33,5 @@ namespace Engine {
 
   }
 }
+
+#endif

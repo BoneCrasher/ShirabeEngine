@@ -26,8 +26,8 @@ namespace Engine {
       std::string            const&,
       Resources::TextureInfo const&) = 0;
 
-    virtual Asset           loadAsset(AssetId_t const&)              = 0;
-    virtual AssetBinaryData loadAssetData(AssetDataReference const&) = 0;
+    virtual Asset           loadAsset(AssetId_t const&) = 0;
+    virtual AssetBinaryData loadAssetData(Asset const&) = 0;
     DeclareInterfaceEnd(IAssetStorage);
 
     DeclareSharedPointerType(IAssetStorage);
@@ -51,11 +51,11 @@ namespace Engine {
         Resources::TextureInfo const&);
 
       Asset           loadAsset(AssetId_t const&);
-      AssetBinaryData loadAssetData(AssetDataReference const&);
+      AssetBinaryData loadAssetData(Asset const&);
 
     private:
-      AssetBinaryData loadBufferAsset(AssetDataReference const&);
-      AssetBinaryData loadTextureAsset(AssetDataReference const&);
+      AssetBinaryData loadBufferAsset(Asset const&);
+      AssetBinaryData loadTextureAsset(Asset const&);
 
       AssetIndex       m_assetIndex;
       TextureAssetData m_textureAssets;

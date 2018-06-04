@@ -9,9 +9,8 @@ namespace Engine {
 
     namespace xml = Engine::Documents;
 
-    void __readAssets(xml::XMLDocument const&file,   AssetRegistry<Asset> &registry);
+    void __readAssets(xml::XMLDocument const&file, AssetRegistry<Asset> &registry);
     void __readAsset(xmlNodePtr        const&assets, xml::XMLDocument const&file, AssetRegistry<Asset> &registry);
-    void __readAssetRef(xmlNodePtr     const&ref,    xml::XMLDocument const&file, AssetRegistry<Asset> &registry);
 
     AssetRegistry<Asset>
       AssetIndex::loadIndexById(std::string const&indexId)
@@ -20,11 +19,11 @@ namespace Engine {
 
       AssetRegistry<Asset> reg{ };
 
-      std::string filename = String::format("./assets/%0.assetindex.xml");
+      std::string filename = String::format("./assets/%0.assetindex.xml", indexId);
 
       xml::XMLDocument file{};
       xml::XMLDocumentOpenState state = xml::XMLDocumentOpenState::FILE_OK;
-      
+
       state = file.openFile(filename);
       switch(state) {
       case xml::XMLDocumentOpenState::FILE_NOT_FOUND:
@@ -58,25 +57,16 @@ namespace Engine {
       xml::XMLDocument     const&file,
       AssetRegistry<Asset>      &registry)
     {
-      std::string aid = String::format("%0", (unsigned char*) xmlGetProp(asset, "aid"));
+      std::string aid  = String::format("%0", (unsigned char*)xmlGetProp(asset, (const xmlChar *)"aid"));
+      std::string type = String::format("%0", (unsigned char*)xmlGetProp(asset, (const xmlChar *)"type"));
+      std::string uri  = String::format("%0", (unsigned char*)xmlGetProp(asset, (const xmlChar *)"uri"));
 
-      std::string path = String::format("/Index/Asset[@aid='%0']/Ref", aid);
+      Asset a{};
+      a.id   = from_string<AssetId_t>(aid);
+      a.type = from_string<AssetType>(type);
+      a.URI  = uri;
 
-      xmlNodeSetPtr refs = file.xmlSelect(path);
-      for(uint32_t k=0; k<refs->nodeNr; ++k) {
-        xmlNodePtr ref = refs->nodeTab[k];
-        __readAssetRef(ref, file, registry);
-      }
+      registry.addAsset(a.id, a);
     }
-
-    void __readAssetRef(
-      xmlNodePtr           const&ref,
-      xml::XMLDocument     const&file,
-      AssetRegistry<Asset>      &registry)
-    {
-      std::string aid = String::format("%0", (unsigned char*)xmlGetProp(asset, "aid"));
-
-    }
-    
   }
 }
