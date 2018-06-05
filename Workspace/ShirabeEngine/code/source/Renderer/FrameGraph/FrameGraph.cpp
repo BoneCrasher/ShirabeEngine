@@ -142,7 +142,7 @@ namespace Engine {
         if(!initialized) {
 
         }
-
+        
         bool executed = pass->execute(m_resourceData, renderContext);
         if(!executed) {
           Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
