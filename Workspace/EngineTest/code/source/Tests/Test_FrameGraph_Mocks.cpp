@@ -3,8 +3,17 @@
 namespace Test {
   namespace FrameGraph {
 
-    EEngineStatus MockRenderContext::bindResource(PublicResourceId_t const&) { return EEngineStatus::Ok; }
-    EEngineStatus MockRenderContext::unbindResource(PublicResourceId_t const&) { return EEngineStatus::Ok; }
+    EEngineStatus MockRenderContext::bindResource(PublicResourceId_t const&pid) { 
+      Log::Verbose(logTag(), String::format("bindResource(ID: %0);", pid));
+
+      return EEngineStatus::Ok; 
+    }
+
+    EEngineStatus MockRenderContext::unbindResource(PublicResourceId_t const&pid) {
+      Log::Verbose(logTag(), String::format("unbindResource(ID: %0);", pid));
+
+      return EEngineStatus::Ok; 
+    }
 
     EEngineStatus
       MockRenderContext::render(Renderable const&renderable)

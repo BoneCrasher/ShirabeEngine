@@ -213,12 +213,11 @@ namespace Engine {
     EEngineStatus FrameGraphRenderContext::bindTextureView(
       FrameGraphTextureView const&view)
     {
-
       Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
 
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
       for(PublicResourceId_t const&pid : subjacentResources)
-        m_platformRenderContext->unbindResource(pid);
+        m_platformRenderContext->bindResource(pid);
 
       return EEngineStatus::Ok;
     }

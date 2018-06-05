@@ -139,19 +139,15 @@ namespace Engine {
         FrameGraphResourceIdList const&passResources = accessor->resourceReferences();
 
         bool initialized = initializeResources(renderContext, passResources);
-        if(!initialized) {
-
-        }
+        bool bound       = bindResources(renderContext, passResources);
         
         bool executed = pass->execute(m_resourceData, renderContext);
         if(!executed) {
           Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
         }
 
+        bool unbound       = unbindResources(renderContext, passResources);
         bool deinitialized = deinitializeResources(renderContext, passResources);
-        if(!deinitialized) {
-
-        }
 
         copy.pop();
       }
@@ -207,6 +203,62 @@ namespace Engine {
       }
 
       return initialized;
+    }
+
+    bool Graph::bindResources(
+      Ptr<IFrameGraphRenderContext>       renderContext,
+      FrameGraphResourceIdList      const&resourceIds)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      bool bound = true;
+
+      for(FrameGraphResourceId_t const&id : resourceIds)
+      {
+        Ptr<FrameGraphTextureView> textureView = nullptr;
+        
+        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        switch(resource->type) {
+        case FrameGraphResourceType::Texture:
+          break;
+        case FrameGraphResourceType::TextureView:
+          textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+
+          status = renderContext->bindTextureView(*textureView);
+          bound |= CheckEngineError(status);
+          break;
+        }
+      }
+
+      return bound;
+    }
+    
+    bool Graph::unbindResources(
+      Ptr<IFrameGraphRenderContext>       renderContext,
+      FrameGraphResourceIdList      const&resourceIds)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      bool unbound = true;
+
+      for(FrameGraphResourceId_t const&id : resourceIds)
+      {
+        Ptr<FrameGraphTextureView> textureView = nullptr;
+
+        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        switch(resource->type) {
+        case FrameGraphResourceType::Texture:
+          break;
+        case FrameGraphResourceType::TextureView:
+          textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+
+          status = renderContext->unbindTextureView(*textureView);
+          unbound |= CheckEngineError(status);
+          break;
+        }
+      }
+
+      return unbound;
     }
 
     bool Graph::deinitializeResources(
