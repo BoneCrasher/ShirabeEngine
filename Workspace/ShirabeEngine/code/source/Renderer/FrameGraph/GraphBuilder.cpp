@@ -119,6 +119,9 @@ namespace Engine {
 
         m_resources.push_back(resource.resourceId);
 
+        UniquePtr<PassBase::MutableAccessor> accessor = m_passes.at(0)->getMutableAccessor(PassKey<GraphBuilder>());
+        accessor->mutableResourceReferences().push_back(resource.resourceId);
+
         return resource;
       }
       catch(std::exception) {

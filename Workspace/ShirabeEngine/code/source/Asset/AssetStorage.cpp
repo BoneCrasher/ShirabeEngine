@@ -5,11 +5,10 @@
 #include "Asset/AssetStorage.h"
 
 #include "Core/EngineTypeHelper.h"
-#include "Resources/Core/IResourceManager.h"
 
 namespace Engine {
   namespace Asset {
-    using namespace Resources;
+    using Resources::TextureInfo;
 
     /**********************************************************************************************//**
      * \fn  AssetStorage::AssetStorage(Ptr<IResourceManager> const manager)
@@ -18,8 +17,19 @@ namespace Engine {
      *
      * \param manager The manager.
      **************************************************************************************************/
-    AssetStorage::AssetStorage(Ptr<IResourceManager> const manager)
+    AssetStorage::AssetStorage()
+      : IAssetStorage()
+      , m_assetIndex()
     {}
+
+    void 
+      AssetStorage::readIndex(AssetIndex const&index)
+    {
+      for(AssetIndex::value_type const&assignment : index) {
+        // Any debug ops?
+        m_assetIndex.addAsset(assignment.first, assignment.second);
+      }
+    }
 
     /**********************************************************************************************//**
      * \fn  AssetId_t AssetStorage::createTextureAsset( std::string const&name, TextureInfo const&texture)
@@ -32,7 +42,7 @@ namespace Engine {
      * \return  The new texture asset.
      **************************************************************************************************/
     AssetId_t
-      AssetStorage::createTextureAsset(
+      AssetStorage::createDynamicTextureAsset(
         std::string const&name,
         TextureInfo const&texture)
     {
@@ -156,7 +166,7 @@ namespace Engine {
       // Default for now... 
       // Will check cache and download from server if necessary
       loadImageFromFile(asset.URI, image);
-      
+
       return std::move(image.data);
     }
 

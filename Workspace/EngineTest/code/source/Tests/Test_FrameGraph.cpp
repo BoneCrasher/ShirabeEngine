@@ -55,13 +55,16 @@ namespace Test {
       namespace asset = Engine::Asset;
       asset::AssetRegistry<asset::Asset> registry = asset::AssetIndex::loadIndexById("Default");
       
+      Ptr<asset::AssetStorage> assetStorage = MakeSharedPointerType<asset::AssetStorage>();
+      assetStorage->readIndex(registry);
+
       Ptr<IResourceManager> resourceManager = MakeSharedPointerType<MockResourceManager>();
 
       RendererConfiguration rendererConfiguration{};
-
       Ptr<IRenderContext> renderer = MakeSharedPointerType<MockRenderContext>();
       // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
-      Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(nullptr, resourceManager, renderer);
+      // 
+      Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(assetStorage, resourceManager, renderer);
 
       OSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
 

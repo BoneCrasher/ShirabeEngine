@@ -41,7 +41,7 @@ namespace Test {
     EEngineStatus MockFrameGraphRenderContext::importTexture(
       FrameGraphTexture const&texture)
     {
-      std::cout << "ImportTexture(...):\n" << to_string(texture) << "\n";
+      Log::Verbose(logTag(), String::format("ImportTexture(...):\n%0", to_string(texture)));
 
       return EEngineStatus::Ok;
     }
@@ -49,7 +49,7 @@ namespace Test {
     EEngineStatus MockFrameGraphRenderContext::createTexture(
       FrameGraphTexture const&texture)
     {
-      std::cout << "CreateTexture(...):\n" << to_string(texture) << "\n";
+      Log::Verbose(logTag(), String::format("CreateTexture(...):\n%0", to_string(texture)));
 
       return EEngineStatus::Ok;
     }
@@ -58,19 +58,19 @@ namespace Test {
       FrameGraphTexture      const&texture,
       FrameGraphTextureView  const&view)
     {
-      std::cout << "CreateTextureView(...):\n" << to_string(view) << "\n";
+      Log::Verbose(logTag(), String::format("CreateTextureView(...):\n%0", to_string(view)));
       return EEngineStatus::Ok;
     }
 
     EEngineStatus MockFrameGraphRenderContext::createBuffer(FrameGraphResourceId_t const&, FrameGraphResource const&, FrameGraphBuffer      const&buffer)
     {
-      std::cout << "CreateBuffer(...):\n" << to_string(buffer) << "\n";
+      Log::Verbose(logTag(), String::format("CreateBuffer(...):\n%0", to_string(buffer)));
       return EEngineStatus::Ok;
     }
 
     EEngineStatus MockFrameGraphRenderContext::createBufferView(FrameGraphResourceId_t const&, FrameGraphResource const&, FrameGraphBufferView  const&view)
     {
-      std::cout << "CreateBufferView(...):\n" << to_string(view) << "\n";
+      Log::Verbose(logTag(), String::format("CreateBufferView(...):\n%0", to_string(view)));
       return EEngineStatus::Ok;
     }
 
@@ -94,7 +94,7 @@ namespace Test {
     EEngineStatus MockFrameGraphRenderContext::bindTextureView(
       FrameGraphTextureView const&view)
     {
-      std::cout << "BindTextureView(...):\n" << to_string(view) << "\n";
+      Log::Verbose(logTag(), String::format("BindTextureView(...):\n%0", to_string(view)));
       return EEngineStatus::Ok;
     }
 
@@ -112,7 +112,7 @@ namespace Test {
     EEngineStatus MockFrameGraphRenderContext::unbindTextureView(
       FrameGraphTextureView const&view)
     {
-      std::cout << "UnbindTextureView(...):\n" << to_string(view) << "\n";
+      Log::Verbose(logTag(), String::format("UnbindTextureView(...):\n%0", to_string(view)));
       return EEngineStatus::Ok;
     }
 
@@ -144,14 +144,14 @@ namespace Test {
     EEngineStatus MockFrameGraphRenderContext::destroyTexture(
       FrameGraphTexture const&texture)
     {
-      std::cout << "DestroyTexture(...):\n" << to_string(texture) << "\n";
+      Log::Verbose(logTag(), String::format("DestroyTexture(...):\n%0", to_string(texture)));
       return EEngineStatus::Ok;
     }
 
     EEngineStatus MockFrameGraphRenderContext::destroyTextureView(
       FrameGraphTextureView  const&view)
     {
-      std::cout << "DestroyTextureView(...):\n" << to_string(view) << "\n";
+      Log::Verbose(logTag(), String::format("DestroyTextureView(...):\n%0", to_string(view)));
       return EEngineStatus::Ok;
     }
 
@@ -167,7 +167,7 @@ namespace Test {
 
     EEngineStatus MockFrameGraphRenderContext::render(Renderable const&renderable)
     {
-      std::cout << "Render(...):\n" << to_string(renderable) << "\n";
+      Log::Verbose(logTag(), String::format("Render(...):\n", to_string(renderable)));
       return EEngineStatus::Ok;
     }
 
@@ -179,7 +179,7 @@ namespace Test {
         PublicResourceId_t             &outId,                \
         bool                            deferLoad             \
       ) {                                                     \
-        std::cout << "create" << #resource << "(...);\n";     \
+        Log::Verbose(logTag(), String::format("create%0(...);", #resource));    \
         load##resource(outId);                                \
         return EEngineStatus::Ok;                             \
       }                                                       \
@@ -187,7 +187,7 @@ namespace Test {
       EEngineStatus MockResourceManager::load##resource(      \
         PublicResourceId_t const&inId                         \
       ) {                                                     \
-        std::cout << "load" << #resource << "(...);\n";       \
+        Log::Verbose(logTag(), String::format("load%0(...);", #resource));    \
         return EEngineStatus::Ok;                             \
       }                                                       \
                                                               \
@@ -195,14 +195,14 @@ namespace Test {
         PublicResourceId_t      const&inId,                   \
         resource::UpdateRequest const&inRequest               \
       ) {                                                     \
-        std::cout << "update" << #resource << "(...);\n";     \
+        Log::Verbose(logTag(), String::format("update%0(...);", #resource));    \
         return EEngineStatus::Ok;                             \
       }                                                       \
                                                               \
       EEngineStatus MockResourceManager::unload##resource(    \
         PublicResourceId_t const&inId                         \
       ) {                                                     \
-        std::cout << "unload" << #resource << "(...);\n";     \
+        Log::Verbose(logTag(), String::format("unload%0(...);", #resource));    \
         return EEngineStatus::Ok;                             \
       }                                                       \
                                                               \
@@ -210,7 +210,7 @@ namespace Test {
         PublicResourceId_t const&inId                         \
       ) {                                                     \
         unload##resource(inId);                               \
-        std::cout << "destroy" << #resource << "(...);\n";    \
+        Log::Verbose(logTag(), String::format("destroy%0(...);", #resource));    \
         return EEngineStatus::Ok;                             \
       }
 

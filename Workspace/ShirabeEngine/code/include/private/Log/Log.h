@@ -168,9 +168,14 @@ namespace Engine {
     std::string msg = ss.str();
 
     #ifdef PLATFORM_WINDOWS
+    #ifdef _UNICODE
     std::wstring wmsg = String::toWideString(msg);
     DWORD       written = 0;
     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), wmsg.c_str(), ((DWORD)msg.size()), &written, nullptr);
+    #else 
+    DWORD       written = 0;
+    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), msg.c_str(), ((DWORD)msg.size()), &written, nullptr);
+    #endif
     #else 
     std::cout << msg << std::endl; 
     #endif

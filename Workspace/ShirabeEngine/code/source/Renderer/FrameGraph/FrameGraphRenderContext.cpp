@@ -53,6 +53,8 @@ namespace Engine {
     EEngineStatus FrameGraphRenderContext::importTexture(
       FrameGraphTexture const&texture)
     {
+      PublicResourceId_t pid = 0;
+      mapFrameGraphToInternalResource(texture.readableName, pid);
       return EEngineStatus::Ok;
     }
 
@@ -72,6 +74,8 @@ namespace Engine {
 
       Texture::CreationRequest request(desc);
 
+      Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
+
       PublicResourceId_t pid = 0;
       EEngineStatus status = m_resourceManager->createTexture(request, pid, false);
       HandleEngineStatusError(status, "Failed to create texture.");
@@ -85,6 +89,8 @@ namespace Engine {
       FrameGraphTexture      const&texture,
       FrameGraphTextureView  const&view)
     {
+      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
+
       if(view.source == FrameGraphViewSource::Color) {
         if(view.mode.check(FrameGraphViewAccessMode::Read)) {
           return createShaderResourceView(texture, view);
@@ -130,7 +136,7 @@ namespace Engine {
       return status;
     }
 
-    EEngineStatus FrameGraphRenderContext::createRenderTargetView(
+    EEngineStatus FrameGraphRenderContext::createDepthStencilView(
       FrameGraphTexture      const&texture,
       FrameGraphTextureView  const&view)
     {
@@ -157,7 +163,7 @@ namespace Engine {
       return status;
     }
 
-    EEngineStatus FrameGraphRenderContext::createDepthStencilView(
+    EEngineStatus FrameGraphRenderContext::createRenderTargetView(
       FrameGraphTexture      const&texture,
       FrameGraphTextureView  const&view)
     {
@@ -207,6 +213,9 @@ namespace Engine {
     EEngineStatus FrameGraphRenderContext::bindTextureView(
       FrameGraphTextureView const&view)
     {
+
+      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
+
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
       for(PublicResourceId_t const&pid : subjacentResources)
         m_platformRenderContext->unbindResource(pid);
@@ -220,6 +229,8 @@ namespace Engine {
     EEngineStatus FrameGraphRenderContext::unbindTextureView(
      FrameGraphTextureView const&view)
     {
+      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
+
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
       for(PublicResourceId_t const&pid : subjacentResources)
         m_platformRenderContext->unbindResource(pid);
@@ -237,6 +248,8 @@ namespace Engine {
     EEngineStatus
       FrameGraphRenderContext::destroyTexture(FrameGraphTexture const&texture)
     {
+      Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
+
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(texture.readableName);
       if(subjacentResources.empty())
         return EEngineStatus::Error;
@@ -251,6 +264,8 @@ namespace Engine {
       FrameGraphRenderContext::destroyTextureView(
         FrameGraphTextureView  const&view)
     {
+      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
+
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
       if(subjacentResources.empty())
         return EEngineStatus::Error;

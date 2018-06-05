@@ -2,7 +2,6 @@
 #define __SHIRABE_ASSET_STORAGE_H__
 
 #include "Core/EngineTypeHelper.h"
-#include "Resources/Core/IResourceManager.h"
 #include "Resources/Types/Texture.h"
 
 #include "Asset/AssetError.h"
@@ -10,9 +9,6 @@
 
 namespace Engine {
   namespace Asset {
-    using Engine::Resources::PublicResourceId_t;
-    using Engine::Resources::IResourceManager;
-
 
     /**********************************************************************************************//**
      * \fn  DeclareInterface(IAssetStorage);
@@ -22,7 +18,7 @@ namespace Engine {
      * \param parameter1  The first parameter.
      **************************************************************************************************/
     DeclareInterface(IAssetStorage);
-    virtual AssetId_t createTextureAsset(
+    virtual AssetId_t createDynamicTextureAsset(
       std::string            const&,
       Resources::TextureInfo const&) = 0;
 
@@ -37,16 +33,18 @@ namespace Engine {
      *
      * \brief An asset storage.
      **************************************************************************************************/
-    class AssetStorage
+    class SHIRABE_TEST_EXPORT AssetStorage
       : public IAssetStorage
     {
       using AssetIndex       = AssetRegistry<Asset>;
       using TextureAssetData = AssetRegistry<TextureAsset>;
       using BufferAssetData  = AssetRegistry<BufferAsset>;
     public:
-      AssetStorage(Ptr<Resources::IResourceManager> const);
+      AssetStorage();
 
-      AssetId_t createTextureAsset(
+      void readIndex(AssetIndex const&);
+
+      AssetId_t createDynamicTextureAsset(
         std::string            const&,
         Resources::TextureInfo const&);
 

@@ -90,8 +90,15 @@ namespace Engine {
     class AssetRegistry {
       using Index = Map<AssetId_t, T>;
     public:
+      typedef typename Index::value_type value_type;
+
       AssetErrorCode addAsset(AssetId_t const&, T const&);
       Optional<T>    getAsset(AssetId_t const&);
+
+      typename Index::iterator       begin()       { return m_index.begin(); }
+      typename Index::iterator       end()         { return m_index.end();   }
+      typename Index::const_iterator begin() const { return m_index.begin(); }
+      typename Index::const_iterator end()   const { return m_index.end();   }
 
     private:
       Index m_index;

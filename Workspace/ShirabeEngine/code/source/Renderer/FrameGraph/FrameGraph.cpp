@@ -130,8 +130,6 @@ namespace Engine {
     {
       assert(renderContext != nullptr);
 
-      // Don't care about explicit lifetimes for now. Keep it all up during execution and shutdown afterward.
-
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
         PassUID_t                     passUID  = copy.top();
@@ -300,7 +298,7 @@ namespace Engine {
       Ptr<FrameGraphTexture>        texture,
       Ptr<FrameGraphTextureView>    textureView)
     {
-      FrameGraphResourceId_t id           = textureView->resourceId;
+      FrameGraphResourceId_t id = textureView->resourceId;
 
       EEngineStatus status = renderContext->createTextureView(*texture, *textureView);
       HandleEngineStatusError(status, "Failed to load texture view for FrameGraphExecution.");

@@ -115,6 +115,7 @@ namespace Test {
     class MockResourceManager
       : public IResourceManager
     {
+      DeclareLogTag(MockResourceManager);
     public:
       bool clear();
 
