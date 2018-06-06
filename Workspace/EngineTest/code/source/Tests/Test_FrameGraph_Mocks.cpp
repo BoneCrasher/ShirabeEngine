@@ -234,5 +234,65 @@ namespace Test {
     bool MockResourceManager::clear() { std::cout << "Cleared resource manager \n"; return true; }
 
     Ptr<BasicGFXAPIResourceBackend>& MockResourceManager::backend() { throw std::exception("Don't call me..."); }
+
+    #define Mock_DefineTaskBuilderModule(Type)                                                                                                                  \
+          EEngineStatus MockGFXAPITaskBackend::creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          {                                                                                                                                                                       \
+            Log::Verbose(logTag(), String::format("creationTask<%0>(...)", #Type));                                                                                               \
+            outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
+            {                                                                                                                                                                     \
+              GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
+              assignment.publicHandle   = 0;                                                                                                                                      \
+              assignment.internalHandle = 0;                                                                                                                                      \
+              return assignment;                                                                                                                                                  \
+            };                                                                                                                                                                    \
+            return EEngineStatus::Ok;                                                                                                                                             \
+          }                                                                                                                                                                       \
+          EEngineStatus MockGFXAPITaskBackend::updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          {                                                                                                                                                                       \
+            Log::Verbose(logTag(), String::format("updateTask<%0>(...)", #Type));                                                                                                 \
+            outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
+            {                                                                                                                                                                     \
+              GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
+              assignment.publicHandle   = 0;                                                                                                                                      \
+              assignment.internalHandle = 0;                                                                                                                                      \
+              return assignment;                                                                                                                                                  \
+            };                                                                                                                                                                    \
+            return EEngineStatus::Ok;                                                                                                                                             \
+          }                                                                                                                                                                       \
+          EEngineStatus MockGFXAPITaskBackend::destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          {                                                                                                                                                                       \
+            Log::Verbose(logTag(), String::format("destructionTask<%0>(...)", #Type));                                                                                            \
+            outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
+            {                                                                                                                                                                     \
+              GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
+              assignment.publicHandle   = 0;                                                                                                                                      \
+              assignment.internalHandle = 0;                                                                                                                                      \
+              return assignment;                                                                                                                                                  \
+            };                                                                                                                                                                    \
+            return EEngineStatus::Ok;                                                                                                                                             \
+          }                                                                                                                                                                       \
+          EEngineStatus MockGFXAPITaskBackend::queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask)                                                 \
+          {                                                                                                                                                                       \
+            Log::Verbose(logTag(), String::format("queryTask<%0>(...)", #Type));                                                                                                  \
+            outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
+            {                                                                                                                                                                     \
+              GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
+              assignment.publicHandle   = 0;                                                                                                                                      \
+              assignment.internalHandle = 0;                                                                                                                                      \
+              return assignment;                                                                                                                                                  \
+            };                                                                                                                                                                    \
+            return EEngineStatus::Ok;                                                                                                                                             \
+          }
+
+    Mock_DefineTaskBuilderModule(Texture);
+    Mock_DefineTaskBuilderModule(ShaderResourceView);
+    Mock_DefineTaskBuilderModule(RenderTargetView);
+    Mock_DefineTaskBuilderModule(DepthStencilView);
+    Mock_DefineTaskBuilderModule(DepthStencilState);
+    Mock_DefineTaskBuilderModule(RasterizerState);
+    Mock_DefineTaskBuilderModule(SwapChain);
+    Mock_DefineTaskBuilderModule(SwapChainBuffer);
+
   }
 }

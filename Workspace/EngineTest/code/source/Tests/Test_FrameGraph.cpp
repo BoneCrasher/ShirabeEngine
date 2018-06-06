@@ -7,6 +7,8 @@
 
 #include <GFXAPI/Types/All.h>
 #include <Resources/Core/IResourceManager.h>
+#include <Resources/Core/ProxyBasedResourceManager.h>
+#include <Resources/Core/ResourceProxyFactory.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
@@ -58,8 +60,25 @@ namespace Test {
       Ptr<asset::AssetStorage> assetStorage = MakeSharedPointerType<asset::AssetStorage>();
       assetStorage->readIndex(registry);
 
-      Ptr<IResourceManager> resourceManager = MakeSharedPointerType<MockResourceManager>();
+      //
+      // RESOURCE MANAGEMENT
+      // 
+      Ptr<BasicGFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = MakeSharedPointerType<MockGFXAPITaskBackend>();
 
+      Ptr<BasicGFXAPIResourceBackend> gfxApiResourceBackend = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
+      gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
+
+      Ptr<ResourceProxyFactory>      resourceProxyFactory = MakeSharedPointerType<ResourceProxyFactory>(gfxApiResourceBackend);
+      Ptr<ProxyBasedResourceManager> proxyResourceManager = MakeSharedPointerType<ProxyBasedResourceManager>(resourceProxyFactory);
+      proxyResourceManager->setResourceBackend(gfxApiResourceBackend);
+
+      Ptr<IResourceManager> resourceManager = std::static_pointer_cast<IResourceManager>(proxyResourceManager);
+
+      gfxApiResourceBackend->initialize();
+
+      //
+      // RENDERING
+      // 
       RendererConfiguration rendererConfiguration{};
       Ptr<IRenderContext> renderer = MakeSharedPointerType<MockRenderContext>();
       // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
@@ -141,6 +160,8 @@ namespace Test {
       // Renderer will call.
       if(frameGraph)
         frameGraph->execute(renderContext);
+
+      gfxApiResourceBackend->deinitialize();
 
       return true;
     }

@@ -7,6 +7,8 @@
 #include <GFXAPI/Types/All.h>
 
 #include <Resources/Core/IResourceManager.h>
+#include <Resources/Core/ProxyBasedResourceManager.h>
+#include <Resources/Core/ResourceProxyFactory.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
@@ -130,6 +132,26 @@ namespace Test {
       Mock_DeclareResourceMethods(RasterizerState);
     };
 	
+    #define Mock_DeclareTaskBuilderModule(Type)                                                                                                                  \
+          EEngineStatus creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);     
+
+    class MockGFXAPITaskBackend
+      : public GFXAPIResourceTaskBackend<EngineTypes>
+    {
+      DeclareLogTag(MockGFXAPITaskBackend);
+    public:
+      Mock_DeclareTaskBuilderModule(Texture);
+      Mock_DeclareTaskBuilderModule(ShaderResourceView);
+      Mock_DeclareTaskBuilderModule(RenderTargetView);
+      Mock_DeclareTaskBuilderModule(DepthStencilView);
+      Mock_DeclareTaskBuilderModule(DepthStencilState);
+      Mock_DeclareTaskBuilderModule(RasterizerState);
+      Mock_DeclareTaskBuilderModule(SwapChain);
+      Mock_DeclareTaskBuilderModule(SwapChainBuffer);
+    };
   }
 }
 

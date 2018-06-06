@@ -18,7 +18,7 @@ namespace Engine {
 		{
 		public:
 			inline ResourceProxyFactory(
-				const Ptr<BasicGFXAPIResourceBackend>& backend)
+				Ptr<BasicGFXAPIResourceBackend> const& backend)
 				: m_gfxApiResourceBackend(backend)
 			{ }
 

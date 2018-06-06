@@ -5,184 +5,193 @@
 #include <thread>
 #include <future>
 
-#include "Core/EngineTypeHelper.h"
-#include "Log/Log.h"
-
 namespace Engine {
-	namespace Threading {
-		/**********************************************************************************************//**
-		* \enum	Priority
-		*
-		* \brief	Values that represent priorities
-		**************************************************************************************************/
-		enum class Priority {
-			Least     =    1,
-			Less      =    2,
-			Normal    =    4,
-			Higher    =    8,
-			Highest   =   16,
-			TonyStark = 1337 // 04/10/2017 - 04:49: Now i want to watch Avengers...
-		};	
+  namespace Threading {
+    /**********************************************************************************************//**
+     * \enum	Priority
+     *
+     * \brief	Values that represent priorities
+     **************************************************************************************************/
+    enum class Priority {
+      Least     =    1,
+      Less      =    2,
+      Normal    =    4,
+      Higher    =    8,
+      Highest   =   16,
+      TonyStark = 1337 // 04/10/2017 - 04:49: Now i want to watch Avengers...
+    };
 
-		/**********************************************************************************************//**
-		 * \fn	DeclareInterface(ILooper);
-		 *
-		 * \brief	Constructor
-		 *
-		 * \param	parameter1	The first parameter.
-		 **************************************************************************************************/
-	  template <typename TTaskResult>
-		DeclareInterface(ILooper);
-		public:
-			class Task {
-			public:
-				friend class ILooper<TTaskResult>;
+    /**********************************************************************************************//**
+     * \fn	DeclareInterface(ILooper);
+     *
+     * \brief	Constructor
+     *
+     * \param	parameter1	The first parameter.
+     **************************************************************************************************/
+    template <typename TTaskResult>
+    class ILooper {
+    public:
+      virtual ~ILooper() = default;
+      ILooper(ILooper<TTaskResult> const&) = delete;
+      ILooper(ILooper<TTaskResult> &&)     = delete;
+      ILooper<TTaskResult>& operator=(ILooper<TTaskResult> const&) = delete;
+      ILooper<TTaskResult>& operator=(ILooper<TTaskResult> &&)     = delete;
 
-				Task();
+    protected:
+      ILooper() = default;
 
-				// Be consistent with the contained packaged_task
-				// No copy!
-				Task(const Task&)            = delete;
-				Task& operator=(const Task&) = delete;
+    public:
+      class Task {
+      public:
+        friend class ILooper<TTaskResult>;
 
-				Task(Task&& t)
-					: m_priority(t.m_priority)
-					, m_task(std::move(t.m_task))
-				{}
+        Task();
 
-				Task& operator=(Task&& t) {
-					_priority = t.m_priority;
-					_task     = std::move(t.m_task);
+        // Be consistent with the contained packaged_task
+        // No copy!
+        Task(const Task&)            = delete;
+        Task& operator=(const Task&) = delete;
 
-					return *this;
-				}
+        Task(Task&& t)
+          : m_priority(t.m_priority)
+          , m_task(std::move(t.m_task))
+        {}
 
-				inline Priority priority()       { return m_priority; }
-				inline Priority priority() const { return m_priority; }
-				
-				inline void setPriority(const Priority& priority) { m_priority = priority; }
+        Task& operator=(Task&& t) {
+          _priority = t.m_priority;
+          _task     = std::move(t.m_task);
 
-				std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
+          return *this;
+        }
 
-				void run() {
+        operator bool() { return m_task.valid(); }
+
+        inline Priority priority() { return m_priority; }
+        inline Priority priority() const { return m_priority; }
+
+        inline void setPriority(const Priority& priority) { m_priority = priority; }
+
+        std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
+
+        void run() {
           m_task(); // Return value is stored in the shared state wrapped by the future returned on bind!
-				}
+        }
 
       private:
-				Priority                          m_priority;
-				std::packaged_task<TTaskResult()> m_task;
-			};
-			/**************************************************************************************************//**/
-			
-			virtual bool initialize()   = 0;
-			virtual bool deinitialize() = 0;
+        Priority                          m_priority;
+        std::packaged_task<TTaskResult()> m_task;
+      };
+      /**************************************************************************************************//**/
 
-			/**********************************************************************************************//**
-			 * \fn	virtual bool Looper::loop() = 0;
-			 *
-			 * \brief	Implementation of the effective loop function to be invoked.
-			 * 			Will be provided with the next to be executed runnable.
-			 *
-			 * \return	True if it succeeds, false if it fails.
-			 **************************************************************************************************/
-			virtual bool loop(typename ILooper<TTaskResult>::Task&& runnable) = 0;
-	   
-		DeclareInterfaceEnd(ILooper);
+      virtual bool initialize()   = 0;
+      virtual bool deinitialize() = 0;
 
-		template <typename TTaskResult>
-		DeclareTemplatedSharedPointerType(ILooper, Template(ILooper<TTaskResult>));
+      /**********************************************************************************************//**
+       * \fn	virtual bool Looper::loop() = 0;
+       *
+       * \brief	Implementation of the effective loop function to be invoked.
+       * 			Will be provided with the next to be executed runnable.
+       *
+       * \return	True if it succeeds, false if it fails.
+       **************************************************************************************************/
+      virtual bool loop(typename ILooper<TTaskResult>::Task&& runnable) = 0;
 
-		/**********************************************************************************************//**
-		 * \class	Looper
-		 *
-		 * \brief	A looper.
-		 *
-		 * \tparam	TDerivedRunnableType	Type of the derived runnable type used for this specific looper.
-		 **************************************************************************************************/
-		template <typename TTaskResult>
-		class Looper
-			: public ILooper<TTaskResult>
-		{
-			DeclareLogTag(Looper<TTaskResult>);
+    };
 
-		public:
-			using LooperType = Looper<TTaskResult>;
-			using TaskType   = typename ILooper<TTaskResult>::Task;
+    template <typename TTaskResult>
+    using ILooperPtr = std::shared_ptr<ILooper<TTaskResult>>;
 
-			/**********************************************************************************************//**
-			 * \class	Handler
-			 *
-			 * \brief	A handler.
-			 **************************************************************************************************/
-			class Handler {
-				friend class Looper; // Allow the looper to access the private constructor.
+    /**********************************************************************************************//**
+     * \class	Looper
+     *
+     * \brief	A looper.
+     *
+     * \tparam	TDerivedRunnableType	Type of the derived runnable type used for this specific looper.
+     **************************************************************************************************/
+    template <typename TTaskResult>
+    class Looper
+      : public ILooper<TTaskResult>
+    {
+      DeclareLogTag(Looper<TTaskResult>);
 
-			public:
-				bool post(TaskType&&);
-				bool postDelayed(TaskType&&, uint64_t timeoutMilliseconds = 0);
+    public:
+      using LooperType = Looper<TTaskResult>;
+      using TaskType   = typename ILooper<TTaskResult>::Task;
 
-			private:
-				inline Handler(LooperType& l)
-					: m_assignedLooper(l)
-				{}
+      /**********************************************************************************************//**
+       * \class	Handler
+       *
+       * \brief	A handler.
+       **************************************************************************************************/
+      class Handler {
+        friend class Looper; // Allow the looper to access the private constructor.
 
-				void storeDelayedPostFuture(std::future<TTaskResult>& f);
+      public:
+        bool post(TaskType&&);
+        bool postDelayed(TaskType&&, uint64_t timeoutMilliseconds = 0);
 
-				bool is_ready(std::future<TTaskResult> const& f);
+      private:
+        inline Handler(LooperType& l)
+          : m_assignedLooper(l)
+        {}
 
-				void checkDelayedPostFutures();
-        
-				LooperType& m_assignedLooper;
+        void storeDelayedPostFuture(std::future<TTaskResult>& f);
 
-				std::recursive_mutex                  m_delayedPostFuturesMutex;
-				std::vector<std::future<TTaskResult>> m_delayedPostFutures;
-			};
-			/**************************************************************************************************//**/
+        bool is_ready(std::future<TTaskResult> const& f);
 
-			Looper();
-			~Looper() = default;
+        void checkDelayedPostFutures();
 
-			// Loopers, like threads, may not be copied or moved.
-			Looper(const LooperType&)                = delete;
-			Looper(LooperType&&)                     = delete;
-			LooperType& operator=(const LooperType&) = delete;
-			LooperType& operator=(LooperType&&)      = delete;
+        LooperType& m_assignedLooper;
 
-			virtual bool initialize();
-			virtual bool deinitialize();
+        std::recursive_mutex                  m_delayedPostFuturesMutex;
+        std::vector<std::future<TTaskResult>> m_delayedPostFutures;
+      };
+      /**************************************************************************************************//**/
 
-			bool run();
-			bool running();
-			bool abortAndJoin(uint64_t timeoutMilliseconds = 10000);
+      Looper();
+      ~Looper() = default;
 
-			inline Handler& getHandler() { return m_handler; }
+      // Loopers, like threads, may not be copied or moved.
+      Looper(const LooperType&)                = delete;
+      Looper(LooperType&&)                     = delete;
+      LooperType& operator=(const LooperType&) = delete;
+      LooperType& operator=(LooperType&&)      = delete;
 
-		protected:
-			inline void requestAbort()         { m_abortRequested.store(true);   }
-			inline bool abortRequested() const { return m_abortRequested.load(); }
+      virtual bool initialize();
+      virtual bool deinitialize();
 
-			TaskType nextRunnable();
+      bool run();
+      bool running();
+      bool abortAndJoin(uint64_t timeoutMilliseconds = 10000);
 
-		private:
-			void runFunc();
+      inline Handler& getHandler() { return m_handler; }
+
+    protected:
+      inline void requestAbort() { m_abortRequested.store(true); }
+      inline bool abortRequested() const { return m_abortRequested.load(); }
+
+      TaskType&& nextRunnable();
+
+    private:
+      void runFunc();
 
       bool loop(typename Threading::ILooper<TTaskResult>::Task&& runnable);
 
-			bool post(TaskType&&);
+      bool post(TaskType&&);
 
-			std::thread      m_thread;
-			std::atomic_bool m_running;
-			std::atomic_bool m_abortRequested;
+      std::thread      m_thread;
+      std::atomic_bool m_running;
+      std::atomic_bool m_abortRequested;
 
-			Handler m_handler;
+      Handler m_handler;
 
-			std::recursive_mutex  m_runnablesMutex;
-			std::vector<TaskType> m_runnables;
-		};
+      std::recursive_mutex  m_runnablesMutex;
+      std::vector<TaskType> m_runnables;
+    };
 
-	}
+  }
 }
 
-#include "Private\LooperImpl.h"
+#include "private\LooperImpl.h"
 
 #endif

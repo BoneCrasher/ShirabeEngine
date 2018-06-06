@@ -191,7 +191,12 @@ namespace Engine {
         switch(inSynchronization) {
         default:
         case ETaskSynchronization::Sync:
-          resourceHandle = handle.futureHandle.get(); // Wait for it...
+          try {
+            resourceHandle = handle.futureHandle.get(); // Wait for it...
+          }
+          catch(std::future_error const&fe) {
+            Log::Error(logTag(), String::format("Failed to access future shared state. Error: %0", fe.what()));
+          }
           if(!resourceHandle.valid())
             status = EEngineStatus::GFXAPI_SubsystemResourceCreationFailed;
           else {

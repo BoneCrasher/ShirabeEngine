@@ -8,8 +8,8 @@
 #include "Core/Random.h"
 
 #include "Resources/Core/IResourceManager.h"
-#include "Resources/Core/IResourcePool.h"
 #include "Resources/Core/IResourceProxy.h"
+#include "Resources/Core/ResourcePool.h"
 #include "Resources/Core/ResourceProxyFactory.h"
 
 namespace Engine {
@@ -78,7 +78,7 @@ namespace Engine {
      *
      * \brief	Manager for proxy based resources.
      **************************************************************************************************/
-    class ProxyBasedResourceManager
+    class SHIRABE_TEST_EXPORT ProxyBasedResourceManager
       : public IResourceManager {
       DeclareLogTag(ProxyBasedResourceManager);
 
@@ -197,14 +197,14 @@ namespace Engine {
         PublicResourceId_t const&inId);
 
       inline AnyProxy getResourceProxy(const PublicResourceId_t& id) {
-        return m_resources->getResource(id);
+        return m_resources.getResource(id);
       }
 
       inline bool storeResourceProxy(
         const PublicResourceId_t &id,
         const AnyProxy           &proxy)
       {
-        return m_resources->addResource(id, proxy);
+        return m_resources.addResource(id, proxy);
       }
 
       Random::RandomState m_idGenerator;
@@ -213,7 +213,7 @@ namespace Engine {
       Ptr<BasicGFXAPIResourceBackend> m_resourceBackend;
 
       // Any kind of resources, abstracted away entirely.
-      IIndexedResourcePoolPtr<PublicResourceId_t, AnyProxy> m_resources;
+      IndexedResourcePool<PublicResourceId_t, AnyProxy> m_resources;
     };
     DeclareSharedPointerType(ProxyBasedResourceManager);
 
@@ -267,7 +267,7 @@ namespace Engine {
         PublicResourceId_t const&id)
     {
       AnyProxy resourceProxy = getResourceProxy(id);
-      if(!resourceProxy.has_value())
+      if(!resourceProxy)
         HandleEngineStatusError(EEngineStatus::Error, "Cannot find resource proxy.");
 
       IResourceProxyBasePtr baseProxy = BaseProxyCast(resourceProxy);
@@ -284,7 +284,7 @@ namespace Engine {
       if(!dependencies.empty()) {
         for(PublicResourceId_t const&dependencyId : dependencies) {
           AnyProxy dependencyProxy = this->getResourceProxy(dependencyId);
-          if(!dependencyProxy.has_value())
+          if(!dependencyProxy)
             throw EngineException(EEngineStatus::Error, "Dependency not registered.");
 
           IResourceProxyBasePtr base = BaseProxyCast(dependencyProxy);
@@ -329,7 +329,7 @@ namespace Engine {
         PublicResourceId_t const&id)
     {
       AnyProxy resourceProxy = getResourceProxy(id);
-      if(!resourceProxy.has_value())
+      if(!resourceProxy)
         HandleEngineStatusError(EEngineStatus::Error, "Cannot find resource proxy.");
 
       IResourceProxyBasePtr base = BaseProxyCast(resourceProxy);
@@ -348,7 +348,7 @@ namespace Engine {
       std::function<EEngineStatus()> eraseFn
         = [&, this] () -> EEngineStatus 
       {
-        if(!m_resources->removeResource(id))
+        if(!m_resources.removeResource(id))
           return HandleEngineStatusError(EEngineStatus::Error, "Failed to remove resource from internal registry.");
 
         return EEngineStatus::Ok;
