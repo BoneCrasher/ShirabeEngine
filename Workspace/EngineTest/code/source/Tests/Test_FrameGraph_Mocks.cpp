@@ -242,8 +242,8 @@ namespace Test {
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
-              assignment.publicHandle   = 0;                                                                                                                                      \
-              assignment.internalHandle = 0;                                                                                                                                      \
+              assignment.publicHandle   = 1;                                                                                                                                      \
+              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -254,8 +254,8 @@ namespace Test {
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
-              assignment.publicHandle   = 0;                                                                                                                                      \
-              assignment.internalHandle = 0;                                                                                                                                      \
+              assignment.publicHandle   = 1;                                                                                                                                      \
+              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -266,8 +266,8 @@ namespace Test {
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
-              assignment.publicHandle   = 0;                                                                                                                                      \
-              assignment.internalHandle = 0;                                                                                                                                      \
+              assignment.publicHandle   = 1;                                                                                                                                      \
+              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -278,8 +278,8 @@ namespace Test {
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
-              assignment.publicHandle   = 0;                                                                                                                                      \
-              assignment.internalHandle = 0;                                                                                                                                      \
+              assignment.publicHandle   = 1;                                                                                                                                      \
+              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \

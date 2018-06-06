@@ -186,35 +186,38 @@ namespace Engine {
       for(GFXAPIResourceHandleList::value_type const&h : dependencies)
         resolvedDependencies[h] = m_storage[h];
 
-      EEngineStatus status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
-      if(!CheckEngineError(status)) {
-        switch(inSynchronization) {
-        default:
-        case ETaskSynchronization::Sync:
-          try {
-            resourceHandle = handle.futureHandle.get(); // Wait for it...
-          }
-          catch(std::future_error const&fe) {
-            Log::Error(logTag(), String::format("Failed to access future shared state. Error: %0", fe.what()));
-          }
-          if(!resourceHandle.valid())
-            status = EEngineStatus::GFXAPI_SubsystemResourceCreationFailed;
-          else {
-            // Store the internal handle and return the public handle
-            m_storage[resourceHandle.publicHandle] = resourceHandle.internalHandle;
-            outResourceHandle = resourceHandle.publicHandle;
+      EEngineStatus status = EEngineStatus::Ok;
 
-            status = EEngineStatus::Ok;
+      try {
+
+        status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
+        if(!CheckEngineError(status)) {
+          switch(inSynchronization) {
+          default:
+          case ETaskSynchronization::Sync:
+            resourceHandle = handle.futureHandle.get(); // Wait for it...
+            if(!resourceHandle.valid())
+              status = EEngineStatus::GFXAPI_SubsystemResourceCreationFailed;
+            else {
+              // Store the internal handle and return the public handle
+              m_storage[resourceHandle.publicHandle] = resourceHandle.internalHandle;
+              outResourceHandle = resourceHandle.publicHandle;
+
+              status = EEngineStatus::Ok;
+            }
+            break;
+          case ETaskSynchronization::Async:
+            // Unsupported so far...
+            break;
           }
-          break;
-        case ETaskSynchronization::Async:
-          // Unsupported so far...
-          break;
         }
+
+      }
+      catch(std::future_error const&fe) {
+        Log::Error(logTag(), String::format("Failed to access future shared state. Error: %0", fe.what()));
       }
 
       HandleEngineStatusError(status, String::format("Failed to create and/or enqueue resource creation task."));
-
       return status;
     }
 
@@ -225,26 +228,32 @@ namespace Engine {
       ::unload(
         typename TResource::DestructionRequest const&inRequest)
     {
-      EEngineStatus status = EEngineStatus::Ok;
+      ResourceTaskFn_t::result_type resourceHandle ={ };
 
       ResolvedDependencyCollection resolvedDependencies={}; // Guarding the public API by passing in this empty map.
 
       DeferredResourceOperationHandle handle;
 
-      status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
-      if(!CheckEngineError(status)) {
-        GFXAPIResourceHandleAssignment const&assignment = handle.futureHandle.get(); // Wait for it ALWAYS!
-        if(assignment.internalHandle) {
-          status = EEngineStatus::GFXAPI_SubsystemResourceDestructionFailed;
+      EEngineStatus status = EEngineStatus::Ok;
+
+      try {
+        status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
+        if(!CheckEngineError(status)) {
+          resourceHandle = handle.futureHandle.get(); // Wait for it ALWAYS!
+          if(!resourceHandle.valid()) {
+            status = EEngineStatus::GFXAPI_SubsystemResourceDestructionFailed;
+          }
+          else {
+            m_storage.erase(resourceHandle.publicHandle);
+            status = EEngineStatus::Ok;
+          }
         }
-        else {
-          m_storage.erase(assignment.publicHandle);
-          status = EEngineStatus::Ok;
-        }
+      }
+      catch(std::future_error const&fe) {
+        Log::Error(logTag(), String::format("Failed to access future shared state. Error: %0", fe.what()));
       }
 
       HandleEngineStatusError(status, String::format("Failed to create and/or enqueue resource destruction task."));
-
       return status;
     }
 
@@ -333,8 +342,8 @@ namespace Engine {
     EEngineStatus
       GFXAPIResourceBackend<TSupportedResourceTypes...>
       ::enqueue(
-        ResourceTaskFn_t                           &inTask,
-        std::future<ResourceTaskFn_t::result_type> &outSharedFuture)
+        ResourceTaskFn_t                             &inTask,
+        std::future<ResourceTaskFn_t::result_type>   &outSharedFuture)
     {
       using namespace Threading;
 
@@ -345,8 +354,9 @@ namespace Engine {
       looperTaskFuture = looperTask.bind(inTask);
       outSharedFuture  = std::move(looperTaskFuture);
 
-      bool enqueued = m_resourceThreadHandler.post(std::move(looperTask));
+      EEngineStatus status = EEngineStatus::Ok;
 
+      bool enqueued = m_resourceThreadHandler.post(std::move(looperTask));
       return (enqueued ? EEngineStatus::Ok : EEngineStatus::GFXAPI_SubsystemThreadEnqueueFailed);
     }
 

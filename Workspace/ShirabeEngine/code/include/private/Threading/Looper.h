@@ -170,7 +170,7 @@ namespace Engine {
       inline void requestAbort() { m_abortRequested.store(true); }
       inline bool abortRequested() const { return m_abortRequested.load(); }
 
-      TaskType&& nextRunnable();
+      TaskType nextRunnable();
 
     private:
       void runFunc();

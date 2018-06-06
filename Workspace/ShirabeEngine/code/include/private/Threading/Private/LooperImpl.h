@@ -19,13 +19,16 @@ namespace Engine {
       return std::move(m_task.get_future());
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	void Looper::Handler::storeDelayedPostFuture(std::future<bool>& f)
-                                                                                                    *
-                                                                                                    * \brief	Stores delayed post future
-                                                                                                    *
-                                                                                                    * \param [in,out]	f	A std::future&lt;bool&gt; to process.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> void Looper<TTaskResult>::Handler ::storeDelayedPostFuture(std::future<TTaskResult>& f)
+     *
+     * \brief Stores delayed post future
+     *
+     * \tparam  TTaskResult Type of the task result.
+     * \param [in,out]  f A std::future&lt;bool&gt; to process.
+     *
+     * \return  A Looper&lt;TTaskResult&gt;::Handler.
+     **************************************************************************************************/
     template <typename TTaskResult>
     void Looper<TTaskResult>::Handler
       ::storeDelayedPostFuture(std::future<TTaskResult>& f)
@@ -34,15 +37,16 @@ namespace Engine {
       m_delayedPostFutures.push_back(std::move(f));
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper::Handler::is_ready(std::future<bool> const& f)
-                                                                                                    *
-                                                                                                    * \brief	Query if 'f' is ready
-                                                                                                    *
-                                                                                                    * \param	f	A const to process.
-                                                                                                    *
-                                                                                                    * \return	True if ready, false if not.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult>::Handler ::is_ready(std::future<TTaskResult> const& f)
+     *
+     * \brief Query if 'f' is ready
+     *
+     * \tparam  TTaskResult Type of the task result.
+     * \param f A const to process.
+     *
+     * \return  True if ready, false if not.
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>::Handler
       ::is_ready(std::future<TTaskResult> const& f)
@@ -50,11 +54,15 @@ namespace Engine {
       return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	void Looper::Handler::checkDelayedPostFutures()
-                                                                                                    *
-                                                                                                    * \brief	Check delayed post futures
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> void Looper<TTaskResult>::Handler ::checkDelayedPostFutures()
+     *
+     * \brief Check delayed post futures
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper&lt;TTaskResult&gt;::Handler.
+     **************************************************************************************************/
     template <typename TTaskResult>
     void Looper<TTaskResult>::Handler
       ::checkDelayedPostFutures()
@@ -84,15 +92,16 @@ namespace Engine {
         m_delayedPostFutures.erase(readyIt);
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper::Handler ::post(RunnableTypePtr runnable)
-                                                                                                    *
-                                                                                                    * \brief	Post this message
-                                                                                                    *
-                                                                                                    * \param	runnable	The runnable.
-                                                                                                    *
-                                                                                                    * \return	A Looper::Handler.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult>::Handler ::post(TaskType&& runnable)
+     *
+     * \brief Post this message
+     *
+     * \tparam  TTaskResult Type of the task result.
+     * \param [in,out]  runnable  The runnable.
+     *
+     * \return  A Looper::Handler.
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>::Handler
       ::post(TaskType&& runnable)
@@ -101,16 +110,17 @@ namespace Engine {
       return m_assignedLooper.post(std::move(runnable));
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper::Handler ::postDelayed(RunnableTypePtr runnable, uint64_t timeoutMilliseconds)
-                                                                                                    *
-                                                                                                    * \brief	Posts a delayed
-                                                                                                    *
-                                                                                                    * \param	runnable		   	The runnable.
-                                                                                                    * \param	timeoutMilliseconds	The timeout in milliseconds.
-                                                                                                    *
-                                                                                                    * \return	A Looper::Handler.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult>::Handler ::postDelayed(TaskType&& runnable, uint64_t timeoutMilliseconds)
+     *
+     * \brief Posts a delayed
+     *
+     * \tparam  TTaskResult Type of the task result.
+     * \param [in,out]  runnable            The runnable.
+     * \param           timeoutMilliseconds The timeout in milliseconds.
+     *
+     * \return  A Looper::Handler.
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>::Handler
       ::postDelayed(TaskType&& runnable, uint64_t timeoutMilliseconds)
@@ -139,17 +149,16 @@ namespace Engine {
       return true;
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper ::post(RunnableTypePtr runnable)
-                                                                                                    *
-                                                                                                    * \brief	Post this message
-                                                                                                    *
-                                                                                                    * \param	runnable	The runnable.
-                                                                                                    *
-                                                                                                    * \return	A Looper&lt;TRunParameters...&gt;::Handler.
-                                                                                                    *
-                                                                                                    * ### tparam	TRunParameters	Type of the run parameters.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult> ::post(TaskType&& runnable)
+     *
+     * \brief Post this message
+     *
+     * \tparam  TTaskResult Type of the task result.
+     * \param [in,out]  runnable  The runnable.
+     *
+     * \return  A Looper&lt;TRunParameters...&gt;::Handler.
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>
       ::post(TaskType&& runnable)
@@ -165,14 +174,15 @@ namespace Engine {
       return true;
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	Looper ::Looper()
-                                                                                                    *
-                                                                                                    * \brief	Gets the looper
-                                                                                                    *
-                                                                                                    * ### tparam	TRunParameters	Type of the run parameters.
-                                                                                                    * ### return	A Looper&lt;TRunParameters...&gt;
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> Looper<TTaskResult> ::Looper() : ILooper<TTaskResult>() , m_running(false) , m_abortRequested(false) , m_handler(*this)
+     *
+     * \brief Gets the looper
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper&lt;TTaskResult&gt;
+     **************************************************************************************************/
     template <typename TTaskResult>
     Looper<TTaskResult>
       ::Looper()
@@ -182,13 +192,15 @@ namespace Engine {
       , m_handler(*this)
     { }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper ::initialize()
-                                                                                                    *
-                                                                                                    * \brief	Initializes this object
-                                                                                                    *
-                                                                                                    * \return	A Looper.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult> ::initialize()
+     *
+     * \brief Initializes this object
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper.
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>
       ::initialize()
@@ -196,13 +208,15 @@ namespace Engine {
       return true;
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper ::cleanup()
-                                                                                                    *
-                                                                                                    * \brief	Gets the cleanup
-                                                                                                    *
-                                                                                                    * \return	A Looper.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult> ::deinitialize()
+     *
+     * \brief Gets the cleanup
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper.
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>
       ::deinitialize()
@@ -219,17 +233,19 @@ namespace Engine {
       return true;
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	typename Looper::RunnableTypePtr Looper ::nextRunnable()
-                                                                                                    *
-                                                                                                    * \brief	Next runnable
-                                                                                                    *
-                                                                                                    * \return	A Looper&lt;TRunParameters...&gt;
-                                                                                                    *
-                                                                                                    * ### tparam	TRunParameters	Type of the run parameters.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> typename Looper<TTaskResult>::TaskType&& Looper<TTaskResult> ::nextRunnable()
+     *
+     * \brief Next runnable
+     *
+     * \exception std::runtime_error  Raised when a runtime error condition occurs.
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper&lt;TRunParameters...&gt;
+     **************************************************************************************************/
     template <typename TTaskResult>
-    typename Looper<TTaskResult>::TaskType&&
+    typename Looper<TTaskResult>::TaskType
       Looper<TTaskResult>
       ::nextRunnable()
     {
@@ -240,21 +256,24 @@ namespace Engine {
 
       // Implement dequeueing by priority with proper
       // load balancing here.
-      typename Looper<TTaskResult>::TaskType& runnable = m_runnables.back();
+      typename Looper<TTaskResult>::TaskType runnable = std::move(m_runnables.back());
       m_runnables.pop_back();
 
       return std::move(runnable);
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	void Looper ::runFunc()
-                                                                                                    *
-                                                                                                    * \brief	Executes the function operation
-                                                                                                    *
-                                                                                                    * \exception	std::exception	Thrown when an exception error condition occurs.
-                                                                                                    *
-                                                                                                    * \return	A Looper.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> void Looper<TTaskResult> ::runFunc()
+     *
+     * \brief Executes the function operation
+     *
+     * \exception std::runtime_error  Raised when a runtime error condition occurs.
+     * \exception std::exception      Thrown when an exception error condition occurs.
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper.
+     **************************************************************************************************/
     template <typename TTaskResult>
     void Looper<TTaskResult>
       ::runFunc()
@@ -265,7 +284,8 @@ namespace Engine {
       // Run
       while(!m_abortRequested.load()) {
         try {
-          if(!loop(std::move(nextRunnable()))) {
+          TaskType task = nextRunnable();
+          if(!loop(std::move(task))) {
             // Error in loop. Step into catch clause.
             throw std::runtime_error("Failed to execute loop function.");
           }
@@ -283,17 +303,17 @@ namespace Engine {
       m_running.store(false);
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper ::run()
-                                                                                                    *
-                                                                                                    * \brief	Gets the run
-                                                                                                    *
-                                                                                                    * \exception	std::exception	Thrown when an exception error condition occurs.
-                                                                                                    *
-                                                                                                    * \return	A Looper&lt;TRunParameters...&gt;
-                                                                                                    *
-                                                                                                    * ### tparam	TRunParameters	Type of the run parameters.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult> ::run()
+     *
+     * \brief Gets the run
+     *
+     * \exception std::exception  Thrown when an exception error condition occurs.
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper&lt;TRunParameters...&gt;
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>
       ::run()
@@ -309,15 +329,15 @@ namespace Engine {
       return true;
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper ::running()
-                                                                                                    *
-                                                                                                    * \brief	Gets the running
-                                                                                                    *
-                                                                                                    * \return	A Looper&lt;TRunParameters...&gt;
-                                                                                                    *
-                                                                                                    * ### tparam	TRunParameters	Type of the run parameters.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult> ::running()
+     *
+     * \brief Gets the running
+     *
+     * \tparam  TTaskResult Type of the task result.
+     *
+     * \return  A Looper&lt;TRunParameters...&gt;
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>
       ::running()
@@ -325,17 +345,16 @@ namespace Engine {
       return m_running.load();
     }
 
-    /**********************************************************************************************//**
-                                                                                                    * \fn	bool Looper ::abortAndJoin(uint64_t timeoutMilliseconds)
-                                                                                                    *
-                                                                                                    * \brief	Abort and join
-                                                                                                    *
-                                                                                                    * \param	timeoutMilliseconds	The timeout in milliseconds.
-                                                                                                    *
-                                                                                                    * \return	A Looper&lt;TRunParameters...&gt;
-                                                                                                    *
-                                                                                                    * ### tparam	TRunParameters	Type of the run parameters.
-                                                                                                    **************************************************************************************************/
+    /**
+     * \fn  template <typename TTaskResult> bool Looper<TTaskResult> ::abortAndJoin(uint64_t timeoutMilliseconds)
+     *
+     * \brief Abort and join
+     *
+     * \tparam  TTaskResult Type of the task result.
+     * \param timeoutMilliseconds The timeout in milliseconds.
+     *
+     * \return  A Looper&lt;TRunParameters...&gt;
+     **************************************************************************************************/
     template <typename TTaskResult>
     bool Looper<TTaskResult>
       ::abortAndJoin(uint64_t timeoutMilliseconds)
