@@ -44,7 +44,7 @@ namespace Engine {
     : m_environment(environment)
     , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
     , m_mainWindow(nullptr)
-    , m_dx11Environment()
+    , m_vulkanEnvironment(nullptr)
   {
   }
 
@@ -58,7 +58,7 @@ namespace Engine {
     using namespace Engine::DX::_11;
 
 
-    EEngineStatus status;
+    EEngineStatus status = EEngineStatus::Ok;
 
     unsigned long const& windowWidth  = m_environment.osDisplays[0].bounds.size.x();
     unsigned long const& windowHeight = m_environment.osDisplays[0].bounds.size.y();
@@ -103,12 +103,12 @@ namespace Engine {
     rendererConfiguration.requestFullscreen       = false;
 
     std::function<void()> fnCreateDefaultGFXAPI
-      = [this, &rendererConfiguration] () -> void
+      = [&, this] () -> void
     {
-      m_dx11Environment = MakeSharedPointerType<DX11Environment>();
+      m_vulkanEnvironment = MakeSharedPointerType<VulkanEnvironment>();
 
-      EEngineStatus status = m_dx11Environment->initialize(m_environment, rendererConfiguration);
-      HandleEngineStatusError(status, "DirectX11 initialization failed.");
+      EEngineStatus status = m_vulkanEnvironment->initialize(m_environment);
+      HandleEngineStatusError(status, "Vulkan initialization failed.");
     };
 
     std::function<void()> fnCreatePlatformResourceSystem
@@ -134,28 +134,28 @@ namespace Engine {
       manager->setResourceBackend(resourceBackend);
       m_resourceManager = manager;
 
-      if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
+      /*if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
         resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_dx11Environment);
 
-      resourceBackend->setResourceTaskBackend(resourceTaskBackend);
+      resourceBackend->setResourceTaskBackend(resourceTaskBackend);*/
       // Renderer will have access to resourceBackend!
     };
 
     std::function<void()> fnCreatePlatformRenderer
       = [&, this] () -> void
     {
-      m_renderer = MakeSharedPointerType<DX11Renderer>();
+      //m_renderer = MakeSharedPointerType<DX11Renderer>();
       //status = m_renderer->initialize(m_environment, rendererConfiguration, m_resourceManager->backend());
-      if(!CheckEngineError(status)) {
-        status = m_scene.initialize();
-      }
+      //if(!CheckEngineError(status)) {
+      //  status = m_scene.initialize();
+      //}
     };
 
     try {
       fnCreatePlatformWindowSystem();
       fnCreateDefaultGFXAPI();
-      fnCreatePlatformResourceSystem();
-      fnCreatePlatformRenderer();
+      //fnCreatePlatformResourceSystem();
+      //fnCreatePlatformRenderer();
 
     }
     catch(WindowsException const we) {

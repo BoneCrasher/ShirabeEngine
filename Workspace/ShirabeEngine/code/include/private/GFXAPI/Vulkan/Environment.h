@@ -15,7 +15,6 @@ namespace Engine {
 
     using Platform::ApplicationEnvironment;
     using Platform::Window::WindowHandleWrapper;
-    using Engine::GFXAPI::GAPIDeviceCapabilities;
     using Engine::Resources::Format;
 
 
@@ -61,26 +60,35 @@ namespace Engine {
       };
 
       struct VulkanState {
+        // Instance
+        std::vector<char const*>     instanceLayers;
+        std::vector<char const*>     instanceExtensions;
         VkInstanceCreateInfo         instanceCreateInfo;
         VkInstance                   instance;
+        // Surface
         VkSurfaceKHR                 surface;
+        // Physical Device
+        std::vector<char const*>     deviceLayers;
+        std::vector<char const*>     deviceExtensions;
         Vector<VulkanPhysicalDevice> supportedPhysicalDevices;
         uint32_t                     selectedPhysicalDevice;
+        // Logical Device
+        VkDevice                     selectedLogicalDevice;
       };
             
       VulkanEnvironment();
 
       EEngineStatus initialize(
-        ApplicationEnvironment const& applicationEnvironment,
-        WindowHandleWrapper    const& windowHandle);
+        ApplicationEnvironment const& applicationEnvironment);
 
       EEngineStatus deinitialize();
       
+      VkQueue getGraphicsQueue();
+
     private:
       void createVulkanInstance(std::string const&name);
       void createVulkanSurface(
-        Platform::ApplicationEnvironment const&,
-        WindowHandleWrapper              const&);
+        Platform::ApplicationEnvironment const&);
       void determinePhysicalDevices(Format const&);
       void selectPhysicalDevice(uint32_t);
 

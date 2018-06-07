@@ -125,7 +125,7 @@ namespace Engine {
 						n = std::min((m_chunks.size() - off - 1), n);
 
 						typename chunk_type::param_type interval = 0;
-						interval = m_chunks.at(n - 1)->parameter() - m_chunks.at(off)->parameter();
+						interval = m_chunks.at(n)->parameter() - m_chunks.at(off)->parameter();
 						if (interval > 0)
 						{
 							for (size_type k = 0; k < m_chunks.size(); ++k)

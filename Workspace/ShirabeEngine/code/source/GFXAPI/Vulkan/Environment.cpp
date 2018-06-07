@@ -28,6 +28,15 @@ namespace Engine {
     VulkanEnvironment::VulkanEnvironment()
     {}
 
+    /**
+     * \fn  void VulkanEnvironment::createVulkanInstance(std::string const&name)
+     *
+     * \brief Creates vulkan instance
+     *
+     * \exception VulkanError Raised when a Vulkan error condition occurs.
+     *
+     * \param name  The name.
+     **************************************************************************************************/
     void VulkanEnvironment::createVulkanInstance(std::string const&name)
     {
       VkApplicationInfo vkApplicationInfo{ };
@@ -40,7 +49,8 @@ namespace Engine {
 
       std::vector<char const*> layers{ };
       std::vector<char const*> extensions ={
-        VK_KHR_SURFACE_EXTENSION_NAME
+        VK_KHR_SURFACE_EXTENSION_NAME,
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME
       };
 
       uint32_t instanceLayerCount     = 0;
@@ -55,7 +65,7 @@ namespace Engine {
       supportedLayers.resize(instanceExtensionCount);
       vkEnumerateInstanceLayerProperties(&instanceLayerCount, supportedLayers.data());
 
-      std::set<char const*> layersCopy(layers.begin(), layers.end());
+      std::set<std::string> layersCopy(layers.begin(), layers.end());
       for(VkLayerProperties const&properties : supportedLayers)
         layersCopy.erase(properties.layerName);
 
@@ -71,7 +81,7 @@ namespace Engine {
       supportedExtensions.resize(instanceExtensionCount);
       vkEnumerateInstanceExtensionProperties(nullptr, &instanceExtensionCount, supportedExtensions.data());
 
-      std::set<char const*> extensionsCopy(extensions.begin(), extensions.end());
+      std::set<std::string> extensionsCopy(extensions.begin(), extensions.end());
       for(VkExtensionProperties const&extensions : supportedExtensions)
         extensionsCopy.erase(extensions.extensionName);
 
@@ -91,23 +101,41 @@ namespace Engine {
       vkInstanceCreatInfo.flags                   = VkInstanceCreateFlags(0);
       vkInstanceCreatInfo.pNext                   = nullptr;
 
-      VkResult result = vkCreateInstance(&vkInstanceCreatInfo, nullptr, &(m_vkState.instance));
+      VkInstance instance = VK_NULL_HANDLE;
+
+      VkResult result = vkCreateInstance(&vkInstanceCreatInfo, nullptr, &instance);
       if(VK_SUCCESS != result) {
         throw VulkanError("Failed to create VkInstance.", result);
       }
+
+      m_vkState.instanceLayers     = layers;
+      m_vkState.instanceExtensions = extensions;
+      m_vkState.instanceCreateInfo = vkInstanceCreatInfo;
+      m_vkState.instance           = instance;
     }
 
+    /**
+     * \fn  void VulkanEnvironment::createVulkanSurface( Platform::ApplicationEnvironment const&appEnvironment, WindowHandleWrapper const&handleWrapper)
+     *
+     * \brief Creates vulkan surface
+     *
+     * \exception VulkanError Raised when a Vulkan error condition occurs.
+     *
+     * \param appEnvironment  The application environment.
+     * \param handleWrapper   The handle wrapper.
+     **************************************************************************************************/
     void VulkanEnvironment::createVulkanSurface(
-      Platform::ApplicationEnvironment const&appEnvironment,
-      WindowHandleWrapper              const&handleWrapper)
+      Platform::ApplicationEnvironment const&appEnvironment)
     {
       VkSurfaceKHR surface{};
 
       #if defined PLATFORM_WINDOWS
       VkWin32SurfaceCreateInfoKHR vkWin32SurfaceCreateInfo{};
-      vkWin32SurfaceCreateInfo.sType     = VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR;
-      vkWin32SurfaceCreateInfo.hwnd      = handleWrapper.handle;
+      vkWin32SurfaceCreateInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+      vkWin32SurfaceCreateInfo.hwnd      = appEnvironment.primaryWindowHandle;
       vkWin32SurfaceCreateInfo.hinstance = appEnvironment.instanceHandle;
+      vkWin32SurfaceCreateInfo.flags     = 0;
+      vkWin32SurfaceCreateInfo.pNext     = nullptr;
 
       auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(m_vkState.instance, "vkCreateWin32SurfaceKHR");
       if(!CreateWin32SurfaceKHR)
@@ -118,13 +146,29 @@ namespace Engine {
         throw VulkanError("Failed to create window surface!", result);
       }
       #endif
+
+      m_vkState.surface = surface;
     }
 
+    /**
+     * \fn  void VulkanEnvironment::determinePhysicalDevices(Format const&requiredBackBufferFormat)
+     *
+     * \brief Determine physical devices
+     *
+     * \exception VulkanError Raised when a Vulkan error condition occurs.
+     *
+     * \param requiredBackBufferFormat  The required back buffer format.
+     **************************************************************************************************/
     void VulkanEnvironment::determinePhysicalDevices(Format const&requiredBackBufferFormat)
     {
       VkResult result = VkResult::VK_SUCCESS;
 
-      VkFormat requiredFormat = VulkanDeviceCapsHelper::convertFormatToVk(requiredBackBufferFormat);
+      VkFormat                 requiredFormat = VulkanDeviceCapsHelper::convertFormatToVk(requiredBackBufferFormat);
+      std::vector<char const*> requiredLayers{};
+      std::vector<char const*> requiredExtensions{};
+      requiredExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);      
+
+      std::vector<VulkanPhysicalDevice> supportedPhysicalDevices{ };
 
       std::vector<VkPhysicalDevice> vkPhysicalDevices;
       uint32_t                      vkPhysicalDeviceCount = 0;
@@ -178,14 +222,12 @@ namespace Engine {
             vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &supportedExtensionCount, supportedExtensions.data());
           }
 
-          std::set<std::string> requiredExtensions ={
-            VK_KHR_SWAPCHAIN_EXTENSION_NAME
-          };
+          std::set<std::string> extensions(requiredExtensions.begin(), requiredExtensions.end());
 
           for(VkExtensionProperties const&extension : supportedExtensions)
-            requiredExtensions.erase(extension.extensionName);
+            extensions.erase(extension.extensionName);
 
-          if(!requiredExtensions.empty()) {
+          if(!extensions.empty()) {
             // Not all extensions supported, skip
             continue;
           }
@@ -251,14 +293,25 @@ namespace Engine {
           physicalDevice.memoryProperties = vkPhysicalDeviceMemoryProperties;
           physicalDevice.queueFamilies    = supportingQueueFamilies;
 
-          m_vkState.supportedPhysicalDevices.push_back(physicalDevice);
+          supportedPhysicalDevices.push_back(physicalDevice);
         }
       }
 
-      if(m_vkState.supportedPhysicalDevices.empty())
+      if(supportedPhysicalDevices.empty())
         throw VulkanError("No supporting physical devices found.", VkResult::VK_SUBOPTIMAL_KHR);
+
+      m_vkState.deviceLayers             = requiredLayers;
+      m_vkState.deviceExtensions         = requiredExtensions;
+      m_vkState.supportedPhysicalDevices = supportedPhysicalDevices;
     }
 
+    /**
+     * \fn  void VulkanEnvironment::selectPhysicalDevice(uint32_t index)
+     *
+     * \brief Select physical device
+     *
+     * \param index Zero-based index of the.
+     **************************************************************************************************/
     void VulkanEnvironment::selectPhysicalDevice(uint32_t index)
     {
       m_vkState.selectedPhysicalDevice = index;
@@ -277,22 +330,34 @@ namespace Engine {
       vkDeviceQueueCreateInfo.pNext            = nullptr;
 
       VkDeviceCreateInfo vkDeviceCreateInfo{};
-      vkDeviceCreateInfo.sType                = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-      vkDeviceCreateInfo.pQueueCreateInfos    = &vkDeviceQueueCreateInfo;
-      vkDeviceCreateInfo.queueCreateInfoCount = 1;
-      vkDeviceCreateInfo.pNext                = nullptr;
+      vkDeviceCreateInfo.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+      vkDeviceCreateInfo.enabledLayerCount       = m_vkState.deviceLayers.size();
+      vkDeviceCreateInfo.ppEnabledLayerNames     = m_vkState.deviceLayers.data();
+      vkDeviceCreateInfo.enabledExtensionCount   = m_vkState.deviceExtensions.size();
+      vkDeviceCreateInfo.ppEnabledExtensionNames = m_vkState.deviceExtensions.data();
+      vkDeviceCreateInfo.pEnabledFeatures        = &(physicalDevice.features);
+      vkDeviceCreateInfo.pQueueCreateInfos       = &vkDeviceQueueCreateInfo;
+      vkDeviceCreateInfo.queueCreateInfoCount    = 1;
+      vkDeviceCreateInfo.flags                   = 0;
+      vkDeviceCreateInfo.pNext                   = nullptr;
+
+      VkDevice vkLogicalDevice = VK_NULL_HANDLE;
+      VkResult result = vkCreateDevice(physicalDevice.handle, &vkDeviceCreateInfo, nullptr, &vkLogicalDevice);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError(String::format("Failed to create logical device for physical device at index %0.", index), result);
+
+      m_vkState.selectedLogicalDevice = vkLogicalDevice;
     }
 
     EEngineStatus
       VulkanEnvironment::initialize(
-        ApplicationEnvironment const& applicationEnvironment,
-        WindowHandleWrapper    const& windowHandle)
+        ApplicationEnvironment const& applicationEnvironment)
     {
       try {
         EEngineStatus status = EEngineStatus::Ok;
 
         createVulkanInstance("ShirabeEngine Demo");
-        createVulkanSurface(applicationEnvironment, windowHandle);
+        createVulkanSurface(applicationEnvironment);
         determinePhysicalDevices(Format::R8G8B8A8_UNORM);
         selectPhysicalDevice(0);
 
@@ -319,11 +384,21 @@ namespace Engine {
     EEngineStatus
       VulkanEnvironment::deinitialize()
     {
+      vkDestroyDevice(m_vkState.selectedLogicalDevice, nullptr);
+      vkDestroyInstance(m_vkState.instance, nullptr);
 
       return EEngineStatus::Ok;
     }
 
+    VkQueue VulkanEnvironment::getGraphicsQueue()
+    {
+      VulkanPhysicalDevice const&physicalDevice = m_vkState.supportedPhysicalDevices.at(m_vkState.selectedPhysicalDevice);
 
+      VkQueue queue = VK_NULL_HANDLE;
+      vkGetDeviceQueue(m_vkState.selectedLogicalDevice, physicalDevice.queueFamilies.graphicsQueueFamilyIndices.at(0), 0, &queue);
+
+      return queue;
+    }
 
   }
 }
