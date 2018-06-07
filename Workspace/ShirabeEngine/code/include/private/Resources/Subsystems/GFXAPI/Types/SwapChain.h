@@ -6,14 +6,13 @@
 #include "Resources/Core/IResource.h"
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/ResourceTraits.h"
+#include "Resources/Core/RequestDefaultImplementation.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
-#include "Resources/Subsystems/GFXAPI/Types/RequestDefaultImplementation.h"
 #include "Resources/Subsystems/GFXAPI/Types/Texture.h"
 #include "Resources/Subsystems/GFXAPI/Types/RenderTargetView.h"
 
 #include "GFXAPI/Definitions.h"
-#include "RequestDefaultImplementation.h"
 
 namespace Engine {
   namespace GFXAPI {

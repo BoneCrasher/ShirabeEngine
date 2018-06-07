@@ -7,9 +7,9 @@
 #include "Resources/Core/IResource.h"
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/ResourceTraits.h"
+#include "Resources/Core/RequestDefaultImplementation.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
-#include "Resources/Subsystems/GFXAPI/Types/RequestDefaultImplementation.h"
 
 #include "GFXAPI/Definitions.h"
 
@@ -60,10 +60,11 @@ namespace Engine {
       struct Descriptor
         : public DescriptorImplBase<EResourceType::TEXTURE, EResourceSubType::UNKNOWN>
       {
-        std::string                    name;
-        TextureInfo                    textureInfo;
-        ResourceUsage                  cpuGpuUsage;
-        BitField<BufferBinding>        gpuBinding;
+        std::string                name;
+        TextureInfo                textureInfo;
+        ResourceUsage              cpuGpuUsage;
+        BitField<BufferBinding>    gpuBinding;
+        Vector<ResourceDataSource> initialData;
 
         std::string toString() const;
       };

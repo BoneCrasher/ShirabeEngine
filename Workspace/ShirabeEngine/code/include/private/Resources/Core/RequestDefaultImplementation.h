@@ -2,13 +2,13 @@
 #define __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 
 #include "Resources/Core/ResourceDTO.h"
+#include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/EResourceType.h"
 #include "Resources/Core/IResource.h"
-
-#include "Resources/Core/ResourceDomainTransfer.h"
+#include "Resources/Core/ResourceDataSource.h"
 
 namespace Engine {
-  namespace GFXAPI {
+  namespace Resources {
 
     using namespace Engine::Resources;
 
@@ -19,7 +19,8 @@ namespace Engine {
       class CreationRequestBase {
       public:
         CreationRequestBase(
-          TDescriptor const&desc)
+          TDescriptor        const&desc,
+          ResourceDataSource const&source)
           : m_resourceDescriptor(desc)
         {}
 

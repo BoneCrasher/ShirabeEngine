@@ -16,6 +16,8 @@ namespace Engine {
   template <typename T>
   class DataBuffer {
   public:
+    static const constexpr std::size_t element_byte_size = sizeof(T);
+
     DataBuffer();
 
     static DataBuffer<T> DataArrayFromSize(

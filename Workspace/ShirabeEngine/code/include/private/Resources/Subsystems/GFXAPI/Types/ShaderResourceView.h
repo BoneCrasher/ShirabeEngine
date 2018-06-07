@@ -14,7 +14,7 @@
 
 #include "GFXAPI/Definitions.h"
 
-#include "RequestDefaultImplementation.h"
+#include "Resources/Core/RequestDefaultImplementation.h"
 
 
 namespace Engine {

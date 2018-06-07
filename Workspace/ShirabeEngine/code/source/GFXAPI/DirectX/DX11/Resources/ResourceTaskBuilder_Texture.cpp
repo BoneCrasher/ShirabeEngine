@@ -14,6 +14,32 @@ namespace Engine {
           ResourceTaskFn_t                  &outTask)
       {
         EEngineStatus status = EEngineStatus::Ok;
+        
+        Texture::Descriptor const&desc = request.resourceDescriptor();
+        if(desc.textureInfo.depth > 1) {
+          if(desc.textureInfo.arraySize > 1) {
+            // 3D Texture Array
+          }
+          else {
+            // 3D Texture
+          }
+        }
+        else if(desc.textureInfo.height > 1) {
+          if(desc.textureInfo.arraySize > 1) {
+            // 2D Texture Array
+          }
+          else {
+            // 2D Texture
+          }
+        }
+        else {
+          if(desc.textureInfo.arraySize > 1) {
+            // 1D Texture Array
+          }
+          else {
+            // 1D Texture
+          }
+        }
 
         return status;
       }

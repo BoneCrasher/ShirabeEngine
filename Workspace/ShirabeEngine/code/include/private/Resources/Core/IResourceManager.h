@@ -6,43 +6,13 @@
 #include "Core/DataBuffer.h"
 
 #include "ResourceDomainTransfer.h"
-
 #include "Resources/Core/ResourceDTO.h"
-#include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
 
-#include "Resources/Subsystems/GFXAPI/Types/SwapChain.h"
-#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
-#include "Resources/Subsystems/GFXAPI/Types/DepthStencilState.h"
-#include "Resources/Subsystems/GFXAPI/Types/RasterizerState.h"
+#include "Resources/Subsystems/GFXAPI/GFXAPIResourceBackend.h"
+#include "Resources/Subsystems/GFXAPI/Types/All.h"
 
 namespace Engine {
   namespace Resources {
-
-    /**
-     * \class ResourceDataSource
-     *
-     * \brief A resource data source.
-     **************************************************************************************************/
-    class ResourceDataSource {
-    public:
-      using ResourceAccessFn_t = std::function<ByteBuffer()>;
-
-      inline
-        ResourceDataSource(ResourceAccessFn_t const&fn)
-        : m_accessorFn(fn)
-      {}
-
-      inline 
-        ByteBuffer getData() {
-        if(m_accessorFn)
-          return m_accessorFn();
-        else
-          return ByteBuffer{};
-      }
-
-    private:
-      ResourceAccessFn_t m_accessorFn;
-    };
 
     #define DeclareResourceMethods(resource)              \
                                                           \
