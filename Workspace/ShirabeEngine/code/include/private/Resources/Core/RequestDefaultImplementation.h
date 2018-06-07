@@ -19,8 +19,7 @@ namespace Engine {
       class CreationRequestBase {
       public:
         CreationRequestBase(
-          TDescriptor        const&desc,
-          ResourceDataSource const&source)
+          TDescriptor        const&desc)
           : m_resourceDescriptor(desc)
         {}
 

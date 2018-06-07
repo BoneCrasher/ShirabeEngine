@@ -18,10 +18,10 @@
 
 #ifdef PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsError.h"
-#include "GFXAPI/DirectX/DX11/Environment.h"
+#include "GFXAPI/Vulkan/Environment.h"
 
 using namespace Platform::Windows;
-using namespace Engine::DX::_11;
+using namespace Engine::Vulkan;
 #endif
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
@@ -30,10 +30,10 @@ namespace Engine {
 	using namespace Renderer;
 	using namespace Resources;
 
-	class EngineInstance
+	class SHIRABE_LIBRARY_EXPORT EngineInstance
 	{
 	public:
-		EngineInstance(const Platform::ApplicationEnvironment& environment);
+		EngineInstance(Platform::ApplicationEnvironment const&environment);
 		~EngineInstance();
 
 		EEngineStatus initialize();
@@ -49,7 +49,7 @@ namespace Engine {
 		IWindowPtr                       m_mainWindow;
 
 #ifdef PLATFORM_WINDOWS
-    Ptr<DX11Environment> m_dx11Environment;
+    Ptr<VulkanEnvironment> m_vulkanEnvironment;
 #endif
 
 		Ptr<ResourceProxyFactory> m_proxyFactory;

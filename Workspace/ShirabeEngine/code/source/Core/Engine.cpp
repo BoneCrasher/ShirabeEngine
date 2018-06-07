@@ -12,35 +12,35 @@ namespace Engine {
   public:
     DeclareLogTag("TestDummy")
 
-      void onResume(const IWindowPtr&) {
+      void onResume(IWindowPtr const&) {
       //Log::Status(logTag(), "OnResume");
     }
 
-    void onShow(const IWindowPtr&) {
+    void onShow(IWindowPtr const&) {
       //Log::Status(logTag(), "onShow");
     }
 
-    void onBoundsChanged(const IWindowPtr&,
-      const Rect& r) {
+    void onBoundsChanged(IWindowPtr const&,
+      Rect const& r) {
       //Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
     }
 
-    void onHide(const IWindowPtr&) {
+    void onHide(IWindowPtr const&) {
       //Log::Status(logTag(), "onHide");
     }
 
-    void onPause(const IWindowPtr&) {
+    void onPause(IWindowPtr const&) {
       //Log::Status(logTag(), "onPause");
     }
 
-    void onClose(const IWindowPtr&) {
+    void onClose(IWindowPtr const&) {
       //Log::Status(logTag(), "onClose");
       PostQuitMessage(0);
     }
 
   };
 
-  EngineInstance::EngineInstance(const Platform::ApplicationEnvironment& environment)
+  EngineInstance::EngineInstance(Platform::ApplicationEnvironment const&environment)
     : m_environment(environment)
     , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
     , m_mainWindow(nullptr)

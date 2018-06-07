@@ -4,6 +4,8 @@ project(ShirabeDevelopment)
 
 add_subdirectory(ShirabeEngine)
 add_subdirectory(EngineTest)
+add_subdirectory(ShirabeEngineDemo)
 
 add_dependencies(EngineTest INSTALL_ShirabeEngine)
+add_dependencies(ShirabeEngineDemo INSTALL_ShirabeEngine)
         

@@ -46,7 +46,7 @@ namespace Platform {
 		};
 		DeclareSharedPointerType(IWinAPIAdapter)
 				
-		class WindowsWindow 
+		class SHIRABE_LIBRARY_EXPORT WindowsWindow
 			: public Engine::IWindow,
 			  public IWinAPIAdapter
 		{

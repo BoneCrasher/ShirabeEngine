@@ -4,11 +4,6 @@
 namespace Engine {
 	namespace Resources {
 
-		class Shader {
-		
-		};
-
-
 	}
 }
 

@@ -4,11 +4,11 @@
 #include <Log/Log.h>
 
 #include <Core/EngineTypeHelper.h>
-#include <GFXAPI/Types/All.h>
 
 #include <Resources/Core/IResourceManager.h>
 #include <Resources/Core/ProxyBasedResourceManager.h>
 #include <Resources/Core/ResourceProxyFactory.h>
+#include <Resources/Subsystems/GFXAPI/Types/All.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
