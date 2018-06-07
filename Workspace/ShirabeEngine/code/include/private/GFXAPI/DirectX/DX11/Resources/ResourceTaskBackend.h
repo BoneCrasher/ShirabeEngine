@@ -4,8 +4,8 @@
 #include <map>
 
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
+#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
 
-#include "GFXAPI/Types/Texture.h"
 #include "GFXAPI/DirectX/DX11/Common.h"
 #include "GFXAPI/DirectX/DX11/Types.h"
 #include "GFXAPI/DirectX/DX11/Environment.h"

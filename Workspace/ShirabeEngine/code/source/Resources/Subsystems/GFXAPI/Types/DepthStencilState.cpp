@@ -1,4 +1,4 @@
-#include "GFXAPI/Types/DepthStencilState.h"
+#include "Resources/Subsystems/GFXAPI/Types/DepthStencilState.h"
 
 namespace Engine {
   namespace GFXAPI {

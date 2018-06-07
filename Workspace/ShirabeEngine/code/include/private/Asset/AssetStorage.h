@@ -2,7 +2,9 @@
 #define __SHIRABE_ASSET_STORAGE_H__
 
 #include "Core/EngineTypeHelper.h"
-#include "Resources/Types/Texture.h"
+#include "Core/DataBuffer.h"
+
+#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
 
 #include "Asset/AssetError.h"
 #include "Asset/AssetTypes.h"
@@ -19,11 +21,11 @@ namespace Engine {
      **************************************************************************************************/
     DeclareInterface(IAssetStorage);
     virtual AssetId_t createDynamicTextureAsset(
-      std::string            const&,
-      Resources::TextureInfo const&) = 0;
+      std::string         const&,
+      GFXAPI::TextureInfo const&) = 0;
 
-    virtual Asset           loadAsset(AssetId_t const&) = 0;
-    virtual AssetBinaryData loadAssetData(Asset const&) = 0;
+    virtual Asset      loadAsset(AssetId_t const&) = 0;
+    virtual ByteBuffer loadAssetData(Asset const&) = 0;
     DeclareInterfaceEnd(IAssetStorage);
 
     DeclareSharedPointerType(IAssetStorage);
@@ -45,15 +47,15 @@ namespace Engine {
       void readIndex(AssetIndex const&);
 
       AssetId_t createDynamicTextureAsset(
-        std::string            const&,
-        Resources::TextureInfo const&);
+        std::string         const&,
+        GFXAPI::TextureInfo const&);
 
-      Asset           loadAsset(AssetId_t const&);
-      AssetBinaryData loadAssetData(Asset const&);
+      Asset      loadAsset(AssetId_t const&);
+      ByteBuffer loadAssetData(Asset const&);
 
     private:
-      AssetBinaryData loadBufferAsset(Asset const&);
-      AssetBinaryData loadTextureAsset(Asset const&);
+      ByteBuffer loadBufferAsset(Asset const&);
+      ByteBuffer loadTextureAsset(Asset const&);
 
       AssetIndex       m_assetIndex;
       TextureAssetData m_textureAssets;

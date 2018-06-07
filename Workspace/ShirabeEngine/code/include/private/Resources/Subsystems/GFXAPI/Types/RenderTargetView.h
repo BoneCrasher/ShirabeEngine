@@ -6,8 +6,9 @@
 
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Core/ResourceTraits.h"
-#include "Resources/Types/Texture.h"
+
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
 
 #include "GFXAPI/Definitions.h"
 

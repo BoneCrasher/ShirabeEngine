@@ -17,7 +17,7 @@
 
 #include "Resources/Core/EResourceType.h"
 #include "Resources/Core/ResourceDomainTransfer.h"
-#include "Resources/Types/Definition.h"
+#include "Resources/Subsystems/GFXAPI/Types/Definition.h"
 
 namespace Engine {
 	namespace GFXAPI {

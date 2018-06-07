@@ -8,7 +8,7 @@
 #include "GFXAPI/DirectX/DX11/Environment.h"
 
 #include "GFXAPI/Capabilities.h"
-#include "GFXAPI/Types/SwapChain.h"
+#include "Resources/Subsystems/GFXAPI/Types/SwapChain.h"
 
 namespace Engine {
   namespace DX {

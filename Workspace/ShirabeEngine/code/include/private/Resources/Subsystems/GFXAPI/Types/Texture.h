@@ -9,18 +9,40 @@
 #include "Resources/Core/ResourceTraits.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
-#include "Resources/Types/Texture.h"
+#include "Resources/Subsystems/GFXAPI/Types/RequestDefaultImplementation.h"
 
 #include "GFXAPI/Definitions.h"
 
-#include "RequestDefaultImplementation.h"
-#include "GFXAPI/Types/RenderTargetView.h"
-#include "GFXAPI/Types/ShaderResourceView.h"
-#include "GFXAPI/Types/DepthStencilView.h"
 
 namespace Engine {
-  namespace Resources {
-    using namespace GFXAPI;
+  namespace GFXAPI {
+
+    struct Multisapmling {
+      uint8_t size;
+      uint8_t quality;
+    };
+
+    struct SHIRABE_TEST_EXPORT TextureInfo {
+      uint32_t
+        width,  // 0 - Undefined
+        height, // At least 1
+        depth;  // At least 1
+      Format
+        format;
+      uint16_t
+        arraySize; // At least 1 (basically everything is a vector...)
+      uint16_t
+        mipLevels;
+      Multisapmling
+        multisampling;
+
+      TextureInfo();
+
+      void assignTextureInfoParameters(TextureInfo const&other);
+    };
+
+    using ArraySlices = Range;
+    using MipSlices   = Range;
 
     class SHIRABE_TEST_EXPORT TextureDeclaration {
     public:

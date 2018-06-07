@@ -6,10 +6,10 @@
 #include "GFXAPI/DirectX/DX11/Common.h"
 #include "GFXAPI/DirectX/DX11/DeviceCapabilities.h"
 
-#include "GFXAPI/Types/SwapChain.h"
-#include "GFXAPI/Types/Texture.h" // Implies RTV, SRV, DSV
-#include "GFXAPI/Types/DepthStencilState.h"
-#include "GFXAPI/Types/RasterizerState.h"
+#include "Resources/Subsystems/GFXAPI/Types/SwapChain.h"
+#include "Resources/Subsystems/GFXAPI/Types/Texture.h" // Implies RTV, SRV, DSV
+#include "Resources/Subsystems/GFXAPI/Types/DepthStencilState.h"
+#include "Resources/Subsystems/GFXAPI/Types/RasterizerState.h"
 
 namespace Engine {
 	namespace DX {

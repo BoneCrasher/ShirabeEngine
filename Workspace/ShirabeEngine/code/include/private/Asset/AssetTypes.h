@@ -5,8 +5,9 @@
 #include <string>
 
 #include "Core/EngineTypeHelper.h"
+#include "Core/DataBuffer.h"
 
-#include "Resources/Types/Texture.h"
+#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
 
 #include "Asset/AssetError.h"
 
@@ -30,48 +31,16 @@ namespace Engine {
     };
 
     struct TextureAsset {
-      std::string            name;
-      Resources::TextureInfo textureInfo;
+      std::string         name;
+      GFXAPI::TextureInfo textureInfo;
     };
 
     struct BufferAsset {
       std::string name;
-    };
-        
-    /**********************************************************************************************//**
-     * \class AssetBinaryData
-     *
-     * \brief An asset binary data.
-     **************************************************************************************************/
-    class AssetBinaryData;
-
-    class AssetBinaryData {
-      friend class AssetStorage;
-
-    public:
-      AssetBinaryData() = default;
-
-      static AssetBinaryData DataArrayFromSize(
-        uint64_t const size);
-
-      inline
-        int8_t const*const data() const { return m_data.data(); }
-      inline
-        int8_t *const mutableData()  { return m_data.data(); }
-      inline
-        uint64_t const size() const { return m_size; }
-
-    private:
-      AssetBinaryData(
-        std::vector<int8_t>     &&data,
-        uint64_t            const size);
-
-      std::vector<int8_t> m_data;
-      uint64_t           m_size;
-    };
+    };   
     
     struct Image {
-      AssetBinaryData
+      ByteBuffer
         data;
       uint32_t
         width,

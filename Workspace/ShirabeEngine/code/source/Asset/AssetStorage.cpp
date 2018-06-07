@@ -8,7 +8,7 @@
 
 namespace Engine {
   namespace Asset {
-    using Resources::TextureInfo;
+    using GFXAPI::TextureInfo;
 
     /**********************************************************************************************//**
      * \fn  AssetStorage::AssetStorage(Ptr<IResourceManager> const manager)
@@ -63,7 +63,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  Ptr<AssetBinaryData> AssetStorage::loadAsset(AssetId_t const&id)
+     * \fn  Ptr<ByteBuffer> AssetStorage::loadAsset(AssetId_t const&id)
      *
      * \brief Loads an asset
      *
@@ -81,10 +81,10 @@ namespace Engine {
       return *asset;
     }
 
-    AssetBinaryData
+    ByteBuffer
       AssetStorage::loadAssetData(Asset const&ref)
     {
-      AssetBinaryData data;
+      ByteBuffer data;
 
       switch(ref.type) {
       case AssetType::Texture: data = loadTextureAsset(ref); break;
@@ -96,7 +96,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  Ptr<AssetBinaryData> AssetStorage::loadBufferAsset(Asset const&asset)
+     * \fn  Ptr<ByteBuffer> AssetStorage::loadBufferAsset(Asset const&asset)
      *
      * \brief Loads buffer asset
      *
@@ -104,10 +104,10 @@ namespace Engine {
      *
      * \return  The buffer asset.
      **************************************************************************************************/
-    AssetBinaryData
+    ByteBuffer
       AssetStorage::loadBufferAsset(Asset const&asset)
     {
-      AssetBinaryData data;
+      ByteBuffer data;
 
       /*Optional<TextureAsset> textureAsset = getTextureAsset(asset.id);
 
@@ -139,7 +139,7 @@ namespace Engine {
       unsigned char* stbuc = stbi_load(filename.c_str(), &w, &h, &c, 4);
 
       uint64_t size = (w * h * 4 * sizeof(int8_t));
-      image.data     = std::move(AssetBinaryData::DataArrayFromSize(size));
+      image.data     = std::move(ByteBuffer::DataArrayFromSize(size));
       image.width    = w;
       image.height   = h;
       image.channels = c;
@@ -150,7 +150,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  Ptr<AssetBinaryData> AssetStorage::loadTextureAsset(Asset const&asset)
+     * \fn  Ptr<ByteBuffer> AssetStorage::loadTextureAsset(Asset const&asset)
      *
      * \brief Loads texture asset
      *
@@ -158,7 +158,7 @@ namespace Engine {
      *
      * \return  The texture asset.
      **************************************************************************************************/
-    AssetBinaryData
+    ByteBuffer
       AssetStorage::loadTextureAsset(Asset const&asset)
     {
       Image image{};

@@ -362,7 +362,6 @@ namespace Engine {
 
     using BasicGFXAPIResourceBackend = GFXAPIResourceBackend<EngineTypes>;
 
-
     template <typename... TSupportedResourceTypes>
     template <typename TUnderlyingType>
     EEngineStatus

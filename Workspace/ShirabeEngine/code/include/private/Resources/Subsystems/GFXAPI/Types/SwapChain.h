@@ -8,11 +8,11 @@
 #include "Resources/Core/ResourceTraits.h"
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
+#include "Resources/Subsystems/GFXAPI/Types/RequestDefaultImplementation.h"
+#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
+#include "Resources/Subsystems/GFXAPI/Types/RenderTargetView.h"
 
 #include "GFXAPI/Definitions.h"
-#include "GFXAPI/Types/RequestDefaultImplementation.h"
-#include "GFXAPI/Types/Texture.h"
-#include "GFXAPI/Types/RenderTargetView.h"
 #include "RequestDefaultImplementation.h"
 
 namespace Engine {

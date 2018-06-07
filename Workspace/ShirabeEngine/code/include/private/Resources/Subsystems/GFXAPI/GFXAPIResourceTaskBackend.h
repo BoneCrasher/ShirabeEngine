@@ -21,7 +21,7 @@
 #include "Resources/Core/ResourceDomainTransfer.h"
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 
-#include "GFXAPI/Types/All.h"
+#include "Resources/Subsystems/GFXAPI/Types/All.h"
 
 namespace Engine {
   namespace GFXAPI {

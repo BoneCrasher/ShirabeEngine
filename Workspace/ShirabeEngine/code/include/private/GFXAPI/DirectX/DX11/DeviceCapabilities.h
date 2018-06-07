@@ -9,7 +9,7 @@
 #include "Core/BitField.h"
 #include "Log/Log.h"
 
-#include "Resources/Types/Definition.h"
+#include "Resources/Subsystems/GFXAPI/Types/Definition.h"
 
 #include "GFXAPI/Capabilities.h"
 

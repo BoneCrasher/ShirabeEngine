@@ -1,7 +1,7 @@
 #include "Renderer/FrameGraph/FrameGraph.h"
 
 #include "Resources/Core/IResourceManager.h"
-#include "GFXAPI/Types/All.h"
+#include "Resources/Subsystems/GFXAPI/Types/All.h"
 
 namespace Engine {
   namespace FrameGraph {
