@@ -228,7 +228,7 @@ namespace Platform {
 			// DO NOT INCLUDE ANYTHING HERE to have the onClose-fallthrough work.
 			// All other messages pass to the message handler in the system class.
 			default:
-				Log::Verbose(logTag(), String::format("Unhandled message '%0'. Fwd to default handler.", message));
+				// Log::Verbose(logTag(), String::format("Unhandled message '%0'. Fwd to default handler.", message));
 				goto unhandled;
 				break;
 			}

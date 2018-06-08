@@ -68,6 +68,31 @@ namespace Engine {
       , swapChain()
     {}
 
+    namespace Debug {
+      DeclareLogTag(ValidationLayers);
+    }
+
+    static VKAPI_ATTR VkBool32 VKAPI_CALL __vkValidationLayerReportCallback(
+      VkDebugReportFlagsEXT      flags,
+      VkDebugReportObjectTypeEXT objType,
+      uint64_t                   obj,
+      size_t                     location,
+      int32_t                    code,
+      const char*                layerPrefix,
+      const char*                msg,
+      void*                      userData) 
+    {
+
+      std::string message =
+        String::format(
+          "[%0][%1(%2)]@'%3' -> (%4) in layer %5:\n%6",
+          flags, objType, (void*)obj, location, code, layerPrefix, msg
+        );
+      Log::Debug(Debug::logTag(), message);
+
+      return VK_FALSE;
+    }
+
     /**
      * \fn  void VulkanEnvironment::createVulkanInstance(std::string const&name)
      *
@@ -87,10 +112,17 @@ namespace Engine {
       vkApplicationInfo.engineVersion      = VK_MAKE_VERSION(0, 0, 1);
       vkApplicationInfo.apiVersion         = VK_API_VERSION_1_1;
 
-      std::vector<char const*> layers{ };
+      std::vector<char const*> layers{
+        #ifdef SHIRABE_DEBUG
+        "VK_LAYER_LUNARG_standard_validation"
+        #endif
+      };
       std::vector<char const*> extensions ={
         VK_KHR_SURFACE_EXTENSION_NAME,
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+        #ifdef SHIRABE_DEBUG 
+        VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+        #endif
       };
 
       uint32_t instanceLayerCount     = 0;
@@ -102,7 +134,7 @@ namespace Engine {
       std::vector<VkLayerProperties> supportedLayers{ };
 
       vkEnumerateInstanceLayerProperties(&instanceLayerCount, nullptr);
-      supportedLayers.resize(instanceExtensionCount);
+      supportedLayers.resize(instanceLayerCount);
       vkEnumerateInstanceLayerProperties(&instanceLayerCount, supportedLayers.data());
 
       std::set<std::string> layersCopy(layers.begin(), layers.end());
@@ -148,10 +180,40 @@ namespace Engine {
         throw VulkanError("Failed to create VkInstance.", result);
       }
 
-      m_vkState.instanceLayers     = layers;
-      m_vkState.instanceExtensions = extensions;
-      m_vkState.instanceCreateInfo = vkInstanceCreatInfo;
-      m_vkState.instance           = instance;
+      m_vkState.instanceLayers      = layers;
+      m_vkState.instanceExtensions  = extensions;
+      m_vkState.instanceCreateInfo  = vkInstanceCreatInfo;
+      m_vkState.instance            = instance;
+
+      //
+      // In Debug-mode, hook-in a validation layer report callback
+      // 
+      #ifdef SHIRABE_DEBUG
+      int reportFlags =
+        VK_DEBUG_REPORT_ERROR_BIT_EXT       | 
+        VK_DEBUG_REPORT_WARNING_BIT_EXT     |
+        VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+        VK_DEBUG_REPORT_DEBUG_BIT_EXT       |
+        VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT
+        ;
+
+      VkDebugReportCallbackCreateInfoEXT vkDebugReportCallbackCreateInfo ={ };
+      vkDebugReportCallbackCreateInfo.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+      vkDebugReportCallbackCreateInfo.flags       = reportFlags;
+      vkDebugReportCallbackCreateInfo.pfnCallback = __vkValidationLayerReportCallback;
+
+      PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT =
+        (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
+      if(!vkCreateDebugReportCallbackEXT)
+        throw VulkanError("Cannot load vulkan extension function 'vkCreateDebugReportCallbackEXT'", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+
+      VkDebugReportCallbackEXT vkDebugReportCallback = 0;
+      result = vkCreateDebugReportCallbackEXT(instance, &vkDebugReportCallbackCreateInfo, nullptr, &vkDebugReportCallback);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError("Cannot hook-in debug report callback.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+
+      m_vkState.debugReportCallback = vkDebugReportCallback;
+      #endif
     }
 
     /**
@@ -404,7 +466,6 @@ namespace Engine {
       VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceCapabilities);
       if(VkResult::VK_SUCCESS != result)
         throw VulkanError("Failed to get surface capabilities for physical device and surface.", result);
-
       // 
       // Determine backbuffer extents
       // 
@@ -537,6 +598,28 @@ namespace Engine {
       vkSwapChainCreateInfo.clipped               = VK_TRUE;
       vkSwapChainCreateInfo.oldSwapchain          = m_vkState.swapChain.handle;
       vkSwapChainCreateInfo.pNext                 = nullptr;
+      
+
+      VulkanQueueFamilyRegistry const&queueFamilies = vkPhysicalDevice.queueFamilies;
+
+      std::vector<uint32_t> supportedGraphicsQueueFamilyIndices{};
+
+      VkBool32 supported = VK_FALSE;
+      for(uint32_t k=0; k<queueFamilies.graphicsQueueFamilyIndices.size(); ++k)
+      {
+        uint32_t index  = queueFamilies.graphicsQueueFamilyIndices.at(k);
+        VkResult result = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, index, vkSurface, &supported);
+        if(VkResult::VK_SUCCESS != result)
+          throw VulkanError("Failed to check for surface support.", result);
+
+        if(VK_TRUE == supported) {
+          supportedGraphicsQueueFamilyIndices.push_back(index);
+          supported = VK_FALSE;
+        }
+      }
+
+      if(supportedGraphicsQueueFamilyIndices.empty())
+        throw VulkanError("No supported queue family indices found which support the swapchain on the given surface.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
 
       result = vkCreateSwapchainKHR(m_vkState.selectedLogicalDevice, &vkSwapChainCreateInfo, nullptr, &vkSwapChain);
       if(VkResult::VK_SUCCESS != result)
@@ -602,6 +685,17 @@ namespace Engine {
       vkDeviceWaitIdle(m_vkState.selectedLogicalDevice);
       // Kill it with fire...
       vkDestroyDevice(m_vkState.selectedLogicalDevice, nullptr);
+
+      #ifdef SHIRABE_DEBUG
+      // Remember to destroy the debug report callback...
+      PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT =
+        (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(m_vkState.instance, "vkDestroyDebugReportCallbackEXT");
+      if(!vkDestroyDebugReportCallbackEXT)
+        Log::Warning(logTag(), "Failed to fetch vulkan extension function 'vkDestroyDebugReportCallbackEXT'");
+      else
+        vkDestroyDebugReportCallbackEXT(m_vkState.instance, m_vkState.debugReportCallback, nullptr);
+      #endif
+
       vkDestroyInstance(m_vkState.instance, nullptr);
 
       return EEngineStatus::Ok;

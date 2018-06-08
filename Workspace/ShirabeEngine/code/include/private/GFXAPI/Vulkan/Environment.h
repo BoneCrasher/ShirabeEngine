@@ -82,6 +82,8 @@ namespace Engine {
         std::vector<char const*>     instanceExtensions;
         VkInstanceCreateInfo         instanceCreateInfo;
         VkInstance                   instance;
+        // Debug
+        VkDebugReportCallbackEXT     debugReportCallback;
         // Surface
         VkSurfaceKHR                 surface;
         // Physical Device
