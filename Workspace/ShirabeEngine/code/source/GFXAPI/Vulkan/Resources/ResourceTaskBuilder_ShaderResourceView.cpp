@@ -1,17 +1,14 @@
-#include "GFXAPI/DirectX/DX11/Common.h"
-#include "GFXAPI/DirectX/DX11/Linkage.h"
-#include "GFXAPI/DirectX/DX11/Types.h"
-#include "GFXAPI/DirectX/DX11/DeviceCapabilities.h"
-#include "GFXAPI/DirectX/DX11/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/DeviceCapabilities.h"
+#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
+
+#include <vulkan/vulkan.h>
 
 namespace Engine {
-  namespace DX {
-    namespace _11 {
-      using namespace Engine::Resources;
-      using namespace Engine::DX::_11;
+  namespace Vulkan {
+    using namespace Engine::Resources;
 
       EEngineStatus
-        DX11ResourceTaskBackend::
+        VulkanResourceTaskBackend::
         creationTask(
           ShaderResourceView::CreationRequest const&request,
           ResolvedDependencyCollection        const&resolvedDependencies,
@@ -21,8 +18,29 @@ namespace Engine {
 
         ShaderResourceView::Descriptor const&desc = request.resourceDescriptor();
 
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc ={};
-        srvDesc.Format = DX11DeviceCapsHelper::convertFormatGAPI2DXGI(desc.format);
+        uint8_t dimensionCount = 1;
+        dimensionCount += (desc.subjacentTexture.height > 1) ? 1 : 0;
+        dimensionCount += (desc.subjacentTexture.depth  > 1) ? 1 : 0;
+
+        VkImageViewType imageViewType = VK_IMAGE_VIEW_TYPE_2D;
+
+        switch(dimensionCount) {
+        case 1:
+          if(desc.subjacentTexture.arraySize > 1)
+            imageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
+          else
+            imageViewType = VK_IMAGE_VIEW_TYPE_1D;
+          break;
+        case 2:
+          if(desc.subjacentTexture.arraySize > 1)
+            imageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+          else
+            imageViewType = VK_IMAGE_VIEW_TYPE_2D;
+          break;
+        case 3:
+          imageViewType = VK_IMAGE_VIEW_TYPE_3D;
+          break;
+        }
 
         // Map configuration to DX11 creation struct
         if(desc.srvType == ShaderResourceView::Descriptor::EShaderResourceDimension::Texture) {
@@ -119,7 +137,7 @@ namespace Engine {
       }
 
       EEngineStatus
-        DX11ResourceTaskBackend::
+        VulkanResourceTaskBackend::
         updateTask(
           ShaderResourceView::UpdateRequest const&request,
           ResolvedDependencyCollection      const&resolvedDependencies,
@@ -131,7 +149,7 @@ namespace Engine {
       }
 
       EEngineStatus
-        DX11ResourceTaskBackend::
+        VulkanResourceTaskBackend::
         destructionTask(
           ShaderResourceView::DestructionRequest const&request,
           ResolvedDependencyCollection           const&resolvedDependencies,
@@ -143,7 +161,7 @@ namespace Engine {
       }
 
       EEngineStatus
-        DX11ResourceTaskBackend::
+        VulkanResourceTaskBackend::
         queryTask(
           ShaderResourceView::Query const&request,
           ResourceTaskFn_t               &outTask)

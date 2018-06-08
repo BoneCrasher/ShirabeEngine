@@ -107,7 +107,8 @@ namespace Engine {
 
       EEngineStatus deinitialize();
 
-      VkQueue getGraphicsQueue();
+      VkQueue      getGraphicsQueue();
+      VulkanState& getState();
 
     private:
       void createVulkanInstance(std::string const&name);

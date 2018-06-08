@@ -1,59 +1,58 @@
-#include "GFXAPI/DirectX/DX11/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
 
 
 namespace Engine {
-  namespace DX {
-    namespace _11 {
-      using namespace Engine::Resources;
-      using namespace Engine::DX::_11;
+  namespace Vulkan {
+    using namespace Engine::Resources;
+    using namespace Engine::DX::_11;
 
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        creationTask(
-          RasterizerState::CreationRequest  const&request,
-          ResolvedDependencyCollection      const&resolvedDependencies,
-          ResourceTaskFn_t                       &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      creationTask(
+        RasterizerState::CreationRequest  const&request,
+        ResolvedDependencyCollection      const&resolvedDependencies,
+        ResourceTaskFn_t                       &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-        return status;
-      }
-
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        updateTask(
-          RasterizerState::UpdateRequest    const&request,
-          ResolvedDependencyCollection      const&resolvedDependencies,
-          ResourceTaskFn_t                       &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
-
-        return status;
-      }
-
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        destructionTask(
-          RasterizerState::DestructionRequest const&request,
-          ResolvedDependencyCollection        const&resolvedDependencies,
-          ResourceTaskFn_t                         &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
-
-        return status;
-      }
-
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        queryTask(
-          RasterizerState::Query const&request,
-          ResourceTaskFn_t            &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
-
-        return status;
-      }
-
+      return status;
     }
+
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      updateTask(
+        RasterizerState::UpdateRequest    const&request,
+        ResolvedDependencyCollection      const&resolvedDependencies,
+        ResourceTaskFn_t                       &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      return status;
+    }
+
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      destructionTask(
+        RasterizerState::DestructionRequest const&request,
+        ResolvedDependencyCollection        const&resolvedDependencies,
+        ResourceTaskFn_t                         &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      return status;
+    }
+
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      queryTask(
+        RasterizerState::Query const&request,
+        ResourceTaskFn_t            &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      return status;
+    }
+
   }
+
 }

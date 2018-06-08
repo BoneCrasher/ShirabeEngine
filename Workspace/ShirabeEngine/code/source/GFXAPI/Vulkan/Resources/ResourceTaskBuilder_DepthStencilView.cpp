@@ -1,59 +1,59 @@
-#include "GFXAPI/DirectX/DX11/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
 
 
 namespace Engine {
-  namespace DX {
-    namespace _11 {
-      using namespace Engine::Resources;
-      using namespace Engine::DX::_11;
+  namespace Vulkan {
 
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        creationTask(
-          DepthStencilView::CreationRequest   const&request,
-          ResolvedDependencyCollection        const&resolvedDependencies,
-          ResourceTaskFn_t                         &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
+    using namespace Engine::Resources;
+    using namespace Engine::DX::_11;
 
-        return status;
-      }
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      creationTask(
+        DepthStencilView::CreationRequest   const&request,
+        ResolvedDependencyCollection        const&resolvedDependencies,
+        ResourceTaskFn_t                         &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
 
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        updateTask(
-          DepthStencilView::UpdateRequest     const&request,
-          ResolvedDependencyCollection        const&resolvedDependencies,
-          ResourceTaskFn_t                         &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
-
-        return status;
-      }
-
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        destructionTask(
-          DepthStencilView::DestructionRequest const&request,
-          ResolvedDependencyCollection         const&resolvedDependencies,
-          ResourceTaskFn_t                          &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
-
-        return status;
-      }
-
-      EEngineStatus
-        DX11ResourceTaskBackend::
-        queryTask(
-          DepthStencilView::Query const&request,
-          ResourceTaskFn_t             &outTask)
-      {
-        EEngineStatus status = EEngineStatus::Ok;
-
-        return status;
-      }
-
+      return status;
     }
+
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      updateTask(
+        DepthStencilView::UpdateRequest     const&request,
+        ResolvedDependencyCollection        const&resolvedDependencies,
+        ResourceTaskFn_t                         &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      return status;
+    }
+
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      destructionTask(
+        DepthStencilView::DestructionRequest const&request,
+        ResolvedDependencyCollection         const&resolvedDependencies,
+        ResourceTaskFn_t                          &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      return status;
+    }
+
+    EEngineStatus
+      VulkanResourceTaskBackend::
+      queryTask(
+        DepthStencilView::Query const&request,
+        ResourceTaskFn_t             &outTask)
+    {
+      EEngineStatus status = EEngineStatus::Ok;
+
+      return status;
+    }
+
+
   }
 }

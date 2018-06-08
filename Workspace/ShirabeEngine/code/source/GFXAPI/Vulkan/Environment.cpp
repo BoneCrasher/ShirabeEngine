@@ -724,6 +724,11 @@ namespace Engine {
 
       return queue;
     }
-
+    
+    VulkanEnvironment::VulkanState& 
+      VulkanEnvironment::getState()
+    {
+      return m_vkState;
+    }
   }
 }

@@ -1,7 +1,6 @@
 #include "Core/Engine.h"
 
-#include "GFXAPI/DirectX/DX11/Renderer/Renderer.h"
-#include "GFXAPI/DirectX/DX11/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
 
 #include "Resources/Core/ProxyBasedResourceManager.h"
 
@@ -135,7 +134,7 @@ namespace Engine {
       m_resourceManager = manager;
 
       if(gfxApi == EGFXAPI::Vulkan && gfxApiVersion == EGFXAPIVersion::Vulkan_)
-        resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_vulkanEnvironment);
+        resourceTaskBackend = MakeSharedPointerType<VulkanResourceTaskBackend>(m_vulkanEnvironment);
 
       resourceBackend->setResourceTaskBackend(resourceTaskBackend);
       // Renderer will have access to resourceBackend!
