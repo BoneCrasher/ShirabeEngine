@@ -49,7 +49,10 @@ namespace Test {
       using namespace Engine::FrameGraph;
 
       Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
-      appEnvironment->osDisplays = Platform::OSDisplay::GetDisplays();
+      appEnvironment->instanceHandle         = 0;
+      appEnvironment->previousInstanceHandle = 0;
+      appEnvironment->osDisplays             = Platform::OSDisplay::GetDisplays(appEnvironment->primaryDisplayIndex);
+
 
       //
       // ASSET STORAGE

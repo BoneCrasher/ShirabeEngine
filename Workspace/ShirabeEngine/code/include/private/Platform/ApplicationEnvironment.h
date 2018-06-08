@@ -20,7 +20,7 @@ namespace Platform {
 		HWND      primaryWindowHandle;
 #endif // PLATFORM_WINDOWS
 
-    uint64_t                primaryDisplayIndex;
+    uint32_t                primaryDisplayIndex;
 		OSDisplayDescriptorList osDisplays;
 
     inline 

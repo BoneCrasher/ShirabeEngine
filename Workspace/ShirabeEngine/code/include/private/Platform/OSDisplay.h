@@ -18,11 +18,11 @@ namespace Platform {
 
 	struct OSDisplayDescriptor {
 #ifdef PLATFORM_WINDOWS
-		HMONITOR     m_monitorHandle;
+		HMONITOR     monitorHandle;
 #endif
-		std::string  m_name;
+		std::string  name;
 		Engine::Rect bounds;
-		bool         m_isPrimary;
+		bool         isPrimary;
 	};
 
 	DeclareListType(OSDisplayDescriptor, OSDisplayDescriptor);
@@ -45,17 +45,17 @@ namespace Platform {
 			} else {
 				OSDisplayDescriptor descriptor ={};
 
-				descriptor.m_monitorHandle = monitor;
-				descriptor.m_name          = String::toNarrowString(info.szDevice);
+				descriptor.monitorHandle = monitor;
+				descriptor.name          = String::toNarrowString(info.szDevice);
 				descriptor.bounds        = Rect(info.rcMonitor.left,
 												 info.rcMonitor.top,
 												 (info.rcMonitor.right - info.rcMonitor.left),
 												 (info.rcMonitor.bottom - info.rcMonitor.top));
-				descriptor.m_isPrimary = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
+				descriptor.isPrimary = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
 
 				Log::Status(logTag(), String::format("Found %0 monitor '%1' with display area: Location: %2, %3; Size: %4, %5",
-					(descriptor.m_isPrimary ? "[primary]" : "[additional]"),
-													 descriptor.m_name,
+					(descriptor.isPrimary ? "[primary]" : "[additional]"),
+													 descriptor.name,
 													 descriptor.bounds.position.x(), descriptor.bounds.position.y(),
 													 descriptor.bounds.size.x(),     descriptor.bounds.size.y()));
 
@@ -65,7 +65,7 @@ namespace Platform {
 			}
 		}
 	public:
-		static OSDisplayDescriptorList GetDisplays() {
+		static OSDisplayDescriptorList GetDisplays(uint32_t &primaryDisplayIndex) {
 			// Only primary screen
 			// int screenWidth       = GetSystemMetrics(SM_CXSCREEN);
 			// int screenHeight      = GetSystemMetrics(SM_CYSCREEN);
@@ -73,6 +73,15 @@ namespace Platform {
 
 			OSDisplayDescriptorList displayDescriptors;
 			EnumDisplayMonitors(NULL, NULL, &WinAPIDisplay::handleDisplayMonitor, reinterpret_cast<LPARAM>(&displayDescriptors));
+
+      uint32_t k=0;
+      for(OSDisplayDescriptor const&desc : displayDescriptors) {
+        if(desc.isPrimary) {
+          primaryDisplayIndex = k;
+          break;
+        }
+        ++k;
+      }
 
 			return displayDescriptors;
 		}

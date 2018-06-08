@@ -28,6 +28,46 @@ namespace Engine {
     VulkanEnvironment::VulkanEnvironment()
     {}
 
+    VulkanEnvironment::VulkanQueueFamilyRegistry::VulkanQueueFamilyRegistry()
+      : supportingQueueFamilyIndices()
+      , graphicsQueueFamilyIndices()
+      , computeQueueFamilyIndices()
+      , transferQueueFamilyIndices()
+      , presentQueueFamilyIndices()
+    {}
+
+    VulkanEnvironment::VulkanPhysicalDevice::VulkanPhysicalDevice()
+      : handle(VK_NULL_HANDLE)
+      , properties({})
+      , features({})
+      , memoryProperties({})
+      , queueFamilies()
+    {}
+
+    VulkanEnvironment::VulkanSwapChain::VulkanSwapChain()
+      : handle(VK_NULL_HANDLE)
+      , capabilities({})
+      , supportedFormats()
+      , supportedPresentModes()
+      , selectedExtents({ 0, 0 })
+      , selectedFormat()
+      , selectedPresentMode()
+    {}
+
+    VulkanEnvironment::VulkanState::VulkanState()
+      : instanceLayers()
+      , instanceExtensions()
+      , instanceCreateInfo()
+      , instance(VK_NULL_HANDLE)
+      , surface(VK_NULL_HANDLE)
+      , deviceLayers()
+      , deviceExtensions()
+      , supportedPhysicalDevices()
+      , selectedPhysicalDevice(0)
+      , selectedLogicalDevice(VK_NULL_HANDLE)
+      , swapChain()
+    {}
+
     /**
      * \fn  void VulkanEnvironment::createVulkanInstance(std::string const&name)
      *
@@ -159,14 +199,13 @@ namespace Engine {
      *
      * \param requiredBackBufferFormat  The required back buffer format.
      **************************************************************************************************/
-    void VulkanEnvironment::determinePhysicalDevices(Format const&requiredBackBufferFormat)
+    void VulkanEnvironment::determinePhysicalDevices()
     {
       VkResult result = VkResult::VK_SUCCESS;
 
-      VkFormat                 requiredFormat = VulkanDeviceCapsHelper::convertFormatToVk(requiredBackBufferFormat);
       std::vector<char const*> requiredLayers{};
       std::vector<char const*> requiredExtensions{};
-      requiredExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);      
+      requiredExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
       std::vector<VulkanPhysicalDevice> supportedPhysicalDevices{ };
 
@@ -349,6 +388,175 @@ namespace Engine {
       m_vkState.selectedLogicalDevice = vkLogicalDevice;
     }
 
+    void VulkanEnvironment::createSwapChain(
+      Rect            const&requestedBackBufferSize,
+      VkFormat        const&requestedFormat,
+      VkColorSpaceKHR const&colorSpace)
+    {
+      VulkanPhysicalDevice const&vkPhysicalDevice = m_vkState.supportedPhysicalDevices.at(m_vkState.selectedPhysicalDevice);
+      VkSurfaceKHR         const&vkSurface        = m_vkState.surface;
+
+      // 
+      // Extract capabilities
+      // 
+      VkSurfaceCapabilitiesKHR vkSurfaceCapabilities{};
+
+      VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceCapabilities);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError("Failed to get surface capabilities for physical device and surface.", result);
+
+      // 
+      // Determine backbuffer extents
+      // 
+      VkExtent2D vkBackBufferExtents{};
+      // Test, whether either the width or height in currentExtent were set to uint32_t::max.
+      // In this case, we can differ from the window size and enforce our requested backbuffer size.
+      if(vkSurfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+        vkBackBufferExtents = vkSurfaceCapabilities.currentExtent;
+      }
+      else {
+        bool requestedBackBufferSizeSupported =
+          (vkSurfaceCapabilities.minImageExtent.width  <= requestedBackBufferSize.size.x()) &&
+          (vkSurfaceCapabilities.minImageExtent.height <= requestedBackBufferSize.size.y()) &&
+          (vkSurfaceCapabilities.maxImageExtent.width  >= requestedBackBufferSize.size.x()) &&
+          (vkSurfaceCapabilities.maxImageExtent.height >= requestedBackBufferSize.size.y());
+        if(!requestedBackBufferSizeSupported)
+          Log::Warning(
+            logTag(),
+            String::format(
+              "Requested backbuffer extents %0 x %1 unsupported. Clamping the extents.",
+              requestedBackBufferSize.size.x(),
+              requestedBackBufferSize.size.y()));
+
+        VkExtent2D actualExtent ={ requestedBackBufferSize.size.x(), requestedBackBufferSize.size.y() };
+        actualExtent.width  = std::max(vkSurfaceCapabilities.minImageExtent.width, std::min(vkSurfaceCapabilities.maxImageExtent.width, actualExtent.width));
+        actualExtent.height = std::max(vkSurfaceCapabilities.minImageExtent.height, std::min(vkSurfaceCapabilities.maxImageExtent.height, actualExtent.height));
+
+        vkBackBufferExtents = actualExtent;
+      }
+
+      //
+      // Extract Formats
+      //
+      uint32_t                        vkSurfaceFormatCount = 0;
+      std::vector<VkSurfaceFormatKHR> vkSurfaceFormats{};
+
+      result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceFormatCount, nullptr);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError("Failed to query the supported surface formats.", result);
+
+      if(vkSurfaceFormatCount == 0)
+        throw VulkanError("No supported surface formats.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+
+      vkSurfaceFormats.resize(vkSurfaceFormatCount);
+      vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceFormatCount, vkSurfaceFormats.data());
+
+      //
+      // Extract PresentModes
+      //
+      uint32_t                      vkSurfacePresentModeCount = 0;
+      std::vector<VkPresentModeKHR> vkSurfacePresentModes{ };
+
+      result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfacePresentModeCount, nullptr);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError("Failed to query the supported surface formats.", result);
+
+      if(vkSurfacePresentModeCount == 0)
+        throw VulkanError("No supported surface present modes.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+
+      vkSurfacePresentModes.resize(vkSurfacePresentModeCount);
+      vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfacePresentModeCount, vkSurfacePresentModes.data());
+
+      // 
+      // Determine format, color space
+      // 
+      VkSurfaceFormatKHR vkSelectedFormat{};
+
+      if(vkSurfaceFormats.size() == 1 && vkSurfaceFormats.at(0).format == VK_FORMAT_UNDEFINED) {
+        // We can use any format desired.
+        vkSelectedFormat ={ requestedFormat, VK_COLORSPACE_SRGB_NONLINEAR_KHR };
+      }
+      else {
+        bool found = false;
+        for(VkSurfaceFormatKHR const&surfaceFormat : vkSurfaceFormats) {
+          found = (surfaceFormat.format == requestedFormat);
+          if(found) {
+            vkSelectedFormat = surfaceFormat;
+            break;
+          }
+        }
+
+        // No immediately suitable format found. Take the first available.
+        if(!found)
+          vkSelectedFormat = vkSurfaceFormats.at(0);
+      }
+
+      // 
+      // Determine present mode 
+      // 
+      VkPresentModeKHR vkSelectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Guaranteed to be available.
+      for(VkPresentModeKHR const&presentMode : vkSurfacePresentModes) {
+        // Try to find a mailbox present mode, as it will allow us to implement triple buffering
+        if(presentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+          vkSelectedPresentMode = presentMode;
+          break;
+        }
+        // Although Khronos recommends to fall back to immediate mode, let's try FIFO. 
+        // Maybe the drivers support it properly by now. Nobody wants visible tearing...
+        //   else {
+        //     vkSelectedPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        //   }
+      }
+
+      // 
+      // Create the swap chain
+      // 
+      VkSwapchainKHR vkSwapChain = VK_NULL_HANDLE;
+
+      // Should give us triple buffering with fallback to double buffering...
+      uint32_t swapChainImageCount = (vkSurfaceCapabilities.minImageCount + 1);
+      if(vkSurfaceCapabilities.maxImageCount > 0) // We have a limited amount of images possible. Clamp!
+        swapChainImageCount = std::min(vkSurfaceCapabilities.maxImageCount, swapChainImageCount);
+
+      VkSwapchainCreateInfoKHR vkSwapChainCreateInfo{};
+      vkSwapChainCreateInfo.sType                 = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+      vkSwapChainCreateInfo.surface               = m_vkState.surface;
+      vkSwapChainCreateInfo.minImageCount         = swapChainImageCount;
+      vkSwapChainCreateInfo.imageFormat           = vkSelectedFormat.format;
+      vkSwapChainCreateInfo.imageColorSpace       = vkSelectedFormat.colorSpace;
+      vkSwapChainCreateInfo.imageExtent           = vkBackBufferExtents;
+      vkSwapChainCreateInfo.imageArrayLayers      = 1;
+      vkSwapChainCreateInfo.imageUsage            = VK_IMAGE_USAGE_TRANSFER_DST_BIT; // Image will be moved into...
+      vkSwapChainCreateInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
+      vkSwapChainCreateInfo.queueFamilyIndexCount = 0; // Optional due to sharing mode exclusive!
+      vkSwapChainCreateInfo.pQueueFamilyIndices   = nullptr;
+      vkSwapChainCreateInfo.preTransform          = vkSurfaceCapabilities.currentTransform;
+      vkSwapChainCreateInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+      vkSwapChainCreateInfo.presentMode           = vkSelectedPresentMode;
+      vkSwapChainCreateInfo.flags                 = 0;
+      vkSwapChainCreateInfo.clipped               = VK_TRUE;
+      vkSwapChainCreateInfo.oldSwapchain          = m_vkState.swapChain.handle;
+      vkSwapChainCreateInfo.pNext                 = nullptr;
+
+      result = vkCreateSwapchainKHR(m_vkState.selectedLogicalDevice, &vkSwapChainCreateInfo, nullptr, &vkSwapChain);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError("Failed to create swapchain.", result);
+
+      // 
+      // Apply to state 
+      //
+      VulkanSwapChain swapChain{};
+      swapChain.capabilities          = vkSurfaceCapabilities;
+      swapChain.supportedFormats      = vkSurfaceFormats;
+      swapChain.supportedPresentModes = vkSurfacePresentModes;
+      swapChain.selectedExtents       = vkBackBufferExtents;
+      swapChain.selectedFormat        = vkSelectedFormat;
+      swapChain.selectedPresentMode   = vkSelectedPresentMode;
+      swapChain.handle                = vkSwapChain;
+
+      m_vkState.swapChain = swapChain;
+    }
+
     EEngineStatus
       VulkanEnvironment::initialize(
         ApplicationEnvironment const& applicationEnvironment)
@@ -356,10 +564,16 @@ namespace Engine {
       try {
         EEngineStatus status = EEngineStatus::Ok;
 
+        VkFormat requiredFormat = VulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
+
         createVulkanInstance("ShirabeEngine Demo");
         createVulkanSurface(applicationEnvironment);
-        determinePhysicalDevices(Format::R8G8B8A8_UNORM);
+        determinePhysicalDevices();
         selectPhysicalDevice(0);
+        createSwapChain(
+          applicationEnvironment.primaryDisplay().bounds, 
+          requiredFormat, 
+          VK_COLORSPACE_SRGB_NONLINEAR_KHR);
 
         return status;
       }
@@ -384,6 +598,9 @@ namespace Engine {
     EEngineStatus
       VulkanEnvironment::deinitialize()
     {
+      // Wait for the logical device to finish up all work.
+      vkDeviceWaitIdle(m_vkState.selectedLogicalDevice);
+      // Kill it with fire...
       vkDestroyDevice(m_vkState.selectedLogicalDevice, nullptr);
       vkDestroyInstance(m_vkState.instance, nullptr);
 

@@ -33,7 +33,7 @@ int WINAPI WinMain(
   Platform::ApplicationEnvironment appEnvironment;
   appEnvironment.instanceHandle         = hInstance;
   appEnvironment.previousInstanceHandle = hPrevInstance;
-  appEnvironment.osDisplays             = Platform::OSDisplay::GetDisplays();
+  appEnvironment.osDisplays             = Platform::OSDisplay::GetDisplays(appEnvironment.primaryDisplayIndex);
 
   EngineInstancePtr pEngine = MakeSharedPointerType<EngineInstance>(appEnvironment/*, engineConfiguration*/);
   if(CheckEngineError(pEngine->initialize())) {

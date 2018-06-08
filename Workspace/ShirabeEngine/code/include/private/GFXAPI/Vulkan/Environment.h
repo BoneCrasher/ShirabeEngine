@@ -43,20 +43,37 @@ namespace Engine {
     class VulkanEnvironment {
       DeclareLogTag(VulkanEnvironment);
 
-    public:      
+    public:
       struct VulkanQueueFamilyRegistry {
         std::vector<uint32_t> supportingQueueFamilyIndices;
         std::vector<uint32_t> graphicsQueueFamilyIndices;
         std::vector<uint32_t> computeQueueFamilyIndices;
         std::vector<uint32_t> transferQueueFamilyIndices;
+        std::vector<uint32_t> presentQueueFamilyIndices;
+
+        VulkanQueueFamilyRegistry();
       };
 
       struct VulkanPhysicalDevice {
         VkPhysicalDevice                 handle;
         VkPhysicalDeviceProperties       properties;
         VkPhysicalDeviceFeatures         features;
-        VkPhysicalDeviceMemoryProperties memoryProperties; 
+        VkPhysicalDeviceMemoryProperties memoryProperties;
         VulkanQueueFamilyRegistry        queueFamilies;
+
+        VulkanPhysicalDevice();
+      };
+
+      struct VulkanSwapChain {
+        VkSwapchainKHR                  handle;
+        VkSurfaceCapabilitiesKHR        capabilities;
+        std::vector<VkSurfaceFormatKHR> supportedFormats;
+        std::vector<VkPresentModeKHR>   supportedPresentModes;
+        VkExtent2D                      selectedExtents;
+        VkSurfaceFormatKHR              selectedFormat;
+        VkPresentModeKHR                selectedPresentMode;
+
+        VulkanSwapChain();
       };
 
       struct VulkanState {
@@ -74,23 +91,31 @@ namespace Engine {
         uint32_t                     selectedPhysicalDevice;
         // Logical Device
         VkDevice                     selectedLogicalDevice;
+        // Swap Chain 
+        VulkanSwapChain              swapChain;
+
+        VulkanState();
       };
-            
+
       VulkanEnvironment();
 
       EEngineStatus initialize(
         ApplicationEnvironment const& applicationEnvironment);
 
       EEngineStatus deinitialize();
-      
+
       VkQueue getGraphicsQueue();
 
     private:
       void createVulkanInstance(std::string const&name);
       void createVulkanSurface(
         Platform::ApplicationEnvironment const&);
-      void determinePhysicalDevices(Format const&);
+      void determinePhysicalDevices();
       void selectPhysicalDevice(uint32_t);
+      void createSwapChain(
+        Rect            const&requestedBackBufferSize,
+        VkFormat        const&requestedFormat,
+        VkColorSpaceKHR const&colorSpace);
 
       VulkanState m_vkState;
     };
