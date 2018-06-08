@@ -624,17 +624,31 @@ namespace Engine {
       result = vkCreateSwapchainKHR(m_vkState.selectedLogicalDevice, &vkSwapChainCreateInfo, nullptr, &vkSwapChain);
       if(VkResult::VK_SUCCESS != result)
         throw VulkanError("Failed to create swapchain.", result);
+      
+      // 
+      // Finally: Extract SwapChain images
+      //
+      uint32_t             createdSwapChainImageCount = 0;
+      std::vector<VkImage> swapChainImages;
 
+      result = vkGetSwapchainImagesKHR(m_vkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, nullptr);
+      if(VkResult::VK_SUCCESS != result)
+        throw VulkanError("Failed to fetch swapchain image handles.", result);
+      
+      swapChainImages.resize(createdSwapChainImageCount);
+      vkGetSwapchainImagesKHR(m_vkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, swapChainImages.data());
+      
       // 
       // Apply to state 
       //
-      VulkanSwapChain swapChain{};
+      VulkanSwapChain swapChain{ };
       swapChain.capabilities          = vkSurfaceCapabilities;
       swapChain.supportedFormats      = vkSurfaceFormats;
       swapChain.supportedPresentModes = vkSurfacePresentModes;
       swapChain.selectedExtents       = vkBackBufferExtents;
       swapChain.selectedFormat        = vkSelectedFormat;
       swapChain.selectedPresentMode   = vkSelectedPresentMode;
+      swapChain.swapChainImages       = swapChainImages;
       swapChain.handle                = vkSwapChain;
 
       m_vkState.swapChain = swapChain;

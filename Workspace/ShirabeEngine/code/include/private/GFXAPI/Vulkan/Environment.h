@@ -72,6 +72,7 @@ namespace Engine {
         VkExtent2D                      selectedExtents;
         VkSurfaceFormatKHR              selectedFormat;
         VkPresentModeKHR                selectedPresentMode;
+        std::vector<VkImage>            swapChainImages;
 
         VulkanSwapChain();
       };
