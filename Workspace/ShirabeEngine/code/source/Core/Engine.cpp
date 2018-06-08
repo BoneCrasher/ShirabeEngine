@@ -134,10 +134,10 @@ namespace Engine {
       manager->setResourceBackend(resourceBackend);
       m_resourceManager = manager;
 
-      /*if(gfxApi == EGFXAPI::DirectX && gfxApiVersion == EGFXAPIVersion::DirectX_11_0)
-        resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_dx11Environment);
+      if(gfxApi == EGFXAPI::Vulkan && gfxApiVersion == EGFXAPIVersion::Vulkan_)
+        resourceTaskBackend = MakeSharedPointerType<DX11ResourceTaskBackend>(m_vulkanEnvironment);
 
-      resourceBackend->setResourceTaskBackend(resourceTaskBackend);*/
+      resourceBackend->setResourceTaskBackend(resourceTaskBackend);
       // Renderer will have access to resourceBackend!
     };
 
