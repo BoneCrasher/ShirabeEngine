@@ -42,19 +42,12 @@ namespace Engine {
      * \brief	Glue...
      **************************************************************************************************/
     class VulkanResourceTaskBackend
-      : public GFXAPIResourceTaskBackend<EngineTypes>
+      : public GFXAPIResourceTaskBackend
     {
     public:
       VulkanResourceTaskBackend(Ptr<VulkanEnvironment> const&);
 
-      DeclareTaskBuilderModule(Texture);
-      DeclareTaskBuilderModule(ShaderResourceView);
-      DeclareTaskBuilderModule(RenderTargetView);
-      DeclareTaskBuilderModule(DepthStencilView);
-      DeclareTaskBuilderModule(DepthStencilState);
-      DeclareTaskBuilderModule(RasterizerState);
-      DeclareTaskBuilderModule(SwapChain);
-      DeclareTaskBuilderModule(SwapChainBuffer);
+      void initialize();
 
     private:
       Ptr<VulkanEnvironment> m_vulkanEnvironment;

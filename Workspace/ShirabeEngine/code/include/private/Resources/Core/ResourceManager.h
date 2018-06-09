@@ -7,7 +7,6 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/Random.h"
 
-#include "Resources/Core/IResourceManager.h"
 #include "Resources/Core/IResourceProxy.h"
 #include "Resources/Core/ResourcePool.h"
 #include "Resources/Core/ResourceProxyFactory.h"
@@ -74,105 +73,36 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \class	ProxyBasedResourceManager
+     * \class	ResourceManager
      *
      * \brief	Manager for proxy based resources.
      **************************************************************************************************/
-    class SHIRABE_TEST_EXPORT ProxyBasedResourceManager
-      : public IResourceManager {
-      DeclareLogTag(ProxyBasedResourceManager);
+    class SHIRABE_TEST_EXPORT ResourceManager {
+      DeclareLogTag(ResourceManager);
 
     public:
-      ProxyBasedResourceManager(
+      ResourceManager(
         const Ptr<ResourceProxyFactory> &proxyFactory)
         : m_proxyFactory(proxyFactory)
       {}
 
-      virtual ~ProxyBasedResourceManager() {
+      virtual ~ResourceManager() {
         // m_resources->clear();
         m_proxyFactory = nullptr;
       };
 
       bool clear();
 
-      void setResourceBackend(Ptr<BasicGFXAPIResourceBackend> const& backend) {
+      void setResourceBackend(Ptr<GFXAPIResourceBackend> const& backend) {
         assert(backend != nullptr);
 
         m_resourceBackend = backend;
       }
 
-      Ptr<BasicGFXAPIResourceBackend>& backend() {
+      Ptr<GFXAPIResourceBackend>& backend() {
         return m_resourceBackend;
       }
 
-      #define DeclareSupportedResource(Type)             \
-      EEngineStatus create##Type(                        \
-        Type::CreationRequest  const&inRequest,          \
-        PublicResourceId_t          &outId,              \
-        bool                         deferLoad = false); \
-                                                         \
-      EEngineStatus load##Type(                          \
-        PublicResourceId_t const&id);                    \
-                                                         \
-      EEngineStatus update##Type(                        \
-        PublicResourceId_t  const&inId,                  \
-        Type::UpdateRequest const&inRequest);            \
-                                                         \
-      EEngineStatus unload##Type(                        \
-        PublicResourceId_t const&id);                    \
-                                                         \
-      EEngineStatus destroy##Type(                       \
-        PublicResourceId_t const&inId);            
-
-      DeclareSupportedResource(SwapChain);
-      DeclareSupportedResource(Texture);
-      DeclareSupportedResource(RenderTargetView);
-      DeclareSupportedResource(ShaderResourceView);
-      DeclareSupportedResource(DepthStencilView);
-      DeclareSupportedResource(DepthStencilState);
-      DeclareSupportedResource(RasterizerState);
-
-    private:
-
-      /**********************************************************************************************//**
-       * \fn	EEngineStatus ProxyBasedResourceManager::proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy)
-       *
-       * \brief	Load dependencies and root of resource tree. This function only deals with root
-       * 			elements of a resource-tree.
-       *
-       * \param	handle	The handle.
-       * \param	proxy 	The proxy.
-       *
-       * \return	The EEngineStatus.
-       **************************************************************************************************/
-      EEngineStatus proxyLoad(IResourceProxyBasePtr &proxy, ResourceProxyList const&dependencies);
-
-      /**********************************************************************************************//**
-       * \fn  EEngineStatus ProxyBasedResourceManager::proxyUnload(const ResourceHandle& handle);
-       *
-       * \brief Proxy unload
-       *
-       * \param handle  The handle.
-       *
-       * \return  The EEngineStatus.
-       **************************************************************************************************/
-      EEngineStatus proxyUnload(IResourceProxyBasePtr &proxy);
-
-      /**********************************************************************************************//**
-       * \fn	template <typename TBuilder> EEngineStatus ProxyBasedResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, bool creationDeferred, Ptr<typename TBuilder::proxy> &outProxy, std::vector<ResourceHandle> &outHandles )
-       *
-       * \brief	Unified algorithm to invoke a specific builder and store the data in the respective
-       * 			storage.
-       *
-       * \tparam	TBuilder	Type of the builder.
-       * \param 		  	desc				The description.
-       * \param 		  	creationDeferred	Handle of the out.
-       * \param [in,out]	outProxy			Variable arguments providing  The arguments.
-       * \param [in,out]	outHandles			The out handles.
-       *
-       * \return	The new resource.
-       *
-       **************************************************************************************************/
       template <typename TResource>
       EEngineStatus createResource(
         typename TResource::CreationRequest const&request,
@@ -196,6 +126,32 @@ namespace Engine {
       EEngineStatus destroyResource(
         PublicResourceId_t const&inId);
 
+    private:
+
+      /**********************************************************************************************//**
+       * \fn	EEngineStatus ResourceManager::proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy)
+       *
+       * \brief	Load dependencies and root of resource tree. This function only deals with root
+       * 			elements of a resource-tree.
+       *
+       * \param	handle	The handle.
+       * \param	proxy 	The proxy.
+       *
+       * \return	The EEngineStatus.
+       **************************************************************************************************/
+      EEngineStatus proxyLoad(IResourceProxyBasePtr &proxy, ResourceProxyList const&dependencies);
+
+      /**********************************************************************************************//**
+       * \fn  EEngineStatus ResourceManager::proxyUnload(const ResourceHandle& handle);
+       *
+       * \brief Proxy unload
+       *
+       * \param handle  The handle.
+       *
+       * \return  The EEngineStatus.
+       **************************************************************************************************/
+      EEngineStatus proxyUnload(IResourceProxyBasePtr &proxy);
+
       inline AnyProxy getResourceProxy(const PublicResourceId_t& id) {
         return m_resources.getResource(id);
       }
@@ -209,16 +165,16 @@ namespace Engine {
 
       Random::RandomState m_idGenerator;
 
-      Ptr<ResourceProxyFactory>       m_proxyFactory;
-      Ptr<BasicGFXAPIResourceBackend> m_resourceBackend;
+      Ptr<ResourceProxyFactory>  m_proxyFactory;
+      Ptr<GFXAPIResourceBackend> m_resourceBackend;
 
       // Any kind of resources, abstracted away entirely.
       IndexedResourcePool<PublicResourceId_t, AnyProxy> m_resources;
     };
-    DeclareSharedPointerType(ProxyBasedResourceManager);
+    DeclareSharedPointerType(ResourceManager);
 
     /**********************************************************************************************//**
-     * \fn	template <typename TBuilder> EEngineStatus ProxyBasedResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, bool creationDeferred, Ptr<typename TBuilder::proxy> &outProxy, std::vector<ResourceHandle> &outHandles )
+     * \fn	template <typename TBuilder> EEngineStatus ResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, bool creationDeferred, Ptr<typename TBuilder::proxy> &outProxy, std::vector<ResourceHandle> &outHandles )
      *
      * \brief	Unified algorithm to invoke a specific builder and store the data in the respective
      * 			storage.
@@ -233,7 +189,7 @@ namespace Engine {
      *
      **************************************************************************************************/
     template <typename TResource>
-    EEngineStatus ProxyBasedResourceManager
+    EEngineStatus ResourceManager
       ::createResource(
         typename TResource::CreationRequest const&request,
         PublicResourceId_t                       &outId,
@@ -262,7 +218,7 @@ namespace Engine {
 
     template <typename TResource>
     EEngineStatus
-      ProxyBasedResourceManager
+      ResourceManager
       ::loadResource(
         PublicResourceId_t const&id)
     {
@@ -314,7 +270,7 @@ namespace Engine {
     }
 
     template <typename TResource>
-    EEngineStatus ProxyBasedResourceManager
+    EEngineStatus ResourceManager
       ::updateResource(
         PublicResourceId_t                const&inId,
         typename TResource::UpdateRequest const&request)
@@ -324,7 +280,7 @@ namespace Engine {
 
     template <typename TResource>
     EEngineStatus
-      ProxyBasedResourceManager
+      ResourceManager
       ::unloadResource(
         PublicResourceId_t const&id)
     {
@@ -339,7 +295,7 @@ namespace Engine {
     }
 
     template <typename TResource>
-    EEngineStatus ProxyBasedResourceManager
+    EEngineStatus ResourceManager
       ::destroyResource(
         PublicResourceId_t const&id)
     {

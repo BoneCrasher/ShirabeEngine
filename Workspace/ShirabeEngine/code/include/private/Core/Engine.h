@@ -9,7 +9,6 @@
 
 #include "Window/WindowManager.h"
 
-#include "Resources/Core/IResourceManager.h"
 #include "Resources/Core/ResourceProxyFactory.h"
 
 #include "BuildingBlocks/Scene.h"
@@ -53,7 +52,7 @@ namespace Engine {
 #endif
 
 		Ptr<ResourceProxyFactory> m_proxyFactory;
-		Ptr<IResourceManager>     m_resourceManager;
+		Ptr<ResourceManager>      m_resourceManager;
 
 		IRendererPtr m_renderer;
 		Scene        m_scene;

@@ -6,7 +6,7 @@ namespace Engine {
 
     using namespace Engine::Resources;
     using namespace Engine::DX::_11;
-
+/*
     EEngineStatus
       VulkanResourceTaskBackend::
       creationTask(
@@ -53,7 +53,7 @@ namespace Engine {
 
       return status;
     }
-
+*/
 
   }
 }

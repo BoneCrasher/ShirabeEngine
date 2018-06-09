@@ -46,19 +46,10 @@ namespace Engine {
        * \brief	Glue...
        **************************************************************************************************/
       class DX11ResourceTaskBackend
-        : public GFXAPIResourceTaskBackend<EngineTypes>
+        : public GFXAPIResourceTaskBackend
       {
       public:
         DX11ResourceTaskBackend(Ptr<DX11Environment> const& device);
-
-        DeclareTaskBuilderModule(Texture);
-        DeclareTaskBuilderModule(ShaderResourceView);
-        DeclareTaskBuilderModule(RenderTargetView);
-        DeclareTaskBuilderModule(DepthStencilView);
-        DeclareTaskBuilderModule(DepthStencilState);
-        DeclareTaskBuilderModule(RasterizerState);
-        DeclareTaskBuilderModule(SwapChain);
-        DeclareTaskBuilderModule(SwapChainBuffer);
 
       private:
         Ptr<DX11Environment> m_dx11Environment;

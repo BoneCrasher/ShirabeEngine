@@ -1,6 +1,6 @@
 #include "Renderer/FrameGraph/FrameGraph.h"
 
-#include "Resources/Core/IResourceManager.h"
+#include "Resources/Core/ResourceManager.h"
 #include "Resources/Subsystems/GFXAPI/Types/All.h"
 
 namespace Engine {

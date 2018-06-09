@@ -5,7 +5,7 @@ namespace Engine {
     namespace _11 {
       using namespace Engine::Resources;
 
-      EEngineStatus
+     /* EEngineStatus
         DX11ResourceTaskBackend::
         creationTask(
           DepthStencilState::CreationRequest  const&request,
@@ -50,7 +50,7 @@ namespace Engine {
         EEngineStatus status = EEngineStatus::Ok;
 
         return status;
-      }
+      }*/
 
     }
   }

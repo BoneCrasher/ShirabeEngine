@@ -5,7 +5,7 @@
 #include "Core/EngineStatus.h"
 
 #include "Platform/ApplicationEnvironment.h"
-#include "Resources/Core/IResourceManager.h"
+#include "Resources/Core/ResourceManager.h"
 #include "Renderer/RendererConfiguration.h"
 
 namespace Engine {
@@ -34,7 +34,7 @@ namespace Engine {
       virtual EEngineStatus initialize(
         const ApplicationEnvironment&,
         const RendererConfiguration&,
-        const IResourceManagerPtr&) = 0;
+        const Ptr<ResourceManager>&) = 0;
 
       virtual EEngineStatus deinitialize() = 0;
       virtual EEngineStatus reinitialize() = 0;

@@ -62,7 +62,7 @@ namespace Engine {
      **************************************************************************************************/
     template <typename TResource>
     class GFXAPIResourceProxy
-      : public ResourceBackendProxy<BasicGFXAPIResourceBackend, TResource>
+      : public ResourceBackendProxy<GFXAPIResourceBackend, TResource>
       , public GFXAPIResourceAdapter
     {
       DeclareLogTag(GFXAPIResourceProxy<TResource>);
@@ -70,9 +70,9 @@ namespace Engine {
     public:
       inline GFXAPIResourceProxy(
         EProxyType                          const&proxyType,
-        Ptr<BasicGFXAPIResourceBackend>     const&resourceBackend,
+        Ptr<GFXAPIResourceBackend>          const&resourceBackend,
         typename TResource::CreationRequest const&request)
-        : ResourceBackendProxy<BasicGFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
+        : ResourceBackendProxy<GFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
         , GFXAPIResourceAdapter()
         , m_destructionRequest(0, 0)
       { }

@@ -6,7 +6,7 @@ namespace Engine {
 
       DX11ResourceTaskBackend
         ::DX11ResourceTaskBackend(Ptr<DX11Environment> const& device)
-        : GFXAPIResourceTaskBackend<EngineTypes>()
+        : GFXAPIResourceTaskBackend()
         , m_dx11Environment(device)
       {
         assert(device != nullptr);

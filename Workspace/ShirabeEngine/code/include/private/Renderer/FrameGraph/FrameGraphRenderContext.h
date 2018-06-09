@@ -5,7 +5,7 @@
 #include "Log/Log.h"
 
 #include "Asset/AssetStorage.h"
-#include "Resources/Core/IResourceManager.h"
+#include "Resources/Core/ResourceManager.h"
 
 #include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
@@ -64,9 +64,9 @@ namespace Engine {
       DeclareLogTag(FrameGraphRenderContext);
     public:
       static Ptr<FrameGraphRenderContext> create(
-        Ptr<IAssetStorage>    assetStorage,
-        Ptr<IResourceManager> resourceManager,
-        Ptr<IRenderContext>   renderer);
+        Ptr<IAssetStorage>   assetStorage,
+        Ptr<ResourceManager> resourceManager,
+        Ptr<IRenderContext>  renderer);
 
       EEngineStatus importTexture(
         FrameGraphTexture const&texture);
@@ -108,9 +108,9 @@ namespace Engine {
 
     private:
       FrameGraphRenderContext(
-        Ptr<IAssetStorage>    assetStorage,
-        Ptr<IResourceManager> resourceManager,
-        Ptr<IRenderContext>   renderer);
+        Ptr<IAssetStorage>   assetStorage,
+        Ptr<ResourceManager> resourceManager,
+        Ptr<IRenderContext>  renderer);
 
       EEngineStatus createShaderResourceView(
         FrameGraphTexture      const&texture,
@@ -133,9 +133,9 @@ namespace Engine {
         removeMappedInternalResourceIds(
           std::string const&);
 
-      Ptr<IAssetStorage>    m_assetStorage;
-      Ptr<IResourceManager> m_resourceManager;
-      Ptr<IRenderContext>   m_platformRenderContext;
+      Ptr<IAssetStorage>   m_assetStorage;
+      Ptr<ResourceManager> m_resourceManager;
+      Ptr<IRenderContext>  m_platformRenderContext;
 
       Map<std::string, Vector<PublicResourceId_t>> m_resourceMap;
     };

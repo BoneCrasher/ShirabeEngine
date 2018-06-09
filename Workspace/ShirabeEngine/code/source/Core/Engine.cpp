@@ -2,7 +2,7 @@
 
 #include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
 
-#include "Resources/Core/ProxyBasedResourceManager.h"
+#include "Resources/Core/ResourceManager.h"
 
 namespace Engine {
 
@@ -124,12 +124,12 @@ namespace Engine {
       EGFXAPI        gfxApi        = EGFXAPI::DirectX;
       EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::DirectX_11_0;
 
-      Ptr<BasicGFXAPIResourceBackend>             resourceBackend     = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
-      Ptr<GFXAPIResourceTaskBackend<EngineTypes>> resourceTaskBackend = nullptr;
+      Ptr<GFXAPIResourceBackend>     resourceBackend     = MakeSharedPointerType<GFXAPIResourceBackend>();
+      Ptr<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
       m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);
 
-      Ptr<ProxyBasedResourceManager> manager = MakeSharedPointerType<ProxyBasedResourceManager>(m_proxyFactory);
+      Ptr<ResourceManager> manager = MakeSharedPointerType<ResourceManager>(m_proxyFactory);
       manager->setResourceBackend(resourceBackend);
       m_resourceManager = manager;
 

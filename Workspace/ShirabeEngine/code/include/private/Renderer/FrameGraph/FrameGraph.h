@@ -145,7 +145,7 @@ namespace Engine {
         TPassCreationArgs &&... args);
 
       // 
-      Ptr<IResourceManager> m_resourceManager;
+      Ptr<ResourceManager> m_resourceManager;
 
       PassMap                     m_passes;
       AdjacencyListMap<PassUID_t> m_passAdjacency;

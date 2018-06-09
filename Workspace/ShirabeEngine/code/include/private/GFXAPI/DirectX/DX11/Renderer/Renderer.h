@@ -30,7 +30,7 @@ namespace Engine {
         EEngineStatus initialize(
           ApplicationEnvironment const &environment,
           RendererConfiguration  const &configuration,
-          IResourceManagerPtr    const &resourceManager);
+          Ptr<ResourceManager>   const &resourceManager);
 
 
         EEngineStatus deinitialize();
@@ -44,7 +44,7 @@ namespace Engine {
 
       private:
         RendererConfiguration m_config;
-        IResourceManagerPtr   m_resourceManager;
+        Ptr<ResourceManager>  m_resourceManager;
 
         Ptr<DX11Environment> m_dx11Environment;
 

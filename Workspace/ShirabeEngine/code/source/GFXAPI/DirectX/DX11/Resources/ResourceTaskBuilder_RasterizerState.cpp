@@ -6,7 +6,7 @@ namespace Engine {
     namespace _11 {
       using namespace Engine::Resources;
       using namespace Engine::DX::_11;
-
+/*
       EEngineStatus
         DX11ResourceTaskBackend::
         creationTask(
@@ -53,7 +53,7 @@ namespace Engine {
 
         return status;
       }
-
+*/
     }
   }
 }

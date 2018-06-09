@@ -5,9 +5,9 @@ namespace Engine {
 
     Ptr<FrameGraphRenderContext>
       FrameGraphRenderContext::create(
-        Ptr<IAssetStorage>    assetStorage,
-        Ptr<IResourceManager> resourceManager,
-        Ptr<IRenderContext>   renderer)
+        Ptr<IAssetStorage>   assetStorage,
+        Ptr<ResourceManager> resourceManager,
+        Ptr<IRenderContext>  renderer)
     {
       assert(assetStorage    != nullptr);
       assert(resourceManager != nullptr);
@@ -20,9 +20,9 @@ namespace Engine {
     }
 
     FrameGraphRenderContext::FrameGraphRenderContext(
-      Ptr<IAssetStorage>    assetStorage,
-      Ptr<IResourceManager> resourceManager,
-      Ptr<IRenderContext>   renderer)
+      Ptr<IAssetStorage>   assetStorage,
+      Ptr<ResourceManager> resourceManager,
+      Ptr<IRenderContext>  renderer)
       : m_assetStorage(assetStorage)
       , m_resourceManager(resourceManager)
       , m_platformRenderContext(renderer)
@@ -77,7 +77,7 @@ namespace Engine {
       Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
 
       PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createTexture(request, pid, false);
+      EEngineStatus status = m_resourceManager->createResource<Texture>(request, pid, false);
       HandleEngineStatusError(status, "Failed to create texture.");
 
       mapFrameGraphToInternalResource(texture.readableName, pid);
@@ -128,7 +128,7 @@ namespace Engine {
       ShaderResourceView::CreationRequest request(desc, subjacentResources[0]);
 
       PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createShaderResourceView(request, pid, false);
+      EEngineStatus status = m_resourceManager->createResource<ShaderResourceView>(request, pid, false);
       HandleEngineStatusError(status, "Failed to create texture.");
 
       mapFrameGraphToInternalResource(view.readableName, pid);
@@ -155,7 +155,7 @@ namespace Engine {
       DepthStencilView::CreationRequest request(desc, subjacentResources[0]);
 
       PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createDepthStencilView(request, pid, false);
+      EEngineStatus status = m_resourceManager->createResource<DepthStencilView>(request, pid, false);
       HandleEngineStatusError(status, "Failed to create texture.");
 
       mapFrameGraphToInternalResource(view.readableName, pid);
@@ -182,7 +182,7 @@ namespace Engine {
       RenderTargetView::CreationRequest request(desc, subjacentResources[0]);
 
       PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createRenderTargetView(request, pid, false);
+      EEngineStatus status = m_resourceManager->createResource<RenderTargetView>(request, pid, false);
       HandleEngineStatusError(status, "Failed to create texture.");
 
       mapFrameGraphToInternalResource(view.readableName, pid);
@@ -253,7 +253,7 @@ namespace Engine {
       if(subjacentResources.empty())
         return EEngineStatus::Error;
 
-      EEngineStatus status = m_resourceManager->destroyTexture(subjacentResources[0]);
+      EEngineStatus status = m_resourceManager->destroyResource<Texture>(subjacentResources[0]);
       removeMappedInternalResourceIds(texture.readableName);
 
       return status;
@@ -273,14 +273,14 @@ namespace Engine {
 
       if(view.source == FrameGraphViewSource::Color) {
         if(view.mode.check(FrameGraphViewAccessMode::Read)) {
-          status = m_resourceManager->destroyShaderResourceView(subjacentResources[0]);
+          status = m_resourceManager->destroyResource<ShaderResourceView>(subjacentResources[0]);
         }
         else if(view.mode.check(FrameGraphViewAccessMode::Write)) {
-          status = m_resourceManager->destroyRenderTargetView(subjacentResources[0]);
+          status = m_resourceManager->destroyResource<RenderTargetView>(subjacentResources[0]);
         }
       }
       else if(view.source == FrameGraphViewSource::Depth) {
-        status = m_resourceManager->destroyDepthStencilView(subjacentResources[0]);
+        status = m_resourceManager->destroyResource<DepthStencilView>(subjacentResources[0]);
       }
 
       removeMappedInternalResourceIds(view.readableName);

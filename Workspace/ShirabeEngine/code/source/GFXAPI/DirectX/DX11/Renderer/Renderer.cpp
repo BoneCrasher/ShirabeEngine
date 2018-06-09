@@ -16,7 +16,7 @@ namespace Engine {
 		namespace _11 {
 
       RendererConfiguration m_config;
-      IResourceManagerPtr   m_resourceManager;
+      Ptr<ResourceManager>   m_resourceManager;
 
       Ptr<DX11Environment> m_dx11Environment;
 
@@ -51,7 +51,7 @@ namespace Engine {
 			EEngineStatus DX11Renderer::initialize(
 				ApplicationEnvironment const &environment,
 				RendererConfiguration  const &configuration,
-				IResourceManagerPtr    const &resourceManager) 
+				Ptr<ResourceManager>   const &resourceManager) 
       {
 
 				m_config          = configuration;
@@ -90,7 +90,7 @@ namespace Engine {
         PublicResourceId_t swapChainId = 0;
         SwapChain::CreationRequest swapChainCreationRequest(swapChainDescriptor);
 
-				status = resourceManager->createSwapChain(swapChainDescriptor, swapChainId);
+				status = resourceManager->createResource<SwapChain>(swapChainDescriptor, swapChainId);
         HandleEngineStatusError(status, String::format("Failed to create swap chain:\n Desc:%0", swapChainDescriptor.toString()));
       
         Texture::Descriptor defaultDepthStencilTextureDescriptor ={};
@@ -104,7 +104,7 @@ namespace Engine {
         defaultDepthStencilTextureDescriptor.gpuBinding                        = EToUnderlying(BufferBinding::ShaderOutput_DepthStencil);
 
         PublicResourceId_t defaultDepthStencilTextureId   = 0;
-				status = resourceManager->createTexture(defaultDepthStencilTextureDescriptor, defaultDepthStencilTextureId);
+				status = resourceManager->createResource<Texture>(defaultDepthStencilTextureDescriptor, defaultDepthStencilTextureId);
         HandleEngineStatusError(status, String::format("Failed to create depth stencil view:\n Desc:%0", defaultDepthStencilTextureDescriptor.toString()));
 
 
@@ -138,7 +138,7 @@ namespace Engine {
         DepthStencilState::CreationRequest dssCreationRequest(defaultDepthStencilStateDescriptor);
 
         PublicResourceId_t defaultDepthStencilStateId = 0;
-				status = resourceManager->createDepthStencilState(dssCreationRequest, defaultDepthStencilStateId);
+				status = resourceManager->createResource<DepthStencilState>(dssCreationRequest, defaultDepthStencilStateId);
         HandleEngineStatusError(status, String::format("Failed to create depth stencil state:\n Desc:%0", defaultDepthStencilStateDescriptor.toString()));
         
         RasterizerState::Descriptor defaultRasterizerStateDescriptor{};
@@ -147,7 +147,7 @@ namespace Engine {
         RasterizerState::CreationRequest rasterizerStateCreationRequest(defaultRasterizerStateDescriptor);
 
         PublicResourceId_t defaultRasterizerStateId{};
-				status = resourceManager->createRasterizerState(rasterizerStateCreationRequest, defaultRasterizerStateId);
+				status = resourceManager->createResource<RasterizerState>(rasterizerStateCreationRequest, defaultRasterizerStateId);
         HandleEngineStatusError(status, String::format("Failed to create rasterizer state:\n Desc:%0", defaultRasterizerStateDescriptor.toString()));
         
 				// m_createDefaultViewPort:
@@ -169,11 +169,11 @@ namespace Engine {
 			EEngineStatus DX11Renderer::deinitialize() {
         EEngineStatus status = EEngineStatus::Ok;
         
-        status = m_resourceManager->destroyDepthStencilState(m_defaultDepthStencilStateId);
+        status = m_resourceManager->destroyResource<DepthStencilState>(m_defaultDepthStencilStateId);
         HandleEngineStatusError(status, "Failed to destroy the default depth stencil state.");
-        status = m_resourceManager->destroyTexture(m_defaultDepthStencilTextureId);
+        status = m_resourceManager->destroyResource<Texture>(m_defaultDepthStencilTextureId);
         HandleEngineStatusError(status, "Failed to destroy the default depth stencil texture or one of its dependers.");
-        status = m_resourceManager->destroySwapChain(m_swapChainId);
+        status = m_resourceManager->destroyResource<SwapChain>(m_swapChainId);
         HandleEngineStatusError(status, "Failed to destroy the swap chain.");
 
 				return EEngineStatus::Ok;

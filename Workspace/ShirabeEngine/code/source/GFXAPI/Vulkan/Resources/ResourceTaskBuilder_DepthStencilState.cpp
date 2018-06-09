@@ -3,7 +3,7 @@
 namespace Engine {
   namespace Vulkan {
     using namespace Engine::Resources;
-
+/*
     EEngineStatus
       VulkanResourceTaskBackend::
       creationTask(
@@ -50,7 +50,7 @@ namespace Engine {
 
       return status;
     }
-
+*/
 
   }
 }

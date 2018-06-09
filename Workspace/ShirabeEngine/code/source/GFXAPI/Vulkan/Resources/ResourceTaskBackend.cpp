@@ -5,12 +5,14 @@ namespace Engine {
 
     VulkanResourceTaskBackend::VulkanResourceTaskBackend(
       Ptr<VulkanEnvironment> const& vulkanEnvironment)
-      : GFXAPIResourceTaskBackend<EngineTypes>()
+      : GFXAPIResourceTaskBackend()
       , m_vulkanEnvironment(vulkanEnvironment)
     {
       assert(vulkanEnvironment != nullptr);
     }
 
-
+    void VulkanResourceTaskBackend::initialize() {
+      addCreator<Texture>(bindmemberhere);
+    }
   }
 }
