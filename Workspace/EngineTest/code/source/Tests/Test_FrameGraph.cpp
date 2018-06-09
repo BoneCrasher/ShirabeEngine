@@ -65,7 +65,8 @@ namespace Test {
       //
       // RESOURCE MANAGEMENT
       // 
-      Ptr<GFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = MakeSharedPointerType<MockGFXAPITaskBackend>();
+      Ptr<MockGFXAPITaskBackend> gfxApiResourceTaskBackend = MakeSharedPointerType<MockGFXAPITaskBackend>();
+      gfxApiResourceTaskBackend->initialize();
 
       Ptr<GFXAPIResourceBackend> gfxApiResourceBackend = MakeSharedPointerType<GFXAPIResourceBackend>();
       gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);

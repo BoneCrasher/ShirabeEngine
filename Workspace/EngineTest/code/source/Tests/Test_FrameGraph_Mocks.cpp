@@ -230,6 +230,24 @@ namespace Test {
             return EEngineStatus::Ok;                                                                                                                                             \
           }
 
+    #define Mock_AddFunctionsForType(Type) \
+      addCreator<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##CreationTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
+      addUpdater<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##UpdateTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
+      addDestructor<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
+      addQuery<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##QueryTask, this, std::placeholders::_1, std::placeholders::_2));
+
+    void MockGFXAPITaskBackend::initialize()
+    {
+      Mock_AddFunctionsForType(Texture);
+      Mock_AddFunctionsForType(ShaderResourceView);
+      Mock_AddFunctionsForType(RenderTargetView);
+      Mock_AddFunctionsForType(DepthStencilView);
+      Mock_AddFunctionsForType(DepthStencilState);
+      Mock_AddFunctionsForType(RasterizerState);
+      Mock_AddFunctionsForType(SwapChain);
+      Mock_AddFunctionsForType(SwapChainBuffer);
+    }
+
     Mock_DefineTaskBuilderModule(Texture);
     Mock_DefineTaskBuilderModule(ShaderResourceView);
     Mock_DefineTaskBuilderModule(RenderTargetView);

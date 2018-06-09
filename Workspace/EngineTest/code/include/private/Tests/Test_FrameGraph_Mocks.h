@@ -98,6 +98,8 @@ namespace Test {
     {
       DeclareLogTag(MockGFXAPITaskBackend);
     public:
+      void initialize();
+
       Mock_DeclareTaskBuilderModule(Texture);
       Mock_DeclareTaskBuilderModule(ShaderResourceView);
       Mock_DeclareTaskBuilderModule(RenderTargetView);
