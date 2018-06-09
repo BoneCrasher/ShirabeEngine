@@ -43,6 +43,8 @@ namespace Engine {
     GFXAPI_SubsystemResourceDestructionFailed                       =  -50202,
     GFXAPI_LoadResourceFailed                                       =  -50210,  
     GFXAPI_UnloadResourceFailed                                     =  -50211,
+    ResourceTaskBackend_FunctionNotFound                            =  -50500,
+    ResourceTaskBackend_FunctionTypeInvalid                         =  -50501,
 		DXGI_FactoryCreationFailed                                      = -100300, // DXGI
 		DXGI_FactoryGetAdapterFailed                                    = -100302, 
 		DXGI_AdapterGetDescFailed                                       = -100303,

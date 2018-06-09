@@ -179,7 +179,7 @@ namespace Engine {
     {
       std::type_index tindex = std::type_index(typeid(TResource));
       if(m_creatorFn.find(tindex) == m_creatorFn.end())
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
       Any fn = m_creatorFn.at(tindex);
       try {
@@ -187,7 +187,7 @@ namespace Engine {
         return f(inRequest, inDependencies, outTask);
       }
       catch(std::bad_any_cast const&) {
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionTypeInvalid;
       }
     }
 
@@ -200,7 +200,7 @@ namespace Engine {
     {
       std::type_index tindex = std::type_index(typeid(TResource));
       if(m_updateFn.find(tindex) == m_updateFn.end())
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
       Any fn = m_updateFn.at(tindex);
       try {
@@ -208,7 +208,7 @@ namespace Engine {
         return f(inRequest, inDependencies, outTask);
       }
       catch(std::bad_any_cast const&) {
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionTypeInvalid;
       }
     }
 
@@ -221,7 +221,7 @@ namespace Engine {
     {
       std::type_index tindex = std::type_index(typeid(TResource));
       if(m_destroyFn.find(tindex) == m_destroyFn.end())
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
       Any fn = m_destroyFn.at(tindex);
       try {
@@ -229,7 +229,7 @@ namespace Engine {
         return f(inRequest, inDependencies, outTask);
       }
       catch(std::bad_any_cast const&) {
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionTypeInvalid;
       }
     }
 
@@ -241,7 +241,7 @@ namespace Engine {
     {
       std::type_index tindex = std::type_index(typeid(TResource));
       if(m_queryFn.find(tindex) == m_queryFn.end())
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
       Any fn = m_queryFn.at(tindex);
       try {
@@ -249,7 +249,7 @@ namespace Engine {
         return f(inRequest, inDependencies, outTask);
       }
       catch(std::bad_any_cast const&) {
-        return EEngineStatus::Error;
+        return EEngineStatus::ResourceTaskBackend_FunctionTypeInvalid;
       }
     }
 

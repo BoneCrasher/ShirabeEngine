@@ -179,64 +179,9 @@ namespace Test {
       Log::Verbose(logTag(), String::format("Render(...):\n", to_string(renderable)));
       return EEngineStatus::Ok;
     }
-
-
-    #define Mock_DefineResourceMethods(resource)              \
-                                                              \
-      EEngineStatus MockResourceManager::create##resource(    \
-        resource::CreationRequest const&inRequest,            \
-        PublicResourceId_t             &outId,                \
-        bool                            deferLoad             \
-      ) {                                                     \
-        Log::Verbose(logTag(), String::format("create%0(...);", #resource));    \
-        load##resource(outId);                                \
-        return EEngineStatus::Ok;                             \
-      }                                                       \
-                                                              \
-      EEngineStatus MockResourceManager::load##resource(      \
-        PublicResourceId_t const&inId                         \
-      ) {                                                     \
-        Log::Verbose(logTag(), String::format("load%0(...);", #resource));    \
-        return EEngineStatus::Ok;                             \
-      }                                                       \
-                                                              \
-      EEngineStatus MockResourceManager::update##resource(    \
-        PublicResourceId_t      const&inId,                   \
-        resource::UpdateRequest const&inRequest               \
-      ) {                                                     \
-        Log::Verbose(logTag(), String::format("update%0(...);", #resource));    \
-        return EEngineStatus::Ok;                             \
-      }                                                       \
-                                                              \
-      EEngineStatus MockResourceManager::unload##resource(    \
-        PublicResourceId_t const&inId                         \
-      ) {                                                     \
-        Log::Verbose(logTag(), String::format("unload%0(...);", #resource));    \
-        return EEngineStatus::Ok;                             \
-      }                                                       \
-                                                              \
-      EEngineStatus MockResourceManager::destroy##resource(   \
-        PublicResourceId_t const&inId                         \
-      ) {                                                     \
-        unload##resource(inId);                               \
-        Log::Verbose(logTag(), String::format("destroy%0(...);", #resource));    \
-        return EEngineStatus::Ok;                             \
-      }
-
-    Mock_DefineResourceMethods(SwapChain);
-    Mock_DefineResourceMethods(Texture);
-    Mock_DefineResourceMethods(RenderTargetView);
-    Mock_DefineResourceMethods(ShaderResourceView);
-    Mock_DefineResourceMethods(DepthStencilView);
-    Mock_DefineResourceMethods(DepthStencilState);
-    Mock_DefineResourceMethods(RasterizerState);
-
-    bool MockResourceManager::clear() { std::cout << "Cleared resource manager \n"; return true; }
-
-    Ptr<BasicGFXAPIResourceBackend>& MockResourceManager::backend() { throw std::exception("Don't call me..."); }
-
+    
     #define Mock_DefineTaskBuilderModule(Type)                                                                                                                  \
-          EEngineStatus MockGFXAPITaskBackend::creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("creationTask<%0>(...)", #Type));                                                                                               \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -248,7 +193,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##UpdateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("updateTask<%0>(...)", #Type));                                                                                                 \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -260,7 +205,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##DestructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("destructionTask<%0>(...)", #Type));                                                                                            \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -272,7 +217,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask)                                                 \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##QueryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask)                                                 \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("queryTask<%0>(...)", #Type));                                                                                                  \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \

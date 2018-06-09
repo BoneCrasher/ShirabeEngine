@@ -5,8 +5,7 @@
 
 #include <Core/EngineTypeHelper.h>
 
-#include <Resources/Core/IResourceManager.h>
-#include <Resources/Core/ProxyBasedResourceManager.h>
+#include <Resources/Core/ResourceManager.h>
 #include <Resources/Core/ResourceProxyFactory.h>
 #include <Resources/Subsystems/GFXAPI/Types/All.h>
 
@@ -87,59 +86,15 @@ namespace Test {
 
       Ptr<IRenderContext> m_renderer;
     };
-
-	 
-    #define Mock_DeclareResourceMethods(resource)         \
-                                                          \
-      EEngineStatus create##resource(                     \
-        resource::CreationRequest const&inRequest,        \
-        PublicResourceId_t             &outId,            \
-        bool                            deferLoad = false \
-      );                                                  \
-                                                          \
-      EEngineStatus load##resource(                       \
-        PublicResourceId_t const&inId                     \
-      );                                                  \
-                                                          \
-      EEngineStatus update##resource(                     \
-        PublicResourceId_t      const&inId,               \
-        resource::UpdateRequest const&inRequest           \
-      );                                                  \
-                                                          \
-      EEngineStatus unload##resource(                     \
-        PublicResourceId_t const&inId                     \
-      );                                                  \
-                                                          \
-      EEngineStatus destroy##resource(                    \
-        PublicResourceId_t const&inId                     \
-      );                                   
-
-    class MockResourceManager
-      : public IResourceManager
-    {
-      DeclareLogTag(MockResourceManager);
-    public:
-      bool clear();
-
-      Ptr<BasicGFXAPIResourceBackend>& backend();
-
-      Mock_DeclareResourceMethods(SwapChain);
-      Mock_DeclareResourceMethods(Texture);
-      Mock_DeclareResourceMethods(RenderTargetView);
-      Mock_DeclareResourceMethods(ShaderResourceView);
-      Mock_DeclareResourceMethods(DepthStencilView);
-      Mock_DeclareResourceMethods(DepthStencilState);
-      Mock_DeclareResourceMethods(RasterizerState);
-    };
-	
+	 	
     #define Mock_DeclareTaskBuilderModule(Type)                                                                                                                  \
-          EEngineStatus creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);     
+          EEngineStatus fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);     
 
     class MockGFXAPITaskBackend
-      : public GFXAPIResourceTaskBackend<EngineTypes>
+      : public GFXAPIResourceTaskBackend
     {
       DeclareLogTag(MockGFXAPITaskBackend);
     public:

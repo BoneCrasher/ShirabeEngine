@@ -51,7 +51,7 @@ namespace Engine {
      * 			  The resourceBackend holds a mapping of GFXAPIResourceHandle_t to GFXAPIResourceHolder to
      * 			   store and manage the resources.
      **************************************************************************************************/
-    class GFXAPIResourceBackend {
+    class SHIRABE_TEST_EXPORT GFXAPIResourceBackend {
       DeclareLogTag(GFXAPIResourceBackend);
 
     public:

@@ -5,10 +5,9 @@
 #include <Asset/AssetIndex.h>
 #include <Asset/AssetStorage.h>
 
-#include <GFXAPI/Types/All.h>
-#include <Resources/Core/IResourceManager.h>
-#include <Resources/Core/ProxyBasedResourceManager.h>
+#include <Resources/Core/ResourceManager.h>
 #include <Resources/Core/ResourceProxyFactory.h>
+#include <Resources/Subsystems/GFXAPI/Types/All.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
@@ -66,16 +65,14 @@ namespace Test {
       //
       // RESOURCE MANAGEMENT
       // 
-      Ptr<BasicGFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = MakeSharedPointerType<MockGFXAPITaskBackend>();
+      Ptr<GFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = MakeSharedPointerType<MockGFXAPITaskBackend>();
 
-      Ptr<BasicGFXAPIResourceBackend> gfxApiResourceBackend = MakeSharedPointerType<BasicGFXAPIResourceBackend>();
+      Ptr<GFXAPIResourceBackend> gfxApiResourceBackend = MakeSharedPointerType<GFXAPIResourceBackend>();
       gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
 
-      Ptr<ResourceProxyFactory>      resourceProxyFactory = MakeSharedPointerType<ResourceProxyFactory>(gfxApiResourceBackend);
-      Ptr<ProxyBasedResourceManager> proxyResourceManager = MakeSharedPointerType<ProxyBasedResourceManager>(resourceProxyFactory);
+      Ptr<ResourceProxyFactory> resourceProxyFactory = MakeSharedPointerType<ResourceProxyFactory>(gfxApiResourceBackend);
+      Ptr<ResourceManager>      proxyResourceManager = MakeSharedPointerType<ResourceManager>(resourceProxyFactory);
       proxyResourceManager->setResourceBackend(gfxApiResourceBackend);
-
-      Ptr<IResourceManager> resourceManager = std::static_pointer_cast<IResourceManager>(proxyResourceManager);
 
       gfxApiResourceBackend->initialize();
 
@@ -86,7 +83,7 @@ namespace Test {
       Ptr<IRenderContext> renderer = MakeSharedPointerType<MockRenderContext>();
       // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
       // 
-      Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(assetStorage, resourceManager, renderer);
+      Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer);
 
       OSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
 
