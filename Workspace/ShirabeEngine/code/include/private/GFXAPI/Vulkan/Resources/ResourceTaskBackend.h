@@ -29,10 +29,10 @@ namespace Engine {
   }
 
   #define DeclareTaskBuilderModule(Type)                                                                                                                  \
-          EEngineStatus creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);                                               
+          EEngineStatus fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);                                               
 
   namespace Vulkan {
 
@@ -50,6 +50,8 @@ namespace Engine {
       void initialize();
 
     private:
+      DeclareTaskBuilderModule(Texture);
+
       Ptr<VulkanEnvironment> m_vulkanEnvironment;
     };
 
