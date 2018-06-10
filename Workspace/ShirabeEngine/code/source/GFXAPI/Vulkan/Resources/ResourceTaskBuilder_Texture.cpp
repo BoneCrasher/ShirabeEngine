@@ -100,6 +100,10 @@ namespace Engine {
     {
       EEngineStatus status = EEngineStatus::Ok;
 
+      VkImage image = *std::static_pointer_cast<VkImage>(assignment.internalHandle);
+
+      vkDestroyImage(m_vulkanEnvironment->getState().selectedLogicalDevice, image, nullptr);
+
       return status;
     }
 
