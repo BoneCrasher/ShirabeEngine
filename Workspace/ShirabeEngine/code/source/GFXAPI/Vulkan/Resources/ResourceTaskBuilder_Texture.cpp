@@ -18,7 +18,6 @@ namespace Engine {
       Texture::Descriptor const&desc = request.resourceDescriptor();
       
       VkImageType imageType = VkImageType::VK_IMAGE_TYPE_2D;
-
       if(desc.textureInfo.depth > 1) {
         imageType = VkImageType::VK_IMAGE_TYPE_3D;
       }
@@ -30,16 +29,17 @@ namespace Engine {
       }
 
       VkImageUsageFlags imageUsage{};
-      if(desc.gpuBinding.check(BufferBinding::ShaderResource)) {
-        imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT;
-        // DISTINGUISH ATTACHEMENT USAGE!
+      if(desc.gpuBinding.check(BufferBinding::ShaderInput)) 
+        imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT;      
+      if(desc.gpuBinding.check(BufferBinding::InputAttachement)) 
         imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
-        // DISTINGUISH IF THE IMAGE IS WRITABLE wITH COPY OPs!
-        imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-      }
-      if(desc.gpuBinding.check(BufferBinding::ShaderOutput_RenderTarget))
+      if(desc.gpuBinding.check(BufferBinding::CopySource))
+        imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+      if(desc.gpuBinding.check(BufferBinding::CopyTarget)) 
+        imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;      
+      if(desc.gpuBinding.check(BufferBinding::ColorAttachement))
         imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-      if(desc.gpuBinding.check(BufferBinding::ShaderOutput_DepthStencil))
+      if(desc.gpuBinding.check(BufferBinding::DepthAttachement))
         imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
       outTask = [&, this] () -> GFXAPIResourceHandleAssignment

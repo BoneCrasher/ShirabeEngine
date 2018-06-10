@@ -33,16 +33,19 @@ namespace Engine {
 		// No bitflags-type defined, since there's only one type of usage at once per resource.
 
 		enum class BufferBinding 
-      : uint8_t
+      : uint16_t
     {
 			VertexBuffer                 = 1,
 			IndexBuffer                  = 2,
-			ConstantBuffer               = 4,
-			ShaderResource               = 8,
-			ShaderOutput_RenderTarget    = 16,
-			ShaderOutput_StreamOutput    = 32,
-			ShaderOutput_DepthStencil    = 64,
-			UnorderedMultithreadedAccess = 128
+			UniformBuffer                = 4,
+			ShaderInput                  = 8,
+      InputAttachement             = 16,
+			ColorAttachement             = 32,
+			DepthAttachement             = 64,
+      ShaderOutput_StreamOutput    = 128,
+			UnorderedMultithreadedAccess = 256,
+      CopySource                   = 512,
+      CopyTarget                   = 1024
 		};
 
     using Format = Resources::Format;
