@@ -5,6 +5,7 @@
 
 #include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
 #include "Resources/Subsystems/GFXAPI/Types/Texture.h"
+#include "Resources/Subsystems/GFXAPI/Types/TextureView.h"
 
 #include "Platform/Vulkan/VulkanImport.h"
 #include "GFXAPI/Vulkan/Environment.h"
@@ -30,9 +31,9 @@ namespace Engine {
 
   #define DeclareTaskBuilderModule(Type)                                                                                                                  \
           EEngineStatus fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);                                               
+          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, GFXAPIResourceHandleAssignment const&, ResourceTaskFn_t &outTask);                                               
 
   namespace Vulkan {
 
@@ -51,6 +52,9 @@ namespace Engine {
 
     private:
       DeclareTaskBuilderModule(Texture);
+      DeclareTaskBuilderModule(TextureView);
+      //DeclareTaskBuilderModule(Buffer);
+      //DeclareTaskBuilderModule(BufferView);
 
       Ptr<VulkanEnvironment> m_vulkanEnvironment;
     };

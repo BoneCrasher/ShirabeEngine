@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_RESOURCETYPES_RENDERTARGET_H__
-#define __SHIRABE_RESOURCETYPES_RENDERTARGET_H__
+#ifndef __SHIRABE_RESOURCETYPES_TEXTUREVIEW_H__
+#define __SHIRABE_RESOURCETYPES_TEXTUREVIEW_H__
 
 #include "Resources/Core/EResourceType.h"
 #include "Resources/Core/IResource.h"
@@ -23,20 +23,21 @@ namespace Engine {
 		 * \brief	A render target descriptor implementation.
 		 **************************************************************************************************/
 		
-    class RenderTargetViewDeclaration {
+    class TextureViewDeclaration {
     public:
       static const constexpr EResourceType    resource_type    = EResourceType::GAPI_VIEW;
-      static const constexpr EResourceSubType resource_subtype = EResourceSubType::RENDER_TARGET_VIEW;
+      static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_VIEW;
 
 
       struct Descriptor
-        : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::RENDER_TARGET_VIEW> 
+        : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::TEXTURE_VIEW>
       {
         std::string name;
         TextureInfo subjacentTexture;
         Format      textureFormat;
         ArraySlices arraySlices;
         MipSlices   mipMapSlices;
+        // TODO: Distinguish binding and read/write mode
 
         Descriptor();
 
@@ -92,19 +93,19 @@ namespace Engine {
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
-		class RenderTargetView
-			: public RenderTargetViewDeclaration
-      , public ResourceDescriptorAdapter<RenderTargetViewDeclaration::Descriptor>
+		class TextureView
+			: public TextureViewDeclaration
+      , public ResourceDescriptorAdapter<TextureViewDeclaration::Descriptor>
 		{
 		public:
-			using my_type = RenderTargetView;
+			using my_type = TextureView;
 
-      RenderTargetView(
-        const RenderTargetView::Descriptor &descriptor);
+      TextureView(
+        const TextureView::Descriptor &descriptor);
 		};
 
-		DeclareSharedPointerType(RenderTargetView);
-    DefineTraitsPublicTypes(RenderTargetView);
+		DeclareSharedPointerType(TextureView);
+    DefineTraitsPublicTypes(TextureView);
 	}
 }
 

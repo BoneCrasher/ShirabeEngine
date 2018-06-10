@@ -1,9 +1,9 @@
-#include "Resources/Subsystems/GFXAPI/Types/RenderTargetView.h"
+#include "Resources/Subsystems/GFXAPI/Types/TextureView.h"
 
 namespace Engine {
   namespace GFXAPI {
 
-    RenderTargetViewDeclaration::Descriptor
+    TextureViewDeclaration::Descriptor
       ::Descriptor()
       : name("")
       , subjacentTexture()
@@ -11,7 +11,7 @@ namespace Engine {
     {}
 
     std::string
-      RenderTargetViewDeclaration::Descriptor
+      TextureViewDeclaration::Descriptor
       ::toString() const {
       std::stringstream ss;
 
@@ -23,7 +23,7 @@ namespace Engine {
     }
 
 
-    RenderTargetViewDeclaration::CreationRequest
+    TextureViewDeclaration::CreationRequest
       ::CreationRequest(
         Descriptor         const&desc,
         PublicResourceId_t const&underlyingTextureHandle)
@@ -32,13 +32,13 @@ namespace Engine {
     {}
     
     PublicResourceId_t const&
-      RenderTargetViewDeclaration::CreationRequest
+      TextureViewDeclaration::CreationRequest
       ::underlyingTextureHandle() const
     {
       return m_underlyingTextureHandle;
     }
 
-    std::string RenderTargetViewDeclaration::CreationRequest
+    std::string TextureViewDeclaration::CreationRequest
       ::toString() const {
       std::stringstream ss;
 
@@ -52,32 +52,32 @@ namespace Engine {
       return ss.str();
     }
 
-    RenderTargetViewDeclaration::UpdateRequest
+    TextureViewDeclaration::UpdateRequest
       ::UpdateRequest(
         PublicResourceId_t    const& inPublicResourceId,
         SubjacentResourceId_t const& inSubjacentResourceId)
       : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
-    RenderTargetViewDeclaration::DestructionRequest
+    TextureViewDeclaration::DestructionRequest
       ::DestructionRequest(
         PublicResourceId_t    const& inPublicResourceId,
         SubjacentResourceId_t const& inSubjacentResourceId)
       : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
-    RenderTargetViewDeclaration::Query
+    TextureViewDeclaration::Query
       ::Query(
         PublicResourceId_t    const& inPublicResourceId,
         SubjacentResourceId_t const& inSubjacentResourceId)
       : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
     {}
 
-    RenderTargetView::
-      RenderTargetView(
-        const RenderTargetView::Descriptor &descriptor)
-      : RenderTargetViewDeclaration()
-      , ResourceDescriptorAdapter<RenderTargetViewDeclaration::Descriptor>(descriptor)
+    TextureView::
+      TextureView(
+        const TextureView::Descriptor &descriptor)
+      : TextureViewDeclaration()
+      , ResourceDescriptorAdapter<TextureViewDeclaration::Descriptor>(descriptor)
     {}
 
   }

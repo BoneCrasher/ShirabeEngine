@@ -50,6 +50,7 @@ namespace Engine {
 			SHADER_RESOURCE_VIEW  = 602,
 			RENDER_TARGET_VIEW    = 603,
 			UNORDERED_ACCESS_VIEW = 604,
+      TEXTURE_VIEW          = 605,
 			DEPTH_STENCIL_STATE   = 701,
 			RASTERIZER_STATE      = 702,
 			BLEND_STATE           = 703
