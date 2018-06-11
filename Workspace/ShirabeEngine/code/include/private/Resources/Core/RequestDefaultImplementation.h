@@ -19,7 +19,7 @@ namespace Engine {
       class CreationRequestBase {
       public:
         CreationRequestBase(
-          TDescriptor        const&desc)
+          TDescriptor const&desc)
           : m_resourceDescriptor(desc)
         {}
 
@@ -39,18 +39,14 @@ namespace Engine {
       public:
         inline 
           ExistingResourceRequestBase(
-            PublicResourceId_t    const& inPublicResourceId,
-            SubjacentResourceId_t const& inSubjacentResourceId)
+            PublicResourceId_t    const& inPublicResourceId)
           : m_publicResourceId(inPublicResourceId)
-          , m_subjacentResouceId(inSubjacentResourceId)
         {}
 
         inline PublicResourceId_t    const& publicResourceId()    const { return m_publicResourceId;   }
-        inline SubjacentResourceId_t const& subjacentResourceId() const { return m_subjacentResouceId; }
 
       private:
         PublicResourceId_t    m_publicResourceId;
-        SubjacentResourceId_t m_subjacentResouceId;
       };
 
 
@@ -59,9 +55,8 @@ namespace Engine {
       {
       public:
         inline UpdateRequestBase(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId)
-          : ExistingResourceRequestBase(inPublicResourceId, inSubjacentResourceId)
+          PublicResourceId_t    const& inPublicResourceId)
+          : ExistingResourceRequestBase(inPublicResourceId)
         {}
       };
 
@@ -70,9 +65,8 @@ namespace Engine {
       {
       public:
         inline DestructionRequestBase(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId)
-          : ExistingResourceRequestBase(inPublicResourceId, inSubjacentResourceId)
+          PublicResourceId_t    const& inPublicResourceId)
+          : ExistingResourceRequestBase(inPublicResourceId)
         {}
       };
 
@@ -81,9 +75,8 @@ namespace Engine {
       {
       public:
         inline QueryBase(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId)
-          : ExistingResourceRequestBase(inPublicResourceId, inSubjacentResourceId)
+          PublicResourceId_t    const& inPublicResourceId)
+          : ExistingResourceRequestBase(inPublicResourceId)
         {}
       };
     };

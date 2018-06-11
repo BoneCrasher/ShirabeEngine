@@ -3,7 +3,7 @@
 namespace Engine {
   namespace GFXAPI {
 
-    
+
     /**********************************************************************************************//**
      * \fn  template <typename... TSupportedResourceTypes> GFXAPIResourceBackend<TSupportedResourceTypes...> ::GFXAPIResourceBackend() : m_resourceThread() , m_resourceThreadHandler(m_resourceThread.getHandler())
      *
@@ -19,7 +19,7 @@ namespace Engine {
       , m_resourceThreadHandler(m_resourceThread.getHandler())
     {}
 
-    
+
     bool
       GFXAPIResourceBackend
       ::initialize()
@@ -47,7 +47,7 @@ namespace Engine {
       return m_resourceThread.deinitialize();
     }
 
-    
+
     /**********************************************************************************************//**
      * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::enqueue( const ResourceTaskFn_t &inTask, std::future<GFXAPIResourceHandle_t> &outSharedFuture)
      *
@@ -79,7 +79,7 @@ namespace Engine {
       bool enqueued = m_resourceThreadHandler.post(std::move(looperTask));
       return (enqueued ? EEngineStatus::Ok : EEngineStatus::GFXAPI_SubsystemThreadEnqueueFailed);
     }
-    
+
     void
       GFXAPIResourceBackend
       ::setResourceTaskBackend(ResourceTaskBackendPtr const& backend)

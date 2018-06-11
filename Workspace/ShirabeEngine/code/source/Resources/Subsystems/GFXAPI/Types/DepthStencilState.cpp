@@ -50,23 +50,20 @@ namespace Engine {
 
     DepthStencilStateDeclaration::UpdateRequest
       ::UpdateRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
     {}
 
     DepthStencilStateDeclaration::DestructionRequest
       ::DestructionRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
     {}
 
     DepthStencilStateDeclaration::Query
       ::Query(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId)
     {}
 
     DepthStencilState

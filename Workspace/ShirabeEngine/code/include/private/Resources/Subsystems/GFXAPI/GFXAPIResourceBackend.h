@@ -5,6 +5,7 @@
 
 namespace Engine {
   namespace GFXAPI {
+    using namespace Resources;
 
     /**********************************************************************************************//**
      * \enum	EGFXAPI
@@ -39,7 +40,7 @@ namespace Engine {
      *
      * \param	handle	The handle.
      **************************************************************************************************/
-    virtual void onResourceLoaded(const GFXAPIResourceHandle_t handle) = 0;
+    virtual void onResourceLoaded(const PublicResourceId_t handle) = 0;
     DeclareInterfaceEnd(IAsyncLoadCallback);
 
     /**********************************************************************************************//**
@@ -66,19 +67,13 @@ namespace Engine {
       template <typename TResource>
       EEngineStatus load(
         typename TResource::CreationRequest const&inRequest,
-        GFXAPIResourceHandleList            const&dependencies,
+        PublicResourceIdList                const&dependencies,
         const ETaskSynchronization               &inRequestMode,
-        const Ptr<IAsyncLoadCallback>            &inCallback,
-        GFXAPIResourceHandle_t                   &outResourceHandle);
+        const Ptr<IAsyncLoadCallback>            &inCallback);
 
       template <typename TResource>
       EEngineStatus unload(
         typename TResource::DestructionRequest const&inRequest);
-
-      template <typename TUnderlyingType>
-      EEngineStatus getGfxApiResourceHandle(
-        GFXAPIResourceHandle_t const&resourceId,
-        Ptr<TUnderlyingType>        &outHandlePtr);
 
       void setResourceTaskBackend(ResourceTaskBackendPtr const& backend);
 
@@ -92,6 +87,7 @@ namespace Engine {
       template <typename TResource>
       EEngineStatus unloadImpl(
         typename TResource::DestructionRequest const&inRequest,
+        GFXAPIResourceHandleAssignment         const&assignment,
         ResolvedDependencyCollection           const&resolvedDependencies,
         DeferredResourceOperationHandle             &outHandle);
 
@@ -126,22 +122,21 @@ namespace Engine {
       GFXAPIResourceBackend
       ::load(
         typename TResource::CreationRequest const&inRequest,
-        GFXAPIResourceHandleList            const&dependencies,
+        PublicResourceIdList                const&dependencies,
         const ETaskSynchronization               &inSynchronization,
-        const Ptr<IAsyncLoadCallback>            &inCallback,
-        GFXAPIResourceHandle_t                   &outResourceHandle)
+        const Ptr<IAsyncLoadCallback>            &inCallback)
     {
       ResourceTaskFn_t::result_type resourceHandle ={};
 
       DeferredResourceOperationHandle handle;
 
-      // Resolve dependencies...
-      ResolvedDependencyCollection resolvedDependencies={};
-      for(GFXAPIResourceHandleList::value_type const&h : dependencies)
-        resolvedDependencies[h] = m_storage[h];
-
       EEngineStatus status = EEngineStatus::Ok;
 
+      // Resolve dependencies...
+      ResolvedDependencyCollection resolvedDependencies={};
+      for(PublicResourceIdList::value_type const&h : dependencies)
+        resolvedDependencies[h] = m_storage[h];
+      
       try {
 
         status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
@@ -155,7 +150,6 @@ namespace Engine {
             else {
               // Store the internal handle and return the public handle
               m_storage[resourceHandle.publicHandle] = resourceHandle.internalHandle;
-              outResourceHandle = resourceHandle.publicHandle;
 
               status = EEngineStatus::Ok;
             }
@@ -166,12 +160,12 @@ namespace Engine {
           }
         }
 
+        HandleEngineStatusError(status, String::format("Failed to create and/or enqueue resource creation task."));
       }
       catch(std::future_error const&fe) {
         Log::Error(logTag(), String::format("Failed to access future shared state. Error: %0", fe.what()));
       }
-
-      HandleEngineStatusError(status, String::format("Failed to create and/or enqueue resource creation task."));
+      
       return status;
     }
 
@@ -186,11 +180,10 @@ namespace Engine {
       ResolvedDependencyCollection resolvedDependencies={}; // Guarding the public API by passing in this empty map.
 
       DeferredResourceOperationHandle handle;
-
+    
       EEngineStatus status = EEngineStatus::Ok;
-
       try {
-        status = unloadImpl<TResource>(inRequest, resolvedDependencies, handle);
+        status = unloadImpl<TResource>(inRequest, { inRequest.publicResourceId(), m_storage[inRequest.publicResourceId()] }, resolvedDependencies, handle);
         if(!CheckEngineError(status)) {
           resourceHandle = handle.futureHandle.get(); // Wait for it ALWAYS!
           if(!resourceHandle.valid()) {
@@ -254,13 +247,14 @@ namespace Engine {
     EEngineStatus GFXAPIResourceBackend
       ::unloadImpl(
         typename TResource::DestructionRequest const&inRequest,
+        GFXAPIResourceHandleAssignment         const&assignment,
         ResolvedDependencyCollection           const&resolvedDependencies,
         DeferredResourceOperationHandle             &outHandle)
     {
       EEngineStatus status = EEngineStatus::Ok;
 
       ResourceTaskFn_t task = nullptr;
-      status = m_resourceTaskBackend->destructionTask<TResource>(inRequest, resolvedDependencies, task);
+      status = m_resourceTaskBackend->destructionTask<TResource>(inRequest, assignment, resolvedDependencies, task);
       if(CheckEngineError(status)) {
         Log::Error(logTag(), String::format("Failed to create destruction task for resource '%0'", "..."));
         return status;
@@ -276,25 +270,6 @@ namespace Engine {
       outHandle.futureHandle = std::move(future);
 
       return status;
-    }
-
-
-    template <typename TUnderlyingType>
-    EEngineStatus
-      GFXAPIResourceBackend
-      ::getGfxApiResourceHandle(
-        GFXAPIResourceHandle_t const&handle,
-        Ptr<TUnderlyingType>        &outHandlePtr)
-    {
-      assert(CheckValidHandle(handle));
-
-      Ptr<void> anything = findUnderlyingHandle(handle);
-      assert(anything != nullptr);
-
-      Ptr<TUnderlyingType> p = std::dynamic_pointer_cast<TUnderlyingType>(anything);
-      assert(p != nullptr);
-
-      return p;
     }
   }
 }

@@ -181,7 +181,7 @@ namespace Test {
     }
     
     #define Mock_DefineTaskBuilderModule(Type)                                                                                                                  \
-          EEngineStatus MockGFXAPITaskBackend::fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##CreationTask(Type::CreationRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("creationTask<%0>(...)", #Type));                                                                                               \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -193,7 +193,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::fn##Type##UpdateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##UpdateTask(Type::UpdateRequest const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("updateTask<%0>(...)", #Type));                                                                                                 \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -205,7 +205,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::fn##Type##DestructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##DestructionTask(Type::DestructionRequest const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("destructionTask<%0>(...)", #Type));                                                                                            \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -217,7 +217,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::fn##Type##QueryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask)                                                 \
+          EEngineStatus MockGFXAPITaskBackend::fn##Type##QueryTask(Type::Query const&request, GFXAPIResourceHandleAssignment const&, ResourceTaskFn_t &outTask)                                                 \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("queryTask<%0>(...)", #Type));                                                                                                  \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -232,16 +232,14 @@ namespace Test {
 
     #define Mock_AddFunctionsForType(Type) \
       addCreator<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##CreationTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
-      addUpdater<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##UpdateTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
-      addDestructor<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
-      addQuery<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##QueryTask, this, std::placeholders::_1, std::placeholders::_2));
+      addUpdater<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##UpdateTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));   \
+      addDestructor<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));   \
+      addQuery<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##QueryTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     void MockGFXAPITaskBackend::initialize()
     {
       Mock_AddFunctionsForType(Texture);
-      Mock_AddFunctionsForType(ShaderResourceView);
-      Mock_AddFunctionsForType(RenderTargetView);
-      Mock_AddFunctionsForType(DepthStencilView);
+      Mock_AddFunctionsForType(TextureView);
       Mock_AddFunctionsForType(DepthStencilState);
       Mock_AddFunctionsForType(RasterizerState);
       Mock_AddFunctionsForType(SwapChain);
@@ -249,9 +247,7 @@ namespace Test {
     }
 
     Mock_DefineTaskBuilderModule(Texture);
-    Mock_DefineTaskBuilderModule(ShaderResourceView);
-    Mock_DefineTaskBuilderModule(RenderTargetView);
-    Mock_DefineTaskBuilderModule(DepthStencilView);
+    Mock_DefineTaskBuilderModule(TextureView);
     Mock_DefineTaskBuilderModule(DepthStencilState);
     Mock_DefineTaskBuilderModule(RasterizerState);
     Mock_DefineTaskBuilderModule(SwapChain);

@@ -45,23 +45,20 @@ namespace Engine {
 
     SwapChainBufferDeclaration::
       UpdateRequest::UpdateRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
     {}
 
     SwapChainBufferDeclaration::
       DestructionRequest::DestructionRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
     {}
 
     SwapChainBufferDeclaration::
       Query::Query(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId)
     {}
     
     Ptr<SwapChainBuffer>
@@ -127,24 +124,21 @@ namespace Engine {
 
     SwapChainDeclaration::
       UpdateRequest::UpdateRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
     {}
 
     SwapChainDeclaration::
       DestructionRequest::DestructionRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
     {}
 
 
     SwapChainDeclaration::
       Query::Query(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId)
     {}
 
 
@@ -154,7 +148,7 @@ namespace Engine {
       return Ptr<SwapChain>(new SwapChain(desc));
     }
 
-    Ptr<RenderTargetView> const&
+    Ptr<TextureView> const&
       SwapChain::getBackBufferRenderTargetView(uint32_t const& index)
     {
       if(index < 0 || index >= m_backBufferRenderTargetViews.size())
@@ -163,7 +157,7 @@ namespace Engine {
       return m_backBufferRenderTargetViews[index];
     }
 
-    Ptr<RenderTargetView> const&
+    Ptr<TextureView> const&
       SwapChain::getCurrentBackBufferRenderTargetView()
     {
       return getBackBufferRenderTargetView(m_currentBackBufferIndex);

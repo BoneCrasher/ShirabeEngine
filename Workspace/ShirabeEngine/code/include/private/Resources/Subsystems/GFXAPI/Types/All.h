@@ -1,6 +1,4 @@
-#include "ShaderResourceView.h"
-#include "RenderTargetView.h"
-#include "DepthStencilView.h"
+#include "TextureView.h"
 #include "DepthStencilState.h"
 #include "Texture.h"
 #include "RasterizerState.h"

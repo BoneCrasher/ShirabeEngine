@@ -106,25 +106,25 @@ namespace Engine {
       template <typename TResource>
       EEngineStatus createResource(
         typename TResource::CreationRequest const&request,
-        PublicResourceId_t                       &outId,
+        std::string                         const&resourceId,
         bool                                      creationDeferred = false);
 
       template <typename TResource>
       EEngineStatus loadResource(
-        PublicResourceId_t const&id);
+        std::string const&resourceId);
 
       template <typename TResource>
       EEngineStatus updateResource(
-        PublicResourceId_t                const&inId,
+        std::string                       const&resourceId,
         typename TResource::UpdateRequest const&request);
 
       template <typename TResource>
       EEngineStatus unloadResource(
-        PublicResourceId_t const&id);
+        std::string const&resourceId);
 
       template <typename TResource>
       EEngineStatus destroyResource(
-        PublicResourceId_t const&inId);
+        std::string const&resourceId);
 
     private:
 
@@ -139,7 +139,7 @@ namespace Engine {
        *
        * \return	The EEngineStatus.
        **************************************************************************************************/
-      EEngineStatus proxyLoad(IResourceProxyBasePtr &proxy, ResourceProxyList const&dependencies);
+      EEngineStatus proxyLoad(Ptr<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies);
 
       /**********************************************************************************************//**
        * \fn  EEngineStatus ResourceManager::proxyUnload(const ResourceHandle& handle);
@@ -150,15 +150,15 @@ namespace Engine {
        *
        * \return  The EEngineStatus.
        **************************************************************************************************/
-      EEngineStatus proxyUnload(IResourceProxyBasePtr &proxy);
+      EEngineStatus proxyUnload(Ptr<IResourceProxyBase> &proxy);
 
-      inline AnyProxy getResourceProxy(const PublicResourceId_t& id) {
+      inline AnyProxy getResourceProxy(std::string const& id) {
         return m_resources.getResource(id);
       }
 
       inline bool storeResourceProxy(
-        const PublicResourceId_t &id,
-        const AnyProxy           &proxy)
+        std::string const&id,
+        AnyProxy    const&proxy)
       {
         return m_resources.addResource(id, proxy);
       }
@@ -192,27 +192,27 @@ namespace Engine {
     EEngineStatus ResourceManager
       ::createResource(
         typename TResource::CreationRequest const&request,
-        PublicResourceId_t                       &outId,
+        std::string                         const&resourceId,
         bool                                      creationDeferred)
     {
       typename TResource::Descriptor const& desc = request.resourceDescriptor();
+
+      AnyProxy resourceProxy = getResourceProxy(resourceId);
+      if(resourceProxy)
+        return EEngineStatus::ResourceManager_ResourceAlreadyCreated;
 
       Ptr<IResourceProxy<TResource>> proxy
         = m_proxyFactory->create<TResource>(EProxyType::Dynamic, request);
       if(!proxy)
         HandleEngineStatusError(EEngineStatus::Error, "Failed to create proxy for resource.");
-
-      PublicResourceId_t id = m_idGenerator.generate();
-
-      if(!storeResourceProxy(id, AnyProxy(proxy)))
+      
+      if(!storeResourceProxy(resourceId, AnyProxy(proxy)))
         HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, "Failed to store resource proxy.");
 
       // If creation is not deferred, immediately load the resources using the proxy.
       if(!creationDeferred)
-        HandleEngineStatusError(loadResource<TResource>(id), "Failed to load resource");
-
-      outId = id;
-
+        HandleEngineStatusError(loadResource<TResource>(resourceId), "Failed to load resource");
+      
       return EEngineStatus::Ok;
     }
 
@@ -220,9 +220,9 @@ namespace Engine {
     EEngineStatus
       ResourceManager
       ::loadResource(
-        PublicResourceId_t const&id)
+        std::string const&resourceId)
     {
-      AnyProxy resourceProxy = getResourceProxy(id);
+      AnyProxy resourceProxy = getResourceProxy(resourceId);
       if(!resourceProxy)
         HandleEngineStatusError(EEngineStatus::Error, "Cannot find resource proxy.");
 
@@ -235,8 +235,7 @@ namespace Engine {
       typename TResource::CreationRequest const&creator = genericProxy->creationRequest();
       typename TResource::Descriptor      const&desc    = creator.resourceDescriptor();
 
-      ResourceProxyList    resolvedDependencies ={};
-      PublicResourceIdList dependencies         = desc.dependencies;
+      PublicResourceIdList dependencies = desc.dependencies;
       if(!dependencies.empty()) {
         for(PublicResourceId_t const&dependencyId : dependencies) {
           AnyProxy dependencyProxy = this->getResourceProxy(dependencyId);
@@ -252,19 +251,17 @@ namespace Engine {
             //   Even more state handling is required here.. what if the resource is currently being unloaded?
             //   Or unavailable?
 
-            ResourceProxyList placeholder={};
+            PublicResourceIdList placeholder={};
             HandleEngineStatusError(proxyLoad(base, placeholder), "Failed to load dependency proxy underlying resource.");
 
             // Recheck for availability?
             if(base->loadState() != ELoadState::LOADED)
               HandleEngineStatusError(EEngineStatus::Error, "Resource loading failed despite previous attempt!");
           }
-
-          resolvedDependencies.push_back(dependencyProxy);
         }
       }
 
-      HandleEngineStatusError(proxyLoad(baseProxy, resolvedDependencies), "Failed to load resource proxy ");
+      HandleEngineStatusError(proxyLoad(baseProxy, dependencies), "Failed to load resource proxy ");
 
       return EEngineStatus::Ok;
     }
@@ -272,7 +269,7 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus ResourceManager
       ::updateResource(
-        PublicResourceId_t                const&inId,
+        std::string                       const&resourceId,
         typename TResource::UpdateRequest const&request)
     {
       return EEngineStatus::Ok;
@@ -282,44 +279,47 @@ namespace Engine {
     EEngineStatus
       ResourceManager
       ::unloadResource(
-        PublicResourceId_t const&id)
+        std::string const&resourceId)
     {
-      AnyProxy resourceProxy = getResourceProxy(id);
+      AnyProxy resourceProxy = getResourceProxy(resourceId);
       if(!resourceProxy)
         HandleEngineStatusError(EEngineStatus::Error, "Cannot find resource proxy.");
 
       IResourceProxyBasePtr base = BaseProxyCast(resourceProxy);
 
       // TODO: Unload all dependers if available...
-      return HandleEngineStatusError(proxyUnload(base), String::format("Failed to unload proxy resource in backend (Id: %0).", id));
+      return HandleEngineStatusError(proxyUnload(base), String::format("Failed to unload proxy resource in backend (Id: %0).", resourceId));
     }
 
     template <typename TResource>
     EEngineStatus ResourceManager
       ::destroyResource(
-        PublicResourceId_t const&id)
+        std::string const&resourceId)
     {
       EEngineStatus status = EEngineStatus::Ok;
 
       std::function<EEngineStatus()> eraseFn
-        = [&, this] () -> EEngineStatus 
+        = [&, this] () -> EEngineStatus
       {
-        if(!m_resources.removeResource(id))
+        if(!m_resources.removeResource(resourceId))
           return HandleEngineStatusError(EEngineStatus::Error, "Failed to remove resource from internal registry.");
 
         return EEngineStatus::Ok;
       };
 
       try {
-        status = unloadResource<TResource>(id);
+        status = unloadResource<TResource>(resourceId);
         status = eraseFn();
-      } catch(EngineException ee) {
+      }
+      catch(EngineException ee) {
         eraseFn();
         throw;
-      } catch(std::exception e) {
+      }
+      catch(std::exception e) {
         eraseFn();
         throw;
-      } catch(...) {
+      }
+      catch(...) {
         eraseFn();
         throw;
       }

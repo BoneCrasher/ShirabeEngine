@@ -65,22 +65,20 @@ namespace Engine {
       desc.name        = texture.readableName;
       desc.textureInfo = texture;
       if(texture.requestedUsage.check(FrameGraphResourceUsage::RenderTarget))
-        desc.gpuBinding.set(BufferBinding::ShaderOutput_RenderTarget);
+        desc.gpuBinding.set(BufferBinding::ColorAttachement);
       if(texture.requestedUsage.check(FrameGraphResourceUsage::DepthTarget))
-        desc.gpuBinding.set(BufferBinding::ShaderOutput_DepthStencil);
+        desc.gpuBinding.set(BufferBinding::DepthAttachement);
       if(texture.requestedUsage.check(FrameGraphResourceUsage::ImageResource))
-        desc.gpuBinding.set(BufferBinding::ShaderResource);
+        desc.gpuBinding.set(BufferBinding::InputAttachement);
+
       desc.cpuGpuUsage = ResourceUsage::CPU_None_GPU_ReadWrite;
 
       Texture::CreationRequest request(desc);
 
       Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
 
-      PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createResource<Texture>(request, pid, false);
+      EEngineStatus status = m_resourceManager->createResource<Texture>(request, texture.readableName, false);
       HandleEngineStatusError(status, "Failed to create texture.");
-
-      mapFrameGraphToInternalResource(texture.readableName, pid);
 
       return status;
     }
@@ -91,101 +89,21 @@ namespace Engine {
     {
       Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
 
-      if(view.source == FrameGraphViewSource::Color) {
-        if(view.mode.check(FrameGraphViewAccessMode::Read)) {
-          return createShaderResourceView(texture, view);
-        }
-        else if(view.mode.check(FrameGraphViewAccessMode::Write)) {
-          return createRenderTargetView(texture, view);
-        }
-      }
-      else if(view.source == FrameGraphViewSource::Depth) {
-        return createDepthStencilView(texture, view);
-      }
-
-      return EEngineStatus::Error;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createShaderResourceView(
-      FrameGraphTexture      const&texture,
-      FrameGraphTextureView  const&view)
-    {
       Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(texture.readableName);
       if(subjacentResources.empty())
         return EEngineStatus::Error;
 
-      ShaderResourceView::Descriptor desc{};
-      desc.name             = view.readableName;
-      desc.format           = view.format;
-      desc.subjacentTexture = texture;
-      desc.srvType = ShaderResourceView::Descriptor::EShaderResourceDimension::Texture;
-
-      ShaderResourceView::Texture t{ };
-      t.arraySlice = view.arraySliceRange;
-      t.mipSlice   = view.mipSliceRange;
-      desc.shaderResourceDimension = t;
-
-      ShaderResourceView::CreationRequest request(desc, subjacentResources[0]);
-
-      PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createResource<ShaderResourceView>(request, pid, false);
-      HandleEngineStatusError(status, "Failed to create texture.");
-
-      mapFrameGraphToInternalResource(view.readableName, pid);
-
-      return status;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createDepthStencilView(
-      FrameGraphTexture      const&texture,
-      FrameGraphTextureView  const&view)
-    {
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(texture.readableName);
-      if(subjacentResources.empty())
-        return EEngineStatus::Error;
-
-      DepthStencilView::Descriptor desc{ };
-      desc.name             = view.readableName;
-      desc.format           = view.format;
-      desc.subjacentTexture = texture;
-
-      desc.arraySlices = view.arraySliceRange;
-      desc.mipSlices   = view.mipSliceRange;
-
-      DepthStencilView::CreationRequest request(desc, subjacentResources[0]);
-
-      PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createResource<DepthStencilView>(request, pid, false);
-      HandleEngineStatusError(status, "Failed to create texture.");
-
-      mapFrameGraphToInternalResource(view.readableName, pid);
-
-      return status;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createRenderTargetView(
-      FrameGraphTexture      const&texture,
-      FrameGraphTextureView  const&view)
-    {
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(texture.readableName);
-      if(subjacentResources.empty())
-        return EEngineStatus::Error;
-
-      RenderTargetView::Descriptor desc{ };
+      TextureView::Descriptor desc{ };
       desc.name             = view.readableName;
       desc.textureFormat    = view.format;
       desc.subjacentTexture = texture;
+      desc.arraySlices      = view.arraySliceRange;
+      desc.mipMapSlices     = view.mipSliceRange;
 
-      desc.arraySlices  = view.arraySliceRange;
-      desc.mipMapSlices = view.mipSliceRange;
+      TextureView::CreationRequest request(desc, subjacentResources[0]);
 
-      RenderTargetView::CreationRequest request(desc, subjacentResources[0]);
-
-      PublicResourceId_t pid = 0;
-      EEngineStatus status = m_resourceManager->createResource<RenderTargetView>(request, pid, false);
+      EEngineStatus status = m_resourceManager->createResource<TextureView>(request, view.readableName, false);
       HandleEngineStatusError(status, "Failed to create texture.");
-
-      mapFrameGraphToInternalResource(view.readableName, pid);
 
       return status;
     }
@@ -249,12 +167,7 @@ namespace Engine {
     {
       Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
 
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(texture.readableName);
-      if(subjacentResources.empty())
-        return EEngineStatus::Error;
-
-      EEngineStatus status = m_resourceManager->destroyResource<Texture>(subjacentResources[0]);
-      removeMappedInternalResourceIds(texture.readableName);
+      EEngineStatus status = m_resourceManager->destroyResource<Texture>(texture.readableName);
 
       return status;
     }
@@ -270,20 +183,7 @@ namespace Engine {
         return EEngineStatus::Error;
 
       EEngineStatus status = EEngineStatus::Ok;
-
-      if(view.source == FrameGraphViewSource::Color) {
-        if(view.mode.check(FrameGraphViewAccessMode::Read)) {
-          status = m_resourceManager->destroyResource<ShaderResourceView>(subjacentResources[0]);
-        }
-        else if(view.mode.check(FrameGraphViewAccessMode::Write)) {
-          status = m_resourceManager->destroyResource<RenderTargetView>(subjacentResources[0]);
-        }
-      }
-      else if(view.source == FrameGraphViewSource::Depth) {
-        status = m_resourceManager->destroyResource<DepthStencilView>(subjacentResources[0]);
-      }
-
-      removeMappedInternalResourceIds(view.readableName);
+      status = m_resourceManager->destroyResource<TextureView>(view.readableName);
 
       return status;
     }

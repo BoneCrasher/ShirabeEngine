@@ -90,8 +90,7 @@ namespace Engine {
       {
       public:
         UpdateRequest(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t    const& inPublicResourceId);
       };
 
       class DestructionRequest
@@ -99,8 +98,7 @@ namespace Engine {
       {
       public:
         DestructionRequest(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t    const& inPublicResourceId);
       };
 
       class Query
@@ -108,8 +106,7 @@ namespace Engine {
       {
       public:
         Query(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t    const& inPublicResourceId);
       };
     };
 

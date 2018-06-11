@@ -18,42 +18,6 @@ namespace Engine {
   namespace GFXAPI {
     using namespace Engine::Resources;
 
-    /**********************************************************************************************//**
-     * \class	GFXAPIResourceAdapter
-     *
-     * \brief	Simple storage base class to hold a GFXAPIResourceHandle_t and make it accessible.
-       **************************************************************************************************/
-    class GFXAPIResourceAdapter
-    {
-    public:
-      inline const GFXAPIResourceHandle_t& handle() const { return m_handle; }
-
-    protected:
-      inline GFXAPIResourceAdapter(const GFXAPIResourceHandle_t& handle = GFXAPIUninitializedResourceHandle)
-        : m_handle(handle)
-      { }
-
-      inline bool setHandle(const GFXAPIResourceHandle_t& handle) {
-        if(m_handle > 0)
-          return false; // Overwrite not allowed!
-        m_handle = handle;
-      }
-
-      inline GFXAPIResourceHandle_t gfxApiResourceHandle() const { return m_handle; }
-
-    private:
-      GFXAPIResourceHandle_t m_handle;
-    };
-
-    static Ptr<GFXAPIResourceAdapter> GFXAPIAdapterCast(const AnyProxy& proxy) {
-      try {
-        Ptr<GFXAPIResourceAdapter> tmp = std::any_cast<Ptr<GFXAPIResourceAdapter>>(proxy);
-        return tmp;
-      }
-      catch(std::bad_any_cast&) {
-        return nullptr;
-      }
-    }
 
     /**********************************************************************************************//**
      * \class	PlatformResourceProxy
@@ -63,7 +27,6 @@ namespace Engine {
     template <typename TResource>
     class GFXAPIResourceProxy
       : public ResourceBackendProxy<GFXAPIResourceBackend, TResource>
-      , public GFXAPIResourceAdapter
     {
       DeclareLogTag(GFXAPIResourceProxy<TResource>);
 
@@ -73,18 +36,15 @@ namespace Engine {
         Ptr<GFXAPIResourceBackend>          const&resourceBackend,
         typename TResource::CreationRequest const&request)
         : ResourceBackendProxy<GFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
-        , GFXAPIResourceAdapter()
-        , m_destructionRequest(0, 0)
+        , m_destructionRequest(0)
       { }
 
       EEngineStatus loadSync(
-        SubjacentResourceIdList const&resolvedDependencies);
+        PublicResourceIdList const&resolvedDependencies);
 
       EEngineStatus unloadSync();
 
       typename TResource::DestructionRequest const&destructionRequest() const { return m_destructionRequest; }
-
-      SubjacentResourceId_t subjacentResourceId() const { return static_cast<SubjacentResourceId_t>(this->handle()); }
 
     protected:
       void setDestructionRequest(typename TResource::DestructionRequest const&request) { m_destructionRequest = request; }
@@ -112,7 +72,7 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus GFXAPIResourceProxy<TResource>
       ::loadSync(
-        SubjacentResourceIdList const&resolvedDependencies)
+        PublicResourceIdList const&resolvedDependencies)
     {
       this->setLoadState(ELoadState::LOADING);
 
@@ -121,12 +81,10 @@ namespace Engine {
       EEngineStatus status = EEngineStatus::Ok;
 
       typename TResource::Descriptor const&rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
-
-      SubjacentResourceId_t handle = 0;
-
+      
       typename TResource::CreationRequest const&creationRequest = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest();
 
-      status = resourceBackend()->load<TResource>(creationRequest, resolvedDependencies, ETaskSynchronization::Sync, nullptr, handle);
+      status = resourceBackend()->load<TResource>(creationRequest, resolvedDependencies, ETaskSynchronization::Sync, nullptr);
       if(CheckEngineError(status)) {
         // MBT TODO: Consider distinguishing the above returned status a little more in 
         //           order to reflect UNLOADED or UNAVAILABLE state.
@@ -135,8 +93,7 @@ namespace Engine {
         HandleEngineStatusError(EEngineStatus::GFXAPI_LoadResourceFailed, String::format("Failed to load GFXAPI resource '%0'", rd.name));
       }
 
-      this->setDestructionRequest(typename TResource::DestructionRequest(handle, creationRequest.serializeOnDestruct()));
-      this->setHandle(handle);
+      this->setDestructionRequest(typename TResource::DestructionRequest(rd.name));
       this->setLoadState(ELoadState::LOADED);
 
       return EEngineStatus::Ok;
@@ -152,7 +109,7 @@ namespace Engine {
       if(CheckEngineError(status)) {
         this->setLoadState(ELoadState::UNKNOWN);
 
-        HandleEngineStatusError(EEngineStatus::GFXAPI_UnloadResourceFailed, String::format("Failed to unload GFXAPI resource '%0'", handle()));
+        HandleEngineStatusError(EEngineStatus::GFXAPI_UnloadResourceFailed, String::format("Failed to unload GFXAPI resource '%0'", ""));
       }
 
       this->setLoadState(ELoadState::UNLOADED);

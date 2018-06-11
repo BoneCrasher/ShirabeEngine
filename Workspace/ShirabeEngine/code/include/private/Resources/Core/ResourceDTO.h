@@ -4,11 +4,12 @@
 #include <stdint.h>
 #include <vector>
 #include <map>
+#include <string>
 
 namespace Engine {
   namespace Resources {
 
-    typedef uint64_t PublicResourceId_t;
+    typedef std::string PublicResourceId_t;
 
     using PublicResourceIdList = std::vector<PublicResourceId_t>;
 

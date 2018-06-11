@@ -112,16 +112,6 @@ namespace Engine {
         Ptr<ResourceManager> resourceManager,
         Ptr<IRenderContext>  renderer);
 
-      EEngineStatus createShaderResourceView(
-        FrameGraphTexture      const&texture,
-        FrameGraphTextureView  const&view);
-      EEngineStatus createRenderTargetView(
-        FrameGraphTexture      const&texture,
-        FrameGraphTextureView  const&view);
-      EEngineStatus createDepthStencilView(
-        FrameGraphTexture      const&texture,
-        FrameGraphTextureView  const&view);
-
       void
         mapFrameGraphToInternalResource(
           std::string        const&,

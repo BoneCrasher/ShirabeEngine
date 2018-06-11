@@ -26,6 +26,7 @@ namespace Engine {
 		WindowMessageHandlerError                                       =    -251,
 		WindowEventError                                                =    -252,
 		ResourceManager_Generic                                         =   -1000, // ResourceManager
+    ResourceManager_ResourceAlreadyCreated                          =   -1001,
     ResourceManager_ProxyCreationFailed                             =   -1010,
     ResourceManager_RootProxyFetchFailed                            =   -1050,
 		ResourceManager_BaseProxyCastFailed                             =   -1051, // ResourceManager::Proxy

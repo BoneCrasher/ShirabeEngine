@@ -107,7 +107,7 @@ namespace Engine {
 
           // Write out the passes' resources
           if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end()) {
-            PublicResourceIdList const&passResources = passResourcesAdj.at(sourceUID);
+            FrameGraphResourceIdList const&passResources = passResourcesAdj.at(sourceUID);
             // Create Texture
             std::vector<FrameGraphResourceId_t> creations = filter(passResources, [] (FrameGraphResource const&r) -> bool {
               return (r.type == FrameGraphResourceType::Texture && r.assignedPassUID != 0);

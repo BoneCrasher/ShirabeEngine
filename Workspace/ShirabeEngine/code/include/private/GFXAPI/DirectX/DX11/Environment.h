@@ -20,6 +20,7 @@ namespace Engine {
       using Platform::ApplicationEnvironment;
       using Engine::Renderer::RendererConfiguration;
       using Engine::GFXAPI::GAPIDeviceCapabilities;
+      using Engine::GFXAPI::GAPIOutputMode;
 
       class DX11Environment {
         DeclareLogTag(DX11Environment);

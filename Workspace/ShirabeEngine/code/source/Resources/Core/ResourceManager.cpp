@@ -21,18 +21,12 @@ namespace Engine {
      * \return	The EEngineStatus.
      **************************************************************************************************/
     EEngineStatus ResourceManager
-      ::proxyLoad(IResourceProxyBasePtr &proxy, ResourceProxyList const&dependencies)
+      ::proxyLoad(Ptr<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies)
     {
       EEngineStatus status = EEngineStatus::Ok;
 
-      SubjacentResourceIdList proxyDependencies={};
-      for(AnyProxy const&dependency : dependencies) {
-        Ptr<IResourceProxyBase> base = BaseProxyCast(dependency);
-        proxyDependencies.push_back(base->subjacentResourceId());
-      }
-
       std::string msg = "Failed to load underlying resource of resource proxy.";
-      HandleEngineStatusError(proxy->loadSync(proxyDependencies), msg);
+      HandleEngineStatusError(proxy->loadSync(dependencies), msg);
 
       return EEngineStatus::Ok;
     }

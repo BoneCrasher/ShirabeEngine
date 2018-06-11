@@ -10,7 +10,7 @@
 
 #include "Resources/Subsystems/GFXAPI/GFXAPI.h"
 #include "Resources/Subsystems/GFXAPI/Types/Texture.h"
-#include "Resources/Subsystems/GFXAPI/Types/RenderTargetView.h"
+#include "Resources/Subsystems/GFXAPI/Types/TextureView.h"
 
 #include "GFXAPI/Definitions.h"
 
@@ -64,8 +64,7 @@ namespace Engine {
       {
       public:
         UpdateRequest(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t const& inPublicResourceId);
       };
 
       class DestructionRequest
@@ -73,8 +72,7 @@ namespace Engine {
       {
       public:
         DestructionRequest(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t const& inPublicResourceId);
       };
 
       class Query
@@ -82,8 +80,7 @@ namespace Engine {
       {
       public:
         Query(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t const& inPublicResourceId);
       };
 
     };
@@ -163,8 +160,7 @@ namespace Engine {
       {
       public:
         UpdateRequest(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t const& inPublicResourceId);
       };
 
       class DestructionRequest
@@ -172,8 +168,7 @@ namespace Engine {
       {
       public:
         DestructionRequest(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t const& inPublicResourceId);
       };
 
       class Query
@@ -181,8 +176,7 @@ namespace Engine {
       {
       public:
         Query(
-          PublicResourceId_t    const& inPublicResourceId,
-          SubjacentResourceId_t const& inSubjacentResourceId);
+          PublicResourceId_t const& inPublicResourceId);
       };
     };
 
@@ -208,16 +202,16 @@ namespace Engine {
       inline static Ptr<SwapChain> create(
         const SwapChain::Descriptor &desc);
 
-      Ptr<RenderTargetView> const& getBackBufferRenderTargetView(uint32_t const& index);
+      Ptr<TextureView> const& getBackBufferRenderTargetView(uint32_t const& index);
 
-      Ptr<RenderTargetView> const& getCurrentBackBufferRenderTargetView();
+      Ptr<TextureView> const& getCurrentBackBufferRenderTargetView();
 
     private:
       inline SwapChain(
         const SwapChain::Descriptor &descriptor);
 
       std::size_t                        m_currentBackBufferIndex;
-      std::vector<Ptr<RenderTargetView>> m_backBufferRenderTargetViews;
+      std::vector<Ptr<TextureView>> m_backBufferRenderTargetViews;
     };
 
     DeclareSharedPointerType(SwapChain);

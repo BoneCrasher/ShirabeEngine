@@ -54,23 +54,20 @@ namespace Engine {
 
     TextureViewDeclaration::UpdateRequest
       ::UpdateRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
     {}
 
     TextureViewDeclaration::DestructionRequest
       ::DestructionRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
     {}
 
     TextureViewDeclaration::Query
       ::Query(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId)
     {}
 
     TextureView::

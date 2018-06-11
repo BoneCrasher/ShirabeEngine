@@ -89,9 +89,9 @@ namespace Test {
 	 	
     #define Mock_DeclareTaskBuilderModule(Type)                                                                                                                  \
           EEngineStatus fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);     
+          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, GFXAPIResourceHandleAssignment const&, ResourceTaskFn_t &outTask);     
 
     class MockGFXAPITaskBackend
       : public GFXAPIResourceTaskBackend
@@ -101,9 +101,7 @@ namespace Test {
       void initialize();
 
       Mock_DeclareTaskBuilderModule(Texture);
-      Mock_DeclareTaskBuilderModule(ShaderResourceView);
-      Mock_DeclareTaskBuilderModule(RenderTargetView);
-      Mock_DeclareTaskBuilderModule(DepthStencilView);
+      Mock_DeclareTaskBuilderModule(TextureView);
       Mock_DeclareTaskBuilderModule(DepthStencilState);
       Mock_DeclareTaskBuilderModule(RasterizerState);
       Mock_DeclareTaskBuilderModule(SwapChain);

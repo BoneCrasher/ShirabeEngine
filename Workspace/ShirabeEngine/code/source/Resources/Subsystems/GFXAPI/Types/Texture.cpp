@@ -43,7 +43,7 @@ namespace Engine {
 
       return ss.str();
     }
-    
+
     TextureDeclaration::CreationRequest
       ::CreationRequest(
         const Descriptor &desc)
@@ -68,23 +68,20 @@ namespace Engine {
 
     TextureDeclaration::UpdateRequest
       ::UpdateRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
     {}
 
     TextureDeclaration::DestructionRequest
       ::DestructionRequest(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
     {}
 
     TextureDeclaration::Query
       ::Query(
-        PublicResourceId_t    const& inPublicResourceId,
-        SubjacentResourceId_t const& inSubjacentResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId, inSubjacentResourceId)
+        PublicResourceId_t const& inPublicResourceId)
+      : BaseDeclaration::QueryBase(inPublicResourceId)
     {}
 
     Texture

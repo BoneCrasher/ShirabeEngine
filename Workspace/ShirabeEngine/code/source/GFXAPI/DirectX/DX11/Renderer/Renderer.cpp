@@ -60,121 +60,121 @@ namespace Engine {
 				using namespace Engine::GFXAPI;
 
 				EEngineStatus status = EEngineStatus::Ok;
-				HRESULT       dxRes  = S_OK;
+				//HRESULT       dxRes  = S_OK;
 
-        GAPIOutputMode const& outputMode = m_dx11Environment->getOutputMode();
+    //    GAPIOutputMode const& outputMode = m_dx11Environment->getOutputMode();
 
-				static const std::size_t BACK_BUFFER_COUNT = 1;
+				//static const std::size_t BACK_BUFFER_COUNT = 1;
 
-				Ptr<SwapChain>        swapChain    = nullptr;    	
-        Ptr<RenderTargetView> swapChainRTV = swapChain->getCurrentBackBufferRenderTargetView();
-        if(!swapChainRTV) {
-          // Mimimi...
-        }
+				//Ptr<SwapChain>        swapChain    = nullptr;    	
+    //    Ptr<RenderTargetView> swapChainRTV = swapChain->getCurrentBackBufferRenderTargetView();
+    //    if(!swapChainRTV) {
+    //      // Mimimi...
+    //    }
 
-				// Get the swap chain.
-				SwapChain::Descriptor swapChainDescriptor ={};
-				swapChainDescriptor.name                       = "DefaultSwapChain";
-				swapChainDescriptor.backBufferCount            = BACK_BUFFER_COUNT;
-				swapChainDescriptor.texture.name               = "DefaultSwapChainTexture2D";
-				swapChainDescriptor.texture.textureInfo.format = outputMode.format;
-				swapChainDescriptor.texture.textureInfo.width  = outputMode.size.x();
-				swapChainDescriptor.texture.textureInfo.height = outputMode.size.y();
-        swapChainDescriptor.texture.textureInfo.depth  = 1;
-				swapChainDescriptor.vsyncEnabled               = configuration.enableVSync;
-				swapChainDescriptor.refreshRateNumerator       = outputMode.refreshRate.x();
-				swapChainDescriptor.refreshRateDenominator     = outputMode.refreshRate.y();
-				swapChainDescriptor.fullscreen                 = !configuration.requestFullscreen;
-				swapChainDescriptor.windowHandle               = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
+				//// Get the swap chain.
+				//SwapChain::Descriptor swapChainDescriptor ={};
+				//swapChainDescriptor.name                       = "DefaultSwapChain";
+				//swapChainDescriptor.backBufferCount            = BACK_BUFFER_COUNT;
+				//swapChainDescriptor.texture.name               = "DefaultSwapChainTexture2D";
+				//swapChainDescriptor.texture.textureInfo.format = outputMode.format;
+				//swapChainDescriptor.texture.textureInfo.width  = outputMode.size.x();
+				//swapChainDescriptor.texture.textureInfo.height = outputMode.size.y();
+    //    swapChainDescriptor.texture.textureInfo.depth  = 1;
+				//swapChainDescriptor.vsyncEnabled               = configuration.enableVSync;
+				//swapChainDescriptor.refreshRateNumerator       = outputMode.refreshRate.x();
+				//swapChainDescriptor.refreshRateDenominator     = outputMode.refreshRate.y();
+				//swapChainDescriptor.fullscreen                 = !configuration.requestFullscreen;
+				//swapChainDescriptor.windowHandle               = reinterpret_cast<unsigned int>(static_cast<void *>(environment.primaryWindowHandle));
 
-        PublicResourceId_t swapChainId = 0;
-        SwapChain::CreationRequest swapChainCreationRequest(swapChainDescriptor);
+    //    PublicResourceId_t swapChainId = 0;
+    //    SwapChain::CreationRequest swapChainCreationRequest(swapChainDescriptor);
 
-				status = resourceManager->createResource<SwapChain>(swapChainDescriptor, swapChainId);
-        HandleEngineStatusError(status, String::format("Failed to create swap chain:\n Desc:%0", swapChainDescriptor.toString()));
-      
-        Texture::Descriptor defaultDepthStencilTextureDescriptor ={};
-        defaultDepthStencilTextureDescriptor.textureInfo                       = swapChainDescriptor.texture.textureInfo;
-				defaultDepthStencilTextureDescriptor.textureInfo.format                = Format::D24_UNORM_S8_UINT;
-        defaultDepthStencilTextureDescriptor.textureInfo.mipLevels             = 1;
-        defaultDepthStencilTextureDescriptor.textureInfo.arraySize             = 1;
-				defaultDepthStencilTextureDescriptor.textureInfo.multisampling.size    = 1;
-				defaultDepthStencilTextureDescriptor.textureInfo.multisampling.quality = 0;
-        defaultDepthStencilTextureDescriptor.cpuGpuUsage                       = ResourceUsage::CPU_None_GPU_ReadWrite;
-        defaultDepthStencilTextureDescriptor.gpuBinding                        = EToUnderlying(BufferBinding::ShaderOutput_DepthStencil);
+				//status = resourceManager->createResource<SwapChain>(swapChainDescriptor, swapChainId);
+    //    HandleEngineStatusError(status, String::format("Failed to create swap chain:\n Desc:%0", swapChainDescriptor.toString()));
+    //  
+    //    Texture::Descriptor defaultDepthStencilTextureDescriptor ={};
+    //    defaultDepthStencilTextureDescriptor.textureInfo                       = swapChainDescriptor.texture.textureInfo;
+				//defaultDepthStencilTextureDescriptor.textureInfo.format                = Format::D24_UNORM_S8_UINT;
+    //    defaultDepthStencilTextureDescriptor.textureInfo.mipLevels             = 1;
+    //    defaultDepthStencilTextureDescriptor.textureInfo.arraySize             = 1;
+				//defaultDepthStencilTextureDescriptor.textureInfo.multisampling.size    = 1;
+				//defaultDepthStencilTextureDescriptor.textureInfo.multisampling.quality = 0;
+    //    defaultDepthStencilTextureDescriptor.cpuGpuUsage                       = ResourceUsage::CPU_None_GPU_ReadWrite;
+    //    defaultDepthStencilTextureDescriptor.gpuBinding                        = EToUnderlying(BufferBinding::ShaderOutput_DepthStencil);
 
-        PublicResourceId_t defaultDepthStencilTextureId   = 0;
-				status = resourceManager->createResource<Texture>(defaultDepthStencilTextureDescriptor, defaultDepthStencilTextureId);
-        HandleEngineStatusError(status, String::format("Failed to create depth stencil view:\n Desc:%0", defaultDepthStencilTextureDescriptor.toString()));
+    //    PublicResourceId_t defaultDepthStencilTextureId   = 0;
+				//status = resourceManager->createResource<Texture>(defaultDepthStencilTextureDescriptor, defaultDepthStencilTextureId);
+    //    HandleEngineStatusError(status, String::format("Failed to create depth stencil view:\n Desc:%0", defaultDepthStencilTextureDescriptor.toString()));
 
 
-    //    ID3D11RenderTargetView *const d3d11SwapChainRTV = nullptr;
-    //    ID3D11DepthStencilView *const d3d11DSV          = m_resourceManager. (defaultDepthStencilViewDescriptor);
+    ////    ID3D11RenderTargetView *const d3d11SwapChainRTV = nullptr;
+    ////    ID3D11DepthStencilView *const d3d11DSV          = m_resourceManager. (defaultDepthStencilViewDescriptor);
 
-    //    m_resourceManager->backend()->getGfxApiResourceHandle<ID3D11RenderTargetView>(_swapChain->binding.)
+    ////    m_resourceManager->backend()->getGfxApiResourceHandle<ID3D11RenderTargetView>(_swapChain->binding.)
 
-				//// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
-				//dx11Environment.getImmediateContext()->OMSetRenderTargets(1, &d3d11SwapChainRTV, d3d11DSV);
+				////// Bind the device context to our backbuffer (with bound swapchain) and the depth stencil view.
+				////dx11Environment.getImmediateContext()->OMSetRenderTargets(1, &d3d11SwapChainRTV, d3d11DSV);
 
-				// m_createDepthStencilState:
-					// 
-					// Setup the default depth stencil state to be used, unless it is overridden for some effects.
-					//
-        DepthStencilState::Descriptor defaultDepthStencilStateDescriptor ={};
-        defaultDepthStencilStateDescriptor.enableDepth                          = true;
-        defaultDepthStencilStateDescriptor.depthMask                            = DepthStencilState::Descriptor::DepthWriteMask::All;
-        defaultDepthStencilStateDescriptor.depthFunc                            = GFXAPI::Comparison::Less;
-        defaultDepthStencilStateDescriptor.enableStencil                        = true;
-        defaultDepthStencilStateDescriptor.stencilWriteMask                     = 0xFF;
-        defaultDepthStencilStateDescriptor.stencilReadMask                      = 0xFF;
-        defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.failOp      = DepthStencilState::Descriptor::StencilOp::Keep;
-        defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.depthFailOp = DepthStencilState::Descriptor::StencilOp::Increment;
-        defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.passOp      = DepthStencilState::Descriptor::StencilOp::Keep;
-        defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.stencilFunc = GFXAPI::Comparison::Always;
-        defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.failOp       = DepthStencilState::Descriptor::StencilOp::Keep;
-        defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.depthFailOp  = DepthStencilState::Descriptor::StencilOp::Decrement;
-        defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.passOp       = DepthStencilState::Descriptor::StencilOp::Keep;
-        defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.stencilFunc  = GFXAPI::Comparison::Always;
-        DepthStencilState::CreationRequest dssCreationRequest(defaultDepthStencilStateDescriptor);
+				//// m_createDepthStencilState:
+				//	// 
+				//	// Setup the default depth stencil state to be used, unless it is overridden for some effects.
+				//	//
+    //    DepthStencilState::Descriptor defaultDepthStencilStateDescriptor ={};
+    //    defaultDepthStencilStateDescriptor.enableDepth                          = true;
+    //    defaultDepthStencilStateDescriptor.depthMask                            = DepthStencilState::Descriptor::DepthWriteMask::All;
+    //    defaultDepthStencilStateDescriptor.depthFunc                            = GFXAPI::Comparison::Less;
+    //    defaultDepthStencilStateDescriptor.enableStencil                        = true;
+    //    defaultDepthStencilStateDescriptor.stencilWriteMask                     = 0xFF;
+    //    defaultDepthStencilStateDescriptor.stencilReadMask                      = 0xFF;
+    //    defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.failOp      = DepthStencilState::Descriptor::StencilOp::Keep;
+    //    defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.depthFailOp = DepthStencilState::Descriptor::StencilOp::Increment;
+    //    defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.passOp      = DepthStencilState::Descriptor::StencilOp::Keep;
+    //    defaultDepthStencilStateDescriptor.stencilFrontfaceCriteria.stencilFunc = GFXAPI::Comparison::Always;
+    //    defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.failOp       = DepthStencilState::Descriptor::StencilOp::Keep;
+    //    defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.depthFailOp  = DepthStencilState::Descriptor::StencilOp::Decrement;
+    //    defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.passOp       = DepthStencilState::Descriptor::StencilOp::Keep;
+    //    defaultDepthStencilStateDescriptor.stencilBackfaceCriteria.stencilFunc  = GFXAPI::Comparison::Always;
+    //    DepthStencilState::CreationRequest dssCreationRequest(defaultDepthStencilStateDescriptor);
 
-        PublicResourceId_t defaultDepthStencilStateId = 0;
-				status = resourceManager->createResource<DepthStencilState>(dssCreationRequest, defaultDepthStencilStateId);
-        HandleEngineStatusError(status, String::format("Failed to create depth stencil state:\n Desc:%0", defaultDepthStencilStateDescriptor.toString()));
-        
-        RasterizerState::Descriptor defaultRasterizerStateDescriptor{};
-        defaultRasterizerStateDescriptor.fillMode = RasterizerState::FillMode::Solid;
-        defaultRasterizerStateDescriptor.cullMode = RasterizerState::CullMode::Back;
-        RasterizerState::CreationRequest rasterizerStateCreationRequest(defaultRasterizerStateDescriptor);
+    //    PublicResourceId_t defaultDepthStencilStateId = 0;
+				//status = resourceManager->createResource<DepthStencilState>(dssCreationRequest, defaultDepthStencilStateId);
+    //    HandleEngineStatusError(status, String::format("Failed to create depth stencil state:\n Desc:%0", defaultDepthStencilStateDescriptor.toString()));
+    //    
+    //    RasterizerState::Descriptor defaultRasterizerStateDescriptor{};
+    //    defaultRasterizerStateDescriptor.fillMode = RasterizerState::FillMode::Solid;
+    //    defaultRasterizerStateDescriptor.cullMode = RasterizerState::CullMode::Back;
+    //    RasterizerState::CreationRequest rasterizerStateCreationRequest(defaultRasterizerStateDescriptor);
 
-        PublicResourceId_t defaultRasterizerStateId{};
-				status = resourceManager->createResource<RasterizerState>(rasterizerStateCreationRequest, defaultRasterizerStateId);
-        HandleEngineStatusError(status, String::format("Failed to create rasterizer state:\n Desc:%0", defaultRasterizerStateDescriptor.toString()));
-        
-				// m_createDefaultViewPort:
-				D3D11_VIEWPORT defaultViewPort;
-				defaultViewPort.MinDepth = 0.0f;
-				defaultViewPort.MaxDepth = 1.0f;
-				defaultViewPort.Width    = configuration.preferredWindowSize.x();
-				defaultViewPort.Height   = configuration.preferredWindowSize.y();
-				defaultViewPort.TopLeftX = 0.0f;
-				defaultViewPort.TopLeftY = 0.0f;
-        
-        m_swapChainId                  = swapChainId;
-        m_defaultDepthStencilTextureId = defaultDepthStencilTextureId;
-        m_defaultDepthStencilStateId   = defaultDepthStencilStateId;
+    //    PublicResourceId_t defaultRasterizerStateId{};
+				//status = resourceManager->createResource<RasterizerState>(rasterizerStateCreationRequest, defaultRasterizerStateId);
+    //    HandleEngineStatusError(status, String::format("Failed to create rasterizer state:\n Desc:%0", defaultRasterizerStateDescriptor.toString()));
+    //    
+				//// m_createDefaultViewPort:
+				//D3D11_VIEWPORT defaultViewPort;
+				//defaultViewPort.MinDepth = 0.0f;
+				//defaultViewPort.MaxDepth = 1.0f;
+				//defaultViewPort.Width    = configuration.preferredWindowSize.x();
+				//defaultViewPort.Height   = configuration.preferredWindowSize.y();
+				//defaultViewPort.TopLeftX = 0.0f;
+				//defaultViewPort.TopLeftY = 0.0f;
+    //    
+    //    m_swapChainId                  = swapChainId;
+    //    m_defaultDepthStencilTextureId = defaultDepthStencilTextureId;
+    //    m_defaultDepthStencilStateId   = defaultDepthStencilStateId;
 
 				return status;
 			}
 
 			EEngineStatus DX11Renderer::deinitialize() {
         EEngineStatus status = EEngineStatus::Ok;
-        
+        /*
         status = m_resourceManager->destroyResource<DepthStencilState>(m_defaultDepthStencilStateId);
         HandleEngineStatusError(status, "Failed to destroy the default depth stencil state.");
         status = m_resourceManager->destroyResource<Texture>(m_defaultDepthStencilTextureId);
         HandleEngineStatusError(status, "Failed to destroy the default depth stencil texture or one of its dependers.");
         status = m_resourceManager->destroyResource<SwapChain>(m_swapChainId);
-        HandleEngineStatusError(status, "Failed to destroy the swap chain.");
+        HandleEngineStatusError(status, "Failed to destroy the swap chain.");*/
 
 				return EEngineStatus::Ok;
 			}

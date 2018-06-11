@@ -68,7 +68,7 @@ namespace Engine {
         
         GFXAPIResourceHandleAssignment assignment ={ };
 
-        assignment.publicHandle   = reinterpret_cast<GFXAPIResourceHandle_t>(vkImage); // Just abuse the pointer target address of the handle...
+        assignment.publicHandle   = desc.name; // Just abuse the pointer target address of the handle...
         assignment.internalHandle = Ptr<void>((void*)vkImage);
 
         return assignment;

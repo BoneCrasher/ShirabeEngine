@@ -56,11 +56,9 @@ namespace Engine {
 
     virtual EProxyType proxyType() const = 0;
     virtual ELoadState loadState() const = 0;
-
-    virtual SubjacentResourceId_t subjacentResourceId() const = 0;
-
+    
     virtual EEngineStatus loadSync(
-      SubjacentResourceIdList const&inResolvedDependencies) = 0;
+      PublicResourceIdList const&inResolvedDependencies) = 0;
     virtual EEngineStatus unloadSync() = 0;
 
     DeclareInterfaceEnd(IResourceProxyBase);

@@ -145,15 +145,15 @@ namespace Engine {
 					d3d11BindFlags |= D3D11_BIND_VERTEX_BUFFER;
 				if (f.check(BufferBinding::IndexBuffer))
 					d3d11BindFlags |= D3D11_BIND_INDEX_BUFFER;
-				if (f.check(BufferBinding::ConstantBuffer))
+				if (f.check(BufferBinding::UniformBuffer))
 					d3d11BindFlags |= D3D11_BIND_CONSTANT_BUFFER;
-				if (f.check(BufferBinding::ShaderResource))
+				if (f.check(BufferBinding::ShaderInput))
 					d3d11BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-				if (f.check(BufferBinding::ShaderOutput_RenderTarget))
+				if (f.check(BufferBinding::ColorAttachement))
 					d3d11BindFlags |= D3D11_BIND_RENDER_TARGET;
 				if (f.check(BufferBinding::ShaderOutput_StreamOutput))
 					d3d11BindFlags |= D3D11_BIND_STREAM_OUTPUT;
-				if (f.check(BufferBinding::ShaderOutput_DepthStencil))
+				if (f.check(BufferBinding::DepthAttachement))
 					d3d11BindFlags |= D3D11_BIND_DEPTH_STENCIL;
 				if (f.check(BufferBinding::UnorderedMultithreadedAccess))
 					d3d11BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
@@ -169,15 +169,15 @@ namespace Engine {
 				if (f == D3D11_BIND_INDEX_BUFFER)
 					gapiBindFlags.set(BufferBinding::IndexBuffer);
 				if (f == D3D11_BIND_CONSTANT_BUFFER)
-					gapiBindFlags.set(BufferBinding::ConstantBuffer);
+					gapiBindFlags.set(BufferBinding::UniformBuffer);
 				if (f == D3D11_BIND_SHADER_RESOURCE)
-					gapiBindFlags.set(BufferBinding::ShaderResource);
+					gapiBindFlags.set(BufferBinding::ShaderInput);
 				if (f == D3D11_BIND_RENDER_TARGET)
-					gapiBindFlags.set(BufferBinding::ShaderOutput_RenderTarget);
+					gapiBindFlags.set(BufferBinding::ColorAttachement);
 				if (f == D3D11_BIND_STREAM_OUTPUT)
 					gapiBindFlags.set(BufferBinding::ShaderOutput_StreamOutput);
 				if (f == D3D11_BIND_DEPTH_STENCIL)
-					gapiBindFlags.set(BufferBinding::ShaderOutput_DepthStencil);
+					gapiBindFlags.set(BufferBinding::DepthAttachement);
 				if (f == D3D11_BIND_UNORDERED_ACCESS)
 					gapiBindFlags.set(BufferBinding::UnorderedMultithreadedAccess);
 
