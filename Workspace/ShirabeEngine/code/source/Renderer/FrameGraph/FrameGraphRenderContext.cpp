@@ -53,7 +53,7 @@ namespace Engine {
     EEngineStatus FrameGraphRenderContext::importTexture(
       FrameGraphTexture const&texture)
     {
-      PublicResourceId_t pid = 0;
+      PublicResourceId_t pid = "";
       mapFrameGraphToInternalResource(texture.readableName, pid);
       return EEngineStatus::Ok;
     }
@@ -78,7 +78,10 @@ namespace Engine {
       Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
 
       EEngineStatus status = m_resourceManager->createResource<Texture>(request, texture.readableName, false);
-      HandleEngineStatusError(status, "Failed to create texture.");
+      if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
+        return EEngineStatus::Ok;
+      else 
+        HandleEngineStatusError(status, "Failed to create texture.");
 
       return status;
     }
@@ -88,11 +91,7 @@ namespace Engine {
       FrameGraphTextureView  const&view)
     {
       Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
-
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(texture.readableName);
-      if(subjacentResources.empty())
-        return EEngineStatus::Error;
-
+      
       TextureView::Descriptor desc{ };
       desc.name             = view.readableName;
       desc.textureFormat    = view.format;
@@ -100,7 +99,7 @@ namespace Engine {
       desc.arraySlices      = view.arraySliceRange;
       desc.mipMapSlices     = view.mipSliceRange;
 
-      TextureView::CreationRequest request(desc, subjacentResources[0]);
+      TextureView::CreationRequest request(desc, texture.readableName);
 
       EEngineStatus status = m_resourceManager->createResource<TextureView>(request, view.readableName, false);
       HandleEngineStatusError(status, "Failed to create texture.");
@@ -177,10 +176,6 @@ namespace Engine {
         FrameGraphTextureView  const&view)
     {
       Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
-
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
-      if(subjacentResources.empty())
-        return EEngineStatus::Error;
 
       EEngineStatus status = EEngineStatus::Ok;
       status = m_resourceManager->destroyResource<TextureView>(view.readableName);

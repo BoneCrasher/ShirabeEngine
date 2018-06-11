@@ -377,8 +377,8 @@ namespace Engine {
       if(texture->isExternalResource)
         return true;
 
-      EEngineStatus status = renderContext->destroyTexture(*texture);
-      HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
+      // EEngineStatus status = renderContext->destroyTexture(*texture);
+      // HandleEngineStatusError(status, "Failed to unload texture for FrameGraphExecution.");
 
       return true;
     }

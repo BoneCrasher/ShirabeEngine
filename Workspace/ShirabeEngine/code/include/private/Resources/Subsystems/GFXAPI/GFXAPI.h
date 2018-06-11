@@ -25,7 +25,7 @@ namespace Engine {
       Ptr<void>          internalHandle;
 
       inline GFXAPIResourceHandleAssignment()
-        : publicHandle(0)
+        : publicHandle("")
         , internalHandle(0)
       {}
 

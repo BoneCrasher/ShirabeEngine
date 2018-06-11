@@ -198,21 +198,20 @@ namespace Engine {
       typename TResource::Descriptor const& desc = request.resourceDescriptor();
 
       AnyProxy resourceProxy = getResourceProxy(resourceId);
-      if(resourceProxy)
-        return EEngineStatus::ResourceManager_ResourceAlreadyCreated;
+      if(!resourceProxy) {
+        Ptr<IResourceProxy<TResource>> proxy
+          = m_proxyFactory->create<TResource>(EProxyType::Dynamic, request);
+        if(!proxy)
+          HandleEngineStatusError(EEngineStatus::Error, "Failed to create proxy for resource.");
 
-      Ptr<IResourceProxy<TResource>> proxy
-        = m_proxyFactory->create<TResource>(EProxyType::Dynamic, request);
-      if(!proxy)
-        HandleEngineStatusError(EEngineStatus::Error, "Failed to create proxy for resource.");
-      
-      if(!storeResourceProxy(resourceId, AnyProxy(proxy)))
-        HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, "Failed to store resource proxy.");
+        if(!storeResourceProxy(resourceId, AnyProxy(proxy)))
+          HandleEngineStatusError(EEngineStatus::ResourceManager_ProxyCreationFailed, "Failed to store resource proxy.");
+      }
 
       // If creation is not deferred, immediately load the resources using the proxy.
       if(!creationDeferred)
         HandleEngineStatusError(loadResource<TResource>(resourceId), "Failed to load resource");
-      
+
       return EEngineStatus::Ok;
     }
 
@@ -255,13 +254,19 @@ namespace Engine {
             HandleEngineStatusError(proxyLoad(base, placeholder), "Failed to load dependency proxy underlying resource.");
 
             // Recheck for availability?
-            if(base->loadState() != ELoadState::LOADED)
-              HandleEngineStatusError(EEngineStatus::Error, "Resource loading failed despite previous attempt!");
+            //if(base->loadState() != ELoadState::LOADED)
+            //  HandleEngineStatusError(EEngineStatus::Error, "Resource loading failed despite previous attempt!");
           }
         }
       }
 
-      HandleEngineStatusError(proxyLoad(baseProxy, dependencies), "Failed to load resource proxy ");
+      if(!(baseProxy->loadState() == ELoadState::LOADED)) {
+        while(baseProxy->loadState() == ELoadState::LOADING)
+          std::this_thread::sleep_for(std::chrono::microseconds(100));
+
+        if(baseProxy->loadState() != ELoadState::LOADED)
+          HandleEngineStatusError(proxyLoad(baseProxy, dependencies), "Failed to load resource proxy ");
+      }
 
       return EEngineStatus::Ok;
     }

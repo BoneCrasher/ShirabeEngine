@@ -36,7 +36,7 @@ namespace Engine {
         Ptr<GFXAPIResourceBackend>          const&resourceBackend,
         typename TResource::CreationRequest const&request)
         : ResourceBackendProxy<GFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
-        , m_destructionRequest(0)
+        , m_destructionRequest("")
       { }
 
       EEngineStatus loadSync(

@@ -92,75 +92,82 @@ namespace Test {
         width  = displayDesc.bounds.size.x(),
         height = displayDesc.bounds.size.y();
 
-      GraphBuilder graphBuilder{};
-      graphBuilder.initialize(appEnvironment);
+      std::function<void()> constructAndRunFrameGraph =
+        [&] () -> void
+      {
+        GraphBuilder graphBuilder{};
+        graphBuilder.initialize(appEnvironment);
 
-      FrameGraphTexture backBufferTextureDesc{};
-      backBufferTextureDesc.width          = width;
-      backBufferTextureDesc.height         = height;
-      backBufferTextureDesc.depth          = 1;
-      backBufferTextureDesc.format         = FrameGraphFormat::R8G8B8A8_UNORM;
-      backBufferTextureDesc.initialState   = FrameGraphResourceInitState::Clear;
-      backBufferTextureDesc.arraySize      = 1;
-      backBufferTextureDesc.mipLevels      = 1;
-      backBufferTextureDesc.permittedUsage = FrameGraphResourceUsage::RenderTarget;
+        FrameGraphTexture backBufferTextureDesc{};
+        backBufferTextureDesc.width          = width;
+        backBufferTextureDesc.height         = height;
+        backBufferTextureDesc.depth          = 1;
+        backBufferTextureDesc.format         = FrameGraphFormat::R8G8B8A8_UNORM;
+        backBufferTextureDesc.initialState   = FrameGraphResourceInitState::Clear;
+        backBufferTextureDesc.arraySize      = 1;
+        backBufferTextureDesc.mipLevels      = 1;
+        backBufferTextureDesc.permittedUsage = FrameGraphResourceUsage::RenderTarget;
 
-      FrameGraphResource backBuffer{ };
-      backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
+        FrameGraphResource backBuffer{ };
+        backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
 
-      RenderableList renderableCollection ={
-        { "Cube",    0, 0 },
-        { "Sphere",  0, 0 },
-        { "Pyramid", 0, 0 }
+        RenderableList renderableCollection ={
+          { "Cube",    0, 0 },
+          { "Sphere",  0, 0 },
+          { "Pyramid", 0, 0 }
+        };
+        FrameGraphResource renderables{ };
+        renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
+
+        // GBuffer
+        FrameGraphModule<GBufferModuleTag_t> gbufferModule{};
+        FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData gbufferExportData{};
+        gbufferExportData = gbufferModule.addGBufferGenerationPass(
+          graphBuilder,
+          renderables);
+
+        // Lighting
+        FrameGraphModule<LightingModuleTag_t> lightingModule{};
+        FrameGraphModule<LightingModuleTag_t>::LightingExportData lightingExportData{};
+        lightingExportData = lightingModule.addLightingPass(
+          graphBuilder,
+          gbufferExportData.gbuffer0,
+          gbufferExportData.gbuffer1,
+          gbufferExportData.gbuffer2,
+          gbufferExportData.gbuffer3);
+
+        // Compositing
+        FrameGraphModule<CompositingModuleTag_t> compositingModule{ };
+        FrameGraphModule<CompositingModuleTag_t>::ExportData compositingExportData{ };
+        compositingExportData = compositingModule.addDefaultCompositingPass(
+          graphBuilder,
+          gbufferExportData.gbuffer0,
+          gbufferExportData.gbuffer1,
+          gbufferExportData.gbuffer2,
+          gbufferExportData.gbuffer3,
+          lightingExportData.lightAccumulationBuffer,
+          backBuffer);
+
+        UniquePtr<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
+
+        Ptr<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
+        serializer->initialize();
+
+        frameGraph->acceptSerializer(serializer);
+        serializer->writeToFile("FrameGraphTest");
+
+        serializer->deinitialize();
+        serializer = nullptr;
+
+        system("makeGraphPNG.bat");
+
+        // Renderer will call.
+        if(frameGraph)
+          frameGraph->execute(renderContext);
       };
-      FrameGraphResource renderables{ };
-      renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
-      // GBuffer
-      FrameGraphModule<GBufferModuleTag_t> gbufferModule{};
-      FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData gbufferExportData{};
-      gbufferExportData = gbufferModule.addGBufferGenerationPass(
-        graphBuilder,
-        renderables);
-
-      // Lighting
-      FrameGraphModule<LightingModuleTag_t> lightingModule{};
-      FrameGraphModule<LightingModuleTag_t>::LightingExportData lightingExportData{};
-      lightingExportData = lightingModule.addLightingPass(
-        graphBuilder,
-        gbufferExportData.gbuffer0,
-        gbufferExportData.gbuffer1,
-        gbufferExportData.gbuffer2,
-        gbufferExportData.gbuffer3);
-
-      // Compositing
-      FrameGraphModule<CompositingModuleTag_t> compositingModule{ };
-      FrameGraphModule<CompositingModuleTag_t>::ExportData compositingExportData{ };
-      compositingExportData = compositingModule.addDefaultCompositingPass(
-        graphBuilder,
-        gbufferExportData.gbuffer0,
-        gbufferExportData.gbuffer1,
-        gbufferExportData.gbuffer2,
-        gbufferExportData.gbuffer3,
-        lightingExportData.lightAccumulationBuffer,
-        backBuffer);
-
-      UniquePtr<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
-
-      Ptr<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
-      serializer->initialize();
-
-      frameGraph->acceptSerializer(serializer);
-      serializer->writeToFile("FrameGraphTest");
-
-      serializer->deinitialize();
-      serializer = nullptr;
-
-      system("makeGraphPNG.bat");
-
-      // Renderer will call.
-      if(frameGraph)
-        frameGraph->execute(renderContext);
+      constructAndRunFrameGraph();
+      constructAndRunFrameGraph(); // Run twice to check for resource persistency
 
       gfxApiResourceBackend->deinitialize();
 

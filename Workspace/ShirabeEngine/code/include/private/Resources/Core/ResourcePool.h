@@ -73,8 +73,9 @@ namespace Engine {
       IndexedResourcePool<TIndex, TValue>::getResource(
         TIndex const&index) const
     {
+      static TValue gDefault = TValue();
       if(!hasResource(index))
-        throw std::runtime_error("Resource not available.");
+        return gDefault;
 
       return m_resources.at(index);
     }
@@ -84,8 +85,9 @@ namespace Engine {
       IndexedResourcePool<TIndex, TValue>::getResource(
         TIndex const&index)
     {
+      static TValue gDefault = TValue();
       if(!hasResource(index))
-        throw std::runtime_error("Resource not available.");
+        return gDefault;
 
       return m_resources.at(index);
     }
