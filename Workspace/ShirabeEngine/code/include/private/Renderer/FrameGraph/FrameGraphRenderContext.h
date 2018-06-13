@@ -7,14 +7,14 @@
 #include "Asset/AssetStorage.h"
 #include "Resources/Core/ResourceManager.h"
 
-#include "Renderer/IRenderer.h"
+#include "Renderer/RendererTypes.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
 
 namespace Engine {
   namespace FrameGraph {
     using Engine::Asset::AssetId_t;
     using Engine::Asset::IAssetStorage;
-    using namespace Engine::Renderer;
+    using namespace Engine::Rendering;
 
     DeclareInterface(IFrameGraphRenderContext);
 

@@ -9,12 +9,10 @@
 
 #include "Window/WindowManager.h"
 
+#include "Asset/AssetStorage.h"
 #include "Resources/Core/ResourceProxyFactory.h"
 
-#include "BuildingBlocks/Scene.h"
-
 #include "Renderer/IRenderer.h"
-
 #ifdef PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsError.h"
 #include "GFXAPI/Vulkan/Environment.h"
@@ -23,10 +21,13 @@ using namespace Platform::Windows;
 using namespace Engine::Vulkan;
 #endif
 
+#include "BuildingBlocks/Scene.h"
+
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 
 namespace Engine {
-	using namespace Renderer;
+  using namespace Asset;
+	using namespace Rendering;
 	using namespace Resources;
 
 	class SHIRABE_LIBRARY_EXPORT EngineInstance
@@ -43,19 +44,26 @@ namespace Engine {
 	private:
 		DeclareLogTag(EngineInstance)
 
+    // Application 
 		Platform::ApplicationEnvironment m_environment;
-		WindowManagerPtr                 m_windowManager;
-		IWindowPtr                       m_mainWindow;
+		
+    // WSI
+    WindowManagerPtr m_windowManager;
+		IWindowPtr       m_mainWindow;
 
+    // Assets & Resources
+    Ptr<AssetStorage>         m_assetStorage;
+    Ptr<ResourceProxyFactory> m_proxyFactory;
+    Ptr<ResourceManager>      m_resourceManager;
+
+    // Rendering
 #ifdef PLATFORM_WINDOWS
     Ptr<VulkanEnvironment> m_vulkanEnvironment;
 #endif
-
-		Ptr<ResourceProxyFactory> m_proxyFactory;
-		Ptr<ResourceManager>      m_resourceManager;
-
 		IRendererPtr m_renderer;
-		Scene        m_scene;
+		
+    // Internals
+    Scene m_scene;
 	};
 
 	DeclareSharedPointerType(EngineInstance)

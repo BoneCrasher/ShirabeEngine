@@ -1,8 +1,12 @@
 #include "Core/Engine.h"
 
-#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
-
 #include "Resources/Core/ResourceManager.h"
+
+#include "Renderer/Renderer.h"
+#include "Renderer/FrameGraph/FrameGraphRenderContext.h"
+
+#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/Rendering/VulkanRenderContext.h"
 
 namespace Engine {
 
@@ -61,6 +65,9 @@ namespace Engine {
 
     unsigned long const& windowWidth  = m_environment.osDisplays[0].bounds.size.x();
     unsigned long const& windowHeight = m_environment.osDisplays[0].bounds.size.y();
+
+    EGFXAPI        gfxApi        = EGFXAPI::Vulkan;
+    EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
 
     std::function<void()> fnCreatePlatformWindowSystem
       = [&, this] () -> void
@@ -121,8 +128,6 @@ namespace Engine {
       // Their life-cycle management will become the manager's task.
       // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
       // 
-      EGFXAPI        gfxApi        = EGFXAPI::DirectX;
-      EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::DirectX_11_0;
 
       Ptr<GFXAPIResourceBackend>     resourceBackend     = MakeSharedPointerType<GFXAPIResourceBackend>();
       Ptr<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
@@ -133,7 +138,7 @@ namespace Engine {
       manager->setResourceBackend(resourceBackend);
       m_resourceManager = manager;
 
-      if(gfxApi == EGFXAPI::Vulkan && gfxApiVersion == EGFXAPIVersion::Vulkan_)
+      if(gfxApi == EGFXAPI::Vulkan)
         resourceTaskBackend = MakeSharedPointerType<VulkanResourceTaskBackend>(m_vulkanEnvironment);
 
       resourceBackend->setResourceTaskBackend(resourceTaskBackend);
@@ -143,18 +148,28 @@ namespace Engine {
     std::function<void()> fnCreatePlatformRenderer
       = [&, this] () -> void
     {
-      //m_renderer = MakeSharedPointerType<DX11Renderer>();
-      //status = m_renderer->initialize(m_environment, rendererConfiguration, m_resourceManager->backend());
-      //if(!CheckEngineError(status)) {
-      //  status = m_scene.initialize();
-      //}
+      using Engine::FrameGraph::IFrameGraphRenderContext;
+      using Engine::FrameGraph::FrameGraphRenderContext;
+
+      // How to decouple?
+      Ptr<IRenderContext> gfxApiRenderContext = nullptr; 
+      if(gfxApi == EGFXAPI::Vulkan)
+        gfxApiRenderContext = MakeSharedPointerType<VulkanRenderContext>();
+
+      Ptr<IFrameGraphRenderContext> frameGraphRenderContext = FrameGraphRenderContext::create(m_assetStorage, m_resourceManager, gfxApiRenderContext);
+
+      m_renderer = MakeSharedPointerType<Renderer>();
+      status = m_renderer->initialize(m_environment, rendererConfiguration, frameGraphRenderContext);
+      if(!CheckEngineError(status)) {
+        status = m_scene.initialize();
+      }
     };
 
     try {
       fnCreatePlatformWindowSystem();
       fnCreateDefaultGFXAPI();
-      //fnCreatePlatformResourceSystem();
-      //fnCreatePlatformRenderer();
+      fnCreatePlatformResourceSystem();
+      fnCreatePlatformRenderer();
 
     }
     catch(WindowsException const we) {
@@ -206,13 +221,14 @@ namespace Engine {
   }
 
   EEngineStatus EngineInstance::update() {
-
     if(CheckWindowManagerError(m_windowManager->update())) {
       Log::Error(logTag(), "Failed to update window manager.");
       return EEngineStatus::EngineComponentUpdateError;
     }
 
     m_scene.update();
+
+    m_renderer->renderScene();
 
     return EEngineStatus::Ok;
   }

@@ -29,7 +29,8 @@ namespace Engine {
       DirectX_11_2,
       DirectX_12_0,
       OpenGL_,
-      Vulkan_
+      Vulkan_1_0,
+      Vulkan_1_1
     };
 
     DeclareInterface(IAsyncLoadCallback);

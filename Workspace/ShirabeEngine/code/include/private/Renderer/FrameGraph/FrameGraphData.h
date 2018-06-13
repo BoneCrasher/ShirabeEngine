@@ -17,12 +17,13 @@
 #include "Resources/Subsystems/GFXAPI/Types/Definition.h"
 #include "Resources/Subsystems/GFXAPI/Types/Texture.h"
 
-#include "Renderer/IRenderer.h"
+#include "Renderer/RendererTypes.h"
 
 namespace Engine {
   namespace FrameGraph {
     using Core::BitField;
     using Engine::Range;
+    using namespace Engine::Rendering;
 
     using FrameGraphResourceId_t = uint64_t;
     using PassUID_t              = uint64_t;

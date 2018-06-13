@@ -4,7 +4,7 @@
 #include "Core/BasicTypes.h"
 
 namespace Engine {
-	namespace Renderer {
+	namespace Rendering {
 
 		struct RendererConfiguration {
 			bool           requestFullscreen;
