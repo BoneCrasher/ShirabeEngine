@@ -1,5 +1,6 @@
 #include "GFXAPI/Vulkan/DeviceCapabilities.h"
 #include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/Resources/Types/VulkanTextureResource.h"
 
 namespace Engine {
   namespace Vulkan {
@@ -92,11 +93,15 @@ namespace Engine {
         result = vkBindImageMemory(vkLogicalDevice, vkImage, vkImageMemory, 0);
         if(VkResult::VK_SUCCESS != result)
           throw VulkanError("Failed to bind image memory on GPU.", result);
-                
+        
+        VulkanTextureResource *textureResource = new VulkanTextureResource();
+        textureResource->handle         = vkImage;
+        textureResource->attachedMemory = vkImageMemory;
+
         GFXAPIResourceHandleAssignment assignment ={ };
 
         assignment.publicHandle   = desc.name; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = static_cast<uint64_t>(vkImage);
+        assignment.internalHandle = Ptr<VulkanTextureResource>(textureResource, [] (VulkanTextureResource const*p) { if(p) delete p; });
 
         return assignment;
       };
@@ -129,14 +134,19 @@ namespace Engine {
 
       outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        VkImage image = static_cast<VkImage>(inAssignment.internalHandle);
+        Ptr<VulkanTextureResource> texture = std::static_pointer_cast<VulkanTextureResource>(inAssignment.internalHandle);
+        if(!texture)
+          throw VulkanError("Invalid internal data provided for texture destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
 
-        vkDestroyImage(m_vulkanEnvironment->getState().selectedLogicalDevice, image, nullptr);
+        VkImage        vkImage         = texture->handle;
+        VkDeviceMemory vkDeviceMemory  = texture->attachedMemory;
+        VkDevice       vkLogicalDevice = m_vulkanEnvironment->getState().selectedLogicalDevice;
 
-        GFXAPIResourceHandleAssignment assignment ={ };
+        vkFreeMemory(vkLogicalDevice, vkDeviceMemory, nullptr);
+        vkDestroyImage(vkLogicalDevice, vkImage, nullptr);
 
-        assignment.publicHandle   = inAssignment.publicHandle; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = 0;
+        GFXAPIResourceHandleAssignment assignment = inAssignment;
+        assignment.internalHandle = nullptr;
 
         return assignment;
       };

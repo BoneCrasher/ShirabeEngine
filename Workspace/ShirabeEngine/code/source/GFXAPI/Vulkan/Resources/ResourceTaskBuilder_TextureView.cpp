@@ -1,5 +1,7 @@
 #include "GFXAPI/Vulkan/DeviceCapabilities.h"
 #include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
+#include "GFXAPI/Vulkan/Resources/Types/VulkanTextureResource.h"
+#include "GFXAPI/Vulkan/Resources/Types/VulkanTextureViewResource.h"
 
 #include <vulkan/vulkan.h>
 
@@ -44,12 +46,17 @@ namespace Engine {
 
       outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        uint64_t privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
+        Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
         if(!privateDependencyHandle) {
           HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV due to missing dependency.");
         }
+        
+        Ptr<VulkanTextureResource> texture = std::static_pointer_cast<VulkanTextureResource>(privateDependencyHandle);
+        if(!texture)
+          throw VulkanError("Invalid internal data provided for texture destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
 
-        VkImage underlyingTexture = static_cast<VkImage>(privateDependencyHandle);
+        VkImage        vkImage         = texture->handle;
+        VkDeviceMemory vkDeviceMemory  = texture->attachedMemory;
         
         VkImageViewCreateInfo vkImageViewCreateInfo{ };
         vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -63,7 +70,7 @@ namespace Engine {
         vkImageViewCreateInfo.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         vkImageViewCreateInfo.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         vkImageViewCreateInfo.components.a                    = VK_COMPONENT_SWIZZLE_IDENTITY;
-        vkImageViewCreateInfo.image                           = underlyingTexture;
+        vkImageViewCreateInfo.image                           = vkImage;
         vkImageViewCreateInfo.viewType                        = imageViewType;
         vkImageViewCreateInfo.flags                           = 0; // Reserved
         vkImageViewCreateInfo.pNext                           = nullptr;
@@ -74,10 +81,13 @@ namespace Engine {
         if(VkResult::VK_SUCCESS != result)
           throw VulkanError("Failed to create render target view.", result);
 
+        VulkanTextureViewResource *textureViewResource = new VulkanTextureViewResource();
+        textureViewResource->handle = vkImageView;
+
         GFXAPIResourceHandleAssignment assignment ={ };
 
         assignment.publicHandle   = desc.name; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = static_cast<uint64_t>(vkImageView);
+        assignment.internalHandle = Ptr<VulkanTextureViewResource>(textureViewResource, [] (VulkanTextureViewResource const*p) { if(p) delete p; });
 
         return assignment;
       };
@@ -110,14 +120,17 @@ namespace Engine {
       
       outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        VkImageView imageView = static_cast<VkImageView>(inAssignment.internalHandle);
+        Ptr<VulkanTextureViewResource> textureView = std::static_pointer_cast<VulkanTextureViewResource>(inAssignment.internalHandle);
+        if(!textureView)
+          throw VulkanError("Invalid internal data provided for texture view destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
 
-        vkDestroyImageView(m_vulkanEnvironment->getState().selectedLogicalDevice, imageView, nullptr);
+        VkImageView vkImageView     = textureView->handle;
+        VkDevice    vkLogicalDevice = m_vulkanEnvironment->getState().selectedLogicalDevice;
 
-        GFXAPIResourceHandleAssignment assignment ={ };
+        vkDestroyImageView(vkLogicalDevice, vkImageView, nullptr);
 
-        assignment.publicHandle   = inAssignment.publicHandle; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = 0;
+        GFXAPIResourceHandleAssignment assignment = inAssignment;
+        assignment.internalHandle = nullptr;
 
         return assignment;
       };
