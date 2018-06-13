@@ -38,10 +38,11 @@ namespace Engine {
     class SHIRABE_TEST_EXPORT AssetStorage
       : public IAssetStorage
     {
-      using AssetIndex       = AssetRegistry<Asset>;
       using TextureAssetData = AssetRegistry<TextureAsset>;
       using BufferAssetData  = AssetRegistry<BufferAsset>;
     public:
+      using AssetIndex = AssetRegistry<Asset>;
+
       AssetStorage();
 
       void readIndex(AssetIndex const&);

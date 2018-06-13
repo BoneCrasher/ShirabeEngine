@@ -80,9 +80,9 @@ namespace Engine {
       // and load state.
       EEngineStatus status = EEngineStatus::Ok;
 
-      typename TResource::Descriptor const&rd = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest().resourceDescriptor();
       
       typename TResource::CreationRequest const&creationRequest = static_cast<GenericProxyBase<TResource>*>(this)->creationRequest();
+      typename TResource::Descriptor      const&rd              = creationRequest.resourceDescriptor();
 
       status = resourceBackend()->load<TResource>(creationRequest, resolvedDependencies, ETaskSynchronization::Sync, nullptr);
       if(CheckEngineError(status)) {

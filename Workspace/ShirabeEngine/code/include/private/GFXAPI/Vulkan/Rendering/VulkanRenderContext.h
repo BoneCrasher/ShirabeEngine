@@ -22,14 +22,17 @@ namespace Engine {
 
     EEngineStatus VulkanRenderContext::bindResource(PublicResourceId_t const&id) {
       Log::Verbose(logTag(), String::format("Binding resource with id %0", id));
+      return EEngineStatus::Ok;
     }
 
     EEngineStatus VulkanRenderContext::unbindResource(PublicResourceId_t const&id) {
       Log::Verbose(logTag(), String::format("Unbinding resource with id %0", id));
+      return EEngineStatus::Ok;
     }
 
     EEngineStatus VulkanRenderContext::render(Renderable const&renderable) {
       Log::Verbose(logTag(), String::format("Rendering renderable: %0", to_string(renderable)));
+      return EEngineStatus::Ok;
     }
   }
 }

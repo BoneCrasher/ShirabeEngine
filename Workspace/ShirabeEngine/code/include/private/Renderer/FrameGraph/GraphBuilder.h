@@ -55,8 +55,8 @@ namespace Engine {
 
       FrameGraphResource
         registerRenderables(
-          std::string              const&readableIdentifier,
-          Renderer::RenderableList const&renderables);
+          std::string               const&readableIdentifier,
+          Rendering::RenderableList const&renderables);
 
       UniquePtr<Graph>
         compile();

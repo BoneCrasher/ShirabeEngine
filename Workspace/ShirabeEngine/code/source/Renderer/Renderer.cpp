@@ -148,6 +148,8 @@ namespace Engine {
       // Renderer will call.
       if(frameGraph)
         frameGraph->execute(m_frameGraphRenderContext);
+
+      return EEngineStatus::Ok;
     }
 
   }

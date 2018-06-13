@@ -132,8 +132,8 @@ namespace Engine {
 
     FrameGraphResource
       GraphBuilder::registerRenderables(
-        std::string              const&readableIdentifier,
-        Renderer::RenderableList const&renderables)
+        std::string               const&readableIdentifier,
+        Rendering::RenderableList const&renderables)
     {
       try {
         FrameGraphRenderableList &resource = m_resourceData.spawnResource<FrameGraphRenderableList>();

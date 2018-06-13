@@ -188,7 +188,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
+              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -200,7 +200,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
+              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -212,7 +212,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
+              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -224,17 +224,17 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = std::static_pointer_cast<void>(MakeSharedPointerType<int>());                                                                           \
+              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }
 
     #define Mock_AddFunctionsForType(Type) \
-      addCreator<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##CreationTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
-      addUpdater<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##UpdateTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));   \
+      addCreator   <Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##CreationTask,    this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));   \
+      addUpdater   <Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##UpdateTask,      this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));   \
       addDestructor<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));   \
-      addQuery<Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##QueryTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+      addQuery     <Type>(std::bind(&MockGFXAPITaskBackend::fn##Type##QueryTask,       this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     void MockGFXAPITaskBackend::initialize()
     {

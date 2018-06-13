@@ -1,7 +1,9 @@
+#include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
 namespace Engine {
   namespace FrameGraph {
+    using namespace Engine::Rendering;
 
     Ptr<FrameGraphRenderContext>
       FrameGraphRenderContext::create(
@@ -98,6 +100,7 @@ namespace Engine {
       desc.subjacentTexture = texture;
       desc.arraySlices      = view.arraySliceRange;
       desc.mipMapSlices     = view.mipSliceRange;
+      desc.dependencies.push_back(texture.readableName);
 
       TextureView::CreationRequest request(desc, texture.readableName);
 

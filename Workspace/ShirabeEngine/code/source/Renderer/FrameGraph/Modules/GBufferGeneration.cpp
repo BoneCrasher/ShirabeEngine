@@ -66,7 +66,7 @@ namespace Engine {
       },
         [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&context) -> bool
       {
-        using namespace Engine::Renderer;
+        using namespace Engine::Rendering;
 
         Log::Verbose(logTag(), "GBufferGeneration");
 

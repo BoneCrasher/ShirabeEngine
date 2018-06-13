@@ -137,7 +137,7 @@ namespace Engine {
       ResolvedDependencyCollection resolvedDependencies={};
       for(PublicResourceIdList::value_type const&h : dependencies)
         resolvedDependencies[h] = m_storage[h];
-      
+
       try {
 
         status = loadImpl<TResource>(inRequest, resolvedDependencies, handle);
@@ -166,7 +166,7 @@ namespace Engine {
       catch(std::future_error const&fe) {
         Log::Error(logTag(), String::format("Failed to access future shared state. Error: %0", fe.what()));
       }
-      
+
       return status;
     }
 
@@ -181,19 +181,14 @@ namespace Engine {
       ResolvedDependencyCollection resolvedDependencies={}; // Guarding the public API by passing in this empty map.
 
       DeferredResourceOperationHandle handle;
-    
+
       EEngineStatus status = EEngineStatus::Ok;
       try {
         status = unloadImpl<TResource>(inRequest, { inRequest.publicResourceId(), m_storage[inRequest.publicResourceId()] }, resolvedDependencies, handle);
         if(!CheckEngineError(status)) {
           resourceHandle = handle.futureHandle.get(); // Wait for it ALWAYS!
-          if(!resourceHandle.valid()) {
-            status = EEngineStatus::GFXAPI_SubsystemResourceDestructionFailed;
-          }
-          else {
-            m_storage.erase(resourceHandle.publicHandle);
-            status = EEngineStatus::Ok;
-          }
+          m_storage.erase(resourceHandle.publicHandle);
+          status = EEngineStatus::Ok;
         }
       }
       catch(std::future_error const&fe) {

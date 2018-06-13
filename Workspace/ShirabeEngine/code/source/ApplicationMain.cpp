@@ -22,10 +22,10 @@ int WINAPI WinMain(
 	Log::setLineWidth(80);
 	Log::Status(Main::logTag(), "SAE5300 - Application", Log::Style::CENTRE);
 
-	Platform::ApplicationEnvironment appEnvironment;
-	appEnvironment.instanceHandle         = hInstance;
-	appEnvironment.previousInstanceHandle = hPrevInstance;
-	appEnvironment.osDisplays             = Platform::OSDisplay::GetDisplays();
+	Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
+	appEnvironment->instanceHandle         = hInstance;
+	appEnvironment->previousInstanceHandle = hPrevInstance;
+	appEnvironment->osDisplays             = Platform::OSDisplay::GetDisplays();
 
 	// TODO: Configuation
 	// EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);

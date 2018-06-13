@@ -11,9 +11,16 @@
 #include "Renderer/FrameGraph/FrameGraphData.h"
 
 namespace Engine {
+
+  namespace Rendering {
+    class IRenderContext;
+  }
+
   namespace FrameGraph {
     using Engine::Asset::AssetId_t;
     using Engine::Asset::IAssetStorage;
+    using namespace Engine::Resources;
+    using namespace Engine::GFXAPI;
     using namespace Engine::Rendering;
 
     DeclareInterface(IFrameGraphRenderContext);

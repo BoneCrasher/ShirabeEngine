@@ -11,11 +11,15 @@ namespace Engine {
       assert(vulkanEnvironment != nullptr);
     }
 
+    #define ImplementTasksFor(Type) \
+      addCreator<Type>   (std::bind(&VulkanResourceTaskBackend::fn##Type##CreationTask,    this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));                        \
+      addUpdater<Type>   (std::bind(&VulkanResourceTaskBackend::fn##Type##UpdateTask,      this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)); \
+      addDestructor<Type>(std::bind(&VulkanResourceTaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)); \
+      addQuery<Type>     (std::bind(&VulkanResourceTaskBackend::fn##Type##QueryTask,       this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
     void VulkanResourceTaskBackend::initialize() {
-      addCreator<Texture>(std::bind(&VulkanResourceTaskBackend::fnTextureCreationTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-      addUpdater<Texture>(std::bind(&VulkanResourceTaskBackend::fnTextureUpdateTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-      addDestructor<Texture>(std::bind(&VulkanResourceTaskBackend::fnTextureDestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-      addQuery<Texture>(std::bind(&VulkanResourceTaskBackend::fnTextureQueryTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+      ImplementTasksFor(Texture);
+      ImplementTasksFor(TextureView);
     }
   }
 }

@@ -9,13 +9,15 @@ namespace Engine {
   namespace Rendering {
     using Engine::FrameGraph::IFrameGraphRenderContext;
 
-    class Renderer {
+    class Renderer 
+      : public IRenderer
+    {
     public:
       Renderer();
       ~Renderer();
 
       EEngineStatus initialize(
-        ApplicationEnvironment        const&,
+        Ptr<ApplicationEnvironment>   const&,
         RendererConfiguration         const&,
         Ptr<IFrameGraphRenderContext>      &) ;
 

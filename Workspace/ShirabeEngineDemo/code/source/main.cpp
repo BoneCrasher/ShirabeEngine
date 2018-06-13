@@ -30,10 +30,10 @@ int WINAPI WinMain(
   Log::setLineWidth(80);
   Log::Status(Main::logTag(), "ShirabeEngineDemo - Application", Log::Style::CENTRE);
 
-  Platform::ApplicationEnvironment appEnvironment;
-  appEnvironment.instanceHandle         = hInstance;
-  appEnvironment.previousInstanceHandle = hPrevInstance;
-  appEnvironment.osDisplays             = Platform::OSDisplay::GetDisplays(appEnvironment.primaryDisplayIndex);
+  Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
+  appEnvironment->instanceHandle         = hInstance;
+  appEnvironment->previousInstanceHandle = hPrevInstance;
+  appEnvironment->osDisplays             = Platform::OSDisplay::GetDisplays(appEnvironment->primaryDisplayIndex);
 
   EngineInstancePtr pEngine = MakeSharedPointerType<EngineInstance>(appEnvironment/*, engineConfiguration*/);
   if(CheckEngineError(pEngine->initialize())) {

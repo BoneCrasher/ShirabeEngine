@@ -42,14 +42,14 @@ namespace Engine {
         break;
       }
 
-      outTask = [&, this] () -> GFXAPIResourceHandleAssignment
+      outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
+        uint64_t privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
         if(!privateDependencyHandle) {
           HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV due to missing dependency.");
         }
 
-        Ptr<VkImage> underlyingTexture = std::static_pointer_cast<VkImage>(privateDependencyHandle);
+        VkImage underlyingTexture = static_cast<VkImage>(privateDependencyHandle);
         
         VkImageViewCreateInfo vkImageViewCreateInfo{ };
         vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -63,7 +63,7 @@ namespace Engine {
         vkImageViewCreateInfo.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         vkImageViewCreateInfo.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         vkImageViewCreateInfo.components.a                    = VK_COMPONENT_SWIZZLE_IDENTITY;
-        vkImageViewCreateInfo.image                           = *underlyingTexture;
+        vkImageViewCreateInfo.image                           = underlyingTexture;
         vkImageViewCreateInfo.viewType                        = imageViewType;
         vkImageViewCreateInfo.flags                           = 0; // Reserved
         vkImageViewCreateInfo.pNext                           = nullptr;
@@ -77,7 +77,7 @@ namespace Engine {
         GFXAPIResourceHandleAssignment assignment ={ };
 
         assignment.publicHandle   = desc.name; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = Ptr<void>((void*)vkImageView);
+        assignment.internalHandle = static_cast<uint64_t>(vkImageView);
 
         return assignment;
       };
@@ -102,15 +102,25 @@ namespace Engine {
       VulkanResourceTaskBackend::
       fnTextureViewDestructionTask(
         TextureView::DestructionRequest const&request,
-        GFXAPIResourceHandleAssignment  const&assignment,
+        GFXAPIResourceHandleAssignment  const&inAssignment,
         ResolvedDependencyCollection    const&resolvedDependencies,
         ResourceTaskFn_t                     &outTask)
     {
       EEngineStatus status = EEngineStatus::Ok;
+      
+      outTask = [=] () -> GFXAPIResourceHandleAssignment
+      {
+        VkImageView imageView = static_cast<VkImageView>(inAssignment.internalHandle);
 
-      VkImageView imageView = *std::static_pointer_cast<VkImageView>(assignment.internalHandle);
+        vkDestroyImageView(m_vulkanEnvironment->getState().selectedLogicalDevice, imageView, nullptr);
 
-      vkDestroyImageView(m_vulkanEnvironment->getState().selectedLogicalDevice, imageView, nullptr);
+        GFXAPIResourceHandleAssignment assignment ={ };
+
+        assignment.publicHandle   = inAssignment.publicHandle; // Just abuse the pointer target address of the handle...
+        assignment.internalHandle = 0;
+
+        return assignment;
+      };
 
       return status;
     }

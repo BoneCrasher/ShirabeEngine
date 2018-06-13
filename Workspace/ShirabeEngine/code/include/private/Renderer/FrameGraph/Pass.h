@@ -19,7 +19,7 @@
 
 namespace Engine {
   namespace FrameGraph {
-    using namespace Renderer;
+    using namespace Rendering;
     using namespace Serialization;
     
     class GraphBuilder;

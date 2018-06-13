@@ -15,7 +15,7 @@
 namespace Engine {
   namespace DX {
     namespace _11 {
-      using namespace Engine::Renderer;
+      using namespace Engine::Rendering;
       using namespace Engine::DX::_11;
 
       class DX11Renderer

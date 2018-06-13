@@ -22,7 +22,7 @@
 namespace Test {
   namespace FrameGraph {
     using namespace Engine;
-    using namespace Engine::Renderer;
+    using namespace Engine::Rendering;
     using namespace Engine::FrameGraph;
 
     class MockRenderContext

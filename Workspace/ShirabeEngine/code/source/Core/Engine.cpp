@@ -1,5 +1,6 @@
 #include "Core/Engine.h"
 
+#include "Asset/AssetIndex.h"
 #include "Resources/Core/ResourceManager.h"
 
 #include "Renderer/Renderer.h"
@@ -43,7 +44,8 @@ namespace Engine {
 
   };
 
-  EngineInstance::EngineInstance(Platform::ApplicationEnvironment const&environment)
+  EngineInstance::EngineInstance(
+    Ptr<Platform::ApplicationEnvironment> const&environment)
     : m_environment(environment)
     , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
     , m_mainWindow(nullptr)
@@ -63,8 +65,8 @@ namespace Engine {
 
     EEngineStatus status = EEngineStatus::Ok;
 
-    unsigned long const& windowWidth  = m_environment.osDisplays[0].bounds.size.x();
-    unsigned long const& windowHeight = m_environment.osDisplays[0].bounds.size.y();
+    unsigned long const& windowWidth  = m_environment->osDisplays[0].bounds.size.x();
+    unsigned long const& windowHeight = m_environment->osDisplays[0].bounds.size.y();
 
     EGFXAPI        gfxApi        = EGFXAPI::Vulkan;
     EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
@@ -75,7 +77,7 @@ namespace Engine {
       EEngineStatus status = EEngineStatus::Ok;
 
       m_windowManager = MakeSharedPointerType<WindowManager>();
-      if(!(m_windowManager && !CheckWindowManagerError(m_windowManager->initialize(m_environment)))) {
+      if(!(m_windowManager && !CheckWindowManagerError(m_windowManager->initialize(*m_environment)))) {
         status = EEngineStatus::EngineComponentInitializationError;
         HandleEngineStatusError(status, "Failed to create WindowManager.");
       }
@@ -86,7 +88,7 @@ namespace Engine {
         HandleEngineStatusError(status, "Failed to create main window in WindowManager.");
       }
       else {
-        m_environment.primaryWindowHandle = m_mainWindow->handle();
+        m_environment->primaryWindowHandle = m_mainWindow->handle();
 
         status = m_mainWindow->resume();
         HandleEngineStatusError(status, "Failed to resume operation in main window.");
@@ -113,7 +115,7 @@ namespace Engine {
     {
       m_vulkanEnvironment = MakeSharedPointerType<VulkanEnvironment>();
 
-      EEngineStatus status = m_vulkanEnvironment->initialize(m_environment);
+      EEngineStatus status = m_vulkanEnvironment->initialize(*m_environment);
       HandleEngineStatusError(status, "Vulkan initialization failed.");
     };
 
@@ -129,6 +131,11 @@ namespace Engine {
       // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
       // 
 
+      AssetStorage::AssetIndex assetIndex ={}; // AssetIndex::loadIndexById("");
+      Ptr<AssetStorage> assetStorage = MakeSharedPointerType<AssetStorage>();
+      m_assetStorage->readIndex(assetIndex);
+      m_assetStorage = assetStorage;
+
       Ptr<GFXAPIResourceBackend>     resourceBackend     = MakeSharedPointerType<GFXAPIResourceBackend>();
       Ptr<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
@@ -138,11 +145,15 @@ namespace Engine {
       manager->setResourceBackend(resourceBackend);
       m_resourceManager = manager;
 
-      if(gfxApi == EGFXAPI::Vulkan)
-        resourceTaskBackend = MakeSharedPointerType<VulkanResourceTaskBackend>(m_vulkanEnvironment);
+      if(gfxApi == EGFXAPI::Vulkan) {
+        Ptr<VulkanResourceTaskBackend> vkResourceTaskBackend = MakeSharedPointerType<VulkanResourceTaskBackend>(m_vulkanEnvironment);
+        vkResourceTaskBackend->initialize();
+
+        resourceTaskBackend = vkResourceTaskBackend;
+      }
 
       resourceBackend->setResourceTaskBackend(resourceTaskBackend);
-      // Renderer will have access to resourceBackend!
+      resourceBackend->initialize();
     };
 
     std::function<void()> fnCreatePlatformRenderer

@@ -33,7 +33,7 @@ namespace Engine {
 	class SHIRABE_LIBRARY_EXPORT EngineInstance
 	{
 	public:
-		EngineInstance(Platform::ApplicationEnvironment const&environment);
+		EngineInstance(Ptr<Platform::ApplicationEnvironment> const&environment);
 		~EngineInstance();
 
 		EEngineStatus initialize();
@@ -45,7 +45,7 @@ namespace Engine {
 		DeclareLogTag(EngineInstance)
 
     // Application 
-		Platform::ApplicationEnvironment m_environment;
+		Ptr<Platform::ApplicationEnvironment> m_environment;
 		
     // WSI
     WindowManagerPtr m_windowManager;

@@ -173,7 +173,7 @@ namespace Engine {
 
     struct SHIRABE_TEST_EXPORT FrameGraphTexture
       : public FrameGraphResource
-      , public Resources::TextureInfo
+      , public GFXAPI::TextureInfo
     {
       FrameGraphResourceInitState
         initialState;
@@ -231,7 +231,7 @@ namespace Engine {
     struct FrameGraphRenderableList
       : public FrameGraphResource
     {
-      Renderer::RenderableList renderableList;
+      Rendering::RenderableList renderableList;
     };
 
     struct FrameGraphRenderableListView 
@@ -240,7 +240,7 @@ namespace Engine {
       std::vector<uint64_t> renderableRefIndices;
     };
 
-    using FrameGraphRenderable = Renderer::Renderable;
+    using FrameGraphRenderable = Rendering::Renderable;
     DeclareListType(FrameGraphRenderableList, FrameGraphRenderableList);
     DeclareMapType(FrameGraphResourceId_t, FrameGraphRenderableList, FrameGraphRenderableList);
     DeclareListType(FrameGraphRenderableListView, FrameGraphRenderableListView);
@@ -253,7 +253,7 @@ namespace Engine {
     template <typename TUnderlyingIDFrom, typename TUnderlyingIDTo = TUnderlyingIDFrom>
     using AdjacencyListMap = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
-    DeclareMapType(FrameGraphResourceId_t, Renderer::RenderableList, RenderableList);
+    DeclareMapType(FrameGraphResourceId_t, Rendering::RenderableList, RenderableList);
 
     using Index    = Vector<Ptr<FrameGraphResource>>;
     using RefIndex = Vector<FrameGraphResourceId_t>;

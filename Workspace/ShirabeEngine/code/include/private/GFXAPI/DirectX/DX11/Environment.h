@@ -18,7 +18,7 @@ namespace Engine {
     namespace _11 {
 
       using Platform::ApplicationEnvironment;
-      using Engine::Renderer::RendererConfiguration;
+      using Engine::Rendering::RendererConfiguration;
       using Engine::GFXAPI::GAPIDeviceCapabilities;
       using Engine::GFXAPI::GAPIOutputMode;
 
