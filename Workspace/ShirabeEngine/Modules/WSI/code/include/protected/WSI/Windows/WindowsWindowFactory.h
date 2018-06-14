@@ -6,27 +6,29 @@
 #define WIN32_LEAN_AND_MEAN // Exclude unnecessary sh**
 #include <Windows.h>
 
-namespace Platform {
-  namespace Windows {
-    using namespace Engine;
+namespace Engine {
+  namespace WSI {
+    namespace Windows {
+      using namespace Engine;
 
-    class SHIRABE_LIBRARY_EXPORT WindowsWindowFactory
-      : public IWindowFactory {
-    public:
-      WindowsWindowFactory(HINSTANCE instanceHandle);
-      ~WindowsWindowFactory();
+      class SHIRABE_LIBRARY_EXPORT WindowsWindowFactory
+        : public IWindowFactory {
+      public:
+        WindowsWindowFactory(HINSTANCE instanceHandle);
+        ~WindowsWindowFactory();
 
-      //
-      // IWindowFactory implementation
-      //
-      IWindowPtr createWindow(
-        std::string const&name,
-        Rect        const&initialBounds);
+        //
+        // IWindowFactory implementation
+        //
+        IWindowPtr createWindow(
+          std::string const&name,
+          Rect        const&initialBounds);
 
-    private:
-      HINSTANCE m_instanceHandle;
-    };
+      private:
+        HINSTANCE m_instanceHandle;
+      };
 
+    }
   }
 }
 

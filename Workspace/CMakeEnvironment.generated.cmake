@@ -31,12 +31,16 @@ message(STATUS "Workspace directory: ${SHIRABE_WORKSPACE_ROOT_DIR}")
 # for each configuration and consequently, to get to the "PWD"
 # of this project, we simply go back by a few folders...
 #
-set(SHIRABE_WS_BASE_DIR         ${SHIRABE_WORKSPACE_ROOT_DIR})
-set(SHIRABE_CMAKE_FRAMEWORK_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/ShirabeCMakeFramework)                         
-set(SHIRABE_THIRD_PARTY_DIR     ${SHIRABE_WORKSPACE_ROOT_DIR}/../ThirdParty)     
-set(SHIRABE_PUBLIC_BUILD_ROOT   ${SHIRABE_WORKSPACE_ROOT_DIR}/_build)                                                       
-set(SHIRABE_PUBLIC_DEPLOY_ROOT  ${SHIRABE_WORKSPACE_ROOT_DIR}/_deploy)                                                 
-set(CMAKE_MODULE_PATH           ${CMAKE_MODULE_PATH} ${SHIRABE_WORKSPACE_ROOT_DIR}/ShirabeCMakeFramework) 
+set(SHIRABE_WS_BASE_DIR          ${SHIRABE_WORKSPACE_ROOT_DIR})
+set(SHIRABE_CMAKE_FRAMEWORK_DIR  ${SHIRABE_WORKSPACE_ROOT_DIR}/ShirabeCMakeFramework)                         
+set(SHIRABE_THIRD_PARTY_DIR      ${SHIRABE_WORKSPACE_ROOT_DIR}/../ThirdParty)     
+set(SHIRABE_PUBLIC_BUILD_ROOT    ${SHIRABE_WORKSPACE_ROOT_DIR}/_build)                                                       
+set(SHIRABE_PUBLIC_DEPLOY_ROOT   ${SHIRABE_WORKSPACE_ROOT_DIR}/_deploy)  
+set(SHIRABE_BUILD_SYSTEM_INC_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/ShirabeEngine/BuildSystemIntegration)
+set(CMAKE_MODULE_PATH           
+      ${CMAKE_MODULE_PATH}          
+	  ${SHIRABE_WORKSPACE_ROOT_DIR}/ShirabeCMakeFramework
+	  ${SHIRABE_BUILD_SYSTEM_INC_DIR}) 
                                                                              
 include(CommonHelper)                                                      
 include(ProjectHelper)                                                                              

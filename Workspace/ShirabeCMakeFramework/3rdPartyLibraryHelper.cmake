@@ -102,7 +102,12 @@ endfunction(linkWindowsOSEnvironment)
 function(link)
 	message(STATUS "Setting up 3rd party libraries for ${SHIRABE_MODULE_NAME}")
 	# Automated LINK-File inclusion and linkage
-	FILE(GLOB LINK_MODULES ${SHIRABE_CMAKE_FRAMEWORK_DIR}/Link*[.]cmake)
+	FILE(
+	  GLOB 
+	    LINK_MODULES 
+      ${SHIRABE_CMAKE_FRAMEWORK_DIR}/Link*[.]cmake
+	  ${SHIRABE_BUILD_SYSTEM_INC_DIR}/Link*[.]cmake
+	  )
 	LogStatus(MESSAGES "Link modules found: " ${LINK_MODULES} "for expression" "${SHIRABE_CMAKE_FRAMEWORK_DIR}/Link*[.]cmake")
 
 	foreach(LINK_MODULE ${LINK_MODULES})
