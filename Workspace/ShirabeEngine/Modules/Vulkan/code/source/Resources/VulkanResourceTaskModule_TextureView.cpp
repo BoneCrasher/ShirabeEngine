@@ -1,7 +1,7 @@
-#include "GFXAPI/Vulkan/DeviceCapabilities.h"
-#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
-#include "GFXAPI/Vulkan/Resources/Types/VulkanTextureResource.h"
-#include "GFXAPI/Vulkan/Resources/Types/VulkanTextureViewResource.h"
+#include "Vulkan/VulkanDeviceCapabilities.h"
+#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "Vulkan/Resources/Types/VulkanTextureResource.h"
+#include "Vulkan/Resources/Types/VulkanTextureViewResource.h"
 
 #include <vulkan/vulkan.h>
 

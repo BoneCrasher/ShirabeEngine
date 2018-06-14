@@ -8,12 +8,12 @@ set(SHIRABE_TEMPLATE "StaticLib")
 set(SHIRABE_EXCLUDED_SOURCES 
 	Serialization/JSONObjectSerializer.cpp 
 	Serialization/XMLObjectSerializer.cpp)
-
-set(LINK_JSON                  TRUE)
-set(LINK_XML2                  TRUE)
+	
 set(LINK_SHIRABEMODULEMATH     TRUE)
 set(LINK_SHIRABEMODULELOG      TRUE)
 set(LINK_SHIRABEMODULEPLATFORM TRUE)
+set(LINK_JSON                  TRUE)
+set(LINK_XML2                  TRUE)
 
 include(GenericProject)
 

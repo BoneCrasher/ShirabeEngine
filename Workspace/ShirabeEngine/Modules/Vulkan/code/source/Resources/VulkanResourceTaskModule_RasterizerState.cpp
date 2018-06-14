@@ -1,10 +1,7 @@
-#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
-
+#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 
 namespace Engine {
   namespace Vulkan {
-    using namespace Engine::Resources;
-    using namespace Engine::DX::_11;
 /*
     EEngineStatus
       VulkanResourceTaskBackend::

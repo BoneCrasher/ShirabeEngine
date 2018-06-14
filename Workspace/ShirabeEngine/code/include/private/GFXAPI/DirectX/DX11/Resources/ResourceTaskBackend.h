@@ -3,8 +3,8 @@
 
 #include <map>
 
-#include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
-#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
+#include "GraphicsAPI/Resources/GFXAPIResourceTaskBackend.h"
+#include "GraphicsAPI/Resources/Types/Texture.h"
 
 #include "GFXAPI/DirectX/DX11/Common.h"
 #include "GFXAPI/DirectX/DX11/Types.h"

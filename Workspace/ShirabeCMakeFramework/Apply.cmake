@@ -173,7 +173,9 @@ elseif(SHIRABE_BUILD_SHAREDLIB)
 	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LIBRARY_OUTPUT_DEBUG_DIRECTORY   ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin)
 	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LIBRARY_OUTPUT_RELEASE_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin)
 elseif(SHIRABE_HEADER_ONLY)
-	add_custom_target(${SHIRABE_MODULE_NAME})
+	add_library(
+	    ${SHIRABE_MODULE_NAME} 
+		INTERFACE)
 endif()
 
 #-----------------------------------------------------------------------------------------
@@ -211,8 +213,10 @@ append(SHIRABE_PROJECT_INCLUDEPATH ${SHIRABE_PROJECT_GEN_DIR}/export_headers/pro
 #-----------------------------------------------------------------------------------------
 # Setup working directory of debugger
 #-----------------------------------------------------------------------------------------
-file(TO_NATIVE_PATH "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/" VSWORKINGDIR)
-set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${VSWORKINGDIR}")
+if(NOT SHIRABE_HEADER_ONLY)
+	file(TO_NATIVE_PATH "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/" VSWORKINGDIR)
+	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${VSWORKINGDIR}")
+endif()
 
 #-----------------------------------------------------------------------------------------
 # Append the preprocessor defines to CMake
@@ -265,12 +269,17 @@ if(SHIRABE_PROJECT_INCLUDEPATH)
 
 	if(NOT SHIRABE_HEADER_ONLY)
 		target_include_directories(${SHIRABE_MODULE_NAME} BEFORE PUBLIC  ${SHIRABE_PROJECT_INCLUDEPATH})
+    else()
+		target_include_directories(${SHIRABE_MODULE_NAME} INTERFACE ${SHIRABE_PROJECT_INCLUDEPATH})
 	endif()
+	
 endif()
 LogStatus(MESSAGES "-I:" ${SHIRABE_PROJECT_INCLUDEPATH})
 
-get_target_property(CURR_INC_DIRS ${SHIRABE_MODULE_NAME} INCLUDE_DIRECTORIES)
-LogStatus(MESSAGES "Include directories queried from target after set: " ${CURR_INC_DIRS})
+if(NOT SHIRABE_HEADER_ONLY)
+	get_target_property(CURR_INC_DIRS ${SHIRABE_MODULE_NAME} INCLUDE_DIRECTORIES)
+	LogStatus(MESSAGES "Include directories queried from target after set: " ${CURR_INC_DIRS})
+endif()
 #-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------
@@ -285,18 +294,19 @@ if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
 		)
 endif()
 
-#-----------------------------------------------------------------------------------------
-# Fix output filename to contain the x64 and d suffixes.
-#-----------------------------------------------------------------------------------------
-set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES OUTPUT_NAME ${SHIRABE_MODULE_TARGET_OUTPUT_NAME})
-#-----------------------------------------------------------------------------------------
+if(NOT SHIRABE_HEADER_ONLY)
+	#-----------------------------------------------------------------------------------------
+	# Fix output filename to contain the x64 and d suffixes.
+	#-----------------------------------------------------------------------------------------
+		set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES OUTPUT_NAME ${SHIRABE_MODULE_TARGET_OUTPUT_NAME})
+	#-----------------------------------------------------------------------------------------
 		
-#-----------------------------------------------------------------------------------------
-# Fix linker language
-#-----------------------------------------------------------------------------------------
-set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_LANGUAGE})
-#-----------------------------------------------------------------------------------------
-
+	#-----------------------------------------------------------------------------------------
+	# Fix linker language
+	#-----------------------------------------------------------------------------------------
+	set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_LANGUAGE})
+	#-----------------------------------------------------------------------------------------
+endif()
 
 #-----------------------------------------------------------------------------------------
 # Apply internal dependencies explicitely given from outside. This should only be used 
@@ -514,7 +524,7 @@ elseif(SHIRABE_HEADER_ONLY)
 		)
 endif()
 
-if(SHIRABE_LANGUAGE)
+if(SHIRABE_LANGUAGE AND NOT SHIRABE_HEADER_ONLY)
     set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_LANGUAGE})
 endif()
 

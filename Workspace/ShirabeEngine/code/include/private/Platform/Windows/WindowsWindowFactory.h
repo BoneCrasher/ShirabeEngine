@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_WINDOWSWINDOWFACTORY_H__
 #define __SHIRABE_WINDOWSWINDOWFACTORY_H__
 
-#include "Window/IWindowFactory.h"
+#include "WSI/IWindowFactory.h"
 
 #define WIN32_LEAN_AND_MEAN // Exclude unnecessary sh**
 #include <Windows.h>

@@ -3,12 +3,12 @@
 
 #include <map>
 
-#include "Resources/Subsystems/GFXAPI/GFXAPIResourceTaskBackend.h"
-#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
-#include "Resources/Subsystems/GFXAPI/Types/TextureView.h"
+#include "GraphicsAPI/Resources/GFXAPIResourceTaskBackend.h"
+#include "GraphicsAPI/Resources/Types/Texture.h"
+#include "GraphicsAPI/Resources/Types/TextureView.h"
 
-#include "Platform/Vulkan/VulkanImport.h"
-#include "GFXAPI/Vulkan/Environment.h"
+#include "Vulkan/VulkanImport.h"
+#include "Vulkan/VulkanEnvironment.h"
 
 namespace Engine {
   namespace Vulkan {

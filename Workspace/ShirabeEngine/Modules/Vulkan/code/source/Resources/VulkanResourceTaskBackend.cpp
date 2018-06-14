@@ -1,4 +1,4 @@
-#include "Vulkan/Resources/ResourceTaskBackend.h"
+#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 
 namespace Engine {
   namespace Vulkan {
@@ -11,7 +11,7 @@ namespace Engine {
       assert(vulkanEnvironment != nullptr);
     }
 
-    #define DeclareTasksFor(Type) \
+    #define ImplementTasksFor(Type) \
       addCreator<Type>   (std::bind(&VulkanResourceTaskBackend::fn##Type##CreationTask,    this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));                        \
       addUpdater<Type>   (std::bind(&VulkanResourceTaskBackend::fn##Type##UpdateTask,      this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)); \
       addDestructor<Type>(std::bind(&VulkanResourceTaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)); \

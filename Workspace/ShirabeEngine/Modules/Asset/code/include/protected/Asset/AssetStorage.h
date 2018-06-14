@@ -4,7 +4,7 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/DataBuffer.h"
 
-#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
+#include "GraphicsAPI/Resources/Types/Texture.h"
 
 #include "Asset/AssetError.h"
 #include "Asset/AssetTypes.h"

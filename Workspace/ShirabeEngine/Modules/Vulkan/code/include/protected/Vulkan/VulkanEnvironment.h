@@ -1,20 +1,20 @@
 #ifndef __SHIRABE_VULKAN_ENVIRONMENT_H__
 #define __SHIRABE_VULKAN_ENVIRONMENT_H__
 
-#include "Platform/ApplicationEnvironment.h"
-#include "Platform/WindowHandleWrapper.h"
+#include "OS/ApplicationEnvironment.h"
+#include "OS/WindowHandleWrapper.h"
 
 #include "Core/EngineStatus.h"
 #include "Log/Log.h"
 
-#include "Platform/Vulkan/VulkanImport.h"
-#include "Resources/Subsystems/GFXAPI/Types/Definition.h"
+#include "GraphicsAPI/Resources/Types/Definition.h"
+#include "Vulkan/VulkanImport.h"
 
 namespace Engine {
   namespace Vulkan {
 
-    using Platform::ApplicationEnvironment;
-    using Platform::Window::WindowHandleWrapper;
+    using OS::ApplicationEnvironment;
+    using OS::WindowHandleWrapper;
     using Engine::Resources::Format;
 
 
@@ -113,7 +113,7 @@ namespace Engine {
     private:
       void createVulkanInstance(std::string const&name);
       void createVulkanSurface(
-        Platform::ApplicationEnvironment const&);
+        OS::ApplicationEnvironment const&);
       void determinePhysicalDevices();
       void selectPhysicalDevice(uint32_t);
       void createSwapChain(

@@ -5,14 +5,12 @@ include(DefaultProject.template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
 
-set(LINK_SHIRABEMODULERESOURCES TRUE)
 set(LINK_SHIRABEMODULECORE      TRUE)
+set(LINK_SHIRABEMODULEAMATH     TRUE)
 set(LINK_SHIRABEMODULEPLATFORM  TRUE)
-set(LINK_JSON                   TRUE)
-set(LINK_XML2                   TRUE)
 
 include(GenericProject)
 
-add_dependencies(GraphicsAPI INSTALL_Resources)
-add_dependencies(GraphicsAPI INSTALL_Platform)
-add_dependencies(GraphicsAPI INSTALL_Core)
+add_dependencies(OS INSTALL_Platform)
+add_dependencies(OS INSTALL_Core)
+add_dependencies(OS INSTALL_Math)

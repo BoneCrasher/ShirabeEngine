@@ -1,11 +1,10 @@
-#include "GFXAPI/Vulkan/DeviceCapabilities.h"
-#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
-#include "GFXAPI/Vulkan/Resources/Types/VulkanTextureResource.h"
+#include "Vulkan/VulkanDeviceCapabilities.h"
+#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "Vulkan/Resources/Types/VulkanTextureResource.h"
 
 namespace Engine {
   namespace Vulkan {
     using namespace Engine::Resources;
-    using namespace Engine::DX::_11;
 
     EEngineStatus
       VulkanResourceTaskBackend::

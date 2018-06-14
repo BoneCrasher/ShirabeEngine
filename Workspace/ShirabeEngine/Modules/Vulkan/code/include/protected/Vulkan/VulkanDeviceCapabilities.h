@@ -9,15 +9,14 @@
 #include "Core/BitField.h"
 #include "Log/Log.h"
 
-#include "Resources/Subsystems/GFXAPI/Types/Definition.h"
+#include "GraphicsAPI/Resources/Types/Definition.h"
 
-#include "GFXAPI/Capabilities.h"
+// #include "GFXAPI/Capabilities.h"
 
 
 namespace Engine {
   namespace Vulkan {
 
-    using namespace GFXAPI;
     using Engine::Resources::Format;
     using Engine::Core::BitField;
 

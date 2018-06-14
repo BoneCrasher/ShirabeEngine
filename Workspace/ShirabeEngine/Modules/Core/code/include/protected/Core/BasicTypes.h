@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "Platform/Platform.h"
-#include "Math/Vector.h"
+#include "Math/Geometric/Rect.h"
 
 namespace Engine {
   using namespace Engine::Math;
@@ -19,23 +19,7 @@ namespace Engine {
   #ifdef max
   #undef max
   #endif
-  
-  struct SHIRABE_LIBRARY_EXPORT Rect {
-    TVector2D<uint16_t> position;
-    TVector2D<uint16_t> size;
-
-    Rect();
-    Rect(
-      long const&x,
-      long const&y,
-      long const&width,
-      long const&height);
-
-    explicit Rect(
-      TVector2D<uint16_t> const& pos,
-      TVector2D<uint16_t> const& sz);
-  };
-
+    
   #define FRAMEGRAPH_RESOURCERANGE_REMAINING -1
 
   struct SHIRABE_LIBRARY_EXPORT Range {

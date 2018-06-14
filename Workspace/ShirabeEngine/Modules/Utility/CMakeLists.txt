@@ -5,10 +5,10 @@ include(DefaultProject.template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
 
+set(LINK_SHIRABEMODULECORE     TRUE)
+set(LINK_SHIRABEMODULEPLATFORM TRUE)
 set(LINK_JSON                  TRUE)
 set(LINK_XML2                  TRUE)
-set(LINK_SHIRABEMODULEPLATFORM TRUE)
-set(LINK_SHIRABEMODULECORE     TRUE)
 
 include(GenericProject)
 

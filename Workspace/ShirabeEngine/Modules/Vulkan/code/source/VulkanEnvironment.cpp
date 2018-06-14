@@ -1,15 +1,17 @@
 #include <functional>
 #include <set>
 
-
+#include "Platform/Platform.h"
+#include "OS/ApplicationEnvironment.h"
 #include "Core/String.h"
-#include "Resources/Subsystems/GFXAPI/Types/SwapChain.h"
-#include "GFXAPI/Capabilities.h"
-#include "GFXAPI/Vulkan/Environment.h"
-#include "GFXAPI/Vulkan/DeviceCapabilities.h"
+#include "GraphicsAPI/Resources/Types/SwapChain.h"
+#include "Vulkan/VulkanEnvironment.h"
+#include "Vulkan/VulkanDeviceCapabilities.h"
+#include "Vulkan/VulkanImport.h"
 
 namespace Engine {
   namespace Vulkan {
+    using namespace Engine::OS;
     using namespace Engine::GFXAPI;
 
     VulkanError::VulkanError(
@@ -227,15 +229,15 @@ namespace Engine {
      * \param handleWrapper   The handle wrapper.
      **************************************************************************************************/
     void VulkanEnvironment::createVulkanSurface(
-      Platform::ApplicationEnvironment const&appEnvironment)
+      OS::ApplicationEnvironment const&appEnvironment)
     {
       VkSurfaceKHR surface{};
 
       #if defined PLATFORM_WINDOWS
       VkWin32SurfaceCreateInfoKHR vkWin32SurfaceCreateInfo{};
       vkWin32SurfaceCreateInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-      vkWin32SurfaceCreateInfo.hwnd      = appEnvironment.primaryWindowHandle;
-      vkWin32SurfaceCreateInfo.hinstance = appEnvironment.instanceHandle;
+      vkWin32SurfaceCreateInfo.hwnd      = reinterpret_cast<HWND>(appEnvironment.primaryWindowHandle);
+      vkWin32SurfaceCreateInfo.hinstance = reinterpret_cast<HINSTANCE>(appEnvironment.instanceHandle);
       vkWin32SurfaceCreateInfo.flags     = 0;
       vkWin32SurfaceCreateInfo.pNext     = nullptr;
 
