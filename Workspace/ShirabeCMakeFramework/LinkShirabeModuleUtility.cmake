@@ -1,15 +1,14 @@
 function(linkLibrary)
     
-	LogStatus(MESSAGES 
-	
+	LogStatus(MESSAGES 	
         ${SHIRABE_ADDRESSMODEL_64BIT}
         ${SHIRABE_PLATFORM_CONFIG})
 
-	set(BINARY_NAME ShirabeEngine)
+	set(BINARY_NAME Utility)
 	set(LINK_STATIC OFF)
 
 	formatPlatformConfigName(
-        ShirabeEngine
+        Utility
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
         OFF

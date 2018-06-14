@@ -5,11 +5,11 @@ function(linkLibrary)
         ${SHIRABE_ADDRESSMODEL_64BIT}
         ${SHIRABE_PLATFORM_CONFIG})
 
-	set(BINARY_NAME ShirabeEngine)
+	set(BINARY_NAME Resources)
 	set(LINK_STATIC OFF)
 
 	formatPlatformConfigName(
-        ShirabeEngine
+        Resources
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
         OFF
