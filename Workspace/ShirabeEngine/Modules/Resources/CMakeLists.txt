@@ -9,8 +9,6 @@ set(LINK_SHIRABEMODULECORE     TRUE)
 set(LINK_SHIRABEMODULEMATH     TRUE)
 set(LINK_SHIRABEMODULELOG      TRUE)
 set(LINK_SHIRABEMODULEPLATFORM TRUE)
-set(LINK_JSON                  TRUE)
-set(LINK_XML2                  TRUE)
 
 include(GenericProject)
 

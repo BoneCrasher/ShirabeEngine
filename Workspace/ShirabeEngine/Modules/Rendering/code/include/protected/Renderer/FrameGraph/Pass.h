@@ -1,13 +1,14 @@
 #ifndef __SHIRABE_FRAMEGRAPH_PASS_H__
 #define __SHIRABE_FRAMEGRAPH_PASS_H__
 
+#include <assert.h>
 #include <string>
 #include <functional>
 #include <stdint.h>
 
 #include "Core/EngineTypeHelper.h"
 #include "Core/PassKey.h"
-#include "Platform/ApplicationEnvironment.h"
+#include "OS/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceDTO.h"
 
 #include "Renderer/IRenderer.h"

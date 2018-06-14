@@ -14,8 +14,9 @@
 #include "Core/BitField.h"
 #include "Core/BasicTypes.h"
 
-#include "Resources/Subsystems/GFXAPI/Types/Definition.h"
-#include "Resources/Subsystems/GFXAPI/Types/Texture.h"
+#include "GraphicsAPI/Resources/Types/Definition.h"
+#include "GraphicsAPI/Resources/Types/Texture.h"
+#include "GraphicsAPI/Resources/Types/TextureView.h"
 
 #include "Renderer/RendererTypes.h"
 

@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_PROXYBASEDRESOURCEMANAGER_H__
 #define __SHIRABE_PROXYBASEDRESOURCEMANAGER_H__
 
+#include <thread>
+
 #include "Log/Log.h"
 #include "Platform/Platform.h"
 

@@ -7,8 +7,8 @@
 #include "Core/EngineTypeHelper.h"
 #include "Log/Log.h"
 
-#include "Serialization/JSONObjectSerializer.h"
-#include "Serialization/GraphVizDotSerializer.h"
+#include "Core/Serialization/JSONObjectSerializer.h"
+#include "Core/Serialization/GraphVizDotSerializer.h"
 
 #include "Renderer/FrameGraph/FrameGraphData.h"
 

@@ -8,7 +8,7 @@
 #include "Renderer/FrameGraph/Modules/Module.h"
 
 #include "Resources/Core/ResourceManager.h"
-#include "Resources/Subsystems/GFXAPI/Types/All.h"
+#include "GraphicsAPI/Resources/Types/All.h"
 
 namespace Engine {
 	namespace FrameGraph {

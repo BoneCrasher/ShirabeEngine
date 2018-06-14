@@ -4,7 +4,7 @@
 #include "Core/BasicTypes.h"
 #include "Core/EngineStatus.h"
 
-#include "Platform/ApplicationEnvironment.h"
+#include "OS/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceManager.h"
 
 #include "Renderer/RendererConfiguration.h"
@@ -13,7 +13,7 @@
 
 namespace Engine {
   namespace Rendering {
-    using namespace Platform;
+    using namespace OS;
     using namespace Engine::Resources;
 
     using Engine::FrameGraph::IFrameGraphRenderContext;

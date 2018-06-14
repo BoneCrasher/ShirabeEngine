@@ -3,7 +3,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-#include "Serialization/Serialization.h"
+#include "Core/Serialization/Serialization.h"
 
 namespace Engine {
   namespace Serialization {

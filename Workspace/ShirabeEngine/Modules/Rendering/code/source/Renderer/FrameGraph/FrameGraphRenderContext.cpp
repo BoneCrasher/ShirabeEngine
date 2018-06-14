@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
