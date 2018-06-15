@@ -51,12 +51,16 @@ LogStatus(
 # Determine, wether we build a static lib or a shared lib and derive properties
 #-----------------------------------------------------------------------------------------
 set(SHIRABE_BUILD_APPLICATION OFF)
+set(SHIRABE_BUILD_MODULE      OFF)
 set(SHIRABE_BUILD_STATICLIB   OFF)
 set(SHIRABE_BUILD_SHAREDLIB   OFF)
 set(SHIRABE_HEADER_ONLY       OFF)
 
 if("${SHIRABE_TEMPLATE}" STREQUAL "Application")
 	set(SHIRABE_BUILD_APPLICATION ON)
+elseif(${SHIRABE_TEMPLATE} STREQUAL "Module")
+	set(SHIRABE_BUILD_STATICLIB ON)
+	set(SHIRABE_BUILD_MODULE    ON)
 elseif("${SHIRABE_TEMPLATE}" STREQUAL "StaticLib")
 	set(SHIRABE_BUILD_STATICLIB  ON)
 elseif("${SHIRABE_TEMPLATE}" STREQUAL "SharedLib")
@@ -125,6 +129,29 @@ LogStatus(
 		""
 )
 #-------------------------------------------------
+
+#
+# Determine embed modules
+#
+LogStatus(
+	MESSAGES	
+		""
+		"Determining module names to be embedded..."
+		""
+)
+set(SHIRABE_EMBED_MODULES)
+foreach(MODULE ${SHIRABE_EMBED_MODULE_NAMES})
+	set(BINARY_NAME ${MODULE})
+	formatPlatformConfigName(
+        ${MODULE}
+			SHIRABE_ADDRESSMODEL_64BIT
+			SHIRABE_PLATFORM_CONFIG
+			OFF
+			BINARY_NAME
+        )
+
+	append(SHIRABE_EMBED_MODULES ${BINARY_NAME})
+endforeach()
 
 #-------------------------------------------------
 # Path setup for SmartRay-project
@@ -396,6 +423,13 @@ else()
 	)
 	message(STATUS "Setting SHIRABE_LINK_STATIC & SHIRABE_LINK_DLL")
 endif(SHIRABE_BUILD_SHAREDLIB)
+
+if(SHIRABE_BUILD_MODULE)
+	append(
+		SHIRABE_PROJECT_PREPROCESSOR_DEFINITIONS
+			ShirabeEngine_EXPORTS
+	)
+endif()
 
 if("${SHIRABE_PLATFORM_CONFIG}" STREQUAL "Release")
 	append(

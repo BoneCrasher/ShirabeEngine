@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 include(../../../CMakeEnvironment.generated.cmake)
 include(DefaultProject.template)
 
-set(SHIRABE_TEMPLATE "StaticLib")
+set(SHIRABE_TEMPLATE "Module")
 
 set(LINK_SHIRABEMODULERESOURCES TRUE)
 set(LINK_SHIRABEMODULECORE      TRUE)

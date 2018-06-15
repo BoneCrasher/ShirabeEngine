@@ -25,6 +25,21 @@ set(
 		Serialization/XMLObjectSerializer.cpp
 )
 
+set(
+	SHIRABE_EMBED_MODULE_NAMES
+		OS
+		Core
+		Log
+		Math 
+		Utility
+		WSI
+		Resources
+		Rendering
+		GraphicsAPI
+		Vulkan
+		Asset
+)
+
 set(LINK_SHIRABEMODULEVULKAN      TRUE)
 set(LINK_SHIRABEMODULERENDERING   TRUE)
 set(LINK_SHIRABEMODULEGRAPHICSAPI TRUE)

@@ -58,9 +58,7 @@ namespace Test {
       Ptr<OS::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<OS::ApplicationEnvironment>();
       appEnvironment->instanceHandle         = 0;
       appEnvironment->previousInstanceHandle = 0;
-      #ifdef PLATFORM_WINDOWS
       appEnvironment->osDisplays = OSDisplayType::GetDisplays(appEnvironment->primaryDisplayIndex);
-      #endif
 
       //
       // ASSET STORAGE

@@ -48,8 +48,8 @@ namespace Engine {
       DeclareSharedPointerType(IWinAPIAdapter)
 
         class SHIRABE_LIBRARY_EXPORT WindowsWindow
-        : public WSI::IWindow,
-        public IWinAPIAdapter
+        : public WSI::IWindow
+        , public IWinAPIAdapter
       {
       public:
         constexpr static const char* ClassName = "WindowsWindow";
@@ -70,12 +70,11 @@ namespace Engine {
         //
 
         // Platform
-        inline
-          const OS::WindowHandleWrapper::Handle& handle() const { return m_handleWrapper.handle(); }
+        OS::WindowHandleWrapper::Handle const& handle() const;
 
         // Properties
-        inline const std::string& name()   const { return m_name; }
-        inline const Rect&        bounds() const { return m_bounds; }
+        std::string const&name()   const;
+        Rect        const&bounds() const;
 
         // Lifecycle
         EEngineStatus show();
@@ -86,12 +85,8 @@ namespace Engine {
         EEngineStatus pause();
 
         // Callbacks
-        inline EEngineStatus registerCallback(const IWindow::IEventCallbackPtr& cb) {
-          return m_callbackAdapter.registerCallback(cb);
-        }
-        inline EEngineStatus unregisterCallback(const IWindow::IEventCallbackPtr& cb) {
-          return m_callbackAdapter.unregisterCallback(cb);
-        }
+        EEngineStatus registerCallback(const IWindow::IEventCallbackPtr& cb);
+        EEngineStatus unregisterCallback(const IWindow::IEventCallbackPtr& cb);
 
         //
         // IWinAPIAdapter implementation
@@ -111,7 +106,7 @@ namespace Engine {
       private:
         DeclareLogTag(WindowsWindow);
 
-          std::string m_name;
+        std::string m_name;
         Rect        m_bounds;
 
         WindowHandleWrapper        m_handleWrapper;

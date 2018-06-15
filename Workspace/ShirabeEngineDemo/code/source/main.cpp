@@ -1,11 +1,11 @@
-#include <vulkan/vulkan.h>
-
 #include <Platform/Platform.h>
-#include <Platform/ApplicationEnvironment.h>
+#include <OS/ApplicationEnvironment.h>
 
 #include <Log/Log.h>
 
 #include <Core/Engine.h>
+#include <Core/EngineTypeHelper.h>
+#include <OS/OSDisplay.h>
 
 namespace Main {
   DeclareLogTag(ApplicationMain)
@@ -13,7 +13,13 @@ namespace Main {
 
 #ifdef PLATFORM_WINDOWS
 
-#include <Platform/Windows/WindowsWindowFactory.h>
+#include <WSI/Windows/WindowsDisplay.h>
+#include <WSI/Windows/WindowsWindowFactory.h>
+#include <Windows.h>
+
+using OSDisplayType = Engine::OS::OSDisplay<Engine::WSI::WinAPIDisplay>;
+
+using namespace Engine;
 
 int WINAPI WinMain(
   HINSTANCE hInstance,
@@ -23,19 +29,19 @@ int WINAPI WinMain(
 {
   #endif
 
-  #ifdef _DEBUG
-  InitializeConsole();
+  #ifdef SHIRABE_DEBUG
+  Console::InitializeConsole();
   #endif
 
   Log::setLineWidth(80);
-  Log::Status(Main::logTag(), "ShirabeEngineDemo - Application", Log::Style::CENTRE);
+  Log::Status(Main::logTag(), "ShirabeEngineDemo - Application");
 
-  Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
-  appEnvironment->instanceHandle         = hInstance;
-  appEnvironment->previousInstanceHandle = hPrevInstance;
-  appEnvironment->osDisplays             = Platform::OSDisplay::GetDisplays(appEnvironment->primaryDisplayIndex);
+  Ptr<OS::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<OS::ApplicationEnvironment>();
+  appEnvironment->instanceHandle         = (OSHandle)hInstance;
+  appEnvironment->previousInstanceHandle = (OSHandle)hPrevInstance;
+  appEnvironment->osDisplays             = OSDisplayType::GetDisplays(appEnvironment->primaryDisplayIndex);
 
-  EngineInstancePtr pEngine = MakeSharedPointerType<EngineInstance>(appEnvironment/*, engineConfiguration*/);
+  Ptr<Engine::EngineInstance> pEngine = MakeSharedPointerType<Engine::EngineInstance>(appEnvironment/*, engineConfiguration*/);
   if(CheckEngineError(pEngine->initialize())) {
     Log::Error(Main::logTag(), "Failed to initialize engine instance.");
   }
@@ -53,8 +59,8 @@ int WINAPI WinMain(
   pEngine.reset();
   pEngine = nullptr;
 
-  #ifdef _DEBUG
-  DeinitializeConsole();
+  #ifdef SHIRABE_DEBUG
+  Console::DeinitializeConsole();
   #endif
 
   return 0;

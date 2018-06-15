@@ -22,6 +22,12 @@ namespace Engine {
           m_active.store(false);
         }
       }
+      
+      OS::WindowHandleWrapper::Handle const& WindowsWindow::handle() const { return m_handleWrapper.handle(); }
+
+      // Properties
+      std::string const& WindowsWindow::name()   const { return m_name; }
+      Rect        const& WindowsWindow::bounds() const { return m_bounds; }
 
       EEngineStatus WindowsWindow::show() {
         try {
@@ -94,6 +100,13 @@ namespace Engine {
           Log::Error(logTag(), String::format("Failed to show window '%0'", name()));
           return EEngineStatus::WindowEventError;
         }
+      }
+      
+      EEngineStatus WindowsWindow::registerCallback(const IWindow::IEventCallbackPtr& cb) {
+        return m_callbackAdapter.registerCallback(cb);
+      }
+      EEngineStatus WindowsWindow::unregisterCallback(const IWindow::IEventCallbackPtr& cb) {
+        return m_callbackAdapter.unregisterCallback(cb);
       }
 
       //

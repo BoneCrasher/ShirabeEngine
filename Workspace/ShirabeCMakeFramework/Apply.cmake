@@ -187,7 +187,7 @@ endif()
 #-----------------------------------------------------------------------------------------
 include(GenerateExportHeader)
 
-if(SR_BUILD_STATIC OR SR_BUILD_SHARED)
+if(SHIRABE_BUILD_STATICLIB OR SHIRABE_BUILD_SHAREDLIB)
 	generate_export_header(
 		${SHIRABE_MODULE_NAME}
 			BASE_NAME         ${SHIRABE_LIBRARY_KEY}
@@ -197,7 +197,7 @@ if(SR_BUILD_STATIC OR SR_BUILD_SHARED)
 endif()
 
 LogStatus(MESSAGES "Test? ${SHIRABE_TEST}")
-if((SR_BUILD_STATIC OR SR_BUILD_SHARED) AND "${SHIRABE_TEST}" STREQUAL "ON")
+if((SHIRABE_BUILD_STATICLIB OR SHIRABE_BUILD_SHAREDLIB) AND "${SHIRABE_TEST}" STREQUAL "ON")
 	generate_export_header(
 		${SHIRABE_MODULE_NAME}
 			BASE_NAME         ${SHIRABE_LIBRARY_KEY}
