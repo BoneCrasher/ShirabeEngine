@@ -7,7 +7,8 @@
 
 #include <Resources/Core/ResourceManager.h>
 #include <Resources/Core/ResourceProxyFactory.h>
-#include <Resources/Subsystems/GFXAPI/Types/All.h>
+#include <GraphicsAPI/Resources/Types/All.h>
+#include <GraphicsAPI/Resources/GFXAPIResourceBackend.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>

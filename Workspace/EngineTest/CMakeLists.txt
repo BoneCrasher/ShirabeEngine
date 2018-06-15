@@ -7,9 +7,11 @@ set(SHIRABE_TEMPLATE "Application")
 
 set(SHIRABE_COMPILER__SUBSYSTEM CONSOLE)
 
-set(LINK_SHIRABEENGINE TRUE)
-set(LINK_FXGLTF        TRUE)
-set(LINK_JSON          TRUE)
-set(LINK_XML2          TRUE)
+#set(LINK_SHIRABEMODULEMATH      TRUE)
+#set(LINK_SHIRABEMODULEOS        TRUE)
+set(LINK_SHIRABEENGINE          TRUE)
+set(LINK_FXGLTF                 TRUE)
+set(LINK_JSON                   TRUE)
+set(LINK_XML2                   TRUE)
 
 include(GenericProject)

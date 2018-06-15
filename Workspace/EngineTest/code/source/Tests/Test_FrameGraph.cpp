@@ -5,9 +5,16 @@
 #include <Asset/AssetIndex.h>
 #include <Asset/AssetStorage.h>
 
+#include <OS/OSDisplay.h>
+#ifdef PLATFORM_WINDOWS
+#include <WSI/Windows/WindowsDisplay.h>
+using OSDisplayType = Engine::OS::OSDisplay<Engine::WSI::WinAPIDisplay>;
+#endif
+
+
 #include <Resources/Core/ResourceManager.h>
 #include <Resources/Core/ResourceProxyFactory.h>
-#include <Resources/Subsystems/GFXAPI/Types/All.h>
+#include <GraphicsAPI/Resources/Types/All.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
@@ -25,6 +32,7 @@
 namespace Test {
   namespace FrameGraph {
     using namespace Engine;
+    using namespace Engine::OS;
     using namespace Engine::Rendering;
     using namespace Engine::FrameGraph;
 
@@ -47,11 +55,12 @@ namespace Test {
       using namespace Engine::GFXAPI;
       using namespace Engine::FrameGraph;
 
-      Ptr<Platform::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<Platform::ApplicationEnvironment>();
+      Ptr<OS::ApplicationEnvironment> appEnvironment = MakeSharedPointerType<OS::ApplicationEnvironment>();
       appEnvironment->instanceHandle         = 0;
       appEnvironment->previousInstanceHandle = 0;
-      appEnvironment->osDisplays             = Platform::OSDisplay::GetDisplays(appEnvironment->primaryDisplayIndex);
-
+      #ifdef PLATFORM_WINDOWS
+      appEnvironment->osDisplays = OSDisplayType::GetDisplays(appEnvironment->primaryDisplayIndex);
+      #endif
 
       //
       // ASSET STORAGE
@@ -71,9 +80,8 @@ namespace Test {
       Ptr<GFXAPIResourceBackend> gfxApiResourceBackend = MakeSharedPointerType<GFXAPIResourceBackend>();
       gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
 
-      Ptr<ResourceProxyFactory> resourceProxyFactory = MakeSharedPointerType<ResourceProxyFactory>(gfxApiResourceBackend);
+      Ptr<ResourceProxyFactory> resourceProxyFactory = MakeSharedPointerType<ResourceProxyFactory>();
       Ptr<ResourceManager>      proxyResourceManager = MakeSharedPointerType<ResourceManager>(resourceProxyFactory);
-      proxyResourceManager->setResourceBackend(gfxApiResourceBackend);
 
       gfxApiResourceBackend->initialize();
 
