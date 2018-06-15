@@ -9,7 +9,7 @@ function(linkLibrary)
 	set(LINK_STATIC OFF)
 
 	formatPlatformConfigName(
-        Math
+        ${BINARY_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
         OFF
@@ -19,8 +19,8 @@ function(linkLibrary)
     # -I
     append_parentscope(
         SHIRABE_PROJECT_INCLUDEPATH
-        ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include/protected
-        ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include/public
+        ${SHIRABE_ENGINE_WS_DIR}/Modules/Math/code/include/protected
+        ${SHIRABE_ENGINE_WS_DIR}/Modules/Math/code/include/public
         )
 		
 	# -L

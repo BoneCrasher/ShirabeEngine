@@ -42,7 +42,7 @@ namespace Engine {
 			~Quaternion();
       
 			inline const Vector3D vector() const {
-				return Vector3D(x(), y(), z());
+        return Vector3D({ x(), y(), z() });
 			}
 
 			inline const value_type scalar() const {

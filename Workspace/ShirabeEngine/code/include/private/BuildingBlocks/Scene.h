@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_SCENE_H__
 #define __SHIRABE_SCENE_H__
 
-#include "Benchmarking/Timer/Timer.h"
+#include "Core/Benchmarking/Timer/Timer.h"
 
 #include "BuildingBlocks/Camera.h"
 

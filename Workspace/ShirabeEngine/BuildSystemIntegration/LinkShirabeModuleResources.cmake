@@ -19,8 +19,8 @@ function(linkLibrary)
     # -I
     append_parentscope(
         SHIRABE_PROJECT_INCLUDEPATH
-        ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include/protected
-        ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/include/public
+        ${SHIRABE_ENGINE_WS_DIR}/Modules/Resources/code/include/protected
+        ${SHIRABE_ENGINE_WS_DIR}/Modules/Resources/code/include/public
         )
 		
 	# -L

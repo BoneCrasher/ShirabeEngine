@@ -6,157 +6,18 @@
 namespace Engine {
   namespace Math {
 
-    #define DefinePermutationAccessor1D(a)          inline TVector1D<T> a()          const { return TVector1D<T>(a());                }
-    #define DefinePermutationAccessor2D(a, b)       inline TVector2D<T> a##b()       const { return TVector2D<T>(a(), b());           }
-    #define DefinePermutationAccessor3D(a, b, c)    inline TVector3D<T> a##b##c()    const { return TVector3D<T>(a(), b(), c());      }
-    #define DefinePermutationAccessor4D(a, b, c, d) inline TVector4D<T> a##b##c##d() const { return TVector4D<T>(a(), b(), c(), d()); }
+    #define DefinePermutationAccessor1D(a)          inline TVectorImpl<T, 1> a()          const { return TVector1D<T>(a());                }
+    #define DefinePermutationAccessor2D(a, b)       inline TVectorImpl<T, 2> a##b()       const { return TVector2D<T>(a(), b());           }
+    #define DefinePermutationAccessor3D(a, b, c)    inline TVectorImpl<T, 3> a##b##c()    const { return TVector3D<T>(a(), b(), c());      }
+    #define DefinePermutationAccessor4D(a, b, c, d) inline TVectorImpl<T, 4> a##b##c##d() const { return TVector4D<T>(a(), b(), c(), d()); }
 
-    #define DeclareImmutableGetter(vec_type, component) \
-    typename vec_type<T>::value_type const              \
+    #define DeclareImmutableGetter(vec_type, vec_size, component) \
+    typename vec_type<T, vec_size>::value_type const              \
       component() const;    
 
-    /**********************************************************************************************//**
-     * \class TVector
-     *
-     * \brief A Tvector.
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     **************************************************************************************************/
+    
     template <typename T, std::size_t N>
-    class TVector
-      : public Field<
-      std::enable_if_t<std::is_arithmetic_v<T>, T>,
-      sizeof(T), N, 1>
-    {
-    public:
-      typedef Field<T, sizeof(T), N, 1> base_type;
-      typedef TVector<T, N>              class_type;
-      typedef T                         value_type;
-
-      TVector();
-      TVector(std::initializer_list<T> const);
-      TVector(Field<T, sizeof(T), N, 1> const&);
-      TVector(class_type const& cpy);
-
-      bool operator==(TVector<T, N> const&);
-
-    public:
-      class_type scale(value_type const factor);
-
-      value_type length();
-
-      value_type squared_length();
-
-      value_type abs();
-
-      class_type& normalize();
-    };
-
-
-    /**********************************************************************************************//**
-     * \fn  template <typename T, std::size_t N> TVector<T, N> +<typename T,std::operator+( TVector<T, N> const& l, TVector<T, N> const& r);
-     *
-     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     * \param l A const to process.
-     * \param r A const to process.
-     *
-     * \return  The result of the operation.
-     **************************************************************************************************/
-    template <typename T, std::size_t N>
-    TVector<T, N> operator +(
-      TVector<T, N> const& l,
-      TVector<T, N> const& r);
-
-    /**********************************************************************************************//**
-     * \fn  template <typename T, std::size_t N> TVector<T, N> -<typename T,std::operator-( TVector<T, N> const& l, TVector<T, N> const& r);
-     *
-     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     * \param l A const to process.
-     * \param r A const to process.
-     *
-     * \return  The result of the operation.
-     **************************************************************************************************/
-    template <typename T, std::size_t N>
-    TVector<T, N> operator -(
-      TVector<T, N> const& l,
-      TVector<T, N> const& r);
-
-    /**********************************************************************************************//**
-     * \fn  template <typename T, std::size_t N> TVector<T, N> *<typename T,std::operator*( TVector<T, N> const&l, typename TVector<T, N>::value_type const&f);
-     *
-     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     * \param l A const to process.
-     * \param f A const to process.
-     *
-     * \return  The result of the operation.
-     **************************************************************************************************/
-    template <typename T, std::size_t N>
-    TVector<T, N> operator *(
-      TVector<T, N>                      const&l,
-      typename TVector<T, N>::value_type const&f);
-
-    /**********************************************************************************************//**
-     * \fn  template <typename T, std::size_t N> TVector<T, N> *<typename T,std::operator*( typename TVector<T, N>::value_type const&f, TVector<T, N> const&l);
-     *
-     * \brief Cast that converts the given typename TVector&lt;T,N&gt;::value_type const&amp; to a
-     *        size_t N&gt;
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     * \param f A const to process.
-     * \param l A const to process.
-     *
-     * \return  The result of the operation.
-     **************************************************************************************************/
-    template <typename T, std::size_t N>
-    TVector<T, N> operator *(
-      typename TVector<T, N>::value_type const&f,
-      TVector<T, N>                      const&l);
-
-    /**********************************************************************************************//**
-     * \fn  template <typename T, std::size_t N> TVector<T, N> /<typename T,std::operator/( TVector<T, N> const&l, typename TVector<T, N>::value_type const&f);
-     *
-     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     * \param l A const to process.
-     * \param f A const to process.
-     *
-     * \return  The result of the operation.
-     **************************************************************************************************/
-    template <typename T, std::size_t N>
-    TVector<T, N> operator /(
-      TVector<T, N>                      const&l,
-      typename TVector<T, N>::value_type const&f);
-
-    /**********************************************************************************************//**
-     * \fn  template <typename T, std::size_t N> TVector<T, N> /<typename T,std::operator/( typename TVector<T, N>::value_type const&f, TVector<T, N> const&l);
-     *
-     * \brief Cast that converts the given typename TVector&lt;T,N&gt;::value_type const&amp; to a
-     *        size_t N&gt;
-     *
-     * \tparam  T Generic type parameter.
-     * \tparam  N Type of the n.
-     * \param f A const to process.
-     * \param l A const to process.
-     *
-     * \return  The result of the operation.
-     **************************************************************************************************/
-    template <typename T, std::size_t N>
-    TVector<T, N> operator /(
-      typename TVector<T, N>::value_type const&f,
-      TVector<T, N>                      const&l);
+    class TVectorImpl;
 
     /**********************************************************************************************//**
      * \class TVector1D
@@ -166,21 +27,31 @@ namespace Engine {
      * \tparam  T Generic type parameter.
      **************************************************************************************************/
     template <typename T>
-    class TVector1D
-      : public TVector<T, 1>
+    class TVectorImpl<T, 1>
+      : public Field<
+          std::enable_if_t<std::is_arithmetic_v<T>, T>,
+          sizeof(T), 1, 1>
     {
     public:
-      TVector1D();
-      TVector1D(value_type const x);
-      TVector1D(class_type const& cpy);
+      static const constexpr std::size_t N = 1;
 
-      DeclareImmutableGetter(TVector1D, x);
+      typedef Field<T, sizeof(T), N, 1> base_type;
+      typedef TVectorImpl<T, N>         class_type;
+      typedef T                         value_type;
+
+      TVectorImpl();
+      TVectorImpl(value_type const x);
+      TVectorImpl(class_type const& cpy);
+      TVectorImpl(std::initializer_list<T> const);
+      TVectorImpl(Field<T, sizeof(T), 1, 1> const&);
+
+      DeclareImmutableGetter(TVectorImpl, 1, x);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
       void x(value_type const& val);
 
-      static TVector1D<T> right();
+      static TVectorImpl<T, 1> right();
     };
 
     /**********************************************************************************************//**
@@ -191,18 +62,28 @@ namespace Engine {
      * \tparam  T Generic type parameter.
      **************************************************************************************************/
     template <typename T>
-    class TVector2D
-      : public TVector<T, 2>
+    class TVectorImpl<T, 2>
+      : public Field<
+      std::enable_if_t<std::is_arithmetic_v<T>, T>,
+      sizeof(T), 2, 1>
     {
     public:
-      TVector2D();
-      TVector2D(
+      static const constexpr std::size_t N = 2;
+
+      typedef Field<T, sizeof(T), N, 1> base_type;
+      typedef TVectorImpl<T, N>         class_type;
+      typedef T                         value_type;
+
+      TVectorImpl();
+      TVectorImpl(
         value_type const x,
         value_type const y);
-      TVector2D(class_type const& cpy);
+      TVectorImpl(class_type const& cpy);
+      TVectorImpl(std::initializer_list<T> const);
+      TVectorImpl(Field<T, sizeof(T), 2, 1> const&);
 
-      DeclareImmutableGetter(TVector2D, x);
-      DeclareImmutableGetter(TVector2D, y);
+      DeclareImmutableGetter(TVectorImpl, 2, x);
+      DeclareImmutableGetter(TVectorImpl, 2, y);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -211,32 +92,41 @@ namespace Engine {
       // using the assignment-operator. Setter.
       void y(value_type const& val);
 
-      static TVector2D<T> right();
-      static TVector2D<T> up();
+      static TVectorImpl<T, 2> right();
+      static TVectorImpl<T, 2> up();
 
       DefinePermutationAccessor2D(x, y);
       DefinePermutationAccessor2D(y, x);
     };
 
-
     template <typename T>
-    class TVector3D
-      : public TVector<T, 3>
+    class TVectorImpl<T, 3>
+      : public Field<
+      std::enable_if_t<std::is_arithmetic_v<T>, T>,
+      sizeof(T), 3, 1>
     {
     public:
-      TVector3D();
-      TVector3D(
+      static const constexpr std::size_t N = 3;
+
+      typedef Field<T, sizeof(T), N, 1> base_type;
+      typedef TVectorImpl<T, N>         class_type;
+      typedef T                         value_type;
+
+      TVectorImpl();
+      TVectorImpl(
         value_type const x,
         value_type const y,
         value_type const z);
-      TVector3D(
-        TVector2D<T> const&v,
-        T           const&z = T(0));
-      TVector3D(class_type const& cpy);
-      
-      DeclareImmutableGetter(TVector3D, x);
-      DeclareImmutableGetter(TVector3D, y);
-      DeclareImmutableGetter(TVector3D, z);
+      TVectorImpl(
+        TVectorImpl<T, 2> const&v,
+        T                 const&z = T(0));
+      TVectorImpl(class_type const& cpy);
+      TVectorImpl(std::initializer_list<T> const);
+      TVectorImpl(Field<T, sizeof(T), 3, 1> const&);
+
+      DeclareImmutableGetter(TVectorImpl, 3, x);
+      DeclareImmutableGetter(TVectorImpl, 3, y);
+      DeclareImmutableGetter(TVectorImpl, 3, z);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -248,9 +138,9 @@ namespace Engine {
       // using the assignment-operator. Setter.
       void z(value_type const& val);
 
-      static TVector3D<T> forward();
-      static TVector3D<T> right();
-      static TVector3D<T> up();
+      static TVectorImpl<T, 3> forward();
+      static TVectorImpl<T, 3> right();
+      static TVectorImpl<T, 3> up();
 
       DefinePermutationAccessor2D(x, y);
       DefinePermutationAccessor2D(y, x);
@@ -268,28 +158,39 @@ namespace Engine {
     };
 
     template <typename T>
-    class TVector4D
-      : public TVector<T, 4> {
+    class TVectorImpl<T, 4>
+      : public Field<
+      std::enable_if_t<std::is_arithmetic_v<T>, T>,
+      sizeof(T), 4, 1> 
+    {
     public:
-      TVector4D();
-      TVector4D(
+      static const constexpr std::size_t N = 4;
+
+      typedef Field<T, sizeof(T), N, 1> base_type;
+      typedef TVectorImpl<T, N>         class_type;
+      typedef T                         value_type;
+
+      TVectorImpl();
+      TVectorImpl(
         value_type const x,
         value_type const y,
         value_type const z,
         value_type const w);
-      TVector4D(class_type const& cpy);
-      TVector4D(
-        TVector3D<T> const& other,
-        T           const& w = T(0));
-      TVector4D(
-        TVector2D<T> const&other,
-        T           const&z = T(0),
-        T           const&w = T(0));
+      TVectorImpl(class_type const& cpy);
+      TVectorImpl(
+        TVectorImpl<T, 3> const& other,
+        T                 const& w = T(0));
+      TVectorImpl(
+        TVectorImpl<T, 2> const&other,
+        T                 const&z = T(0),
+        T                 const&w = T(0));
+      TVectorImpl(std::initializer_list<T> const);
+      TVectorImpl(Field<T, sizeof(T), 4, 1> const&);
 
-      DeclareImmutableGetter(TVector4D, x);
-      DeclareImmutableGetter(TVector4D, y);
-      DeclareImmutableGetter(TVector4D, z);
-      DeclareImmutableGetter(TVector4D, w);
+      DeclareImmutableGetter(TVectorImpl, 4, x);
+      DeclareImmutableGetter(TVectorImpl, 4, y);
+      DeclareImmutableGetter(TVectorImpl, 4, z);
+      DeclareImmutableGetter(TVectorImpl, 4, w);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -303,7 +204,7 @@ namespace Engine {
       // Return a FieldAccessor for the stored z-component to safely assign a new value 
       // using the assignment-operator. Setter.
       void w(value_type const& val);
-      
+
       DefinePermutationAccessor2D(x, y);
       DefinePermutationAccessor2D(y, x);
       DefinePermutationAccessor2D(x, z);
@@ -367,6 +268,155 @@ namespace Engine {
       DefinePermutationAccessor4D(w, z, x, y);
       DefinePermutationAccessor4D(w, z, y, x);
     };
+
+    /**********************************************************************************************//**
+     * \class TVector
+     *
+     * \brief A Tvector.
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    class TVector
+      : public TDerived
+    {
+    public:
+      typedef Field<T, sizeof(T), N, 1> base_type;
+      typedef TVector<T, N, TDerived>   class_type;
+      typedef T                         value_type;
+
+      TVector();
+      TVector(std::initializer_list<T> const);
+      TVector(Field<T, sizeof(T), N, 1> const&);
+      TVector(class_type const& cpy);
+
+      bool operator==(TVector<T, N, TDerived> const&);
+
+    public:
+      class_type scale(value_type const factor);
+
+      value_type length();
+
+      value_type squared_length();
+
+      value_type abs();
+
+      class_type& normalize();
+    };
+
+    /**********************************************************************************************//**
+     * \fn  template <typename T, std::size_t N> TVector<T, N> +<typename T,std::operator+( TVector<T, N> const& l, TVector<T, N> const& r);
+     *
+     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     * \param l A const to process.
+     * \param r A const to process.
+     *
+     * \return  The result of the operation.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    TVector<T, N, TDerived> operator +(
+      TVector<T, N, TDerived> const& l,
+      TVector<T, N, TDerived> const& r);
+
+    /**********************************************************************************************//**
+     * \fn  template <typename T, std::size_t N> TVector<T, N> -<typename T,std::operator-( TVector<T, N> const& l, TVector<T, N> const& r);
+     *
+     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     * \param l A const to process.
+     * \param r A const to process.
+     *
+     * \return  The result of the operation.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    TVector<T, N, TDerived> operator -(
+      TVector<T, N, TDerived> const& l,
+      TVector<T, N, TDerived> const& r);
+
+    /**********************************************************************************************//**
+     * \fn  template <typename T, std::size_t N> TVector<T, N> *<typename T,std::operator*( TVector<T, N> const&l, typename TVector<T, N>::value_type const&f);
+     *
+     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     * \param l A const to process.
+     * \param f A const to process.
+     *
+     * \return  The result of the operation.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    TVector<T, N, TDerived> operator *(
+      TVector<T, N, TDerived>                      const&l,
+      typename TVector<T, N, TDerived>::value_type const&f);
+
+    /**********************************************************************************************//**
+     * \fn  template <typename T, std::size_t N> TVector<T, N> *<typename T,std::operator*( typename TVector<T, N>::value_type const&f, TVector<T, N> const&l);
+     *
+     * \brief Cast that converts the given typename TVector&lt;T,N&gt;::value_type const&amp; to a
+     *        size_t N&gt;
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     * \param f A const to process.
+     * \param l A const to process.
+     *
+     * \return  The result of the operation.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    TVector<T, N, TDerived> operator *(
+      typename TVector<T, N, TDerived>::value_type const&f,
+      TVector<T, N, TDerived>                      const&l);
+
+    /**********************************************************************************************//**
+     * \fn  template <typename T, std::size_t N> TVector<T, N> /<typename T,std::operator/( TVector<T, N> const&l, typename TVector<T, N>::value_type const&f);
+     *
+     * \brief Cast that converts the given TVector&lt;T,N&gt; const&amp; to a size_t N&gt;
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     * \param l A const to process.
+     * \param f A const to process.
+     *
+     * \return  The result of the operation.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    TVector<T, N, TDerived> operator /(
+      TVector<T, N, TDerived>                      const&l,
+      typename TVector<T, N, TDerived>::value_type const&f);
+
+    /**********************************************************************************************//**
+     * \fn  template <typename T, std::size_t N> TVector<T, N> /<typename T,std::operator/( typename TVector<T, N>::value_type const&f, TVector<T, N> const&l);
+     *
+     * \brief Cast that converts the given typename TVector&lt;T,N&gt;::value_type const&amp; to a
+     *        size_t N&gt;
+     *
+     * \tparam  T Generic type parameter.
+     * \tparam  N Type of the n.
+     * \param f A const to process.
+     * \param l A const to process.
+     *
+     * \return  The result of the operation.
+     **************************************************************************************************/
+    template <typename T, std::size_t N, typename TDerived = TVectorImpl<T, N>>
+    TVector<T, N, TDerived> operator /(
+      typename TVector<T, N, TDerived>::value_type const&f,
+      TVector<T, N, TDerived>                      const&l);
+
+    template <typename T>
+    using TVector1D = TVector<T, 1>;
+    template <typename T>
+    using TVector2D = TVector<T, 2>;
+    template <typename T>
+    using TVector3D = TVector<T, 3>;
+    template <typename T>
+    using TVector4D = TVector<T, 4>;
 
     // Returns a copy of the 2D dot product of two Vec2 instances.
     template <typename T>

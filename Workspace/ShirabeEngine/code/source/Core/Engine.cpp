@@ -6,8 +6,9 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
-#include "GFXAPI/Vulkan/Resources/ResourceTaskBackend.h"
-#include "GFXAPI/Vulkan/Rendering/VulkanRenderContext.h"
+#include "GraphicsAPI/Resources/GFXAPIResourceBackend.h"
+#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "Vulkan/Rendering/VulkanRenderContext.h"
 
 namespace Engine {
 
@@ -45,7 +46,7 @@ namespace Engine {
   };
 
   EngineInstance::EngineInstance(
-    Ptr<Platform::ApplicationEnvironment> const&environment)
+    Ptr<OS::ApplicationEnvironment> const&environment)
     : m_environment(environment)
     , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
     , m_mainWindow(nullptr)
@@ -60,8 +61,6 @@ namespace Engine {
   }
 
   EEngineStatus EngineInstance::initialize() {
-    using namespace Engine::DX::_11;
-
 
     EEngineStatus status = EEngineStatus::Ok;
 
@@ -139,10 +138,9 @@ namespace Engine {
       Ptr<GFXAPIResourceBackend>     resourceBackend     = MakeSharedPointerType<GFXAPIResourceBackend>();
       Ptr<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
-      m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>(resourceBackend);
+      m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>();
 
       Ptr<ResourceManager> manager = MakeSharedPointerType<ResourceManager>(m_proxyFactory);
-      manager->setResourceBackend(resourceBackend);
       m_resourceManager = manager;
 
       if(gfxApi == EGFXAPI::Vulkan) {
@@ -182,10 +180,6 @@ namespace Engine {
       fnCreatePlatformResourceSystem();
       fnCreatePlatformRenderer();
 
-    }
-    catch(WindowsException const we) {
-      Log::Error(logTag(), we.message());
-      return we.engineStatus();
     }
     catch(EngineException const e) {
       Log::Error(logTag(), e.message());

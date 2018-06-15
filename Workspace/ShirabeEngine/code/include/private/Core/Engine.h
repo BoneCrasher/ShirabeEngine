@@ -1,24 +1,22 @@
 #ifndef __SHIRABE_ENGINEINSTANCE_H__
 #define __SHIRABE_ENGINEINSTANCE_H__
 
-#include "Platform/ApplicationEnvironment.h"
 #include "Platform/Platform.h"
+#include "OS/ApplicationEnvironment.h"
 
 #include "Core/EngineStatus.h"
 #include "Core/EngineTypeHelper.h"
 
-#include "Window/WindowManager.h"
+#include "WSI/WindowManager.h"
 
 #include "Asset/AssetStorage.h"
 #include "Resources/Core/ResourceProxyFactory.h"
 
 #include "Renderer/IRenderer.h"
 #ifdef PLATFORM_WINDOWS
-#include "Platform/Windows/WindowsError.h"
-#include "GFXAPI/Vulkan/Environment.h"
+#include "WSI/Windows/WindowsError.h"
+#include "Vulkan/VulkanEnvironment.h"
 
-using namespace Platform::Windows;
-using namespace Engine::Vulkan;
 #endif
 
 #include "BuildingBlocks/Scene.h"
@@ -29,11 +27,14 @@ namespace Engine {
   using namespace Asset;
 	using namespace Rendering;
 	using namespace Resources;
+  using namespace Engine::OS;
+  using namespace Engine::WSI;
+  using namespace Engine::Vulkan;
 
 	class SHIRABE_LIBRARY_EXPORT EngineInstance
 	{
 	public:
-		EngineInstance(Ptr<Platform::ApplicationEnvironment> const&environment);
+		EngineInstance(Ptr<OS::ApplicationEnvironment> const&environment);
 		~EngineInstance();
 
 		EEngineStatus initialize();
@@ -45,11 +46,11 @@ namespace Engine {
 		DeclareLogTag(EngineInstance)
 
     // Application 
-		Ptr<Platform::ApplicationEnvironment> m_environment;
+		Ptr<OS::ApplicationEnvironment> m_environment;
 		
     // WSI
-    WindowManagerPtr m_windowManager;
-		IWindowPtr       m_mainWindow;
+    Ptr<WindowManager> m_windowManager;
+		Ptr<IWindow>       m_mainWindow;
 
     // Assets & Resources
     Ptr<AssetStorage>         m_assetStorage;

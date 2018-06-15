@@ -13,10 +13,10 @@ namespace Engine {
 
       Rect();
       Rect(
-        long const&x,
-        long const&y,
-        long const&width,
-        long const&height);
+        uint16_t const&x,
+        uint16_t const&y,
+        uint16_t const&width,
+        uint16_t const&height);
 
       explicit Rect(
         TVector2D<uint16_t> const& pos,

@@ -1,10 +1,12 @@
 #ifndef __SHIRABE_PLATFORM_H__
 #define __SHIRABE_PLATFORM_H__
 
+#ifdef SR_BUILD_SHARED
 #include "ShirabeEngine_Export.h"
 
 #ifdef SHIRABE_TEST
 #include "ShirabeEngine_TestExport.h"
+#endif
 #endif
 
 #ifndef SHIRABEENGINE_TEST_EXPORT 

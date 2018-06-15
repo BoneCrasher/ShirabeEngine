@@ -6,7 +6,7 @@ include(DefaultProject.template)
 set(SHIRABE_TEMPLATE "StaticLib")
 
 set(LINK_SHIRABEMODULECORE      TRUE)
-set(LINK_SHIRABEMODULEAMATH     TRUE)
+set(LINK_SHIRABEMODULEMATH      TRUE)
 set(LINK_SHIRABEMODULEPLATFORM  TRUE)
 
 include(GenericProject)
