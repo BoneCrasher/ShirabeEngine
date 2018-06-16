@@ -57,7 +57,7 @@ namespace Engine {
        *
        * \tparam	N	Type of the n.
        **************************************************************************************************/
-      struct Descriptor
+      struct SHIRABE_TEST_EXPORT Descriptor
         : public DescriptorImplBase<EResourceType::TEXTURE, EResourceSubType::UNKNOWN>
       {
         std::string                name;
@@ -76,7 +76,7 @@ namespace Engine {
        *
        * \tparam  N Type of the n.
        **************************************************************************************************/
-      class CreationRequest
+      class SHIRABE_TEST_EXPORT CreationRequest
         : public BaseDeclaration::CreationRequestBase<Descriptor>
       {
       public:
@@ -85,7 +85,7 @@ namespace Engine {
         std::string toString() const;
       };
 
-      class UpdateRequest
+      class SHIRABE_TEST_EXPORT UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
@@ -93,7 +93,7 @@ namespace Engine {
           PublicResourceId_t    const& inPublicResourceId);
       };
 
-      class DestructionRequest
+      class SHIRABE_TEST_EXPORT DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
@@ -101,7 +101,7 @@ namespace Engine {
           PublicResourceId_t    const& inPublicResourceId);
       };
 
-      class Query
+      class SHIRABE_TEST_EXPORT Query
         : public BaseDeclaration::QueryBase
       {
       public:

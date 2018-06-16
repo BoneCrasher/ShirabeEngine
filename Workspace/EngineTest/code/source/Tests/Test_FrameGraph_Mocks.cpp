@@ -179,7 +179,9 @@ namespace Test {
       Log::Verbose(logTag(), String::format("Render(...):\n", to_string(renderable)));
       return EEngineStatus::Ok;
     }
-    
+
+    struct Dummy {};
+
     #define Mock_DefineTaskBuilderModule(Type)                                                                                                                  \
           EEngineStatus MockGFXAPITaskBackend::fn##Type##CreationTask(Type::CreationRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
@@ -188,7 +190,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
+              assignment.internalHandle = Ptr<Dummy>(new Dummy());                                                                                                                \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -200,7 +202,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
+              assignment.internalHandle = Ptr<Dummy>(new Dummy());                                                                                                                \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -212,7 +214,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
+              assignment.internalHandle = Ptr<Dummy>(new Dummy());                                                                                                                \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
@@ -224,7 +226,7 @@ namespace Test {
             {                                                                                                                                                                     \
               GFXAPIResourceHandleAssignment assignment ={ };                                                                                                                     \
               assignment.publicHandle   = 1;                                                                                                                                      \
-              assignment.internalHandle = static_cast<uint64_t>(0);                                                                                                               \
+              assignment.internalHandle = Ptr<Dummy>(new Dummy());                                                                                                                \
               return assignment;                                                                                                                                                  \
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \

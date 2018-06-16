@@ -15,6 +15,7 @@ using OSDisplayType = Engine::OS::OSDisplay<Engine::WSI::WinAPIDisplay>;
 #include <Resources/Core/ResourceManager.h>
 #include <Resources/Core/ResourceProxyFactory.h>
 #include <GraphicsAPI/Resources/Types/All.h>
+#include <GraphicsAPI/Resources/GFXAPIResourceProxy.h>
 
 #include <Renderer/IRenderer.h>
 #include <Renderer/FrameGraph/GraphBuilder.h>
@@ -46,6 +47,25 @@ namespace Test {
       return ok;
     }
 
+    template <typename TResource>
+    struct SpawnProxy {
+      static ResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(
+        Ptr<GFXAPIResourceBackend> backend)
+      {
+        return
+          [=]()
+          -> ResourceProxyFactory::CreatorFn_t<TResource>
+        {
+          return
+            [=](EProxyType const&type, typename TResource::CreationRequest const&request)
+            -> Ptr<IResourceProxy<TResource>>
+          {
+            return MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(type, backend, request);
+          };
+        }();
+      }
+    };
+
     bool
       Test__FrameGraph::testGraphBuilder()
     {
@@ -65,7 +85,7 @@ namespace Test {
       // 
       namespace asset = Engine::Asset;
       asset::AssetRegistry<asset::Asset> registry = asset::AssetIndex::loadIndexById("Default");
-      
+
       Ptr<asset::AssetStorage> assetStorage = MakeSharedPointerType<asset::AssetStorage>();
       assetStorage->readIndex(registry);
 
@@ -73,14 +93,15 @@ namespace Test {
       // RESOURCE MANAGEMENT
       // 
       Ptr<MockGFXAPITaskBackend> gfxApiResourceTaskBackend = MakeSharedPointerType<MockGFXAPITaskBackend>();
+      Ptr<GFXAPIResourceBackend> gfxApiResourceBackend     = MakeSharedPointerType<GFXAPIResourceBackend>();
+      Ptr<ResourceProxyFactory>  resourceProxyFactory      = MakeSharedPointerType<ResourceProxyFactory>();
+      Ptr<ResourceManager>       proxyResourceManager      = MakeSharedPointerType<ResourceManager>(resourceProxyFactory);
+
+      resourceProxyFactory->addCreator<Texture>(EResourceType::TEXTURE, SpawnProxy<Texture>::forGFXAPIBackend(gfxApiResourceBackend));
+      resourceProxyFactory->addCreator<TextureView>(EResourceType::GAPI_VIEW, SpawnProxy<TextureView>::forGFXAPIBackend(gfxApiResourceBackend));
+
       gfxApiResourceTaskBackend->initialize();
-
-      Ptr<GFXAPIResourceBackend> gfxApiResourceBackend = MakeSharedPointerType<GFXAPIResourceBackend>();
       gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
-
-      Ptr<ResourceProxyFactory> resourceProxyFactory = MakeSharedPointerType<ResourceProxyFactory>();
-      Ptr<ResourceManager>      proxyResourceManager = MakeSharedPointerType<ResourceManager>(resourceProxyFactory);
-
       gfxApiResourceBackend->initialize();
 
       //

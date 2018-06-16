@@ -21,13 +21,13 @@ namespace Engine {
 		 * \brief	A render target descriptor implementation.
 		 **************************************************************************************************/
 		
-    class TextureViewDeclaration {
+    class SHIRABE_TEST_EXPORT TextureViewDeclaration {
     public:
       static const constexpr EResourceType    resource_type    = EResourceType::GAPI_VIEW;
       static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_VIEW;
 
 
-      struct Descriptor
+      struct SHIRABE_TEST_EXPORT Descriptor
         : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::TEXTURE_VIEW>
       {
         std::string name;
@@ -42,7 +42,7 @@ namespace Engine {
         std::string toString() const;
       };
 
-      struct CreationRequest 
+      struct SHIRABE_TEST_EXPORT CreationRequest
         : public BaseDeclaration::CreationRequestBase<Descriptor> 
       {
       public:
@@ -58,7 +58,7 @@ namespace Engine {
         PublicResourceId_t m_underlyingTextureHandle;
       };
 
-      class UpdateRequest
+      class SHIRABE_TEST_EXPORT UpdateRequest
         : public BaseDeclaration::UpdateRequestBase
       {
       public:
@@ -66,7 +66,7 @@ namespace Engine {
           PublicResourceId_t const& inPublicResourceId);
       };
 
-      class DestructionRequest
+      class SHIRABE_TEST_EXPORT DestructionRequest
         : public BaseDeclaration::DestructionRequestBase
       {
       public:
@@ -74,7 +74,7 @@ namespace Engine {
           PublicResourceId_t const& inPublicResourceId);
       };
 
-      class Query
+      class SHIRABE_TEST_EXPORT Query
         : public BaseDeclaration::QueryBase
       {
       public:
@@ -88,7 +88,7 @@ namespace Engine {
 		 *
 		 * \brief	A gfxapi render target.
 		 **************************************************************************************************/
-		class TextureView
+		class SHIRABE_TEST_EXPORT TextureView
 			: public TextureViewDeclaration
       , public ResourceDescriptorAdapter<TextureViewDeclaration::Descriptor>
 		{

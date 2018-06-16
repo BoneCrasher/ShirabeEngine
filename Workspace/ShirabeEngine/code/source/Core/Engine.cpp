@@ -7,6 +7,7 @@
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
 #include "GraphicsAPI/Resources/GFXAPIResourceBackend.h"
+#include "GraphicsAPI/Resources/GFXAPIResourceProxy.h"
 #include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 #include "Vulkan/Rendering/VulkanRenderContext.h"
 
@@ -59,6 +60,25 @@ namespace Engine {
     if(m_windowManager)
       m_windowManager = nullptr;
   }
+
+  template <typename TResource>
+  struct SpawnProxy {
+    static ResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(
+      Ptr<GFXAPIResourceBackend> backend)
+    {
+      return
+        [=]()
+        -> ResourceProxyFactory::CreatorFn_t<TResource>
+      {
+        return 
+          [=](EProxyType const&type, typename TResource::CreationRequest const&request)
+          -> Ptr<IResourceProxy<TResource>>
+        {
+          return MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(type, backend, request);
+        };
+      }();
+    }
+  };
 
   EEngineStatus EngineInstance::initialize() {
 
@@ -139,6 +159,8 @@ namespace Engine {
       Ptr<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
       m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>();
+      m_proxyFactory->addCreator<Texture>(EResourceType::TEXTURE, SpawnProxy<Texture>::forGFXAPIBackend(resourceBackend));
+      m_proxyFactory->addCreator<TextureView>(EResourceType::GAPI_VIEW, SpawnProxy<TextureView>::forGFXAPIBackend(resourceBackend));
 
       Ptr<ResourceManager> manager = MakeSharedPointerType<ResourceManager>(m_proxyFactory);
       m_resourceManager = manager;
@@ -161,7 +183,7 @@ namespace Engine {
       using Engine::FrameGraph::FrameGraphRenderContext;
 
       // How to decouple?
-      Ptr<IRenderContext> gfxApiRenderContext = nullptr; 
+      Ptr<IRenderContext> gfxApiRenderContext = nullptr;
       if(gfxApi == EGFXAPI::Vulkan)
         gfxApiRenderContext = MakeSharedPointerType<VulkanRenderContext>();
 

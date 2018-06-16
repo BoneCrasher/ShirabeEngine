@@ -11,23 +11,25 @@
 namespace Engine {
   namespace Resources {
 
-    class ResourceProxyFactory {
+    class ResourceProxyFactory 
+    {
+      using CreatorMap_t = Map<EResourceType, Any>;
+
     public:
+      template <typename TResource>
+      using CreatorFn_t  = std::function<Ptr<IResourceProxy<TResource>>(EProxyType const&, typename TResource::CreationRequest const&)>;
+
       template <typename TResource>
       Ptr<IResourceProxy<TResource>> create(
         EProxyType                          const&proxyType,
         typename TResource::CreationRequest const&creationRequest);
 
-    private:
-      template <typename TResource>
-      using CreatorFn_t  = std::function<Ptr<IResourceProxy<TResource>>(EProxyType const&, typename TResource::CreationRequest const&)>;
-      using CreatorMap_t = Map<EResourceType, Any>;
-
       template <typename TResource>
       bool addCreator(
         EResourceType          const&type,
         CreatorFn_t<TResource> const&creatorFn);
-
+      
+    private:      
       CreatorMap_t m_creators;
     };
 

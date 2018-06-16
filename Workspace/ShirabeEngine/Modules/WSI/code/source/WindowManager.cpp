@@ -5,9 +5,9 @@
 
 #include "Platform/Platform.h"
 
-// #ifdef PLATFORM_WINDOWS
-//     #include "Platform/Windows/WindowsWindowFactory.h"
-// #endif // PLATFORM_WINDOWS
+#ifdef PLATFORM_WINDOWS
+#include "WSI/Windows/WindowsWindowFactory.h"
+#endif // PLATFORM_WINDOWS
 
 namespace Engine {
   namespace WSI {
@@ -31,10 +31,9 @@ namespace Engine {
     WindowManager::EWindowManagerError WindowManager::initialize(
       OS::ApplicationEnvironment const&environment)
     {
-      //#ifdef PLATFORM_WINDOWS
-      //		m_windowFactory = MakeSharedPointerType<Platform::Windows::WindowsWindowFactory>(environment.instanceHandle);
-      //		// TODO: Create conditional "ApplicationEnvironment"-struct, which contains HINSTANCE as a member in csase  of MSC_VER
-      //#endif // PLATFORM_WINDOWS
+      #ifdef PLATFORM_WINDOWS
+      m_windowFactory = MakeSharedPointerType<WSI::Windows::WindowsWindowFactory>((HINSTANCE)environment.instanceHandle);
+      #endif // PLATFORM_WINDOWS
 
       if(!m_windowFactory) {
         Log::Error(logTag(), "Failed to initialize the window factory.");
