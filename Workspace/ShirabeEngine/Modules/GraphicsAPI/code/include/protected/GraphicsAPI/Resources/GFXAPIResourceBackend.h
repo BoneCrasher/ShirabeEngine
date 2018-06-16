@@ -76,6 +76,10 @@ namespace Engine {
       EEngineStatus unload(
         typename TResource::DestructionRequest const&inRequest);
 
+      EEngineStatus registerResource(
+        PublicResourceId_t const&id,
+        Ptr<void>                resouce);
+
       void setResourceTaskBackend(ResourceTaskBackendPtr const& backend);
 
     private:
@@ -150,7 +154,7 @@ namespace Engine {
               status = EEngineStatus::GFXAPI_SubsystemResourceCreationFailed;
             else {
               // Store the internal handle and return the public handle
-              m_storage[resourceHandle.publicHandle] = resourceHandle.internalHandle;
+              registerResource(resourceHandle.publicHandle, resourceHandle.internalHandle);
 
               status = EEngineStatus::Ok;
             }

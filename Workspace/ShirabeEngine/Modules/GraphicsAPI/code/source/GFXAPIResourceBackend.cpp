@@ -47,6 +47,17 @@ namespace Engine {
       return m_resourceThread.deinitialize();
     }
 
+    EEngineStatus 
+      GFXAPIResourceBackend::registerResource(
+        PublicResourceId_t const&id,
+        Ptr<void>                resource)
+    {
+      if(m_storage.find(id) != m_storage.end())
+        return EEngineStatus::Error;
+
+      m_storage[id] = resource;
+      return EEngineStatus::Ok;
+    }
 
     /**********************************************************************************************//**
      * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::enqueue( const ResourceTaskFn_t &inTask, std::future<GFXAPIResourceHandle_t> &outSharedFuture)

@@ -237,7 +237,8 @@ namespace Engine {
         for(PublicResourceId_t const&dependencyId : dependencies) {
           AnyProxy dependencyProxy = this->getResourceProxy(dependencyId);
           if(!dependencyProxy)
-            throw EngineException(EEngineStatus::Error, "Dependency not registered.");
+            // throw EngineException(EEngineStatus::Error, "Dependency not registered.");
+            continue;
 
           IResourceProxyBasePtr base = BaseProxyCast(dependencyProxy);
           if(!(base->loadState() == ELoadState::LOADED)) {

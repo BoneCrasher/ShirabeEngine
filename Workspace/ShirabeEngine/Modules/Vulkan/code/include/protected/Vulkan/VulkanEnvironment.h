@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_VULKAN_ENVIRONMENT_H__
 #define __SHIRABE_VULKAN_ENVIRONMENT_H__
 
+#include <vector>
+
 #include "OS/ApplicationEnvironment.h"
 #include "OS/WindowHandleWrapper.h"
 

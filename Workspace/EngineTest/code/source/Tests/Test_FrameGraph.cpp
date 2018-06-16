@@ -138,6 +138,8 @@ namespace Test {
         FrameGraphResource backBuffer{ };
         backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
 
+        gfxApiResourceBackend->registerResource("BackBuffer", Ptr<void>(new int()));
+
         RenderableList renderableCollection ={
           { "Cube",    0, 0 },
           { "Sphere",  0, 0 },
