@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="icon" href="vulkan_lunarg_icon.png">
+<link rel="stylesheet" href="github-markdown.css">
+<style>
+    body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+    }
+</style>
+</head>
+<body>
+<article class="markdown-body">
+<h1>
+<a id="user-content-vulkan-layer-factory" class="anchor" href="#user-content-vulkan-layer-factory" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vulkan Layer Factory</h1>
+<h2>
+<a id="user-content-overview" class="anchor" href="#user-content-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h2>
+<p>The Vulkan Layer Factory is a framework based on the canonical Vulkan layer model that
+facilitates the creation of Vulkan Layers. The layer factory hides the majority of the
+loader-layer interface, layer boilerplate, setup and initialization, and complexities
+of layer development.</p>
+<p>A complete layer with the attendant support files can be produced by simply creating a
+subdirectory in the <code>sources\layer_factory</code> directory and adding in a simple header file
+and then running cmake. This layer can be used just as any other Vulkan layer.</p>
+<p>The Vulkan Layer Factory framework produces 'Factory Layers' comprising one or more
+'interceptor' objects. Interceptor objects override functions to be called before (<code>PreCallApiName</code>)
+or after (<code>PostCallApiName</code>) each Vulkan entrypoint of interest. Each interceptor is independent
+of all others within a single Factory layer.  If multiple interceptors attach to the same API call the calling
+order is indeterminate.</p>
+<h3>
+<a id="user-content-layer-factory-sample-code" class="anchor" href="#user-content-layer-factory-sample-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Layer Factory sample code</h3>
+<p>The base installation of the layer factory contains some sample layers, including the Vulkan
+Assistant Layer, demo_layer, and the starter_layer. The Starter Layer in particular is meant to serve as
+an example of a very simple layer implementation. The Demo Layer exhibits some new VLF ease-of-use features,
+including global intercepts and various output options, while the Assistant Layer is a production layer
+which functions to highlight performance issues and to enforce best-practices for applications.</p>
+<h3>
+<a id="user-content-create-a-factory-layer" class="anchor" href="#user-content-create-a-factory-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create a Factory Layer</h3>
+<p><strong>Step 1:</strong> Create a subdirectory in the <code>source\layer_factory</code> directory using a name that will serve as the base
+for the final layer</p>
+<p>For example, a subdirectory named 'starter_layer' will produce <code>libVkLayer_starter_layer.so</code> and be loaded as <code>VK_LAYER_LUNARG_starter_layer</code></p>
+<p><strong>Step 2:</strong> Add your interceptor file(s) to the subdirectory</p>
+<p>This can be a single header file, or multiple header and source files. See the other VLF layers for examples.</p>
+<p><strong>Step 3:</strong> Create or copy an <code>interceptor_objects.h</code> file into your new directory</p>
+<p>This should include the header file for each of the included interceptors:</p>
+<p><code>#include "whatever_you_called_your_layers_header_file.h"</code></p>
+<p><strong>Step 4:</strong> Run CMake and build</p>
+<pre><code>    cd source/layer_factory
+    cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Debug
+    cd build
+    make
+</code></pre>
+<p>CMake will discover all Factory Layer subdirectories in layer_factory each time it is run.
+A *.json will also be created with your layer binary.
+As part of the build process, these files will be copied to the appropriated SDK layer file locations,
+and will be picked up by the usual <code>VK_LAYERS_PATH</code> environment variable set by running <code>setup_env.sh</code>.</p>
+<p>Note that adding or removing a layer factory subdirectory requires re-running CMake in order to
+properly recognize the additions/deletions.</p>
+<h2>
+<a id="user-content-using-layers" class="anchor" href="#user-content-using-layers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using Layers</h2>
+<p><strong>1.</strong> Build VK loader using normal steps (cmake and make).</p>
+<p>The library and json files will be automatically copied to the standard SDK locations, made available by running <code>source setup_env.sh</code>.</p>
+<p><strong>2.</strong> Specify which layers to activate using environment variables.</p>
+<pre><code>`export VK_INSTANCE_LAYERS=VK_LAYER_LUNARG_standard_validation:VK_LAYER_LUNARG_starter_layer`
+</code></pre>
+<p><strong>3.</strong> Run your application. The layer path and layer choices will be picked up from your environment.</p>
+<p>Alternatively, you can specify these variables on the command line, like so:</p>
+<p><code>VK_INSTANCE_LAYERS=VK_LAYER_LUNARG_demo_layer VK_LAYER_PATH=/home/user/VulkanSDK/1.0.68.0/source/layer_factory/build ./vulkaninfo</code></p>
+<h3>
+<a id="user-content-layer-factory-features" class="anchor" href="#user-content-layer-factory-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Layer Factory Features</h3>
+<p>The layer factory provides helper functions for layer authors to simplify layer tasks. These include some
+simpler output functions, debug facilities, and simple global intercept functions.</p>
+<p><em>Output Helpers:</em></p>
+<p>Interceptors can use base-class defined output helpers for easy access to Debug Report Extension output.
+These include Information(), Warning(), Performance_Warning(), and Error(), corresponding to the
+VkDebugReportFlagBitsEXT enumerations. Alternatively, the standard layer-provided log_msg() call can be used
+directly, as can printf for standard-out or OutputDebugString for Windows.</p>
+<p><em>Debug Helpers:</em></p>
+<p>A BreakPoint() helper can be used in an intercepted function which will generate a break in a Windows or Linux
+debugger.</p>
+<p><em>Global Intercept Helpers:</em></p>
+<p>There are two global intercept helpers, PreCallApiFunction() and PostCallApiFunction(). Overriding these virtual
+functions in your intercepter will result in them being called for EVERY API call.</p>
+<h3>
+<a id="user-content-details" class="anchor" href="#user-content-details" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Details</h3>
+<p>By creating a child framework object, the factory will generate a full layer and call any overridden functions
+in your interceptor.</p>
+<p>Here is a simple, and complete, interceptor (the starter_layer). This layer intercepts the memory allocate and free
+functions, tracking the number and total size of device memory allocations. The QueuePresent() function is also intercepted, and
+results are outputted on every 60th frame.  Note that the function signatures are and must be identical to those in the specification.</p>
+<p>In this example, there is a single interceptor in which the child object is named 'MemAllocLevel' and is instantiated as
+'memory_allocation_stats'. A layer can contain many interceptors as long as the instantiated object names are unique within that layer.</p>
+<pre><code>    #pragma once
+    #include &lt;sstream&gt;
+    #include &lt;unordered_map&gt;
+
+    static uint32_t display_rate = 60;
+
+    class MemAllocLevel : public layer_factory {
+        public:
+            // Constructor for interceptor
+            MemAllocLevel() : layer_factory(this), number_mem_objects_(0), total_memory_(0), present_count_(0) {};
+
+            // Intercept memory allocation calls and increment counter
+            VkResult PostCallAllocateMemory(VkDevice device, const VkMemoryAllocateInfo *pAllocateInfo,
+                    const VkAllocationCallbacks *pAllocator, VkDeviceMemory *pMemory) {
+                number_mem_objects_++;
+                total_memory_ += pAllocateInfo-&gt;allocationSize;
+                mem_size_map_[*pMemory] = pAllocateInfo-&gt;allocationSize;
+                return VK_SUCCESS;
+            };
+
+            // Intercept free memory calls and update totals
+            void PreCallFreeMemory(VkDevice device, VkDeviceMemory memory, const VkAllocationCallbacks *pAllocator) {
+                if (memory != VK_NULL_HANDLE) {
+                    number_mem_objects_--;
+                    VkDeviceSize this_alloc = mem_size_map_[memory];
+                    total_memory_ -= this_alloc;
+                }
+            }
+
+            VkResult PreCallQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR *pPresentInfo) {
+                present_count_++;
+                if (present_count_ &gt;= display_rate) {
+                    present_count_ = 0;
+                    std::stringstream message;
+                    message &lt;&lt; "Memory Allocation Count: " &lt;&lt; number_mem_objects_ &lt;&lt; "\n";
+                    message &lt;&lt; "Total Memory Allocation Size: " &lt;&lt; total_memory_ &lt;&lt; "\n\n";
+                    Information(message.str());
+                }
+                return VK_SUCCESS;
+            }
+
+        private:
+            // Counter for the number of currently active memory allocations
+            uint32_t number_mem_objects_;
+            VkDeviceSize total_memory_;
+            uint32_t present_count_;
+            std::unordered_map&lt;VkDeviceMemory, VkDeviceSize&gt; mem_size_map_;
+    };
+
+    MemAllocLevel memory_allocation_stats;
+</code></pre>
+<h3>
+<a id="user-content-current-known-issues" class="anchor" href="#user-content-current-known-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Current known issues</h3>
+<ul>
+<li>CMake MUST be run to pick up and interpret new or deleted factory layers.</li>
+</ul>
+</article>
+</body>
+</html>

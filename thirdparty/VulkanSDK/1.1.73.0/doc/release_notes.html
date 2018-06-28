@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="icon" href="vulkan_lunarg_icon.png">
+<link rel="stylesheet" href="github-markdown.css">
+<style>
+    body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+    }
+</style>
+</head>
+<body>
+<article class="markdown-body">
+<h1>
+<a id="user-content-vulkan-sdk-for-linux-release-notes" class="anchor" href="#user-content-vulkan-sdk-for-linux-release-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vulkan SDK for Linux Release Notes</h1>
+<p><a name="user-content-vsdkrel-1.1.73.0"></a></p>
+<h2>
+<a id="user-content-vulkan-sdk-11730-release-notes" class="anchor" href="#user-content-vulkan-sdk-11730-release-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vulkan SDK 1.1.73.0 Release Notes</h2>
+<h5>
+<a id="user-content-version-11730-for-linux" class="anchor" href="#user-content-version-11730-for-linux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.1.73.0 for Linux</h5>
+<h6>
+<a id="user-content-april-20-2018" class="anchor" href="#user-content-april-20-2018" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>April 20, 2018</h6>
+<p>This SDK supports Vulkan API revision 1.1.73.  The prior SDK supported Vulkan API revision 1.1.70.1.</p>
+<p>NOTE -- this SDK supports Vulkan 1.1.73, and is <strong>backwards-compatible</strong> with Vulkan 1.0.73.</p>
+<p>Dependencies for Ubuntu now include:</p>
+<pre><code>libx11-dev libxcb1-dev libxkbcommon-dev libmirclient-dev libwayland-dev
+</code></pre>
+<p>The dependencies on other platforms may be different.</p>
+<p>Please refer to the Getting Started Guide for a list of supported Linux distributions.</p>
+<p><strong>Drivers:</strong> LunarG recommends that you update your Vulkan-capable hardware drivers to the latest
+recommended version from your hardware vendor.  A list of <a href="#user-content-known-driver-issues">Known Driver Issues</a> appears
+at the end of this document with more information.</p>
+<p><strong>Linux Loader now searches <code>/usr/local/etc/vulkan</code> and <code>/usr/local/share/vulkan</code> for drivers and layers.</strong>
+These new paths are in addition to the previous locations of <code>/etc/vulkan</code>, <code>/usr/share/vulkan</code>,
+and the user's <code>HOME</code> local path, e.g., <code>$HOME/.local/share/vulkan</code>.
+The two new "<code>/usr/local</code>" locations are configurable at build time, allowing configuration of the loader
+for specific filesystem structures.
+See the <code>BUILD.html</code> guide in the Loader And Validation Layers repository and the "Loader and Layers Interface"
+guide for more information.</p>
+<p><strong>CMake:</strong> CMake 3.2 or later is now required to build the source code contents of the SDK. Any user with an older version will need to upgrade.</p>
+<h3>
+<a id="user-content-overview-of-new-features-in-sdk-1173" class="anchor" href="#user-content-overview-of-new-features-in-sdk-1173" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview of new features in SDK 1.1.73</h3>
+<ul>
+<li>
+<p>Many bug fixes, increased validation coverage and accuracy improvements, and feature additions</p>
+</li>
+<li>
+<p>The following extensions are <strong>new</strong> for Vulkan <strong>1.1.73</strong>:</p>
+<pre><code>  VK_ANDROID_external_memory_android_hardware_buffer
+  VK_EXT_descriptor_indexing
+  VK_AMD_shader_core_properties
+  VK_NV_shader_subgroup_partitioned
+</code></pre>
+</li>
+</ul>
+<h3>
+<a id="user-content-outside-contributors" class="anchor" href="#user-content-outside-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Outside Contributors</h3>
+<p>Lunarg would like to thank the following Vulkan Ecosystem Developers for their contributions:</p>
+<ul>
+<li>Jeff Bolz</li>
+<li>Michael Chock</li>
+<li>Jason Duerstock</li>
+<li>Francois Duranleau</li>
+<li>Martin Herkt</li>
+<li>Petr Kraus</li>
+<li>James Le Cuirot</li>
+<li>Liam Middlebrook</li>
+<li>Gabriel Arthur Petursson</li>
+<li>Justus Wang</li>
+</ul>
+<h4>
+<a id="user-content-sdk-components" class="anchor" href="#user-content-sdk-components" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SDK Components</h4>
+<p>This version of the SDK components are based on the following specifications and source code repositories:</p>
+<ul>
+<li>
+<p><a href="https://www.khronos.org/registry/vulkan" TARGET="_blank" rel="nofollow"><strong>Vulkan Specification including extensions</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/tree/sdk-1.1.73" TARGET="_blank"><strong>Vulkan Loader and Validation Layers</strong></a></p>
+</li>
+<li>
+<p><a href="https://www.khronos.org/registry/spir-v/" TARGET="_blank" rel="nofollow"><strong>SPIR-V Specification</strong> version 1.3</a></p>
+</li>
+<li>
+<p><a href="https://github.com/KhronosGroup/glslang/commit/3bb4c48cd95892a5cfcd63df20fcc47fd51c97a0" TARGET="_blank"><strong>Glslang library and tools</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/LunarG/VulkanTools/tree/sdk-1.1.73" TARGET="_blank"><strong>Vulkan Tools</strong></a></p>
+</li>
+<li>
+<p><a href="https://github.com/LunarG/VulkanSamples/tree/sdk-1.1.73" TARGET="_blank"><strong>Vulkan Samples</strong></a></p>
+</li>
+</ul>
+<h3>
+<a id="user-content-last-commits-are-designated-by-the-following-git-tags-in-the-respective-repositories" class="anchor" href="#user-content-last-commits-are-designated-by-the-following-git-tags-in-the-respective-repositories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Last Commits are designated by the following Git Tags in the respective repositories:</h3>
+<ul>
+<li>LoaderAndValidationLayers:    sdk-1.1.73.0</li>
+<li>VulkanTools:                  sdk-1.1.73.0</li>
+<li>VulkanSamples:                sdk-1.1.73.0</li>
+</ul>
+<h3>
+<a id="user-content-fixed-issues" class="anchor" href="#user-content-fixed-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fixed Issues</h3>
+<p><strong>Fixed Vulkan-LoaderAndValidationLayers Github Issues:</strong></p>
+<ul>
+<li>#2571 ImmutableSampler sample getting unwarranted validation error</li>
+<li>#2569 VK_LAYER_LUNARG_api_dump: Show Image handle next to ImageView handle</li>
+<li>#2568 Validation layers cause crash when using vulkan.hpp and the dynamic dispatcher help wanted</li>
+<li>#2562 Validation layers don't check for descriptor sets being bound incomplete</li>
+<li>#2557 Missing validation: VkWriteDescriptorSet.dstSet != VK_NULL_HANDLE incomplete</li>
+<li>#2556 Threading layer: vkResetCommandBuffer() is incorrectly required to have exclusive access to the command pool</li>
+<li>#2548 Two image validation issues bug</li>
+<li>#2547 ShaderValidation: may has incorrect check for read only buffers</li>
+<li>#2546 Feature Request: disable removing of blend state info on pipeline create bug</li>
+<li>#2543 VK_IMAGE_CREATE_EXTENDED_USAGE_BIT is ignored when creating multiplanar images with unsupported flags bug</li>
+<li>#2538 ParameterValidation layer + VK_KHR_descriptor_update_template: Invalid error reported for vkCreateDescriptorUpdateTemplateKHR() bug</li>
+<li>#2537 Validate getter's structure count enhancement</li>
+<li>#2535 More robust validation of CreateDescriptorUpdateTemplateKHR</li>
+<li>#2530 Core Validation layer crashes when different render pass is used for drawing than the one provided during pipeline creation</li>
+<li>#2528 Multiplanar aspect flags are still reporting an error bug</li>
+<li>#2527 Queue family ownership transfer is not recognized by core validation layer incomplete</li>
+<li>#2522 ABA issue with freeing and allocation of command buffers and destruction of command pools in core validation layer bug</li>
+<li>#2517 CreateInstance warning for apiVersion 0 bug</li>
+<li>#2515 Incorrect case bug</li>
+<li>#2511 Potentially false validation error if image size &gt; maxResourceSize</li>
+<li>#2486 Dangling sampler references are not reported bug</li>
+<li>#2485 Handle secondary cmd buffer clear attachment requests incomplete</li>
+<li>#2480 trampoline.c is missing core entrypoints loader</li>
+<li>#2476 Crash during calling vkCreateInstance with VK_LAYER_LUNARG_device_simulation + VK_LAYER_LUNARG_assistant_layer</li>
+<li>#2471 Validation layers cause memory leak unless vkQueueWaitIdle is called every frame</li>
+<li>#2468 Implement checks for fragmentStoresAndAtomics, vertexPipelineStoresAndAtomics</li>
+<li>#2466 Potentially false validation errors with VK_IMAGE_CREATE_EXTENDED_USAGE_BIT_KHR bug</li>
+<li>#2464 Why are the Loader and Validation Layers combined in the same repo? enhancement</li>
+<li>#2458 Clean up stale branches</li>
+<li>#2450 Validation database Vs Issues tracker enhancement</li>
+<li>#2449 Implement VU for dedicated allocation extensions incomplete</li>
+<li>#2444 Validating push constant ranges with overlapping shader stages bug</li>
+<li>#2442 VK_DYNAMIC_STATE_LINE_WIDTH and Geometry Shader incomplete</li>
+<li>#2429 vulkaninfo: For HTML output, there is an image ref to a local filesystem. bug</li>
+<li>#2424 vkCmdCopyImage fails when used on multi-planar images enhancement</li>
+<li>#2378 Core validation does not check push constant ranges to determine set compatibility between pipeline layouts incomplete</li>
+<li>#2214 vkCreateInstance takes 2 seconds help wanted</li>
+<li>#2191 Barrier validation: clarify acceptable access masks for TOP_OF_PIPE etc incomplete question</li>
+<li>#2172 Scrub error messages and add suggestions where appropriate enhancement</li>
+<li>#2140 VK_LAYER_LUNARG_api_dump: Allow dumping debug markers enhancement</li>
+<li>#2107 RenderPassIncompatible test have unexpected validation messages tests</li>
+<li>#2080 Changing image layouts in release/acquire image barriers triggers false positives. bug</li>
+<li>#1986 Add warning when a parameter of vkCmdDispatch is 0 enhancement incomplete</li>
+<li>#1912 layers: Code should adhere to RAII help wanted</li>
+<li>#1848 VK_LAYER_LUNARG_core_validation queue submissions list grows forever and causes crash bug</li>
+<li>#1628 Cross-queue memory barriers not validated properly bug</li>
+<li>#1550 Validate CmdClearAttachment regions against RenderArea for secondary cmd buffers incomplete</li>
+<li>#1501 tests: Add better helper for creating pipeline layouts enhancement tests</li>
+<li>#930  Error when moving exclusive image ownership between queue families with simultaneous image transition bug</li>
+<li>#865  Validation layer should check that vk(Invalidate|Flush)MappedRange() rounds ranges to VkPhysicalDeviceLimits::nonCoherentAtomSize help wanted</li>
+</ul>
+<p><strong>Fixed VulkanTools Github Issues:</strong></p>
+<ul>
+<li>#421 Backward compatibility is broken when replaying 32bit trace files with portability table</li>
+<li>#267 vktrace/vkreplay: Quake 3 Arena Vulkan fails to replay properly bug</li>
+<li>#224 VIA doc has broken link</li>
+</ul>
+<p><strong>Fixed VulkanSamples Github Issues:</strong></p>
+<ul>
+<li>#165 CMake Error: The following variables are used in this project, but they are set to NOTFOUND.</li>
+</ul>
+<p><strong>Fixed LunarXchange Issues:</strong></p>
+<ul>
+<li>#755 - can't get started</li>
+<li>#754 - glslang build from source fails in SDK 1.1.70.1</li>
+<li>#753 - OSX framework layer manifest files</li>
+<li>#751 - Hologram SDK sample doesn't handle VK_ERROR_OUT_OF_DATE_KHR properly</li>
+<li>#750 - Validation layer not allowing timestamps on transfer-only queues..</li>
+<li>#749 - VKstatic.1.lib wrong parameter exports for vkFreeCommandBuffers and vkDestroyCommandPool</li>
+</ul>
+<h3>
+<a id="user-content-known-issues" class="anchor" href="#user-content-known-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known Issues</h3>
+<ul>
+<li>Loader and validation layer open issues are available in the <a href="https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues" TARGET="_blank">Vulkan-LoaderAndValidationLayers Github Repository</a>
+</li>
+<li>VkTrace and other tool-related open issues are available in the <a href="https://github.com/LunarG/VulkanTools/issues" TARGET="_blank">VulkanTools Github Repository</a>
+</li>
+<li>Vulkan Sample-related open issues are available in the <a href="https://github.com/LunarG/VulkanSamples/issues" TARGET="_blank">VulkanSamples Github Repository</a>
+</li>
+</ul>
+<h2>
+<a id="user-content-developer-notes" class="anchor" href="#user-content-developer-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developer Notes</h2>
+<ul>
+<li>The pre-compiled glslang static libraries are not compatible with the Linux 4 runtime (e.g., Ubuntu 15.10).  These libraries must be rebuilt before use with the SDK samples.  See the Vulkan Samples page for more information.</li>
+<li>The script <code>source/shaderc/update_shaderc_sources.py</code> fails on Arch Linux because python3 is the default python interpreter. To work around this issue, change the line at the top of the file to be python2.</li>
+</ul>
+<h3>
+<a id="user-content-known-driver-issues" class="anchor" href="#user-content-known-driver-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known Driver Issues</h3>
+<p>None</p>
+<h4>
+<a id="user-content-important-notes-about-experimental-extensions" class="anchor" href="#user-content-important-notes-about-experimental-extensions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Important Notes About Experimental Extensions</h4>
+<p>The <code>KHX</code> and <code>NVX</code> identifiers in the name indicate that the extension is experimental, and is being considered for
+future standardization.  In the case of a <code>KHX</code> extension, this extension is being considered as either a <code>KHR</code> extension
+or core Vulkan API functionality.  <code>NVX</code> extensions are being considered for either a final <code>NV</code> or a more general
+(<code>EXT</code>, <code>KHR</code>) extension.</p>
+<p>As experimental extensions:</p>
+<ul>
+<li>Developers are encouraged to experiment with them and provide feedback, but <strong>should not</strong> use them as the basis for production applications.</li>
+<li>These experimental extensions are expected to be supported for a limited time only.</li>
+<li>They <strong>may</strong> change their interfaces and behavior in significant ways as a result of feedback</li>
+<li>They <strong>may</strong> be withdrawn or replaced with a different stable (<code>KHR</code>, <code>EXT</code>, ...) extension or core functionality at any time.</li>
+<li>Implementations of these extensions receive limited or no testing when submitted to the Khronos conformance process.</li>
+<li>Using experimental extensions with the validation layers may produce inaccurate validation results.</li>
+</ul>
+</article>
+</body>
+</html>
