@@ -2,7 +2,7 @@
 #define __SHIRABE_MATH_GEOMETRIC_RECT_H__
 
 #include <stdint.h>
-#include "Math/Vector.h"
+#include "math/vector.h"
 
 namespace Engine {
   namespace Math {
