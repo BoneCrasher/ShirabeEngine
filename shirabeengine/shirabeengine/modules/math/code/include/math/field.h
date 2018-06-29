@@ -6,294 +6,408 @@
 #include <iterator>
 #include <initializer_list>
 #include <cstring>
+#include <cassert>
 
 #include "platform/platform.h"
+#include "base/declaration.h"
 
-namespace Engine {
-	namespace Math {
+namespace Engine
+{
+    namespace Math
+    {
 
-#define FIELD_DEFAULT_SIZE 1
+#define DFIELD_DEFAULT_SIZE   1
+#define DFIELD_DEFAULT_STRIDE 1
+#define DASSERT_FIELD_SIZE_AND_STRIDE() \
+    static_assert(((TN % TStride) == 0), "Invalid TN and TStride combination.");
 
-		template <
-			typename T,
-			std::size_t bytesize = sizeof(T),
-			std::size_t N        = FIELD_DEFAULT_SIZE,
-			std::size_t S        = 1
-		>
-			// Defines a templated, non-growable field-type to hold certain type of data as 
-			// a vector-structure, internally stored as an array.
-        class SHIRABE_TEST_EXPORT Field
-		{
-			public:
-                typedef Field<T, bytesize, N, S> class_type;
-                typedef T                        value_type;
-                typedef value_type const         const_value_type;
 
-				Field<T, bytesize, N, S>
-					(std::size_t const size   = N,
-					 std::size_t const stride = S)
-				{
-					//m_field = new T[size];
-					memset(m_field, 0, (bytesize * size));
-				};
+        /**
+         * @brief            Defines a templated, non-growable field-type to hold certain type of data as
+         *                   a vector-structure, internally stored as an array.
+         *                   A field can be two dimensional, i.e. the stride parameter is greater than 1,
+         *                   but has to obey the constraint: (TN % TStride) == 0
+         * @tparam T,        Underlying meet type of the field.
+         * @tparam TByteSize Bytesize of the data type.
+         *                   Default: sizeof(T)
+         * @tparam TN        Number of elements in field.
+         *                   Default: 1
+         * @tparam TStride   Number of elements per row, in case of a two dimensional field.
+         *                   Default: 1
+         */
+        template <
+                typename    T,
+                std::size_t TByteSize = sizeof(T),
+                std::size_t TN        = DFIELD_DEFAULT_SIZE,
+                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                >
+        class SHIRABE_TEST_EXPORT CField
+        {
+            public_typedefs:
+            typedef CField<T, TByteSize, TN, TStride> class_type;
+            typedef T                                 value_type;
+            typedef value_type const                  const_value_type;
 
-				Field<T, bytesize, N, S>
-					(std::initializer_list<T> const&source,
-					 std::size_t const size   = N,
-					 std::size_t const stride = S)
-				{
-					//m_field = new T[size];
+            public_constructors:
+            CField(std::initializer_list<T> const&aSource);
+            CField(CField<T, TByteSize, TN, TStride> const&aCopy);
 
-					std::size_t i = 0;
-                    typename std::initializer_list<T>::iterator it;
-					for (it = source.begin(); it != source.end(); ++it) {
-						m_field[i] = *it;
-						++i;
-					}
-				};
+            public_destructors:
+            ~CField() = default;
 
-				Field<T, bytesize, N, S>
-					(Field<T, bytesize, N, S> const& cpy)
-				{
-					this->assign(cpy);
-				}
+            public_operators:
+            class_type& operator= (class_type const&aOther);
+            T    const&operator[] (std::size_t const aIndex) const;
+            T         &operator[] (std::size_t const aIndex);
+            bool       operator==(class_type const&aOther);
+            void       operator+=(class_type const& aRight);
+            void       operator-=(class_type const& aRight);
+            void       operator*=(T const aFactor);
+            void       operator/=(T const aFactor);
 
-				~Field<T, bytesize, N, S>() {
-					//SAFE_DELETE_ARRAY<T>(&(this->m_field));
-				}
+            public_methods:
+            T const*const const_ptr() const;
+            T      *const ptr();
 
-			public:
-				// Assign another field and overwrite contained values.
-				class_type& operator= (class_type const& right) {
-					this->assign(right);
+            std::size_t const size()        const;
+            std::size_t const byte_size()   const;
+            std::size_t const byte_stride() const;
 
-					return *this;
-				}
+            std::string toString();
 
-				// Access the element at the given index.
-				const T& operator[] (std::size_t const i) const {
-					if (N > 0) {
-						if (N > i) {
-							return *(m_field + i);
-						}
-					}
+            protected_methods:
+            void assign(class_type const& aOther);
 
-                    throw std::runtime_error("Out of range");
-				}
+            protected_members:
+            T mField[TN * TByteSize];
+        };
 
-				T& operator[] (std::size_t const i) {
-					return const_cast<T&>(static_cast<const class_type *>(this)->operator[](i));
-				}
+        /**
+         * @brief         Initialize a field from an initializer list.
+         * @param aSource An initializer list containing at least N values.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        CField<T, TByteSize, TN, TStride>::CField(
+                std::initializer_list<T> const&aSource)
+        {
+            DASSERT_FIELD_SIZE_AND_STRIDE();
 
-        bool operator==(class_type const&other) {
-          return (memcmp(m_field, other.m_field, sizeof(T) * N) == 0);
+            std::size_t i = 0;
+
+            for(typename std::initializer_list<T>::value_type const&v : aSource)
+                if(i < TN)
+                    mField[i++] = v;
+        };
+
+        /**
+         * @brief       Initialize a field from another field.
+         * @param aCopy The other instance to copy from.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        CField<T, TByteSize, TN, TStride>::CField(
+                CField<T, TByteSize, TN, TStride> const&aCopy)
+        {
+            DASSERT_FIELD_SIZE_AND_STRIDE();
+
+            assign(aCopy);
         }
-				
-				// Add another vector to this instance.
-				// There are no range checks and no clamping applied.
-				void operator+=(class_type const& r) {
-					for (size_t i = 0; i < N; ++i)
-						this->m_field[i] += r[i];
-				}
 
-				// Subtract another vector from this instance.
-				// There are no range checks and no clamping applied.
-				void operator-=(class_type const& r) {
-					for (size_t i = 0; i < N; ++i)
-						this->m_field[i] -= r[i];
-				}
+        /**
+         * @brief       Assign another field and overwrite contained values.
+         * @param right Field to assign.
+         * @return      Self-Reference
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        CField<T, TByteSize, TN, TStride>& CField<T, TByteSize, TN, TStride>::operator=(class_type const& right)
+        {
+            DASSERT_FIELD_SIZE_AND_STRIDE();
 
-				// Multiply this vector with the passed factor.
-				// There are no range checks and no clamping applied.
-				void operator*=(T const factor) {
-					for (size_t i = 0; i < N; ++i)
-						this->m_field[i] *= factor;
-				}
+            assign(right);
+            return *this;
+        }
 
+        /**
+         * @brief         Returns an immutable value reference to an element in the field at index 'aIndex'.
+         * @param  aIndex 0-based position in the field.
+         * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
+         * @throws        std::out_of_range if: 0 < aIndex < TN.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        T const& CField<T, TByteSize, TN, TStride>::operator[] (std::size_t const aIndex) const
+        {
+            DASSERT_FIELD_SIZE_AND_STRIDE();
 
-				// Dividy this vector by the passed factor.
-				// There are no range checks and no clamping applied.
-				void operator/=(T const factor) {
-					this->operator*=((1 / factor));
-				}
+            if (TN > 0 && TN > aIndex)
+                return *(mField + aIndex);
 
-			protected:
-				// Assign another matrix to this instance.
-				// Internally theres only a copy operation taking place 
-				// overriding the old data of this instance, if any!
-				inline void assign(class_type const& r) {
-					// Only recreate if NULL. Use available allocated memory instead!
-					//if (this->m_field == NULL)
-						//this->m_field = new T[N];
+            throw std::out_of_range("Index out of field bounds.");
+        }
 
-                    memcpy(this->m_field, r.const_ptr(), (N * bytesize));
-				}
+        /**
+         * @brief         Returns a mutable value reference to an element in the field at index 'aIndex'.
+         * @param  aIndex 0-based position in the field.
+         * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
+         * @throws        std::out_of_range if: 0 < aIndex < TN.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        T& CField<T, TByteSize, TN, TStride>::operator[] (std::size_t const aIndex)
+        {
+            // Cast to const this, so that we can reuse the const operator[].
+            class_type const*const cthis  = static_cast<class_type const*const>(this);
+            value_type const&      cvalue = cthis->operator[](aIndex);
+            value_type      &      value  = const_cast<value_type&>(cvalue);
+            return value;
+        }
 
-			public:
-				// Return a const pointer to the internal data array.
-				// Used for read-only access.
-				inline  T const*const_ptr() const { return &this->m_field[0]; };
+        /**
+         * @brief        Compares this instance to another for bitwise equality.
+         * @param aOther The other instance to be compared with.
+         * @return       True, if bitwise equal. False otherwise.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        bool CField<T, TByteSize, TN, TStride>::operator==(class_type const&aOther)
+        {
+            int32_t result = memcmp(mField, aOther.m_field, (TByteSize * TN));
+            return (result == 0);
+        }
 
-				// Return a pointer to the internal data array.
-				// Used for read-write access.
-				inline T *ptr() { return this->m_field; };
+        /**
+         * @brief        Add another field to this instance.
+         * @param aOther The field to be added.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        void CField<T, TByteSize, TN, TStride>::operator+=(class_type const& aOther)
+        {
+            for(size_t i = 0; i < TN; ++i)
+                mField[i] += aOther[i];
+        }
 
-				// Return the total number of elements in the field.
-				inline std::size_t const size() const { return N; };
+        /**
+         * @brief        Subtract another field from this instance.
+         * @param aOther The field to subtract.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        void CField<T, TByteSize, TN, TStride>::operator-=(class_type const& r)
+        {
+            for(size_t i = 0; i < TN; ++i)
+                mField[i] -= r[i];
+        }
 
-				// Return the size of a single element of the field in bytes.
-				inline std::size_t const byte_size() const { return bytesize; };
+        /**
+         * @brief         Multiply this field instance with a given factor.
+         * @param aFactor The factor to multiply with.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        void CField<T, TByteSize, TN, TStride>::operator*=(T const aFactor)
+        {
+            for(size_t i = 0; i < TN; ++i)
+                mField[i] *= aFactor;
+        }
 
-				// Return the number of (imaginary) columns in the field.
-				// Dividing the size by the byte_stride should return the number of (imaginary) rows!
-				// If the field should contain an arbitrary number of elements, pass 1 for the byte_stride.
-				inline std::size_t const byte_stride() const { return S; };
+        /**
+         * @brief          Divide this field instance by the passed factor.
+         * @param aFactor The factor to divide by.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        void CField<T, TByteSize, TN, TStride>::operator/=(T const aFactor)
+        {
+            operator*=((1 / aFactor));
+        }
 
-			public:
-				std::string toString() {
-					std::stringstream ss;
-					for (size_t i = 0; i < N; i += S) {
-						for (size_t j = 0; j < S; ++j) {
-                            ss << (((j) == 0) ? "" : ", ");
-							ss << m_field[i + j];
-						}
+        /**
+         * @brief        Assign another matrix to this instance.
+         *               Internally theres only a copy operation taking place
+         *               overriding the old data of this instance, if any!
+         * @param aOther The field instance to assign.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        void CField<T, TByteSize, TN, TStride>::assign(class_type const& aOther)
+        {
+            memcpy(mField, aOther.const_ptr(), (TN * TByteSize));
+        }
 
-						ss << ",\n";
-					}
+        /**
+         * @brief  Return a const pointer to the internal data array.
+         *         Used for read-only access.
+         * @return A const pointer to the internal data array.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        T const* const CField<T, TByteSize, TN, TStride>::const_ptr() const
+        {
+            return &mField[0];
+        }
 
-					ss << "\n";
+        /**
+         * @brief  Return a pointer to the internal data array.
+         *         Used for read-write access.
+         * @return A pointer to the internal data array.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        T * const CField<T, TByteSize, TN, TStride>::ptr()
+        {
+            return mField;
+        }
 
-					return ss.str();
-				}
+        /**
+         * @brief  Return the total number of elements in the field.
+         * @return See above...
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        std::size_t const CField<T, TByteSize, TN, TStride>::size() const
+        {
+            return TN;
+        }
 
-			protected:
-				T m_field[N * bytesize];
-		};
+        /**
+         * @brief  Return the size of a single element of the field in bytes.
+         * @return See also above...
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        std::size_t const CField<T, TByteSize, TN, TStride>::byte_size() const
+        {
+            return TByteSize;
+        }
 
-		template <
-			typename T,
-			size_t bytesize = sizeof(T),
-			size_t N        = FIELD_DEFAULT_SIZE,
-			size_t S        = 1
-		>
-		// Return a copy of this vector which the passed vector was added to.
-		// There are no range checks and no clamping applied.
-		Field<T, bytesize, N, S>
-			operator+(
-        Field<T, bytesize, N, S> const& l,
-        Field<T, bytesize, N, S> const& r) 
-    {
+        /**
+         * @brief   Return the number of (imaginary) columns in the field.
+         *          Dividing the size by the byte_stride should return the number of (imaginary) rows!
+         *          If the field should contain an arbitrary number of elements, pass 1 for the byte_stride.
+         * @return  See again... you've guessed it...
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        std::size_t const CField<T, TByteSize, TN, TStride>::byte_stride() const
+        {
+            return TStride;
+        }
 
-			Field<T, bytesize, N, S> cpy = Field<T, bytesize, N, S>(l);
-		
-			T *field = cpy.ptr();
+        /**
+         * @brief  Serialize this field to a comma-delimited string.
+         * @return Stringized field.
+         */
+        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        std::string CField<T, TByteSize, TN, TStride>::toString()
+        {
+            std::stringstream ss;
+            for (size_t i = 0; i < TN; i += TStride) {
+                for (size_t j = 0; j < TStride; ++j) {
+                    ss << (((j) == 0) ? "" : ", ");
+                    ss << mField[i + j];
+                }
 
-			for (size_t i = 0; i < N; ++i)
-				field[i] += r[i];
+                ss << ",\n";
+            }
 
-      field = nullptr;
+            ss << "\n";
 
-			return cpy;
-		}
+            return ss.str();
+        }
 
-		template <
-			typename T,
-			size_t bytesize = sizeof(T),
-			size_t N        = FIELD_DEFAULT_SIZE,
-			size_t S        = 1
-		>
-		// Return a copy of this vector which the passed vector was subtracted from.
-		// There are no range checks and no clamping applied.
-			Field<T, bytesize, N, S>
-			operator-(
-        Field<T, bytesize, N, S> const& l,
-        Field<T, bytesize, N, S> const& r)
-    {
-			Field<T, bytesize, N, S> cpy = Field<T, bytesize, N, S>(l);
+        /**
+         * @brief       Accumulate two field instances and return the reuslt of the operation as a copy.
+         * @param  aLHS Left operand
+         * @param  aRHS Right operand
+         * @return A new field instance with the result of addition.
+         */
+        template <
+                typename    T,
+                std::size_t TByteSize = sizeof(T),
+                std::size_t TN        = DFIELD_DEFAULT_SIZE,
+                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                >
+        CField<T, TByteSize, TN, TStride>
+        operator+(
+                CField<T, TByteSize, TN, TStride> const& aLHS,
+                CField<T, TByteSize, TN, TStride> const& aRHS)
+        {
+            CField<T, TByteSize, TN, TStride> copy = CField<T, TByteSize, TN, TStride>(aLHS);
 
-			T *field = cpy.ptr();
+            copy += aRHS;
+            return copy;
+        }
 
-			for (size_t i = 0; i < N; ++i)
-				field[i] -= r[i];
+        /**
+         * @brief       Subtract the right operand from the left and return the reuslt of the operation as a copy.
+         * @param  aLHS Left operand
+         * @param  aRHS Right operand
+         * @return A new field instance with the result of subtraction.
+         */
+        template <
+                typename    T,
+                std::size_t TByteSize = sizeof(T),
+                std::size_t TN        = DFIELD_DEFAULT_SIZE,
+                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                >
+        CField<T, TByteSize, TN, TStride>
+        operator-(
+                CField<T, TByteSize, TN, TStride> const& aLHS,
+                CField<T, TByteSize, TN, TStride> const& aRHS)
+        {
+            CField<T, TByteSize, TN, TStride> copy = CField<T, TByteSize, TN, TStride>(aLHS);
 
-			field = nullptr;
+            copy -= aRHS;
+            return copy;
+        }
 
-			return cpy;
-		}
+        /**
+         * @brief          Multiply a field instance with a factor and return the result of the operation as a copy.
+         * @param  aLHS    Field instance to multiply with.
+         * @param  aFactor Factor to multiply.
+         * @return A new field instance with the result of multiplication.
+         */
+        template <
+                typename    T,
+                std::size_t TByteSize = sizeof(T),
+                std::size_t TN        = DFIELD_DEFAULT_SIZE,
+                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                >
+        CField<T, TByteSize, TN, TStride>operator*(
+                CField<T, TByteSize, TN, TStride> const&aLHS,
+                T                                 const&aFactor)
+        {
+            CField<T, TByteSize, TN, TStride> copy = CField<T, TByteSize, TN, TStride>(aLHS);
 
-		template <
-			typename T,
-			size_t bytesize = sizeof(T),
-			size_t N        = FIELD_DEFAULT_SIZE,
-			size_t S        = 1
-		>
-		// Return a multiplied copy of this vector applying the passed factor.
-		// There are no range checks and no clamping applied.
-			Field<T, bytesize, N, S>
-			operator*(
-        Field<T, bytesize, N, S> const& l,
-        T                        const  factor) 
-    {
-			Field<T, bytesize, N, S> cpy = Field<T, bytesize, N, S>(l);
+            copy *= aFactor;
+            return copy;
+        }
 
-			T *field = cpy.ptr();
-		
-			for (size_t i = 0; i < N; ++i)
-				field[i] *= factor;
+        /**
+         * @brief          Multiply a field instance with a factor and return the result of the operation as a copy.
+         * @param  aFactor Factor to multiply.
+         * @param  aLHS    Field instance to multiply with.
+         * @return A new field instance with the result of multiplication.
+         */
+        template <
+                typename    T,
+                std::size_t TByteSize = sizeof(T),
+                std::size_t TN        = DFIELD_DEFAULT_SIZE,
+                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                >
+        CField<T, TByteSize, TN, TStride>operator*(
+                T                                 const&aFactor,
+                CField<T, TByteSize, TN, TStride> const&aLHS)
+        {
+            return operator*(aLHS, aFactor);
+        }
 
-			field = nullptr;
+        /**
+         * @brief  Divide a field instance by a factor and return the result of the operation as a copy.
+         * @param  aLHS    Field instance to multiply with.
+         * @param  aFactor Factor to multiply.
+         * @return A new field instance with the result of division.
+         */
+        template <
+                typename    T,
+                std::size_t TByteSize = sizeof(T),
+                std::size_t TN        = DFIELD_DEFAULT_SIZE,
+                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                >
+        CField<T, TByteSize, TN, TStride>operator/(
+                CField<T, TByteSize, TN, TStride> const&aLHS,
+                T                                 const&aFactor)
+        {
+            return operator*(aLHS, (T(1.0) / aFactor));
+        }
 
-			return cpy;
-		}
-
-		template <
-			typename T,
-			size_t bytesize = sizeof(T),
-			size_t N        = FIELD_DEFAULT_SIZE,
-			size_t S        = 1
-		>
-			// Return a multiplied copy of this vector applying the passed factor.
-			// There are no range checks and no clamping applied.
-			Field<T, bytesize, N, S>
-			operator*(
-        T                        const  factor,
-        Field<T, bytesize, N, S> const& l)
-    {
-			return operator*(l, factor);
-		}
-
-		template <
-			typename T,
-			size_t bytesize = sizeof(T),
-			size_t N        = FIELD_DEFAULT_SIZE,
-			size_t S        = 1
-		>
-		// Return a divided copy of this vector applying the passed factor.
-		// There are no range checks and no clamping applied.
-			Field<T, bytesize, N, S>
-			operator/(
-        Field<T, bytesize, N, S> const& field,
-			  T                        const  factor)
-    {
-			return operator*(field, (1 / factor));
-		}
-
-		template <
-			typename T,
-			size_t bytesize = sizeof(T),
-			size_t N        = FIELD_DEFAULT_SIZE,
-			size_t S        = 1
-		>
-			// Return a divided copy of this vector applying the passed factor.
-			// There are no range checks and no clamping applied.
-			Field<T, bytesize, N, S>
-		operator/(
-      T                        const  factor,
-			Field<T, bytesize, N, S> const& field)
-    {
-			return operator*(field, (1 / factor));
-		}
-
-	}
+    }
 }
 #endif
