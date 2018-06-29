@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 set(SHIRABE_MODULE_TARGET_NAME SHIRABEENGINE)
 # Add modules
 add_subdirectory(modules/platform)
+add_subdirectory(modules/base)
 add_subdirectory(modules/log)
 add_subdirectory(modules/math)
 add_subdirectory(modules/core)
@@ -64,6 +65,7 @@ set(
 include(project_setup)
 
 add_dependencies(shirabeengine INSTALL_platform)
+add_dependencies(shirabeengine INSTALL_base)
 add_dependencies(shirabeengine INSTALL_os)
 add_dependencies(shirabeengine INSTALL_log)
 add_dependencies(shirabeengine INSTALL_math)
