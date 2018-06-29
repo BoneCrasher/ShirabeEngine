@@ -205,15 +205,4 @@ namespace Engine
     #endif
 }
 
-template <
-        typename    T,
-        std::size_t TByteSize,
-        std::size_t TN,
-        std::size_t TStride
-        >
-CField<T, TByteSize, TN, TStride>::CField(
-        std::size_t const size   = TN,
-        std::size_t const stride = TStride)
-{
-    memset(m_field, 0, (TByteSize * size));
-};
+

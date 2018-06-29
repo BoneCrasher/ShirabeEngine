@@ -9,8 +9,9 @@
 #include <fstream>
 
 #include <platform/platform.h>
+#include <base/declaration.h>
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 
@@ -25,113 +26,138 @@
 #include <math.h>
 #include <cmath>
 
-// #include "Platform/ApplicationEnvironment.h"
-// #include "Core/EngineTypeHelper.h"
-// #include "Core/BitField.h"
-//
-// #include "Core/String.h"
-//
-namespace Engine {
+namespace Engine
+{
+    #ifdef SHIRABE_DEBUG
+        #if defined LOG_USE_VERBOSE || defined SHIRABE_TEST
+            #define MinimumLogLevel ELogLevel::Verbose
+        #else
+            #define MinimumLogLevel ELogLevel::Debug
+        #endif
+    #else
+        #ifdef LOG_IGNORE_STATUS
+            #ifdef LOG_IGNORE_WARNINGS
+                #define MinimumLogLevel ELogLevel::Error
+            #else
+                #define MinimumLogLevel ELogLevel::Warning
+            #endif
+        #else
+            #define MinimumLogLevel ELogLevel::Status
+        #endif
+    #endif
 
-  enum class ELogLevel {
-    Verbose,
-    Debug,
-    Status,
-    Warning,
-    Error,
-    WTF
-  };
+    #define DDeclareLogTag(className)                                          \
+        constexpr static  char const* const kLogTag = #className;              \
+        constexpr static inline char const* const logTag() { return kLogTag; }
 
-  static std::string ELogLevelToString(const ELogLevel& level) {
-    if(level == ELogLevel::Verbose) return "VERBOSE";
-    if(level == ELogLevel::Debug)   return "DEBUG";
-    if(level == ELogLevel::Status)  return "STATUS";
-    if(level == ELogLevel::Warning) return "WARNING";
-    if(level == ELogLevel::Error)   return "ERROR";
-    if(level == ELogLevel::WTF)     return "WTF";
-    return "UNKNOWN";
-  }
+    class SHIRABE_LIBRARY_EXPORT CLog
+    {
+        public_enums:
+        /**
+         * @brief The ELogLevel describes the specific kind of severity of the log
+         *        output in increasing order from Verbose to WTF.
+         */
+        enum class ELogLevel
+                : int8_t
+        {
+            Verbose =  1,
+            Debug   =  2,
+            Status  =  4,
+            Warning =  8,
+            Error   = 16,
+            WTF     = 32
+        };
 
-  #ifdef SHIRABE_DEBUG
-  #if defined LOG_USE_VERBOSE || defined SHIRABE_TEST
-  #define MinimumLogLevel ELogLevel::Verbose
-  #else 
-  #define MinimumLogLevel ELogLevel::Debug 
-  #endif
-  #else 
-  #ifdef LOG_IGNORE_STATUS
-  #ifdef LOG_IGNORE_WARNINGS
-  #define MinimumLogLevel ELogLevel::Error
-  #else 
-  #define MinimumLogLevel ELogLevel::Warning
-  #endif
-  #else
-  #define MinimumLogLevel ELogLevel::Status
-  #endif
-  #endif
+    public_static_functions:
+        static std::string ELogLevelToString(
+                ELogLevel const& level);
 
-  #define DeclareLogTag(className) constexpr static const char* const kLogTag = #className;         \
-								 constexpr static inline const char* logTag() { return kLogTag; }
+        /**
+         * @brief         Log-call for very descriptive output, usually just for
+         *                testing or profiling.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void Verbose(
+                std::string const&tag,
+                std::string const&message);
 
-  // using Engine::Core::BitField;
+        /**
+         * @brief Status  Log-call to trace events and status in the system.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void Status(
+                std::string const&tag,
+                std::string const&message);
+        /**
+         * @brief Debug   Log-call for debug output, usally printing state and
+         *                values or intermediate positional output.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void Debug(
+                std::string const&tag,
+                std::string const&message);
+        /**
+         * @brief Warning Log-call for abnormal state or behaviour, which can be
+         *                caught or recovered but require attention.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void Warning(
+                std::string const&tag,
+                std::string const&message);
+        /**
+         * @brief Error   Log-call for abnormal state or behaviour, which requires
+         *                handling or cleanup and abort.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void Error(
+                std::string const&tag,
+                std::string const&message);
+        /**
+         * @brief WTF     Log-call for errors that should never have happened.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void WTF(
+                std::string const&tag,
+                std::string const&message);
 
-  class SHIRABE_LIBRARY_EXPORT Log {
-  public:
-    enum class Style
-      : unsigned int {
-      NO_HEADER = 1,
-      LEFT      = 2,
-      CENTRE    = 4,
-      RIGHT     = 8,
-      TRUNCATE  = 16
+    private_static_functions:
+        /**
+         * @brief         Common implementation of log output generation.
+         *                Forwarded to by all other log-calls.
+         * @param type    The specific severity/type of output.
+         * @param tag     The tag of the source of the log call to associate with.
+         * @param message -
+         */
+        static void LogImpl(
+                ELogLevel       const&level,
+                std::string     const&tag,
+                std::string     const&message);
     };
 
-    static void Verbose(
-      std::string     const&tag,
-      std::string     const&message);
-
-    static void Status(
-      std::string     const&tag,
-      std::string     const&message);
-
-    static void Debug(
-      std::string     const&tag,
-      std::string     const&message);
-
-    static void Warning(
-      std::string     const&tag,
-      std::string     const&message);
-
-    static void Error(
-      std::string     const&tag,
-      std::string     const&message);
-
-    static void WTF(
-      std::string     const&tag,
-      std::string     const&message);
-
-    static unsigned int lineWidth();
-    static void setLineWidth(unsigned int width);
-
-  private:
-    static void LogImpl(
-      ELogLevel       const&type,
-      std::string     const&tag,
-      std::string     const&message);
-
-    static unsigned int* lineWidthInternal();
-  };
-
-#ifdef PLATFORM_WINDOWS
-  // maximum mumber of lines the output console should have
-  constexpr static const WORD MAX_CONSOLE_LINES = 500;
-#endif
-
-  class SHIRABE_LIBRARY_EXPORT Console {
-  public:
-    static void InitializeConsole();
-    static void DeinitializeConsole();
-  };
+    /**
+     * @brief The CConsole class provides static entry points to create
+     *        and shutdown additional console instances in case of a GUI
+     *        application, which requires STDOUT, STDIN and STDERR output.
+     */
+    class SHIRABE_LIBRARY_EXPORT CConsole {
+    public:
+        /**
+         * @brief Create, initialize and bind a console instance to the running
+         *        application and prepare it for STDOUT/IN/ERR I/O.
+         */
+        static void InitializeConsole();
+        /**
+         * @brief Unbind, deinitialize and destroy a console instance from a running
+         *        application, if any.
+         */
+        static void DeinitializeConsole();
+    };
 }
 
 #endif

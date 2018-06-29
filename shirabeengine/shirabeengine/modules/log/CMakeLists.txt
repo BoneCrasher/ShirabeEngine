@@ -8,9 +8,11 @@ set(SHIRABE_TEMPLATE "StaticLib")
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEPLATFORM
+        SHIRABEMODULEBASE
         JSON                 
         XML2)
         
 include(project_setup)
 
 add_dependencies(log INSTALL_platform)
+add_dependencies(log INSTALL_base)
