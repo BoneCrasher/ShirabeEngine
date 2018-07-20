@@ -3,43 +3,116 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-namespace Engine {
-	namespace Math {
-
-		AxisAngle::AxisAngle()
+namespace Engine
+{
+    namespace Math
+    {
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAxisAngle::CAxisAngle()
 			: Vector4D({ 0, 0, 0, 0 })
 		{}
+        //<-----------------------------------------------------------------------------
 
-		AxisAngle::AxisAngle(const Vector3D&   axis,
-							 const value_type& phi)
-			: Vector4D({ axis.x(), axis.y(), axis.z(), phi })
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAxisAngle::CAxisAngle(
+                Vector3D   const &aAxis,
+                value_type const &aPhi)
+            : Vector4D({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
 		{}
+        //<-----------------------------------------------------------------------------
 
-		AxisAngle::AxisAngle(const AxisAngle& axisAngle) 
-			: Vector4D({ })
-		{ }
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAxisAngle::CAxisAngle(CAxisAngle const& aOther)
+            : Vector4D({ aOther })
+        {}
+        //<-----------------------------------------------------------------------------
 
-		AxisAngle::AxisAngle(const value_type& x,
-							 const value_type& y,
-							 const value_type& z,
-							 const value_type& phi) 
-			: Vector4D({ x, y, z, phi })
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAxisAngle::CAxisAngle(
+                value_type const& aX,
+                value_type const& aY,
+                value_type const& aZ,
+                value_type const& aPhi)
+            : Vector4D({ aX, aY, aZ, aPhi })
 		{}
+        //<-----------------------------------------------------------------------------
 
-		AxisAngle::~AxisAngle() {
-		}
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAxisAngle::~CAxisAngle()
+        {}
+        //<-----------------------------------------------------------------------------
 
-		Vector3D operator*(const AxisAngle &a,
-						   const Vector3D  &v) {
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        Vector3D const CAxisAngle::axis() const
+        {
+            return Vector3D({ x(), y(), z() });
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        const CAxisAngle::value_type& CAxisAngle::phi() const
+        {
+            return mField[3];
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        Vector3D const CAxisAngle::axis(
+                value_type const& aX,
+                value_type const& aY,
+                value_type const& aZ)
+        {
+            this->x(aX);
+            this->y(aY);
+            this->z(aZ);
+            return this->axis(); // Hope for copy elision to work... otherwise switch to move semantics.
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAxisAngle::value_type const &CAxisAngle::phi(value_type const &aPhi)
+        {
+            return (mField[3] = aPhi);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        Vector3D operator*(
+                CAxisAngle const &aAxisAngle,
+                Vector3D   const &aVector)
+        {
+            using Value_t = CAxisAngle::value_type;
+
 			// Rodriguez rotation formula
 			// v_rot = (cos(phi)*v + sin(phi)*cross(e, v) + (1 - cos(phi))*(dot(e, v)*e)
-			typename AxisAngle::value_type cos_phi   = cosf(a.phi());
-			typename AxisAngle::value_type sin_phi   = sinf(a.phi());
-			Vector3D                       e         = a.axis();
-			typename AxisAngle::value_type dot_e_v   = dot(e, v);
-			Vector3D                       cross_e_v = cross(e, v);
+            Value_t  cos_phi   = cosf(aAxisAngle.phi());
+            Value_t  sin_phi   = sinf(aAxisAngle.phi());
+            Vector3D e         = aAxisAngle.axis();
+            Value_t  dot_e_v   = dot(e, aVector);
+            Vector3D cross_e_v = cross(e, aVector);
 
-			return cos_phi*v + sin_phi*cross_e_v + (1 - cos_phi)*(dot_e_v*e);
+            return ((cos_phi * aVector) + (sin_phi * cross_e_v) + ((1 - cos_phi) * (dot_e_v * e)));
 		}
+        //<-----------------------------------------------------------------------------
 	}
 }

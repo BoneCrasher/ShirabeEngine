@@ -20,3 +20,5 @@ Release
 *.dll
 
 modules_back
+
+.*

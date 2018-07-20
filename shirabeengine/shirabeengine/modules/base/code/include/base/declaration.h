@@ -47,5 +47,4 @@
 #define private_constants           private
 #define private_members             private
 
-
 #endif

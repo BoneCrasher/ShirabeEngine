@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.6.82, 2018-06-28T13:11:15. -->
+<!-- Written by QtCreator 4.6.82, 2018-07-20T16:58:05. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -8,7 +8,7 @@
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
-  <value type="int">1</value>
+  <value type="int">0</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.EditorSettings</variable>
@@ -57,6 +57,10 @@
   <valuemap type="QVariantMap">
    <valuelist type="QVariantList" key="ClangCodeModel.CustomCommandLineKey"/>
    <value type="bool" key="ClangCodeModel.UseGlobalConfig">true</value>
+   <valuelist type="QVariantList" key="ClangTools.SelectedDirs"/>
+   <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
+   <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
+   <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
   </valuemap>
  </data>
  <data>
@@ -162,11 +166,9 @@
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
     <valuelist type="QVariantList" key="CMake.Configuration">
      <value type="QString">CMAKE_BUILD_TYPE:STRING=Release</value>
-     <value type="QString">CMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}</value>
-     <value type="QString">CMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}</value>
-     <value type="QString">CMAKE_INSTALL_PREFIX:PATH=/home/dottidev/workspaces/shirabe/workspace/shirabeengine/_deploy/linux64/release</value>
-     <value type="QString">CMAKE_PREFIX_PATH:STRING=%{Qt:QT_INSTALL_PREFIX}</value>
-     <value type="QString">QT_QMAKE_EXECUTABLE:STRING=%{Qt:qmakeExecutable}</value>
+     <value type="QString">CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++</value>
+     <value type="QString">CMAKE_C_COMPILER:FILEPATH=/usr/bin/cc</value>
+     <value type="QString">CMAKE_INSTALL_PREFIX:PATH=/usr/local</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/dottidev/workspaces/shirabe/workspace/shirabeengine/_build/linux64/release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
@@ -664,7 +666,7 @@
     </valuelist>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/dottidev/workspaces/shirabe/workspace/shirabeengine/_deploy/linux32/release/bin</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default"></value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">enginetest</value>

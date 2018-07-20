@@ -16,10 +16,10 @@ namespace Engine
     namespace Math
     {
 
-#define DFIELD_DEFAULT_SIZE   1
-#define DFIELD_DEFAULT_STRIDE 1
-#define DASSERT_FIELD_SIZE_AND_STRIDE() \
-    static_assert(((TN % TStride) == 0), "Invalid TN and TStride combination.");
+        #define DFIELD_DEFAULT_SIZE   1
+        #define DFIELD_DEFAULT_STRIDE 1
+        #define DASSERT_FIELD_SIZE_AND_STRIDE() \
+            static_assert(((TN % TStride) == 0), "Invalid TN and TStride combination.");
 
 
         /**
@@ -43,29 +43,29 @@ namespace Engine
                 >
         class SHIRABE_TEST_EXPORT CField
         {
-            public_typedefs:
+        public_typedefs:
             typedef CField<T, TByteSize, TN, TStride> class_type;
             typedef T                                 value_type;
             typedef value_type const                  const_value_type;
 
-            public_constructors:
+        public_constructors:
             CField(std::initializer_list<T> const&aSource);
             CField(CField<T, TByteSize, TN, TStride> const&aCopy);
 
-            public_destructors:
+        public_destructors:
             ~CField() = default;
 
-            public_operators:
-            class_type& operator= (class_type const&aOther);
-            T    const&operator[] (std::size_t const aIndex) const;
-            T         &operator[] (std::size_t const aIndex);
+        public_operators:
+            class_type&operator= (class_type const&aOther);
+            T    const&operator[](std::size_t const aIndex) const;
+            T         &operator[](std::size_t const aIndex);
             bool       operator==(class_type const&aOther);
             void       operator+=(class_type const& aRight);
             void       operator-=(class_type const& aRight);
             void       operator*=(T const aFactor);
             void       operator/=(T const aFactor);
 
-            public_methods:
+        public_methods:
             T const*const const_ptr() const;
             T      *const ptr();
 
@@ -75,10 +75,10 @@ namespace Engine
 
             std::string toString();
 
-            protected_methods:
+        protected_methods:
             void assign(class_type const& aOther);
 
-            protected_members:
+        protected_members:
             T mField[TN * TByteSize];
         };
 
@@ -167,7 +167,7 @@ namespace Engine
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
         bool CField<T, TByteSize, TN, TStride>::operator==(class_type const&aOther)
         {
-            int32_t result = memcmp(mField, aOther.m_field, (TByteSize * TN));
+            int32_t result = memcmp(mField, aOther.mField, (TByteSize * TN));
             return (result == 0);
         }
 
@@ -288,8 +288,10 @@ namespace Engine
         std::string CField<T, TByteSize, TN, TStride>::toString()
         {
             std::stringstream ss;
-            for (size_t i = 0; i < TN; i += TStride) {
-                for (size_t j = 0; j < TStride; ++j) {
+            for (size_t i = 0; i < TN; i += TStride)
+            {
+                for (size_t j = 0; j < TStride; ++j)
+                {
                     ss << (((j) == 0) ? "" : ", ");
                     ss << mField[i + j];
                 }
