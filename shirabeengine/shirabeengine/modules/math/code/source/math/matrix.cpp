@@ -1,85 +1,87 @@
 #include "math/matrix.h"
 
-namespace Engine {
-	namespace Math {
+namespace Engine
+{
+    namespace Math
+    {
 
 		// Calculates the determinante of the 2x2 matrix.
-		Matrix2x2::value_type SMMatrixDeterminant( const Matrix2x2& matrix)
+        CMatrix2x2::value_type SMMatrixDeterminant(CMatrix2x2 const &aMatrix)
 		{
-			Matrix2x2::value_type det = 0;
+            CMatrix2x2::value_type det = 0;
 
-			__shirabe_math__matrix_determinant_fishrule<Matrix2x2::value_type>(matrix.const_ptr(), &det);
+            __shirabe_math__matrix_determinant_fishrule<CMatrix2x2::value_type>(aMatrix.const_ptr(), &det);
 
 			return det;
 		}
 		// Calculates the determinante of the 3x3 matrix.
-		Matrix3x3::value_type SMMatrixDeterminant( const Matrix3x3& matrix)
+        CMatrix3x3::value_type SMMatrixDeterminant(CMatrix3x3 const &aMatrix)
 		{
-			Matrix3x3::value_type det = 0;
+            CMatrix3x3::value_type det = 0;
 
-			__shirabe_math__matrix_determinant_sarrus<Matrix3x3::value_type>(matrix.const_ptr(), &det);
+            __shirabe_math__matrix_determinant_sarrus<CMatrix3x3::value_type>(aMatrix.const_ptr(), &det);
 
 			return det;
 		}
 		// Calculates the determinante of the 4x4 matrix.
-		Matrix4x4::value_type SMMatrixDeterminant( const Matrix4x4& matrix)
+        CMatrix4x4::value_type SMMatrixDeterminant(CMatrix4x4 const &aMatrix)
 		{
-			Matrix4x4::value_type det = 0;
+            CMatrix4x4::value_type det = 0;
 
-			__shirabe_math__matrix_determinant_gauss_jordan<4, 4, Matrix4x4::value_type>(matrix.const_ptr(), &det);
+            __shirabe_math__matrix_determinant_gauss_jordan<4, 4, CMatrix4x4::value_type>(aMatrix.const_ptr(), &det);
 
 			return det;
 		}
 
 		// Returns a transposed copy of the passed 2x2 matrix.
-		Matrix2x2 SMMatrixTranspose( const Matrix2x2& matrix)
+        CMatrix2x2 SMMatrixTranspose(CMatrix2x2 const &aMatrix)
 		{
-			Matrix2x2 transposed;
+            CMatrix2x2 transposed;
 
-			__shirabe_math__matrix_transpose<2, 2, Matrix2x2::value_type>(matrix.const_ptr(), transposed.ptr());
+            __shirabe_math__matrix_transpose<2, 2, CMatrix2x2::value_type>(aMatrix.const_ptr(), transposed.ptr());
 
 			return transposed;
 		}
 		// Returns a transposed copy of the passed 3x3 matrix.
-		Matrix3x3 SMMatrixTranspose( const Matrix3x3& matrix)
+        CMatrix3x3 SMMatrixTranspose(CMatrix3x3 const &aMatrix)
 		{
-			Matrix3x3 transposed;
+            CMatrix3x3 transposed;
 
-			__shirabe_math__matrix_transpose<3, 3, Matrix3x3::value_type>(matrix.const_ptr(), transposed.ptr());
+            __shirabe_math__matrix_transpose<3, 3, CMatrix3x3::value_type>(aMatrix.const_ptr(), transposed.ptr());
 
 			return transposed;
 		}
 		// Returns a transposed copy of the passed 4x4 matrix.
-		Matrix4x4 SMMatrixTranspose( const Matrix4x4& matrix)
+        CMatrix4x4 SMMatrixTranspose(CMatrix4x4 const &aMatrix)
 		{
-			Matrix4x4 transposed;
+            CMatrix4x4 transposed;
 
-			__shirabe_math__matrix_transpose<4, 4, Matrix4x4::value_type>(matrix.const_ptr(), transposed.ptr());
+            __shirabe_math__matrix_transpose<4, 4, CMatrix4x4::value_type>(aMatrix.const_ptr(), transposed.ptr());
 
 			return transposed;
 		}
 
-		Matrix2x2 SMMatrixMultiply( const Matrix2x2& l,  const Matrix2x2& r)
+        CMatrix2x2 SMMatrixMultiply(CMatrix2x2 const &aLHS,CMatrix2x2 const &aRHS)
 		{
-			Matrix2x2 product;
+            CMatrix2x2 product;
 
-			__shirabe_math__matrix_multiply<Matrix2x2::value_type, 2, 2, 2>(l.const_ptr(), r.const_ptr(), product.ptr());
+            __shirabe_math__matrix_multiply<CMatrix2x2::value_type, 2, 2, 2>(aLHS.const_ptr(), aRHS.const_ptr(), product.ptr());
 
 			return product;
 		}
-		Matrix3x3 SMMatrixMultiply( const Matrix3x3& l,  const Matrix3x3& r)
+        CMatrix3x3 SMMatrixMultiply(CMatrix3x3 const &aLHS,CMatrix3x3 const &aRHS)
 		{
-			Matrix3x3 product;
+            CMatrix3x3 product;
 
-			__shirabe_math__matrix_multiply<Matrix3x3::value_type, 3, 3, 3>(l.const_ptr(), r.const_ptr(), product.ptr());
+            __shirabe_math__matrix_multiply<CMatrix3x3::value_type, 3, 3, 3>(aLHS.const_ptr(), aRHS.const_ptr(), product.ptr());
 
 			return product;
 		}
-		Matrix4x4 SMMatrixMultiply( const Matrix4x4& l,  const Matrix4x4& r)
+        CMatrix4x4 SMMatrixMultiply(CMatrix4x4 const &aLHS,CMatrix4x4 const &aRHS)
 		{
-			Matrix4x4 product;
+            CMatrix4x4 product;
 
-			__shirabe_math__matrix_multiply<Matrix4x4::value_type, 4, 4, 4>(l.const_ptr(), r.const_ptr(), product.ptr());
+            __shirabe_math__matrix_multiply<CMatrix4x4::value_type, 4, 4, 4>(aLHS.const_ptr(), aRHS.const_ptr(), product.ptr());
 
 			return product;
 		}

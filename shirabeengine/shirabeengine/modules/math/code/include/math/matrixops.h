@@ -1,159 +1,351 @@
 #ifndef __SHIRABE_SHIRABE_MATH_MATRIX_OPS_H__
 #define __SHIRABE_SHIRABE_MATH_MATRIX_OPS_H__
 
-#include "Platform/Platform.h"
+#include <stdint.h>
+#include <exception>
 
-namespace Engine {
-	namespace Math {
-		namespace PRIVATE {
+#include "platform/platform.h"
+#include "math/common.h"
 
-#if defined(PLATFORM_WINDOWS)
-#pragma warning(push)
-			// Disable C4244 for warnings on multiplication of size_t with float/double
-#pragma warning(disable:4244)
-#endif
-			// Implementations for the elemental row transformations.
+namespace Engine
+{
+    namespace Math
+    {
+        namespace PRIVATE
+        {
+
+            #if defined(PLATFORM_WINDOWS)
+            #pragma warning(push)
+                        // Disable C4244 for warnings on multiplication of uint64_t with float/double
+            #pragma warning(disable:4244)
+            #endif
+
+            // Implementations for the elemental row transformations.
 			//
 			// ElemT: Switch the i-th row with the j-th row
 			// ElemR: Add the a-fold of the j-th row to the i-th row.
 			// ElemS: Scale the i-th row by the factor lambda
 
+            /**
+             * Scale the row at 'aRowIndex' in 'aMatrix' by factor 'aScaleFactor'.
+             *   --> row[i] *= s;
+             *
+             * @param aMatrix
+             * @param aRowIndex
+             * @param aScaleFactor
+             * @param aOutInverse
+             */
+            template <uint64_t NRows, uint64_t NCols, typename TValue>
+            static void __shirabe_math__matrix_elemental_row_transform_S(
+                TValue       *aMatrix,
+                uint64_t      aRowIndex,
+                TValue const  aScaleFactor,
+                TValue       *aOutInverse = nullptr);
 
-			template <size_t rows, size_t cols, typename val_type>
-			// Multiply the i-th row with lambda
-			inline void __shirabe_math__matrix_elemental_row_transform_S(
-				val_type       *pMat,
-				size_t          i,
-				const val_type  lambda,
-				val_type       *pInv = NULL)
+            /**
+             * Add the 'aSourceRowIndex' scaled by 'aScaleFactor' to 'aTargetRowIndex'.
+             *   --> row[i] += row[j] * s.
+             *
+             * @param aMatrix
+             * @param aTargetRowIndex
+             * @param aSourceRowIndex
+             * @param aScaleFactor
+             * @param aOutInverse
+             */
+            template <uint64_t NRows, uint64_t NCols, typename TValue>
+            static void __shirabe_math__matrix_elemental_row_transform_R(
+                TValue       *aMatrix,
+                uint64_t      aTargetRowIndex,
+                uint64_t      aSourceRowIndex,
+                TValue const  aScaleFactor,
+                TValue       *aOutInverse = nullptr);
+
+            /**
+             * Switches the rows at 'aSourceRowIndex' and 'aTargetRowIndex'.
+             *   --> swap(row[i], row[j])
+             *
+             * @param aMatrix
+             * @param aSourceRowIndex
+             * @param aTargetRowIndex
+             */
+            template <uint64_t NRows, uint64_t NCols, typename TValue>
+            static void __shirabe_math__matrix_elemental_row_transform_T(
+                TValue   aMatrix,
+                uint64_t aSourceRowIndex,
+                uint64_t aTargetRowIndex);
+
+            /**
+             * Multiplies this m*s-matrix with another s*n-matrix passed.
+             * The multiplication will return a m*n-product-matrix.
+             *
+             * @param aLHS
+             * @param aRHS
+             * @param aInOutMultiplicationResult
+             */
+            template <typename TValue, uint64_t M, uint64_t S, uint64_t N>
+            static void __shirabe_math__matrix_multiply(
+                TValue const *aLHS,
+                TValue const *aRHS,
+                TValue       *aInOutMultiplicationResult);
+
+            /**
+             * Return a transposed copy of the matrix passed!
+             * The original matrix remains unchanged.
+             *
+             * @param aMatrix
+             * @param aInOutTransposedMatrix
+             */
+            template <uint64_t M, uint64_t N, typename TValue>
+            static void __shirabe_math__matrix_transpose(
+                TValue const *aMatrix,
+                TValue       *aInOutTransposedMatrix);
+
+            /**
+             * Get the minor in m_mat for the element a(i, j).
+             *
+             * @param aMatrix
+             * @param aRowCount
+             * @param aColumnCount
+             * @param aRowIndex
+             * @param aColumnIndex
+             * @param aOutMinor
+             * @param aOutMinorRowCount
+             * @param pOutMinorColumnCount
+             */
+            template <typename TValue>
+            static void __shirabe_math__matrix_get_minor(
+                TValue   const  *aMatrix,
+                uint64_t const   aRowCount,
+                uint64_t const   aColumnCount,
+                uint64_t const   aRowIndex,
+                uint64_t const   aColumnIndex,
+                TValue         **aOutMinor,
+                uint64_t        *aOutMinorRowCount,
+                uint64_t        *pOutMinorColumnCount);
+
+            /**
+             * Get the cofactor for the element a(i, j) of m_mat.
+             *
+             * @param aMatrix
+             * @param aRowCount
+             * @param aColumnCount
+             * @param aRowIndex
+             * @param aColumnIndex
+             * @param aOutCofactor
+             */
+            template <typename TValue>
+            static void __shirabe_math__matrix_get_cofactor(
+                TValue   const *aMatrix,
+                uint64_t const  aRowCount,
+                uint64_t const  aColumnCount,
+                uint64_t const  aRowIndex,
+                uint64_t const  aColumnIndex,
+                TValue         *aOutCofactor);
+
+            /**
+             * Get the cofactor matrix of m_mat.
+             *
+             * @param aMatrix
+             * @param aOutCofactorMatrix
+             */
+            template <typename TValue, uint64_t M, uint64_t N>
+            static void __shirabe_math__matrix_get_cofactor_matrix(
+                TValue const *aMatrix,
+                TValue       *aOutCofactorMatrix);
+
+
+            template <uint64_t m, uint64_t n, typename TValue>
+            // Apply the gauss-jordan-elimination-algorithm to m_mat.
+            //
+            // By default the algorithm returns the echelon form of the upper triangle matrix.
+            // To return the reduced echelon form set m_pivot to true.
+            //
+            // Optionally the parity caused by elemental row transforms can be returned.
+            // If a pointer is passed for m_inv, returning the inverse matrix of m_mat, m_pivot must be
+            // set to true, as well as a pointer passed for m_parity.
+            void __shirabe_math__matrix_gauss_jordan(
+                TValue *pMat,
+                bool      pivot   = false,
+                char     *pParity = nullptr,
+                TValue *pInv    = nullptr);
+
+            template <typename TValue>
+            // Determine the determinant of an arbitrary 3x3-matrix applying sarrus' rule.
+            void __shirabe_math__matrix_determinant_sarrus(
+                TValue const *pMat,
+                TValue       *pDet);
+
+            template<typename TValue>
+            // Determine the determinant of an arbitrary 2x2-matrix applying the fish rule.
+            static void __shirabe_math__matrix_determinant_fishrule(
+                TValue const *pMat,
+                TValue       *det);
+
+            template <typename TValue>
+            void __shirabe_math__matrix_determinant_leibnitz_laplace(
+                TValue const *pMat,
+                const uint64_t    m,
+                const uint64_t    n,
+                TValue       *pDet = nullptr);
+
+            template <uint64_t m, uint64_t n, typename TValue>
+            // Applies the gauss-jordan-elimination algorithm to this nxn-matrix to calulcate it's determinant.
+            void __shirabe_math__matrix_determinant_gauss_jordan(
+                TValue const *pMat,
+                TValue       *pDet);
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <uint64_t NRows, uint64_t NCols, typename TValue>
+            static void __shirabe_math__matrix_elemental_row_transform_S(
+                    TValue       *aMatrix,
+                    uint64_t      aRowIndex,
+                    TValue const  aScaleFactor,
+                    TValue       *aOutInverse)
 			{				
-				val_type *ptr       = pMat;
-				val_type *inv_ptr   = pInv;
-				size_t    byte_size = cols * sizeof(val_type);
-				size_t    i_off     = (i * cols);
+                TValue         *ptr       = aMatrix;
+                TValue         *inv_ptr   = aOutInverse;
+                uint64_t  const byte_size = NCols * sizeof(TValue);
+                uint64_t  const i_off     = (aRowIndex * NCols);
 				
-				for (size_t i = 0; i < rows; ++i) {
-					ptr[i_off + i] *= lambda;
-					if (inv_ptr != NULL)
-						inv_ptr[i_off + i] *= lambda;
+                for (uint64_t i = 0; i < NRows; ++i) {
+                    ptr[i_off + i] *= aScaleFactor;
+                    if (inv_ptr != nullptr)
+                        inv_ptr[i_off + i] *= aScaleFactor;
+				}
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <uint64_t NRows, uint64_t NCols, typename TValue>
+            static void __shirabe_math__matrix_elemental_row_transform_R(
+                    TValue       *aMatrix,
+                    uint64_t      aTargetRowIndex,
+                    uint64_t      aSourceRowIndex,
+                    TValue const  aScaleFactor,
+                    TValue       *aOutInverse)
+			{
+                TValue         *ptr    = aMatrix;
+                TValue        *inv_ptr = aOutInverse;
+                TValue         tmp     = 0;
+                uint64_t const i_off   = (aTargetRowIndex * NCols);
+                uint64_t const j_off   = (aSourceRowIndex * NCols);
+
+                for (uint64_t i = 0; i < NRows; ++i) {
+                    ptr[i_off + i] += (ptr[j_off + i] * aScaleFactor);
+                    if (inv_ptr != nullptr)
+                        inv_ptr[i_off + i] += (inv_ptr[j_off + i] * aScaleFactor);
 				}
 			}
+            //<-----------------------------------------------------------------------------
 
-			template <size_t rows, size_t cols, typename val_type>
-			// Add the a-fold of the j-th row to the i-th
-			inline void __shirabe_math__matrix_elemental_row_transform_R(
-				val_type       *pMat,
-				size_t          i,
-				size_t          j,
-				const val_type  a,
-				val_type       *pInv = NULL)
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <uint64_t NRows, uint64_t NCols, typename TValue>
+            static void __shirabe_math__matrix_elemental_row_transform_T(
+                    TValue   aMatrix,
+                    uint64_t aSourceRowIndex,
+                    uint64_t aTargetRowIndex)
 			{
-				val_type *ptr     = pMat;
-				val_type *inv_ptr = pInv;
-				val_type  tmp     = 0;
-				size_t    i_off   = (i * cols);
-				size_t    j_off   = (j * cols);
-
-				for (size_t i = 0; i < rows; ++i) {
-					ptr[i_off + i] += (ptr[j_off + i] * a);
-					if (inv_ptr != NULL)
-						inv_ptr[i_off + i] += (inv_ptr[j_off + i] * a);
-				}
-			}
-
-			template <size_t rows, size_t cols, typename val_type>
-			// Switch the i-th row with the j-th
-			inline void __shirabe_math__matrix_elemental_row_transform_T(
-				val_type *pMat, 
-				size_t    i,
-				size_t    j)
-			{
-				if (i == j)
+                if (aSourceRowIndex == aTargetRowIndex)
 					return;
 
-				val_type *ptr       = pMat;
-				size_t    byte_size = cols * sizeof(val_type);
-				size_t    i_off     = (i * cols);
-				size_t    j_off     = (j * cols);
-				val_type  tmp[cols];
+                TValue        *ptr        = aMatrix;
+                uint64_t const byte_size  = NCols * sizeof(TValue);
+                uint64_t const i_off      = (aSourceRowIndex * NCols);
+                uint64_t const j_off      = (aTargetRowIndex * NCols);
+                TValue         tmp[NCols] = {};
 
-				memcpy_s(tmp, byte_size, (ptr + i_off), byte_size);
-				memcpy_s((ptr + i_off), byte_size, (ptr + j_off), byte_size);
-				memcpy_s((ptr + j_off), byte_size, tmp, byte_size);
+                memcpy_s(tmp,            byte_size, (ptr + i_off), byte_size);
+                memcpy_s((ptr + i_off),  byte_size, (ptr + j_off), byte_size);
+                memcpy_s((ptr + j_off),  byte_size, tmp,           byte_size);
 			}
+            //<-----------------------------------------------------------------------------
 
-			template <typename val_type, size_t m, size_t s, size_t n>
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <typename TValue, uint64_t M, uint64_t S, uint64_t N>
 			// Multiplies this m*s-matrix with another s*n-matrix passed.
 			// The multiplication will return a m*n-product-matrix.
-			inline void __shirabe_math__matrix_multiply(
-				const val_type *l, 
-				const val_type *r, 
-				val_type       *productPtr)
+            static void __shirabe_math__matrix_multiply(
+                    TValue const *aLHS,
+                    TValue const *aRHS,
+                    TValue       *aInOutMultiplicationResult)
 			{
 				// Implement asserts!
 
 				// Get immediate matrix value storage pointers for both matrices.
-				const val_type *l_ptr = l;
-				const val_type *r_ptr = r;
+                TValue const *l_ptr = aLHS;
+                TValue const *r_ptr = aRHS;
 
 				// Get immediate matrix value storage pointer for the result matrix.
-				val_type *val_ptr     = NULL;
-				val_type *product_ptr = productPtr;
+                TValue *val_ptr     = nullptr;
+                TValue *product_ptr = aInOutMultiplicationResult;
 
 				// Algorithm:
 				// -> c[i, j] = a[i, s]*b[s, j]
 				// Since the matrix buffers are plain blocks of m*n*sizeof(value_type) bytes
 				// data access must be offset by using iteration indices!
 
-				for (size_t i = 0; i < m; ++i) {
-					for (size_t j = 0; j < n; ++j) {
-						val_ptr = (product_ptr + (i*n + j));
+                for (uint64_t i = 0; i < M; ++i) {
+                    for (uint64_t j = 0; j < N; ++j) {
+                        val_ptr = (product_ptr + ((i * N) + j));
 						*val_ptr = 0;
 
-						for (size_t sidx = 0; sidx < s; ++sidx)
-							*val_ptr += (l_ptr[i*s + sidx] * r_ptr[sidx*n + j]);
+                        for (uint64_t sidx = 0; sidx < S; ++sidx)
+                            *val_ptr += (l_ptr[(i * S) + sidx] * r_ptr[(sidx * N) + j]);
 					}
 				}
 
-				l_ptr = r_ptr = val_ptr = product_ptr = NULL;
+                l_ptr = r_ptr = val_ptr = product_ptr = nullptr;
 			}
+            //<-----------------------------------------------------------------------------
 
-			template <size_t m, size_t n, typename val_type>
-			// Return a transposed copy of the matrix passed!
-			// The original matrix remains unchanged.
-			inline void __shirabe_math__matrix_transpose(
-				const val_type *pMat, 
-				val_type       *transposedPtr)
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <uint64_t M, uint64_t N, typename TValue>
+            static void __shirabe_math__matrix_transpose(
+                    TValue const *aMatrix,
+                    TValue       *aInOutTransposedMatrix)
 			{
 				/* a11 a12 ... a1n      a11 a21 ... am1
 				*  a21 a22 ... a2n  ->  a12 a22 ... am2
 				*  ... ... ... ...      ... ... ... ...
 				*  am1 am2 ... amn      a1n a2n ... amn
 				*/
-				val_type *transpPtr = transposedPtr;
-				const val_type *ptr = pMat;
+                TValue       *transpPtr = aInOutTransposedMatrix;
+                TValue const *ptr       = aMatrix;
 
-				for (size_t i = 0; i < m; ++i) {
-					for (size_t j = 0; j < n; ++j) {
-						transpPtr[j*n + i] = ptr[j + i*n];
+                for (uint64_t i = 0; i < M; ++i) {
+                    for (uint64_t j = 0; j < N; ++j) {
+                        transpPtr[(j * N) + i] = ptr[j + (i * N)];
 					}
 				}
 			}
+            //<-----------------------------------------------------------------------------
 
-
-			template <typename val_type>
-			// Get the minor in m_mat for the element a(i, j).
-			inline void __shirabe_math__matrix_get_minor(
-				const val_type  *pMat,
-				const size_t     m,
-				const size_t     n,
-				const size_t     i,
-				const size_t     j,
-				val_type       **pMinor,
-				size_t          *pMinor_m,
-				size_t          *pMinor_n)
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <typename TValue>
+            static void __shirabe_math__matrix_get_minor(
+                    TValue   const  *aMatrix,
+                    uint64_t const   aRowCount,
+                    uint64_t const   aColumnCount,
+                    uint64_t const   aRowIndex,
+                    uint64_t const   aColumnIndex,
+                    TValue         **aOutMinor,
+                    uint64_t        *aOutMinorRowCount,
+                    uint64_t        *aOutMinorColumnCount)
 			{
-				if (m < 2 || n < 2)
+                if (aRowCount < 2 || aColumnCount < 2)
 					return;
 
 				/*
@@ -162,81 +354,103 @@ namespace Engine {
 				* am1 ... amn                             am2 ... amn
 				*/
 
-				if (*pMinor == NULL)
-					// Minor dimensionNb are each reduced by 1!
-					*pMinor = new val_type[(m - 1) * (n - 1)];
+                if (*aOutMinor == nullptr)
+                    throw std::exception(); //"No out pointer provided for calculation.");
 
-				*pMinor_m = m - 1;
-				*pMinor_n = n - 1;
+                *aOutMinorRowCount    = aRowCount    - 1;
+                *aOutMinorColumnCount = aColumnCount - 1;
 
-				size_t i_off = 0, j_off = 0;
+                uint64_t
+                        i_off = 0,
+                        j_off = 0;
 
-				for (size_t iidx = 0; iidx < m; ++iidx) {
-					if (iidx == i)
+                for (uint64_t iidx = 0; iidx < aRowCount; ++iidx) {
+                    if (iidx == aRowIndex)
 						continue;
 
-					i_off = (iidx + ((iidx > i)*(-1)));
+                    i_off = (iidx + ((iidx > aRowIndex) * (-1)));
 
-					for (size_t jidx = 0; jidx < n; ++jidx) {
-						if (jidx == j)
+                    for (uint64_t jidx = 0; jidx < aColumnCount; ++jidx) {
+                        if (jidx == aColumnIndex)
 							continue;
 
-						j_off = (jidx + ((jidx > j)*(-1)));
+                        j_off = (jidx + ((jidx > aColumnIndex) * (-1)));
 
-						(*pMinor)[i_off*(n - 1) + j_off] = pMat[iidx*n + jidx];
+                        (*aOutMinor)[(i_off * (aColumnCount - 1)) + j_off] = aMatrix[(iidx * aColumnCount) + jidx];
 					}
 				}
 			};
+            //<-----------------------------------------------------------------------------
 
-			template <typename val_type>
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <typename TValue>
 			// Get the cofactor for the element a(i, j) of m_mat.
-			inline void __shirabe_math__matrix_get_cofactor(
-				const val_type *pMat,
-				const size_t    m,
-				const size_t    n,
-				const size_t    i,
-				const size_t    j,
-				val_type       *pCofactor)
+            static void __shirabe_math__matrix_get_cofactor(
+                    TValue   const *aMatrix,
+                    uint64_t const  aRowCount,
+                    uint64_t const  aColumnCount,
+                    uint64_t const  aRowIndex,
+                    uint64_t const  aColumnIndex,
+                    TValue         *aOutCofactor)
 			{
-				val_type  det    = 0;
-				size_t    out_m  = 0, out_n = 0;
-				val_type *pMinor = NULL;
+                TValue   determinant      = 0;
+                uint64_t minorRowCount    = 0,
+                         minorColumnCount = 0;
+                TValue  *minorMatrix      = nullptr;
 
-				__shirabe_math__matrix_get_minor<val_type>(pMat, m, n, i, j, &pMinor, &out_m, &out_n);
+                __shirabe_math__matrix_get_minor<TValue>(
+                            aMatrix,
+                            aRowCount,
+                            aColumnCount,
+                            aRowIndex,
+                            aColumnIndex,
+                            &minorMatrix,
+                            &minorRowCount,
+                            &minorColumnCount);
 
-				if (out_m > 3)
-					__shirabe_math__matrix_determinant_leibnitz_laplace<val_type>(pMinor, m - 1, n - 1, &det);
+                if (minorRowCount > 3)
+                    __shirabe_math__matrix_determinant_leibnitz_laplace<TValue>(
+                                minorMatrix,
+                                minorRowCount,
+                                minorColumnCount,
+                                &determinant);
 				else
-					__shirabe_math__matrix_determinant_sarrus<val_type>(pMinor, &det);
+                    __shirabe_math__matrix_determinant_sarrus<TValue>(minorMatrix, &determinant);
 
-				//__shirabe_math__matrix_determinant_gauss_jordan<_m - 1, m_n - 1, val_type>(minor, &det);
+                //__shirabe_math__matrix_determinant_gauss_jordan<_m - 1, m_n - 1, TValue>(minor, &det);
 
-				*pCofactor = powf(-1, (i + j))*det;
+                *aOutCofactor = powf(-1, (aRowIndex + aColumnIndex)) * determinant;
 
 			};
+            //<-----------------------------------------------------------------------------
 
-			template <typename val_type, size_t m, size_t n>
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <typename TValue, uint64_t M, uint64_t N>
 			// Get the cofactor matrix of m_mat.
-			inline void __shirabe_math__matrix_get_cofactor_matrix(
-				const val_type *pMat,
-				val_type       *pCofactor_mat)
+            static void __shirabe_math__matrix_get_cofactor_matrix(
+                    TValue const *aMatrix,
+                    TValue       *aOutCofactorMatrix)
 			{
-				val_type cofactor = 0;
+                TValue cofactor = 0;
 
-				if (pCofactor_mat == NULL)
-					pCofactor_mat = new val_type[m * n];
+                if (aOutCofactorMatrix == nullptr)
+                    throw std::exception();
 
-				for (size_t i = 0; i < m; ++i) {
-					for (size_t j = 0; j < n; ++j) {
-						__shirabe_math__matrix_get_cofactor<val_type>(pMat, m, n, i, j, &cofactor);
+                for (uint64_t i = 0; i < M; ++i) {
+                    for (uint64_t j = 0; j < N; ++j) {
+                        __shirabe_math__matrix_get_cofactor<TValue>(aMatrix, M, N, i, j, &cofactor);
 
-						pCofactor_mat[i*n + j] = cofactor;
+                        aOutCofactorMatrix[(i * N) + j] = cofactor;
 					}
 				}
 			};
 
 
-			template <size_t m, size_t n, typename val_type>
+            template <uint64_t m, uint64_t n, typename TValue>
 			// Apply the gauss-jordan-elimination-algorithm to m_mat.
 			//
 			// By default the algorithm returns the echelon form of the upper triangle matrix.
@@ -246,18 +460,18 @@ namespace Engine {
 			// If a pointer is passed for m_inv, returning the inverse matrix of m_mat, m_pivot must be 
 			// set to true, as well as a pointer passed for m_parity.
 			void __shirabe_math__matrix_gauss_jordan(
-				val_type *pMat, 
-				bool      pivot   = false,
-				char     *pParity = NULL, 
-				val_type *pInv    = NULL)
+                TValue *pMat,
+                bool      pivot,
+                char     *pParity,
+                TValue *pInv)
 			{
 				// ASSERTION REQUIRED
 
-				val_type *ptr = pMat, *a_ij = 0;
-				val_type *inv_ptr = pInv;
+                TValue *ptr = pMat, *a_ij = 0;
+                TValue *inv_ptr = pInv;
 
 				char parity = 1;
-				size_t row = 0;
+                uint64_t row = 0;
 
 				// Gauﬂ-Elimination Algorithm
 				//
@@ -271,7 +485,7 @@ namespace Engine {
 				// used to sufficiently apply the gauﬂ algorithm without 
 				// redundancies!
 				// The S-operation is optional depending on if pivotization is
-				// required or not. If not, only the rows below the non-normalized
+                // required or not. If not, only the NRows below the non-normalized
 				// pivot point will be set to 0 with the R-op putting the
 				// result matrix into the echelon form.
 				//
@@ -294,46 +508,46 @@ namespace Engine {
 				// but may not used for determinant-calculation!
 
 				// Process column by column
-				for (size_t j = 0; j < n; ++j) {
+                for (uint64_t j = 0; j < n; ++j) {
 					a_ij = (ptr + (row*n + j));
 
-					// Switch rows if a_ij is 0!
+                    // Switch NRows if a_ij is 0!
 					if (*a_ij == 0) {
-						bool null_row = true;
+                        bool nullptr_row = true;
 
 						// Find row to replace! If none is found, nothing happens an 
 						// the algorithm moves on with the next row.
-						for (size_t k = (row + 1); k < m; ++k) {
+                        for (uint64_t k = (row + 1); k < m; ++k) {
 							if (ptr[k*m + j] != 0)
 							{
-								__shirabe_math__matrix_elemental_row_transform_T<m, n, val_type>(pMat, row, k);
-								if (pInv != NULL)
-									__shirabe_math__matrix_elemental_row_transform_T<m, n, val_type>(pInv, row, k);
+                                __shirabe_math__matrix_elemental_row_transform_T<m, n, TValue>(pMat, row, k);
+                                if (pInv != nullptr)
+                                    __shirabe_math__matrix_elemental_row_transform_T<m, n, TValue>(pInv, row, k);
 
 								parity   = parity > 0 ? -1 : 1;
-								null_row = false;
+                                nullptr_row = false;
 								break;
 							}
 						}
 
-						row -= null_row;
+                        row -= nullptr_row;
 					}
 
 					// Pivotize a_ij
 					if (pivot) {
 						if (*a_ij != 0) {
 							// a_ij is pivot
-							__shirabe_math__matrix_elemental_row_transform_S<m, n, val_type>(pMat, row, (1.0f / (*a_ij)), pInv);
+                            __shirabe_math__matrix_elemental_row_transform_S<m, n, TValue>(pMat, row, (1.0f / (*a_ij)), pInv);
 						}
 					}
 
 					// For all i != j, make a_ij above and below pivot to become 0
-					for (size_t i = ((pivot) ? 0 : (row + 1)); i < m; ++i) {
+                    for (uint64_t i = ((pivot) ? 0 : (row + 1)); i < m; ++i) {
 						if (i == j)
 							continue;
 
 						if (ptr[i*n + j] != 0)
-							__shirabe_math__matrix_elemental_row_transform_R<m, n, val_type>(pMat, i, j, -(ptr[i*n + j] / ptr[row*n + j]), pInv);
+                            __shirabe_math__matrix_elemental_row_transform_R<m, n, TValue>(pMat, i, j, -(ptr[i*n + j] / ptr[row*n + j]), pInv);
 					}
 
 					++row;
@@ -342,11 +556,11 @@ namespace Engine {
 				*pParity = parity;
 			}
 
-			template<typename val_type>
+            template<typename TValue>
 			// Determine the determinant of an arbitrary 2x2-matrix applying the fish rule.
-			inline void __shirabe_math__matrix_determinant_fishrule(
-				const val_type *pMat, 
-				val_type       *det)
+            static void __shirabe_math__matrix_determinant_fishrule(
+                TValue const *pMat,
+                TValue       *det)
 			{
 				// Fischregel
 				// INSERT AASSERT!
@@ -354,20 +568,20 @@ namespace Engine {
 				*det = ((pMat[0] * pMat[3]) - (pMat[2] * pMat[1]));
 			}
 
-			template <typename val_type>
+            template <typename TValue>
 			// Determine the determinant of an arbitrary 3x3-matrix applying sarrus' rule.
-			inline void __shirabe_math__matrix_determinant_sarrus(
-				const val_type *pMat,
-				val_type       *pDet)
+            static void __shirabe_math__matrix_determinant_sarrus(
+                TValue const *pMat,
+                TValue       *pDet)
 			{
 				// Regel von Sarrus!
-				size_t col_off = 0;
-				val_type det = 0, tmp_pos = 0, tmp_neg = 0;
-				const val_type *ptr = pMat;
+                uint64_t col_off = 0;
+                TValue det = 0, tmp_pos = 0, tmp_neg = 0;
+                TValue const *ptr = pMat;
 
-				for (size_t j = 0; j < 3; ++j) {
+                for (uint64_t j = 0; j < 3; ++j) {
 					tmp_pos = tmp_neg = 1;
-					for (size_t i = 0; i < 3; ++i) {
+                    for (uint64_t i = 0; i < 3; ++i) {
 						col_off  = ((i + j) % 3);
 						tmp_pos *= ptr[i * 3 + col_off];
 						tmp_neg *= ptr[(3 - i - 1) * 3 + col_off];
@@ -378,54 +592,54 @@ namespace Engine {
 				*pDet = det;
 			}
 
-			template <size_t m, size_t n, typename val_type>
+            template <uint64_t m, uint64_t n, typename TValue>
 			// Applies the gauss-jordan-elimination algorithm to this nxn-matrix to calulcate it's determinant.
-			inline void __shirabe_math__matrix_determinant_gauss_jordan(
-				const val_type *pMat, 
-				val_type       *pDet)
+            static void __shirabe_math__matrix_determinant_gauss_jordan(
+                TValue const *pMat,
+                TValue       *pDet)
 			{
-				val_type det = 1;
+                TValue det = 1;
 
 				// container for triangle matrix!
-				val_type *tri = new val_type[m * n];
+                TValue *tri = new TValue[m * n];
 
-				size_t size = (m * n * sizeof(val_type));
+                uint64_t size = (m * n * sizeof(TValue));
 				memcpy_s(tri, size, pMat, size);
 
-				const val_type *ptr = NULL;
+                TValue const *ptr = nullptr;
 				char parity = 1;
 
-				__shirabe_math__matrix_gauss_jordan<m, n, val_type>(tri, false, &parity, NULL);
+                __shirabe_math__matrix_gauss_jordan<m, n, TValue>(tri, false, &parity, nullptr);
 
 				// Determinant is product of triangulated 
 				// matrix diagonal elements!
-				for (size_t i = 0; i < m; ++i)
+                for (uint64_t i = 0; i < m; ++i)
 					det *= tri[i * n + i];
 
 				delete[] tri;
-				tri = NULL;
+                tri = nullptr;
 
-				// Apply parity if rows had to be switched, 
+                // Apply parity if NRows had to be switched,
 				// since this inverts the sign.
 				*pDet = det * parity;
 			}
 
-			template <typename val_type>
-			inline void __shirabe_math__matrix_determinant_leibnitz_laplace(
-				const val_type *pMat,
-				const size_t    m,
-				const size_t    n,
-				val_type       *pDet = NULL)
+            template <typename TValue>
+            static void __shirabe_math__matrix_determinant_leibnitz_laplace(
+                TValue const *pMat,
+                const uint64_t    m,
+                const uint64_t    n,
+                TValue       *pDet)
 			{
 				if (!(pMat && pDet))
 					return;
 
-				val_type cofactor = 0;
+                TValue cofactor = 0;
 				*pDet = 0;
 
-				for (size_t j = 0; j < n; ++j) {
+                for (uint64_t j = 0; j < n; ++j) {
 					cofactor = 0;
-					__shirabe_math__matrix_get_cofactor<val_type>(pMat, m, n, 0, j, &cofactor);
+                    __shirabe_math__matrix_get_cofactor<TValue>(pMat, m, n, 0, j, &cofactor);
 					*pDet += (pMat[j] * cofactor);
 				}
 			};
