@@ -153,46 +153,72 @@ namespace Engine
                 TValue const *aMatrix,
                 TValue       *aOutCofactorMatrix);
 
-
+            /**
+             * Apply the gauss-jordan-elimination-algorithm to aMatrix.
+             * By default the algorithm returns the echelon form of the upper triangle matrix.
+             * Optionally the parity caused by elemental row transforms can be returned.
+             * If a pointer is passed for mInverse, returning the inverse matrix of aMatrix,
+             * aReducedEchelon must be set to true, as well as a pointer passed for aOutParity.
+             *
+             * @param aMatrix
+             * @param aReducedEchelon To return the reduced echelon form set aReducedEchelon. to true
+             * @param aOutParity
+             * @param aOutInverse
+             */
             template <uint64_t m, uint64_t n, typename TValue>
-            // Apply the gauss-jordan-elimination-algorithm to m_mat.
-            //
-            // By default the algorithm returns the echelon form of the upper triangle matrix.
-            // To return the reduced echelon form set m_pivot to true.
-            //
-            // Optionally the parity caused by elemental row transforms can be returned.
-            // If a pointer is passed for m_inv, returning the inverse matrix of m_mat, m_pivot must be
-            // set to true, as well as a pointer passed for m_parity.
-            void __shirabe_math__matrix_gauss_jordan(
-                TValue *pMat,
-                bool      pivot   = false,
-                char     *pParity = nullptr,
-                TValue *pInv    = nullptr);
+            static void __shirabe_math__matrix_gauss_jordan(
+                TValue *aMatrix,
+                bool    aReducedEchelon = false,
+                char   *aOutParity      = nullptr,
+                TValue *aOutInverse     = nullptr);
 
+            /**
+             * Determine the determinant of an arbitrary 3x3-matrix applying sarrus' rule.
+             *
+             * @param aMatrix
+             * @param aOutDeterminant
+             */
             template <typename TValue>
-            // Determine the determinant of an arbitrary 3x3-matrix applying sarrus' rule.
-            void __shirabe_math__matrix_determinant_sarrus(
-                TValue const *pMat,
-                TValue       *pDet);
+            static void __shirabe_math__matrix_determinant_sarrus(
+                TValue const *aMatrix,
+                TValue       *aOutDeterminant);
 
+            /**
+             * Determine the determinant of an arbitrary 2x2-matrix applying the fish rule.
+             *
+             * @param aMatrix
+             * @param aOutDeterminant
+             */
             template<typename TValue>
-            // Determine the determinant of an arbitrary 2x2-matrix applying the fish rule.
             static void __shirabe_math__matrix_determinant_fishrule(
-                TValue const *pMat,
-                TValue       *det);
+                TValue const *aMatrix,
+                TValue       *aOutDeterminant);
 
+            /**
+             * Applies the gauss-jordan-elimination algorithm to this nxn-matrix to calulcate it's determinant.
+             *
+             * @param aMatrix
+             * @param aOutDeterminant
+             */
+            template <uint64_t M, uint64_t N, typename TValue>
+            void __shirabe_math__matrix_determinant_gauss_jordan(
+                    TValue const *aMatrix,
+                    TValue       *aOutDeterminant);
+
+            /**
+             * Determine the determinant of an arbitrary MxN matrix using the leibnitz-laplace method.
+             *
+             * @param pMat
+             * @param m
+             * @param n
+             * @param pDet
+             */
             template <typename TValue>
             void __shirabe_math__matrix_determinant_leibnitz_laplace(
-                TValue const *pMat,
-                const uint64_t    m,
-                const uint64_t    n,
-                TValue       *pDet = nullptr);
-
-            template <uint64_t m, uint64_t n, typename TValue>
-            // Applies the gauss-jordan-elimination algorithm to this nxn-matrix to calulcate it's determinant.
-            void __shirabe_math__matrix_determinant_gauss_jordan(
-                TValue const *pMat,
-                TValue       *pDet);
+                TValue   const *aMatrix,
+                uint64_t const  aRowCount,
+                uint64_t const  aColumnCount,
+                TValue         *aOutDeterminant = nullptr);
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -448,30 +474,25 @@ namespace Engine
 					}
 				}
 			};
+            //<-----------------------------------------------------------------------------
 
-
-            template <uint64_t m, uint64_t n, typename TValue>
-			// Apply the gauss-jordan-elimination-algorithm to m_mat.
-			//
-			// By default the algorithm returns the echelon form of the upper triangle matrix.
-			// To return the reduced echelon form set m_pivot to true.
-			//
-			// Optionally the parity caused by elemental row transforms can be returned.
-			// If a pointer is passed for m_inv, returning the inverse matrix of m_mat, m_pivot must be 
-			// set to true, as well as a pointer passed for m_parity.
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <uint64_t M, uint64_t N, typename TValue>
 			void __shirabe_math__matrix_gauss_jordan(
-                TValue *pMat,
-                bool      pivot,
-                char     *pParity,
-                TValue *pInv)
+                    TValue *aMatrix,
+                    bool    aReducedEchelon,
+                    char   *aOutParity,
+                    TValue *aOutInverse)
 			{
 				// ASSERTION REQUIRED
 
-                TValue *ptr = pMat, *a_ij = 0;
-                TValue *inv_ptr = pInv;
+                TValue *ptr     = aMatrix, *a_ij = 0;
+                TValue *inv_ptr = aOutInverse;
 
-				char parity = 1;
-                uint64_t row = 0;
+                char     parity = 1;
+                uint64_t row    = 0;
 
 				// Gauﬂ-Elimination Algorithm
 				//
@@ -508,23 +529,27 @@ namespace Engine
 				// but may not used for determinant-calculation!
 
 				// Process column by column
-                for (uint64_t j = 0; j < n; ++j) {
-					a_ij = (ptr + (row*n + j));
+                for (uint64_t j = 0; j < N; ++j)
+                {
+                    a_ij = (ptr + ((row * N) + j));
 
                     // Switch NRows if a_ij is 0!
-					if (*a_ij == 0) {
+                    if (*a_ij == 0)
+                    {
                         bool nullptr_row = true;
 
 						// Find row to replace! If none is found, nothing happens an 
 						// the algorithm moves on with the next row.
-                        for (uint64_t k = (row + 1); k < m; ++k) {
-							if (ptr[k*m + j] != 0)
+                        for (uint64_t k = (row + 1); k < M; ++k)
+                        {
+                            if (ptr[(k * M) + j] != 0)
 							{
-                                __shirabe_math__matrix_elemental_row_transform_T<m, n, TValue>(pMat, row, k);
-                                if (pInv != nullptr)
-                                    __shirabe_math__matrix_elemental_row_transform_T<m, n, TValue>(pInv, row, k);
+                                __shirabe_math__matrix_elemental_row_transform_T<M, N, TValue>(aMatrix, row, k);
 
-								parity   = parity > 0 ? -1 : 1;
+                                if (aOutInverse != nullptr)
+                                    __shirabe_math__matrix_elemental_row_transform_T<M, N, TValue>(aOutInverse, row, k);
+
+                                parity      = parity > 0 ? -1 : 1;
                                 nullptr_row = false;
 								break;
 							}
@@ -534,113 +559,140 @@ namespace Engine
 					}
 
 					// Pivotize a_ij
-					if (pivot) {
-						if (*a_ij != 0) {
+                    if (aReducedEchelon)
+                    {
+                        if (*a_ij != 0)
+                        {
 							// a_ij is pivot
-                            __shirabe_math__matrix_elemental_row_transform_S<m, n, TValue>(pMat, row, (1.0f / (*a_ij)), pInv);
+                            TValue const scaleFactor = (1.0f / (*a_ij));
+                            __shirabe_math__matrix_elemental_row_transform_S<M, N, TValue>(aMatrix, row, scaleFactor, aOutInverse);
 						}
 					}
 
 					// For all i != j, make a_ij above and below pivot to become 0
-                    for (uint64_t i = ((pivot) ? 0 : (row + 1)); i < m; ++i) {
+                    uint64_t initialIndex = ((aReducedEchelon) ? 0 : (row + 1));
+                    for (uint64_t i = initialIndex; i < M; ++i)
+                    {
 						if (i == j)
 							continue;
 
-						if (ptr[i*n + j] != 0)
-                            __shirabe_math__matrix_elemental_row_transform_R<m, n, TValue>(pMat, i, j, -(ptr[i*n + j] / ptr[row*n + j]), pInv);
+                        TValue const scaleFactor = -(ptr[(i * N) + j] / ptr[(row * N) + j]);
+                        if (ptr[(i * N) + j] != 0)
+                            __shirabe_math__matrix_elemental_row_transform_R<M, N, TValue>(aMatrix, i, j, scaleFactor, aOutInverse);
 					}
 
 					++row;
 				}
 
-				*pParity = parity;
+                *aOutParity = parity;
 			}
+            //<-----------------------------------------------------------------------------
 
-            template<typename TValue>
-			// Determine the determinant of an arbitrary 2x2-matrix applying the fish rule.
-            static void __shirabe_math__matrix_determinant_fishrule(
-                TValue const *pMat,
-                TValue       *det)
-			{
-				// Fischregel
-				// INSERT AASSERT!
-
-				*det = ((pMat[0] * pMat[3]) - (pMat[2] * pMat[1]));
-			}
-
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
             template <typename TValue>
-			// Determine the determinant of an arbitrary 3x3-matrix applying sarrus' rule.
-            static void __shirabe_math__matrix_determinant_sarrus(
-                TValue const *pMat,
-                TValue       *pDet)
+            void __shirabe_math__matrix_determinant_sarrus(
+                    TValue const *aMatrix,
+                    TValue       *aOutDeterminant)
 			{
 				// Regel von Sarrus!
                 uint64_t col_off = 0;
-                TValue det = 0, tmp_pos = 0, tmp_neg = 0;
-                TValue const *ptr = pMat;
+                TValue
+                        det     = 0,
+                        tmp_pos = 0,
+                        tmp_neg = 0;
+                TValue const
+                        *ptr = aMatrix;
 
-                for (uint64_t j = 0; j < 3; ++j) {
+                for (uint64_t j = 0; j < 3; ++j)
+                {
 					tmp_pos = tmp_neg = 1;
-                    for (uint64_t i = 0; i < 3; ++i) {
+                    for (uint64_t i = 0; i < 3; ++i)
+                    {
 						col_off  = ((i + j) % 3);
-						tmp_pos *= ptr[i * 3 + col_off];
-						tmp_neg *= ptr[(3 - i - 1) * 3 + col_off];
+                        tmp_pos *= ptr[(i * 3) + col_off];
+                        tmp_neg *= ptr[((3 - i - 1) * 3) + col_off];
 					}
+
 					det += tmp_pos - tmp_neg;
 				}
 
-				*pDet = det;
+                *aOutDeterminant = det;
 			}
+            //<-----------------------------------------------------------------------------
 
-            template <uint64_t m, uint64_t n, typename TValue>
-			// Applies the gauss-jordan-elimination algorithm to this nxn-matrix to calulcate it's determinant.
-            static void __shirabe_math__matrix_determinant_gauss_jordan(
-                TValue const *pMat,
-                TValue       *pDet)
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template<typename TValue>
+            void __shirabe_math__matrix_determinant_fishrule(
+                    TValue const *aMatrix,
+                    TValue       *aOutDeterminant)
+            {
+                // Fischregel
+                *aOutDeterminant = ((aMatrix[0] * aMatrix[3]) - (aMatrix[2] * aMatrix[1]));
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            template <uint64_t M, uint64_t N, typename TValue>
+            void __shirabe_math__matrix_determinant_gauss_jordan(
+                TValue const *aMatrix,
+                TValue       *aOutDeterminant)
 			{
                 TValue det = 1;
 
 				// container for triangle matrix!
-                TValue *tri = new TValue[m * n];
+                TValue *tri = new TValue[M * N];
 
-                uint64_t size = (m * n * sizeof(TValue));
-				memcpy_s(tri, size, pMat, size);
+                uint64_t const size = (M * N * sizeof(TValue));
+                memcpy_s(tri, size, aMatrix, size);
 
-                TValue const *ptr = nullptr;
-				char parity = 1;
+                TValue const *ptr    = nullptr;
+                char          parity = 1;
 
-                __shirabe_math__matrix_gauss_jordan<m, n, TValue>(tri, false, &parity, nullptr);
+                __shirabe_math__matrix_gauss_jordan<M, N, TValue>(tri, false, &parity, nullptr);
 
 				// Determinant is product of triangulated 
 				// matrix diagonal elements!
-                for (uint64_t i = 0; i < m; ++i)
-					det *= tri[i * n + i];
+                for (uint64_t i = 0; i < M; ++i)
+                    det *= tri[(i * N) + i];
 
 				delete[] tri;
                 tri = nullptr;
 
                 // Apply parity if NRows had to be switched,
 				// since this inverts the sign.
-				*pDet = det * parity;
+                *aOutDeterminant = (det * parity);
 			}
+            //<-----------------------------------------------------------------------------
 
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
             template <typename TValue>
-            static void __shirabe_math__matrix_determinant_leibnitz_laplace(
-                TValue const *pMat,
-                const uint64_t    m,
-                const uint64_t    n,
-                TValue       *pDet)
+            void __shirabe_math__matrix_determinant_leibnitz_laplace(
+                    TValue   const *aMatrix,
+                    uint64_t const  aRowCount,
+                    uint64_t const  aColumnCount,
+                    TValue         *aOutDeterminant)
 			{
-				if (!(pMat && pDet))
+                if (!(aMatrix && aOutDeterminant))
 					return;
 
                 TValue cofactor = 0;
-				*pDet = 0;
 
-                for (uint64_t j = 0; j < n; ++j) {
+                *aOutDeterminant = 0;
+
+                for (uint64_t j = 0; j < aColumnCount; ++j)
+                {
 					cofactor = 0;
-                    __shirabe_math__matrix_get_cofactor<TValue>(pMat, m, n, 0, j, &cofactor);
-					*pDet += (pMat[j] * cofactor);
+
+                    __shirabe_math__matrix_get_cofactor<TValue>(aMatrix, aRowCount, aColumnCount, 0, j, &cofactor);
+                    *aOutDeterminant += (aMatrix[j] * cofactor);
 				}
 			};
 

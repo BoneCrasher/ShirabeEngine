@@ -926,23 +926,14 @@ namespace Engine
             }
         
         template <typename T>
-            CVectorImpl<T, 4>::CVectorImpl(CVectorImpl<T, 2>
-                                           const&v,
-                                           T const&z,
-                                           T
-                                           const&w)
-                : CField<T, sizeof(T), 4, 1>({
-                                                 v.
-                        
-                                                      x(), v
-                        
-                                                     .
-                            
-                                                         y(), z, w
-                    
-                                             })
-            {
-            }
+        CVectorImpl<T, 4>::CVectorImpl(CVectorImpl<T, 2>
+                                       const&v,
+                                       T const&z,
+                                       T
+                                       const&w)
+            : CField<T, sizeof(T), 4, 1>({ v.x(), v.y(), z, w })
+        {
+        }
         
         template <typename T>
             CVectorImpl<T, 4>::CVectorImpl(CVectorImpl<T, 3>
@@ -977,25 +968,25 @@ namespace Engine
         template <typename T>
             void CVectorImpl<T, 4>::x(value_type const&val)
             {
-                this->m_field[ 0 ] = val;
+                this->mField[ 0 ] = val;
             }
         
         template <typename T>
             void CVectorImpl<T, 4>::y(value_type const&val)
             {
-                this->m_field[ 1 ] = val;
+                this->mField[ 1 ] = val;
             }
         
         template <typename T>
             void CVectorImpl<T, 4>::z(value_type const&val)
             {
-                this->m_field[ 2 ] = val;
+                this->mField[ 2 ] = val;
             }
         
         template <typename T>
             void CVectorImpl<T, 4>::w(value_type const&val)
             {
-                this->m_field[ 3 ] = val;
+                this->mField[ 3 ] = val;
             }
         
         template <typename T>
