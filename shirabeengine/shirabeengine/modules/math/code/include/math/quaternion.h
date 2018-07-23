@@ -1,16 +1,18 @@
-#ifndef __SHIRABE_QUATERNION_H__
-#define __SHIRABE_QUATERNION_H__
+#ifndef __SHIRABE_CQuaternion_H__
+#define __SHIRABE_CQuaternion_H__
 
-#include "Math/Vector.h"
-#include "Math/AxisAngle.h"
-#include "Math/Matrix.h"
+#include "math/vector.h"
+#include "math/axisangle.h"
+#include "math/matrix.h"
 
-namespace Engine {
-	namespace Math {
+namespace Engine
+{
+    namespace Math
+    {
 
 		//
-		// The set of quaternions is also known as the ring of Hamiltonian
-		// quaternions, denoted by "H".
+        // The set of CQuaternions is also known as the ring of Hamiltonian
+        // CQuaternions, denoted by "H".
 		//
 		// An element of "H" is a 4 element vector:
 		//
@@ -29,67 +31,84 @@ namespace Engine {
 		//   ki  = -ik = j
 		//
 
-		class Quaternion
-			: public Vector4D
+        class CQuaternion
+            : public CVector4D_t
 		{
 			
 		public:
-			Quaternion();
-			Quaternion(const Quaternion&);
-			Quaternion(value_type w, const Vector3D&); 
-			Quaternion(const AxisAngle&);
-			Quaternion(value_type w, value_type x, value_type y, value_type z);
-			~Quaternion();
+            CQuaternion();
+            CQuaternion(CQuaternion const &aOther);
+            CQuaternion(
+                    value_type  const &aPhi,
+                    CVector3D_t const &aAxis);
+            CQuaternion(CAxisAngle const &aAxisAngle);
+            CQuaternion(
+                    value_type const &aPhi,
+                    value_type const &aAxisX,
+                    value_type const &aAxisY,
+                    value_type const &aAxisZ);
+            virtual ~CQuaternion() final;
       
-			inline const Vector3D vector() const {
-        return Vector3D({ x(), y(), z() });
+            inline const CVector3D_t vector() const
+            {
+                return CVector3D_t({ x(), y(), z() });
 			}
 
-			inline const value_type scalar() const {
+            inline const value_type scalar() const
+            {
 				return w();
 			}
 
-			Quaternion& operator+=(const Quaternion& other);
-			Quaternion& operator-=(const Quaternion& other);
-			Quaternion& operator*=(const value_type& other);
-			Quaternion& operator*=(const Quaternion& other);
-			Quaternion& operator/=(const value_type& other);
+            CQuaternion& operator+=(CQuaternion const &aOther);
+            CQuaternion& operator-=(CQuaternion const &aOther);
+            CQuaternion& operator*=(value_type  const &aOther);
+            CQuaternion& operator*=(CQuaternion const &aOther);
+            CQuaternion& operator/=(value_type  const &aOther);
 
-			value_type magnitude() const;
-			Quaternion conjugate() const;
-			Quaternion inverse()   const;
-			Quaternion normalize() const;
+            value_type  magnitude() const;
+            CQuaternion conjugate() const;
+            CQuaternion inverse()   const;
+            CQuaternion normalize() const;
 
-			static value_type rotationAngle(const Quaternion& q);
-			static Vector3D   rotationAxis(const Quaternion& q);
+            static value_type  rotationAngle(CQuaternion const &aQuaternion);
+            static CVector3D_t rotationAxis(CQuaternion const &aQuaternion);
 
-			static Quaternion quaternionFromEuler(const value_type& x,
-												  const value_type& y,
-												  const value_type& z);
-			static Quaternion quaternionFromRotationMatrix(const Matrix4x4& m);
-			static Quaternion quaternionFromAxisAngle(const Vector3D& axis, 
-													  const value_type& phi);
+            static CQuaternion CQuaternionFromEuler(
+                    value_type const &aX,
+                    value_type const &aY,
+                    value_type const &aZ);
 
-			static Vector4D  axisAngleFromQuaternion(const Quaternion& q);
-			static Vector3D  eulerFromQuaternion(const Quaternion& q);
-			static Matrix4x4 rotationMatrixFromQuaternion(const Quaternion& q);
+            static CQuaternion CQuaternionFromRotationMatrix(
+                    CMatrix4x4 const &aMatrix);
+
+            static CQuaternion CQuaternionFromAxisAngle(
+                    CVector3D_t const &aAxis,
+                    value_type  const &aPhi);
+
+            static CVector4D_t axisAngleFromCQuaternion(CQuaternion const &aQuaternion);
+            static CVector3D_t eulerFromCQuaternion(CQuaternion const &aQuaternion);
+            static CMatrix4x4  rotationMatrixFromCQuaternion(CQuaternion const &aQuaternion);
 
 		private:
-			void assign(value_type w, value_type x, value_type y, value_type z);
-			void assign(const Quaternion& r);
+            void assign(
+                    value_type const &aPhi,
+                    value_type const &aAxisX,
+                    value_type const &aAxisY,
+                    value_type const &aAxisZ);
+            void assign(CQuaternion const &aOther);
 		};
 
-		Quaternion rotate(const Quaternion& l, const Quaternion& r);
-		Vector3D   rotate(const Quaternion& l, const Vector3D&   r);
+        CQuaternion  rotate(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS);
+        CVector3D_t  rotate(CQuaternion const &aQuaternion, CVector3D_t const &aVector);
 
-		Quaternion operator+(const Quaternion& q,  const Quaternion& other);
-		Quaternion operator-(const Quaternion& q,  const Quaternion& other);
-		Quaternion operator*(const Quaternion& q,  const Quaternion::value_type& factor);
-		Quaternion operator*(const Quaternion::value_type& factor, const Quaternion& q);
-		Quaternion operator*(const Quaternion& q,  const Vector3D& vec);
-		Quaternion operator*(const Vector3D& vec,  const Quaternion& q);
-		Quaternion operator*(const Quaternion& q,  const Quaternion& other);
-		Quaternion operator/(const Quaternion& q,  const Quaternion::value_type& factor);
+        CQuaternion operator+(CQuaternion const &aQuaternion,         CQuaternion const &aOther);
+        CQuaternion operator-(CQuaternion const &aQuaternion,         CQuaternion const &aOther);
+        CQuaternion operator*(CQuaternion const &aQuaternion,         CQuaternion::value_type const& aFactor);
+        CQuaternion operator*(CQuaternion::value_type const& aFactor, CQuaternion const &aQuaternion);
+        CQuaternion operator*(CQuaternion const &aQuaternion,         CVector3D_t const &aVector);
+        CQuaternion operator*(CVector3D_t const &aVector,             CQuaternion const &aQuaternion);
+        CQuaternion operator*(CQuaternion const &aQuaternion,         CQuaternion const &aOther);
+        CQuaternion operator/(CQuaternion const &aQuaternion,         CQuaternion::value_type const&aFactor);
 	}
 }
 

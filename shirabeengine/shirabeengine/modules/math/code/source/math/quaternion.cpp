@@ -1,114 +1,145 @@
-#include "Math/Quaternion.h"
+#include "math/quaternion.h"
+#include "math/common.h"
 
-#include "Math/Common.h"
+namespace Engine
+{
+  namespace Math
+  {
 
-namespace Engine {
-  namespace Math {
-
-    Quaternion::Quaternion()
-      : Vector4D({ 0, 0, 0, 0 })
+    CQuaternion::CQuaternion()
+        : CVector4D_t({ 0, 0, 0, 0 })
     {
     }
 
-    Quaternion::Quaternion(const Quaternion& other)
-      : Vector4D(other)
+    CQuaternion::CQuaternion(const CQuaternion& aOther)
+        : CVector4D_t(aOther)
     {
     }
 
-    Quaternion::Quaternion(const AxisAngle& other)
-      : Quaternion(Quaternion::quaternionFromAxisAngle(other.axis(), other.phi()))
+    CQuaternion::CQuaternion(const CAxisAngle& aAxisAngle)
+        : CQuaternion(CQuaternion::CQuaternionFromAxisAngle(aAxisAngle.axis(), aAxisAngle.phi()))
     {}
 
-    Quaternion::Quaternion(value_type w, const Vector3D& vec)
-      : Vector4D({ w, vec.x(), vec.y(), vec.z() })
+    CQuaternion::CQuaternion(
+            value_type  const &aPhi,
+            CVector3D_t const &aAxis)
+        : CVector4D_t({ aPhi, aAxis.x(), aAxis.y(), aAxis.z() })
     {
     }
 
-    Quaternion::Quaternion(value_type w, value_type x, value_type y, value_type z)
-      : Vector4D({ w, x, y, z })
+    CQuaternion::CQuaternion(
+            value_type const &aPhi,
+            value_type const &aAxisX,
+            value_type const &aAxisY,
+            value_type const &aAxisZ)
+        : CVector4D_t({ aPhi, aAxisX, aAxisY, aAxisZ })
     {
     }
 
-    Quaternion::~Quaternion() { }
+    CQuaternion::~CQuaternion() { }
 
-    void Quaternion::assign(value_type w, value_type x, value_type y, value_type z) {
-      this->w(w);
-      this->x(x);
-      this->y(y);
-      this->z(z);
+    void CQuaternion::assign(
+            value_type const &aPhi,
+            value_type const &aAxisX,
+            value_type const &aAxisY,
+            value_type const &aAxisZ)
+    {
+        this->w(aPhi);
+        this->x(aAxisX);
+        this->y(aAxisY);
+        this->z(aAxisZ);
     }
 
-    void Quaternion::assign(const Quaternion& r) {
-      this->w(r.w());
-      this->x(r.x());
-      this->y(r.y());
-      this->z(r.z());
+    void CQuaternion::assign(const CQuaternion& aOther)
+    {
+        this->w(aOther.w());
+        this->x(aOther.x());
+        this->y(aOther.y());
+        this->z(aOther.z());
     }
 
-    Quaternion& Quaternion::operator+=(const Quaternion& other) {
-      this->w(w() + other.w());
-      this->x(x() + other.x());
-      this->y(y() + other.y());
-      this->z(z() + other.z());
+    CQuaternion& CQuaternion::operator+=(CQuaternion const &aOther)
+    {
+        this->w(w() + aOther.w());
+        this->x(x() + aOther.x());
+        this->y(y() + aOther.y());
+        this->z(z() + aOther.z());
+
+        return *this;
+    }
+
+    CQuaternion& CQuaternion::operator-=(CQuaternion const &aOther)
+    {
+        this->w(w() - aOther.w());
+        this->x(x() - aOther.x());
+        this->y(y() - aOther.y());
+        this->z(z() - aOther.z());
+
+        return *this;
+    }
+
+    CQuaternion& CQuaternion::operator*=(value_type const &aFactor)
+    {
+        this->w(w() * aFactor);
+        this->x(x() * aFactor);
+        this->y(y() * aFactor);
+        this->z(z() * aFactor);
+
+        return *this;
+    }
+
+    CQuaternion& CQuaternion::operator*=(CQuaternion const &aOther)
+    {
+        value_type  const phiProduct        = (this->w() * aOther.w());
+        value_type  const axisDotProduct    = dot(this->vector(), aOther.vector());
+
+        CVector3D_t const scaledThisVector  = this->vector() * aOther.w();
+        CVector3D_t const scaledOtherVecotr = this->w()      * aOther.vector();
+        CVector3D_t const crossVector       = cross(this->vector(), aOther.vector());
+
+        value_type  const scale  = (phiProduct - axisDotProduct);
+        CVector3D_t const vector = (scaledThisVector + scaledOtherVecotr) + crossVector;
+
+        assign(scale, vector.x(), vector.y(), vector.z());
 
       return *this;
     }
 
-    Quaternion& Quaternion::operator-=(const Quaternion& other) {
-      this->w(w() - other.w());
-      this->x(x() - other.x());
-      this->y(y() - other.y());
-      this->z(z() - other.z());
-
-      return *this;
-    }
-
-    Quaternion& Quaternion::operator*=(const value_type& factor) {
-      this->w(w() * factor);
-      this->x(x() * factor);
-      this->y(y() * factor);
-      this->z(z() * factor);
-
-      return *this;
-    }
-
-    Quaternion& Quaternion::operator*=(const Quaternion& other) {
-      value_type   scl = (this->w()*other.w() - dot(this->vector(), other.vector()));
-      Vector3D vec = (this->w()*other.vector()) + (other.w()*this->vector()) + cross(this->vector(), other.vector());
-
-      assign(scl, vec.x(), vec.y(), vec.z());
-
-      return *this;
-    }
-
-    Quaternion& Quaternion::operator/=(const value_type& factor) {
-      if(fabs(factor) > 0.00001) {
-        this->w(w() / factor);
-        this->x(x() / factor);
-        this->y(y() / factor);
-        this->z(z() / factor);
+    CQuaternion& CQuaternion::operator/=(value_type const &aFactor)
+    {
+      if(fabs(aFactor) > 0.00001f)
+      {
+        this->w(w() / aFactor);
+        this->x(x() / aFactor);
+        this->y(y() / aFactor);
+        this->z(z() / aFactor);
       }
 
-      return *this;
+      return (*this);
     }
 
-    Quaternion::value_type Quaternion::magnitude() const {
+    CQuaternion::value_type CQuaternion::magnitude() const
+    {
       return (value_type)sqrt(w()*w() + x()*x() + y()*y() + z()*z());
     }
 
-    Quaternion Quaternion::conjugate() const {
-      return Quaternion(w(), -x(), -y(), -z());
+    CQuaternion CQuaternion::conjugate() const
+    {
+      return CQuaternion(w(), -x(), -y(), -z());
     }
 
-    Quaternion Quaternion::inverse() const {
-      // Decays to inverse == conjugate if we deal with a unit quaternion.
-      value_type mag = magnitude();
+    CQuaternion CQuaternion::inverse() const
+    {
+      // Decays to inverse == conjugate if we deal with a unit CQuaternion.
+      value_type const mag = magnitude();
       return (conjugate() / (mag * mag));
     }
 
-    Quaternion Quaternion::normalize() const {
-      value_type N = magnitude();
-      return Quaternion(
+    CQuaternion CQuaternion::normalize() const
+    {
+      value_type const N = magnitude();
+
+      return CQuaternion(
         w() / N,
         x() / N,
         y() / N,
@@ -117,28 +148,32 @@ namespace Engine {
     }
 
 
-    Quaternion::value_type Quaternion::rotationAngle(const Quaternion& q) {
-      return (value_type)(2 * acos(q.w()));
+    CQuaternion::value_type CQuaternion::rotationAngle(CQuaternion const &aQuaternion)
+    {
+      return (value_type)(2 * acos(aQuaternion.w()));
     }
 
-    Vector3D Quaternion::rotationAxis(const Quaternion& q) {
+    CVector3D_t CQuaternion::rotationAxis(CQuaternion const &aQuaternion)
+    {
       // Threshold to allow for rounding errors.
-      static const value_type TOLERANCE = 0.005f;
+      static constexpr value_type const TOLERANCE = 0.005f;
 
-      Vector3D v = q.vector();
-      value_type   m = v.length();
+      CVector3D_t const vector = aQuaternion.vector();
+      value_type  const m      = vector.length();
 
       if(m <= TOLERANCE) {
-        return Vector3D();
+        return CVector3D_t();
       }
       else {
-        return (v / m);
+        return (vector / m);
       }
     }
 
-    Quaternion Quaternion::quaternionFromEuler(const value_type& x,
-      const value_type& y,
-      const value_type& z) {
+    CQuaternion CQuaternion::CQuaternionFromEuler(
+            value_type const &aX,
+            value_type const &aY,
+            value_type const &aZ)
+    {
       // 
       // q_roll  = [cos(phi/2), (sin(phi/2))i + 0j          + 0k         ]
       // q_pitch = [cos(tau/2), 0i            + sin(tau/2)j + 0k         ]
@@ -152,9 +187,9 @@ namespace Engine {
       //       { cos(phi/2)cos(tau/2)sin(psi/2) - sin(phi/2)sin(tau/2)cos(psi/2) }k ];
       //
 
-      value_type phi = x; // deg_to_rad(x);
-      value_type tau = y; // deg_to_rad(y);
-      value_type psi = z; // deg_to_rad(z);
+      value_type phi = aX; // deg_to_rad(x);
+      value_type tau = aY; // deg_to_rad(y);
+      value_type psi = aZ; // deg_to_rad(z);
 
       value_type cos_psi = cos(0.5f * psi);
       value_type cos_tau = cos(0.5f * tau);
@@ -168,7 +203,7 @@ namespace Engine {
       value_type cos_psi_sin_tau = (cos_psi * sin_tau);
       value_type sin_psi_cos_tau = (sin_psi * cos_tau);
 
-      return Quaternion(
+      return CQuaternion(
         ((cos_psi_cos_tau * cos_phi) + (sin_psi_sin_tau * sin_phi)),
         ((cos_psi_cos_tau * sin_phi) - (sin_psi_sin_tau * cos_phi)),
         ((cos_psi_sin_tau * cos_phi) + (sin_psi_cos_tau * sin_phi)),
@@ -176,10 +211,10 @@ namespace Engine {
       );
     }
 
-    Quaternion Quaternion::quaternionFromRotationMatrix(const Matrix4x4& m) {
-      value_type r00 = m.r00();
-      value_type r11 = m.r11();
-      value_type r22 = m.r22();
+    CQuaternion CQuaternion::CQuaternionFromRotationMatrix(CMatrix4x4 const &aMatrix) {
+      value_type r00 = aMatrix.r00();
+      value_type r11 = aMatrix.r11();
+      value_type r22 = aMatrix.r22();
 
       value_type q_w = 0.0f;
       value_type q_x = 0.0f;
@@ -188,103 +223,122 @@ namespace Engine {
 
       value_type trace = r00 + r11 + r22;
       if(trace > 0) {
-        value_type S = sqrtf(trace + 1.0f) * 2.0f; // S = 4qw
+        value_type const S = sqrtf(trace + 1.0f) * 2.0f; // S = 4qw
         q_w = (0.25f * S);
-        q_x = (m.r21() - m.r12()) / S;
-        q_y = (m.r02() - m.r20()) / S;
-        q_z = (m.r10() - m.r01()) / S;
+        q_x = (aMatrix.r21() - aMatrix.r12()) / S;
+        q_y = (aMatrix.r02() - aMatrix.r20()) / S;
+        q_z = (aMatrix.r10() - aMatrix.r01()) / S;
       }
       else if((r00 > r11) & (r00 > r22)) {
-        value_type S = sqrtf(1.0f + r00 - r11 - r22) * 2.0f; // S=4qx
-        q_w = (m.r21() - m.r12()) / S;
+        value_type const S = sqrtf(1.0f + r00 - r11 - r22) * 2.0f; // S=4qx
+        q_w = (aMatrix.r21() - aMatrix.r12()) / S;
         q_x = (0.25f * S);
-        q_y = (m.r01() + m.r10()) / S;
-        q_z = (m.r02() + m.r20()) / S;
+        q_y = (aMatrix.r01() + aMatrix.r10()) / S;
+        q_z = (aMatrix.r02() + aMatrix.r20()) / S;
       }
       else if(r11 > r22) {
-        value_type S = sqrtf(1.0f + r11 - r00 - r22) * 2.0f; // S = 4qy
-        q_w = (m.r02() - m.r20()) / S;
-        q_x = (m.r01() + m.r10()) / S;
+        value_type const S = sqrtf(1.0f + r11 - r00 - r22) * 2.0f; // S = 4qy
+        q_w = (aMatrix.r02() - aMatrix.r20()) / S;
+        q_x = (aMatrix.r01() + aMatrix.r10()) / S;
         q_y = (0.25f * S);
-        q_z = (m.r12() + m.r21()) / S;
+        q_z = (aMatrix.r12() + aMatrix.r21()) / S;
       }
       else {
-        value_type S = sqrtf(1.0f + r22 - r00 - r11) * 2.0f; // S = 4qz
-        q_w = (m.r10() - m.r01()) / S;
-        q_x = (m.r02() + m.r20()) / S;
-        q_y = (m.r12() + m.r21()) / S;
+        value_type const S = sqrtf(1.0f + r22 - r00 - r11) * 2.0f; // S = 4qz
+        q_w = (aMatrix.r10() - aMatrix.r01()) / S;
+        q_x = (aMatrix.r02() + aMatrix.r20()) / S;
+        q_y = (aMatrix.r12() + aMatrix.r21()) / S;
         q_z = (0.25f * S);
       }
 
-      return Quaternion(q_w, q_x, q_y, q_z);
+      return CQuaternion(q_w, q_x, q_y, q_z);
     }
 
-    Quaternion Quaternion::quaternionFromAxisAngle(const Vector3D& axis,
-      const value_type&   phi) {
-      value_type hsin = sinf(phi / 2.0f);
-      value_type hcos = cosf(phi / 2.0f);
-      return Quaternion(hcos,
-        axis.x() * hsin,
-        axis.y() * hsin,
-        axis.z() * hsin);
+    CQuaternion CQuaternion::CQuaternionFromAxisAngle(
+            CVector3D_t const &aAxis,
+            value_type  const &aPhi)
+    {
+        value_type const hsin = sinf(aPhi / 2.0f);
+        value_type const hcos = cosf(aPhi / 2.0f);
+        return CQuaternion(
+                    hcos,
+                    aAxis.x() * hsin,
+                    aAxis.y() * hsin,
+                    aAxis.z() * hsin);
     }
 
-    Vector3D Quaternion::eulerFromQuaternion(const Quaternion& q) {
-      Vector3D v;
+    CVector3D_t CQuaternion::eulerFromCQuaternion(CQuaternion const &aQuaternion)
+    {
+        CVector3D_t v {};
 
-      value_type q00sq = q.scalar()     * q.scalar();
-      value_type q11sq = q.vector().x() * q.vector().x();
-      value_type q22sq = q.vector().y() * q.vector().y();
-      value_type q33sq = q.vector().z() * q.vector().z();
+        value_type aQuaternion00saQuaternion = aQuaternion.scalar()     * aQuaternion.scalar();
+        value_type aQuaternion11saQuaternion = aQuaternion.vector().x() * aQuaternion.vector().x();
+        value_type aQuaternion22saQuaternion = aQuaternion.vector().y() * aQuaternion.vector().y();
+        value_type aQuaternion33saQuaternion = aQuaternion.vector().z() * aQuaternion.vector().z();
 
-      value_type r00 = q00sq + q11sq - q22sq - q33sq;
-      value_type r10 = 2 * (q.vector().x()*q.vector().y() + q.scalar()*q.vector().z());
-      value_type r20 = 2 * (q.vector().x()*q.vector().z() - q.scalar()*q.vector().y());
-      value_type r21 = 2 * (q.vector().y()*q.vector().z() + q.scalar()*q.vector().x());
-      value_type r22 = q00sq - q11sq - q22sq + q33sq;
+        value_type r00 = aQuaternion00saQuaternion + aQuaternion11saQuaternion
+                         - aQuaternion22saQuaternion - aQuaternion33saQuaternion;
+        value_type r10 = 2 * ((aQuaternion.vector().x() * aQuaternion.vector().y()) +
+                              (aQuaternion.scalar()     * aQuaternion.vector().z()));
+        value_type r20 = 2 * ((aQuaternion.vector().x() * aQuaternion.vector().z()) -
+                              (aQuaternion.scalar()     * aQuaternion.vector().y()));
+        value_type r21 = 2 * ((aQuaternion.vector().y() * aQuaternion.vector().z()) +
+                              (aQuaternion.scalar()     * aQuaternion.vector().x()));
+        value_type r22 = aQuaternion00saQuaternion - aQuaternion11saQuaternion
+                         - aQuaternion22saQuaternion + aQuaternion33saQuaternion;
 
-      value_type r01 = 0;
-      value_type r02 = 0;
+        value_type r01 = 0;
+        value_type r02 = 0;
 
-      value_type tmp = fabs(r20);
-      if(tmp > 0.999999) { // Test for pole singularities
-        r01 = 2 * (q.vector().x()*q.vector().y() - q.scalar()*q.vector().z());
-        r02 = 2 * (q.vector().x()*q.vector().z() + q.scalar()*q.vector().y());
+        value_type tmp = fabs(r20);
+        if(tmp > 0.999999)
+        {
+            // Test for pole singularities
+            r01 = 2 * ((aQuaternion.vector().x() * aQuaternion.vector().y()) -
+                       (aQuaternion.scalar()     * aQuaternion.vector().z()));
+            r02 = 2 * ((aQuaternion.vector().x() * aQuaternion.vector().z()) +
+                       (aQuaternion.scalar()     * aQuaternion.vector().y()));
 
-        v = Vector3D({
-          rad_to_deg(0.0f),                                   // phi
-          rad_to_deg((-((value_type)M_PI / 2.0f)*r20 / tmp)), // tau
-          rad_to_deg(atan2(-r01, -r20*r02))                   // psi
+            v = CVector3D_t(
+            {
+                rad_to_deg(0.0f),                                   // phi
+                rad_to_deg((-((value_type)M_PI / 2.0f)*r20 / tmp)), // tau
+                rad_to_deg(atan2(-r01, -r20*r02))                   // psi
             });
-      }
-      else {
-        v = Vector3D({
-          rad_to_deg(atan2(r21, r22)), // phi 
-          rad_to_deg(asin(-r20)),      // tau 
-          rad_to_deg(atan2(r10, r00))  // psi
-          });
-      }
+        }
+        else
+        {
+            v = CVector3D_t(
+            {
+                rad_to_deg(atan2(r21, r22)), // phi
+                rad_to_deg(asin(-r20)),      // tau
+                rad_to_deg(atan2(r10, r00))  // psi
+            });
+        }
 
-      return v;
+        return v;
     }
 
-    Matrix4x4 Quaternion::rotationMatrixFromQuaternion(const Quaternion& q) {
-      value_type r11 = 1 - (2 * q.y()*q.y()) - (2 * q.z()*q.z());
-      value_type r12 = (2 * q.x()*q.y()) - (2 * q.w()*q.z());
-      value_type r13 = (2 * q.x()*q.z()) + (2 * q.w()*q.y());
-      value_type r21 = (2 * q.x()*q.y()) + (2 * q.w()*q.z());
-      value_type r22 = 1 - (2 * q.x()*q.x()) - (2 * q.z()*q.z());
-      value_type r23 = (2 * q.y()*q.z()) - (2 * q.w()*q.x());
-      value_type r31 = (2 * q.x()*q.z()) - (2 * q.w()*q.y());
-      value_type r32 = (2 * q.y()*q.z()) + (2 * q.w()*q.x());
-      value_type r33 = 1 - (2 * q.x()*q.x()) - (2 * q.y()*q.y());
-      value_type r44 = 1.0;
+    CMatrix4x4 CQuaternion::rotationMatrixFromCQuaternion(CQuaternion const &aQuaternion)
+    {
+        value_type r11 = 1 - (2 * (aQuaternion.y() * aQuaternion.y())) - (2 * (aQuaternion.z() * aQuaternion.z()));
+        value_type r12 =     (2 * (aQuaternion.x() * aQuaternion.y())) - (2 * (aQuaternion.w() * aQuaternion.z()));
+        value_type r13 =     (2 * (aQuaternion.x() * aQuaternion.z())) + (2 * (aQuaternion.w() * aQuaternion.y()));
+        value_type r21 =     (2 * (aQuaternion.x() * aQuaternion.y())) + (2 * (aQuaternion.w() * aQuaternion.z()));
+        value_type r22 = 1 - (2 * (aQuaternion.x() * aQuaternion.x())) - (2 * (aQuaternion.z() * aQuaternion.z()));
+        value_type r23 =     (2 * (aQuaternion.y() * aQuaternion.z())) - (2 * (aQuaternion.w() * aQuaternion.x()));
+        value_type r31 =     (2 * (aQuaternion.x() * aQuaternion.z())) - (2 * (aQuaternion.w() * aQuaternion.y()));
+        value_type r32 =     (2 * (aQuaternion.y() * aQuaternion.z())) + (2 * (aQuaternion.w() * aQuaternion.x()));
+        value_type r33 = 1 - (2 * (aQuaternion.x() * aQuaternion.x())) - (2 * (aQuaternion.y() * aQuaternion.y()));
+        value_type r44 = 1.0;
 
-      return Matrix4x4({ r11, r12, r13, 0.0, r21, r22, r23, 0.0, r31, r32, r33, 0.0, 0.0, 0.0, 0.0, r44 });
+        return CMatrix4x4({ r11, r12, r13, 0.0, r21, r22, r23, 0.0, r31, r32, r33, 0.0, 0.0, 0.0, 0.0, r44 });
     }
 
-    Vector4D Quaternion::axisAngleFromQuaternion(const Quaternion& q) {
-      Quaternion p = q;
+    CVector4D_t CQuaternion::axisAngleFromCQuaternion(CQuaternion const &aQuaternion)
+    {
+      CQuaternion p = aQuaternion;
+
       if(p.scalar() > 1.0)
         p = p.normalize();
 
@@ -293,112 +347,137 @@ namespace Engine {
       value_type z = 0.0;
 
       value_type sqrtOneMinusScalarSq = sqrt(1 - p.scalar() * p.scalar());
-      if(sqrtOneMinusScalarSq < 0.001) {
+      if(sqrtOneMinusScalarSq < 0.001)
+      {
         x = p.x();
         y = p.y();
         z = p.z();
       }
-      else {
+      else
+      {
         x = p.x() / sqrtOneMinusScalarSq;
         y = p.y() / sqrtOneMinusScalarSq;
         z = p.z() / sqrtOneMinusScalarSq;
       }
 
-      return Vector4D(
-        {
-          x,
-          y,
-          z,
-          2.0f * acos(p.scalar())
-        });
+      return CVector4D_t(
+                {
+                  x,
+                  y,
+                  z,
+                  2.0f * acos(p.scalar())
+                });
     }
 
-    Quaternion rotate(const Quaternion& q,
-      const Quaternion& p) {
-      // This function assumes a unit quaternion be passed!
+    CQuaternion rotate(const CQuaternion& q,
+      const CQuaternion& p) {
+      // This function assumes a unit CQuaternion be passed!
       return (q*p)*q.conjugate();
     }
 
-    Vector3D rotate(const Quaternion& q,
-      const Vector3D&   v) {
-      Quaternion p = Quaternion(0.0f, v);
-      return rotate(q, p).vector();
+    CVector3D_t rotate(
+            CQuaternion const &aQuaternion,
+            CVector3D_t const &aVector)
+    {
+      CQuaternion p = CQuaternion(0.0f, aVector);
+      return rotate(aQuaternion, p).vector();
     }
 
-    Quaternion operator+(const Quaternion &q,
-      const Quaternion &other) {
-      return Quaternion(q.w() + other.w(),
-        q.x() + other.x(),
-        q.y() + other.y(),
-        q.z() + other.z());
+    CQuaternion operator+(
+            CQuaternion const &aQuaternionLHS,
+            CQuaternion const &aQuaternionRHS)
+    {
+      return CQuaternion(
+                  aQuaternionLHS.w() + aQuaternionRHS.w(),
+                  aQuaternionLHS.x() + aQuaternionRHS.x(),
+                  aQuaternionLHS.y() + aQuaternionRHS.y(),
+                  aQuaternionLHS.z() + aQuaternionRHS.z());
     }
 
-    Quaternion operator-(const Quaternion &q,
-      const Quaternion &other) {
-      return Quaternion(q.w() - other.w(),
-        q.x() - other.x(),
-        q.y() - other.y(),
-        q.z() - other.z());
+    CQuaternion operator-(
+            CQuaternion const &aQuaternionLHS,
+            CQuaternion const &aQuaternionRHS)
+    {
+      return CQuaternion(
+                  aQuaternionLHS.w() - aQuaternionRHS.w(),
+                  aQuaternionLHS.x() - aQuaternionRHS.x(),
+                  aQuaternionLHS.y() - aQuaternionRHS.y(),
+                  aQuaternionLHS.z() - aQuaternionRHS.z());
     }
 
-    Quaternion operator*(const Quaternion             &q,
-      const Quaternion::value_type &factor) {
-      return Quaternion((q.w() * factor),
-        (q.x() * factor),
-        (q.y() * factor),
-        (q.z() * factor));
+    CQuaternion operator*(
+            CQuaternion             const &aQuaternion,
+            CQuaternion::value_type const &aFactor)
+    {
+      return CQuaternion(
+                  (aQuaternion.w() * aFactor),
+                  (aQuaternion.x() * aFactor),
+                  (aQuaternion.y() * aFactor),
+                  (aQuaternion.z() * aFactor));
     }
 
-    Quaternion operator*(const Quaternion::value_type &factor,
-      const Quaternion             &q) {
-      return Quaternion((factor * q.w()),
-        (factor * q.x()),
-        (factor * q.y()),
-        (factor * q.z()));
+    CQuaternion operator*(
+            CQuaternion::value_type const &aFactor,
+            CQuaternion             const &aQuaternion)
+    {
+      return CQuaternion(
+                  (aFactor * aQuaternion.w()),
+                  (aFactor * aQuaternion.x()),
+                  (aFactor * aQuaternion.y()),
+                  (aFactor * aQuaternion.z()));
     }
 
-    Quaternion operator*(const Quaternion &q,
-      const Vector3D   &v) {
+    CQuaternion operator*(
+            CQuaternion const &aQuaternion,
+            CVector3D_t const &aVector)
+    {
       // qp = (nq*0 - dot(vq, vp)) + (nq*vp + 0*vq + cross(vq, vp))ijk
 
-      return Quaternion(
-        -(q.x()*v.x() + q.y()*v.y() + q.z()*v.z()),
-        q.w()*v.x() + q.y()*v.z() - q.z()*v.y(),
-        q.w()*v.y() + q.z()*v.x() - q.x()*v.z(),
-        q.w()*v.z() + q.x()*v.y() - q.y()*v.x()
+      return CQuaternion(
+        -((aQuaternion.x() * aVector.x()) + (aQuaternion.y() * aVector.y()) + (aQuaternion.z() * aVector.z())),
+        +((aQuaternion.w() * aVector.x()) + (aQuaternion.y() * aVector.z()) - (aQuaternion.z() * aVector.y())),
+        +((aQuaternion.w() * aVector.y()) + (aQuaternion.z() * aVector.x()) - (aQuaternion.x() * aVector.z())),
+        +((aQuaternion.w() * aVector.z()) + (aQuaternion.x() * aVector.y()) - (aQuaternion.y() * aVector.x()))
       );
     }
 
-    Quaternion operator*(const Vector3D   &v,
-      const Quaternion &q) {
+    CQuaternion operator*(
+            CVector3D_t const &aVector,
+            CQuaternion const &aQuaternion)
+    {
       // qp = (0*0 - dot(vq, vp)) + (0*vp + 0*vq + cross(vq, vp))ijk
 
-      return Quaternion(
-        -(q.x()*v.x() + q.y()*v.y() + q.z()*v.z()),
-        q.w()*v.x() + q.z()*v.y() - q.y()*v.z(),
-        q.w()*v.y() + q.x()*v.z() - q.z()*v.x(),
-        q.w()*v.z() + q.y()*v.x() - q.x()*v.y()
+      return CQuaternion(
+        -((aQuaternion.x() * aVector.x()) + (aQuaternion.y() * aVector.y()) + (aQuaternion.z() * aVector.z())),
+        +((aQuaternion.w() * aVector.x()) + (aQuaternion.z() * aVector.y()) - (aQuaternion.y() * aVector.z())),
+        +((aQuaternion.w() * aVector.y()) + (aQuaternion.x() * aVector.z()) - (aQuaternion.z() * aVector.x())),
+        +((aQuaternion.w() * aVector.z()) + (aQuaternion.y() * aVector.x()) - (aQuaternion.x() * aVector.y()))
       );
     }
 
-    Quaternion operator*(const Quaternion &q,
-      const Quaternion &p) {
+    CQuaternion operator*(
+            CQuaternion const &aQuaternionLHS,
+            CQuaternion const &aQuaternionRHS)
+    {
       // qp = (nq*np - dot(vq, vp)) + (nq*vp + np*vq + cross(vq, vp))ijk
 
-      return Quaternion(
-        q.w()*p.w() - q.x()*p.x() - q.y()*p.y() - q.z()*p.z(),
-        q.w()*p.x() + q.x()*p.w() + q.y()*p.z() - q.z()*p.y(),
-        q.w()*p.y() + q.y()*p.w() + q.z()*p.x() - q.x()*p.z(),
-        q.w()*p.z() + q.z()*p.w() + q.x()*p.y() - q.y()*p.x()
+      return CQuaternion(
+        (aQuaternionLHS.w() * aQuaternionRHS.w()) - (aQuaternionLHS.x() * aQuaternionRHS.x()) - (aQuaternionLHS.y() * aQuaternionRHS.y()) - (aQuaternionLHS.z() * aQuaternionRHS.z()),
+        (aQuaternionLHS.w() * aQuaternionRHS.x()) + (aQuaternionLHS.x() * aQuaternionRHS.w()) + (aQuaternionLHS.y() * aQuaternionRHS.z()) - (aQuaternionLHS.z() * aQuaternionRHS.y()),
+        (aQuaternionLHS.w() * aQuaternionRHS.y()) + (aQuaternionLHS.y() * aQuaternionRHS.w()) + (aQuaternionLHS.z() * aQuaternionRHS.x()) - (aQuaternionLHS.x() * aQuaternionRHS.z()),
+        (aQuaternionLHS.w() * aQuaternionRHS.z()) + (aQuaternionLHS.z() * aQuaternionRHS.w()) + (aQuaternionLHS.x() * aQuaternionRHS.y()) - (aQuaternionLHS.y() * aQuaternionRHS.x())
       );
     }
 
-    Quaternion operator/(const Quaternion             &q,
-      const Quaternion::value_type &factor) {
-      return Quaternion((q.w() / factor),
-        (q.x() / factor),
-        (q.y() / factor),
-        (q.z() / factor));
+    CQuaternion operator/(
+            CQuaternion             const &aQuaternion,
+            CQuaternion::value_type const &aFactor)
+    {
+      return CQuaternion(
+                  (aQuaternion.w() / aFactor),
+                  (aQuaternion.x() / aFactor),
+                  (aQuaternion.y() / aFactor),
+                  (aQuaternion.z() / aFactor));
     }
   }
 }

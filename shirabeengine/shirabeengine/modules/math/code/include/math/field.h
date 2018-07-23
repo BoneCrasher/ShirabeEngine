@@ -49,6 +49,7 @@ namespace Engine
             typedef value_type const                  const_value_type;
 
         public_constructors:
+            CField() = default;
             CField(std::initializer_list<T> const&aSource);
             CField(CField<T, TByteSize, TN, TStride> const&aCopy);
 

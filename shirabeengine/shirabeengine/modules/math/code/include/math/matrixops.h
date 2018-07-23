@@ -70,9 +70,9 @@ namespace Engine
              */
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_T(
-                TValue   aMatrix,
-                uint64_t aSourceRowIndex,
-                uint64_t aTargetRowIndex);
+                TValue   *aMatrix,
+                uint64_t  aSourceRowIndex,
+                uint64_t  aTargetRowIndex);
 
             /**
              * Multiplies this m*s-matrix with another s*n-matrix passed.
@@ -274,9 +274,9 @@ namespace Engine
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_T(
-                    TValue   aMatrix,
-                    uint64_t aSourceRowIndex,
-                    uint64_t aTargetRowIndex)
+                    TValue   *aMatrix,
+                    uint64_t  aSourceRowIndex,
+                    uint64_t  aTargetRowIndex)
 			{
                 if (aSourceRowIndex == aTargetRowIndex)
 					return;
@@ -287,9 +287,9 @@ namespace Engine
                 uint64_t const j_off      = (aTargetRowIndex * NCols);
                 TValue         tmp[NCols] = {};
 
-                memcpy_s(tmp,            byte_size, (ptr + i_off), byte_size);
-                memcpy_s((ptr + i_off),  byte_size, (ptr + j_off), byte_size);
-                memcpy_s((ptr + j_off),  byte_size, tmp,           byte_size);
+                memcpy(tmp,           (ptr + i_off), byte_size);
+                memcpy((ptr + i_off), (ptr + j_off), byte_size);
+                memcpy((ptr + j_off), tmp,           byte_size);
 			}
             //<-----------------------------------------------------------------------------
 
@@ -649,7 +649,7 @@ namespace Engine
                 TValue *tri = new TValue[M * N];
 
                 uint64_t const size = (M * N * sizeof(TValue));
-                memcpy_s(tri, size, aMatrix, size);
+                memcpy(tri, aMatrix, size);
 
                 TValue const *ptr    = nullptr;
                 char          parity = 1;

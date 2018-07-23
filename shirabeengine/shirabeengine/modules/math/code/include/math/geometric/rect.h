@@ -7,20 +7,21 @@
 namespace Engine {
   namespace Math {
 
-    struct SHIRABE_LIBRARY_EXPORT Rect {
-      TVector2D<uint16_t> position;
-      TVector2D<uint16_t> size;
+    struct SHIRABE_LIBRARY_EXPORT CRect
+    {
+      CVector2D<uint16_t> position;
+      CVector2D<uint16_t> size;
 
-      Rect();
-      Rect(
-        uint16_t const&x,
-        uint16_t const&y,
-        uint16_t const&width,
-        uint16_t const&height);
+      CRect();
+      CRect(
+        uint16_t const&aX,
+        uint16_t const&aY,
+        uint16_t const&aWidth,
+        uint16_t const&aHeight);
 
-      explicit Rect(
-        TVector2D<uint16_t> const& pos,
-        TVector2D<uint16_t> const& sz);
+      explicit CRect(
+        CVector2D<uint16_t> const& aPosition,
+        CVector2D<uint16_t> const& aSize);
     };
 
   }

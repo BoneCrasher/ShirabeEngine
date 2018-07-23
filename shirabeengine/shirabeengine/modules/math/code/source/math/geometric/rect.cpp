@@ -3,26 +3,26 @@
 namespace Engine {
   namespace Math {
 
-    Rect::Rect()
+    CRect::CRect()
       : position({ 0, 0 })
       , size({ 0, 0 })
     {}
 
-    Rect::Rect(
-      uint16_t const&x,
-      uint16_t const&y,
-      uint16_t const&width,
-      uint16_t const&height)
-      : position({ x, y })
-      , size({ width, height })
+    CRect::CRect(
+      uint16_t const&aX,
+      uint16_t const&aY,
+      uint16_t const&aWidth,
+      uint16_t const&aHeight)
+      : position({ aX, aY })
+      , size({ aWidth, aHeight })
     {
     }
 
-    Rect::Rect(
-      TVector2D<uint16_t> const& pos,
-      TVector2D<uint16_t> const& sz)
-      : position(pos)
-      , size(sz)
+    CRect::CRect(
+            CVector2D<uint16_t> const& aPosition,
+            CVector2D<uint16_t> const& aSize)
+      : position(aPosition)
+      , size(aSize)
     {
     }
 
