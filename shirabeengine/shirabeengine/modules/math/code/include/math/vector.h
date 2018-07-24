@@ -456,14 +456,17 @@ namespace Engine
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived
+            typename    TDerived = CVectorImpl<T, N>
         >
         CVector<T, N, TDerived> operator+(CVector<T, N, TDerived> const &aLHS,
                                           CVector<T, N, TDerived> const &aRHS)
         {
-            typename CVector<T, N, TDerived>::base_type vec = operator+(
-                static_cast<typename CVector<T, N, TDerived>::base_type>(aLHS),
-                static_cast<typename CVector<T, N, TDerived>::base_type>(aRHS));
+            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+
+            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t rhs = static_cast<BaseType_t>(aRHS);
+
+            BaseType_t vec = operator+(lhs, rhs);
 
             return CVector<T, N, TDerived>(vec);
         }
@@ -471,125 +474,78 @@ namespace Engine
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived
+            typename    TDerived = CVectorImpl<T, N>
         >
         CVector<T, N, TDerived> operator-(CVector<T, N, TDerived> const &aLHS,
                                           CVector<T, N, TDerived> const &aRHS)
         {
-            typename CVector<T, N, TDerived>::base_type vec =
-                    CVector<T, N, TDerived>::operator-(
-                        static_cast<typename CVector<T, N, TDerived>::base_type>(aLHS),
-                        static_cast<typename CVector<T, N, TDerived>::base_type>(aRHS));
+            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+
+            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t rhs = static_cast<BaseType_t>(aRHS);
+
+            BaseType_t vec = operator-(lhs, rhs);
+
+            return CVector<T, N, TDerived>(vec);
         }
         
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived
+            typename    TDerived = CVectorImpl<T, N>
         >
         CVector<T, N, TDerived>
         operator*(CVector<T, N, TDerived>                      const &aLHS,
                   typename CVector<T, N, TDerived>::value_type const &aFactor)
-        {
-            typename CVector<T, N, TDerived>::base_type vec =
-                    CVector<T, N, TDerived>::operator*(
-                        static_cast<typename CVector<T, N, TDerived>::base_type>(aLHS), aFactor);
+        {            
+            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+
+            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t vec = operator*(lhs, aFactor);
+
+            return CVector<T, N, TDerived>(vec);
         }
         
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived
+            typename    TDerived = CVectorImpl<T, N>
         >
         CVector<T, N, TDerived>
         operator*(typename CVector<T, N, TDerived>::value_type const&aFactor,
                   CVector<T, N, TDerived>                      const&aLHS)
         {
-            typename CVector<T, N, TDerived>::base_type vec =
-                    operator*(
-                        static_cast<typename CVector<T, N, TDerived>::base_type>(aLHS),
-                        aFactor);
+            return operator*(aLHS, aFactor);
         }
         
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived
+            typename    TDerived = CVectorImpl<T, N>
         >
         CVector<T, N, TDerived>
         operator/(CVector<T, N, TDerived>                      const &aLHS,
                   typename CVector<T, N, TDerived>::value_type const &aFactor)
         {
-            return operator/(
-                        static_cast<typename CVector<T, N, TDerived>::base_type>(aLHS),
-                        aFactor);
+            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+
+            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t vec = operator/(lhs, aFactor);
+
+            return CVector<T, N, TDerived>(vec);
         }
         
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived
+            typename    TDerived = CVectorImpl<T, N>
         >
         CVector<T, N, TDerived>
         operator/(typename CVector<T, N, TDerived>::value_type const&aFactor,
-                  CVector<T, N, TDerived>                      const&aLHS)
+                  CVector<T, N, TDerived>                      const&aRHS)
         {
-            return operator/(
-                        static_cast<typename CVector<T, N, TDerived>::base_type>(aLHS),
-                        aFactor);
+            return operator/(aRHS, aFactor);
         }
-        
-        template <
-            typename T,
-            std::size_t N,
-            typename TDerived = CVectorImpl<T, N>
-        >
-        CVector<T, N, TDerived> operator+(CVector<T, N, TDerived> const &aLHS,
-                                          CVector<T, N, TDerived> const &aRHS);
-        
-        template <
-            typename T,
-            std::size_t N,
-            typename TDerived = CVectorImpl<T, N>
-        >
-        CVector<T, N, TDerived> operator-(CVector<T, N, TDerived> const&aLHS,
-                                          CVector<T, N, TDerived> const&aRHS);
-
-        template <
-            typename T,
-            std::size_t N,
-            typename TDerived = CVectorImpl<T, N>
-        >
-        CVector<T, N, TDerived>
-        operator*(CVector<T, N, TDerived>                      const&aLHS,
-                  typename CVector<T, N, TDerived>::value_type const&aFactor);
-        
-        template <
-            typename T,
-            std::size_t N,
-            typename TDerived = CVectorImpl<T, N>
-        >
-        CVector<T, N, TDerived>
-        operator*(typename CVector<T, N, TDerived>::value_type const&aFactor,
-                  CVector<T, N, TDerived>                      const&aLHS);
-        
-        template <
-            typename T,
-            std::size_t N,
-            typename TDerived = CVectorImpl<T, N>
-        >
-        CVector<T, N, TDerived>
-        operator/(CVector<T, N, TDerived>                      const&aLHS,
-                  typename CVector<T, N, TDerived>::value_type const&aFactor);
-        
-        template <
-            typename T,
-            std::size_t N,
-            typename TDerived = CVectorImpl<T, N>
-        >
-        CVector<T, N, TDerived>
-        operator/(typename CVector<T, N, TDerived>::value_type const&aFactor,
-                  CVector<T, N, TDerived>                      const&aLHS);
         
         template <typename T>
             using CVector1D = CVector<T, 1>;
