@@ -16,17 +16,18 @@ namespace Engine
     namespace Math
     {
 
-        #define DFIELD_DEFAULT_SIZE   1
-        #define DFIELD_DEFAULT_STRIDE 1
-        #define DASSERT_FIELD_SIZE_AND_STRIDE() \
+        #define D_FIELD_DEFAULT_SIZE   1
+        #define D_FIELD_DEFAULT_STRIDE 1
+        #define D_ASSERT_FIELD_SIZE_AND_STRIDE() \
             static_assert(((TN % TStride) == 0), "Invalid TN and TStride combination.");
 
 
         /**
-         * @brief            Defines a templated, non-growable field-type to hold certain type of data as
-         *                   a vector-structure, internally stored as an array.
-         *                   A field can be two dimensional, i.e. the stride parameter is greater than 1,
-         *                   but has to obey the constraint: (TN % TStride) == 0
+         * Defines a templated, non-growable field-type to hold certain type of data as
+         * a vector-structure, internally stored as an array.
+         * A field can be two dimensional, i.e. the stride parameter is greater than 1,
+         * but has to obey the constraint: (TN % TStride) == 0
+         *
          * @tparam T,        Underlying meet type of the field.
          * @tparam TByteSize Bytesize of the data type.
          *                   Default: sizeof(T)
@@ -38,8 +39,8 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = DFIELD_DEFAULT_SIZE,
-                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
                 >
         class SHIRABE_TEST_EXPORT CField
         {
@@ -49,22 +50,76 @@ namespace Engine
             typedef value_type const                  const_value_type;
 
         public_constructors:
+            /**
+             * Default initializes a field.
+             */
             CField() = default;
-            CField(std::initializer_list<T> const&aSource);
-            CField(CField<T, TByteSize, TN, TStride> const&aCopy);
+
+            /**
+             * Initialize a field from an initializer list.
+             *
+             * @param aSource An initializer list containing at least N values.
+             */
+            CField(std::initializer_list<T> const &aSource);
+
+            /**
+             * Initialize a field from another field.
+             *
+             * @param aCopy The other instance to copy from.
+             */
+            CField(CField<T, TByteSize, TN, TStride> const &aCopy);
 
         public_destructors:
-            ~CField() = default;
+            /**
+             * Destroy this field instance
+             */
+            virtual ~CField() = default;
 
         public_operators:
+
+            /**
+             * Assign another field and overwrite contained values.
+             *
+             * @param right Field to assign.
+             * @return      Self-Reference
+             */
             class_type&operator= (class_type const&aOther);
-            T    const&operator[](std::size_t const aIndex) const;
-            T         &operator[](std::size_t const aIndex);
-            bool       operator==(class_type const&aOther);
-            void       operator+=(class_type const& aRight);
-            void       operator-=(class_type const& aRight);
-            void       operator*=(T const aFactor);
-            void       operator/=(T const aFactor);
+
+            /**
+             * Returns an immutable value reference to an element in the field at index 'aIndex'.
+             *
+             * @param  aIndex 0-based position in the field.
+             * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
+             * @throws        std::out_of_range if: 0 < aIndex < TN.
+             */
+            T const &operator[](std::size_t const aIndex) const;
+
+            /**
+             * Returns a mutable value reference to an element in the field at index 'aIndex'.
+             *
+             * @param  aIndex 0-based position in the field.
+             * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
+             * @throws        std::out_of_range if: 0 < aIndex < TN.
+             */
+            T &operator[](std::size_t const aIndex);
+
+            /**
+             * Compares this instance to another for bitwise equality.
+             *
+             * @param aOther The other instance to be compared with.
+             * @return       True, if bitwise equal. False otherwise.
+             */
+            bool operator==(class_type const&aOther);
+
+            /**
+             * Add another field to this instance.
+             *
+             * @param aOther The field to be added.
+             */
+            void operator+=(class_type const& aRight);
+            void operator-=(class_type const& aRight);
+            void operator*=(T const aFactor);
+            void operator/=(T const aFactor);
 
         public_methods:
             T const*const const_ptr() const;
@@ -82,16 +137,23 @@ namespace Engine
         protected_members:
             T mField[TN * TByteSize];
         };
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief         Initialize a field from an initializer list.
-         * @param aSource An initializer list containing at least N values.
-         */
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        #define D_FIELD_TEMPLATE_DECL \
+                    template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        D_FIELD_TEMPLATE_DECL
         CField<T, TByteSize, TN, TStride>::CField(
                 std::initializer_list<T> const&aSource)
         {
-            DASSERT_FIELD_SIZE_AND_STRIDE();
+            D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             std::size_t i = 0;
 
@@ -99,57 +161,52 @@ namespace Engine
                 if(i < TN)
                     mField[i++] = v;
         };
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief       Initialize a field from another field.
-         * @param aCopy The other instance to copy from.
-         */
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        D_FIELD_TEMPLATE_DECL
         CField<T, TByteSize, TN, TStride>::CField(
                 CField<T, TByteSize, TN, TStride> const&aCopy)
         {
-            DASSERT_FIELD_SIZE_AND_STRIDE();
+            D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             assign(aCopy);
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief       Assign another field and overwrite contained values.
-         * @param right Field to assign.
-         * @return      Self-Reference
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
         CField<T, TByteSize, TN, TStride>& CField<T, TByteSize, TN, TStride>::operator=(class_type const& right)
         {
-            DASSERT_FIELD_SIZE_AND_STRIDE();
+            D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             assign(right);
             return *this;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief         Returns an immutable value reference to an element in the field at index 'aIndex'.
-         * @param  aIndex 0-based position in the field.
-         * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
-         * @throws        std::out_of_range if: 0 < aIndex < TN.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
         T const& CField<T, TByteSize, TN, TStride>::operator[] (std::size_t const aIndex) const
         {
-            DASSERT_FIELD_SIZE_AND_STRIDE();
+            D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             if (TN > 0 && TN > aIndex)
                 return *(mField + aIndex);
 
             throw std::out_of_range("Index out of field bounds.");
-        }
+        }        
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief         Returns a mutable value reference to an element in the field at index 'aIndex'.
-         * @param  aIndex 0-based position in the field.
-         * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
-         * @throws        std::out_of_range if: 0 < aIndex < TN.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
         T& CField<T, TByteSize, TN, TStride>::operator[] (std::size_t const aIndex)
         {
@@ -159,23 +216,22 @@ namespace Engine
             value_type      &      value  = const_cast<value_type&>(cvalue);
             return value;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief        Compares this instance to another for bitwise equality.
-         * @param aOther The other instance to be compared with.
-         * @return       True, if bitwise equal. False otherwise.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
         bool CField<T, TByteSize, TN, TStride>::operator==(class_type const&aOther)
         {
             int32_t result = memcmp(mField, aOther.mField, (TByteSize * TN));
             return (result == 0);
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief        Add another field to this instance.
-         * @param aOther The field to be added.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
         void CField<T, TByteSize, TN, TStride>::operator+=(class_type const& aOther)
         {
@@ -306,7 +362,9 @@ namespace Engine
         }
 
         /**
-         * @brief       Accumulate two field instances and return the reuslt of the operation as a copy.
+         * Accumulate two field instances and return the reuslt of the
+         * operation as a copy.
+         *
          * @param  aLHS Left operand
          * @param  aRHS Right operand
          * @return A new field instance with the result of addition.

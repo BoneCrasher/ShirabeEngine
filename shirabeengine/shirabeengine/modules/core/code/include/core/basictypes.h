@@ -6,68 +6,73 @@
 #include <cmath>
 #include <stdint.h>
 
-#include "Platform/Platform.h"
-#include "Math/Geometric/Rect.h"
+#include <platform/platform.h>
+#include <math/geometric/rect.h>
 
-namespace Engine {
-  using namespace Engine::Math;
+namespace Engine
+{
+    using namespace Engine::Math;
 
-  #ifdef min 
-  #undef min
-  #endif
+    #ifdef min
+    #undef min
+    #endif
 
-  #ifdef max
-  #undef max
-  #endif
-    
-  #define FRAMEGRAPH_RESOURCERANGE_REMAINING -1
+    #ifdef max
+    #undef max
+    #endif
 
-  struct SHIRABE_LIBRARY_EXPORT Range {
-    Range();
+    #define FRAMEGRAPH_RESOURCECRange_REMAINING -1
 
-    Range(
-      uint32_t const&inOffset,
-      int32_t  const&inLength);
+    struct SHIRABE_LIBRARY_EXPORT CRange
+    {
+        CRange();
 
-    bool overlapsWith(Range const&other) const;
+        CRange(uint32_t const &aOffset,
+               int32_t  const &aLength);
 
-    uint32_t
-      offset;
-    int32_t
-      length;
-  };
+        bool overlapsWith(CRange const &aOther) const;
 
-  static bool operator==(Range const&lhs, Range const&rhs) {
-    return
-      ((lhs.offset == rhs.offset) &&
-      (lhs.length == rhs.length));
-  }
+        uint32_t
+          offset;
+        int32_t
+          length;
+    };
 
-  template <typename T>
-  T from_string(std::string const&input) {
-    T output{ };
+    static bool operator==(
+            CRange const &aLHS,
+            CRange const &aRHS)
+    {
+        return
+            ((aLHS.offset == aRHS.offset) &&
+             (aLHS.length == aRHS.length));
+    }
 
-    std::stringstream ss;
-    ss << input;
-    ss >> output;
+    template <typename T>
+    T from_string(std::string const &aInput)
+    {
+        T output{ };
 
-    return output;
-  }
+        std::stringstream ss;
+        ss << aInput;
+        ss >> output;
 
-  template <typename T>
-  std::string to_string(T const&input)
-  {
-    std::string output{ };
+        return output;
+    }
 
-    std::stringstream ss;
-    ss << input;
-    output = ss.str();
+    template <typename T>
+    std::string to_string(T const &aInput)
+    {
+        std::string output{ };
 
-    return output;
-  }
+        std::stringstream ss;
+        ss << aInput;
+        output = ss.str();
 
-  template <>
-  std::string to_string<Range>(Range const&range);
+        return output;
+    }
+
+    template <>
+    std::string to_string<CRange>(CRange const&aRange);
 }
 
 #endif
