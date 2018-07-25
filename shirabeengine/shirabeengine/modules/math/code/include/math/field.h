@@ -117,21 +117,85 @@ namespace Engine
              * @param aOther The field to be added.
              */
             void operator+=(class_type const& aRight);
+
+            /**
+             * Subtract another field from this instance.
+             *
+             * @param aOther The field to subtract.
+             */
             void operator-=(class_type const& aRight);
+
+            /**
+             * Multiply this field instance with a given factor.
+             *
+             * @param aFactor The factor to multiply with.
+             */
             void operator*=(T const aFactor);
+
+            /**
+             * Divide this field instance by the passed factor.
+             *
+             * @param aFactor The factor to divide by.
+             */
             void operator/=(T const aFactor);
 
         public_methods:
+            /**
+             * Return a const pointer to the internal data array.
+             * Used for read-only access.
+             *
+             * @return A const pointer to the internal data array.
+             */
             T const*const const_ptr() const;
-            T      *const ptr();
 
-            std::size_t const size()        const;
-            std::size_t const byte_size()   const;
+            /**
+             * Return a pointer to the internal data array.
+             * Used for read-write access.
+             *
+             * @return A pointer to the internal data array.
+             */
+            T *const ptr();
+
+            /**
+             * Return the total number of elements in the field.
+             *
+             * @return See above...
+             */
+            std::size_t const size() const;
+
+            /**
+             * Return the size of a single element of the field in bytes.
+             *
+             * @return See also above...
+             */
+            std::size_t const byte_size() const;
+
+            /**
+             * Return the number of (imaginary) columns in the field.
+             * Dividing the size by the byte_stride should return the number of (imaginary) rows!
+             * If the field should contain an arbitrary number of elements, pass 1 for the byte_stride.
+             *
+             * @return  See again... you've guessed it...
+             */
             std::size_t const byte_stride() const;
 
+            /**
+             * Serialize this field to a comma-delimited string.
+             *
+             * @return Stringized field.
+             */
             std::string toString();
 
         protected_methods:
+
+
+            /**
+             * Assign another matrix to this instance.
+             * Internally theres only a copy operation taking place
+             * overriding the old data of this instance, if any!
+             *
+             * @param aOther The field instance to assign.
+             */
             void assign(class_type const& aOther);
 
         protected_members:
@@ -144,14 +208,16 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         #define D_FIELD_TEMPLATE_DECL \
                     template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
+        #define D_FIELD \
+                    CField<T, TByteSize, TN, TStride>
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         D_FIELD_TEMPLATE_DECL
-        CField<T, TByteSize, TN, TStride>::CField(
-                std::initializer_list<T> const&aSource)
+        D_FIELD::CField(
+                std::initializer_list<T> const &aSource)
         {
             D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
@@ -167,8 +233,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         D_FIELD_TEMPLATE_DECL
-        CField<T, TByteSize, TN, TStride>::CField(
-                CField<T, TByteSize, TN, TStride> const&aCopy)
+        D_FIELD::CField(
+                class_type const&aCopy)
         {
             D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
@@ -180,7 +246,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        CField<T, TByteSize, TN, TStride>& CField<T, TByteSize, TN, TStride>::operator=(class_type const& right)
+        typename D_FIELD::class_type &D_FIELD::operator=(class_type const& right)
         {
             D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
@@ -193,7 +259,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T const& CField<T, TByteSize, TN, TStride>::operator[] (std::size_t const aIndex) const
+        T const &D_FIELD::operator[] (std::size_t const aIndex) const
         {
             D_ASSERT_FIELD_SIZE_AND_STRIDE();
 
@@ -208,7 +274,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T& CField<T, TByteSize, TN, TStride>::operator[] (std::size_t const aIndex)
+        T& D_FIELD::operator[] (std::size_t const aIndex)
         {
             // Cast to const this, so that we can reuse the const operator[].
             class_type const*const cthis  = static_cast<class_type const*const>(this);
@@ -222,7 +288,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        bool CField<T, TByteSize, TN, TStride>::operator==(class_type const&aOther)
+        bool D_FIELD::operator==(class_type const&aOther)
         {
             int32_t result = memcmp(mField, aOther.mField, (TByteSize * TN));
             return (result == 0);
@@ -233,116 +299,110 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void CField<T, TByteSize, TN, TStride>::operator+=(class_type const& aOther)
+        void D_FIELD::operator+=(class_type const& aOther)
         {
             for(size_t i = 0; i < TN; ++i)
                 mField[i] += aOther[i];
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief        Subtract another field from this instance.
-         * @param aOther The field to subtract.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void CField<T, TByteSize, TN, TStride>::operator-=(class_type const& r)
+        void D_FIELD::operator-=(class_type const& r)
         {
             for(size_t i = 0; i < TN; ++i)
                 mField[i] -= r[i];
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief         Multiply this field instance with a given factor.
-         * @param aFactor The factor to multiply with.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void CField<T, TByteSize, TN, TStride>::operator*=(T const aFactor)
+        void D_FIELD::operator*=(T const aFactor)
         {
             for(size_t i = 0; i < TN; ++i)
                 mField[i] *= aFactor;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief          Divide this field instance by the passed factor.
-         * @param aFactor The factor to divide by.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void CField<T, TByteSize, TN, TStride>::operator/=(T const aFactor)
+        void D_FIELD::operator/=(T const aFactor)
         {
             operator*=((1 / aFactor));
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief        Assign another matrix to this instance.
-         *               Internally theres only a copy operation taking place
-         *               overriding the old data of this instance, if any!
-         * @param aOther The field instance to assign.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void CField<T, TByteSize, TN, TStride>::assign(class_type const& aOther)
+        void D_FIELD::assign(class_type const& aOther)
         {
             memcpy(mField, aOther.const_ptr(), (TN * TByteSize));
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief  Return a const pointer to the internal data array.
-         *         Used for read-only access.
-         * @return A const pointer to the internal data array.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T const* const CField<T, TByteSize, TN, TStride>::const_ptr() const
+        T const* const D_FIELD::const_ptr() const
         {
             return &mField[0];
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief  Return a pointer to the internal data array.
-         *         Used for read-write access.
-         * @return A pointer to the internal data array.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T * const CField<T, TByteSize, TN, TStride>::ptr()
+        T * const D_FIELD::ptr()
         {
             return mField;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief  Return the total number of elements in the field.
-         * @return See above...
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::size_t const CField<T, TByteSize, TN, TStride>::size() const
+        std::size_t const D_FIELD::size() const
         {
             return TN;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief  Return the size of a single element of the field in bytes.
-         * @return See also above...
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::size_t const CField<T, TByteSize, TN, TStride>::byte_size() const
+        std::size_t const D_FIELD::byte_size() const
         {
             return TByteSize;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief   Return the number of (imaginary) columns in the field.
-         *          Dividing the size by the byte_stride should return the number of (imaginary) rows!
-         *          If the field should contain an arbitrary number of elements, pass 1 for the byte_stride.
-         * @return  See again... you've guessed it...
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::size_t const CField<T, TByteSize, TN, TStride>::byte_stride() const
+        std::size_t const D_FIELD::byte_stride() const
         {
             return TStride;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-         * @brief  Serialize this field to a comma-delimited string.
-         * @return Stringized field.
-         */
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::string CField<T, TByteSize, TN, TStride>::toString()
+        std::string D_FIELD::toString()
         {
             std::stringstream ss;
             for (size_t i = 0; i < TN; i += TStride)
@@ -372,22 +432,23 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = DFIELD_DEFAULT_SIZE,
-                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
                 >
-        CField<T, TByteSize, TN, TStride>
+        typename D_FIELD::class_type
         operator+(
-                CField<T, TByteSize, TN, TStride> const& aLHS,
-                CField<T, TByteSize, TN, TStride> const& aRHS)
+                typename D_FIELD::class_type const& aLHS,
+                typename D_FIELD::class_type const& aRHS)
         {
-            CField<T, TByteSize, TN, TStride> copy = CField<T, TByteSize, TN, TStride>(aLHS);
+            CField<T, TByteSize, TN, TStride> copy(aLHS);
 
             copy += aRHS;
             return copy;
         }
 
         /**
-         * @brief       Subtract the right operand from the left and return the reuslt of the operation as a copy.
+         * Subtract the right operand from the left and return the reuslt of the operation as a copy.
+         *
          * @param  aLHS Left operand
          * @param  aRHS Right operand
          * @return A new field instance with the result of subtraction.
@@ -395,22 +456,23 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = DFIELD_DEFAULT_SIZE,
-                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
                 >
-        CField<T, TByteSize, TN, TStride>
+        typename D_FIELD::class_type
         operator-(
-                CField<T, TByteSize, TN, TStride> const& aLHS,
-                CField<T, TByteSize, TN, TStride> const& aRHS)
+                typename D_FIELD::class_type const& aLHS,
+                typename D_FIELD::class_type const& aRHS)
         {
-            CField<T, TByteSize, TN, TStride> copy = CField<T, TByteSize, TN, TStride>(aLHS);
+            D_FIELD copy(aLHS);
 
             copy -= aRHS;
             return copy;
         }
 
         /**
-         * @brief          Multiply a field instance with a factor and return the result of the operation as a copy.
+         * Multiply a field instance with a factor and return the result of the operation as a copy.
+         *
          * @param  aLHS    Field instance to multiply with.
          * @param  aFactor Factor to multiply.
          * @return A new field instance with the result of multiplication.
@@ -418,21 +480,23 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = DFIELD_DEFAULT_SIZE,
-                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
                 >
-        CField<T, TByteSize, TN, TStride>operator*(
-                CField<T, TByteSize, TN, TStride> const&aLHS,
-                T                                 const&aFactor)
+        typename D_FIELD::class_type
+        operator*(
+                typename D_FIELD::class_type const &aLHS,
+                typename D_FIELD::value_type const &aFactor)
         {
-            CField<T, TByteSize, TN, TStride> copy = CField<T, TByteSize, TN, TStride>(aLHS);
+            D_FIELD copy = D_FIELD(aLHS);
 
             copy *= aFactor;
             return copy;
         }
 
         /**
-         * @brief          Multiply a field instance with a factor and return the result of the operation as a copy.
+         * Multiply a field instance with a factor and return the result of the operation as a copy.
+         *
          * @param  aFactor Factor to multiply.
          * @param  aLHS    Field instance to multiply with.
          * @return A new field instance with the result of multiplication.
@@ -440,18 +504,20 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = DFIELD_DEFAULT_SIZE,
-                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
                 >
-        CField<T, TByteSize, TN, TStride>operator*(
-                T                                 const&aFactor,
-                CField<T, TByteSize, TN, TStride> const&aLHS)
+        typename D_FIELD::class_type
+        operator*(
+                typename D_FIELD::value_type const &aFactor,
+                typename D_FIELD::class_type const &aLHS)
         {
             return operator*(aLHS, aFactor);
         }
 
         /**
-         * @brief  Divide a field instance by a factor and return the result of the operation as a copy.
+         * Divide a field instance by a factor and return the result of the operation as a copy.
+         *
          * @param  aLHS    Field instance to multiply with.
          * @param  aFactor Factor to multiply.
          * @return A new field instance with the result of division.
@@ -459,12 +525,13 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = DFIELD_DEFAULT_SIZE,
-                std::size_t TStride   = DFIELD_DEFAULT_STRIDE
+                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
                 >
-        CField<T, TByteSize, TN, TStride>operator/(
-                CField<T, TByteSize, TN, TStride> const&aLHS,
-                T                                 const&aFactor)
+        typename D_FIELD::class_type
+        operator/(
+                typename D_FIELD::class_type const &aLHS,
+                typename D_FIELD::value_type const &aFactor)
         {
             return operator*(aLHS, (T(1.0) / aFactor));
         }
