@@ -1,42 +1,58 @@
 #include "core/basictypes.h"
 #include "core/string.h"
 
-namespace Engine {
-  
-  CRange::CRange()
-    : offset(0)
-    , length(0)
-  {}
+namespace Engine
+{
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CRange::CRange()
+      : offset(0)
+      , length(0)
+    {}
+    //<-----------------------------------------------------------------------------
 
-  CRange::CRange(
-          uint32_t const &aOffset,
-          int32_t  const &aLength)
-      : offset(aOffset)
-      , length(aLength)
-  {}
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CRange::CRange(
+            uint32_t const &aOffset,
+            int32_t  const &aLength)
+        : offset(aOffset)
+        , length(aLength)
+    {}
+    //<-----------------------------------------------------------------------------
 
-  bool CRange::overlapsWith(CRange const &aOther) const
-  {
-      // Pretest: Both CRanges must be at least 1 unit in length to check anything...
-      bool const lengthValid = (length && aOther.length);
-      if(!lengthValid)
-        return false;
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    bool CRange::overlapsWith(CRange const &aOther) const
+    {
+        // Pretest: Both CRanges must be at least 1 unit in length to check anything...
+        bool const lengthValid = (length && aOther.length);
+        if(!lengthValid)
+          return false;
 
-      bool overlap = false;
+        bool overlap = false;
 
-      if(offset == aOther.offset)
-        overlap = true;
-      else if(offset < aOther.offset)
-        overlap = (((offset + length) - (aOther.offset)) > 0);
-      else
-        overlap = (((aOther.offset + aOther.length) - offset) > 0);
+        if(offset == aOther.offset)
+          overlap = true;
+        else if(offset < aOther.offset)
+          overlap = (((offset + length) - (aOther.offset)) > 0);
+        else
+          overlap = (((aOther.offset + aOther.length) - offset) > 0);
 
-      return overlap;
-  }
+        return overlap;
+    }
+    //<-----------------------------------------------------------------------------
 
-  template <>
-  std::string to_string<CRange>(CRange const& aRange)
-  {
-      return String::format("[off:%0,len:%1]", aRange.offset, aRange.length);
-  }
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <>
+    std::string to_string<CRange>(CRange const& aRange)
+    {
+        return String::format("[off:%0,len:%1]", aRange.offset, aRange.length);
+    }
+    //<-----------------------------------------------------------------------------
 }

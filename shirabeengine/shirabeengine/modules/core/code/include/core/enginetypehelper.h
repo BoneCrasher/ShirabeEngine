@@ -1,3 +1,10 @@
+/*!
+ * @file      enginetypehelper.h
+ * @author    Marc-Anton Boehm-von Thenen
+ * @date      27/07/2018
+ * @copyright SmartRay GmbH (www.smartray.com)
+ */
+
 #ifndef __SHIRABE_ENGINETYPEHELPER_H__
 #define __SHIRABE_ENGINETYPEHELPER_H__
 
@@ -8,213 +15,155 @@
 #include <vector>
 #include <unordered_map>
 
-#define STR(m) #m
-#define LOG_FUNCTION(...) STR( __VA_ARGS__)
+#include "base/declaration.h"
 
-namespace Engine {
+#define SHIRABE_STR(m) #m
+#define SHIRABE_LOG_FUNCTION(...) SHIRABE_STR( __VA_ARGS__)
 
+namespace Engine
+{
+    /**
+     *
+     */
+    template <typename T>
+    using CStdSharedPtr_t = std::shared_ptr<T>;
 
-	template <typename T>
-	using Ptr = std::shared_ptr<T>;
+    /**
+     *
+     */
+    template <typename T>
+    using CStdUniquePtr_t = std::unique_ptr<T>;
 
-  template <typename T>
-  using UniquePtr = std::unique_ptr<T>;
+    /**
+     * @brief makeCStdSharedPtr
+     * @param aArgs
+     * @return
+     */
+    template <typename TUnderlyingType, typename ... TArgs>
+    static CStdSharedPtr_t<TUnderlyingType> makeCStdSharedPtr(TArgs&&... aArgs)
+    {
+        return std::make_shared<TUnderlyingType>(std::forward<TArgs>(aArgs)...);
+    }
 
-	  #define DeclareSharedPointerType(type) \
-            using type##Ptr = Ptr<type>;
+    /**
+     *
+     */
+    template <typename T>
+    using CStdSharedPtrDeleterFn_t = std::function<void(T*)>;
 
-    #define DeclarePrefixedSharedPointerType(prefix, type) \
-            using prefix##Ptr = Ptr<type>;
+    /**
+     * @brief makeCStdSharedPtrCustomDeleter
+     * @param aInstance
+     * @param aDeleter
+     * @return
+     */
+    template <typename T, typename TDeleter>
+    static CStdSharedPtr_t<T> makeCStdSharedPtrCustomDeleter(
+            T          *aInstance,
+            TDeleter    aDeleter)
+    {
+        return CStdSharedPtr_t<T>(aInstance, aDeleter);
+    }
 
-    #define DeclareSharedPointerTypeCustomDeleter(type) \
-            using type##Ptr = Ptr<type>;
+    template <typename T, typename TPtr = CStdSharedPtr_t<T>>
+    static inline TPtr makeCStdSharedFromThis(T* instance) {
+        return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
+    }
 
-    #define Template(...) __VA_ARGS__
+    /**
+     * @brief makeCStdUniquePtr
+     * @param aArgs
+     * @return
+     */
+    template <typename TUnderlyingType, typename ... TArgs>
+    static CStdUniquePtr_t<TUnderlyingType> makeCStdUniquePtr(TArgs&&... aArgs)
+    {
+        return std::make_unique<TUnderlyingType>(std::forward<TArgs>(aArgs)...);
+    }
 
-    #define DeclareTemplatedSharedPointerType(prefix, type) \
-	        using prefix##Ptr = Ptr<type>;
+    /**
+     *
+     */
+    template <typename T>
+    using Vector = std::vector<T>;
 
-	template <typename TUnderlyingType, typename ... TArgs>
-	static inline std::shared_ptr<TUnderlyingType> MakeSharedPointerType(TArgs&&... args) {
-		return std::make_shared<TUnderlyingType>(std::forward<TArgs>(args)...);
-	}
+    /**
+     *
+     */
+    template <typename TKey, typename TValue>
+    using Map = std::unordered_map<TKey, TValue>;
 
-	template <typename T>
-	using SharedPtrDeleterFn = std::function<void(T*)>;
+    #define SHIRABE_DECLARE_LIST_OF_TYPE(type, prefix) \
+        using prefix##List = std::vector<type>;
 
-	template <typename T, typename TDeleter>
-	static inline Ptr<T>
-		MakeSharedPointerTypeCustomDeleter(
-			T          *pInstance,
-		    TDeleter    deleter) {
-		return Ptr<T>(pInstance, deleter);
-	}
+    #define SHIRABE_DECLARE_MAP_OF_TYPES(keytype, valuetype, prefix) \
+        using prefix##Map = std::unordered_map<keytype, valuetype>;
 
-	template <typename T, typename TPtr = std::shared_ptr<T>>
-	static inline TPtr GetNonDeletingSelfPtrType(T* instance) {
-		return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
-	}
+    #define SHIRABE_DECLARE_INTERFACE(interface_name)                                \
+            public_destructors:                                                      \
+                /*!
+                 * Declare virtual destructor for correct destruction behaviour
+                 * during runtime.
+                 */                                                                  \
+                virtual ~interface_name() = default;                                 \
+                                                                                     \
+            private_constructors:                                                    \
+                /*!
+                 * Delete copy and move constructors to avoid copy/move-construction
+                 *
+                 * @param aOther The other interface instance to copy/move from.
+                 */                                                                  \
+                interface_name(interface_name const &aOther) = delete;               \
+                /*!
+                 * Delete copy and move constructors to avoid copy/move-construction
+                 *
+                 * @param aOther The other interface instance to copy/move from.
+                 */                                                                  \
+                interface_name(interface_name      &&aOther) = delete;               \
+                                                                                     \
+            protected_constructors:                                                  \
+                /*!
+                 * Default constructor protected, so that no instantiation is
+                 * possible, but during runtinme the proper construction behaviour
+                 * can be ensured.
+                 */                                                                  \
+                 interface_name() = default;                                         \
+                                                                                     \
+            private_operators:                                                       \
+                                                                                     \
+                /*!
+                * Delete copy and move assignment to avoid copying/moving around
+                * instances of this interface.
+                *
+                * @param   aOther
+                * @returns Hopefully nothing. :P
+                */                                                                   \
+                interface_name& operator=(interface_name const &aOther) = delete;    \
+                /*!
+                * Delete copy and move assignment to avoid copying/moving around
+                * instances of this interface.
+                *
+                * @param   aOther
+                * @returns Hopefully nothing. :P
+                */                                                                   \
+                interface_name& operator=(interface_name      &&aOther) = delete;
 
-	template <typename T, typename TPtr = std::shared_ptr<T>>
-	static inline TPtr GetNonDeletingPtrType(TPtr ptr) {
-		return TPtr(ptr.get(), [](T*) -> void {; /* Do not delete */ });
-	}
+    /**
+     *
+     */
+    using Any = std::any;
 
+    /**
+     *
+     */
+    template <typename T>
+    using Optional = std::optional<T>;
 
-	#define DeclareUniquePointerType(type) \
-            using type##Ptr = std::unique_ptr<type>;
-
-	template <typename TUnderlyingType, typename ... TArgs>
-	static inline std::unique_ptr<TUnderlyingType> MakeUniquePointerType(TArgs&&... args) {
-		return std::make_unique<TUnderlyingType>(std::forward<TArgs>(args)...);
-	}
-
-	template <typename TEnum>
-	static inline
-		std::underlying_type_t<TEnum> EToUnderlying(const TEnum& r) {
-		return static_cast<std::underlying_type_t<TEnum>>(r);
-	}
-
-	/*template <typename TEnum>
-	static inline 
-		std::underlying_type_t<TEnum> operator |(
-			const TEnum& l,
-			const TEnum& r
-			) {
-		return (EToUnderlying<TEnum>(l) | EToUnderlying<TEnum>(r));
-	}
-
-	template <typename TEnum>
-	static inline 
-		std::underlying_type_t<TEnum> operator |(
-			const std::underlying_type_t<TEnum>& l,
-			const TEnum& r
-			) {
-		return (l | EToUnderlying<TEnum>(r));
-	}*/
-	/*
-	template <typename T, T... Rest>
-	struct CombineEnumClassFlags;
-
-	template <typename T>
-	struct CombineEnumClassFlags<T> {
-		static const std::underlying_type_t<T> value = 0;
-	};
-	
-	template <typename T, T First, T... Rest>
-	struct CombineEnumClassFlags<T, First, Rest...> {
-		static const
-			std::underlying_type_t<T> value
-			= (((std::underlying_type_t<T>)First) | CombineEnumClassFlags<T, Rest...>::value);
-	};
-
-	template <typename T>
-	struct EnumClassFlags {
-		static inline 
-		std::underlying_type_t<T>
-			append(const std::underlying_type_t<T>& f,
-				const T& a) {
-			return (f | a);
-		}
-	};
-
-	template <typename T>
-	static inline bool checkFlag
-	(
-		const typename std::underlying_type<
-		                  typename std::enable_if<std::is_enum<T>::value, T>::type
-		               >::type &flags,   
-		               const T &test
-	) {
-		return ((flags & ((typename std::underlying_type<T>::type) test)) == ((typename std::underlying_type<T>::type) test));
-	}
-
-	#define DeclareEnumClassUnderlyingType(enumName, typeName) \
-            typedef std::underlying_type<enumName>::type typeName;
-
-	template <typename TEnum, typename TUnderlying = typename std::underlying_type<TEnum>::type>
-	static inline bool CheckEnumFlag(
-		const TEnum       &value,
-		const TUnderlying &underlyingFlags) {
-		TUnderlying underlyingValue = static_cast<TUnderlying>(value);
-		return ((underlyingFlags & underlyingValue) == underlyingValue);
-	}*/
-
-  template <typename T>
-  using Vector = std::vector<T>;
-
-  template <typename TKey, typename TValue>
-  using Map = std::unordered_map<TKey, TValue>;
-
-#define DeclareListType(type, prefix) using prefix##List = std::vector<type>;
-#define DeclareMapType(keytype, valuetype, prefix) using prefix##Map = std::unordered_map<keytype, valuetype>;
-
-#define DeclareTemplateListType(type, prefix) \
-             template <typename type>         \
-	         using prefix##List = std::vector<std::shared_ptr<type>>;
-
-
-	#define DenyCopyAndMove(type, alias)              \
-		type(const alias&)              = delete; \
-		type(alias&&)                   = delete; \
-		alias& operator =(const alias&) = delete; \
-		alias& operator =(alias&&)      = delete; 
-
-	#define DeclareInterface(name)           \
-		class name {                         \
-            public:                          \
-                virtual ~name() = default;   \
-                                             \
-                DenyCopyAndMove(name, name); \
-            protected:                       \
-                name() = default;            \
-            public:
-
-	#define DeclareTemplatedInterface(name, alias)            \
-    class name {                                         	  \
-            public:                 						  \
-				typedef alias my_type;						  \
-															  \
-                virtual ~name() = default;               	  \
-                                                         	  \
-                DenyCopyAndMove(name, alias);                 \
-            protected:                                  	  \
-                name() = default;                       	  \
-            public:
-
-	#define DeclareDerivedInterface(name, base) \
-		class name 								\
-	        : public base {                     \
-            public:                             \
-                virtual ~name() = default;      \
-                                                \
-                DenyCopyAndMove(name, name);    \
-            protected:                          \
-                name() = default;               \
-            public:
-
-	#define DeclareDerivedTemplatedInterface(name, alias, base) \
-		class name 								\
-	        : public base {                     \
-            public:                             \
-				typedef alias my_type;		    \
-												\
-                virtual ~name() = default;      \
-                                                \
-                DenyCopyAndMove(name, alias);   \
-            protected:                          \
-                name() = default;               \
-            public:
-
-	#define DeclareInterfaceEnd(name) };
-
-  using Any = std::any;
-
-  template <typename T>
-  using Optional = std::optional<T>;
-
-  template <typename T>
-  using RefWrapper = std::reference_wrapper<T>;
+    /**
+     *
+     */
+    template <typename T>
+    using RefWrapper = std::reference_wrapper<T>;
 
 }
 

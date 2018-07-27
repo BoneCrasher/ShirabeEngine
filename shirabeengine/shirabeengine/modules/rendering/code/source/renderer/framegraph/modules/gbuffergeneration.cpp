@@ -28,7 +28,7 @@ namespace Engine {
           width  = 1920,
           height = 1080;
 
-        Ptr<ApplicationEnvironment> environment = graphBuilder.env();
+        CStdSharedPtr_t<ApplicationEnvironment> environment = graphBuilder.env();
         if(environment) {
           OSDisplayDescriptor const&displayDesc = environment->primaryDisplay();
           width  = displayDesc.bounds.size.x();
@@ -64,20 +64,20 @@ namespace Engine {
 
         return true;
       },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&context) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, CStdSharedPtr_t<IFrameGraphRenderContext>&context) -> bool
       {
         using namespace Engine::Rendering;
 
         Log::Verbose(logTag(), "GBufferGeneration");
 
-        Ptr<FrameGraphRenderableListView> const&renderableView = frameGraphResources.get<FrameGraphRenderableListView>(passData.importData.renderableListView.resourceId);
+        CStdSharedPtr_t<FrameGraphRenderableListView> const&renderableView = frameGraphResources.get<FrameGraphRenderableListView>(passData.importData.renderableListView.resourceId);
         
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
         if(!renderableView)
           throw std::runtime_error(String::format("Renderable view with id %0 not found.", passData.importData.renderableListView.resourceId));
         #endif
 
-        Ptr<FrameGraphRenderableList> const&renderableList = frameGraphResources.get<FrameGraphRenderableList>(passData.importData.renderableListView.subjacentResource);
+        CStdSharedPtr_t<FrameGraphRenderableList> const&renderableList = frameGraphResources.get<FrameGraphRenderableList>(passData.importData.renderableListView.subjacentResource);
         
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
         if(!renderableList)

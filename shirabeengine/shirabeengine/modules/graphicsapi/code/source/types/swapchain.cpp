@@ -61,11 +61,11 @@ namespace Engine {
       : BaseDeclaration::QueryBase(inPublicResourceId)
     {}
     
-    Ptr<SwapChainBuffer>
+    CStdSharedPtr_t<SwapChainBuffer>
       SwapChainBuffer::create(
         const SwapChainBuffer::Descriptor &desc)
     {
-      return Ptr<SwapChainBuffer>(new SwapChainBuffer(desc));
+      return CStdSharedPtr_t<SwapChainBuffer>(new SwapChainBuffer(desc));
     }
 
     SwapChainBuffer::SwapChainBuffer(
@@ -142,13 +142,13 @@ namespace Engine {
     {}
 
 
-    Ptr<SwapChain>
+    CStdSharedPtr_t<SwapChain>
       SwapChain::create(
         const SwapChain::Descriptor &desc) {
-      return Ptr<SwapChain>(new SwapChain(desc));
+      return CStdSharedPtr_t<SwapChain>(new SwapChain(desc));
     }
 
-    Ptr<TextureView> const&
+    CStdSharedPtr_t<TextureView> const&
       SwapChain::getBackBufferRenderTargetView(uint32_t const& index)
     {
       if(index < 0 || index >= m_backBufferRenderTargetViews.size())
@@ -157,7 +157,7 @@ namespace Engine {
       return m_backBufferRenderTargetViews[index];
     }
 
-    Ptr<TextureView> const&
+    CStdSharedPtr_t<TextureView> const&
       SwapChain::getCurrentBackBufferRenderTargetView()
     {
       return getBackBufferRenderTargetView(m_currentBackBufferIndex);

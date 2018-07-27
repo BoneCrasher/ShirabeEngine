@@ -100,10 +100,10 @@ namespace Engine {
         std::atomic<bool>            m_running;
         std::atomic<bool>            m_pause;
         std::atomic<bool>            m_interrupt;
-        std::shared_ptr<std::thread> m_timerThread;
+        CStdSharedPtr_t<std::thread> m_timerThread;
         std::function<void()>        m_timerCallbackFunction;
     };
-    using CallbackTimerPtr = std::shared_ptr<CallbackTimer>;
+    using CallbackTimerPtr = CStdSharedPtr_t<CallbackTimer>;
 
 }
 

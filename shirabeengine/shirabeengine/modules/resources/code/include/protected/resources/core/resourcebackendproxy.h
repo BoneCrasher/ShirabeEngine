@@ -17,17 +17,17 @@ namespace Engine {
 		public:
 			inline ResourceBackendProxy(
 				const EProxyType                          &proxyType,
-				const Ptr<TBackend>                       &resourceBackend,
+				const CStdSharedPtr_t<TBackend>                       &resourceBackend,
 				const typename TResource::CreationRequest &request)
 				: GenericProxyBase<TResource>(proxyType, request)
 				, m_backend(resourceBackend)
 			{ }
 
 		protected:
-			Ptr<TBackend> resourceBackend() { return m_backend; }
+			CStdSharedPtr_t<TBackend> resourceBackend() { return m_backend; }
 
 		private:
-			Ptr<TBackend> m_backend;
+			CStdSharedPtr_t<TBackend> m_backend;
 		};
 
 		// template <typename TBackend, EResourceType type, EResourceSubType subtype>

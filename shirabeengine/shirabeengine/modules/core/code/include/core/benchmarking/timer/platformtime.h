@@ -4,18 +4,18 @@
 #include <map>
 #include <iostream>   // for printf
 
-#include "Platform/Platform.h"
-#include "Core/EngineStatus.h"
+#include "platform/platform.h"
+#include "core/enginestatus.h"
 
 #ifdef PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 
 namespace Engine
-{	
-	/// <summary>
-	/// Specifies valid time-units to be used for converting the internal time values.
-	/// </summary>
+{
+    /**
+     * Specifies valid time-units to be used for converting the internal time values.
+     */
 	enum class ETimeUnit
 	{
 		NanoSeconds = 0,
@@ -43,32 +43,21 @@ namespace Engine
 	 * T - 	Internal time value data-type to represent a point in time numerically.
 	 **************************************************************************************************/
 	template <typename T>
-	class PlatformTime
-	{
+    class CPlatformTime
+    {
 
-	protected:
-		using ConversionFactorMap = std::map<ETimeUnit, double>;
+    public_typedefs:
+        typedef CPlatformTime<T> timer_type;
+        typedef T                internal_time_value_type;
 
-	public:
-		typedef typename PlatformTime<T> timer_type;
-		typedef typename T               internal_time_value_type;
-		
-	protected: 		
-
-		/**************************************************************************************************
-		 * Fn:	PlatformTime::PlatformTime() = default;
-		 *
-		 * Summary:	Default constructor.
-		 **************************************************************************************************/
-		PlatformTime() = default;
-	public:    		
+    public_destructors:
 
 		/**************************************************************************************************
 		 * Fn:	virtual PlatformTime::~PlatformTime() = default;
 		 *
 		 * Summary:	Destructor.
 		 **************************************************************************************************/
-		virtual ~PlatformTime() = default;
+        virtual ~CPlatformTime() = default;
 
 		/**************************************************************************************************
 		 * Fn:	EEngineStatus PlatformTime::initialize();
@@ -93,7 +82,7 @@ namespace Engine
 		 *  Valid conversion factor from seconds to @unit.
 		 *          1.0 if the requested target unit is not supported.
 		 **************************************************************************************************/
-		double getConversionMask(ETimeUnit unit = ETimeUnit::Seconds);
+        double getConversionMask(ETimeUnit aUnit = ETimeUnit::Seconds);
 
 		/**************************************************************************************************
 		 * Fn:	virtual EEngineStatus PlatformTime::getTimestamp(T& buffer) const = 0;
@@ -106,7 +95,7 @@ namespace Engine
 		 *
 		 * Returns:	EEngineStatus::Ok if successful. An error Of EEngineStatus otherwise.
 		 **************************************************************************************************/
-		virtual EEngineStatus getTimestamp(T& buffer) const = 0;	
+        virtual EEngineStatus getTimestamp(T &aBuffer) const = 0;
 
 		/**************************************************************************************************
 		 * Fn:	virtual EEngineStatus PlatformTime::getConversionConstant(T& buffer) const = 0;
@@ -120,39 +109,63 @@ namespace Engine
 		 *
 		 * Returns:	EEngineStatus::Ok if successful. An error Of EEngineStatus otherwise.
 		 **************************************************************************************************/
-		virtual EEngineStatus getConversionConstant(T& buffer) const = 0;
+        virtual EEngineStatus getConversionConstant(T &aBuffer) const = 0;
 
-		/**************************************************************************************************
-		 * Fn:	virtual void PlatformTime::requestSetConversionFactors(ConversionFactorMap& map) = 0;
-		 *
-		 * Summary:
-		 *  Requests derivate implementations to set all valid conversion factors
-		 *  	for each supported ETimeUnit.
-		 *
-		 * Parameters:
-		 * map - 	[in,out] Assignment-container to hold all supported conversion factors.
-		 **************************************************************************************************/
-		virtual void requestSetConversionFactors(ConversionFactorMap& map) = 0;
+
+    protected_typedefs:
+        using ConversionFactorMap_t = std::map<ETimeUnit, double>;
+
+    protected_constructors:
+        /**************************************************************************************************
+         * Fn:	PlatformTime::PlatformTime() = default;
+         *
+         * Summary:	Default constructor.
+         **************************************************************************************************/
+        CPlatformTime() = default;
+
+    protected_methods:
+        /**************************************************************************************************
+         * Fn:	virtual void PlatformTime::requestSetConversionFactors(ConversionFactorMap& map) = 0;
+         *
+         * Summary:
+         *  Requests derivate implementations to set all valid conversion factors
+         *  	for each supported ETimeUnit.
+         *
+         * Parameters:
+         * map - 	[in,out] Assignment-container to hold all supported conversion factors.
+         **************************************************************************************************/
+        virtual void requestSetConversionFactors(ConversionFactorMap_t &aMap) = 0;
 		
+    private_members:
 		/** Summary: Container holding all valid mappings of <time unit> to <conversion factor>. */
-		ConversionFactorMap m_conversionFactors;
+        ConversionFactorMap_t mConversionFactors;
 	};
+    //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
 	template <typename T>
-	EEngineStatus PlatformTime<T>::initialize() {
-		requestSetConversionFactors(m_conversionFactors);
+    EEngineStatus CPlatformTime<T>::initialize()
+    {
+        requestSetConversionFactors(mConversionFactors);
 		return EEngineStatus::Ok;
 	}
+    //<-----------------------------------------------------------------------------
 
-
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
 	template <typename T>
-	double PlatformTime<T>::getConversionMask(ETimeUnit unit) {
-		ConversionFactorMap::iterator it = m_conversionFactors.find(unit);
-		if (it != m_conversionFactors.end())
+    double CPlatformTime<T>::getConversionMask(ETimeUnit unit)
+    {
+        ConversionFactorMap_t::iterator it = mConversionFactors.find(unit);
+        if (it != mConversionFactors.end())
 			return it->second;
 		else
 			return 1.0;
 	};
+    //<-----------------------------------------------------------------------------
 }
 
 #endif

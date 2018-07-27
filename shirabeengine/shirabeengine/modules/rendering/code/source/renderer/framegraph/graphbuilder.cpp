@@ -35,7 +35,7 @@ namespace Engine {
     {
     }
 
-    Ptr<IUIDGenerator<FrameGraphResourceId_t>>
+    CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>>
       GraphBuilder::resourceUIDGenerator()
     {
       return m_resourceUIDGenerator;
@@ -56,17 +56,17 @@ namespace Engine {
      **************************************************************************************************/
     bool
       GraphBuilder::initialize(
-        Ptr<ApplicationEnvironment> const&environment)
+        CStdSharedPtr_t<ApplicationEnvironment> const&environment)
     {
       assert(environment != nullptr);
       env()   = environment;
-      graph() = MakeUniquePointerType<Graph>();
+      graph() = makeCStdUniquePtr<Graph>();
 
       // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
       spawnPass<CallbackPass<bool>>(
         "Pseudo-Pass",
         [] (PassBuilder const&, bool&)                                               -> bool { return true; },
-        [] (bool const&, FrameGraphResources const&, Ptr<IFrameGraphRenderContext>&) -> bool { return true; });
+        [] (bool const&, FrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&) -> bool { return true; });
 
       return true;
     }
@@ -87,7 +87,7 @@ namespace Engine {
       return true;
     }
 
-    Ptr<ApplicationEnvironment>&
+    CStdSharedPtr_t<ApplicationEnvironment>&
       GraphBuilder::env()
     {
       return m_applicationEnvironment;
@@ -120,7 +120,7 @@ namespace Engine {
 
         m_resources.push_back(resource.resourceId);
 
-        UniquePtr<PassBase::MutableAccessor> accessor = m_passes.at(0)->getMutableAccessor(PassKey<GraphBuilder>());
+        UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = m_passes.at(0)->getMutableAccessor(PassKey<GraphBuilder>());
         accessor->mutableResourceReferences().push_back(resource.resourceId);
 
         return resource;
@@ -156,16 +156,16 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  UniquePtr<Graph> GraphBuilder::compile()
+     * \fn  UniqueCStdSharedPtr_t<Graph> GraphBuilder::compile()
      *
      * \brief Gets the compile
      *
      * \return  An UniquePtr&lt;Graph&gt;
      **************************************************************************************************/
-    UniquePtr<Graph>
+    UniqueCStdSharedPtr_t<Graph>
       GraphBuilder::compile()
     {
-      UniquePtr<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<GraphBuilder>());
+      UniqueCStdSharedPtr_t<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<GraphBuilder>());
 
       for(PassMap::value_type const&assignment : graph()->passes())
         assert(true == collectPass(assignment.second));
@@ -204,13 +204,13 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  UniquePtr<Graph>& GraphBuilder::graph()
+     * \fn  UniqueCStdSharedPtr_t<Graph>& GraphBuilder::graph()
      *
      * \brief Gets the graph
      *
      * \return  A reference to an UniquePtr&lt;Graph&gt;
      **************************************************************************************************/
-    UniquePtr<Graph>&
+    UniqueCStdSharedPtr_t<Graph>&
       GraphBuilder::graph()
     {
       return m_frameGraph;
@@ -286,11 +286,11 @@ namespace Engine {
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
     bool
-      GraphBuilder::collectPass(Ptr<PassBase> pass)
+      GraphBuilder::collectPass(CStdSharedPtr_t<PassBase> pass)
     {
       assert(nullptr != pass);
 
-      UniquePtr<PassBase::MutableAccessor> accessor = pass->getMutableAccessor(PassKey<GraphBuilder>());
+      UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = pass->getMutableAccessor(PassKey<GraphBuilder>());
 
       // Derive:
       // - Resource creation requests.

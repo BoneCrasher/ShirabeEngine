@@ -42,7 +42,7 @@ namespace Engine {
 
     using ResourceTaskFn_t = std::function<GFXAPIResourceHandleAssignment()>;
 
-    using ResolvedDependencyCollection = std::map<PublicResourceId_t, Ptr<void>>;
+    using ResolvedDependencyCollection = std::map<PublicResourceId_t, CStdSharedPtr_t<void>>;
 
     template <typename T>
     class GFXAPIResourceTaskBackendModule

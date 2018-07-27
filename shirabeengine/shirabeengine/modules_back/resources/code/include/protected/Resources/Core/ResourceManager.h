@@ -84,7 +84,7 @@ namespace Engine {
 
     public:
       ResourceManager(
-        const Ptr<ResourceProxyFactory> &proxyFactory)
+        const CStdSharedPtr_t<ResourceProxyFactory> &proxyFactory)
         : m_proxyFactory(proxyFactory)
       {}
 
@@ -95,7 +95,7 @@ namespace Engine {
 
       bool clear();
 
-      /*void setResourceBackend(Ptr<GFXAPIResourceBackend> const& backend) {
+      /*void setResourceBackend(CStdSharedPtr_t<GFXAPIResourceBackend> const& backend) {
         assert(backend != nullptr);
 
         m_resourceBackend = backend;
@@ -137,7 +137,7 @@ namespace Engine {
        *
        * \return	The EEngineStatus.
        **************************************************************************************************/
-      EEngineStatus proxyLoad(Ptr<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies);
+      EEngineStatus proxyLoad(CStdSharedPtr_t<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies);
 
       /**********************************************************************************************//**
        * \fn  EEngineStatus ResourceManager::proxyUnload(const ResourceHandle& handle);
@@ -148,7 +148,7 @@ namespace Engine {
        *
        * \return  The EEngineStatus.
        **************************************************************************************************/
-      EEngineStatus proxyUnload(Ptr<IResourceProxyBase> &proxy);
+      EEngineStatus proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &proxy);
 
       inline AnyProxy getResourceProxy(std::string const& id) {
         return m_resources.getResource(id);
@@ -163,8 +163,8 @@ namespace Engine {
 
       Random::RandomState m_idGenerator;
 
-      Ptr<ResourceProxyFactory>  m_proxyFactory;
-      // Ptr<GFXAPIResourceBackend> m_resourceBackend;
+      CStdSharedPtr_t<ResourceProxyFactory>  m_proxyFactory;
+      // CStdSharedPtr_t<GFXAPIResourceBackend> m_resourceBackend;
 
       // Any kind of resources, abstracted away entirely.
       IndexedResourcePool<PublicResourceId_t, AnyProxy> m_resources;
@@ -172,7 +172,7 @@ namespace Engine {
     DeclareSharedPointerType(ResourceManager);
 
     /**********************************************************************************************//**
-     * \fn	template <typename TBuilder> EEngineStatus ResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, bool creationDeferred, Ptr<typename TBuilder::proxy> &outProxy, std::vector<ResourceHandle> &outHandles )
+     * \fn	template <typename TBuilder> EEngineStatus ResourceManager::createResource( const typename TBuilder::traits_type::descriptor_type &desc, bool creationDeferred, CStdSharedPtr_t<typename TBuilder::proxy> &outProxy, std::vector<ResourceHandle> &outHandles )
      *
      * \brief	Unified algorithm to invoke a specific builder and store the data in the respective
      * 			storage.
@@ -197,7 +197,7 @@ namespace Engine {
 
       AnyProxy resourceProxy = getResourceProxy(resourceId);
       if(!resourceProxy) {
-        Ptr<IResourceProxy<TResource>> proxy
+        CStdSharedPtr_t<IResourceProxy<TResource>> proxy
           = m_proxyFactory->create<TResource>(EProxyType::Dynamic, request);
         if(!proxy)
           HandleEngineStatusError(EEngineStatus::Error, "Failed to create proxy for resource.");
@@ -225,7 +225,7 @@ namespace Engine {
 
       IResourceProxyBasePtr baseProxy = BaseProxyCast(resourceProxy);
 
-      Ptr<GenericProxyBase<TResource>> genericProxy = GenericProxyBaseCast<TResource>(resourceProxy);
+      CStdSharedPtr_t<GenericProxyBase<TResource>> genericProxy = GenericProxyBaseCast<TResource>(resourceProxy);
       if(!genericProxy)
         HandleEngineStatusError(EEngineStatus::Error, "Proxy is not a GenericResourceProxy");
 

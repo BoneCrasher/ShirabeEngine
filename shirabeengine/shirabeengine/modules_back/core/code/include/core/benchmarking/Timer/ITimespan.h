@@ -184,7 +184,7 @@ namespace Engine {
          */
         class Factory {
         public:
-            static inline std::shared_ptr<Timespan<iSubsecondUnits>> create(intmax_t units) {
+            static inline CStdSharedPtr_t<Timespan<iSubsecondUnits>> create(intmax_t units) {
                 return std::make_shared<Timespan<iSubsecondUnits>>(units);
             }
         };
@@ -308,12 +308,12 @@ namespace Engine {
 
     private:
 
-        inline std::shared_ptr<Timespan<iSubsecondUnits>> add(
+        inline CStdSharedPtr_t<Timespan<iSubsecondUnits>> add(
                 const ITimespanPtr& other) {
             return Factory::create((totalSeconds() + other->totalSeconds()) * iSubsecondUnits);
         }
 
-        inline std::shared_ptr<Timespan<iSubsecondUnits>> sub(
+        inline CStdSharedPtr_t<Timespan<iSubsecondUnits>> sub(
                 const ITimespanPtr& other) {
             return Factory::create((totalSeconds() - other->totalSeconds()) * iSubsecondUnits);
         }
@@ -355,7 +355,7 @@ namespace Engine {
     }
 
     template <int iSubseconds>
-    static std::shared_ptr<Timespan<iSubseconds>> FromTimeString(std::string timeStr) {
+    static CStdSharedPtr_t<Timespan<iSubseconds>> FromTimeString(std::string timeStr) {
         std::stringstream timestream(timeStr);
         int HH, mm, ss, mss;
         std::string strHH, strmm, strss, strmss;

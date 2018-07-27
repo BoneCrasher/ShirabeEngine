@@ -22,7 +22,7 @@ namespace Engine {
 
     struct GFXAPIResourceHandleAssignment {
       PublicResourceId_t publicHandle;
-      Ptr<void>          internalHandle;
+      CStdSharedPtr_t<void>          internalHandle;
 
       inline GFXAPIResourceHandleAssignment()
         : publicHandle("")
@@ -31,7 +31,7 @@ namespace Engine {
 
       inline GFXAPIResourceHandleAssignment(
         PublicResourceId_t inPublicHandle,
-        Ptr<void>          inInternalHandle)
+        CStdSharedPtr_t<void>          inInternalHandle)
         : publicHandle(inPublicHandle)
         , internalHandle(inInternalHandle)
       {}

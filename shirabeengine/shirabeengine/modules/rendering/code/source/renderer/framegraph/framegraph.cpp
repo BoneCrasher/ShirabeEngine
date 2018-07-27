@@ -100,14 +100,14 @@ namespace Engine {
     }
 
     void
-      Graph::acceptSerializer(Ptr<IFrameGraphSerializer> s)
+      Graph::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s)
     {
       s->serializeGraph(*this);
     }
 
 
     void
-      Graph::acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
+      Graph::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d)
     {
       d->deserializeGraph(*this);
     }
@@ -126,15 +126,15 @@ namespace Engine {
     }
 
     bool
-      Graph::execute(Ptr<IFrameGraphRenderContext>&renderContext)
+      Graph::execute(CStdSharedPtr_t<IFrameGraphRenderContext>&renderContext)
     {
       assert(renderContext != nullptr);
 
       std::stack<PassUID_t> copy = m_passExecutionOrder;
       while(!copy.empty()) {
         PassUID_t                     passUID  = copy.top();
-        Ptr<PassBase>                 pass     = m_passes.at(passUID);
-        UniquePtr<PassBase::Accessor> accessor = pass->getAccessor(PassKey<Graph>());
+        CStdSharedPtr_t<PassBase>                 pass     = m_passes.at(passUID);
+        UniqueCStdSharedPtr_t<PassBase::Accessor> accessor = pass->getAccessor(PassKey<Graph>());
 
         FrameGraphResourceIdList const&passResources = accessor->resourceReferences();
 
@@ -156,20 +156,20 @@ namespace Engine {
     }
 
     bool Graph::initializeResources(
-      Ptr<IFrameGraphRenderContext>       renderContext,
+      CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
       FrameGraphResourceIdList      const&resourceIds)
     {
       bool initialized = true;
 
       for(FrameGraphResourceId_t const&id : resourceIds)
       {
-        Ptr<FrameGraphResource>    subjacent   = nullptr;
-        Ptr<FrameGraphTexture>     texture     = nullptr;
-        Ptr<FrameGraphTextureView> textureView = nullptr;
+        CStdSharedPtr_t<FrameGraphResource>    subjacent   = nullptr;
+        CStdSharedPtr_t<FrameGraphTexture>     texture     = nullptr;
+        CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
         
         FrameGraphResourceIdList::const_iterator it = m_instantiatedResources.end();
 
-        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        CStdSharedPtr_t<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
           texture = std::static_pointer_cast<FrameGraphTexture>(resource);
@@ -206,7 +206,7 @@ namespace Engine {
     }
 
     bool Graph::bindResources(
-      Ptr<IFrameGraphRenderContext>       renderContext,
+      CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
       FrameGraphResourceIdList      const&resourceIds)
     {
       EEngineStatus status = EEngineStatus::Ok;
@@ -215,9 +215,9 @@ namespace Engine {
 
       for(FrameGraphResourceId_t const&id : resourceIds)
       {
-        Ptr<FrameGraphTextureView> textureView = nullptr;
+        CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
         
-        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        CStdSharedPtr_t<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
           break;
@@ -234,7 +234,7 @@ namespace Engine {
     }
     
     bool Graph::unbindResources(
-      Ptr<IFrameGraphRenderContext>       renderContext,
+      CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
       FrameGraphResourceIdList      const&resourceIds)
     {
       EEngineStatus status = EEngineStatus::Ok;
@@ -243,9 +243,9 @@ namespace Engine {
 
       for(FrameGraphResourceId_t const&id : resourceIds)
       {
-        Ptr<FrameGraphTextureView> textureView = nullptr;
+        CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
 
-        Ptr<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+        CStdSharedPtr_t<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
           break;
@@ -262,7 +262,7 @@ namespace Engine {
     }
 
     bool Graph::deinitializeResources(
-      Ptr<IFrameGraphRenderContext>       renderContext,
+      CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
       FrameGraphResourceIdList      const&resourceIds)
     {
       std::function<bool(FrameGraphResourceId_t const&, bool)> recurse = nullptr;
@@ -270,11 +270,11 @@ namespace Engine {
       {
         bool deinitialized = true;
 
-        Ptr<FrameGraphResource> resource = m_resourceData.getMutable<FrameGraphResource>(id);
+        CStdSharedPtr_t<FrameGraphResource> resource = m_resourceData.getMutable<FrameGraphResource>(id);
         
-        Ptr<FrameGraphResource>    subjacent   = nullptr;
-        Ptr<FrameGraphTexture>     texture     = nullptr;
-        Ptr<FrameGraphTextureView> textureView = nullptr;
+        CStdSharedPtr_t<FrameGraphResource>    subjacent   = nullptr;
+        CStdSharedPtr_t<FrameGraphTexture>     texture     = nullptr;
+        CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
 
         switch(resource->type) {
         case FrameGraphResourceType::Texture:
@@ -330,8 +330,8 @@ namespace Engine {
     }
 
     bool Graph::initializeTexture(
-      Ptr<IFrameGraphRenderContext> renderContext,
-      Ptr<FrameGraphTexture>        texture)
+      CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+      CStdSharedPtr_t<FrameGraphTexture>        texture)
     {
       EEngineStatus status = EEngineStatus::Ok;
 
@@ -346,9 +346,9 @@ namespace Engine {
     }
 
     bool Graph::initializeTextureView(
-      Ptr<IFrameGraphRenderContext> renderContext,
-      Ptr<FrameGraphTexture>        texture,
-      Ptr<FrameGraphTextureView>    textureView)
+      CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+      CStdSharedPtr_t<FrameGraphTexture>        texture,
+      CStdSharedPtr_t<FrameGraphTextureView>    textureView)
     {
       FrameGraphResourceId_t id = textureView->resourceId;
 
@@ -359,9 +359,9 @@ namespace Engine {
     }
 
     bool Graph::deinitializeTextureView(
-      Ptr<IFrameGraphRenderContext> renderContext,
-      Ptr<FrameGraphTexture>        texture,
-      Ptr<FrameGraphTextureView>    textureView)
+      CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+      CStdSharedPtr_t<FrameGraphTexture>        texture,
+      CStdSharedPtr_t<FrameGraphTextureView>    textureView)
     {
       EEngineStatus status = renderContext->destroyTextureView(*textureView);
       HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
@@ -371,8 +371,8 @@ namespace Engine {
     }
 
     bool Graph::deinitializeTexture(
-      Ptr<IFrameGraphRenderContext> renderContext,
-      Ptr<FrameGraphTexture>        texture)
+      CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+      CStdSharedPtr_t<FrameGraphTexture>        texture)
     {
       if(texture->isExternalResource)
         return true;
@@ -390,7 +390,7 @@ namespace Engine {
     }
 
     bool
-      Graph::addPass(Ptr<PassBase> const&pass)
+      Graph::addPass(CStdSharedPtr_t<PassBase> const&pass)
     {
       if(m_passes.find(pass->passUID()) != m_passes.end())
         return false;

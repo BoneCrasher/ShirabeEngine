@@ -11,7 +11,7 @@ namespace Engine {
     using GFXAPI::TextureInfo;
 
     /**********************************************************************************************//**
-     * \fn  AssetStorage::AssetStorage(Ptr<IResourceManager> const manager)
+     * \fn  AssetStorage::AssetStorage(CStdSharedPtr_t<IResourceManager> const manager)
      *
      * \brief Constructor
      *
@@ -63,7 +63,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  Ptr<ByteBuffer> AssetStorage::loadAsset(AssetId_t const&id)
+     * \fn  CStdSharedPtr_t<ByteBuffer> AssetStorage::loadAsset(AssetId_t const&id)
      *
      * \brief Loads an asset
      *
@@ -96,7 +96,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  Ptr<ByteBuffer> AssetStorage::loadBufferAsset(Asset const&asset)
+     * \fn  CStdSharedPtr_t<ByteBuffer> AssetStorage::loadBufferAsset(Asset const&asset)
      *
      * \brief Loads buffer asset
      *
@@ -150,7 +150,7 @@ namespace Engine {
     }
 
     /**********************************************************************************************//**
-     * \fn  Ptr<ByteBuffer> AssetStorage::loadTextureAsset(Asset const&asset)
+     * \fn  CStdSharedPtr_t<ByteBuffer> AssetStorage::loadTextureAsset(Asset const&asset)
      *
      * \brief Loads texture asset
      *

@@ -46,7 +46,7 @@ namespace Engine {
       : public GFXAPIResourceTaskBackend
     {
     public:
-      VulkanResourceTaskBackend(Ptr<VulkanEnvironment> const&);
+      VulkanResourceTaskBackend(CStdSharedPtr_t<VulkanEnvironment> const&);
 
       void initialize();
 
@@ -56,7 +56,7 @@ namespace Engine {
       //DeclareTaskBuilderModule(Buffer);
       //DeclareTaskBuilderModule(BufferView);
 
-      Ptr<VulkanEnvironment> m_vulkanEnvironment;
+      CStdSharedPtr_t<VulkanEnvironment> m_vulkanEnvironment;
     };
 
 

@@ -4,7 +4,7 @@ namespace Engine {
   namespace Vulkan {
 
     VulkanResourceTaskBackend::VulkanResourceTaskBackend(
-      Ptr<VulkanEnvironment> const& vulkanEnvironment)
+      CStdSharedPtr_t<VulkanEnvironment> const& vulkanEnvironment)
       : GFXAPIResourceTaskBackend()
       , m_vulkanEnvironment(vulkanEnvironment)
     {

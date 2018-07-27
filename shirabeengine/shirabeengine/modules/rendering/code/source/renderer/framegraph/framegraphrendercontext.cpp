@@ -7,26 +7,26 @@ namespace Engine {
   namespace FrameGraph {
     using namespace Engine::Rendering;
 
-    Ptr<FrameGraphRenderContext>
+    CStdSharedPtr_t<FrameGraphRenderContext>
       FrameGraphRenderContext::create(
-        Ptr<IAssetStorage>   assetStorage,
-        Ptr<ResourceManager> resourceManager,
-        Ptr<IRenderContext>  renderer)
+        CStdSharedPtr_t<IAssetStorage>   assetStorage,
+        CStdSharedPtr_t<ResourceManager> resourceManager,
+        CStdSharedPtr_t<IRenderContext>  renderer)
     {
       assert(assetStorage    != nullptr);
       assert(resourceManager != nullptr);
       assert(renderer        != nullptr);
 
-      Ptr<FrameGraphRenderContext> context = Ptr<FrameGraphRenderContext>(new FrameGraphRenderContext(assetStorage, resourceManager, renderer));
+      CStdSharedPtr_t<FrameGraphRenderContext> context = CStdSharedPtr_t<FrameGraphRenderContext>(new FrameGraphRenderContext(assetStorage, resourceManager, renderer));
       if(!context)
         Log::Error(logTag(), "Failed to create render context from renderer and resourcemanager.");
       return context;
     }
 
     FrameGraphRenderContext::FrameGraphRenderContext(
-      Ptr<IAssetStorage>   assetStorage,
-      Ptr<ResourceManager> resourceManager,
-      Ptr<IRenderContext>  renderer)
+      CStdSharedPtr_t<IAssetStorage>   assetStorage,
+      CStdSharedPtr_t<ResourceManager> resourceManager,
+      CStdSharedPtr_t<IRenderContext>  renderer)
       : m_assetStorage(assetStorage)
       , m_resourceManager(resourceManager)
       , m_platformRenderContext(renderer)

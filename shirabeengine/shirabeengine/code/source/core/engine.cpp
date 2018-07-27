@@ -47,7 +47,7 @@ namespace Engine {
   };
 
   EngineInstance::EngineInstance(
-    Ptr<OS::ApplicationEnvironment> const&environment)
+    CStdSharedPtr_t<OS::ApplicationEnvironment> const&environment)
     : m_environment(environment)
     , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
     , m_mainWindow(nullptr)
@@ -64,7 +64,7 @@ namespace Engine {
   template <typename TResource>
   struct SpawnProxy {
     static ResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(
-      Ptr<GFXAPIResourceBackend> backend)
+      CStdSharedPtr_t<GFXAPIResourceBackend> backend)
     {
       return
         [=]()
@@ -72,9 +72,9 @@ namespace Engine {
       {
         return 
           [=](EProxyType const&type, typename TResource::CreationRequest const&request)
-          -> Ptr<IResourceProxy<TResource>>
+          -> CStdSharedPtr_t<IResourceProxy<TResource>>
         {
-          return MakeSharedPointerType<GFXAPIResourceProxy<TResource>>(type, backend, request);
+          return makeCStdSharedPtr<GFXAPIResourceProxy<TResource>>(type, backend, request);
         };
       }();
     }
@@ -95,7 +95,7 @@ namespace Engine {
     {
       EEngineStatus status = EEngineStatus::Ok;
 
-      m_windowManager = MakeSharedPointerType<WindowManager>();
+      m_windowManager = makeCStdSharedPtr<WindowManager>();
       if(!(m_windowManager && !CheckWindowManagerError(m_windowManager->initialize(*m_environment)))) {
         status = EEngineStatus::EngineComponentInitializationError;
         HandleEngineStatusError(status, "Failed to create WindowManager.");
@@ -118,7 +118,7 @@ namespace Engine {
         }
       }
 
-      IWindow::IEventCallbackPtr dummy = MakeSharedPointerType<TestDummy>();
+      IWindow::IEventCallbackPtr dummy = makeCStdSharedPtr<TestDummy>();
       m_mainWindow->registerCallback(dummy);
     };
 
@@ -132,7 +132,7 @@ namespace Engine {
     std::function<void()> fnCreateDefaultGFXAPI
       = [&, this] () -> void
     {
-      m_vulkanEnvironment = MakeSharedPointerType<VulkanEnvironment>();
+      m_vulkanEnvironment = makeCStdSharedPtr<VulkanEnvironment>();
 
       EEngineStatus status = m_vulkanEnvironment->initialize(*m_environment);
       HandleEngineStatusError(status, "Vulkan initialization failed.");
@@ -151,22 +151,22 @@ namespace Engine {
       // 
 
       AssetStorage::AssetIndex assetIndex ={}; // AssetIndex::loadIndexById("");
-      Ptr<AssetStorage> assetStorage = MakeSharedPointerType<AssetStorage>();
+      CStdSharedPtr_t<AssetStorage> assetStorage = makeCStdSharedPtr<AssetStorage>();
       m_assetStorage->readIndex(assetIndex);
       m_assetStorage = assetStorage;
 
-      Ptr<GFXAPIResourceBackend>     resourceBackend     = MakeSharedPointerType<GFXAPIResourceBackend>();
-      Ptr<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
+      CStdSharedPtr_t<GFXAPIResourceBackend>     resourceBackend     = makeCStdSharedPtr<GFXAPIResourceBackend>();
+      CStdSharedPtr_t<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
-      m_proxyFactory = MakeSharedPointerType<ResourceProxyFactory>();
+      m_proxyFactory = makeCStdSharedPtr<ResourceProxyFactory>();
       m_proxyFactory->addCreator<Texture>(EResourceType::TEXTURE, SpawnProxy<Texture>::forGFXAPIBackend(resourceBackend));
       m_proxyFactory->addCreator<TextureView>(EResourceType::GAPI_VIEW, SpawnProxy<TextureView>::forGFXAPIBackend(resourceBackend));
 
-      Ptr<ResourceManager> manager = MakeSharedPointerType<ResourceManager>(m_proxyFactory);
+      CStdSharedPtr_t<ResourceManager> manager = makeCStdSharedPtr<ResourceManager>(m_proxyFactory);
       m_resourceManager = manager;
 
       if(gfxApi == EGFXAPI::Vulkan) {
-        Ptr<VulkanResourceTaskBackend> vkResourceTaskBackend = MakeSharedPointerType<VulkanResourceTaskBackend>(m_vulkanEnvironment);
+        CStdSharedPtr_t<VulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<VulkanResourceTaskBackend>(m_vulkanEnvironment);
         vkResourceTaskBackend->initialize();
 
         resourceTaskBackend = vkResourceTaskBackend;
@@ -183,13 +183,13 @@ namespace Engine {
       using Engine::FrameGraph::FrameGraphRenderContext;
 
       // How to decouple?
-      Ptr<IRenderContext> gfxApiRenderContext = nullptr;
+      CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;
       if(gfxApi == EGFXAPI::Vulkan)
-        gfxApiRenderContext = MakeSharedPointerType<VulkanRenderContext>();
+        gfxApiRenderContext = makeCStdSharedPtr<VulkanRenderContext>();
 
-      Ptr<IFrameGraphRenderContext> frameGraphRenderContext = FrameGraphRenderContext::create(m_assetStorage, m_resourceManager, gfxApiRenderContext);
+      CStdSharedPtr_t<IFrameGraphRenderContext> frameGraphRenderContext = FrameGraphRenderContext::create(m_assetStorage, m_resourceManager, gfxApiRenderContext);
 
-      m_renderer = MakeSharedPointerType<Renderer>();
+      m_renderer = makeCStdSharedPtr<Renderer>();
       status = m_renderer->initialize(m_environment, rendererConfiguration, frameGraphRenderContext);
       if(!CheckEngineError(status)) {
         status = m_scene.initialize();

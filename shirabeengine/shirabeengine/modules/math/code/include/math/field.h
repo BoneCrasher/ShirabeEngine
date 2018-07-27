@@ -1,3 +1,10 @@
+/*!
+ * @file      field.h
+ * @author    Marc-Anton Boehm-von Thenen
+ * @date      27/07/2018
+ * @copyright SmartRay GmbH (www.smartray.com)
+ */
+
 #ifndef __SHIRABE_MATH_FIELD_H__
 #define __SHIRABE_MATH_FIELD_H__
 
@@ -512,7 +519,7 @@ namespace Engine
                 typename D_FIELD::value_type const &aFactor,
                 typename D_FIELD::class_type const &aLHS)
         {
-            return operator*(aLHS, aFactor);
+            return operator*<T, TByteSize, TN, TStride>(aLHS, aFactor);
         }
 
         /**
@@ -533,7 +540,7 @@ namespace Engine
                 typename D_FIELD::class_type const &aLHS,
                 typename D_FIELD::value_type const &aFactor)
         {
-            return operator*(aLHS, (T(1.0) / aFactor));
+            return operator*<T, TByteSize, TN, TStride>(aLHS, (T(1.0) / aFactor));
         }
 
     }

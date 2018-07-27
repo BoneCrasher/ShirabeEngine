@@ -1,17 +1,18 @@
 #ifndef __SHIRABE__TIMER_H__
 #define __SHIRABE__TIMER_H__
 
-#include "Core/EngineTypeHelper.h"
-#include "Core/Benchmarking/MeasurementDataStore.h"
-#include "Core/Benchmarking/Timer/TimespanUnit.h"
+#include "core/enginetypehelper.h"
+#include "core/benchmarking/measurementdatastore.h"
+#include "core/benchmarking/timer/timespanunit.h"
 
-#include "Platform/Platform.h"
+#include <platform/platform.h>
+
 #ifdef PLATFORM_WINDOWS
 #pragma warning(push)
 #pragma warning(disable:4820)
-#include "WindowsTime.h"
-#elif
-	#include "Time.h"
+#include "core/benchmarking/timer/windowstime.h"
+#else
+    #include "time.h"
 #endif
 
 using namespace Engine::Benchmarking;
@@ -21,7 +22,7 @@ using namespace Engine::Benchmarking;
  *
  * Summary:	Defines an alias representing the FPS data store.
  **************************************************************************************************/
-typedef MeasurementDataStore<MeasurementChunk<double, double>> FPSDataStore;
+typedef CMeasurementDataStore<CMeasurementChunk<double, double>> FPSDataStore_t;
 
 namespace Engine {
 
@@ -68,7 +69,7 @@ namespace Engine {
 			typename internal_time_type::internal_time_value_type
 			internal_time_value_type;
 		typedef
-			std::shared_ptr<internal_time_type>
+			CStdSharedPtr_t<internal_time_type>
 			TimePtr;
 
 		void setTimeInterface(const TimePtr&);

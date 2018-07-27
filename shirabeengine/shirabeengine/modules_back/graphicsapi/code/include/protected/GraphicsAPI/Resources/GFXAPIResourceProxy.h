@@ -33,7 +33,7 @@ namespace Engine {
     public:
       inline GFXAPIResourceProxy(
         EProxyType                          const&proxyType,
-        Ptr<GFXAPIResourceBackend>          const&resourceBackend,
+        CStdSharedPtr_t<GFXAPIResourceBackend>          const&resourceBackend,
         typename TResource::CreationRequest const&request)
         : ResourceBackendProxy<GFXAPIResourceBackend, TResource>(proxyType, resourceBackend, request)
         , m_destructionRequest("")
@@ -54,7 +54,7 @@ namespace Engine {
     };
 
     /**********************************************************************************************//**
-     * \fn	template <typename TResource> static Ptr<GFXAPIResourceProxy<TResource>> GFXAPIProxyCast(const AnyProxy& proxy)
+     * \fn	template <typename TResource> static CStdSharedPtr_t<GFXAPIResourceProxy<TResource>> GFXAPIProxyCast(const AnyProxy& proxy)
      *
      * \brief	Gfxapi proxy cast
      *
@@ -64,8 +64,8 @@ namespace Engine {
      * \return	A Ptr&lt;GFXAPIResourceProxy&lt;TResource&gt;&gt;
      **************************************************************************************************/
     template <typename TResource>
-    static Ptr<GFXAPIResourceProxy<TResource>> GFXAPIProxyCast(const AnyProxy& proxy) {
-      Ptr<GFXAPIResourceProxy<TResource>> tmp = std::static_pointer_cast<GFXAPIResourceProxy<TResource>>(proxy);
+    static CStdSharedPtr_t<GFXAPIResourceProxy<TResource>> GFXAPIProxyCast(const AnyProxy& proxy) {
+      CStdSharedPtr_t<GFXAPIResourceProxy<TResource>> tmp = std::static_pointer_cast<GFXAPIResourceProxy<TResource>>(proxy);
       return tmp;
     }
 

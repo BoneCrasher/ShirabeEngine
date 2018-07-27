@@ -30,7 +30,7 @@ namespace Engine {
     bool
       FrameGraphGraphVizSerializer::serializeGraph(Graph const&graph)
     {
-      UniquePtr<Graph::Accessor> accessor = graph.getAccessor(PassKey<FrameGraphGraphVizSerializer>());
+      UniqueCStdSharedPtr_t<Graph::Accessor> accessor = graph.getAccessor(PassKey<FrameGraphGraphVizSerializer>());
 
       FrameGraphResources const&resources = accessor->resourceData();
 
@@ -102,8 +102,8 @@ namespace Engine {
           m_stream
             << String::format("\n  subgraph pass%0 {\n", sourceUID);
 
-          Ptr<PassBase> sourcePass = graph.passes().at(sourceUID);
-          sourcePass->acceptSerializer(GetNonDeletingSelfPtrType(this));
+          CStdSharedPtr_t<PassBase> sourcePass = graph.passes().at(sourceUID);
+          sourcePass->acceptSerializer(makeCStdSharedFromThis(this));
 
           // Write out the passes' resources
           if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end()) {

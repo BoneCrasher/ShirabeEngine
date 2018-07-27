@@ -30,14 +30,14 @@ namespace Engine {
 
       EWindowManagerError update();
 
-      Ptr<IWindow> createWindow(std::string const&name, Rect const&initialBounds);
+      CStdSharedPtr_t<IWindow> createWindow(std::string const&name, Rect const&initialBounds);
 
-      Ptr<IWindow> getWindowByName(std::string const&name);
-      Ptr<IWindow> getWindowByHandle(OS::WindowHandleWrapper::Handle const&handle);
+      CStdSharedPtr_t<IWindow> getWindowByName(std::string const&name);
+      CStdSharedPtr_t<IWindow> getWindowByHandle(OS::WindowHandleWrapper::Handle const&handle);
 
     private:
       IWindowList         m_windows;
-      Ptr<IWindowFactory> m_windowFactory;
+      CStdSharedPtr_t<IWindowFactory> m_windowFactory;
     };
     DeclareSharedPointerType(WindowManager)
 

@@ -24,9 +24,9 @@ namespace Engine {
 
     EEngineStatus 
       Renderer::initialize(
-        Ptr<ApplicationEnvironment>   const&environment,
+        CStdSharedPtr_t<ApplicationEnvironment>   const&environment,
         RendererConfiguration         const&configuration,
-        Ptr<IFrameGraphRenderContext>      &frameGraphRenderContext)
+        CStdSharedPtr_t<IFrameGraphRenderContext>      &frameGraphRenderContext)
     {
       assert(nullptr != environment);
       assert(nullptr != frameGraphRenderContext);
@@ -132,9 +132,9 @@ namespace Engine {
         lightingExportData.lightAccumulationBuffer,
         backBuffer);
 
-      UniquePtr<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
+      UniqueCStdSharedPtr_t<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
 
-      Ptr<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
+      CStdSharedPtr_t<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
       serializer->initialize();
 
       frameGraph->acceptSerializer(serializer);

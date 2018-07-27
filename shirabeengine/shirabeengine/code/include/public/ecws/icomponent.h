@@ -1,14 +1,15 @@
 #ifndef __SHIRABE_COMPONENT_H__
 #define __SHIRABE_COMPONENT_H__
 
-#include "Core/EngineTypeHelper.h"
-#include "Core/EngineStatus.h"
-
-#include "Core/Benchmarking/Timer/Timer.h"
+#include <core/enginetypehelper.h>
+#include <core/enginestatus.h>
+#include <core/benchmarking/timer/timer.h>
 
 namespace Engine {
 
-	DeclareInterface(IComponent);
+    class IComponent
+    {
+        SHIRABE_DECLARE_INTERFACE(IComponent);
 
 	virtual const std::string& name() const = 0;
 	virtual void name(const std::string& name) = 0;

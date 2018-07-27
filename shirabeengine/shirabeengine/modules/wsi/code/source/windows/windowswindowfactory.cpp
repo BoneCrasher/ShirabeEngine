@@ -26,7 +26,7 @@ namespace Engine {
         const std::string &name,
         const Rect        &initialBounds) {
 
-        IWindowPtr pWindow = MakeSharedPointerType<WindowsWindow>(name, initialBounds);
+        IWindowPtr pWindow = makeCStdSharedPtr<WindowsWindow>(name, initialBounds);
 
         HWND handle
           = WinAPIFunctions::__CreateWindow<WindowsWindow>(

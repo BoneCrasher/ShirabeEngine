@@ -21,8 +21,11 @@ namespace Engine
     #undef max
     #endif
 
-    #define FRAMEGRAPH_RESOURCECRange_REMAINING -1
+    #define D_RANGE_REMAINING -1
 
+    /**
+     * @brief The CRange struct
+     */
     struct SHIRABE_LIBRARY_EXPORT CRange
     {
         CRange();
@@ -38,6 +41,12 @@ namespace Engine
           length;
     };
 
+    /**
+     * @brief operator ==
+     * @param aLHS
+     * @param aRHS
+     * @return
+     */
     static bool operator==(
             CRange const &aLHS,
             CRange const &aRHS)
@@ -47,6 +56,11 @@ namespace Engine
              (aLHS.length == aRHS.length));
     }
 
+    /**
+     * @brief from_string
+     * @param aInput
+     * @return
+     */
     template <typename T>
     T from_string(std::string const &aInput)
     {
@@ -59,6 +73,11 @@ namespace Engine
         return output;
     }
 
+    /**
+     * @brief to_string
+     * @param aInput
+     * @return
+     */
     template <typename T>
     std::string to_string(T const &aInput)
     {
@@ -71,6 +90,11 @@ namespace Engine
         return output;
     }
 
+    /**
+     * @brief to_string<CRange>
+     * @param aRange
+     * @return
+     */
     template <>
     std::string to_string<CRange>(CRange const&aRange);
 }

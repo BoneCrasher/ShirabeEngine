@@ -100,7 +100,7 @@ namespace Engine {
         GFXAPIResourceHandleAssignment assignment ={ };
 
         assignment.publicHandle   = desc.name; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = Ptr<VulkanTextureResource>(textureResource, [] (VulkanTextureResource const*p) { if(p) delete p; });
+        assignment.internalHandle = CStdSharedPtr_t<VulkanTextureResource>(textureResource, [] (VulkanTextureResource const*p) { if(p) delete p; });
 
         return assignment;
       };
@@ -133,7 +133,7 @@ namespace Engine {
 
       outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        Ptr<VulkanTextureResource> texture = std::static_pointer_cast<VulkanTextureResource>(inAssignment.internalHandle);
+        CStdSharedPtr_t<VulkanTextureResource> texture = std::static_pointer_cast<VulkanTextureResource>(inAssignment.internalHandle);
         if(!texture)
           throw VulkanError("Invalid internal data provided for texture destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
 

@@ -54,7 +54,7 @@ namespace Engine {
 		class Subject
 		{
 		public:
-			using observer_type_ptr = ObserverPtr<TCallbackInterface>;
+			using observer_type_ptr = ObserverCStdSharedPtr_t<TCallbackInterface>;
 			using observer_list     = std::vector<observer_type_ptr>;
 
 			template <typename... Args>

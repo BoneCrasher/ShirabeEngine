@@ -15,57 +15,57 @@ namespace Engine {
 
 
 	template <typename T>
-	using Ptr = std::shared_ptr<T>;
+	using Ptr = CStdSharedPtr_t<T>;
 
   template <typename T>
-  using UniquePtr = std::unique_ptr<T>;
+  using UniquePtr = CStdUniquePtr_t<T>;
 
 	  #define DeclareSharedPointerType(type) \
-            using type##Ptr = Ptr<type>;
+            using type##Ptr = CStdSharedPtr_t<type>;
 
     #define DeclarePrefixedSharedPointerType(prefix, type) \
-            using prefix##Ptr = Ptr<type>;
+            using prefix##Ptr = CStdSharedPtr_t<type>;
 
     #define DeclareSharedPointerTypeCustomDeleter(type) \
-            using type##Ptr = Ptr<type>;
+            using type##Ptr = CStdSharedPtr_t<type>;
 
     #define Template(...) __VA_ARGS__
 
     #define DeclareTemplatedSharedPointerType(prefix, type) \
-	        using prefix##Ptr = Ptr<type>;
+	        using prefix##Ptr = CStdSharedPtr_t<type>;
 
 	template <typename TUnderlyingType, typename ... TArgs>
-	static inline std::shared_ptr<TUnderlyingType> MakeSharedPointerType(TArgs&&... args) {
+	static inline CStdSharedPtr_t<TUnderlyingType> makeCStdSharedPtr(TArgs&&... args) {
 		return std::make_shared<TUnderlyingType>(std::forward<TArgs>(args)...);
 	}
 
 	template <typename T>
-	using SharedPtrDeleterFn = std::function<void(T*)>;
+	using CStdSharedPtrDeleterFn_t = std::function<void(T*)>;
 
 	template <typename T, typename TDeleter>
-	static inline Ptr<T>
-		MakeSharedPointerTypeCustomDeleter(
+	static inline CStdSharedPtr_t<T>
+		makeCStdSharedPtrCustomDeleter(
 			T          *pInstance,
 		    TDeleter    deleter) {
-		return Ptr<T>(pInstance, deleter);
+		return CStdSharedPtr_t<T>(pInstance, deleter);
 	}
 
-	template <typename T, typename TPtr = std::shared_ptr<T>>
-	static inline TPtr GetNonDeletingSelfPtrType(T* instance) {
+	template <typename T, typename TPtr = CStdSharedPtr_t<T>>
+	static inline TPtr makeCStdSharedFromThis(T* instance) {
 		return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
 	}
 
-	template <typename T, typename TPtr = std::shared_ptr<T>>
-	static inline TPtr GetNonDeletingPtrType(TPtr ptr) {
+	template <typename T, typename TPtr = CStdSharedPtr_t<T>>
+	static inline TPtr makeCStdSharedFromThis(TPtr ptr) {
 		return TPtr(ptr.get(), [](T*) -> void {; /* Do not delete */ });
 	}
 
 
 	#define DeclareUniquePointerType(type) \
-            using type##Ptr = std::unique_ptr<type>;
+            using type##Ptr = CStdUniquePtr_t<type>;
 
 	template <typename TUnderlyingType, typename ... TArgs>
-	static inline std::unique_ptr<TUnderlyingType> MakeUniquePointerType(TArgs&&... args) {
+	static inline CStdUniquePtr_t<TUnderlyingType> makeCStdUniquePtr(TArgs&&... args) {
 		return std::make_unique<TUnderlyingType>(std::forward<TArgs>(args)...);
 	}
 
@@ -151,7 +151,7 @@ namespace Engine {
 
 #define DeclareTemplateListType(type, prefix) \
              template <typename type>         \
-	         using prefix##List = std::vector<std::shared_ptr<type>>;
+	         using prefix##List = std::vector<CStdSharedPtr_t<type>>;
 
 
 	#define DenyCopyAndMove(type, alias)              \

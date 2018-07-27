@@ -37,13 +37,13 @@ namespace Engine {
       ~GraphBuilder() = default;
 
       bool initialize(
-        Ptr<ApplicationEnvironment> const&environment);
+        CStdSharedPtr_t<ApplicationEnvironment> const&environment);
       bool deinitialize();
 
-      Ptr<IUIDGenerator<FrameGraphResourceId_t>> resourceUIDGenerator();
+      CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> resourceUIDGenerator();
 
       template <typename TPass, typename... TPassCreationArgs>
-      Ptr<TPass>
+      CStdSharedPtr_t<TPass>
         spawnPass(
           std::string                 const&name,
           TPassCreationArgs            &&...args);
@@ -58,21 +58,21 @@ namespace Engine {
           std::string               const&readableIdentifier,
           Rendering::RenderableList const&renderables);
 
-      UniquePtr<Graph>
+      UniqueCStdSharedPtr_t<Graph>
         compile();
       
-      Ptr<ApplicationEnvironment>& env();
+      CStdSharedPtr_t<ApplicationEnvironment>& env();
 
       inline FrameGraphResources const&getResources() const { return m_resourceData; }
 
     private:
       FrameGraphResourceId_t generatePassUID();
 
-      UniquePtr<Graph>&            graph();
+      UniqueCStdSharedPtr_t<Graph>&            graph();
 
       FrameGraphResourceId_t findSubjacentResource(FrameGraphResourceMap const&, FrameGraphResource const&);
 
-      bool collectPass(Ptr<PassBase> pass);
+      bool collectPass(CStdSharedPtr_t<PassBase> pass);
      
       template <typename TUID>
       bool topologicalSort(std::stack<TUID>&outPassOrder);
@@ -83,10 +83,10 @@ namespace Engine {
       bool validateTextureSubresourceAccess(FrameGraphTexture const&, FrameGraphTextureView const&);
       bool validateBufferView(FrameGraphBuffer const&, FrameGraphBufferView const&);
 
-      Ptr<ApplicationEnvironment> m_applicationEnvironment;
+      CStdSharedPtr_t<ApplicationEnvironment> m_applicationEnvironment;
 
-      Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_passUIDGenerator;
-      Ptr<IUIDGenerator<FrameGraphResourceId_t>> m_resourceUIDGenerator;
+      CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> m_passUIDGenerator;
+      CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> m_resourceUIDGenerator;
 
       Map<std::string, PublicResourceId_t> m_importedResources;
 
@@ -98,11 +98,11 @@ namespace Engine {
       AdjacencyListMap<PassUID_t>                         m_passAdjacency;
       AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> m_passToResourceAdjacency;
 
-      UniquePtr<Graph> m_frameGraph;
+      UniqueCStdSharedPtr_t<Graph> m_frameGraph;
     };
 
     /**********************************************************************************************//**
-     * \fn  template <typename TPassImplementation, typename... TPassCreationArgs> Ptr<Pass<TPassImplementation>> GraphBuilder::spawnPass( std::string const&id, TPassCreationArgs&&... args)
+     * \fn  template <typename TPassImplementation, typename... TPassCreationArgs> CStdSharedPtr_t<Pass<TPassImplementation>> GraphBuilder::spawnPass( std::string const&id, TPassCreationArgs&&... args)
      *
      * \brief Spawn pass
      *
@@ -114,7 +114,7 @@ namespace Engine {
      * \return  A Ptr&lt;Pass&lt;TPassImplementation&gt;&gt;
      **************************************************************************************************/
     template <typename TPass, typename... TPassCreationArgs>
-    Ptr<TPass>
+    CStdSharedPtr_t<TPass>
       GraphBuilder::spawnPass(
         std::string                 const&name,
         TPassCreationArgs            &&...args)
@@ -123,11 +123,11 @@ namespace Engine {
         return false;
 
       try {
-        UniquePtr<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<GraphBuilder>());
+        UniqueCStdSharedPtr_t<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<GraphBuilder>());
 
         PassUID_t uid = generatePassUID();
 
-        Ptr<TPass> pass =
+        CStdSharedPtr_t<TPass> pass =
           accessor->createPass<TPass, TPassCreationArgs...>(uid, name, std::forward<TPassCreationArgs>(args)...);
         if(!pass)
           return nullptr;

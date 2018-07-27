@@ -58,7 +58,7 @@ namespace Engine {
     public:      
       PassBuilder(
         PassUID_t                  const&passUID,
-        Ptr<PassBase>                    pass,
+        CStdSharedPtr_t<PassBase>                    pass,
         FrameGraphMutableResources      &resourceData);
 
       PassUID_t const&assignedPassUID() const { return m_passUID; }
@@ -130,7 +130,7 @@ namespace Engine {
         Range               const&mipSliceRange);
 
       PassUID_t     m_passUID;
-      Ptr<PassBase> m_pass;
+      CStdSharedPtr_t<PassBase> m_pass;
 
       FrameGraphMutableResources &m_resourceData;
     };

@@ -256,7 +256,7 @@ namespace Engine {
 
     DeclareMapType(FrameGraphResourceId_t, Rendering::RenderableList, RenderableList);
 
-    using Index    = Vector<Ptr<FrameGraphResource>>;
+    using Index    = Vector<CStdSharedPtr_t<FrameGraphResource>>;
     using RefIndex = Vector<FrameGraphResourceId_t>;
   
     template <typename T>
@@ -294,7 +294,7 @@ namespace Engine {
       FrameGraphResources();
 
       template <typename T>
-      Ptr<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> const 
+      CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> const 
         get(FrameGraphResourceId_t const&id) const
       {
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
@@ -302,13 +302,13 @@ namespace Engine {
           throw std::runtime_error("Resource handle not found.");
         #endif
 
-        Ptr<FrameGraphResource> resource = m_resources.at(id);
+        CStdSharedPtr_t<FrameGraphResource> resource = m_resources.at(id);
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
         if(nullptr == resource)
           throw std::runtime_error("Resource handle is empty.");
         #endif
 
-        Ptr<T> ptr = std::static_pointer_cast<T>(resource);
+        CStdSharedPtr_t<T> ptr = std::static_pointer_cast<T>(resource);
 
         return ptr;
       }
@@ -334,7 +334,7 @@ namespace Engine {
       typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>& 
         spawnResource()
       {
-        Ptr<T> ptr = std::make_shared<T>();
+        CStdSharedPtr_t<T> ptr = std::make_shared<T>();
         ptr->resourceId = m_resources.size();
 
         m_resources.push_back(ptr);
@@ -345,10 +345,10 @@ namespace Engine {
       }
 
       template <typename T> // with T : FrameGraphResource
-      Ptr<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> 
+      CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<FrameGraphResource, T>, T>> 
         getMutable(FrameGraphResourceId_t const&id)
       {
-        return *const_cast<Ptr<T>*>(&static_cast<FrameGraphResources*>(this)->get<T>(id));
+        return *const_cast<CStdSharedPtr_t<T>*>(&static_cast<FrameGraphResources*>(this)->get<T>(id));
       }
 
       bool mergeIn(FrameGraphResources const&other);

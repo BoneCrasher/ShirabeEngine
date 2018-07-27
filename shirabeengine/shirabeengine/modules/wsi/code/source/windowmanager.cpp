@@ -32,7 +32,7 @@ namespace Engine {
       OS::ApplicationEnvironment const&environment)
     {
       #ifdef PLATFORM_WINDOWS
-      m_windowFactory = MakeSharedPointerType<WSI::Windows::WindowsWindowFactory>((HINSTANCE)environment.instanceHandle);
+      m_windowFactory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)environment.instanceHandle);
       #endif // PLATFORM_WINDOWS
 
       if(!m_windowFactory) {
@@ -68,7 +68,7 @@ namespace Engine {
       return error;
     }
 
-    Ptr<IWindow> WindowManager::createWindow(
+    CStdSharedPtr_t<IWindow> WindowManager::createWindow(
       std::string const&name,
       Rect        const&initialBounds)
     {
@@ -87,7 +87,7 @@ namespace Engine {
       return pNewWindow;
     }
 
-    Ptr<IWindow> WindowManager::getWindowByName(std::string const&name) {
+    CStdSharedPtr_t<IWindow> WindowManager::getWindowByName(std::string const&name) {
       for(const IWindowPtr& pWindow : m_windows) {
         if(pWindow->name().compare(name) == 0)
           return pWindow;
@@ -95,7 +95,7 @@ namespace Engine {
       return nullptr;
     }
 
-    Ptr<IWindow> WindowManager::getWindowByHandle(
+    CStdSharedPtr_t<IWindow> WindowManager::getWindowByHandle(
       OS::WindowHandleWrapper::Handle const&handle
     ) {
       std::function<bool(const IWindowPtr&)> pred

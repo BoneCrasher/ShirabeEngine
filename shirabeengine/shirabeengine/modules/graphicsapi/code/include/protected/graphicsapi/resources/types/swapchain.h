@@ -103,7 +103,7 @@ namespace Engine {
       // 
       // EEngineStatus present(bool verticallySynchronized = true);
 
-      inline static Ptr<SwapChainBuffer> create(
+      inline static CStdSharedPtr_t<SwapChainBuffer> create(
         const SwapChainBuffer::Descriptor &desc);
 
     private:
@@ -198,19 +198,19 @@ namespace Engine {
       // 
       // EEngineStatus present(bool verticallySynchronized = true);
 
-      inline static Ptr<SwapChain> create(
+      inline static CStdSharedPtr_t<SwapChain> create(
         const SwapChain::Descriptor &desc);
 
-      Ptr<TextureView> const& getBackBufferRenderTargetView(uint32_t const& index);
+      CStdSharedPtr_t<TextureView> const& getBackBufferRenderTargetView(uint32_t const& index);
 
-      Ptr<TextureView> const& getCurrentBackBufferRenderTargetView();
+      CStdSharedPtr_t<TextureView> const& getCurrentBackBufferRenderTargetView();
 
     private:
       inline SwapChain(
         const SwapChain::Descriptor &descriptor);
 
       std::size_t                        m_currentBackBufferIndex;
-      std::vector<Ptr<TextureView>> m_backBufferRenderTargetViews;
+      std::vector<CStdSharedPtr_t<TextureView>> m_backBufferRenderTargetViews;
     };
 
     DeclareSharedPointerType(SwapChain);

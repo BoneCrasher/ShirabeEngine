@@ -31,31 +31,31 @@ namespace Engine {
       return m_pass->registerResource(id);
     }
 
-    UniquePtr<PassBase::Accessor>
+    UniqueCStdSharedPtr_t<PassBase::Accessor>
       PassBase::getAccessor(PassKey<GraphBuilder>&&) const
     {
       return std::move(std::make_unique<PassBase::Accessor>(this));
     }
 
-    UniquePtr<PassBase::MutableAccessor>
+    UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
       PassBase::getMutableAccessor(PassKey<GraphBuilder>&&)
     {
       return std::move(std::make_unique<PassBase::MutableAccessor>(this));
     }
 
-    UniquePtr<PassBase::Accessor>
+    UniqueCStdSharedPtr_t<PassBase::Accessor>
       PassBase::getAccessor(PassKey<PassBuilder>&&) const
     {
       return std::move(std::make_unique<PassBase::Accessor>(this));
     }
 
-    UniquePtr<PassBase::MutableAccessor>
+    UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
       PassBase::getMutableAccessor(PassKey<PassBuilder>&&)
     {
       return std::move(std::make_unique<PassBase::MutableAccessor>(this));
     }
 
-    UniquePtr<PassBase::Accessor>
+    UniqueCStdSharedPtr_t<PassBase::Accessor>
       PassBase::getAccessor(PassKey<Graph>&&) const
     {
       return std::move(std::make_unique<PassBase::Accessor>(this));
@@ -76,7 +76,7 @@ namespace Engine {
     bool
       PassBase::execute(
         FrameGraphResources           const&frameGraphResources,
-        Ptr<IFrameGraphRenderContext>      &pass)
+        CStdSharedPtr_t<IFrameGraphRenderContext>      &pass)
     {
       return true;
     }
@@ -93,13 +93,13 @@ namespace Engine {
     }
 
     void
-      PassBase::acceptSerializer(Ptr<IFrameGraphSerializer> s)
+      PassBase::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s)
     {
       s->serializePass(*this);
     }
 
     void
-      PassBase::acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d)
+      PassBase::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d)
     {
       d->deserializePass(*this);
     }

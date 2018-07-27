@@ -45,7 +45,7 @@ namespace Engine {
 
         return true;
       },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, Ptr<IFrameGraphRenderContext>&context) -> bool
+        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, CStdSharedPtr_t<IFrameGraphRenderContext>&context) -> bool
       {
         Log::Verbose(logTag(), "Compositing");
 

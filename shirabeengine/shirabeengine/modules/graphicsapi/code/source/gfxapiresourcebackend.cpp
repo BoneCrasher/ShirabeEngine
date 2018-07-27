@@ -50,7 +50,7 @@ namespace Engine {
     EEngineStatus 
       GFXAPIResourceBackend::registerResource(
         PublicResourceId_t const&id,
-        Ptr<void>                resource)
+        CStdSharedPtr_t<void>                resource)
     {
       if(m_storage.find(id) != m_storage.end())
         return EEngineStatus::Error;

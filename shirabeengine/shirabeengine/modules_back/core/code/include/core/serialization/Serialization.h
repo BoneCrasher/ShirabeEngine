@@ -29,8 +29,8 @@ namespace Engine {
     >
       DeclareTemplatedInterface(ISerializable, Template(ISerializable<IInterfaceSerialization, IInterfaceDeserialization>));
 
-    virtual void acceptSerializer(Ptr<IInterfaceSerialization>)            = 0;
-    virtual void acceptDeserializer(Ptr<IInterfaceDeserialization> const&) = 0;
+    virtual void acceptSerializer(CStdSharedPtr_t<IInterfaceSerialization>)            = 0;
+    virtual void acceptDeserializer(CStdSharedPtr_t<IInterfaceDeserialization> const&) = 0;
 
     DeclareInterfaceEnd(ISerializable);
 

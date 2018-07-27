@@ -17,9 +17,9 @@ namespace Engine {
       ~Renderer();
 
       EEngineStatus initialize(
-        Ptr<ApplicationEnvironment>   const&,
+        CStdSharedPtr_t<ApplicationEnvironment>   const&,
         RendererConfiguration         const&,
-        Ptr<IFrameGraphRenderContext>      &) ;
+        CStdSharedPtr_t<IFrameGraphRenderContext>      &) ;
 
       EEngineStatus deinitialize();
       EEngineStatus reinitialize();
@@ -33,8 +33,8 @@ namespace Engine {
     private:
       RendererConfiguration m_configuration;
 
-      Ptr<ApplicationEnvironment>   m_appEnvironment;
-      Ptr<IFrameGraphRenderContext> m_frameGraphRenderContext;
+      CStdSharedPtr_t<ApplicationEnvironment>   m_appEnvironment;
+      CStdSharedPtr_t<IFrameGraphRenderContext> m_frameGraphRenderContext;
 
       std::atomic<bool> m_paused;
 

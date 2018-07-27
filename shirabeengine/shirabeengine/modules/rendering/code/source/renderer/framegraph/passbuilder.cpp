@@ -7,7 +7,7 @@
 namespace Engine {
   namespace FrameGraph {
     /**********************************************************************************************//**
-     * \fn  template <typename TPassImplementation> PassBuilder<TPassImplementation>::PassBuilder( Ptr<Pass<TPassImplementation>> &pass)
+     * \fn  template <typename TPassImplementation> PassBuilder<TPassImplementation>::PassBuilder( CStdSharedPtr_t<Pass<TPassImplementation>> &pass)
      *
      * \brief Constructor
      *
@@ -16,7 +16,7 @@ namespace Engine {
      **************************************************************************************************/
     PassBuilder::PassBuilder(
       PassUID_t                  const&passId,
-      Ptr<PassBase>                    pass,
+      CStdSharedPtr_t<PassBase>                    pass,
       FrameGraphMutableResources      &resourceData)
       : m_passUID(passId)
       , m_pass(pass)
@@ -50,7 +50,7 @@ namespace Engine {
       resource.type              = FrameGraphResourceType::Texture;
       resource.assignTextureParameters(desc);
 
-      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(resource.resourceId);
 
       return resource;
@@ -96,14 +96,14 @@ namespace Engine {
       adjustedMipSliceRange   = mipSliceRange;
       if(sourceResource.type == FrameGraphResourceType::TextureView)
       {
-        Ptr<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.subjacentResource);
+        CStdSharedPtr_t<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.subjacentResource);
 
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
         if(!subjacentRef)
           throw std::runtime_error(String::format("Subjacent resource handle w/ id %0 is empty.", sourceResource.subjacentResource));
         #endif
 
-        Ptr<FrameGraphTextureView> const parentRef = resourceData.get<FrameGraphTextureView>(sourceResource.resourceId);
+        CStdSharedPtr_t<FrameGraphTextureView> const parentRef = resourceData.get<FrameGraphTextureView>(sourceResource.resourceId);
 
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
         if(!parentRef)
@@ -128,7 +128,7 @@ namespace Engine {
       else {
 
         #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        Ptr<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.resourceId);
+        CStdSharedPtr_t<FrameGraphTexture> const subjacentRef = resourceData.get<FrameGraphTexture>(sourceResource.resourceId);
         if(!subjacentRef)
           throw std::runtime_error(String::format("Subjacent resource handle w/ id %0 is empty.", sourceResource.subjacentResource));
 
@@ -209,7 +209,7 @@ namespace Engine {
       if(flags.writeTarget == FrameGraphWriteTarget::Depth)
         source = FrameGraphViewSource::Depth;
 
-      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
 
       Optional<RefWrapper<FrameGraphTextureView>> ref;
 
@@ -245,7 +245,7 @@ namespace Engine {
         view.readableName       = String::format("TextureView ID %0 - Write #%1", view.resourceId, sourceResource.resourceId);
         view.type               = FrameGraphResourceType::TextureView;
         
-        Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
+        CStdSharedPtr_t<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
         ++subjacent->referenceCount;
 
         ref = view;
@@ -299,7 +299,7 @@ namespace Engine {
       if(flags.source == FrameGraphReadSource::Depth)
         source = FrameGraphViewSource::Depth;
 
-      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
 
       Optional<RefWrapper<FrameGraphTextureView>> ref;
 
@@ -335,7 +335,7 @@ namespace Engine {
         view.readableName       = String::format("TextureView ID %0 - Read #%1", view.resourceId, sourceResource.resourceId);
         view.type               = FrameGraphResourceType::TextureView;
         
-        Ptr<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
+        CStdSharedPtr_t<FrameGraphResource> subjacent = m_resourceData.getMutable<FrameGraphResource>(subjacentResourceId);
         ++subjacent->referenceCount;
 
         ref = view;
@@ -369,7 +369,7 @@ namespace Engine {
       resource.type               = FrameGraphResourceType::RenderableListView;
       resource.isExternalResource = false;
 
-      Ptr<FrameGraphRenderableList> const listRef = m_resourceData.get<FrameGraphRenderableList>(renderableListResource.resourceId);
+      CStdSharedPtr_t<FrameGraphRenderableList> const listRef = m_resourceData.get<FrameGraphRenderableList>(renderableListResource.resourceId);
 
       #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
       if(!listRef)
@@ -381,7 +381,7 @@ namespace Engine {
       for(uint64_t k=0; k<list.renderableList.size(); ++k)
         resource.renderableRefIndices.push_back(k);
 
-      UniquePtr<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
+      UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = m_pass->getMutableAccessor(PassKey<PassBuilder>());
       accessor->registerResource(resource.resourceId);
 
       return resource;

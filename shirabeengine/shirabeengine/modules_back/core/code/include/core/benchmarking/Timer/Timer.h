@@ -68,7 +68,7 @@ namespace Engine {
 			typename internal_time_type::internal_time_value_type
 			internal_time_value_type;
 		typedef
-			std::shared_ptr<internal_time_type>
+			CStdSharedPtr_t<internal_time_type>
 			TimePtr;
 
 		void setTimeInterface(const TimePtr&);

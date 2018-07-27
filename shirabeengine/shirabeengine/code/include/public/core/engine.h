@@ -34,7 +34,7 @@ namespace Engine {
 	class SHIRABE_LIBRARY_EXPORT EngineInstance
 	{
 	public:
-		EngineInstance(Ptr<OS::ApplicationEnvironment> const&environment);
+		EngineInstance(CStdSharedPtr_t<OS::ApplicationEnvironment> const&environment);
 		~EngineInstance();
 
 		EEngineStatus initialize();
@@ -46,20 +46,20 @@ namespace Engine {
 		DeclareLogTag(EngineInstance)
 
     // Application 
-		Ptr<OS::ApplicationEnvironment> m_environment;
+		CStdSharedPtr_t<OS::ApplicationEnvironment> m_environment;
 		
     // WSI
-    Ptr<WindowManager> m_windowManager;
-		Ptr<IWindow>       m_mainWindow;
+    CStdSharedPtr_t<WindowManager> m_windowManager;
+		CStdSharedPtr_t<IWindow>       m_mainWindow;
 
     // Assets & Resources
-    Ptr<AssetStorage>         m_assetStorage;
-    Ptr<ResourceProxyFactory> m_proxyFactory;
-    Ptr<ResourceManager>      m_resourceManager;
+    CStdSharedPtr_t<AssetStorage>         m_assetStorage;
+    CStdSharedPtr_t<ResourceProxyFactory> m_proxyFactory;
+    CStdSharedPtr_t<ResourceManager>      m_resourceManager;
 
     // Rendering
 #ifdef PLATFORM_WINDOWS
-    Ptr<VulkanEnvironment> m_vulkanEnvironment;
+    CStdSharedPtr_t<VulkanEnvironment> m_vulkanEnvironment;
 #endif
 		IRendererPtr m_renderer;
 		

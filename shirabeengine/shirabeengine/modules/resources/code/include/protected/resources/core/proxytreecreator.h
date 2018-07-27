@@ -24,7 +24,7 @@ namespace Engine {
     public:
 
 			/**********************************************************************************************//**
-			 * \fn	static bool ProxyTreeCreator::create( const Ptr<ResourceProxyFactory> &proxyFactory, const ResourceDescriptor<type, subtype> &desc, ResourceHandleList &inDependencyHandles, TResourceBinding &outBinding, ResourceProxyMap &outProxyMap, DependerTreeNodeList &outResourceHierarchy)
+			 * \fn	static bool ProxyTreeCreator::create( const CStdSharedPtr_t<ResourceProxyFactory> &proxyFactory, const ResourceDescriptor<type, subtype> &desc, ResourceHandleList &inDependencyHandles, TResourceBinding &outBinding, ResourceProxyMap &outProxyMap, DependerTreeNodeList &outResourceHierarchy)
 			 *
 			 * \brief	Creates a new bool
 			 *
@@ -41,7 +41,7 @@ namespace Engine {
 			 **************************************************************************************************/
 			static bool create(
 				//
-				Ptr<ResourceProxyFactory>           const&proxyFactory,
+				CStdSharedPtr_t<ResourceProxyFactory>           const&proxyFactory,
 				typename TResource::CreationRequest const&request,
         typename TResource::Binding              &outBinding,
 				ResourceProxyMap                         &outProxyMap,

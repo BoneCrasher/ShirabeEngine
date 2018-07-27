@@ -9,53 +9,59 @@
 #include <thread>
 #include <atomic>
 
-namespace Engine {
+#include "core/enginetypehelper.h"
+
+namespace Engine
+{
 
     /**
-     * @brief The CallbackTimer class provides a multifunctional timing interface.
-     *        It runs in a separate thread and allows blocking execution for a given
-     *        time in milliseconds or until timing has finished/stopped.
-     *        It can fire a callback one a specific amount of time has passed, once
-     *        or repeatedly.
+     * The CallbackTimer class provides a multifunctional timing interface.
+     * It runs in a separate thread and allows blocking execution for a given
+     * time in milliseconds or until timing has finished/stopped.
+     * It can fire a callback one a specific amount of time has passed, once
+     * or repeatedly.
      */
-    class CallbackTimer {
+    class CCallbackTimer
+    {
     public:
         using CallbackFn = std::function<void()>;
 
         /**
-         * @brief CallbackTimer Constructs a new timer.
-         * @param cbFn Callback to be executed on expiration of tickInMs.
-         * @param tickInMs A generically usable time threshold for callbacks or blocking duration.
-         * @param blockWhileRunning Should the execution block until the timer has
-         *                          been stopped or finished?
-         * @param once If a callback is to be fired, should it be fired only once?
-         *             The timer will stop after notification.
+         * Constructs a new timer.
+         *
+         * @param aCbFn              Callback to be executed on expiration of tickInMs.
+         * @param aTickInMs          A generically usable time threshold for callbacks or blocking duration.
+         * @param aBlockWhileRunning Should the execution block until the timer has
+         *                           been stopped or finished?
+         * @param aOnce              If a callback is to be fired, should it be fired only once?
+         *                           The timer will stop after notification.
          */
-        CallbackTimer(
-                std::function<void()> cbFn,
-                unsigned int          tickInMs,
-                bool                  blockWhileRunning = true,
-                bool                  once              = false);
+        CCallbackTimer(
+                std::function<void()> aCbFn,
+                uint32_t              aTickInMs,
+                bool                  aBlockWhileRunning = true,
+                bool                  aOnce              = false);
 
         // Deny copy and move!
-        CallbackTimer(const CallbackTimer&)             = delete;
-        CallbackTimer& operator =(const CallbackTimer&) = delete;
-        CallbackTimer(CallbackTimer&&)                  = delete;
-        CallbackTimer& operator =(CallbackTimer&&)      = delete;
+        CCallbackTimer(CCallbackTimer const &)             = delete;
+        CCallbackTimer(CCallbackTimer &&)                  = delete;
+        CCallbackTimer& operator =(CCallbackTimer const &) = delete;
+        CCallbackTimer& operator =(CCallbackTimer &&)      = delete;
 
         /**
-         * @brief   elapsedMs How many milliseconds have currently passed?
+         * How many milliseconds have currently passed?
+         *
          * @return  Returns the total amount of milliseconds passed from
          *          initial cycle or the start of subsequent cycles.
          * @remarks If no notifications are used and the timer should run
          *          infinitely or for a limited amount of time,
          *          this entire duration is considered "one cycle".
          */
-        inline unsigned int elapsedMs() const { return m_elapsed.load(); }
+        uint32_t elapsedMs() const;
 
         /**
-         * @brief run Creates & initializes the timer runtime, if it was not
-         *            created yet!
+         * Creates & initializes the timer runtime, if it was not created yet!
+         *
          * @return True, if the timer is successfully set up and ready to be used.
          *         False, otherwise, e.g. the thread already runs.
          * @remarks This method will create a std::thread and detach the thread, if
@@ -68,42 +74,49 @@ namespace Engine {
         bool run();
 
         /**
-         * @brief pause Pauses the thread execution without altering any of the
-         *        runtime states.
+         * Pauses the thread execution without altering any of the
+         * runtime states.
+         *
          * @return True, if the thread was in a pausable state. False otherwise.
          */
         bool pause();
 
         /**
-         * @brief resume Resumes the thread, if created, running and paused.
-         *               Otherwise 'run()' will be invoked.
+         * Resumes the thread, if created, running and paused.
+         * Otherwise 'run()' will be invoked.
+         *
          * @return True if the thread could be resumed or run. False, otherwise.
          */
         bool resume();
 
         /**
-         * @brief stop Stops & destroys the internal pointer instance.
+         * Stops & destroys the internal pointer instance.
+         *
          * @return True, if the thread could be stopped. False, otherwise.
          */
         bool stop();
 
     private:
         /**
-         * @brief exec Internal execution function implementing the timing logic.
+         * Internal execution function implementing the timing logic.
          */
         void exec();
 
-        unsigned int                 m_tickMs;
-        bool                         m_once;
-        bool                         m_blockWhileRunning;
-        std::atomic<double>          m_elapsed;
-        std::atomic<bool>            m_running;
-        std::atomic<bool>            m_pause;
-        std::atomic<bool>            m_interrupt;
-        std::shared_ptr<std::thread> m_timerThread;
-        std::function<void()>        m_timerCallbackFunction;
+        uint32_t                     mTickMs;
+        bool                         mOnce;
+        bool                         mBlockWhileRunning;
+        std::atomic<double>          mElapsed;
+        std::atomic<bool>            mRunning;
+        std::atomic<bool>            mPause;
+        std::atomic<bool>            mInterrupt;
+        CStdSharedPtr_t<std::thread> mTimerThread;
+        std::function<void()>        mTimerCallbackFunction;
     };
-    using CallbackTimerPtr = std::shared_ptr<CallbackTimer>;
+
+    /**
+     *
+     */
+    using CallbackTimerPtr = CStdSharedPtr_t<CCallbackTimer>;
 
 }
 

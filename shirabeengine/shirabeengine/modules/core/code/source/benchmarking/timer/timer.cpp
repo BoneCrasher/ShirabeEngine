@@ -25,7 +25,7 @@ namespace Engine {
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-		setTimeInterface(MakeSharedPointerType<internal_time_type>());
+		setTimeInterface(makeCStdSharedPtr<internal_time_type>());
 
 		if (!m_timeInterface) {
 			printf("FATAL_ERROR: Timer::initialize: Assigning by YTime::getInterface() failed. Interface-pointer is NULL.");

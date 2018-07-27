@@ -27,9 +27,9 @@ namespace Engine {
 
     DeclareInterface(IRenderer);
       virtual EEngineStatus initialize(
-        Ptr<ApplicationEnvironment>   const&,
+        CStdSharedPtr_t<ApplicationEnvironment>   const&,
         RendererConfiguration         const&,
-        Ptr<IFrameGraphRenderContext>      &) = 0;
+        CStdSharedPtr_t<IFrameGraphRenderContext>      &) = 0;
 
       virtual EEngineStatus deinitialize() = 0;
       virtual EEngineStatus reinitialize() = 0;

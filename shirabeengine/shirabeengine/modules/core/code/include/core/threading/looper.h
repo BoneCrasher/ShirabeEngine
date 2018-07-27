@@ -99,7 +99,7 @@ namespace Engine {
     };
 
     template <typename TTaskResult>
-    using ILooperPtr = std::shared_ptr<ILooper<TTaskResult>>;
+    using ILooperPtr = CStdSharedPtr_t<ILooper<TTaskResult>>;
 
     /**********************************************************************************************//**
      * \class	Looper

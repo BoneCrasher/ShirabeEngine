@@ -1,3 +1,10 @@
+/*!
+ * @file      declaration.h
+ * @author    Marc-Anton Boehm-von Thenen
+ * @date      27/07/2018
+ * @copyright SmartRay GmbH (www.smartray.com)
+ */
+
 #ifndef __SHIRABE_BASE_DECLARATION_H__
 #define __SHIRABE_BASE_DECLARATION_H__
 

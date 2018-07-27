@@ -46,12 +46,12 @@ namespace Engine {
 
       outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        Ptr<void> privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
+        CStdSharedPtr_t<void> privateDependencyHandle = resolvedDependencies.at(request.underlyingTextureHandle());
         if(!privateDependencyHandle) {
           HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV due to missing dependency.");
         }
         
-        Ptr<VulkanTextureResource> texture = std::static_pointer_cast<VulkanTextureResource>(privateDependencyHandle);
+        CStdSharedPtr_t<VulkanTextureResource> texture = std::static_pointer_cast<VulkanTextureResource>(privateDependencyHandle);
         if(!texture)
           throw VulkanError("Invalid internal data provided for texture destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
 
@@ -87,7 +87,7 @@ namespace Engine {
         GFXAPIResourceHandleAssignment assignment ={ };
 
         assignment.publicHandle   = desc.name; // Just abuse the pointer target address of the handle...
-        assignment.internalHandle = Ptr<VulkanTextureViewResource>(textureViewResource, [] (VulkanTextureViewResource const*p) { if(p) delete p; });
+        assignment.internalHandle = CStdSharedPtr_t<VulkanTextureViewResource>(textureViewResource, [] (VulkanTextureViewResource const*p) { if(p) delete p; });
 
         return assignment;
       };
@@ -120,7 +120,7 @@ namespace Engine {
       
       outTask = [=] () -> GFXAPIResourceHandleAssignment
       {
-        Ptr<VulkanTextureViewResource> textureView = std::static_pointer_cast<VulkanTextureViewResource>(inAssignment.internalHandle);
+        CStdSharedPtr_t<VulkanTextureViewResource> textureView = std::static_pointer_cast<VulkanTextureViewResource>(inAssignment.internalHandle);
         if(!textureView)
           throw VulkanError("Invalid internal data provided for texture view destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
 

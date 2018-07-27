@@ -55,7 +55,7 @@ namespace Engine {
         AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> &mutablePassToResourceAdjacency();
 
         template <typename TPass, typename... TPassCreationArgs>
-        Ptr<TPass> createPass(
+        CStdSharedPtr_t<TPass> createPass(
           PassUID_t         const&uid,
           std::string       const&name,
           TPassCreationArgs &&... args);
@@ -64,30 +64,30 @@ namespace Engine {
         Graph *m_graph;
       };
 
-      UniquePtr<Accessor> getAccessor(PassKey<class GraphBuilder> &&key) const {
+      UniqueCStdSharedPtr_t<Accessor> getAccessor(PassKey<class GraphBuilder> &&key) const {
         return std::move(std::make_unique<Accessor>(this));
       }
 
-      UniquePtr<MutableAccessor> getMutableAccessor(PassKey<class GraphBuilder> &&key) {
+      UniqueCStdSharedPtr_t<MutableAccessor> getMutableAccessor(PassKey<class GraphBuilder> &&key) {
         return std::move(std::make_unique<MutableAccessor>(this));
       }
 
-      UniquePtr<Accessor> getAccessor(PassKey<FrameGraphGraphVizSerializer> &&key) const {
+      UniqueCStdSharedPtr_t<Accessor> getAccessor(PassKey<FrameGraphGraphVizSerializer> &&key) const {
         return std::move(std::make_unique<Accessor>(this));
       }
       
-      UniquePtr<MutableAccessor> getMutableAccessor(PassKey<FrameGraphGraphVizSerializer> &&key) {
+      UniqueCStdSharedPtr_t<MutableAccessor> getMutableAccessor(PassKey<FrameGraphGraphVizSerializer> &&key) {
         return std::move(std::make_unique<MutableAccessor>(this));
       }
 
       bool
-        execute(Ptr<IFrameGraphRenderContext>&);
+        execute(CStdSharedPtr_t<IFrameGraphRenderContext>&);
 
       virtual
-        void acceptSerializer(Ptr<IFrameGraphSerializer> s);
+        void acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s);
 
       virtual
-        void acceptDeserializer(Ptr<IFrameGraphDeserializer> const&d);
+        void acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d);
 
       inline
         Graph& operator=(Graph const&other);
@@ -97,55 +97,55 @@ namespace Engine {
     private:
 
       bool initializeResources(
-        Ptr<IFrameGraphRenderContext>       renderContext,
+        CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
         FrameGraphResourceIdList      const&resourceIds);
 
       bool bindResources(
-        Ptr<IFrameGraphRenderContext>       renderContext,
+        CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
         FrameGraphResourceIdList      const&resourceIds);
 
       bool unbindResources(
-        Ptr<IFrameGraphRenderContext>       renderContext,
+        CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
         FrameGraphResourceIdList      const&resourceIds);
 
       bool deinitializeResources(
-        Ptr<IFrameGraphRenderContext>       renderContext,
+        CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
         FrameGraphResourceIdList      const&resourceIds);
 
       bool initializeTexture(
-        Ptr<IFrameGraphRenderContext> renderContext,
-        Ptr<FrameGraphTexture>        texture);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+        CStdSharedPtr_t<FrameGraphTexture>        texture);
       bool initializeTextureView(
-        Ptr<IFrameGraphRenderContext> renderContext,
-        Ptr<FrameGraphTexture>        texture,
-        Ptr<FrameGraphTextureView>    textureView);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+        CStdSharedPtr_t<FrameGraphTexture>        texture,
+        CStdSharedPtr_t<FrameGraphTextureView>    textureView);
       bool initializeBuffer(
-        Ptr<IFrameGraphRenderContext> renderContext);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext);
       bool initializeBufferView(
-        Ptr<IFrameGraphRenderContext> renderContext);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext);
       
       bool deinitializeTexture(
-        Ptr<IFrameGraphRenderContext> renderContext,
-        Ptr<FrameGraphTexture>        texture);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+        CStdSharedPtr_t<FrameGraphTexture>        texture);
       bool deinitializeTextureView(
-        Ptr<IFrameGraphRenderContext> renderContext,
-        Ptr<FrameGraphTexture>        texture,
-        Ptr<FrameGraphTextureView>    textureView);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
+        CStdSharedPtr_t<FrameGraphTexture>        texture,
+        CStdSharedPtr_t<FrameGraphTextureView>    textureView);
       bool deinitializeBufferView(
-        Ptr<IFrameGraphRenderContext> renderContext);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext);
       bool deinitializeBuffer(
-        Ptr<IFrameGraphRenderContext> renderContext);
+        CStdSharedPtr_t<IFrameGraphRenderContext> renderContext);
 
-      bool addPass(Ptr<PassBase> const&);
+      bool addPass(CStdSharedPtr_t<PassBase> const&);
 
       template <typename TPass, typename... TPassCreationArgs>
-      Ptr<TPass> createPass(
+      CStdSharedPtr_t<TPass> createPass(
         PassUID_t         const&uid,
         std::string       const&name,
         TPassCreationArgs &&... args);
 
       // 
-      Ptr<ResourceManager> m_resourceManager;
+      CStdSharedPtr_t<ResourceManager> m_resourceManager;
 
       PassMap                     m_passes;
       AdjacencyListMap<PassUID_t> m_passAdjacency;
@@ -163,7 +163,7 @@ namespace Engine {
     };
     
     template <typename TPass, typename... TPassCreationArgs>
-    Ptr<TPass>
+    CStdSharedPtr_t<TPass>
       Graph::MutableAccessor::createPass(
         PassUID_t         const&uid,
         std::string       const&name,
@@ -173,13 +173,13 @@ namespace Engine {
     }
 
     template <typename TPass, typename... TPassCreationArgs>
-    Ptr<TPass>
+    CStdSharedPtr_t<TPass>
       Graph::createPass(
         PassUID_t         const&uid, 
         std::string       const&name, 
         TPassCreationArgs &&... args)
     {
-      Ptr<TPass> pass = MakeSharedPointerType<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
+      CStdSharedPtr_t<TPass> pass = makeCStdSharedPtr<TPass>(uid, name, std::forward<TPassCreationArgs>(args)...);
       if(!pass) {
         //...
       }

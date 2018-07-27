@@ -21,7 +21,7 @@ namespace Engine {
      * \return	The EEngineStatus.
      **************************************************************************************************/
     EEngineStatus ResourceManager
-      ::proxyLoad(Ptr<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies)
+      ::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies)
     {
       EEngineStatus status = EEngineStatus::Ok;
 
@@ -32,7 +32,7 @@ namespace Engine {
     }
 
     EEngineStatus ResourceManager
-      ::proxyUnload(Ptr<IResourceProxyBase> &proxy)
+      ::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &proxy)
     {
       EEngineStatus status = EEngineStatus::Ok;
 

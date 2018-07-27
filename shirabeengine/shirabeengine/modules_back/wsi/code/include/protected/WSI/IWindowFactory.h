@@ -17,7 +17,7 @@ namespace Engine {
       //
       // Interface API
       //
-      virtual Ptr<IWindow> createWindow(
+      virtual CStdSharedPtr_t<IWindow> createWindow(
         std::string const&name,
         Rect        const&initialBounds) = 0;
 

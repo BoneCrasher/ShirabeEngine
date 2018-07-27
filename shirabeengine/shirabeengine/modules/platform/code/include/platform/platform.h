@@ -25,31 +25,31 @@
 // #define SHIRABE_TEST_EXPORT
 
 #if defined _WIN32
-#  define PLATFORM_WINDOWS
+#  define SHIRABE_PLATFORM_WINDOWS
 
 // Check for address model
 #  ifdef _WIN64
-#    define TARGET_64BIT
+#    define SHIRABE_TARGET_64BIT
 #  else 
-#    define TARGET_32BIT
+#    define SHIRABE_TARGET_32BIT
 #  endif
 // Go on and check for the compiler and define related settings
 #  ifdef _MSC_VER
-#    define COMPILER_MSVC
+#    define SHIRABE_COMPILER_MSVC
 // This is for public exports
 #  else
 #    ifdef __linux__
-#      define PLATFORM_LINUX
+#      define SHIRABE_PLATFORM_LINUX
 #      ifdef __GNUC__
-#        define COMPILER_GCC
+#        define SHIRABE_COMPILER_GCC
 #      endif
 #    endif
 #  endif
 
 #  ifdef _DEBUG
-#    define CONFIGURATION_DEBUG
+#    define SHIRABE_CONFIGURATION_DEBUG
 #  else 
-#    define CONFIGURATION_RELEASE
+#    define SHIRABE_CONFIGURATION_RELEASE
 #  endif
 #endif
 

@@ -1,101 +1,110 @@
-#ifndef __SHIRABE_CORE_DATABUFFER_H__
-#define __SHIRABE_CORE_DATABUFFER_H__
+#ifndef __SHIRABE_CORE_CDataBuffer_H__
+#define __SHIRABE_CORE_CDataBuffer_H__
 
 #include <vector>
 #include <stdint.h>
+#include <base/declaration.h>
 
 namespace Engine {
 
-  /**
-   * \class DataBuffer
-   *
-   * \brief Buffer for data.
-   *
-   * \tparam  T Generic type parameter.
-   **************************************************************************************************/
-  template <typename T>
-  class DataBuffer {
-  public:
-    static const constexpr std::size_t element_byte_size = sizeof(T);
+    /**
+     *
+     */
+    template <typename T>
+    class CDataBuffer
+    {
+    public_static_constants:
+        static const constexpr std::size_t element_byte_size = sizeof(T);
 
-    DataBuffer();
+    public_static_functions:
+        static CDataBuffer<T> DataArrayFromSize(uint64_t const aSize);
 
-    static DataBuffer<T> DataArrayFromSize(
-      uint64_t const size);
+    public_constructors:
+        CDataBuffer();
 
-    inline
-      T const*const data() const { return m_data.data(); }
-    inline
-      T *const mutableData() { return m_data.data(); }
-    inline
-      uint64_t const size() const { return m_size; }
+    public_methods:
+        /**
+         * @brief data
+         * @return
+         */
+        inline T const*const data() const
+        {
+            return mData.data();
+        }
 
-  private:
-    DataBuffer(
-      std::vector<T>     &&data,
-      uint64_t            const size);
+        /**
+         * @brief mutableData
+         * @return
+         */
+        inline T *const mutableData()
+        {
+            return mData.data();
+        }
 
-    std::vector<T> m_data;
-    uint64_t       m_size;
-  };
+        /**
+         * @brief size
+         * @return
+         */
+        inline uint64_t const size() const
+        {
+            return mSize;
+        }
 
-  /**
-   * \fn  AssetBinaryData AssetBinaryData::DataArrayFromSize( uint64_t const size)
-   *
-   * \brief From memory
-   *
-   * \param size  The size.
-   *
-   * \return  A Ptr&lt;AssetBinaryData&gt;
-   *
-   * ### param  data  The data.
-   **************************************************************************************************/
-  template <typename T>
-  DataBuffer<T>
-    DataBuffer<T>::DataArrayFromSize(
-      uint64_t const size)
-  {
-    std::vector<T> data{};
-    data.resize(size);
+    private_constructors:
+        /**
+         * @brief CDataBuffer
+         * @param data
+         * @param size
+         */
+        CDataBuffer( std::vector<T> &&aData, uint64_t const aSize);
 
-    DataBuffer<T> binaryData = DataBuffer<T>(std::move(data), size);
+    private_members:
+        std::vector<T> mData;
+        uint64_t       mSize;
+    };
+    //<-----------------------------------------------------------------------------
 
-    return binaryData;
-  }
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T> CDataBuffer<T>::DataArrayFromSize(uint64_t const size)
+    {
+        std::vector<T> data{};
+        data.resize(size);
 
-  /**
-   * \fn  template <typename T> DataBuffer<T>::DataBuffer()
-   *
-   * \brief Default constructor
-   *
-   * \tparam  T Generic type parameter.
-   **************************************************************************************************/
-  template <typename T>
-  DataBuffer<T>::DataBuffer()
-    : m_data()
-    , m_size(0)
-  {}
+        CDataBuffer<T> binaryData = CDataBuffer<T>(std::move(data), size);
 
-  /**
-   * \fn  template <typename T> DataBuffer<T>::DataBuffer( std::vector<int8_t> &&data, uint64_t const size) : m_data(std::move(data)) , m_size(size)
-   *
-   * \brief Constructor
-   *
-   * \tparam  T Generic type parameter.
-   * \param [in,out]  data  The data.
-   * \param           size  The size.
-   **************************************************************************************************/
-  template <typename T>
-  DataBuffer<T>::DataBuffer(
-    std::vector<T>          &&data,
-    uint64_t            const size)
-    : m_data(std::move(data))
-    , m_size(size)
-  {}
+        return binaryData;
+    }
+    //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T>::CDataBuffer()
+        : mData()
+        , mSize(0)
+    {}
+    //<-----------------------------------------------------------------------------
 
-  /** \brief Buffer for byte data */
-  using ByteBuffer = DataBuffer<int8_t>;
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T>::CDataBuffer(
+            std::vector<T>     &&aData,
+            uint64_t       const aSize)
+        : mData(std::move(aData))
+        , mSize(aSize)
+    {}
+    //<-----------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    using ByteBuffer = CDataBuffer<int8_t>;
 }
 
 #endif

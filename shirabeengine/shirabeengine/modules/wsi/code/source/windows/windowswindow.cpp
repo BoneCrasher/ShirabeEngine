@@ -59,7 +59,7 @@ namespace Engine {
         try {
           m_active.store(true);
 
-          m_callbackAdapter.onResume(GetNonDeletingSelfPtrType(this));
+          m_callbackAdapter.onResume(makeCStdSharedFromThis(this));
           return EEngineStatus::Ok;
         }
         catch(...) {
@@ -93,7 +93,7 @@ namespace Engine {
         try {
           m_active.store(false);
 
-          m_callbackAdapter.onPause(GetNonDeletingSelfPtrType(this));
+          m_callbackAdapter.onPause(makeCStdSharedFromThis(this));
           return EEngineStatus::Ok;
         }
         catch(...) {
@@ -122,11 +122,11 @@ namespace Engine {
       }
 
       void WindowsWindow::onShow() {
-        m_callbackAdapter.onShow(GetNonDeletingSelfPtrType(this));
+        m_callbackAdapter.onShow(makeCStdSharedFromThis(this));
       }
 
       void WindowsWindow::onHide() {
-        m_callbackAdapter.onHide(GetNonDeletingSelfPtrType(this));
+        m_callbackAdapter.onHide(makeCStdSharedFromThis(this));
       }
 
       void WindowsWindow::onDisabled() {
@@ -134,7 +134,7 @@ namespace Engine {
       }
 
       void WindowsWindow::onClose() {
-        m_callbackAdapter.onClose(GetNonDeletingSelfPtrType(this));
+        m_callbackAdapter.onClose(makeCStdSharedFromThis(this));
       }
 
 
@@ -144,14 +144,14 @@ namespace Engine {
         m_bounds.position.x(x);
         m_bounds.position.y(y);
 
-        m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
+        m_callbackAdapter.onBoundsChanged(makeCStdSharedFromThis(this), m_bounds);
       }
       void WindowsWindow::onResize(const long& width,
         const long& height) {
         m_bounds.size.x(width);
         m_bounds.size.y(height);
 
-        m_callbackAdapter.onBoundsChanged(GetNonDeletingSelfPtrType(this), m_bounds);
+        m_callbackAdapter.onBoundsChanged(makeCStdSharedFromThis(this), m_bounds);
       }
 
       //

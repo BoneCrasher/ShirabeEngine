@@ -58,7 +58,7 @@ namespace Engine {
 
     public:
       typedef GFXAPIResourceTaskBackend  ResourceTaskBackend_t;
-      typedef Ptr<ResourceTaskBackend_t> ResourceTaskBackendPtr;
+      typedef CStdSharedPtr_t<ResourceTaskBackend_t> ResourceTaskBackendPtr;
 
       GFXAPIResourceBackend();
 
@@ -70,7 +70,7 @@ namespace Engine {
         typename TResource::CreationRequest const&inRequest,
         PublicResourceIdList                const&dependencies,
         const ETaskSynchronization               &inRequestMode,
-        const Ptr<IAsyncLoadCallback>            &inCallback);
+        const CStdSharedPtr_t<IAsyncLoadCallback>            &inCallback);
 
       template <typename TResource>
       EEngineStatus unload(
@@ -78,7 +78,7 @@ namespace Engine {
 
       EEngineStatus registerResource(
         PublicResourceId_t const&id,
-        Ptr<void>                resouce);
+        CStdSharedPtr_t<void>                resouce);
 
       void setResourceTaskBackend(ResourceTaskBackendPtr const& backend);
 
@@ -109,7 +109,7 @@ namespace Engine {
 
 
     /**********************************************************************************************//**
-     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const Ptr<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
+     * \fn	template <typename TResource> EEngineStatus GFXAPIResourceBackend::load( const ResourceDescriptor<TResource> &inDescriptor, const GFXAPIResourceHandleMap &inResourceDependencyHandles, const ETaskSynchronization &inRequestMode, const CStdSharedPtr_t<IAsyncLoadCallback> &inCallback, GFXAPIResourceHandle_t &outResourceHandle)
      *
      * \brief	Loads
      *
@@ -129,7 +129,7 @@ namespace Engine {
         typename TResource::CreationRequest const&inRequest,
         PublicResourceIdList                const&dependencies,
         const ETaskSynchronization               &inSynchronization,
-        const Ptr<IAsyncLoadCallback>            &inCallback)
+        const CStdSharedPtr_t<IAsyncLoadCallback>            &inCallback)
     {
       ResourceTaskFn_t::result_type resourceHandle ={};
 

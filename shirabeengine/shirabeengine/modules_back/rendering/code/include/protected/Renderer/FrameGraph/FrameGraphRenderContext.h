@@ -70,10 +70,10 @@ namespace Engine {
     {
       DeclareLogTag(FrameGraphRenderContext);
     public:
-      static Ptr<FrameGraphRenderContext> create(
-        Ptr<IAssetStorage>   assetStorage,
-        Ptr<ResourceManager> resourceManager,
-        Ptr<IRenderContext>  renderer);
+      static CStdSharedPtr_t<FrameGraphRenderContext> create(
+        CStdSharedPtr_t<IAssetStorage>   assetStorage,
+        CStdSharedPtr_t<ResourceManager> resourceManager,
+        CStdSharedPtr_t<IRenderContext>  renderer);
 
       EEngineStatus importTexture(
         FrameGraphTexture const&texture);
@@ -115,9 +115,9 @@ namespace Engine {
 
     private:
       FrameGraphRenderContext(
-        Ptr<IAssetStorage>   assetStorage,
-        Ptr<ResourceManager> resourceManager,
-        Ptr<IRenderContext>  renderer);
+        CStdSharedPtr_t<IAssetStorage>   assetStorage,
+        CStdSharedPtr_t<ResourceManager> resourceManager,
+        CStdSharedPtr_t<IRenderContext>  renderer);
 
       void
         mapFrameGraphToInternalResource(
@@ -130,9 +130,9 @@ namespace Engine {
         removeMappedInternalResourceIds(
           std::string const&);
 
-      Ptr<IAssetStorage>   m_assetStorage;
-      Ptr<ResourceManager> m_resourceManager;
-      Ptr<IRenderContext>  m_platformRenderContext;
+      CStdSharedPtr_t<IAssetStorage>   m_assetStorage;
+      CStdSharedPtr_t<ResourceManager> m_resourceManager;
+      CStdSharedPtr_t<IRenderContext>  m_platformRenderContext;
 
       Map<std::string, Vector<PublicResourceId_t>> m_resourceMap;
     };
