@@ -46,16 +46,19 @@ namespace Engine
         #endif
     #endif
 
-    #define DDeclareLogTag(className)                                          \
+    #define SHIRABE_DECLARE_LOG_TAG(className)                                 \
         constexpr static  char const* const kLogTag = #className;              \
         constexpr static inline char const* const logTag() { return kLogTag; }
 
+    /**
+     * Static entry point for any kind of log-calls.
+     */
     class SHIRABE_LIBRARY_EXPORT CLog
     {
         public_enums:
         /**
-         * @brief The ELogLevel describes the specific kind of severity of the log
-         *        output in increasing order from Verbose to WTF.
+         * The ELogLevel describes the specific kind of severity of the log
+         * output in increasing order from Verbose to WTF.
          */
         enum class ELogLevel
                 : int8_t
@@ -70,91 +73,99 @@ namespace Engine
 
     public_static_functions:
         static std::string ELogLevelToString(
-                ELogLevel const& level);
+                ELogLevel const &aLevel);
 
         /**
-         * @brief         Log-call for very descriptive output, usually just for
-         *                testing or profiling.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Log-call for very descriptive output, usually just for
+         * testing or profiling.
+         *
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void Verbose(
-                std::string const&tag,
-                std::string const&message);
+                std::string const &aLogTag,
+                std::string const &aMessage);
 
         /**
-         * @brief Status  Log-call to trace events and status in the system.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Log-call to trace events and status in the system.
+         *
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void Status(
-                std::string const&tag,
-                std::string const&message);
+                std::string const &aLogTag,
+                std::string const &aMessage);
         /**
-         * @brief Debug   Log-call for debug output, usally printing state and
-         *                values or intermediate positional output.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Log-call for debug output, usally printing state and
+         * values or intermediate positional output.
+         *
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void Debug(
-                std::string const&tag,
-                std::string const&message);
+                std::string const &aLogTag,
+                std::string const &aMessage);
         /**
-         * @brief Warning Log-call for abnormal state or behaviour, which can be
-         *                caught or recovered but require attention.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Log-call for abnormal state or behaviour, which can be
+         * caught or recovered but require attention.
+         *
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void Warning(
-                std::string const&tag,
-                std::string const&message);
+                std::string const &aLogTag,
+                std::string const &aMessage);
         /**
-         * @brief Error   Log-call for abnormal state or behaviour, which requires
-         *                handling or cleanup and abort.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Log-call for abnormal state or behaviour, which requires
+         * handling or cleanup and abort.
+         *
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void Error(
-                std::string const&tag,
-                std::string const&message);
+                std::string const &aLogTag,
+                std::string const &aMessage);
         /**
-         * @brief WTF     Log-call for errors that should never have happened.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Log-call for errors that should never have happened.
+         *
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void WTF(
-                std::string const&tag,
-                std::string const&message);
+                std::string const &aLogTag,
+                std::string const &aMessage);
 
     private_static_functions:
         /**
-         * @brief         Common implementation of log output generation.
-         *                Forwarded to by all other log-calls.
-         * @param type    The specific severity/type of output.
-         * @param tag     The tag of the source of the log call to associate with.
-         * @param message -
+         * Common implementation of log output generation.
+         * Forwarded to by all other log-calls.
+         *
+         * @param aLevel   The specific severity/type of output.
+         * @param aLogTag  The tag of the source of the log call to associate with.
+         * @param aMessage -
          */
         static void LogImpl(
-                ELogLevel       const&level,
-                std::string     const&tag,
-                std::string     const&message);
+                ELogLevel       const &aLevel,
+                std::string     const &aLogTag,
+                std::string     const &aMessage);
     };
 
     /**
-     * @brief The CConsole class provides static entry points to create
-     *        and shutdown additional console instances in case of a GUI
-     *        application, which requires STDOUT, STDIN and STDERR output.
+     * The CConsole class provides static entry points to create
+     * and shutdown additional console instances in case of a GUI
+     * application, which requires STDOUT, STDIN and STDERR output.
      */
-    class SHIRABE_LIBRARY_EXPORT CConsole {
+    class SHIRABE_LIBRARY_EXPORT CConsole
+    {
     public:
         /**
-         * @brief Create, initialize and bind a console instance to the running
-         *        application and prepare it for STDOUT/IN/ERR I/O.
+         * Create, initialize and bind a console instance to the running
+         * application and prepare it for STDOUT/IN/ERR I/O.
          */
         static void InitializeConsole();
         /**
-         * @brief Unbind, deinitialize and destroy a console instance from a running
-         *        application, if any.
+         * Unbind, deinitialize and destroy a console instance from a running
+         * application, if any.
          */
         static void DeinitializeConsole();
     };

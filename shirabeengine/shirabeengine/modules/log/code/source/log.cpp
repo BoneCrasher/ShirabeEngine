@@ -7,15 +7,17 @@ namespace Engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::string ELogLevelToString(CLog::ELogLevel const& level)
+    std::string ELogLevelToString(CLog::ELogLevel const &aLevel)
     {
-        if(level == CLog::ELogLevel::Verbose) return "VERBOSE";
-        if(level == CLog::ELogLevel::Debug)   return "DEBUG";
-        if(level == CLog::ELogLevel::Status)  return "STATUS";
-        if(level == CLog::ELogLevel::Warning) return "WARNING";
-        if(level == CLog::ELogLevel::Error)   return "ERROR";
-        if(level == CLog::ELogLevel::WTF)     return "WTF";
-        return "UNKNOWN";
+        switch(aLevel)
+        {
+        case CLog::ELogLevel::Verbose: return "VERBOSE";
+        case CLog::ELogLevel::Debug:   return "DEBUG";
+        case CLog::ELogLevel::Status:  return "STATUS";
+        case CLog::ELogLevel::Warning: return "WARNING";
+        case CLog::ELogLevel::Error:   return "ERROR";
+        case CLog::ELogLevel::WTF:     return "WTF";
+        }
     }
     //<-----------------------------------------------------------------------------
 
@@ -23,10 +25,10 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::Verbose(
-            std::string const&tag,
-            std::string const&message)
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        LogImpl(ELogLevel::Verbose, tag, message);
+        LogImpl(ELogLevel::Verbose, aLogTag, aMessage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -34,10 +36,10 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::Status(
-            std::string const&tag,
-            std::string const&message)
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        LogImpl(ELogLevel::Status, tag, message);
+        LogImpl(ELogLevel::Status, aLogTag, aMessage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -45,10 +47,10 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::Debug(
-            std::string const&tag,
-            std::string const&message)
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        LogImpl(ELogLevel::Debug, tag, message);
+        LogImpl(ELogLevel::Debug, aLogTag, aMessage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -56,10 +58,10 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::Warning(
-            std::string const&tag,
-            std::string const&message)
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        LogImpl(ELogLevel::Warning, tag, message);
+        LogImpl(ELogLevel::Warning, aLogTag, aMessage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -67,10 +69,10 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::Error(
-            std::string const&tag,
-            std::string const&message)
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        LogImpl(ELogLevel::Error, tag, message);
+        LogImpl(ELogLevel::Error, aLogTag, aMessage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -78,10 +80,10 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::WTF(
-            std::string const&tag,
-            std::string const&message)
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        LogImpl(ELogLevel::WTF, tag, message);
+        LogImpl(ELogLevel::WTF, aLogTag, aMessage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -89,21 +91,21 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     void CLog::LogImpl(
-            ELogLevel   const&type,
-            std::string const&tag,
-            std::string const&message)
+            ELogLevel   const &aLevel,
+            std::string const &aLogTag,
+            std::string const &aMessage)
     {
-        if(MinimumLogLevel > type)
+        if(MinimumLogLevel > aLevel)
             // Only print in case of a valid loglevel
             return;
 
         std::stringstream ss;
         ss
-            << std::setw(7)  << ELogLevelToString(type) << "): "
-            << std::setw(20) << "[" << tag << "]"       << " --> "
-            << message       << "\n";
+            << std::setw(7)  << ELogLevelToString(aLevel) << "): "
+            << std::setw(20) << "[" << aLogTag << "]"     << " --> "
+            << aMessage      << "\n";
 
-        std::string formatted = ss.str();
+        std::string const formatted = ss.str();
 
         #ifdef SHIRABE_PLATFORM_WINDOWS
         #ifdef _UNICODE
