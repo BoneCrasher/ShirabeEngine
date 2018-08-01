@@ -28,7 +28,7 @@ namespace Engine {
     class GFXAPIResourceProxy
       : public ResourceBackendProxy<GFXAPIResourceBackend, TResource>
     {
-      DeclareLogTag(GFXAPIResourceProxy<TResource>);
+      SHIRABE_DECLARE_LOG_TAG(GFXAPIResourceProxy<TResource>);
 
     public:
       inline GFXAPIResourceProxy(

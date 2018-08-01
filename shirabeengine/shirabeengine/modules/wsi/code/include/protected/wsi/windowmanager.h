@@ -12,7 +12,7 @@ namespace Engine {
   namespace WSI {
 
     class WindowManager {
-      DeclareLogTag(WindowManager);
+      SHIRABE_DECLARE_LOG_TAG(WindowManager);
     public:
       enum class EWindowManagerError
         : int8_t {

@@ -46,7 +46,7 @@ namespace Engine {
 
       namespace WinAPIFunctions {
 
-        DeclareLogTag(WinAPIFunctions)
+        SHIRABE_DECLARE_LOG_TAG(WinAPIFunctions)
 
           template <typename TWindowType>
         HWND __CreateWindow(

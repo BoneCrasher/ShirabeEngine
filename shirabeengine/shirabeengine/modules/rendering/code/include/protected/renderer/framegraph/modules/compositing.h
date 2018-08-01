@@ -17,7 +17,7 @@ namespace Engine {
 
     template<>
     class SHIRABE_TEST_EXPORT FrameGraphModule<CompositingModuleTag_t> {
-      DeclareLogTag(FrameGraphModule<CompositingModuleTag_t>);
+      SHIRABE_DECLARE_LOG_TAG(FrameGraphModule<CompositingModuleTag_t>);
     public:
       struct ImportData {
         FrameGraphResource

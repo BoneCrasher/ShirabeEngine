@@ -30,7 +30,7 @@ namespace Engine {
      * \brief A graph builder.
      **************************************************************************************************/
     class SHIRABE_TEST_EXPORT GraphBuilder {
-      DeclareLogTag(GraphBuilder);
+      SHIRABE_DECLARE_LOG_TAG(GraphBuilder);
 
     public:
       GraphBuilder();

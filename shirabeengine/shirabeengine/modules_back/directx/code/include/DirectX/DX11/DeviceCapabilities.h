@@ -22,7 +22,7 @@ namespace Engine {
       using Engine::Core::BitField;
 
 			class DX11DeviceCapsHelper {
-				DeclareLogTag(DX11DeviceCapsHelper)
+				SHIRABE_DECLARE_LOG_TAG(DX11DeviceCapsHelper)
 			public:
 
 				static DXGI_FORMAT convertFormatGAPI2DXGI(const Format& fmt); 

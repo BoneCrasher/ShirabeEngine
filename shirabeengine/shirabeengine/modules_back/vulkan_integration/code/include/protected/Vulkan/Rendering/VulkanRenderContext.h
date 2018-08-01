@@ -12,7 +12,7 @@ namespace Engine {
     class VulkanRenderContext
       : public IRenderContext
     {
-      DeclareLogTag(VulkanRenderContext);
+      SHIRABE_DECLARE_LOG_TAG(VulkanRenderContext);
     public:
       EEngineStatus bindResource(PublicResourceId_t const&);
       EEngineStatus unbindResource(PublicResourceId_t const&);

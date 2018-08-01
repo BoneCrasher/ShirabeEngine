@@ -21,7 +21,7 @@ namespace Engine {
     class SHIRABE_TEST_EXPORT Graph
       : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
     {
-      DeclareLogTag(Graph);
+      SHIRABE_DECLARE_LOG_TAG(Graph);
 
     public:
       class SHIRABE_TEST_EXPORT Accessor {

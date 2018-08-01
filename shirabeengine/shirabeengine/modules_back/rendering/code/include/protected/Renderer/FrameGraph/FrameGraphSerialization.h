@@ -64,7 +64,7 @@ namespace Engine {
       : public Serializer<GraphVizDotOutputTag_t, IFrameGraphSerializer, IFrameGraphDeserializer>
       , public ISerializationResult
     {
-      DeclareLogTag(FrameGraphGraphVizSerializer);
+      SHIRABE_DECLARE_LOG_TAG(FrameGraphGraphVizSerializer);
 
     public:
       bool initialize();

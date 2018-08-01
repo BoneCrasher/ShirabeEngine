@@ -71,7 +71,7 @@ namespace Engine {
     {}
 
     namespace Debug {
-      DeclareLogTag(ValidationLayers);
+      SHIRABE_DECLARE_LOG_TAG(ValidationLayers);
     }
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL __vkValidationLayerReportCallback(

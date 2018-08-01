@@ -69,7 +69,7 @@ namespace Engine {
   #endif
   #endif
 
-  #define DeclareLogTag(className) constexpr static const char* const kLogTag = #className;         \
+  #define SHIRABE_DECLARE_LOG_TAG(className) constexpr static const char* const kLogTag = #className;         \
 								 constexpr static inline const char* logTag() { return kLogTag; }
 
   using Engine::Core::BitField;

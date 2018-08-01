@@ -80,7 +80,7 @@ namespace Engine {
      * \brief	Manager for proxy based resources.
      **************************************************************************************************/
     class SHIRABE_TEST_EXPORT ResourceManager {
-      DeclareLogTag(ResourceManager);
+      SHIRABE_DECLARE_LOG_TAG(ResourceManager);
 
     public:
       ResourceManager(

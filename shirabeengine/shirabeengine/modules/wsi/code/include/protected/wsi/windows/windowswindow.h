@@ -104,7 +104,7 @@ namespace Engine {
           const long& height);
 
       private:
-        DeclareLogTag(WindowsWindow);
+        SHIRABE_DECLARE_LOG_TAG(WindowsWindow);
 
         std::string m_name;
         Rect        m_bounds;

@@ -68,7 +68,7 @@ namespace Engine {
     class SHIRABE_TEST_EXPORT FrameGraphRenderContext
       : public IFrameGraphRenderContext
     {
-      DeclareLogTag(FrameGraphRenderContext);
+      SHIRABE_DECLARE_LOG_TAG(FrameGraphRenderContext);
     public:
       static CStdSharedPtr_t<FrameGraphRenderContext> create(
         CStdSharedPtr_t<IAssetStorage>   assetStorage,

@@ -21,7 +21,7 @@ namespace Engine {
     using Engine::Core::BitField;
 
     class VulkanDeviceCapsHelper {
-      DeclareLogTag(VulkanDeviceCapsHelper)
+      SHIRABE_DECLARE_LOG_TAG(VulkanDeviceCapsHelper)
     public:
 
       static VkFormat convertFormatToVk(const Format& fmt);

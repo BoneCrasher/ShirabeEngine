@@ -16,7 +16,7 @@ namespace Engine {
   class TestDummy
     : public IWindow::IEventCallback {
   public:
-    DeclareLogTag("TestDummy")
+    SHIRABE_DECLARE_LOG_TAG("TestDummy")
 
       void onResume(IWindowPtr const&) {
       //Log::Status(logTag(), "OnResume");

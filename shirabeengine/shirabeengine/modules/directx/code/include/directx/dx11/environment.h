@@ -23,7 +23,7 @@ namespace Engine {
       using Engine::GFXAPI::GAPIOutputMode;
 
       class DX11Environment {
-        DeclareLogTag(DX11Environment);
+        SHIRABE_DECLARE_LOG_TAG(DX11Environment);
 
       public:
         DX11Environment();

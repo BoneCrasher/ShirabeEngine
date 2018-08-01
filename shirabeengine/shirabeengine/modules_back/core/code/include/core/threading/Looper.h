@@ -112,7 +112,7 @@ namespace Engine {
     class Looper
       : public ILooper<TTaskResult>
     {
-      DeclareLogTag(Looper<TTaskResult>);
+      SHIRABE_DECLARE_LOG_TAG(Looper<TTaskResult>);
 
     public:
       using LooperType = Looper<TTaskResult>;

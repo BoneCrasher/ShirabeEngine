@@ -43,7 +43,7 @@ namespace Engine {
 		EEngineStatus update();
 
 	private:
-		DeclareLogTag(EngineInstance)
+		SHIRABE_DECLARE_LOG_TAG(EngineInstance)
 
     // Application 
 		CStdSharedPtr_t<OS::ApplicationEnvironment> m_environment;

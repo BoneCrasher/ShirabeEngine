@@ -12,7 +12,7 @@ namespace Engine {
 
     class WinAPIDisplay {
     private:
-      DeclareLogTag(WinAPIDisplay);
+      SHIRABE_DECLARE_LOG_TAG(WinAPIDisplay);
 
       static BOOL CALLBACK handleDisplayMonitor(HMONITOR monitor, HDC hdc, LPRECT rect, LPARAM param) {
         using namespace Engine;

@@ -43,7 +43,7 @@ namespace Engine {
      * \brief A vulkan environment.
      **************************************************************************************************/
     class VulkanEnvironment {
-      DeclareLogTag(VulkanEnvironment);
+      SHIRABE_DECLARE_LOG_TAG(VulkanEnvironment);
 
     public:
       struct VulkanQueueFamilyRegistry {

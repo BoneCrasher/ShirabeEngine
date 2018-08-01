@@ -29,7 +29,7 @@ namespace Test {
     class MockRenderContext
       : public IRenderContext
     {
-      DeclareLogTag(MockRenderContext);
+      SHIRABE_DECLARE_LOG_TAG(MockRenderContext);
     public:
 
       EEngineStatus bindResource(PublicResourceId_t const&);
@@ -40,7 +40,7 @@ namespace Test {
     class MockFrameGraphRenderContext
       : public IFrameGraphRenderContext
     {
-      DeclareLogTag(MockFrameGraphRenderContext);
+      SHIRABE_DECLARE_LOG_TAG(MockFrameGraphRenderContext);
     public:
       static Ptr<IFrameGraphRenderContext> fromRenderer(Ptr<IRenderContext> renderer);
 
@@ -117,7 +117,7 @@ namespace Test {
     class MockResourceManager
       : public IResourceManager
     {
-      DeclareLogTag(MockResourceManager);
+      SHIRABE_DECLARE_LOG_TAG(MockResourceManager);
     public:
       bool clear();
 
@@ -141,7 +141,7 @@ namespace Test {
     class MockGFXAPITaskBackend
       : public GFXAPIResourceTaskBackend<EngineTypes>
     {
-      DeclareLogTag(MockGFXAPITaskBackend);
+      SHIRABE_DECLARE_LOG_TAG(MockGFXAPITaskBackend);
     public:
       Mock_DeclareTaskBuilderModule(Texture);
       Mock_DeclareTaskBuilderModule(ShaderResourceView);

@@ -4,7 +4,7 @@
 #include "Log/Log.h"
 
 namespace Main {
-	DeclareLogTag(ApplicationMain)
+	SHIRABE_DECLARE_LOG_TAG(ApplicationMain)
 }
 
 int WINAPI WinMain(

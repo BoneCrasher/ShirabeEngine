@@ -54,7 +54,7 @@ namespace Engine {
      * 			   store and manage the resources.
      **************************************************************************************************/
     class SHIRABE_TEST_EXPORT GFXAPIResourceBackend {
-      DeclareLogTag(GFXAPIResourceBackend);
+      SHIRABE_DECLARE_LOG_TAG(GFXAPIResourceBackend);
 
     public:
       typedef GFXAPIResourceTaskBackend  ResourceTaskBackend_t;

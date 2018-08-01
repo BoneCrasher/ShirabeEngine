@@ -19,7 +19,7 @@ namespace Engine {
 
     template<>
     class SHIRABE_TEST_EXPORT FrameGraphModule<GBufferModuleTag_t> {
-      DeclareLogTag(FrameGraphModule<GBufferModuleTag_t>);
+      SHIRABE_DECLARE_LOG_TAG(FrameGraphModule<GBufferModuleTag_t>);
     public:
       struct GBufferGenerationImportData {
         FrameGraphResource

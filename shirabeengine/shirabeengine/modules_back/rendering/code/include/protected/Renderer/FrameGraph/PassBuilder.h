@@ -53,7 +53,7 @@ namespace Engine {
      * \tparam  TPassImplementation Type of the pass implementation.
      **************************************************************************************************/
     class PassBuilder {
-      DeclareLogTag(PassBuilder);
+      SHIRABE_DECLARE_LOG_TAG(PassBuilder);
      
     public:      
       PassBuilder(
