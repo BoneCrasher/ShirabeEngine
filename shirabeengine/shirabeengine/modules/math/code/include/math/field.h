@@ -23,9 +23,10 @@ namespace Engine
     namespace Math
     {
 
-        #define D_FIELD_DEFAULT_SIZE   1
-        #define D_FIELD_DEFAULT_STRIDE 1
-        #define D_ASSERT_FIELD_SIZE_AND_STRIDE() \
+        #define SHIRABE_FIELD_DEFAULT_SIZE   1
+        #define SHIRABE_FIELD_DEFAULT_STRIDE 1
+
+        #define SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE() \
             static_assert(((TN % TStride) == 0), "Invalid TN and TStride combination.");
 
 
@@ -46,15 +47,14 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
-                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
+                std::size_t TN        = SHIRABE_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = SHIRABE_FIELD_DEFAULT_STRIDE
                 >
         class SHIRABE_TEST_EXPORT CField
         {
         public_typedefs:
-            typedef CField<T, TByteSize, TN, TStride> class_type;
-            typedef T                                 value_type;
-            typedef value_type const                  const_value_type;
+            using ClassType_t       = CField<T, TByteSize, TN, TStride>;
+            using ValueType_t       = T;
 
         public_constructors:
             /**
@@ -74,7 +74,7 @@ namespace Engine
              *
              * @param aCopy The other instance to copy from.
              */
-            CField(CField<T, TByteSize, TN, TStride> const &aCopy);
+            CField(ClassType_t const &aCopy);
 
         public_destructors:
             /**
@@ -90,7 +90,7 @@ namespace Engine
              * @param right Field to assign.
              * @return      Self-Reference
              */
-            class_type&operator= (class_type const&aOther);
+            ClassType_t&operator= (ClassType_t const &aOther);
 
             /**
              * Returns an immutable value reference to an element in the field at index 'aIndex'.
@@ -116,21 +116,21 @@ namespace Engine
              * @param aOther The other instance to be compared with.
              * @return       True, if bitwise equal. False otherwise.
              */
-            bool operator==(class_type const&aOther);
+            bool operator==(ClassType_t const &aOther);
 
             /**
              * Add another field to this instance.
              *
              * @param aOther The field to be added.
              */
-            void operator+=(class_type const& aRight);
+            void operator+=(ClassType_t const & aRight);
 
             /**
              * Subtract another field from this instance.
              *
              * @param aOther The field to subtract.
              */
-            void operator-=(class_type const& aRight);
+            void operator-=(ClassType_t const & aRight);
 
             /**
              * Multiply this field instance with a given factor.
@@ -168,14 +168,14 @@ namespace Engine
              *
              * @return See above...
              */
-            std::size_t const size() const;
+            std::size_t size() const;
 
             /**
              * Return the size of a single element of the field in bytes.
              *
              * @return See also above...
              */
-            std::size_t const byte_size() const;
+            std::size_t byte_size() const;
 
             /**
              * Return the number of (imaginary) columns in the field.
@@ -184,7 +184,7 @@ namespace Engine
              *
              * @return  See again... you've guessed it...
              */
-            std::size_t const byte_stride() const;
+            std::size_t byte_stride() const;
 
             /**
              * Serialize this field to a comma-delimited string.
@@ -194,8 +194,6 @@ namespace Engine
             std::string toString();
 
         protected_methods:
-
-
             /**
              * Assign another matrix to this instance.
              * Internally theres only a copy operation taking place
@@ -203,7 +201,7 @@ namespace Engine
              *
              * @param aOther The field instance to assign.
              */
-            void assign(class_type const& aOther);
+            void assign(ClassType_t const & aOther);
 
         protected_members:
             T mField[TN * TByteSize];
@@ -213,37 +211,40 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        #define D_FIELD_TEMPLATE_DECL \
+        #define SHIRABE_FIELD_TEMPLATE_DECL \
                     template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        #define D_FIELD \
+
+        #define SHIRABE_FIELD \
                     CField<T, TByteSize, TN, TStride>
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        D_FIELD_TEMPLATE_DECL
-        D_FIELD::CField(
+        SHIRABE_FIELD_TEMPLATE_DECL
+        SHIRABE_FIELD::CField(
                 std::initializer_list<T> const &aSource)
         {
-            D_ASSERT_FIELD_SIZE_AND_STRIDE();
+            SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             std::size_t i = 0;
 
-            for(typename std::initializer_list<T>::value_type const&v : aSource)
+            for(typename std::initializer_list<T>::ValueType_t const &v : aSource)
+            {
                 if(i < TN)
                     mField[i++] = v;
+            }
         };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        D_FIELD_TEMPLATE_DECL
-        D_FIELD::CField(
-                class_type const&aCopy)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        SHIRABE_FIELD::CField(
+                ClassType_t const &aCopy)
         {
-            D_ASSERT_FIELD_SIZE_AND_STRIDE();
+            SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             assign(aCopy);
         }
@@ -252,10 +253,10 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        typename D_FIELD::class_type &D_FIELD::operator=(class_type const& right)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        typename SHIRABE_FIELD::ClassType_t &SHIRABE_FIELD::operator=(ClassType_t const & right)
         {
-            D_ASSERT_FIELD_SIZE_AND_STRIDE();
+            SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             assign(right);
             return *this;
@@ -265,10 +266,10 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T const &D_FIELD::operator[] (std::size_t const aIndex) const
+        SHIRABE_FIELD_TEMPLATE_DECL
+        T const &SHIRABE_FIELD::operator[] (std::size_t const aIndex) const
         {
-            D_ASSERT_FIELD_SIZE_AND_STRIDE();
+            SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             if (TN > 0 && TN > aIndex)
                 return *(mField + aIndex);
@@ -280,13 +281,13 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T& D_FIELD::operator[] (std::size_t const aIndex)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        T& SHIRABE_FIELD::operator[] (std::size_t const aIndex)
         {
             // Cast to const this, so that we can reuse the const operator[].
-            class_type const*const cthis  = static_cast<class_type const*const>(this);
-            value_type const&      cvalue = cthis->operator[](aIndex);
-            value_type      &      value  = const_cast<value_type&>(cvalue);
+            ClassType_t const*const cthis  = static_cast<ClassType_t const*const>(this);
+            ValueType_t const &      cvalue = cthis->operator[](aIndex);
+            ValueType_t      &      value  = const_cast<ValueType_t&>(cvalue);
             return value;
         }
         //<-----------------------------------------------------------------------------
@@ -294,8 +295,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        bool D_FIELD::operator==(class_type const&aOther)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        bool SHIRABE_FIELD::operator==(ClassType_t const &aOther)
         {
             int32_t result = memcmp(mField, aOther.mField, (TByteSize * TN));
             return (result == 0);
@@ -305,8 +306,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void D_FIELD::operator+=(class_type const& aOther)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::operator+=(ClassType_t const & aOther)
         {
             for(size_t i = 0; i < TN; ++i)
                 mField[i] += aOther[i];
@@ -316,19 +317,19 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void D_FIELD::operator-=(class_type const& r)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::operator-=(ClassType_t const & aRight)
         {
             for(size_t i = 0; i < TN; ++i)
-                mField[i] -= r[i];
+                mField[i] -= aRight[i];
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void D_FIELD::operator*=(T const aFactor)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::operator*=(T const aFactor)
         {
             for(size_t i = 0; i < TN; ++i)
                 mField[i] *= aFactor;
@@ -338,8 +339,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void D_FIELD::operator/=(T const aFactor)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::operator/=(T const aFactor)
         {
             operator*=((1 / aFactor));
         }
@@ -348,8 +349,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        void D_FIELD::assign(class_type const& aOther)
+        SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::assign(ClassType_t const & aOther)
         {
             memcpy(mField, aOther.const_ptr(), (TN * TByteSize));
         }
@@ -358,8 +359,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T const* const D_FIELD::const_ptr() const
+        SHIRABE_FIELD_TEMPLATE_DECL
+        T const* const SHIRABE_FIELD::const_ptr() const
         {
             return &mField[0];
         }
@@ -368,8 +369,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        T * const D_FIELD::ptr()
+        SHIRABE_FIELD_TEMPLATE_DECL
+        T * const SHIRABE_FIELD::ptr()
         {
             return mField;
         }
@@ -378,8 +379,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::size_t const D_FIELD::size() const
+        SHIRABE_FIELD_TEMPLATE_DECL
+        std::size_t SHIRABE_FIELD::size() const
         {
             return TN;
         }
@@ -388,8 +389,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::size_t const D_FIELD::byte_size() const
+        SHIRABE_FIELD_TEMPLATE_DECL
+        std::size_t SHIRABE_FIELD::byte_size() const
         {
             return TByteSize;
         }
@@ -398,8 +399,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::size_t const D_FIELD::byte_stride() const
+        SHIRABE_FIELD_TEMPLATE_DECL
+        std::size_t SHIRABE_FIELD::byte_stride() const
         {
             return TStride;
         }
@@ -408,8 +409,8 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template<typename T, std::size_t TByteSize, std::size_t TN, std::size_t TStride>
-        std::string D_FIELD::toString()
+        SHIRABE_FIELD_TEMPLATE_DECL
+        std::string SHIRABE_FIELD::toString()
         {
             std::stringstream ss;
             for (size_t i = 0; i < TN; i += TStride)
@@ -439,13 +440,13 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
-                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
+                std::size_t TN        = SHIRABE_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = SHIRABE_FIELD_DEFAULT_STRIDE
                 >
-        typename D_FIELD::class_type
+        typename SHIRABE_FIELD::ClassType_t
         operator+(
-                typename D_FIELD::class_type const& aLHS,
-                typename D_FIELD::class_type const& aRHS)
+                typename SHIRABE_FIELD::ClassType_t const & aLHS,
+                typename SHIRABE_FIELD::ClassType_t const & aRHS)
         {
             CField<T, TByteSize, TN, TStride> copy(aLHS);
 
@@ -463,15 +464,15 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
-                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
+                std::size_t TN        = SHIRABE_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = SHIRABE_FIELD_DEFAULT_STRIDE
                 >
-        typename D_FIELD::class_type
+        typename SHIRABE_FIELD::ClassType_t
         operator-(
-                typename D_FIELD::class_type const& aLHS,
-                typename D_FIELD::class_type const& aRHS)
+                typename SHIRABE_FIELD::ClassType_t const & aLHS,
+                typename SHIRABE_FIELD::ClassType_t const & aRHS)
         {
-            D_FIELD copy(aLHS);
+            SHIRABE_FIELD copy(aLHS);
 
             copy -= aRHS;
             return copy;
@@ -487,15 +488,15 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
-                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
+                std::size_t TN        = SHIRABE_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = SHIRABE_FIELD_DEFAULT_STRIDE
                 >
-        typename D_FIELD::class_type
+        typename SHIRABE_FIELD::ClassType_t
         operator*(
-                typename D_FIELD::class_type const &aLHS,
-                typename D_FIELD::value_type const &aFactor)
+                typename SHIRABE_FIELD::ClassType_t const &aLHS,
+                typename SHIRABE_FIELD::ValueType_t const &aFactor)
         {
-            D_FIELD copy = D_FIELD(aLHS);
+            SHIRABE_FIELD copy = SHIRABE_FIELD(aLHS);
 
             copy *= aFactor;
             return copy;
@@ -511,13 +512,13 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
-                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
+                std::size_t TN        = SHIRABE_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = SHIRABE_FIELD_DEFAULT_STRIDE
                 >
-        typename D_FIELD::class_type
+        typename SHIRABE_FIELD::ClassType_t
         operator*(
-                typename D_FIELD::value_type const &aFactor,
-                typename D_FIELD::class_type const &aLHS)
+                typename SHIRABE_FIELD::ValueType_t const &aFactor,
+                typename SHIRABE_FIELD::ClassType_t const &aLHS)
         {
             return operator*<T, TByteSize, TN, TStride>(aLHS, aFactor);
         }
@@ -532,16 +533,17 @@ namespace Engine
         template <
                 typename    T,
                 std::size_t TByteSize = sizeof(T),
-                std::size_t TN        = D_FIELD_DEFAULT_SIZE,
-                std::size_t TStride   = D_FIELD_DEFAULT_STRIDE
+                std::size_t TN        = SHIRABE_FIELD_DEFAULT_SIZE,
+                std::size_t TStride   = SHIRABE_FIELD_DEFAULT_STRIDE
                 >
-        typename D_FIELD::class_type
+        typename SHIRABE_FIELD::ClassType_t
         operator/(
-                typename D_FIELD::class_type const &aLHS,
-                typename D_FIELD::value_type const &aFactor)
+                typename SHIRABE_FIELD::ClassType_t const &aLHS,
+                typename SHIRABE_FIELD::ValueType_t const &aFactor)
         {
             return operator*<T, TByteSize, TN, TStride>(aLHS, (T(1.0) / aFactor));
         }
+        //<-----------------------------------------------------------------------------
 
     }
 }
