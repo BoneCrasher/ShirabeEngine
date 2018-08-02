@@ -202,7 +202,7 @@ namespace Engine
              * @param aOutDeterminant
              */
             template <uint64_t M, uint64_t N, typename TValue>
-            void __shirabe_math__matrix_determinant_gauss_jordan(
+            static void __shirabe_math__matrix_determinant_gauss_jordan(
                     TValue const *aMatrix,
                     TValue       *aOutDeterminant);
 
@@ -215,7 +215,7 @@ namespace Engine
              * @param pDet
              */
             template <typename TValue>
-            void __shirabe_math__matrix_determinant_leibnitz_laplace(
+            static void __shirabe_math__matrix_determinant_leibnitz_laplace(
                 TValue   const *aMatrix,
                 uint64_t const &aRowCount,
                 uint64_t const &aColumnCount,
@@ -226,11 +226,11 @@ namespace Engine
             //<
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
-            static void __shirabe_math__matrix_elemental_row_transform_S(
-                    TValue        *aMatrix,
-                    uint64_t const aRowIndex,
-                    TValue   const aScaleFactor,
-                    TValue        *aOutInverse)
+            void __shirabe_math__matrix_elemental_row_transform_S(
+                    TValue         *aMatrix,
+                    uint64_t const &aRowIndex,
+                    TValue   const &aScaleFactor,
+                    TValue         *aOutInverse)
 			{				
                 TValue         *ptr       = aMatrix;
                 TValue         *inv_ptr   = aOutInverse;
@@ -251,7 +251,7 @@ namespace Engine
             //<
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
-            static void __shirabe_math__matrix_elemental_row_transform_R(
+            void __shirabe_math__matrix_elemental_row_transform_R(
                     TValue         *aMatrix,
                     uint64_t const &aTargetRowIndex,
                     uint64_t const &aSourceRowIndex,
@@ -278,7 +278,7 @@ namespace Engine
             //<
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
-            static void __shirabe_math__matrix_elemental_row_transform_T(
+            void __shirabe_math__matrix_elemental_row_transform_T(
                     TValue         *aMatrix,
                     uint64_t const &aSourceRowIndex,
                     uint64_t const &aTargetRowIndex)
@@ -304,7 +304,7 @@ namespace Engine
             template <typename TValue, uint64_t M, uint64_t S, uint64_t N>
 			// Multiplies this m*s-matrix with another s*n-matrix passed.
 			// The multiplication will return a m*n-product-matrix.
-            static void __shirabe_math__matrix_multiply(
+            void __shirabe_math__matrix_multiply(
                     TValue const *aLHS,
                     TValue const *aRHS,
                     TValue       *aInOutMultiplicationResult)
@@ -344,7 +344,7 @@ namespace Engine
             //<
             //<-----------------------------------------------------------------------------
             template <uint64_t M, uint64_t N, typename TValue>
-            static void __shirabe_math__matrix_transpose(
+            void __shirabe_math__matrix_transpose(
                     TValue const *aMatrix,
                     TValue       *aInOutTransposedMatrix)
 			{
@@ -370,7 +370,7 @@ namespace Engine
             //<
             //<-----------------------------------------------------------------------------
             template <typename TValue>
-            static void __shirabe_math__matrix_get_minor(
+            void __shirabe_math__matrix_get_minor(
                     TValue   const  *aMatrix,
                     uint64_t const   aRowCount,
                     uint64_t const   aColumnCount,
@@ -424,7 +424,7 @@ namespace Engine
             //<-----------------------------------------------------------------------------
             template <typename TValue>
 			// Get the cofactor for the element a(i, j) of m_mat.
-            static void __shirabe_math__matrix_get_cofactor(
+            void __shirabe_math__matrix_get_cofactor(
                     TValue   const *aMatrix,
                     uint64_t const  aRowCount,
                     uint64_t const  aColumnCount,
@@ -471,7 +471,7 @@ namespace Engine
             //<-----------------------------------------------------------------------------
             template <typename TValue, uint64_t M, uint64_t N>
 			// Get the cofactor matrix of m_mat.
-            static void __shirabe_math__matrix_get_cofactor_matrix(
+            void __shirabe_math__matrix_get_cofactor_matrix(
                     TValue const *aMatrix,
                     TValue       *aOutCofactorMatrix)
 			{
@@ -690,8 +690,8 @@ namespace Engine
             template <typename TValue>
             void __shirabe_math__matrix_determinant_leibnitz_laplace(
                     TValue   const *aMatrix,
-                    uint64_t const  aRowCount,
-                    uint64_t const  aColumnCount,
+                    uint64_t const &aRowCount,
+                    uint64_t const &aColumnCount,
                     TValue         *aOutDeterminant)
 			{
                 if (!(aMatrix && aOutDeterminant))
