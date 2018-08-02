@@ -54,4 +54,6 @@
 #define private_constants           private
 #define private_members             private
 
+#define SHIRABE_INLINE inline
+
 #endif

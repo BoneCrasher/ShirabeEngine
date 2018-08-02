@@ -11,7 +11,7 @@
 #include <exception>
 #include <sstream>
 #include <iterator>
-#include <initializer_list>
+#include <array>
 #include <cstring>
 #include <cassert>
 
@@ -67,7 +67,7 @@ namespace Engine
              *
              * @param aSource An initializer list containing at least N values.
              */
-            CField(std::initializer_list<T> const &aSource);
+            CField(std::array<T, TN> const &aSource);
 
             /**
              * Initialize a field from another field.
@@ -223,13 +223,13 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
         SHIRABE_FIELD::CField(
-                std::initializer_list<T> const &aSource)
+                std::array<T, TN> const &aSource)
         {
             SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             std::size_t i = 0;
 
-            for(typename std::initializer_list<T>::ValueType_t const &v : aSource)
+            for(typename std::array<T, TN>::value_type const &v : aSource)
             {
                 if(i < TN)
                     mField[i++] = v;

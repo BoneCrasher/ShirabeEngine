@@ -2,6 +2,7 @@
 #define __SHIRABE_SHIRABE_MATH_MATRIX_H__
 
 #include <iterator>
+#include <array>
 
 #include "math/field.h"
 #include "math/matrixops.h"
@@ -16,197 +17,286 @@ namespace Engine
 
 		/* NOTES
 		 *
-         * The matrix row iterator should encapsulate a well defined interval of a matrix-CField.
+         * The matrix row Iterator_t should encapsulate a well defined interval of a matrix-CField.
          * The interval is row := [i*_N, i*_n + j].
 		 *
 		 * Required operators:
 		 *
-		 * operator++/operator-- : move forward or backward in the iterator.
+         * operator++/operator-- : move forward or backward in the Iterator_t.
 		 * begin()/end() : to determine, where to start and stop
 		 * operator[] : for direct access, throws invalid_argument exception!
-		 * operator do access the current value this way : value = *iterator;
+         * operator do access the current value this way : value = *Iterator_t;
 		 *
-		 * May derive from the STL-iterator.
+         * May derive from the STL-Iterator_t.
 		 */
 
         /**
-         * @brief
+         * The CMatrixRowIterator_t permits iterating a matrix row-by-row.
+         *
          * @tparam T
          */
 		template <typename T>
-        class CMatrixRowIterator
+        class CMatrixRowIterator_t
 		{
         public_typedefs:
-            typedef CMatrixRowIterator<T>                                          class_type;
-            typedef T                                                              value_type;
-            typedef value_type const                                               const_value_type;
-            typedef std::iterator<std::forward_iterator_tag, T, ptrdiff_t, T*, T&> iterator;
-            typedef iterator const                                                 const_iterator;
+            using ClassType_t = CMatrixRowIterator_t<T>                                       ;
+            using ValueType_t = T                                                             ;
+            using Iterator_t  = std::iterator<std::forward_iterator_tag, T, ptrdiff_t, T*, T&>;
 
         public_constructors:
-            CMatrixRowIterator<T>() = default;
+            CMatrixRowIterator_t<T>() = default;
 
         public_methods:
-            value_type       *ptr()             { return mRow; }
-            const_value_type  const_ptr() const { return const_cast<const_value_type>(mRow); }
+            ValueType_t       *ptr()             { return mRow; }
+            ValueType_t const  const_ptr() const { return const_cast<ValueType_t const>(mRow); }
 
         public_operators:
-            const_value_type operator[](size_t aIndex)
+            ValueType_t const operator[](size_t aIndex)
             {
-                value_type *ptr = (mRow + aIndex);
-                return const_cast<const_value_type>(*(mRow + index));
+                ValueType_t *ptr = (mRow + aIndex);
+                return const_cast<ValueType_t const>(*(mRow + aIndex));
 			}
 
         private_members:
-            value_type* mRow;
-            size_t      mRowOffset;
+            ValueType_t* mRow;
+            size_t       mRowOffset;
 		};
 
         /**
-         * @brief               Matrix base class for arbitrary m x n matrices.
-         *                      Defines basic initialization and operations such as:
-         *                      - Addition
-         *                      - Scalar-multiplication
-         *                      - Matrix-multiplication
-         *                      - Lerping
+         * Matrix base class for arbitrary m x n matrices.
+         * Defines basic initialization and operations such as:
+         * - Addition
+         * - Scalar-multiplication
+         * - Matrix-multiplication
+         * - Lerping
+         *
          * @tparam NRowCount
          * @tparam NColumnCount
          */
-        template <size_t NRowCount = 4, size_t NColumnCount = 4>
+        template <
+                size_t NRowCount = 4,
+                size_t NColumnCount = 4
+                >
         class CMatrix
             : public CField<float, sizeof(float), (NRowCount * NColumnCount), NColumnCount>
 		{
         public_typedefs:
-            typedef CField <float, sizeof(float), (NRowCount * NColumnCount), NColumnCount> base_type;
-            typedef typename base_type::value_type                                          value_type;
-            typedef CMatrix<NRowCount, NColumnCount>                                        class_type, matrix_type;
-            typedef CMatrix<NColumnCount, NRowCount>                                        transposed_matrix_type;
+            using BaseType_t            = CField <float, sizeof(float), (NRowCount * NColumnCount), NColumnCount>;
+            using ValueType_t           = typename BaseType_t::ValueType_t                                       ;
+            using ClassType_t           = CMatrix<NRowCount, NColumnCount>                                       ;
+            using MatrixType_t          = ClassType_t                                                            ;
+            using TransposeMatrixType_t = CMatrix<NColumnCount, NRowCount>                                       ;
 
         public_constructors:
+            /**
+             * Default construct a matrix of size NRowCount * NColumnCount.
+             */
             CMatrix<NRowCount, NColumnCount>()
                 : CField<float, sizeof(float), (NRowCount * NColumnCount), NColumnCount>()
-			{};
+            {}
 
-            CMatrix<NRowCount, NColumnCount>(std::initializer_list<value_type> aSource)
-                : base_type(aSource)
-			{};
+            /**
+             * Construct a matrix of size NRowCount * NColumnCount from a list of values.
+             * @param aSource
+             */
+            CMatrix<NRowCount, NColumnCount>(std::array<ValueType_t, (NRowCount * NColumnCount)> aSource)
+                : BaseType_t(aSource)
+            {}
 
-            CMatrix<NRowCount, NColumnCount>(base_type const &aOther)
-                : base_type(aOther)
-			{};
+            /**
+             * Construct a matrix of size NRowCount * NColumnCount from a field of equal size.
+             *
+             * @param aOther
+             */
+            CMatrix<NRowCount, NColumnCount>(BaseType_t const &aOther)
+                : BaseType_t(aOther)
+            {}
 
-            CMatrix<NRowCount, NColumnCount>(matrix_type const &aOther)
-                : base_type(aOther)
-			{};
+            /**
+             * Copy-Construct matrix of size NRowCount * NColumnCount from another equally sized matrix.
+             *
+             * @param aOther
+             */
+            CMatrix<NRowCount, NColumnCount>(MatrixType_t const &aOther)
+                : BaseType_t(aOther)
+            {}
 
         public_destructors:
+            /**
+             * Default destroy this matrix instance.
+             */
             virtual ~CMatrix<NRowCount, NColumnCount>() = default;
 
         public_static_functions:
-            static matrix_type identity()
+            /**
+             * Return an identity matrix.
+             * @return
+             */
+            static MatrixType_t identity()
             {
-				matrix_type              identity = matrix_type();
-				matrix_type::value_type *ptr      = identity.ptr();
+                MatrixType_t              identity = MatrixType_t();
+                MatrixType_t::ValueType_t *ptr     = identity.ptr();
 
                 for (size_t i = 0; i < NColumnCount; ++i)
                 {
-                    ptr[i*NColumnCount + i] = 1;
+                    ptr[(i * NColumnCount) + i] = 1;
                 }
 
 				return identity;
 			}
 
-            static matrix_type zero()
+            /**
+             * Return a fully zero-initialized matrix.
+             *
+             * @return
+             */
+            static MatrixType_t zero()
             {
-				return matrix_type();
+                return MatrixType_t();
 			}
 
         public_operators:
-            operator base_type()
+            /**
+             * Conversion-Constructor: Convert to CField representation.
+             */
+            operator BaseType_t()
             {
-                return static_cast<base_type>(*this);
+                return static_cast<BaseType_t>(*this);
             }
 
-            class_type operator+(class_type const &r)
+            /**
+             * Add another matrix to this one. Return the result as a copy.
+             *
+             * @param aOther
+             * @return
+             */
+            ClassType_t operator+(ClassType_t const &aOther)
             {
-				return ((class_type(*this)) += r);
+                return ((ClassType_t(*this)) += aOther);
 			}
 
-            class_type& operator +=(class_type const &r)
+            /**
+             * Add another matrix to this one.
+             *
+             * @param aOther
+             * @return
+             */
+            ClassType_t& operator +=(ClassType_t const &aOther)
             {
-				_matrix_op__add((*this).ptr(), r.const_ptr());
+                _matrix_op__add((*this).ptr(), aOther.const_ptr());
 
 				return *this;
 			}
 
-            class_type operator-(class_type const &r)
+            /**
+             * Subtract another matrix from this one. Return the result as a copy.
+             *
+             * @param aOther
+             * @return
+             */
+            ClassType_t operator-(ClassType_t const &aOther)
             {
-				return ((class_type(*this)) -= r);
+                return ((ClassType_t(*this)) -= aOther);
 			}
 
-            class_type& operator -=(class_type const &r)
+            /**
+             * Subtract another matrix from this one.
+             *
+             * @param aOther
+             * @return
+             */
+            ClassType_t& operator -=(ClassType_t const &aOther)
             {
-				_matrix_op__subtract((*this).ptr(), r.const_ptr());
+                _matrix_op__subtract((*this).ptr(), aOther.const_ptr());
 
 				return *this;
             }
 
         public_methods:
-			// Transpose this matrix instance and return it's reference.
-            // Opposite to the SMMatrixTranspose functioN,
-			// the transposition is immediately applied to this instance.
-            transposed_matrix_type transpose()
+            /**
+             * Transpose this matrix instance and return it's reference.
+             * Opposite to the SMMatrixTranspose functioN, the transposition is immediately applied to this instance.
+             *
+             * @return
+             */
+            TransposeMatrixType_t transpose()
             {
-				transposed_matrix_type mat;
-                __shirabe_math__matrix_transpose<NRowCount, NColumnCount, value_type>(this->const_ptr(), mat.ptr());
+                TransposeMatrixType_t mat = {};
+
+                __shirabe_math__matrix_transpose<NRowCount, NColumnCount, ValueType_t>(this->const_ptr(), mat.ptr());
+
 				return mat;
 			}
 
-			// Return a copy of the adjoint-matrix of this instance.
-			// The adjoint matrix is the transposed co-factor matrix.
-            transposed_matrix_type adjoint()
+            /**
+             * Return a copy of the adjoint-matrix of this instance.
+             * The adjoint matrix is the transposed co-factor matrix.
+             *
+             * @return
+             */
+            TransposeMatrixType_t adjoint()
             {
-				return this->cofactor().transpose();
+                TransposeMatrixType_t const mat = this->cofactor().transpose();
+
+                return mat;
 			}
 
-            matrix_type cofactor()
+            /**
+             * Calculate the cofactor representation of this matrix.
+             *
+             * @return
+             */
+            MatrixType_t cofactor()
             {
-				matrix_type mat = matrix_type();
+                MatrixType_t mat = MatrixType_t();
 
-                __shirabe_math__matrix_get_cofactor_matrix<value_type, NRowCount, NColumnCount>(this->const_ptr(), mat.ptr());
+                __shirabe_math__matrix_get_cofactor_matrix<ValueType_t, NRowCount, NColumnCount>(this->const_ptr(), mat.ptr());
 			}
 
-            virtual value_type const determinant() const
+            /**
+             * Calculate the determinant of this matrix.
+             *
+             * @return
+             */
+            virtual ValueType_t const determinant() const
             {
-				// dirrty test
-                if(NColumnCount != NRowCount)
-                    throw new std::runtime_error("Determinant is not properly defined for non-square matrices.");
+                ValueType_t det = 0;
 
-				value_type det = 0;
-                __shirabe_math__matrix_determinant_leibnitz_laplace<value_type>(this->const_ptr(), NRowCount, NColumnCount, &det);
+                if constexpr (NColumnCount == NRowCount)
+                {
+                    __shirabe_math__matrix_determinant_leibnitz_laplace<ValueType_t>(this->const_ptr(), NRowCount, NColumnCount, &det);
+                }
 
-                //__shirabe_math__matrix_determinant_gauss_jordan<NRowCount, NColumnCount, value_type>(this->const_ptr(), &det);
-
-				return det;
+                return det;
 			}
 
-            matrix_type invert()
+            /**
+             * Invert this matrix, using the Gauss-Elimination algorithm.
+             *
+             * @return
+             */
+            MatrixType_t invert()
             {
 				/* 'Treppennormalformgleichung' -> Gauss-Elimination with pivoting and identity matrix transformation! */
-                matrix_type inv    = matrix_type::identity(); //matrix_type(*this);
-                matrix_type cpy    = matrix_type(*this);
-                char        parity = 1;
+                MatrixType_t const inv    = MatrixType_t::identity(); //MatrixType_t(*this);
+                MatrixType_t const cpy    = MatrixType_t(*this);
+                char               parity = 1;
 
-                __shirabe_math__matrix_gauss_jordan<NRowCount, NColumnCount, value_type>(cpy.ptr(), true, &parity, inv.ptr());
+                __shirabe_math__matrix_gauss_jordan<NRowCount, NColumnCount, ValueType_t>(cpy.ptr(), true, &parity, inv.ptr());
 
 				return inv;
             }
 
         private_methods:
-            // Algorithm: additions
+            /**
+             * Algorithm: Matrix addition
+             *
+             * @param aLeftPointer
+             * @param aRightPointer
+             */
             void _matrix_op__add(
-                        value_type       *aLeftPointer,
-                        value_type const *aRightPointer) const
+                        ValueType_t       *aLeftPointer,
+                        ValueType_t const *aRightPointer) const
             {
                 size_t off = 0;
 
@@ -220,10 +310,15 @@ namespace Engine
                 }
             }
 
-            // Algorithm: inverse addition
+            /**
+             * Algorithm: Matrix subtraction
+             *
+             * @param aLeftPointer
+             * @param aRightPointer
+             */
             void _matrix_op__subtract(
-                        value_type       *aLeftPointer,
-                        value_type const *aRightPointer) const
+                        ValueType_t       *aLeftPointer,
+                        ValueType_t const *aRightPointer) const
             {
                 size_t off = 0;
 
@@ -237,10 +332,15 @@ namespace Engine
                 }
             }
 
-            // Algorithm: scalar multiplication
+            /**
+             * Algorithm: Scalar-Product
+             *
+             * @param aLeftPointer
+             * @param aFactor
+             */
             void _matrix_op__scale(
-                        value_type       *aLeftPointer,
-                        value_type const  aFactor) const
+                        ValueType_t       *aLeftPointer,
+                        ValueType_t const  aFactor) const
             {
                 size_t off = 0;
 
@@ -255,202 +355,313 @@ namespace Engine
             }
 		};
 
+        /**
+         * Square-Matrix specialication for N = M.
+         *
+         * @tparam M
+         */
         template <size_t N = 4>
         class CSquareMatrix
             : public CMatrix<N, N>
 		{
         public_typedefs:
-            typedef          CMatrix<N, N>         base_type;
-            typedef          CSquareMatrix<N>      class_type;
-            typedef typename base_type::value_type value_type;
+            using BaseType_t  =          CMatrix<N, N>          ;
+            using ClassType_t =          CSquareMatrix<N>       ;
+            using ValueType_t = typename BaseType_t::ValueType_t;
 
         public_constructors:
+            /**
+             * Default construct a zero-square matrix.
+             */
             CSquareMatrix<N>() = default;
 
-            CSquareMatrix<N>(std::initializer_list<value_type> aSource)
+            /**
+             * Construct a square matrix from a list of values.
+             *
+             * @param aSource
+             */
+            CSquareMatrix<N>(std::array<ValueType_t, (N * N)> const &aSource)
                 : CMatrix<N, N>(aSource)
 			{}
 
-            CSquareMatrix<N>(base_type const &aOther)
+            /**
+             * Construct a square matrix from an equally sized regular matrix.
+             *
+             * @param aOther
+             */
+            CSquareMatrix<N>(BaseType_t const &aOther)
                 : CMatrix<N, N>(aOther)
 			{}
+
+            /**
+             * Construct a square matrix from another, equally sized square matrix.
+             *
+             * @param aOther
+             */
             CSquareMatrix<N>(CSquareMatrix<N> const &aOther)
                 : CMatrix<N, N>(aOther)
 			{}
 
         public_destructors:
+            /**
+             * Cleanly destroy this matrix instance.
+             */
             virtual ~CSquareMatrix<N>() = default;
-
-        public_methods:
-            virtual value_type const determinant() const
-            {
-				return base_type::determinant();
-			}
 		};
 
+        /**
+         * Square matrix specialization for N = 2.
+         * Implemented, as we can use some more efficient algorithms and provide per component access.
+         */
         class CMatrix2x2
             : public CSquareMatrix<2>
 		{
         public_typedefs:
-            typedef CSquareMatrix<2>               base_type;
-            typedef CMatrix2x2                     class_type;
-            typedef typename base_type::value_type value_type;
+            using BaseType_t  = CSquareMatrix<2>                ;
+            using ClassType_t = CMatrix2x2                      ;
+            using ValueType_t = typename BaseType_t::ValueType_t;
 
         public_constructors:
+            /**
+             * Default construct an empty 2x2 matrix.
+             */
             CMatrix2x2() = default;
 
-            CMatrix2x2(std::initializer_list<value_type> aSource)
+            /**
+             * Construct a 2x2 matrix from a list of values.
+             *
+             * @param aSource
+             */
+            CMatrix2x2(std::array<ValueType_t, 4> const &aSource)
                 : CSquareMatrix<2>(aSource)
 			{}
 
-            CMatrix2x2(base_type const &aOther)
-                : base_type(aOther)
+            /**
+             * Construct a 2x2 matrix from another, equally sized square matrix.
+             *
+             * @param aOther
+             */
+            CMatrix2x2(BaseType_t const &aOther)
+                : BaseType_t(aOther)
 			{}
 
+            /**
+             * Construct a 2x2 matrix from another 2x2 matrix.
+             *
+             * @param aOther
+             */
             CMatrix2x2(CMatrix2x2 const &aOther)
                 : CSquareMatrix<2>(aOther)
 			{}
 
         public_destructors:
+            /**
+             * Destroy and run...
+             */
             virtual ~CMatrix2x2() = default;
 
         public_methods:
-            value_type const &r00() const { return mField[0]; }
-            value_type const &r01() const { return mField[1]; }
-            value_type const &r10() const { return mField[2]; }
-            value_type const &r11() const { return mField[3]; }
+            // Per-Component read access.
+            ValueType_t const &r00() const { return mField[0]; }
+            ValueType_t const &r01() const { return mField[1]; }
+            ValueType_t const &r10() const { return mField[2]; }
+            ValueType_t const &r11() const { return mField[3]; }
 
-            value_type const &r00(value_type const &aValue) { return (mField[0] = aValue); }
-            value_type const &r01(value_type const &aValue) { return (mField[1] = aValue); }
-            value_type const &r10(value_type const &aValue) { return (mField[2] = aValue); }
-            value_type const &r11(value_type const &aValue) { return (mField[3] = aValue); }
+            // Per-Component write access.
+            ValueType_t const &r00(ValueType_t const &aValue) { return (mField[0] = aValue); }
+            ValueType_t const &r01(ValueType_t const &aValue) { return (mField[1] = aValue); }
+            ValueType_t const &r10(ValueType_t const &aValue) { return (mField[2] = aValue); }
+            ValueType_t const &r11(ValueType_t const &aValue) { return (mField[3] = aValue); }
 
-            virtual const_value_type determinant() const
+            /**
+             * Calculate the 2x2 matrix's determinant applying the fish-rule.
+             *
+             * @return
+             */
+            virtual ValueType_t const determinant() const
             {
-				value_type det = 0;
-				__shirabe_math__matrix_determinant_fishrule<value_type>(this->const_ptr(), &det);
+                ValueType_t det = 0;
+                __shirabe_math__matrix_determinant_fishrule<ValueType_t>(this->const_ptr(), &det);
 
 				return det;
 			}
 		};
 
+        /**
+         * Square matrix specialization for N = 3
+         * Implemented, as we can use some more efficient algorithms and provide per component access.
+         */
         class CMatrix3x3
             : public CSquareMatrix<3>
 		{
         public_typedefs:
-            typedef CSquareMatrix<3>      base_type;
-            typedef CMatrix3x3            class_type;
-			typedef base_type::value_type value_type;
+            using BaseType_t  = CSquareMatrix<3>       ;
+            using ClassType_t = CMatrix3x3             ;
+            using ValueType_t = BaseType_t::ValueType_t;
 
         public_constructors:
+            /**
+             * Default construct a 3x3 matrix.
+             */
             CMatrix3x3() = default;
 
-            CMatrix3x3(std::initializer_list<value_type> aSource)
+            /**
+             * Construct a 3x3 matrix from a list of values.
+             *
+             * @param aSource
+             */
+            CMatrix3x3(std::array<ValueType_t, 9> aSource)
                 : CSquareMatrix<3>(aSource)
 			{}
 
-            CMatrix3x3(base_type const &aOther)
-                : base_type(aOther)
+            /**
+             * Construct a 3x3 matrix from an equally sized square matrix.
+             *
+             * @param aOther
+             */
+            CMatrix3x3(BaseType_t const &aOther)
+                : BaseType_t(aOther)
 			{}
 
+            /**
+             * Copy-Construct a 3x3 matrix from another 3x3 matrix.
+             *
+             * @param aOther
+             */
             CMatrix3x3(CMatrix3x3 const &aOther)
                 : CSquareMatrix<3>(aOther)
 			{}
 			
         public_destructors:
+            /**
+             * Destroy and run
+             */
             virtual ~CMatrix3x3() = default;
 
         public_methods:
-            value_type const & r00() const { return mField[0]; }
-            value_type const & r01() const { return mField[1]; }
-            value_type const & r02() const { return mField[2]; }
-            value_type const & r10() const { return mField[3]; }
-            value_type const & r11() const { return mField[4]; }
-            value_type const & r12() const { return mField[5]; }
-            value_type const & r20() const { return mField[6]; }
-            value_type const & r21() const { return mField[7]; }
-            value_type const & r22() const { return mField[8]; }
+            // Per-Component read access.
+            ValueType_t const &r00() const { return mField[0]; }
+            ValueType_t const &r01() const { return mField[1]; }
+            ValueType_t const &r02() const { return mField[2]; }
+            ValueType_t const &r10() const { return mField[3]; }
+            ValueType_t const &r11() const { return mField[4]; }
+            ValueType_t const &r12() const { return mField[5]; }
+            ValueType_t const &r20() const { return mField[6]; }
+            ValueType_t const &r21() const { return mField[7]; }
+            ValueType_t const &r22() const { return mField[8]; }
 
-            value_type const & r00(value_type const &aValue) { return (mField[0] = aValue); }
-            value_type const & r01(value_type const &aValue) { return (mField[1] = aValue); }
-            value_type const & r02(value_type const &aValue) { return (mField[2] = aValue); }
-            value_type const & r10(value_type const &aValue) { return (mField[3] = aValue); }
-            value_type const & r11(value_type const &aValue) { return (mField[4] = aValue); }
-            value_type const & r12(value_type const &aValue) { return (mField[5] = aValue); }
-            value_type const & r20(value_type const &aValue) { return (mField[6] = aValue); }
-            value_type const & r21(value_type const &aValue) { return (mField[7] = aValue); }
-            value_type const & r22(value_type const &aValue) { return (mField[8] = aValue); }
+            // Per-Component write access.
+            ValueType_t const &r00(ValueType_t const &aValue) { return (mField[0] = aValue); }
+            ValueType_t const &r01(ValueType_t const &aValue) { return (mField[1] = aValue); }
+            ValueType_t const &r02(ValueType_t const &aValue) { return (mField[2] = aValue); }
+            ValueType_t const &r10(ValueType_t const &aValue) { return (mField[3] = aValue); }
+            ValueType_t const &r11(ValueType_t const &aValue) { return (mField[4] = aValue); }
+            ValueType_t const &r12(ValueType_t const &aValue) { return (mField[5] = aValue); }
+            ValueType_t const &r20(ValueType_t const &aValue) { return (mField[6] = aValue); }
+            ValueType_t const &r21(ValueType_t const &aValue) { return (mField[7] = aValue); }
+            ValueType_t const &r22(ValueType_t const &aValue) { return (mField[8] = aValue); }
 
-            virtual const_value_type determinant() const
+            /**
+             * Calculate the determinant of this matrix using sarrus' rule.
+             *
+             * @return
+             */
+            virtual ValueType_t const determinant() const
             {
-				value_type det = 0;
-				__shirabe_math__matrix_determinant_sarrus<value_type>(this->const_ptr(), &det);
+                ValueType_t det = 0;
+                __shirabe_math__matrix_determinant_sarrus<ValueType_t>(this->const_ptr(), &det);
 
 				return det;
 			}
-
 		};
 
+        /**
+         * Square matrix specialization for N = 4
+         * Implemented, as we can use some more efficient algorithms and provide per component access.
+         */
         class CMatrix4x4
             : public CSquareMatrix<4>
 		{
         public_typedefs:
-            typedef CSquareMatrix<4>      base_type;
-            typedef CMatrix4x4            class_type;
-			typedef base_type::value_type value_type;
+            using BaseType_t  = CSquareMatrix<4>       ;
+            using ClassType_t = CMatrix4x4             ;
+            using ValueType_t = BaseType_t::ValueType_t;
 
         public_constructors:
+            /**
+             * Default construct a 4x4 matrix.
+             */
             CMatrix4x4() = default;
 
-            CMatrix4x4(std::initializer_list<value_type> aSource)
+            /**
+             * Construct a 4x4 matrix from a list of values.
+             *
+             * @param aSource
+             */
+            CMatrix4x4(std::array<ValueType_t, 16> aSource)
                 : CSquareMatrix<4>(aSource)
 			{}
 
-            CMatrix4x4(const CMatrix<4, 4>&aOther)
-                : base_type(aOther)
+            /**
+             * Construct a 4x4 matrix from another, equally sized square matrix.
+             *
+             * @param aOther
+             */
+            CMatrix4x4(BaseType_t const &aOther)
+                : BaseType_t(aOther)
 			{}
 
+            /**
+             * Construct a 4x4 for matrix from another 4x4 matrix.
+             *
+             * @param aOther
+             */
             CMatrix4x4(CMatrix4x4 const &aOther)
-                : base_type(aOther)
+                : BaseType_t(aOther)
 			{}
 
         public_destructors:
+            /**
+             * Destroy and run
+             */
             virtual ~CMatrix4x4() = default;
 
         public_methods:
-            value_type const & r00() const { return mField[0];  }
-            value_type const & r01() const { return mField[1];  }
-            value_type const & r02() const { return mField[2];  }
-            value_type const & r03() const { return mField[3];  }
-            value_type const & r10() const { return mField[4];  }
-            value_type const & r11() const { return mField[5];  }
-            value_type const & r12() const { return mField[6];  }
-            value_type const & r13() const { return mField[7];  }
-            value_type const & r20() const { return mField[8];  }
-            value_type const & r21() const { return mField[9];  }
-            value_type const & r22() const { return mField[10]; }
-            value_type const & r23() const { return mField[11]; }
-            value_type const & r30() const { return mField[12]; }
-            value_type const & r31() const { return mField[13]; }
-            value_type const & r32() const { return mField[14]; }
-            value_type const & r33() const { return mField[15]; }
+            // Per-Component read only access.
+            ValueType_t const &r00() const { return mField[0];  }
+            ValueType_t const &r01() const { return mField[1];  }
+            ValueType_t const &r02() const { return mField[2];  }
+            ValueType_t const &r03() const { return mField[3];  }
+            ValueType_t const &r10() const { return mField[4];  }
+            ValueType_t const &r11() const { return mField[5];  }
+            ValueType_t const &r12() const { return mField[6];  }
+            ValueType_t const &r13() const { return mField[7];  }
+            ValueType_t const &r20() const { return mField[8];  }
+            ValueType_t const &r21() const { return mField[9];  }
+            ValueType_t const &r22() const { return mField[10]; }
+            ValueType_t const &r23() const { return mField[11]; }
+            ValueType_t const &r30() const { return mField[12]; }
+            ValueType_t const &r31() const { return mField[13]; }
+            ValueType_t const &r32() const { return mField[14]; }
+            ValueType_t const &r33() const { return mField[15]; }
 
-            value_type const & r00(value_type const &aValue) { return (mField[0]  = aValue); }
-            value_type const & r01(value_type const &aValue) { return (mField[1]  = aValue); }
-            value_type const & r02(value_type const &aValue) { return (mField[2]  = aValue); }
-            value_type const & r03(value_type const &aValue) { return (mField[3]  = aValue); }
-            value_type const & r10(value_type const &aValue) { return (mField[4]  = aValue); }
-            value_type const & r11(value_type const &aValue) { return (mField[5]  = aValue); }
-            value_type const & r12(value_type const &aValue) { return (mField[6]  = aValue); }
-            value_type const & r13(value_type const &aValue) { return (mField[7]  = aValue); }
-            value_type const & r20(value_type const &aValue) { return (mField[8]  = aValue); }
-            value_type const & r21(value_type const &aValue) { return (mField[9]  = aValue); }
-            value_type const & r22(value_type const &aValue) { return (mField[10] = aValue); }
-            value_type const & r23(value_type const &aValue) { return (mField[11] = aValue); }
-            value_type const & r30(value_type const &aValue) { return (mField[12] = aValue); }
-            value_type const & r31(value_type const &aValue) { return (mField[13] = aValue); }
-            value_type const & r32(value_type const &aValue) { return (mField[14] = aValue); }
-            value_type const & r33(value_type const &aValue) { return (mField[15] = aValue); }
+            // Per-Component write access.
+            ValueType_t const &r00(ValueType_t const &aValue) { return (mField[0]  = aValue); }
+            ValueType_t const &r01(ValueType_t const &aValue) { return (mField[1]  = aValue); }
+            ValueType_t const &r02(ValueType_t const &aValue) { return (mField[2]  = aValue); }
+            ValueType_t const &r03(ValueType_t const &aValue) { return (mField[3]  = aValue); }
+            ValueType_t const &r10(ValueType_t const &aValue) { return (mField[4]  = aValue); }
+            ValueType_t const &r11(ValueType_t const &aValue) { return (mField[5]  = aValue); }
+            ValueType_t const &r12(ValueType_t const &aValue) { return (mField[6]  = aValue); }
+            ValueType_t const &r13(ValueType_t const &aValue) { return (mField[7]  = aValue); }
+            ValueType_t const &r20(ValueType_t const &aValue) { return (mField[8]  = aValue); }
+            ValueType_t const &r21(ValueType_t const &aValue) { return (mField[9]  = aValue); }
+            ValueType_t const &r22(ValueType_t const &aValue) { return (mField[10] = aValue); }
+            ValueType_t const &r23(ValueType_t const &aValue) { return (mField[11] = aValue); }
+            ValueType_t const &r30(ValueType_t const &aValue) { return (mField[12] = aValue); }
+            ValueType_t const &r31(ValueType_t const &aValue) { return (mField[13] = aValue); }
+            ValueType_t const &r32(ValueType_t const &aValue) { return (mField[14] = aValue); }
+            ValueType_t const &r33(ValueType_t const &aValue) { return (mField[15] = aValue); }
 		};
 
 		// Transposition functions. Will always return copies and leave the passed matrix unchanged.
@@ -460,12 +671,23 @@ namespace Engine
 
 		// Determinant calculation. 
 		// Will use fish-rule, sarrus' rule, gauss-jordan elimination or leibniz-formula/laplace'sche Entwicklungssatz 
-        CMatrix2x2::value_type SMMatrixDeterminant(CMatrix2x2 const &aMatrix);
-        CMatrix3x3::value_type SMMatrixDeterminant(CMatrix3x3 const &aMatrix);
-        CMatrix4x4::value_type SMMatrixDeterminant(CMatrix4x4 const &aMatrix);
+        CMatrix2x2::ValueType_t SMMatrixDeterminant(CMatrix2x2 const &aMatrix);
+        CMatrix3x3::ValueType_t SMMatrixDeterminant(CMatrix3x3 const &aMatrix);
+        CMatrix4x4::ValueType_t SMMatrixDeterminant(CMatrix4x4 const &aMatrix);
 
-
-        template<size_t M, size_t S, size_t N, typename val_type = typename CMatrix<M, N>::value_type>
+        /**
+         * Multiply a MxS matrix with a SxN matrix.
+         *
+         * @param aLHS
+         * @param aRHS
+         * @return
+         */
+        template<
+                size_t   M,
+                size_t   S,
+                size_t   N,
+                typename val_type = typename CMatrix<M, N>::ValueType_t
+                >
         CMatrix<M, N> SMCMatrixMultiply(
                 CMatrix<M, S> const &aLHS,
                 CMatrix<S, N> const &aRHS)
@@ -477,6 +699,7 @@ namespace Engine
 			return (product);
 		};
 
+        // Square matrix multiplications.
         CMatrix2x2 SMMatrixMultiply(CMatrix2x2 const &aLHS, CMatrix2x2 const &aRHS);
         CMatrix3x3 SMMatrixMultiply(CMatrix3x3 const &aLHS, CMatrix3x3 const &aRHS);
         CMatrix4x4 SMMatrixMultiply(CMatrix4x4 const &aLHS, CMatrix4x4 const &aRHS);

@@ -95,7 +95,7 @@ namespace Engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const &aInitializer);
+            CVectorImpl(std::array<T, 1> const &aInitializer);
 
             /**
              * Initialize this 1D vector with a single value.
@@ -163,7 +163,7 @@ namespace Engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const &aInitializer);
+            CVectorImpl(std::array<T, 2> const &aInitializer);
 
             /**
              * Construct a 2D vector with a x- and y-value.
@@ -254,7 +254,7 @@ namespace Engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const &aInitializer);
+            CVectorImpl(std::array<T, 3> const &aInitializer);
 
             /**
              * Construct this 3D vector from the values.
@@ -382,7 +382,7 @@ namespace Engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const &aInitializer);
+            CVectorImpl(std::array<T, 4> const &aInitializer);
 
             /**
              * Construct this 4D vector from four values.
@@ -551,7 +551,7 @@ namespace Engine
             /**
              * Construct this vector from a list of values.
              */
-            CVector(std::initializer_list<T> const &aValues);
+            CVector(std::array<T, N> const &aValues);
 
             /**
              * Copy-Initialize this vector from a field of T with N elements.
@@ -665,7 +665,7 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        CVector<T, N, TDerived>::CVector(std::initializer_list<T> const &aInitializer)
+        CVector<T, N, TDerived>::CVector(std::array<T, N> const &aInitializer)
             : TDerived(aInitializer)
         {
         }
@@ -1080,7 +1080,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 1>::CVectorImpl(std::initializer_list<T> const &aInitializer)
+        CVectorImpl<T, 1>::CVectorImpl(std::array<T, 1> const &aInitializer)
             : CField<T, sizeof(T), 1, 1>(aInitializer)
         {
         }
@@ -1154,7 +1154,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 2>::CVectorImpl(std::initializer_list<T> const &aInitializer)
+        CVectorImpl<T, 2>::CVectorImpl(std::array<T, 2> const &aInitializer)
             : CField<T, sizeof(T), 2, 1>(aInitializer)
         {
         }
@@ -1253,7 +1253,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 3>::CVectorImpl(std::initializer_list<T> const &aInitializer)
+        CVectorImpl<T, 3>::CVectorImpl(std::array<T, 3> const &aInitializer)
             : CField<T, sizeof(T), 3, 1>(aInitializer)
         {
         }
@@ -1384,7 +1384,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 4>::CVectorImpl(std::initializer_list<T> const &aInitializer)
+        CVectorImpl<T, 4>::CVectorImpl(std::array<T, 4> const &aInitializer)
             : CField<T, sizeof(T), 4, 1>(aInitializer)
         {
         }
