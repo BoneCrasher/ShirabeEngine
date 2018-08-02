@@ -27,87 +27,65 @@ namespace Engine
 		Day
 	};
 
-	/**************************************************************************************************
-	 * Class:	PlatformTime
-	 *
-	 * Summary:
-	 *  The PlatformTime-class is used to provide a common base interface and
-	 *       functionality for platform time access, storage and conversions. Therefore it cannot be
-	 *       instantiated directly, must be overridden for each to be supported platform and has to
-	 *       implement the getTimestamp(), getConversionConstant()
-	 *       and requestSetConversionFactors() methods. Since each platform has its' own internal
-	 *       value type to hold a specific time value, the type need be provided as the template
-	 *       parameter T.
-	 *
-	 * Typeparams:
-	 * T - 	Internal time value data-type to represent a point in time numerically.
-	 **************************************************************************************************/
+
+
+
+    /**
+     * The PlatformTime-class is used to provide a common base interface and
+     * functionality for platform time access, storage and conversions. Therefore it cannot be
+     * instantiated directly, must be overridden for each to be supported platform and has to
+     * implement the getTimestamp(), getConversionConstant()
+     * and requestSetConversionFactors() methods. Since each platform has its' own internal
+     * value type to hold a specific time value, the type need be provided as the template
+     * parameter T.
+     *
+     * @tparam T Internal time value data-type to represent a point in time numerically.
+     */
 	template <typename T>
     class CPlatformTime
     {
-
     public_typedefs:
-        typedef CPlatformTime<T> timer_type;
-        typedef T                internal_time_value_type;
+        using TimerType_t      = CPlatformTime<T>;
+        using TimerValueType_t = T               ;
 
     public_destructors:
 
-		/**************************************************************************************************
-		 * Fn:	virtual PlatformTime::~PlatformTime() = default;
-		 *
-		 * Summary:	Destructor.
-		 **************************************************************************************************/
+        /**
+         * Destroy and run
+         */
         virtual ~CPlatformTime() = default;
 
-		/**************************************************************************************************
-		 * Fn:	EEngineStatus PlatformTime::initialize();
+        /**
+         * Initializes this instance by requesting the currently valid conversion
+         * factors for each permitted value of ETimeUnit.
 		 *
-		 * Summary:
-		 *  Initializes this instance by requesting the currently valid conversion
-		 *  	factors for each permitted value of ETimeUnit.
-		 *
-		 * Returns:	The EEngineStatus.
-		 **************************************************************************************************/
+         * @return An EEngineStatus flag describing the operation result.
+         */
 		EEngineStatus initialize();		
 
-		/**************************************************************************************************
-		 * Fn:	double PlatformTime::getConversionMask(ETimeUnit unit = ETimeUnit::Seconds);
-		 *
-		 * Summary:	Determine the proper conversion factor to convert from.
-		 *
-		 * Parameters:
-		 * unit - 	(Optional) The unit.
-		 *
-		 * Returns:
-		 *  Valid conversion factor from seconds to @unit.
+        /**
+         * Determine the proper conversion factor to convert from.
+         *
+         * @param unit (Optional) The unit.
+         * @return  Valid conversion factor from seconds to @unit.
 		 *          1.0 if the requested target unit is not supported.
-		 **************************************************************************************************/
+         */
         double getConversionMask(ETimeUnit aUnit = ETimeUnit::Seconds);
 
-		/**************************************************************************************************
-		 * Fn:	virtual EEngineStatus PlatformTime::getTimestamp(T& buffer) const = 0;
-		 *
-		 * Summary:
-		 *  Fetch the current platform implementation timestamp to perform all necessary computations.
-		 *
-		 * Parameters:
-		 * buffer - 	[in,out] Reference to a field holding the value if successful.
-		 *
-		 * Returns:	EEngineStatus::Ok if successful. An error Of EEngineStatus otherwise.
-		 **************************************************************************************************/
+        /**
+         * Fetch the current platform implementation timestamp to perform all necessary computations.
+         *
+         * @param buffer [in,out] Reference to a field holding the value if successful.
+         * @return                EEngineStatus::Ok if successful. An error Of EEngineStatus otherwise.
+         */
         virtual EEngineStatus getTimestamp(T &aBuffer) const = 0;
 
-		/**************************************************************************************************
-		 * Fn:	virtual EEngineStatus PlatformTime::getConversionConstant(T& buffer) const = 0;
-		 *
-		 * Summary:
-		 *  Fetch the base conversion constant from the platform implementation to convert from platform
-		 *  Low-level time resolution to Seconds.
-		 *
-		 * Parameters:
-		 * buffer - 	[in,out] Reference to a field holding the value if successful.
-		 *
-		 * Returns:	EEngineStatus::Ok if successful. An error Of EEngineStatus otherwise.
+        /**
+         * Fetch the base conversion constant from the platform implementation to convert from platform
+         * Low-level time resolution to Seconds.
+         *
+         * @param buffer [in,out] Reference to a field holding the value if successful.
+         * @return       EEngineStatus::Ok if successful. An error Of EEngineStatus otherwise.
 		 **************************************************************************************************/
         virtual EEngineStatus getConversionConstant(T &aBuffer) const = 0;
 
@@ -116,28 +94,24 @@ namespace Engine
         using ConversionFactorMap_t = std::map<ETimeUnit, double>;
 
     protected_constructors:
-        /**************************************************************************************************
-         * Fn:	PlatformTime::PlatformTime() = default;
-         *
-         * Summary:	Default constructor.
-         **************************************************************************************************/
+        /**
+         * Run and destroy
+         */
         CPlatformTime() = default;
 
     protected_methods:
-        /**************************************************************************************************
-         * Fn:	virtual void PlatformTime::requestSetConversionFactors(ConversionFactorMap& map) = 0;
+        /**
+         * Requests derivate implementations to set all valid conversion factors
+         * for each supported ETimeUnit.
          *
-         * Summary:
-         *  Requests derivate implementations to set all valid conversion factors
-         *  	for each supported ETimeUnit.
-         *
-         * Parameters:
-         * map - 	[in,out] Assignment-container to hold all supported conversion factors.
+         * @param map [in,out] Assignment-container to hold all supported conversion factors.
          **************************************************************************************************/
         virtual void requestSetConversionFactors(ConversionFactorMap_t &aMap) = 0;
 		
     private_members:
-		/** Summary: Container holding all valid mappings of <time unit> to <conversion factor>. */
+        /**
+         * Container holding all valid mappings of <time unit> to <conversion factor>.
+         */
         ConversionFactorMap_t mConversionFactors;
 	};
     //<-----------------------------------------------------------------------------

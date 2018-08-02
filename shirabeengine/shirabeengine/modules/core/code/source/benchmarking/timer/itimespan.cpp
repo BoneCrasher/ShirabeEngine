@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "core/benchmarking/timer/itimespan.h"
 
 namespace Engine
@@ -83,37 +85,41 @@ namespace Engine
     //<
     //<-----------------------------------------------------------------------------
     double UnitConversionFactorImpl(
-            double        aBase,
-            eTimespanUnit aFrom,
-            eTimespanUnit aTo)
+            double               aBase,
+            eTimespanUnit const &aFrom,
+            eTimespanUnit const &aTo)
     {
         bool   const invert = (aTo > aFrom);
         double       factor = 1.0;
 
+        eTimespanUnit from = aFrom;
+        eTimespanUnit to   = aTo;
+
         if(invert)
         {
-            std::swap(aTo, aFrom);
+            from = aTo;
+            to   = aFrom;
         }
 
-        if(aFrom == eTimespanUnit::SecondsUnit() && aTo == eTimespanUnit::SubsecondsUnit())
+        if(from == eTimespanUnit::SecondsUnit() && to == eTimespanUnit::SubsecondsUnit())
             factor = aBase;
-        else if(aFrom == eTimespanUnit::MinutesUnit() && aTo == eTimespanUnit::SubsecondsUnit())
+        else if(from == eTimespanUnit::MinutesUnit() && to == eTimespanUnit::SubsecondsUnit())
             factor = aBase * 60;
-        else if(aFrom == eTimespanUnit::MinutesUnit() && aTo == eTimespanUnit::SecondsUnit())
+        else if(from == eTimespanUnit::MinutesUnit() && to == eTimespanUnit::SecondsUnit())
             factor = 60;
-        else if(aFrom == eTimespanUnit::HoursUnit() && aTo == eTimespanUnit::SubsecondsUnit())
+        else if(from == eTimespanUnit::HoursUnit() && to == eTimespanUnit::SubsecondsUnit())
             factor = aBase * 60 * 60;
-        else if(aFrom == eTimespanUnit::HoursUnit() && aTo == eTimespanUnit::SecondsUnit())
+        else if(from == eTimespanUnit::HoursUnit() && to == eTimespanUnit::SecondsUnit())
             factor = 60 * 60;
-        else if(aFrom == eTimespanUnit::HoursUnit() && aTo == eTimespanUnit::MinutesUnit())
+        else if(from == eTimespanUnit::HoursUnit() && to == eTimespanUnit::MinutesUnit())
             factor = 60;
-        else if(aFrom == eTimespanUnit::DaysUnit() && aTo == eTimespanUnit::SubsecondsUnit())
+        else if(from == eTimespanUnit::DaysUnit() && to == eTimespanUnit::SubsecondsUnit())
             factor = aBase * 60 * 60 * 24;
-        else if(aFrom == eTimespanUnit::DaysUnit() && aTo == eTimespanUnit::SecondsUnit())
+        else if(from == eTimespanUnit::DaysUnit() && to == eTimespanUnit::SecondsUnit())
             factor = 60 * 60 * 24;
-        else if(aFrom == eTimespanUnit::DaysUnit() && aTo == eTimespanUnit::MinutesUnit())
+        else if(from == eTimespanUnit::DaysUnit() && to == eTimespanUnit::MinutesUnit())
             factor = 60 * 24;
-        else if(aFrom == eTimespanUnit::DaysUnit() && aTo == eTimespanUnit::HoursUnit())
+        else if(from == eTimespanUnit::DaysUnit() && to == eTimespanUnit::HoursUnit())
             factor = 24;
 
         if(invert)

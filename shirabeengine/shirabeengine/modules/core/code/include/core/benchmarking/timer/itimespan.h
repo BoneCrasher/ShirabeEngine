@@ -17,11 +17,17 @@ namespace Engine
 
     namespace Helper
     {
+        /**
+         * Returns the sign of a value.
+         *
+         * @tparam Type of the value.
+         */
         template<class T>
         int32_t signum(T aValue)
         {
             if(aValue < T(0))
                 return T(-1);
+
             return (aValue > T(0));
         }
     }
@@ -42,52 +48,163 @@ namespace Engine
     class ITimespan;
 
     /**
-     * @brief ITimespan is the aBase interface class for arbitrary timespan operations
-     *        providing access aTo subseconds, seconds, minutes, hours & days.
+     * ITimespan is the aBase interface class for arbitrary timespan operations
+     * providing access aTo subseconds, seconds, minutes, hours & days.
      */
     class ITimespan
     {
         SHIRABE_DECLARE_INTERFACE(ITimespan);
 
     public_typedefs:
-        typedef ITimespan my_type;
+        typedef ITimespan ClassType_t;
 
     public_methods:
+        /**
+         * Return the number of subseconds in the timespan clamped to 1..1000
+         *
+         * @return
+         */
         virtual int32_t subseconds() const = 0;
-        virtual int32_t seconds()    const = 0;
-        virtual int32_t minutes()    const = 0;
-        virtual int32_t hours()      const = 0;
-        virtual int32_t days()       const = 0;
+        /**
+         * Return the number of seconds in the timespan clamped to 1..60
+         *
+         * @return
+         */
+        virtual int32_t seconds() const = 0;
+        /**
+         * Return the number of minutes in the timespan clamped to 1..60
+         *
+         * @return
+         */
+        virtual int32_t minutes() const = 0;
+        /**
+         * Return the number of hours in the timespan clamped to 1..24
+         *
+         * @return
+         */
+        virtual int32_t hours() const = 0;
+        /**
+         * Return the number of days in the timespan clamped to 1..365
+         *
+         * @return
+         */
+        virtual int32_t days() const = 0;
 
+        /**
+         * Return the unclamped total number of subseconds in the timespan.
+         *
+         * @return
+         */
         virtual double totalSubseconds() const = 0;
-        virtual double totalSeconds()    const = 0;
-        virtual double totalMinutes()    const = 0;
-        virtual double totalHours()      const = 0;
-        virtual double totalDays()       const = 0;
+        /**
+         * Return the unclamped total number of seconds in the timespan.
+         *
+         * @return
+         */
+        virtual double totalSeconds() const = 0;
+        /**
+         * Return the unclamped total number of minutes in the timespan.
+         *
+         * @return
+         */
+        virtual double totalMinutes() const = 0;
+        /**
+         * Return the unclamped total number of hours in the timespan.
+         *
+         * @return
+         */
+        virtual double totalHours() const = 0;
+        /**
+         * Return the unclamped total number of days in the timespan.
+         *
+         * @return
+         */
+        virtual double totalDays() const = 0;
 
-        virtual void setTo(double distance, eTimespanUnit unit) = 0;
+        /**
+         * Set the timespan value to an arbitrary multiple of a given timespan unit, e.g. 5 milliseconds.
+         *
+         * @param distance
+         * @param unit
+         */
+        virtual void setTo(double const &aDistance, eTimespanUnit const &aUnit) = 0;
 
-        virtual int32_t compare(CStdSharedPtr_t<ITimespan> const& other) const = 0;
+        /**
+         * Compare this timespan to anaOther for it's relative position.
+         * If the returned value is less than 0, this instance is located
+         * earlier in the timeline.
+         *
+         * @param aOther
+         * @return
+         */
+        virtual int32_t compare(CStdSharedPtr_t<ITimespan> const& aOther) const = 0;
 
     public_operators:
+        /**
+         * Add one timespan to this timespan.
+         *
+         * @param aOther
+         * @return
+         */
         virtual CStdSharedPtr_t<ITimespan> operator+(
-                CStdSharedPtr_t<ITimespan> const &other) = 0;
+                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
 
+        /**
+         * Subtract one timespan from this instance.
+         *
+         * @param aOther
+         * @return
+         */
         virtual CStdSharedPtr_t<ITimespan> operator-(
-                CStdSharedPtr_t<ITimespan> const &other) = 0;
+                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
 
+        /**
+         * Compare this timespan with anaOther for equality.
+         *
+         * @param aOther
+         * @return
+         */
         virtual bool operator ==(
-                CStdSharedPtr_t<ITimespan> const &other) = 0;
+                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
 
+        /**
+         * Test whether this timespan is located earlier in the timeline.
+         *
+         * @param aOther
+         * @return
+         */
         virtual bool operator <(
-                CStdSharedPtr_t<ITimespan> const &other) = 0;
+                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
 
+        /**
+         * Test whether this timespan is located later in the timeline.
+         *
+         * @param aOther
+         * @return
+         */
         virtual bool operator >(
-                CStdSharedPtr_t<ITimespan> const &other) = 0;
+                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
 
+        /**
+         * Returns the number of elements inside a subsecond unit.
+         * 1000 for milliseconds.
+         * 24   for PAL
+         * 25   for NTSC
+         * etc...
+         *
+         * @return
+         */
         virtual intmax_t subsecondUnits() const = 0;
+
+        /**
+         * Calculates the conversion factor required to go from a specific timespan unit to anaOther.
+         *
+         * @param aTo
+         * @param aFrom
+         * @return
+         */
         virtual double unitConversionFactorForUnit(
-                eTimespanUnit to,
+                eTimespanUnit aTo,
                 eTimespanUnit aFrom = eTimespanUnit::SubsecondsUnit()) const = 0;
     };
 
@@ -95,7 +212,8 @@ namespace Engine
 #pragma GCC diagnostic ignored "-Wunused-function" // Deactivated since these functions are not used by all static-lib-linkers and might cause those warnings depending on where it's linked.
 
     /**
-     * @brief operator +
+     * Add to timespans and return the result as a copy.
+     *
      * @param aLHS
      * @param aRHS
      * @return
@@ -105,7 +223,8 @@ namespace Engine
             CStdSharedPtr_t<ITimespan> const &aRHS);
 
     /**
-     * @brief operator -
+     * Subtract one timespan from another and return the result as a copy.
+     *
      * @param aLHS
      * @param aRHS
      * @return
@@ -115,7 +234,8 @@ namespace Engine
             CStdSharedPtr_t<ITimespan> const &aRHS);
 
     /**
-     * @brief operator ==
+     * Compare two timespan instances for equality.
+     *
      * @param aLHS
      * @param aRHS
      * @return
@@ -125,7 +245,8 @@ namespace Engine
             CStdSharedPtr_t<ITimespan> const &aRHS);
 
     /**
-     * @brief operator <
+     * Test, whether aLHS is located earlier in the timeline than aRHS.
+     *
      * @param aLHS
      * @param aRHS
      * @return
@@ -135,7 +256,8 @@ namespace Engine
             CStdSharedPtr_t<ITimespan> const &aRHS);
 
     /**
-     * @brief operator >
+     * Test, whether aLHS is located later in the timeline than aRHS.
+     *
      * @param aLHS
      * @param aRHS
      * @return
@@ -145,7 +267,8 @@ namespace Engine
             CStdSharedPtr_t<ITimespan> const &aRHS);
 
     /**
-     * @brief operator >=
+     * Test, whether aLHS is located later in the timeline than aRHS or at the same time point.
+     *
      * @param aLHS
      * @param aRHS
      * @return
@@ -155,7 +278,7 @@ namespace Engine
             CStdSharedPtr_t<ITimespan> const &aRHS);
 
     /**
-     * @brief operator <=
+     * Test, whether aLHS is located earlier in the timeline than aRHS or at the same time point.
      * @param aLHS
      * @param aRHS
      * @return
@@ -167,27 +290,28 @@ namespace Engine
 #pragma GCC diagnostic pop
 
     /**
-     * @brief UnitConversionFactorImpl
-     * @param base
-     * @param from
-     * @param to
+     * Calculates the conversion factor for a conversion from aFrom to aTo, based
+     * on a subsecond unit lenght of "base".
+     * @param aBase
+     * @param aFrom
+     * @param aTo
      * @return
      */
     static double UnitConversionFactorImpl(
-            double        aBase,
-            eTimespanUnit aFrom,
-            eTimespanUnit aTo);
+            double              aBase,
+            eTimespanUnit const &aFrom,
+            eTimespanUnit const &aTo);
 
     /**
-     * @brief The Timespan class
+     * CTimespan provides a default implementation of ITimespan.
      */
     template <intmax_t iSubsecondUnits>
     class CTimespan
             : public ITimespan
     {
-    public:
+    public_classes:
         /**
-         * @brief Creates a new instance of this specific timespan type.
+         * Creates a new instance of this specific timespan type.
          */
         class CFactory
         {
@@ -199,7 +323,7 @@ namespace Engine
         };
 
         /**
-         * @brief Converts one timespan type aTo another!
+         * Converts one timespan type aTo anaOther!
          */
         template <intmax_t iSourceUnitsPerSecond,
                   intmax_t iTargetUnitsPerSecond>
@@ -211,13 +335,13 @@ namespace Engine
         };
 
     public_typedefs:
-        typedef typename std::ratio<1, iSubsecondUnits>              ratio_type;
-        typedef typename std::chrono::duration<intmax_t, ratio_type> chrono_duration_type;
-        typedef CTimespan<iSubsecondUnits>                           my_type;
+        using RatioType_t          = typename std::ratio<1, iSubsecondUnits>              ;
+        using ChronoDurationType_t = typename std::chrono::duration<intmax_t, RatioType_t>;
+        using ClassType_t          = CTimespan<iSubsecondUnits>                           ;
 
     public_static_functions:
         /**
-         * @brief SecToMillisec
+         * Convert a second value to it's millisecond representation.
          * @param sec
          * @return
          */
@@ -226,8 +350,9 @@ namespace Engine
             return sec * 1000.0;
         }
 
+    public_constructors:
         /**
-         * @brief CTimespan
+         * Construct a zero timespan.
          */
         CTimespan()
             : mInternalValue(0)
@@ -235,34 +360,38 @@ namespace Engine
         }
 
         /**
-         * @brief CTimespan
-         * @param otherToCopy
+         * Copy-Construct a timespan from another.
+         *
+         * @param aOtherToCopy
          */
-        CTimespan(my_type const &otherToCopy)
-            : mInternalValue(otherToCopy.totalSubseconds())
+        CTimespan(ClassType_t const &aOtherToCopy)
+            : mInternalValue(aOtherToCopy.totalSubseconds())
         {
         }
 
         /**
-         * @brief CTimespan
-         * @param otherToMove
+         * Move-Construct a timespan from another.
+         *
+         * @param aOtherToMove
          */
-        CTimespan(my_type&& otherToMove)
-            : mInternalValue(otherToMove.totalSubseconds())
+        CTimespan(ClassType_t&& aOtherToMove)
+            : mInternalValue(aOtherToMove.totalSubseconds())
         {
         }
 
         /**
-         * @brief CTimespan
-         * @param aOther
+         * Create a Timespan from another timespan of another subsecond resolution.
+         *
+         * @param aaOther
          */
-        template <intmax_t iOtherBaseDenominator>
-        CTimespan(CTimespan<iOtherBaseDenominator> const &aOther)
-            : mInternalValue(chrono_duration_type(aOther).size())
+        template <intmax_t iaOtherBaseDenominator>
+        CTimespan(CTimespan<iaOtherBaseDenominator> const &aaOther)
+            : mInternalValue(ChronoDurationType_t(aaOther).size())
         {}
 
         /**
-         * @brief CTimespan
+         * Create a Timespan from a subsecond based time value.
+         *
          * @param initialValue
          */
         explicit CTimespan(intmax_t initialValue)
@@ -270,7 +399,8 @@ namespace Engine
         }
 
         /**
-         * @brief CTimespan
+         * Construct a timespan from explicit time component values.
+         *
          * @param aDays
          * @param aHours
          * @param aMinutes
@@ -284,7 +414,7 @@ namespace Engine
                 int32_t aSeconds,
                 int32_t aSubseconds)
         {
-            chrono_duration_type tmp(aSubseconds);
+            ChronoDurationType_t tmp(aSubseconds);
             tmp += std::chrono::seconds(aSeconds)
                     + std::chrono::minutes(aMinutes)
                     + std::chrono::hours(aHours)
@@ -294,7 +424,8 @@ namespace Engine
         }
 
         /**
-         * @brief base
+         * Return the current base of this timespan unit.
+         *
          * @return
          */
         CTimespan<iSubsecondUnits> base()
@@ -303,7 +434,8 @@ namespace Engine
         }
 
         /**
-         * @brief subseconds
+         * Return the number of subseconds, clamped to 0..subseconds-max
+         *
          * @return
          */
         int32_t subseconds() const
@@ -312,7 +444,8 @@ namespace Engine
         }
 
         /**
-         * @brief seconds
+         * Return the number of seconds, clamped to 0..60
+         *
          * @return
          */
         int32_t seconds() const
@@ -321,7 +454,8 @@ namespace Engine
         }
 
         /**
-         * @brief minutes
+         * Return the number of minutes, clamped to 0..60
+         *
          * @return
          */
         int32_t minutes() const
@@ -330,7 +464,8 @@ namespace Engine
         }
 
         /**
-         * @brief hours
+         * Return the number of hours, clamped to 0..24.
+         *
          * @return
          */
         int32_t hours() const
@@ -339,7 +474,8 @@ namespace Engine
         }
 
         /**
-         * @brief days
+         * Return the number of days, clamped to 0.365.
+         *
          * @return
          */
         int32_t days() const
@@ -348,7 +484,8 @@ namespace Engine
         }
 
         /**
-         * @brief totalSubseconds
+         * Return the total number of subseconds representing this timespan.
+         *
          * @return
          */
         double totalSubseconds() const
@@ -357,7 +494,8 @@ namespace Engine
         }
 
         /**
-         * @brief totalSeconds
+         * Return the total number of seconds representing this timespan.
+         *
          * @return
          */
         double totalSeconds() const
@@ -366,7 +504,8 @@ namespace Engine
         }
 
         /**
-         * @brief totalMinutes
+         * Return the total number of minutes representing this timespan.
+         *
          * @return
          */
         double totalMinutes() const
@@ -375,7 +514,8 @@ namespace Engine
         }
 
         /**
-         * @brief totalHours
+         * Return the total number of hours representing this timespan.
+         *
          * @return
          */
         double totalHours() const
@@ -384,7 +524,8 @@ namespace Engine
         }
 
         /**
-         * @brief totalDays
+         * Return the total number of days representing this timespan.
+         *
          * @return
          */
         double totalDays() const
@@ -393,8 +534,9 @@ namespace Engine
         }
 
         /**
-         * @brief compare
-         * @param other
+         * Compare this timespan to another for timeline relative position.
+         *
+         * @param aOther
          * @return
          */
         int32_t compare(CStdSharedPtr_t<ITimespan> const &aOther) const
@@ -403,8 +545,9 @@ namespace Engine
         }
 
         /**
-         * @brief operator +
-         * @param aOther
+         * Add another timespan to this instance.
+         *
+         * @param aaOther
          * @return
          */
         CStdSharedPtr_t<ITimespan> operator+(
@@ -414,8 +557,9 @@ namespace Engine
         }
 
         /**
-         * @brief operator -
-         * @param aOther
+         * Subtract another timespan from this instance.
+         *
+         * @param aaOther
          * @return
          */
         CStdSharedPtr_t<ITimespan> operator-(
@@ -425,8 +569,9 @@ namespace Engine
         }
 
         /**
-         * @brief operator ==
-         * @param aOther
+         * Compare this timespan and another for equality.
+         *
+         * @param aaOther
          * @return
          */
         bool operator ==(
@@ -436,9 +581,10 @@ namespace Engine
         }
 
         /**
-         * @brief operator >
-         * @param aOther
-         * @return
+         * Compare this instance to another for less-than relation.
+         *
+         * @param aaOther
+         * @return        True, if the other instance is located earlier in the timeline.
          */
         bool operator>(
                 CStdSharedPtr_t<ITimespan> &aOther)
@@ -447,9 +593,10 @@ namespace Engine
         }
 
         /**
-         * @brief operator <
-         * @param aOther
-         * @return
+         * Compare this instance to another for greater-than relation.
+         *
+         * @param aaOther
+         * @return        True, if the other instance is located later in the timeline.
          */
         bool operator<(
                 CStdSharedPtr_t<ITimespan> &aOther)
@@ -458,7 +605,10 @@ namespace Engine
         }
 
         /**
-         * @brief SubsecondUnits
+         * Return the current subsecond units of this timespan.
+         * 1000     Milliseconds
+         * 24       PAL
+         * 25       NTSC
          * @return
          */
         static intmax_t SubsecondUnits()
@@ -467,7 +617,10 @@ namespace Engine
         }
 
         /**
-         * @brief subsecondUnits
+         * Return the current subsecond units of this timespan.
+         * 1000     Milliseconds
+         * 24       PAL
+         * 25       NTSC
          * @return
          */
         intmax_t subsecondUnits() const
@@ -489,23 +642,24 @@ namespace Engine
         }
 
         /**
-         * @brief setTo
-         * @param distance
-         * @param unit
+         * Set the timespan value to an arbitrary multiple of a given timespan unit, e.g. 5 milliseconds.
+         *
+         * @param aDistance
+         * @param aUnit
          */
-        void setTo(double distance, eTimespanUnit unit)
+        void setTo(double const &aDistance, eTimespanUnit const &aUnit)
         {
-            double const factor = CTimespan<iSubsecondUnits>::unitConversionFactorForUnit(eTimespanUnit::SubsecondsUnit(), unit);
-            double const final  = (distance * factor);
+            double const factor = CTimespan<iSubsecondUnits>::unitConversionFactorForUnit(eTimespanUnit::SubsecondsUnit(), aUnit);
+            double const final  = (aDistance * factor);
 
-            mInternalValue = chrono_duration_type((intmax_t) final);
+            mInternalValue = ChronoDurationType_t((intmax_t) final);
         }
 
     private:
 
         /**
          * @brief add
-         * @param aOther
+         * @param aaOther
          * @return
          */
         CStdSharedPtr_t<CTimespan<iSubsecondUnits>> add(CStdSharedPtr_t<ITimespan> &aOther)
@@ -515,7 +669,7 @@ namespace Engine
 
         /**
          * @brief sub
-         * @param aOther
+         * @param aaOther
          * @return
          */
         CStdSharedPtr_t<CTimespan<iSubsecondUnits>> sub(CStdSharedPtr_t<ITimespan> const &aOther)
@@ -525,7 +679,7 @@ namespace Engine
 
         /**
          * @brief compareImpl
-         * @param aOther
+         * @param aaOther
          * @return
          */
         int32_t compareImpl(CStdSharedPtr_t<ITimespan> &aOther) const
@@ -548,7 +702,7 @@ namespace Engine
          * @return
          */
         template <typename TRet, typename TPeriod>
-        TRet convertTo(chrono_duration_type const &aValue) const
+        TRet convertTo(ChronoDurationType_t const &aValue) const
         {
             return std::chrono::duration_cast<std::chrono::duration<TRet, TPeriod>>(aValue).size();
         }
@@ -560,13 +714,13 @@ namespace Engine
          * @return
          */
         static double UnitConversionFactor(
-                eTimespanUnit aFrom,
-                eTimespanUnit aTo)
+                eTimespanUnit const &aFrom,
+                eTimespanUnit const &aTo)
         {
             return UnitConversionFactorImpl(iSubsecondUnits, aFrom, aTo);
         }
 
-        chrono_duration_type mInternalValue;
+        ChronoDurationType_t mInternalValue;
     };
 
     using Timespan_t    = CTimespan<100>;
