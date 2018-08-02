@@ -4,27 +4,31 @@
 #include <stdint.h>
 #include "math/vector.h"
 
-namespace Engine {
-  namespace Math {
-
-    struct SHIRABE_LIBRARY_EXPORT CRect
+namespace Engine
+{
+    namespace Math
     {
-      CVector2D<uint16_t> position;
-      CVector2D<uint16_t> size;
+        /**
+         * CRect defines a simple rectangle structure.
+         */
+        struct SHIRABE_LIBRARY_EXPORT CRect
+        {
+            CVector2D<uint16_t> position;
+            CVector2D<uint16_t> size;
 
-      CRect();
-      CRect(
-        uint16_t const&aX,
-        uint16_t const&aY,
-        uint16_t const&aWidth,
-        uint16_t const&aHeight);
+            CRect();
+            CRect(
+                    uint16_t const&aX,
+                    uint16_t const&aY,
+                    uint16_t const&aWidth,
+                    uint16_t const&aHeight);
 
-      explicit CRect(
-        CVector2D<uint16_t> const& aPosition,
-        CVector2D<uint16_t> const& aSize);
-    };
+            explicit CRect(
+                    CVector2D<uint16_t> const& aPosition,
+                    CVector2D<uint16_t> const& aSize);
+        };
 
-  }
+    }
 }
 
 #endif
