@@ -6,12 +6,12 @@
 namespace Engine {
   namespace Math {
 
-    #define DefinePermutationAccessor1D(a)          inline TVectorImpl<T, 1> a()          const { return TVector1D<T>(a());                }
-    #define DefinePermutationAccessor2D(a, b)       inline TVectorImpl<T, 2> a##b()       const { return TVector2D<T>(a(), b());           }
-    #define DefinePermutationAccessor3D(a, b, c)    inline TVectorImpl<T, 3> a##b##c()    const { return TVector3D<T>(a(), b(), c());      }
-    #define DefinePermutationAccessor4D(a, b, c, d) inline TVectorImpl<T, 4> a##b##c##d() const { return TVector4D<T>(a(), b(), c(), d()); }
+    #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_1D(a)          inline TVectorImpl<T, 1> a()          const { return TVector1D<T>(a());                }
+    #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(a, b)       inline TVectorImpl<T, 2> a##b()       const { return TVector2D<T>(a(), b());           }
+    #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(a, b, c)    inline TVectorImpl<T, 3> a##b##c()    const { return TVector3D<T>(a(), b(), c());      }
+    #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(a, b, c, d) inline TVectorImpl<T, 4> a##b##c##d() const { return TVector4D<T>(a(), b(), c(), d()); }
 
-    #define DeclareImmutableGetter(vec_type, vec_size, component) \
+    #define SHIRABE_DECLARE_IMMUTABLE_GETTER(vec_type, vec_size, component) \
     typename vec_type<T, vec_size>::value_type const              \
       component() const;    
 
@@ -45,7 +45,7 @@ namespace Engine {
       TVectorImpl(std::initializer_list<T> const);
       TVectorImpl(Field<T, sizeof(T), 1, 1> const&);
 
-      DeclareImmutableGetter(TVectorImpl, 1, x);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 1, x);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -82,8 +82,8 @@ namespace Engine {
       TVectorImpl(std::initializer_list<T> const);
       TVectorImpl(Field<T, sizeof(T), 2, 1> const&);
 
-      DeclareImmutableGetter(TVectorImpl, 2, x);
-      DeclareImmutableGetter(TVectorImpl, 2, y);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 2, x);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 2, y);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -95,8 +95,8 @@ namespace Engine {
       static TVectorImpl<T, 2> right();
       static TVectorImpl<T, 2> up();
 
-      DefinePermutationAccessor2D(x, y);
-      DefinePermutationAccessor2D(y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x);
     };
 
     template <typename T>
@@ -124,9 +124,9 @@ namespace Engine {
       TVectorImpl(std::initializer_list<T> const);
       TVectorImpl(Field<T, sizeof(T), 3, 1> const&);
 
-      DeclareImmutableGetter(TVectorImpl, 3, x);
-      DeclareImmutableGetter(TVectorImpl, 3, y);
-      DeclareImmutableGetter(TVectorImpl, 3, z);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 3, x);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 3, y);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 3, z);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -142,19 +142,19 @@ namespace Engine {
       static TVectorImpl<T, 3> right();
       static TVectorImpl<T, 3> up();
 
-      DefinePermutationAccessor2D(x, y);
-      DefinePermutationAccessor2D(y, x);
-      DefinePermutationAccessor2D(x, z);
-      DefinePermutationAccessor2D(z, x);
-      DefinePermutationAccessor2D(y, z);
-      DefinePermutationAccessor2D(z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, y);
 
-      DefinePermutationAccessor3D(x, y, z);
-      DefinePermutationAccessor3D(x, z, y);
-      DefinePermutationAccessor3D(y, x, z);
-      DefinePermutationAccessor3D(y, z, x);
-      DefinePermutationAccessor3D(z, x, y);
-      DefinePermutationAccessor3D(z, y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, y, x);
     };
 
     template <typename T>
@@ -187,10 +187,10 @@ namespace Engine {
       TVectorImpl(std::initializer_list<T> const);
       TVectorImpl(Field<T, sizeof(T), 4, 1> const&);
 
-      DeclareImmutableGetter(TVectorImpl, 4, x);
-      DeclareImmutableGetter(TVectorImpl, 4, y);
-      DeclareImmutableGetter(TVectorImpl, 4, z);
-      DeclareImmutableGetter(TVectorImpl, 4, w);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 4, x);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 4, y);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 4, z);
+      SHIRABE_DECLARE_IMMUTABLE_GETTER(TVectorImpl, 4, w);
 
       // Return a FieldAccessor for the stored x-component to safely assign a new value 
       // using the assignment-operator. Setter.
@@ -205,68 +205,68 @@ namespace Engine {
       // using the assignment-operator. Setter.
       void w(value_type const& val);
 
-      DefinePermutationAccessor2D(x, y);
-      DefinePermutationAccessor2D(y, x);
-      DefinePermutationAccessor2D(x, z);
-      DefinePermutationAccessor2D(z, x);
-      DefinePermutationAccessor2D(y, z);
-      DefinePermutationAccessor2D(z, y);
-      DefinePermutationAccessor2D(x, w);
-      DefinePermutationAccessor2D(w, x);
-      DefinePermutationAccessor2D(y, w);
-      DefinePermutationAccessor2D(w, y);
-      DefinePermutationAccessor2D(z, w);
-      DefinePermutationAccessor2D(w, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(w, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(w, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(w, z);
 
-      DefinePermutationAccessor3D(x, y, z);
-      DefinePermutationAccessor3D(x, z, y);
-      DefinePermutationAccessor3D(y, x, z);
-      DefinePermutationAccessor3D(y, z, x);
-      DefinePermutationAccessor3D(z, x, y);
-      DefinePermutationAccessor3D(z, y, x);
-      DefinePermutationAccessor3D(x, y, w);
-      DefinePermutationAccessor3D(x, w, y);
-      DefinePermutationAccessor3D(x, z, w);
-      DefinePermutationAccessor3D(x, w, z);
-      DefinePermutationAccessor3D(y, x, w);
-      DefinePermutationAccessor3D(y, w, x);
-      DefinePermutationAccessor3D(y, z, w);
-      DefinePermutationAccessor3D(y, w, z);
-      DefinePermutationAccessor3D(z, x, w);
-      DefinePermutationAccessor3D(z, w, x);
-      DefinePermutationAccessor3D(z, y, w);
-      DefinePermutationAccessor3D(z, w, y);
-      DefinePermutationAccessor3D(w, x, y);
-      DefinePermutationAccessor3D(w, y, x);
-      DefinePermutationAccessor3D(w, x, z);
-      DefinePermutationAccessor3D(w, z, x);
-      DefinePermutationAccessor3D(w, y, z);
-      DefinePermutationAccessor3D(w, z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, y, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, w, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, z, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, w, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, x, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, w, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, z, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, w, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, x, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, w, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, y, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, w, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, z, y);
 
-      DefinePermutationAccessor4D(x, y, z, w);
-      DefinePermutationAccessor4D(x, y, w, z);
-      DefinePermutationAccessor4D(x, z, y, w);
-      DefinePermutationAccessor4D(x, z, w, y);
-      DefinePermutationAccessor4D(x, w, y, z);
-      DefinePermutationAccessor4D(x, w, z, y);
-      DefinePermutationAccessor4D(y, x, z, w);
-      DefinePermutationAccessor4D(y, x, w, z);
-      DefinePermutationAccessor4D(y, z, x, w);
-      DefinePermutationAccessor4D(y, z, w, x);
-      DefinePermutationAccessor4D(y, w, x, z);
-      DefinePermutationAccessor4D(y, w, z, x);
-      DefinePermutationAccessor4D(z, x, y, w);
-      DefinePermutationAccessor4D(z, x, w, y);
-      DefinePermutationAccessor4D(z, y, x, w);
-      DefinePermutationAccessor4D(z, y, w, x);
-      DefinePermutationAccessor4D(z, w, x, y);
-      DefinePermutationAccessor4D(z, w, y, x);
-      DefinePermutationAccessor4D(w, x, y, z);
-      DefinePermutationAccessor4D(w, x, z, y);
-      DefinePermutationAccessor4D(w, y, x, z);
-      DefinePermutationAccessor4D(w, y, z, x);
-      DefinePermutationAccessor4D(w, z, x, y);
-      DefinePermutationAccessor4D(w, z, y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, y, z, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, y, w, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, z, y, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, z, w, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, w, y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, w, z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, x, z, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, x, w, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, z, x, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, z, w, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, w, x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, w, z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, x, y, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, x, w, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, y, x, w);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, y, w, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, w, x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, w, y, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, x, y, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, x, z, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, y, x, z);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, y, z, x);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, z, x, y);
+      SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, z, y, x);
     };
 
     /**********************************************************************************************//**

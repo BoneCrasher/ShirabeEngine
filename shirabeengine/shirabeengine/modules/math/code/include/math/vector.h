@@ -11,41 +11,44 @@ namespace Engine
 {
     namespace Math
     {
-        #define DefinePermutationAccessor1D(a)                                         \
+        #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_1D(a)                              \
             inline CVectorImpl<T, 1> a() const                                         \
             {                                                                          \
                 return CVectorImpl<T, 1>(a());                                         \
             }
 
-        #define DefinePermutationAccessor2D(a, b)                                      \
+        #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(a, b)                           \
             inline CVectorImpl<T, 2> a##b() const                                      \
             {                                                                          \
                 return CVectorImpl<T, 2>(a(), b());                                    \
             }
-        #define DefinePermutationAccessor3D(a, b, c)                                   \
+        #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(a, b, c)                        \
             inline CVectorImpl<T, 3> a##b##c() const                                   \
             {                                                                          \
                 return CVectorImpl<T, 3>(a(), b(), c());                               \
             }
-        #define DefinePermutationAccessor4D(a, b, c, d)                                \
+        #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(a, b, c, d)                     \
             inline CVectorImpl<T, 4> a##b##c##d() const                                \
             {                                                                          \
                 return CVectorImpl<T, 4>(a(), b(), c(), d());                          \
             }
         
-        #define DeclareImmutableGetter(vec_type, vec_size, component)                  \
-            typename vec_type<T, vec_size>::value_type const component() const;
+        #define SHIRABE_DECLARE_IMMUTABLE_GETTER(vec_type, vec_size, component)        \
+            typename vec_type<T, vec_size>::ValueType_t const component() const;
         
-        #define DefineImmutableGetter(vec_type, vec_size, component, index)            \
+        #define SHIRABE_DEFINE_IMMUTABLE_GETTER(vec_type, vec_size, component, index)  \
             template <typename T>                                                      \
-            typename vec_type<T, vec_size>::value_type const                           \
+            typename vec_type<T, vec_size>::ValueType_t const                           \
             vec_type<T, vec_size>::component() const                                   \
             {                                                                          \
                 return this->mField[index];                                            \
             }
         
         /**
+         * Forward declaration for vector implementation classes of value type T and length N.
          *
+         * @tparam T Underlying value type of the vector.
+         * @tparam N Number of elements in the vector.
          */
         template <typename T, std::size_t N>
             class CVectorImpl;
@@ -61,12 +64,12 @@ namespace Engine
             : public CField<std::enable_if_t<std::is_arithmetic_v<T>, T>, sizeof(T), 1, 1>
         {
         public_static_constants:
-            static const constexpr std::size_t N = 1;
+            static constexpr std::size_t const N = 1;
             
         public_typedefs:
-            typedef CField<T, sizeof(T), N, 1> base_type;
-            typedef CVectorImpl<T, N>          class_type;
-            typedef T                          value_type;
+            using BaseType_t  = CField<T, sizeof(T), N, 1>;
+            using ClassType_t = CVectorImpl<T, N>;
+            using ValueType_t = T;
             
         public_constructors:
             /**
@@ -78,38 +81,38 @@ namespace Engine
              *
              * @param aOther
              */
-            CVectorImpl(class_type const&aOther);
+            CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 1D vector with a 1D field 'aOther'.
              *
              * @param aOther
              */
-            CVectorImpl(base_type const&aOther);
+            CVectorImpl(BaseType_t const &aOther);
 
             /**
              * Initialize this 1D vector with a list of values.
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const aInitializer);
+            CVectorImpl(std::initializer_list<T> const &aInitializer);
 
             /**
              * Initialize this 1D vector with a single value.
              *
              * @param aX
              */
-            CVectorImpl(value_type const aX);
+            CVectorImpl(ValueType_t const &aX);
             
         public_methods:
-            DeclareImmutableGetter(CVectorImpl, 1, x);
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 1, x);
             
             /**
              * Set the value of the x-component to 'aValue'.
              *
              * @param aValue
              */
-            void x(value_type const&aValue);
+            void x(ValueType_t const &aValue);
 
             /**
              * Return a 1D axis vector pointing to the right along the x-axis.
@@ -132,9 +135,9 @@ namespace Engine
             static const constexpr std::size_t N = 2;
 
         public_typedefs:
-            typedef CField<T, sizeof(T), N, 1> base_type;
-            typedef CVectorImpl<T, N>          class_type;
-            typedef T                          value_type;
+            using BaseType_t  = CField<T, sizeof(T), N, 1>;
+            using ClassType_t = CVectorImpl<T, N>         ;
+            using ValueType_t = T                         ;
 
         public_constructors:
             /**
@@ -146,21 +149,21 @@ namespace Engine
              *
              * @param aOther
              */
-            CVectorImpl(class_type const&aOther);
+            CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 2D vector with a 2D field 'aOther'.
              *
              * @param aOther
              */
-            CVectorImpl(base_type const&aOther);
+            CVectorImpl(BaseType_t const &aOther);
 
             /**
              * Initialize this 2D vector with a list of values.
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const aInitializer);
+            CVectorImpl(std::initializer_list<T> const &aInitializer);
 
             /**
              * Construct a 2D vector with a x- and y-value.
@@ -169,44 +172,44 @@ namespace Engine
              * @param aY Y-component value
              */
             CVectorImpl(
-                value_type const aX,
-                value_type const aY
+                ValueType_t const &aX,
+                ValueType_t const &aY
             );
 
         public_methods:
-            DeclareImmutableGetter(CVectorImpl, 2, x);
-            DeclareImmutableGetter(CVectorImpl, 2, y);
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 2, x)
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 2, y)
 
             /**
              * Set the value of the x-component to 'aValue'.
              *
              * @param aValue
              */
-            void x(value_type const &aValue);
+            void x(ValueType_t const &aValue);
 
             /**
              * Set the value of the y-component to 'aValue'.
              *
              * @param aValue
              */
-            void y(value_type const &aValue);
+            void y(ValueType_t const &aValue);
 
             /**
              * Return a 2D vector pointing along and resembling the local x-axis.
              *
-             * @return
+             * @return See above
              */
             static CVectorImpl<T, 2> right( );
 
             /**
              * Return a 2D vector pointing along and resembling the local y-axis.
              *
-             * @return
+             * @return See above
              */
             static CVectorImpl<T, 2> up( );
 
-            DefinePermutationAccessor2D(x, y);
-            DefinePermutationAccessor2D(y, x);
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x)
         };
 
         /**
@@ -223,9 +226,9 @@ namespace Engine
             static const constexpr std::size_t N = 3;
 
         public_typedefs:
-            typedef CField<T, sizeof(T), N, 1> base_type;
-            typedef CVectorImpl<T, N>          class_type;
-            typedef T                          value_type;
+            using BaseType_t  = CField<T, sizeof(T), N, 1>;
+            using ClassType_t = CVectorImpl<T, N>         ;
+            using ValueType_t = T                         ;
 
         public_constructors:
             /**
@@ -237,21 +240,21 @@ namespace Engine
              *
              * @param aOther
              */
-            CVectorImpl(class_type const&aOther);
+            CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 3D vector with a 3D field 'aOther'.
              *
              * @param aOther
              */
-            CVectorImpl(base_type const&aOther);
+            CVectorImpl(BaseType_t const &aOther);
 
             /**
              * Initialize this 3D vector with a list of values.
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const aInitializer);
+            CVectorImpl(std::initializer_list<T> const &aInitializer);
 
             /**
              * Construct this 3D vector from the values.
@@ -261,9 +264,9 @@ namespace Engine
              * @param aZ Z-component value
              */
             CVectorImpl(
-                value_type const aX,
-                value_type const aY,
-                value_type const aZ);
+                ValueType_t const &aX,
+                ValueType_t const &aY,
+                ValueType_t const &aZ);
 
             /**
              * Construct this 3D vector from a 2D vector and a z-value.
@@ -272,35 +275,35 @@ namespace Engine
              * @param aZ
              */
             CVectorImpl(
-                CVectorImpl<T, 2> const&aVector2D,
-                T                 const&aZ         = T(0)
+                CVectorImpl<T, 2> const &aVector2D,
+                T                 const &aZ         = T(0)
             );
 
         public_methods:
-            DeclareImmutableGetter(CVectorImpl, 3, x);
-            DeclareImmutableGetter(CVectorImpl, 3, y);
-            DeclareImmutableGetter(CVectorImpl, 3, z);
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 3, x)
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 3, y)
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 3, z)
 
             /**
              * Set the value of the x-component to 'aValue'.
              *
              * @param aValue
              */
-            void x(value_type const&aValue);
+            void x(ValueType_t const &aValue);
 
             /**
              * Set the value of the y-component to 'aValue'.
              *
              * @param aValue
              */
-            void y(value_type const&aValue);
+            void y(ValueType_t const &aValue);
 
             /**
              * Set the value of the z-component to 'aValue'.
              *
              * @param aValue
              */
-            void z(value_type const&aValue);
+            void z(ValueType_t const &aValue);
 
             /**
              * Return a 3D vector pointing along and resembling the local x-axis.
@@ -323,18 +326,18 @@ namespace Engine
              */
             static CVectorImpl<T, 3> up( );
 
-            DefinePermutationAccessor2D(x, y);
-            DefinePermutationAccessor2D(y, x);
-            DefinePermutationAccessor2D(x, z);
-            DefinePermutationAccessor2D(z, x);
-            DefinePermutationAccessor2D(y, z);
-            DefinePermutationAccessor2D(z, y);
-            DefinePermutationAccessor3D(x, y, z);
-            DefinePermutationAccessor3D(x, z, y);
-            DefinePermutationAccessor3D(y, x, z);
-            DefinePermutationAccessor3D(y, z, x);
-            DefinePermutationAccessor3D(z, x, y);
-            DefinePermutationAccessor3D(z, y, x);
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, y, x)
         };
 
         /**
@@ -351,9 +354,9 @@ namespace Engine
             static const constexpr std::size_t N = 4;
 
         public_typedefs:
-            typedef CField<T, sizeof(T), N, 1> base_type;
-            typedef CVectorImpl<T, N>          class_type;
-            typedef T                          value_type;
+            using BaseType_t  = CField<T, sizeof(T), N, 1>;
+            using ClassType_t = CVectorImpl<T, N>         ;
+            using ValueType_t = T                         ;
 
         public_constructors:
             /**
@@ -365,21 +368,21 @@ namespace Engine
              *
              * @param aOther
              */
-            CVectorImpl(class_type const&aOther);
+            CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 4D vector with a 4D field 'aOther'.
              *
              * @param aOther
              */
-            CVectorImpl(base_type const&aOther);
+            CVectorImpl(BaseType_t const &aOther);
 
             /**
              * Initialize this 4D vector with a list of values.
              *
              * @param aInitializer
              */
-            CVectorImpl(std::initializer_list<T> const aInitializer);
+            CVectorImpl(std::initializer_list<T> const &aInitializer);
 
             /**
              * Construct this 4D vector from four values.
@@ -390,10 +393,10 @@ namespace Engine
              * @param aW
              */
             CVectorImpl(
-                value_type const &aX,
-                value_type const &aY,
-                value_type const &aZ,
-                value_type const &aW
+                ValueType_t const &aX,
+                ValueType_t const &aY,
+                ValueType_t const &aZ,
+                ValueType_t const &aW
             );
 
             /**
@@ -421,99 +424,99 @@ namespace Engine
             );
 
         public_methods:
-            DeclareImmutableGetter(CVectorImpl, 4, x);
-            DeclareImmutableGetter(CVectorImpl, 4, y);
-            DeclareImmutableGetter(CVectorImpl, 4, z);
-            DeclareImmutableGetter(CVectorImpl, 4, w);
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 4, x)
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 4, y)
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 4, z)
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 4, w)
 
             /**
              * Set the value of the x-component to 'aValue'.
              *
              * @param aValue
              */
-            void x(value_type const&aValue);
+            void x(ValueType_t const &aValue);
 
             /**
              * Set the value of the y-component to 'aValue'.
              *
              * @param aValue
              */
-            void y(value_type const&aValue);
+            void y(ValueType_t const &aValue);
 
             /**
              * Set the value of the z-component to 'aValue'.
              *
              * @param aValue
              */
-            void z(value_type const&aValue);
+            void z(ValueType_t const &aValue);
 
             /**
              * Set the value of the z-component to 'aValue'.
              *
              * @param aValue
              */
-            void w(value_type const&aValue);
+            void w(ValueType_t const &aValue);
 
-            DefinePermutationAccessor2D(x, y);
-            DefinePermutationAccessor2D(y, x);
-            DefinePermutationAccessor2D(x, z);
-            DefinePermutationAccessor2D(z, x);
-            DefinePermutationAccessor2D(y, z);
-            DefinePermutationAccessor2D(z, y);
-            DefinePermutationAccessor2D(x, w);
-            DefinePermutationAccessor2D(w, x);
-            DefinePermutationAccessor2D(y, w);
-            DefinePermutationAccessor2D(w, y);
-            DefinePermutationAccessor2D(z, w);
-            DefinePermutationAccessor2D(w, z);
-            DefinePermutationAccessor3D(x, y, z);
-            DefinePermutationAccessor3D(x, z, y);
-            DefinePermutationAccessor3D(y, x, z);
-            DefinePermutationAccessor3D(y, z, x);
-            DefinePermutationAccessor3D(z, x, y);
-            DefinePermutationAccessor3D(z, y, x);
-            DefinePermutationAccessor3D(x, y, w);
-            DefinePermutationAccessor3D(x, w, y);
-            DefinePermutationAccessor3D(x, z, w);
-            DefinePermutationAccessor3D(x, w, z);
-            DefinePermutationAccessor3D(y, x, w);
-            DefinePermutationAccessor3D(y, w, x);
-            DefinePermutationAccessor3D(y, z, w);
-            DefinePermutationAccessor3D(y, w, z);
-            DefinePermutationAccessor3D(z, x, w);
-            DefinePermutationAccessor3D(z, w, x);
-            DefinePermutationAccessor3D(z, y, w);
-            DefinePermutationAccessor3D(z, w, y);
-            DefinePermutationAccessor3D(w, x, y);
-            DefinePermutationAccessor3D(w, y, x);
-            DefinePermutationAccessor3D(w, x, z);
-            DefinePermutationAccessor3D(w, z, x);
-            DefinePermutationAccessor3D(w, y, z);
-            DefinePermutationAccessor3D(w, z, y);
-            DefinePermutationAccessor4D(x, y, z, w);
-            DefinePermutationAccessor4D(x, y, w, z);
-            DefinePermutationAccessor4D(x, z, y, w);
-            DefinePermutationAccessor4D(x, z, w, y);
-            DefinePermutationAccessor4D(x, w, y, z);
-            DefinePermutationAccessor4D(x, w, z, y);
-            DefinePermutationAccessor4D(y, x, z, w);
-            DefinePermutationAccessor4D(y, x, w, z);
-            DefinePermutationAccessor4D(y, z, x, w);
-            DefinePermutationAccessor4D(y, z, w, x);
-            DefinePermutationAccessor4D(y, w, x, z);
-            DefinePermutationAccessor4D(y, w, z, x);
-            DefinePermutationAccessor4D(z, x, y, w);
-            DefinePermutationAccessor4D(z, x, w, y);
-            DefinePermutationAccessor4D(z, y, x, w);
-            DefinePermutationAccessor4D(z, y, w, x);
-            DefinePermutationAccessor4D(z, w, x, y);
-            DefinePermutationAccessor4D(z, w, y, x);
-            DefinePermutationAccessor4D(w, x, y, z);
-            DefinePermutationAccessor4D(w, x, z, y);
-            DefinePermutationAccessor4D(w, y, x, z);
-            DefinePermutationAccessor4D(w, y, z, x);
-            DefinePermutationAccessor4D(w, z, x, y);
-            DefinePermutationAccessor4D(w, z, y, x);
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(w, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(w, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(z, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(w, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, y, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, y, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, w, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, z, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(x, w, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, x, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, w, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, z, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(y, w, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, x, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, w, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, y, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(z, w, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, y, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D(w, z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, y, z, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, y, w, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, z, y, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, z, w, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, w, y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(x, w, z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, x, z, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, x, w, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, z, x, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, z, w, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, w, x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(y, w, z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, x, y, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, x, w, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, y, x, w)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, y, w, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, w, x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(z, w, y, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, x, y, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, x, z, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, y, x, z)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, y, z, x)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, z, x, y)
+            SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D(w, z, y, x)
         };
 
         /**
@@ -535,9 +538,9 @@ namespace Engine
             : public TDerived
         {
         public_typedefs:
-            typedef CField<T, sizeof(T), N, 1> base_type;
-            typedef CVector<T, N, TDerived>    class_type;
-            typedef T                          value_type;
+            using BaseType_t  = CField<T, sizeof(T), N, 1>;
+            using ClassType_t = CVector<T, N, TDerived>   ;
+            using ValueType_t = T                         ;
 
         public_constructors:
             /**
@@ -548,21 +551,21 @@ namespace Engine
             /**
              * Construct this vector from a list of values.
              */
-            CVector(std::initializer_list<T> const);
+            CVector(std::initializer_list<T> const &aValues);
 
             /**
              * Copy-Initialize this vector from a field of T with N elements.
              *
              * @param aOther The field to copy from.
              */
-            CVector(base_type const&aOther);
+            CVector(BaseType_t const &aOther);
 
             /**
              * Copy-Initialize this vector from another equally sized and typed vector.
              *
              * @param aOther The vector to copy from.
              */
-            CVector(class_type const&aOther);
+            CVector(ClassType_t const &aOther);
 
         public_operators:
             /**
@@ -571,7 +574,7 @@ namespace Engine
              * @param aOther The vector to compare with.
              * @return       True, if bitwise equal. False otherwise.
              */
-            bool operator==(class_type const&aOther);
+            bool operator==(ClassType_t const &aOther);
 
         public_methods:
             /**
@@ -580,35 +583,35 @@ namespace Engine
              * @param aFactor The scale-factor to apply.
              * @return        Returns this vector scaled by 'aFactor'.
              */
-            class_type& scale(value_type const aFactor);
+            ClassType_t& scale(ValueType_t const aFactor);
 
             /**
              * Return the length of this vector by calculating square-root of self-dot-product.
              *
              * @return The length of this vector.
              */
-            value_type length() const;
+            ValueType_t length() const;
 
             /**
              * Like length(), but without calculating the square-root.
              *
              * @return The squared length of this vector.
              */
-            value_type squared_length() const;
+            ValueType_t squared_length() const;
 
             /**
              * Return the absolute of this vector, which is identical to length().
              *
              * @return Returns the absolute of this vector.
              */
-            value_type abs() const;
+            ValueType_t abs() const;
 
             /**
              * Return this vector w/ length 1 by multiplying by the inverse of it's length.
              *
              * @return Returns this vector normalized.
              */
-            class_type& normalize( );
+            ClassType_t& normalize( );
         };
         //<-----------------------------------------------------------------------------
 
@@ -634,22 +637,7 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        CVector<T, N, TDerived>::CVector(std::initializer_list<T> const aInitializer)
-            : TDerived(aInitializer)
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <
-            typename    T,
-            std::size_t N,
-            typename    TDerived
-        >
-        CVector<T, N, TDerived>::CVector(
-                CField<T, sizeof(T), N, 1> const&aField)
+        CVector<T, N, TDerived>::CVector(BaseType_t const &aField)
             : TDerived(aField)
         {
         }
@@ -663,7 +651,7 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        CVector<T, N, TDerived>::CVector(class_type const&aOther)
+        CVector<T, N, TDerived>::CVector(ClassType_t const &aOther)
             : TDerived(aOther)
         {
         }
@@ -677,10 +665,9 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        bool CVector<T, N, TDerived>::operator==(CVector<T, N, TDerived> const&aOther)
+        CVector<T, N, TDerived>::CVector(std::initializer_list<T> const &aInitializer)
+            : TDerived(aInitializer)
         {
-            CField<T, sizeof(T), N, 1> const &field = static_cast<CField<T, sizeof(T), N, 1>>(aOther);
-            return CField<T, sizeof(T), N, 1>::operator==(field);
         }
         //<-----------------------------------------------------------------------------
 
@@ -692,8 +679,23 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        typename CVector<T, N, TDerived>::class_type
-        &CVector<T, N, TDerived>::scale(value_type const aFactor)
+        bool CVector<T, N, TDerived>::operator==(ClassType_t const &aOther)
+        {
+            BaseType_t const &field = static_cast<BaseType_t>(aOther);
+            return BaseType_t::operator==(field);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+            typename    T,
+            std::size_t N,
+            typename    TDerived
+        >
+        typename CVector<T, N, TDerived>::ClassType_t
+            &CVector<T, N, TDerived>::scale(ValueType_t const aFactor)
         {
             this->operator*=(aFactor);
 
@@ -709,8 +711,8 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        typename CVector<T, N, TDerived>::value_type
-        CVector<T, N, TDerived>::length() const
+        typename CVector<T, N, TDerived>::ValueType_t
+            CVector<T, N, TDerived>::length() const
         {
             return sqrt(this->squared_length());
         }
@@ -724,11 +726,11 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        typename CVector<T, N, TDerived>::value_type
-        CVector<T, N, TDerived>::squared_length() const
+        typename CVector<T, N, TDerived>::ValueType_t
+            CVector<T, N, TDerived>::squared_length() const
         {
-            value_type        len  = 0;
-            value_type const *ptr  = this->const_ptr();
+            ValueType_t        len  = 0;
+            ValueType_t const *ptr  = this->const_ptr();
 
             for(size_t i = 0; i < this->size(); ++i)
             {
@@ -747,8 +749,8 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        typename CVector<T, N, TDerived>::value_type
-        CVector<T, N, TDerived>::abs() const
+        typename CVector<T, N, TDerived>::ValueType_t
+            CVector<T, N, TDerived>::abs() const
         {
             return this->length();
         }
@@ -762,8 +764,8 @@ namespace Engine
             std::size_t N,
             typename    TDerived
         >
-        typename CVector<T, N, TDerived>::class_type&
-        CVector<T, N, TDerived>::normalize()
+        typename CVector<T, N, TDerived>::ClassType_t&
+            CVector<T, N, TDerived>::normalize()
         {
             // For now use the "paper-version" of normalization!
             this->operator/=(this->length());
@@ -787,15 +789,16 @@ namespace Engine
             std::size_t N,
             typename    TDerived = CVectorImpl<T, N>
         >
-        CVector<T, N, TDerived> operator+(CVector<T, N, TDerived> const &aLHS,
-                                          CVector<T, N, TDerived> const &aRHS)
+        CVector<T, N, TDerived> operator+(
+                CVector<T, N, TDerived> const &aLHS,
+                CVector<T, N, TDerived> const &aRHS)
         {
-            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+            using BaseType_t = typename CVector<T, N, TDerived>::BaseType_t;
 
             BaseType_t const lhs = static_cast<BaseType_t>(aLHS);
             BaseType_t const rhs = static_cast<BaseType_t>(aRHS);
 
-            BaseType_t vec = operator+<T, sizeof(T), N, 1>(lhs, rhs);
+            BaseType_t const vec = operator+<T, sizeof(T), N, 1>(lhs, rhs);
 
             return CVector<T, N, TDerived>(vec);
         }
@@ -817,15 +820,16 @@ namespace Engine
             std::size_t N,
             typename    TDerived = CVectorImpl<T, N>
         >
-        CVector<T, N, TDerived> operator-(CVector<T, N, TDerived> const &aLHS,
-                                          CVector<T, N, TDerived> const &aRHS)
+        CVector<T, N, TDerived> operator-(
+                CVector<T, N, TDerived> const &aLHS,
+                CVector<T, N, TDerived> const &aRHS)
         {
-            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+            using BaseType_t = typename CVector<T, N, TDerived>::BaseType_t;
 
-            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
-            BaseType_t rhs = static_cast<BaseType_t>(aRHS);
+            BaseType_t const lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t const rhs = static_cast<BaseType_t>(aRHS);
 
-            BaseType_t vec = operator-<T, sizeof(T), N, 1>(lhs, rhs);
+            BaseType_t const vec = operator-<T, sizeof(T), N, 1>(lhs, rhs);
 
             return CVector<T, N, TDerived>(vec);
         }
@@ -846,14 +850,14 @@ namespace Engine
             std::size_t N,
             typename    TDerived = CVectorImpl<T, N>
         >
-        CVector<T, N, TDerived>
-        operator*(CVector<T, N, TDerived>                      const &aLHS,
-                  typename CVector<T, N, TDerived>::value_type const &aFactor)
+        CVector<T, N, TDerived> operator*(
+                CVector<T, N, TDerived>                       const &aLHS,
+                typename CVector<T, N, TDerived>::ValueType_t const &aFactor)
         {            
-            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+            using BaseType_t = typename CVector<T, N, TDerived>::BaseType_t;
 
-            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
-            BaseType_t vec = operator*<T, sizeof(T), N, 1>(lhs, aFactor);
+            BaseType_t const lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t const vec = operator*<T, sizeof(T), N, 1>(lhs, aFactor);
 
             return CVector<T, N, TDerived>(vec);
         }
@@ -874,9 +878,9 @@ namespace Engine
             std::size_t N,
             typename    TDerived = CVectorImpl<T, N>
         >
-        CVector<T, N, TDerived>
-        operator*(typename CVector<T, N, TDerived>::value_type const&aFactor,
-                  CVector<T, N, TDerived>                      const&aLHS)
+        CVector<T, N, TDerived> operator*(
+                typename CVector<T, N, TDerived>::ValueType_t const &aFactor,
+                CVector<T, N, TDerived>                       const &aLHS)
         {
             return operator*(aLHS, aFactor);
         }
@@ -897,14 +901,14 @@ namespace Engine
             std::size_t N,
             typename    TDerived = CVectorImpl<T, N>
         >
-        CVector<T, N, TDerived>
-        operator/(CVector<T, N, TDerived>                      const &aLHS,
-                  typename CVector<T, N, TDerived>::value_type const &aFactor)
+        CVector<T, N, TDerived> operator/(
+                CVector<T, N, TDerived>                      const &aLHS,
+                typename CVector<T, N, TDerived>::ValueType_t const &aFactor)
         {
-            using BaseType_t = typename CVector<T, N, TDerived>::base_type;
+            using BaseType_t = typename CVector<T, N, TDerived>::BaseType_t;
 
-            BaseType_t lhs = static_cast<BaseType_t>(aLHS);
-            BaseType_t vec = operator/<T, sizeof(T), N, 1>(lhs, aFactor);
+            BaseType_t const lhs = static_cast<BaseType_t>(aLHS);
+            BaseType_t const vec = operator/<T, sizeof(T), N, 1>(lhs, aFactor);
 
             return CVector<T, N, TDerived>(vec);
         }
@@ -925,9 +929,9 @@ namespace Engine
             std::size_t N,
             typename    TDerived = CVectorImpl<T, N>
         >
-        CVector<T, N, TDerived>
-        operator/(typename CVector<T, N, TDerived>::value_type const&aFactor,
-                  CVector<T, N, TDerived>                      const&aRHS)
+        CVector<T, N, TDerived> operator/(
+                typename CVector<T, N, TDerived>::ValueType_t const &aFactor,
+                CVector<T, N, TDerived>                       const &aRHS)
         {
             return operator/(aRHS, aFactor);
         }
@@ -961,8 +965,8 @@ namespace Engine
          * @return     The result of the dot product.
          */
         template <typename T>
-        typename CVector2D<T>::value_type dot(CVector2D<T> const &aLHS,
-                                              CVector2D<T> const &aRHS);
+        typename CVector2D<T>::ValueType_t dot(CVector2D<T> const &aLHS,
+                                               CVector2D<T> const &aRHS);
 
         /**
          * Perform the dot product of two 3D-vectors.
@@ -972,8 +976,8 @@ namespace Engine
          * @return     The result of the dot product.
          */
         template <typename T>
-        typename CVector3D<T>::value_type dot(CVector3D<T> const &aLHS,
-                                              CVector3D<T> const &aRHS);
+        typename CVector3D<T>::ValueType_t dot(CVector3D<T> const &aLHS,
+                                               CVector3D<T> const &aRHS);
 
         /**
          * Perform the dot product of two 4D-vectors.
@@ -983,8 +987,8 @@ namespace Engine
          * @return     The result of the dot product.
          */
         template <typename T>
-        typename CVector4D<T>::value_type dot(CVector4D<T> const &aLHS,
-                                              CVector4D<T> const &aRHS);
+        typename CVector4D<T>::ValueType_t dot(CVector4D<T> const &aLHS,
+                                               CVector4D<T> const &aRHS);
 
         /**
          * Perform the cross product of two 2D-vectors.
@@ -1006,8 +1010,8 @@ namespace Engine
          * @return        The operation-result as copy.
          */
         template <typename T>
-        CVector2D<T> scale(CVector2D<T>                     const &aVector,
-                           typename CVector2D<T>::value_type const&aFactor);
+        CVector2D<T> scale(CVector2D<T>                       const &aVector,
+                           typename CVector2D<T>::ValueType_t const &aFactor);
 
         /**
          * Scale a 3D-vector by a factor.
@@ -1017,8 +1021,9 @@ namespace Engine
          * @return        The operation-result as copy.
          */
         template <typename T>
-        CVector3D<T> scale(CVector3D<T>                      const&aVector,
-                           typename CVector3D<T>::value_type const&aFactor);
+        CVector3D<T> scale(
+                CVector3D<T>                       const &aVector,
+                typename CVector3D<T>::ValueType_t const &aFactor);
 
         /**
          * Scale a 4D-vector by a factor.
@@ -1028,8 +1033,9 @@ namespace Engine
          * @return        The operation-result as copy.
          */
         template <typename T>
-        CVector4D<T> scale(CVector4D<T>                      const&aVector,
-                           typename CVector4D<T>::value_type const&aFactor);
+        CVector4D<T> scale(
+                CVector4D<T>                       const &aVector,
+                typename CVector4D<T>::ValueType_t const &aFactor);
 
         /**
          * Normalize a vector of size N.
@@ -1037,7 +1043,7 @@ namespace Engine
          * @return
          */
         template <typename T, size_t N>
-        CVector<T, N> normalize(CVector<T, N> const&vec);
+        CVector<T, N> normalize(CVector<T, N> const &vec);
         
         //<-----------------------------------------------------------------------------
 
@@ -1054,16 +1060,17 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 1>::CVectorImpl(value_type const aX)
-            : CField<T, sizeof(T), 1, 1>({ aX })
-        { }
+        CVectorImpl<T, 1>::CVectorImpl(BaseType_t const &aField)
+            : CField<T, sizeof(T), 1, 1>(aField)
+        {
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 1>::CVectorImpl(class_type const &aCopy)
+        CVectorImpl<T, 1>::CVectorImpl(ClassType_t const &aCopy)
             : CField<T, sizeof(T), 1, 1>(aCopy)
         {
         }        
@@ -1073,7 +1080,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 1>::CVectorImpl(std::initializer_list<T> const aInitializer)
+        CVectorImpl<T, 1>::CVectorImpl(std::initializer_list<T> const &aInitializer)
             : CField<T, sizeof(T), 1, 1>(aInitializer)
         {
         }
@@ -1083,23 +1090,22 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 1>::CVectorImpl(base_type const &aField)
-            : CField<T, sizeof(T), 1, 1>(aField)
-        {
-        }
+        CVectorImpl<T, 1>::CVectorImpl(ValueType_t const &aX)
+            : CField<T, sizeof(T), 1, 1>({ aX })
+        { }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        DefineImmutableGetter(CVectorImpl, 1, x, 0);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 1, x, 0);
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 1>::x(value_type const&aValue)
+        void CVectorImpl<T, 1>::x(ValueType_t const &aValue)
         {
             this->m_field[ 0 ] = aValue;
         }
@@ -1128,10 +1134,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 2>::CVectorImpl(
-                value_type const aX,
-                value_type const aY)
-            : CField<T, sizeof(T), 2, 1>({ aX, aY })
+        CVectorImpl<T, 2>::CVectorImpl(BaseType_t const &aField)
+            : CField<T, sizeof(T), 2, 1>(aField)
         {
         }
         //<-----------------------------------------------------------------------------
@@ -1140,7 +1144,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 2>::CVectorImpl(class_type const &aOther)
+        CVectorImpl<T, 2>::CVectorImpl(ClassType_t const &aOther)
             : CField<T, sizeof(T), 2, 1>(aOther)
         {
         }
@@ -1150,7 +1154,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 2>::CVectorImpl(std::initializer_list<T> const aInitializer)
+        CVectorImpl<T, 2>::CVectorImpl(std::initializer_list<T> const &aInitializer)
             : CField<T, sizeof(T), 2, 1>(aInitializer)
         {
         }
@@ -1160,8 +1164,10 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 2>::CVectorImpl(base_type const &aField)
-            : CField<T, sizeof(T), 2, 1>(aField)
+        CVectorImpl<T, 2>::CVectorImpl(
+                ValueType_t const &aX,
+                ValueType_t const &aY)
+            : CField<T, sizeof(T), 2, 1>({ aX, aY })
         {
         }
         //<-----------------------------------------------------------------------------
@@ -1169,15 +1175,15 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        DefineImmutableGetter(CVectorImpl, 2, x, 0);        
-        DefineImmutableGetter(CVectorImpl, 2, y, 1);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 2, x, 0);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 2, y, 1);
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 2>::x(value_type const &aValue)
+        void CVectorImpl<T, 2>::x(ValueType_t const &aValue)
         {
             this->m_field[ 0 ] = aValue;
         }
@@ -1187,7 +1193,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 2>::y(value_type const &aValue)
+        void CVectorImpl<T, 2>::y(ValueType_t const &aValue)
         {
             this->m_field[ 1 ] = aValue;
         }
@@ -1227,39 +1233,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 3>::CVectorImpl(value_type const aX,
-                                       value_type const aY,
-                                       value_type const aZ)
-            : CField<T, sizeof(T), 3, 1>({ aX, aY, aZ })
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CVectorImpl<T, 3>::CVectorImpl(class_type const&aOther)
-            : CField<T, sizeof(T), 3, 1>(aOther)
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CVectorImpl<T, 3>::CVectorImpl(std::initializer_list<T> const aInitializer)
-            : CField<T, sizeof(T), 3, 1>(aInitializer)
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CVectorImpl<T, 3>::CVectorImpl(base_type const &aField)
+        CVectorImpl<T, 3>::CVectorImpl(BaseType_t const &aField)
             : CField<T, sizeof(T), 3, 1>(aField)
         {
         }
@@ -1269,8 +1243,40 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 3>::CVectorImpl(CVectorImpl<T, 2> const&aVector2D,
-                                       T                 const&aZ)
+        CVectorImpl<T, 3>::CVectorImpl(ClassType_t const &aOther)
+            : CField<T, sizeof(T), 3, 1>(aOther)
+        {
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CVectorImpl<T, 3>::CVectorImpl(std::initializer_list<T> const &aInitializer)
+            : CField<T, sizeof(T), 3, 1>(aInitializer)
+        {
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CVectorImpl<T, 3>::CVectorImpl(ValueType_t const &aX,
+                                       ValueType_t const &aY,
+                                       ValueType_t const &aZ)
+            : CField<T, sizeof(T), 3, 1>({ aX, aY, aZ })
+        {
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CVectorImpl<T, 3>::CVectorImpl(CVectorImpl<T, 2> const &aVector2D,
+                                       T                 const &aZ)
             : CField<T, sizeof(T), 3, 1>({ aVector2D.x(), aVector2D.y(), aZ})
         {
         }
@@ -1279,16 +1285,16 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        DefineImmutableGetter(CVectorImpl, 3, x, 0);        
-        DefineImmutableGetter(CVectorImpl, 3, y, 1);        
-        DefineImmutableGetter(CVectorImpl, 3, z, 2);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, x, 0);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, y, 1);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, z, 2);
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 3>::x(value_type const&aValue)
+        void CVectorImpl<T, 3>::x(ValueType_t const &aValue)
         {
             this->m_field[ 0 ] = aValue;
         }
@@ -1298,7 +1304,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 3>::y(value_type const&aValue)
+        void CVectorImpl<T, 3>::y(ValueType_t const &aValue)
         {
             this->m_field[ 1 ] = aValue;
         }
@@ -1308,7 +1314,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 3>::z(value_type const&aValue)
+        void CVectorImpl<T, 3>::z(ValueType_t const &aValue)
         {
             this->m_field[ 2 ] = aValue;
         }
@@ -1358,40 +1364,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 4>::CVectorImpl(value_type const &aX,
-                                       value_type const &aY,
-                                       value_type const &aZ,
-                                       value_type const &aW)
-            : CField<T, sizeof(T), 4, 1>({ aX, aY, aZ, aW })
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CVectorImpl<T, 4>::CVectorImpl(class_type const&aOther)
-            : CField<T, sizeof(T), 4, 1>(aOther)
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CVectorImpl<T, 4>::CVectorImpl(std::initializer_list<T> const aInitializer)
-            : CField<T, sizeof(T), 4, 1>(aInitializer)
-        {
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CVectorImpl<T, 4>::CVectorImpl(base_type const&aField)
+        CVectorImpl<T, 4>::CVectorImpl(BaseType_t const &aField)
             : CField<T, sizeof(T), 4, 1>(aField)
         {
         }
@@ -1401,9 +1374,42 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 4>::CVectorImpl(CVectorImpl<T, 2> const&aVector,
-                                       T                 const&aZ,
-                                       T                 const&aW)
+        CVectorImpl<T, 4>::CVectorImpl(ClassType_t const &aOther)
+            : CField<T, sizeof(T), 4, 1>(aOther)
+        {
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CVectorImpl<T, 4>::CVectorImpl(std::initializer_list<T> const &aInitializer)
+            : CField<T, sizeof(T), 4, 1>(aInitializer)
+        {
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CVectorImpl<T, 4>::CVectorImpl(ValueType_t const &aX,
+                                       ValueType_t const &aY,
+                                       ValueType_t const &aZ,
+                                       ValueType_t const &aW)
+            : CField<T, sizeof(T), 4, 1>({ aX, aY, aZ, aW })
+        {
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CVectorImpl<T, 4>::CVectorImpl(CVectorImpl<T, 2> const &aVector,
+                                       T                 const &aZ,
+                                       T                 const &aW)
             : CField<T, sizeof(T), 4, 1>({ aVector.x(), aVector.y(), aZ, aW })
         {
         }
@@ -1423,17 +1429,17 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        DefineImmutableGetter(CVectorImpl, 4, x, 0);        
-        DefineImmutableGetter(CVectorImpl, 4, y, 1);        
-        DefineImmutableGetter(CVectorImpl, 4, z, 2);        
-        DefineImmutableGetter(CVectorImpl, 4, w, 3);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, x, 0);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, y, 1);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, z, 2);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, w, 3);
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 4>::x(value_type const &aValue)
+        void CVectorImpl<T, 4>::x(ValueType_t const &aValue)
         {
             this->mField[ 0 ] = aValue;
         }
@@ -1443,7 +1449,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 4>::y(value_type const&aValue)
+        void CVectorImpl<T, 4>::y(ValueType_t const &aValue)
         {
             this->mField[ 1 ] = aValue;
         }
@@ -1453,7 +1459,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 4>::z(value_type const &aValue)
+        void CVectorImpl<T, 4>::z(ValueType_t const &aValue)
         {
             this->mField[ 2 ] = aValue;
         }
@@ -1463,7 +1469,7 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void CVectorImpl<T, 4>::w(value_type const &aValue)
+        void CVectorImpl<T, 4>::w(ValueType_t const &aValue)
         {
             this->mField[ 3 ] = aValue;
         }
@@ -1473,8 +1479,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        typename CVector2D<T>::value_type dot(CVector2D<T> const &aLHS,
-                                              CVector2D<T> const &aRHS)
+        typename CVector2D<T>::ValueType_t dot(CVector2D<T> const &aLHS,
+                                               CVector2D<T> const &aRHS)
         {
             return (( aLHS.x() * aRHS.x()) + ( aLHS.y() * aRHS.y()));
         }
@@ -1484,8 +1490,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        typename CVector3D<T>::value_type dot(CVector3D<T> const &aLHS,
-                                              CVector3D<T> const &aRHS)
+        typename CVector3D<T>::ValueType_t dot(CVector3D<T> const &aLHS,
+                                               CVector3D<T> const &aRHS)
         {
             return (( aLHS.x() * aRHS.x()) + ( aLHS.y() * aRHS.y()) + ( aLHS.z() * aRHS.z()));
         }
@@ -1495,8 +1501,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        typename CVector4D<T>::value_type dot(CVector4D<T> const &aLHS,
-                                              CVector4D<T> const &aRHS)
+        typename CVector4D<T>::ValueType_t dot(CVector4D<T> const &aLHS,
+                                               CVector4D<T> const &aRHS)
         {
             return (( aLHS.x() * aRHS.x()) +
                     ( aLHS.y() * aRHS.y()) +
@@ -1509,7 +1515,9 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVector3D<T> cross(CVector3D<T> const &aLHS, CVector3D<T> const &aRHS)
+        CVector3D<T> cross(
+                CVector3D<T> const &aLHS,
+                CVector3D<T> const &aRHS)
         {
             return CVector3D<T>({ ( (aLHS.y() * aRHS.z()) - (aLHS.z() * aRHS.y()) ),
                                   ( (aLHS.z() * aRHS.x()) - (aLHS.x() * aRHS.z()) ),
@@ -1521,8 +1529,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVector2D<T> scale(CVector2D<T>                      const &aVector,
-                           typename CVector2D<T>::value_type const &aFactor)
+        CVector2D<T> scale(CVector2D<T>                       const &aVector,
+                           typename CVector2D<T>::ValueType_t const &aFactor)
         {
             return CVector2D<T>(aVector).scale(aFactor);
         }
@@ -1532,8 +1540,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVector3D<T> scale(CVector3D<T>                      const&aVector,
-                           typename CVector3D<T>::value_type const&aFactor)
+        CVector3D<T> scale(CVector3D<T>                       const &aVector,
+                           typename CVector3D<T>::ValueType_t const &aFactor)
         {
             return CVector3D<T>(aVector).scale(aFactor);
         }
@@ -1543,8 +1551,8 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVector4D<T> scale(CVector4D<T>                      const&aVector,
-                           typename CVector4D<T>::value_type const&aFactor)
+        CVector4D<T> scale(CVector4D<T>                       const &aVector,
+                           typename CVector4D<T>::ValueType_t const &aFactor)
         {
             return CVector4D<T>(aVector).scale(aFactor);
         }
@@ -1575,6 +1583,13 @@ namespace Engine
          * Convenience type alias for 4D float vectors.
          */
         using CVector4D_t = CVector4D<float>;
+
+        #undef SHIRABE_DEFINE_PERMUTATION_ACCESSOR_1D
+        #undef SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D
+        #undef SHIRABE_DEFINE_PERMUTATION_ACCESSOR_3D
+        #undef SHIRABE_DEFINE_PERMUTATION_ACCESSOR_4D
+        #undef SHIRABE_DECLARE_IMMUTABLE_GETTER
+        #undef SHIRABE_DEFINE_IMMUTABLE_GETTER
         
     } // namespace Math
 } // namespace Engine
