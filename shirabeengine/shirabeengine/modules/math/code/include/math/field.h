@@ -545,6 +545,11 @@ namespace Engine
         }
         //<-----------------------------------------------------------------------------
 
+        #undef SHIRABE_FIELD
+        #undef SHIRABE_FIELD_TEMPLATE_DECL
+        #undef SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE
+        #undef SHIRABE_FIELD_DEFAULT_STRIDE
+        #undef SHIRABE_FIELD_DEFAULT_SIZE
     }
 }
 #endif

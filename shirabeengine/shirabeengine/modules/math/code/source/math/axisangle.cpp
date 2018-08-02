@@ -20,7 +20,7 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         CAxisAngle::CAxisAngle(
                 CVector3D_t const &aAxis,
-                value_type  const &aPhi)
+                ValueType_t const &aPhi)
             : CVector4D_t({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
 		{}
         //<-----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CAxisAngle::CAxisAngle(CAxisAngle const& aOther)
+        CAxisAngle::CAxisAngle(CAxisAngle const &aOther)
             : CVector4D_t({ aOther })
         {}
         //<-----------------------------------------------------------------------------
@@ -37,10 +37,10 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         CAxisAngle::CAxisAngle(
-                value_type const& aX,
-                value_type const& aY,
-                value_type const& aZ,
-                value_type const& aPhi)
+                ValueType_t const &aX,
+                ValueType_t const &aY,
+                ValueType_t const &aZ,
+                ValueType_t const &aPhi)
             : CVector4D_t({ aX, aY, aZ, aPhi })
 		{}
         //<-----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        const CAxisAngle::value_type& CAxisAngle::phi() const
+        const CAxisAngle::ValueType_t&CAxisAngle::phi() const
         {
             return mField[3];
         }
@@ -74,9 +74,9 @@ namespace Engine
         //<
         //<-----------------------------------------------------------------------------
         CVector3D_t const CAxisAngle::axis(
-                value_type const& aX,
-                value_type const& aY,
-                value_type const& aZ)
+                ValueType_t const &aX,
+                ValueType_t const &aY,
+                ValueType_t const &aZ)
         {
             this->x(aX);
             this->y(aY);
@@ -88,7 +88,7 @@ namespace Engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CAxisAngle::value_type const &CAxisAngle::phi(value_type const &aPhi)
+        CAxisAngle::ValueType_t const &CAxisAngle::phi(ValueType_t const &aPhi)
         {
             return (mField[3] = aPhi);
         }
@@ -101,17 +101,19 @@ namespace Engine
                 CAxisAngle  const &aAxisAngle,
                 CVector3D_t const &aVector)
         {
-            using Value_t = CAxisAngle::value_type;
+            using Value_t = CAxisAngle::ValueType_t;
 
 			// Rodriguez rotation formula
 			// v_rot = (cos(phi)*v + sin(phi)*cross(e, v) + (1 - cos(phi))*(dot(e, v)*e)
-            Value_t     cos_phi   = cosf(aAxisAngle.phi());
-            Value_t     sin_phi   = sinf(aAxisAngle.phi());
-            CVector3D_t e         = aAxisAngle.axis();
-            Value_t     dot_e_v   = dot(e, aVector);
-            CVector3D_t cross_e_v = cross(e, aVector);
+            Value_t     const cos_phi   = cosf(aAxisAngle.phi());
+            Value_t     const sin_phi   = sinf(aAxisAngle.phi());
+            CVector3D_t const e         = aAxisAngle.axis();
+            Value_t     const dot_e_v   = dot(e, aVector);
+            CVector3D_t const cross_e_v = cross(e, aVector);
 
-            return ((cos_phi * aVector) + (sin_phi * cross_e_v) + ((1 - cos_phi) * (dot_e_v * e)));
+            CVector3D_t const vec = ((cos_phi * aVector) + (sin_phi * cross_e_v) + ((1 - cos_phi) * (dot_e_v * e)));
+
+            return vec;
 		}
         //<-----------------------------------------------------------------------------
 	}

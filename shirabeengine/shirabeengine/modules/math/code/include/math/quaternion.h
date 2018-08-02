@@ -36,9 +36,52 @@ namespace Engine
          */
         class CQuaternion
             : public CVector4D_t
-		{
-			
-		public:
+		{			
+        public_static_functions:
+            /**
+             * Construct a quaternion from a rotation matrix.
+             *
+             * @param aMatrix
+             * @return
+             */
+            static CQuaternion CQuaternionFromRotationMatrix(
+                    CMatrix4x4 const &aMatrix);
+
+            /**
+             * Construct a quaternion from a rotation axis and angle.
+             *
+             * @param aAxis
+             * @param aPhi
+             * @return
+             */
+            static CQuaternion CQuaternionFromAxisAngle(
+                    CVector3D_t const &aAxis,
+                    ValueType_t const &aPhi);
+
+            /**
+             * Extract a rotation vector (xyz) and angle (w) from a quaternion.
+             *
+             * @param aQuaternion
+             * @return
+             */
+            static CVector4D_t axisAngleFromCQuaternion(CQuaternion const &aQuaternion);
+            /**
+             * Extract the x, y and z euler angles from a quaternion.
+             *
+             * @param aQuaternion
+             * @return
+             */
+            static CVector3D_t eulerFromCQuaternion(CQuaternion const &aQuaternion);
+
+            /**
+             * Extract a rotation matrix from a quaternion.
+             *
+             * @param aQuaternion
+             * @return
+             */
+            static CMatrix4x4  rotationMatrixFromCQuaternion(CQuaternion const &aQuaternion);
+
+        public_constructors:
             /**
              * Default construct a zero quaternion.
              */
@@ -83,31 +126,13 @@ namespace Engine
                     ValueType_t const &aAxisY,
                     ValueType_t const &aAxisZ);
 
+        public_destructors:
             /**
              * Destroy this quaternion.
              */
             virtual ~CQuaternion() final;
-      
-            /**
-             * Return a vector representation of the quaternion axis.
-             *
-             * @return
-             */
-            SHIRABE_INLINE CVector3D_t const vector() const
-            {
-                return CVector3D_t({ x(), y(), z() });
-			}
 
-            /**
-             * Return the angle component of the quaternion.
-             *
-             * @return
-             */
-            SHIRABE_INLINE ValueType_t const scalar() const
-            {
-				return w();
-			}
-
+        public_operators:
             /**
              * Add 'aOther' quaternion to this quaternion instance.
              *
@@ -143,6 +168,27 @@ namespace Engine
              * @return
              */
             CQuaternion &operator/=(ValueType_t const &aOther);
+
+        public_methods:
+            /**
+             * Return a vector representation of the quaternion axis.
+             *
+             * @return
+             */
+            SHIRABE_INLINE CVector3D_t const vector() const
+            {
+                return CVector3D_t({ x(), y(), z() });
+            }
+
+            /**
+             * Return the angle component of the quaternion.
+             *
+             * @return
+             */
+            SHIRABE_INLINE ValueType_t const scalar() const
+            {
+                return w();
+            }
 
             /**
              * Calculate and return the magnitude of this quaternion.
@@ -199,50 +245,7 @@ namespace Engine
                     ValueType_t const &aY,
                     ValueType_t const &aZ);
 
-            /**
-             * Construct a quaternion from a rotation matrix.
-             *
-             * @param aMatrix
-             * @return
-             */
-            static CQuaternion CQuaternionFromRotationMatrix(
-                    CMatrix4x4 const &aMatrix);
-
-            /**
-             * Construct a quaternion from a rotation axis and angle.
-             *
-             * @param aAxis
-             * @param aPhi
-             * @return
-             */
-            static CQuaternion CQuaternionFromAxisAngle(
-                    CVector3D_t const &aAxis,
-                    ValueType_t const &aPhi);
-
-            /**
-             * Extract a rotation vector (xyz) and angle (w) from a quaternion.
-             *
-             * @param aQuaternion
-             * @return
-             */
-            static CVector4D_t axisAngleFromCQuaternion(CQuaternion const &aQuaternion);
-            /**
-             * Extract the x, y and z euler angles from a quaternion.
-             *
-             * @param aQuaternion
-             * @return
-             */
-            static CVector3D_t eulerFromCQuaternion(CQuaternion const &aQuaternion);
-
-            /**
-             * Extract a rotation matrix from a quaternion.
-             *
-             * @param aQuaternion
-             * @return
-             */
-            static CMatrix4x4  rotationMatrixFromCQuaternion(CQuaternion const &aQuaternion);
-
-		private:
+        private_methods:
             /**
              * Assign an angle aPhi and three axis components to this quaternion.
              *

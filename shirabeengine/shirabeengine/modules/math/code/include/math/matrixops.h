@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <exception>
+#include <stdexcept>
 
 #include "platform/platform.h"
 #include "math/common.h"
@@ -37,10 +38,10 @@ namespace Engine
              */
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_S(
-                TValue       *aMatrix,
-                uint64_t      aRowIndex,
-                TValue const  aScaleFactor,
-                TValue       *aOutInverse = nullptr);
+                TValue         *aMatrix,
+                uint64_t const &aRowIndex,
+                TValue   const &aScaleFactor,
+                TValue         *aOutInverse = nullptr);
 
             /**
              * Add the 'aSourceRowIndex' scaled by 'aScaleFactor' to 'aTargetRowIndex'.
@@ -54,11 +55,11 @@ namespace Engine
              */
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_R(
-                TValue       *aMatrix,
-                uint64_t      aTargetRowIndex,
-                uint64_t      aSourceRowIndex,
-                TValue const  aScaleFactor,
-                TValue       *aOutInverse = nullptr);
+                TValue         *aMatrix,
+                uint64_t const &aTargetRowIndex,
+                uint64_t const &aSourceRowIndex,
+                TValue   const &aScaleFactor,
+                TValue         *aOutInverse = nullptr);
 
             /**
              * Switches the rows at 'aSourceRowIndex' and 'aTargetRowIndex'.
@@ -70,9 +71,9 @@ namespace Engine
              */
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_T(
-                TValue   *aMatrix,
-                uint64_t  aSourceRowIndex,
-                uint64_t  aTargetRowIndex);
+                TValue         *aMatrix,
+                uint64_t const &aSourceRowIndex,
+                uint64_t const &aTargetRowIndex);
 
             /**
              * Multiplies this m*s-matrix with another s*n-matrix passed.
@@ -216,8 +217,8 @@ namespace Engine
             template <typename TValue>
             void __shirabe_math__matrix_determinant_leibnitz_laplace(
                 TValue   const *aMatrix,
-                uint64_t const  aRowCount,
-                uint64_t const  aColumnCount,
+                uint64_t const &aRowCount,
+                uint64_t const &aColumnCount,
                 TValue         *aOutDeterminant = nullptr);
             //<-----------------------------------------------------------------------------
 
@@ -226,19 +227,21 @@ namespace Engine
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_S(
-                    TValue       *aMatrix,
-                    uint64_t      aRowIndex,
-                    TValue const  aScaleFactor,
-                    TValue       *aOutInverse)
+                    TValue        *aMatrix,
+                    uint64_t const aRowIndex,
+                    TValue   const aScaleFactor,
+                    TValue        *aOutInverse)
 			{				
                 TValue         *ptr       = aMatrix;
                 TValue         *inv_ptr   = aOutInverse;
                 uint64_t  const byte_size = NCols * sizeof(TValue);
                 uint64_t  const i_off     = (aRowIndex * NCols);
 				
-                for (uint64_t i = 0; i < NRows; ++i) {
+                for (uint64_t i = 0; i < NRows; ++i)
+                {
                     ptr[i_off + i] *= aScaleFactor;
-                    if (inv_ptr != nullptr)
+
+                    if (nullptr != inv_ptr)
                         inv_ptr[i_off + i] *= aScaleFactor;
 				}
             }
@@ -249,11 +252,11 @@ namespace Engine
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_R(
-                    TValue       *aMatrix,
-                    uint64_t      aTargetRowIndex,
-                    uint64_t      aSourceRowIndex,
-                    TValue const  aScaleFactor,
-                    TValue       *aOutInverse)
+                    TValue         *aMatrix,
+                    uint64_t const &aTargetRowIndex,
+                    uint64_t const &aSourceRowIndex,
+                    TValue   const &aScaleFactor,
+                    TValue         *aOutInverse)
 			{
                 TValue         *ptr    = aMatrix;
                 TValue        *inv_ptr = aOutInverse;
@@ -261,8 +264,10 @@ namespace Engine
                 uint64_t const i_off   = (aTargetRowIndex * NCols);
                 uint64_t const j_off   = (aSourceRowIndex * NCols);
 
-                for (uint64_t i = 0; i < NRows; ++i) {
+                for (uint64_t i = 0; i < NRows; ++i)
+                {
                     ptr[i_off + i] += (ptr[j_off + i] * aScaleFactor);
+
                     if (inv_ptr != nullptr)
                         inv_ptr[i_off + i] += (inv_ptr[j_off + i] * aScaleFactor);
 				}
@@ -274,9 +279,9 @@ namespace Engine
             //<-----------------------------------------------------------------------------
             template <uint64_t NRows, uint64_t NCols, typename TValue>
             static void __shirabe_math__matrix_elemental_row_transform_T(
-                    TValue   *aMatrix,
-                    uint64_t  aSourceRowIndex,
-                    uint64_t  aTargetRowIndex)
+                    TValue         *aMatrix,
+                    uint64_t const &aSourceRowIndex,
+                    uint64_t const &aTargetRowIndex)
 			{
                 if (aSourceRowIndex == aTargetRowIndex)
 					return;
@@ -319,8 +324,10 @@ namespace Engine
 				// Since the matrix buffers are plain blocks of m*n*sizeof(value_type) bytes
 				// data access must be offset by using iteration indices!
 
-                for (uint64_t i = 0; i < M; ++i) {
-                    for (uint64_t j = 0; j < N; ++j) {
+                for (uint64_t i = 0; i < M; ++i)
+                {
+                    for (uint64_t j = 0; j < N; ++j)
+                    {
                         val_ptr = (product_ptr + ((i * N) + j));
 						*val_ptr = 0;
 
@@ -349,8 +356,10 @@ namespace Engine
                 TValue       *transpPtr = aInOutTransposedMatrix;
                 TValue const *ptr       = aMatrix;
 
-                for (uint64_t i = 0; i < M; ++i) {
-                    for (uint64_t j = 0; j < N; ++j) {
+                for (uint64_t i = 0; i < M; ++i)
+                {
+                    for (uint64_t j = 0; j < N; ++j)
+                    {
                         transpPtr[(j * N) + i] = ptr[j + (i * N)];
 					}
 				}
@@ -371,40 +380,42 @@ namespace Engine
                     uint64_t        *aOutMinorRowCount,
                     uint64_t        *aOutMinorColumnCount)
 			{
-                if (aRowCount < 2 || aColumnCount < 2)
-					return;
+                if(aRowCount >= 2 || aColumnCount >= 2)
+                {
+                    /*
+                    * a11 ... a1n                             a22 ... a2n
+                    * ... ... ...  --> i = j = 1 --> minor =  ... ... ...
+                    * am1 ... amn                             am2 ... amn
+                    */
 
-				/*
-				* a11 ... a1n                             a22 ... a2n
-				* ... ... ...  --> i = j = 1 --> minor =  ... ... ...
-				* am1 ... amn                             am2 ... amn
-				*/
+                    if (*aOutMinor == nullptr)
+                        throw std::exception(); //"No out pointer provided for calculation.");
 
-                if (*aOutMinor == nullptr)
-                    throw std::exception(); //"No out pointer provided for calculation.");
+                    *aOutMinorRowCount    = aRowCount    - 1;
+                    *aOutMinorColumnCount = aColumnCount - 1;
 
-                *aOutMinorRowCount    = aRowCount    - 1;
-                *aOutMinorColumnCount = aColumnCount - 1;
+                    uint64_t
+                            i_off = 0,
+                            j_off = 0;
 
-                uint64_t
-                        i_off = 0,
-                        j_off = 0;
+                    for (uint64_t iidx = 0; iidx < aRowCount; ++iidx)
+                    {
+                        if (iidx == aRowIndex)
+                            continue;
 
-                for (uint64_t iidx = 0; iidx < aRowCount; ++iidx) {
-                    if (iidx == aRowIndex)
-						continue;
+                        i_off = (iidx + ((iidx > aRowIndex) * (-1)));
 
-                    i_off = (iidx + ((iidx > aRowIndex) * (-1)));
+                        for (uint64_t jidx = 0; jidx < aColumnCount; ++jidx)
+                        {
+                            if (jidx == aColumnIndex)
+                                continue;
 
-                    for (uint64_t jidx = 0; jidx < aColumnCount; ++jidx) {
-                        if (jidx == aColumnIndex)
-							continue;
+                            j_off = (jidx + ((jidx > aColumnIndex) * (-1)));
 
-                        j_off = (jidx + ((jidx > aColumnIndex) * (-1)));
-
-                        (*aOutMinor)[(i_off * (aColumnCount - 1)) + j_off] = aMatrix[(iidx * aColumnCount) + jidx];
-					}
-				}
+                            (*aOutMinor)[(i_off * (aColumnCount - 1)) + j_off] = aMatrix[(iidx * aColumnCount) + jidx];
+                        }
+                    }
+                }
 			};
             //<-----------------------------------------------------------------------------
 
@@ -427,28 +438,31 @@ namespace Engine
                 TValue  *minorMatrix      = nullptr;
 
                 __shirabe_math__matrix_get_minor<TValue>(
-                            aMatrix,
-                            aRowCount,
-                            aColumnCount,
-                            aRowIndex,
-                            aColumnIndex,
+                             aMatrix,
+                             aRowCount,
+                             aColumnCount,
+                             aRowIndex,
+                             aColumnIndex,
                             &minorMatrix,
                             &minorRowCount,
                             &minorColumnCount);
 
                 if (minorRowCount > 3)
+                {
                     __shirabe_math__matrix_determinant_leibnitz_laplace<TValue>(
                                 minorMatrix,
                                 minorRowCount,
                                 minorColumnCount,
                                 &determinant);
+                }
 				else
+                {
                     __shirabe_math__matrix_determinant_sarrus<TValue>(minorMatrix, &determinant);
+                }
 
                 //__shirabe_math__matrix_determinant_gauss_jordan<_m - 1, m_n - 1, TValue>(minor, &det);
 
                 *aOutCofactor = powf(-1, (aRowIndex + aColumnIndex)) * determinant;
-
 			};
             //<-----------------------------------------------------------------------------
 
@@ -464,7 +478,7 @@ namespace Engine
                 TValue cofactor = 0;
 
                 if (aOutCofactorMatrix == nullptr)
-                    throw std::exception();
+                    throw std::runtime_error("Invalid cofactor matrix out pointer.");
 
                 for (uint64_t i = 0; i < M; ++i) {
                     for (uint64_t j = 0; j < N; ++j) {
@@ -695,6 +709,7 @@ namespace Engine
                     *aOutDeterminant += (aMatrix[j] * cofactor);
 				}
 			};
+            //<-----------------------------------------------------------------------------
 
 #if defined(PLATFORM_WINDOWS)
 // Reenable C4244 for further code
