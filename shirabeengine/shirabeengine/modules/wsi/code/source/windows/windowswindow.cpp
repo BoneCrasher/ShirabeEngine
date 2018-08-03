@@ -1,7 +1,7 @@
 #include "Log/Log.h"
 #include "WSI/Windows/WindowsWindow.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
     namespace Windows {
 

@@ -23,13 +23,13 @@
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 
-namespace Engine {
+namespace engine {
   using namespace Asset;
 	using namespace Rendering;
 	using namespace Resources;
-  using namespace Engine::OS;
-  using namespace Engine::WSI;
-  using namespace Engine::Vulkan;
+  using namespace engine::OS;
+  using namespace engine::WSI;
+  using namespace engine::Vulkan;
 
 	class SHIRABE_LIBRARY_EXPORT EngineInstance
 	{

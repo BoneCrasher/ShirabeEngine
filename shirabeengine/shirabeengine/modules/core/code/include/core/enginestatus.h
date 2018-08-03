@@ -13,7 +13,7 @@
 #include "core/enginetypehelper.h"
 #include "log/log.h"
 
-namespace Engine
+namespace engine
 {
     /**
      * @brief The EEngineStatus enum

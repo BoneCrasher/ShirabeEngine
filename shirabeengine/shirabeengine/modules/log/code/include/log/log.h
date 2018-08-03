@@ -26,7 +26,7 @@
 #include <math.h>
 #include <cmath>
 
-namespace Engine
+namespace engine
 {
     #ifdef SHIRABE_DEBUG
         #if defined LOG_USE_VERBOSE || defined SHIRABE_TEST

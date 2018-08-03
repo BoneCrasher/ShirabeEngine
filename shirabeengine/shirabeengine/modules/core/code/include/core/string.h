@@ -13,181 +13,283 @@
 #include <sstream>
 #include <array>
 
+#include <base/declaration.h>
 
-namespace Engine {
+namespace engine
+{
+    /**
+     * The CString class provides helpers to convert 8 and 16-bit
+     * strings to each other or format a string with a variadic number
+     * of arguments.
+     */
+    class CString
+    {
+        public_static_functions:
+        /**
+         * Format a string based on 'aFormat' with a variadic number of arbitrarily typed arguments.
+         *
+         * @param aFormat
+         * @param aArguments
+         * @return
+         */
+        template <typename... TArgs>
+        static std::string format(
+                std::string const&aFormat,
+                TArgs        &&...aArguments);
 
-	class String {
-	public:
+        /**
+         * Convert an 8-bit char array to a 16-bit string.
+         *
+         * @param aInput
+         * @return
+         */
+        static std::wstring widen(char *aInput);
+        /**
+         * Convert an 8-bit string to a 16-bit string.
+         *
+         * @param aInput
+         * @return
+         */
+        static std::wstring widen(std::string const &aInput);
 
-		/**********************************************************************************************//**
-		 * \fn	template <typename... TArgs> static std::string String::format(const std::string& format, TArgs&&... args);
-		 *
-		 * \brief	Formats a string using format and a variadic number of arguments 
-		 * 			with different types.
-		 *
-		 * \tparam	TArgs	Type of the arguments.
-		 * \param	format	Describes the format to use.
-		 * \param	args  	Variable arguments providing [in,out] The arguments.
-		 *
-		 * \return	The formatted value.
-		 **************************************************************************************************/
-		template <typename... TArgs>
-		static std::string format(const std::string& format, TArgs&&... args);
+        /**
+         * Convert a 16-bit char array to an 8-bit string.
+         *
+         * @param aInput
+         * @return
+         */
+        static std::string  narrow(wchar_t *aInput);
+        /**
+         * Convert a 16-bit string to an 8-bit string.
+         *
+         * @param aInput
+         * @return
+         */
+        static std::string  narrow(std::wstring const &aInput);
 
-		/**********************************************************************************************//**
-		 * \fn	static std::wstring String::toWideString(const std::string& in);
-		 *
-		 * \brief	Converts a narrow char-based string into its wide wchar_t based version.
-		 *
-		 * \param	in	The in.
-		 *
-		 * \return	In as a std::wstring.
-		 **************************************************************************************************/
-		//static std::wstring toWideString(const std::string& in);
+        private_static_functions:
+        /**
+         * Accept an arbitrarily typed argument and convert it to it's proper
+         * string representation.
+         *
+         * @tparam TArg
+         * @tparam TEnable
+         * @param aArg
+         * @return
+         */
+        template <
+                typename TArg,
+                typename TEnable = void
+                >
+        static std::string toString(TArg const &aArg);
 
-		/**********************************************************************************************//**
-		 * \fn	static std::string String::toNarrowString(const std::wstring& in);
-		 *
-		 * \brief	Converts a wide wchar_t-based string into its narrow char based version, omitting
-		 * 			unsupported wide-characters.
-		 *
-		 * \param	in	The in.
-		 *
-		 * \return	In as a std::string.
-		 **************************************************************************************************/
-		//static std::string  toNarrowString(const std::wstring& in);
+        /**
+         * Accept a float argument and convert it to it's proper string representation.
+         *
+         * @tparam TArg
+         * @param arg
+         * @return
+         */
+        template <
+                typename TArg,
+                typename std::enable_if<std::is_floating_point<TArg>::value, TArg>::type
+                >
+        static std::string toString(const float& arg);
 
-		static std::wstring toWideString(const std::string& in) {
-			std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
-			std::wstring wide = converter.from_bytes(in);
-			return wide;
-		}
+        /**
+         * Format a list of arguments. In this case zero arguments as the abort-condition
+         * of the recursive expansion of the parameter pack.
+         *
+         * @param aArguments
+         */
+        template <std::size_t NArgs>
+        static void formatArguments(std::array<std::string, NArgs> const &aArguments);
 
-    static std::wstring toWideString(char *in) {
-      std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
-      std::wstring wide = converter.from_bytes(in);
-      return wide;
-    }
+        /**
+         * Format a list of arguments of arbitrary type and expand recursively.
+         *
+         * @param outFormatted
+         * @param inArg
+         * @param inArgs
+         */
+        template <
+                std::size_t NArgs,
+                typename    TArg,
+                typename... TArgs
+                >
+        static void formatArguments(
+                std::array<std::string, NArgs>     &aOutFormatted,
+                TArg                              &&aInArg,
+                TArgs                          &&...aInArgs);
+    };
+    //<-----------------------------------------------------------------------------
 
-    static std::wstring toWideString(wchar_t *in) {
-      return std::wstring(in);
-    }
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename... TArgs>
+    std::string CString::format(
+            const std::string     &aFormat,
+            TArgs             &&...aArgs)
+    {
+        std::array<std::string, sizeof...(aArgs)> formattedArguments{};
 
-    static std::wstring toWideString(std::wstring const&in) {
-      return std::wstring(in);
-    }
+        formatArguments(formattedArguments, std::forward<TArgs>(aArgs)...);
 
-		static std::string toNarrowString(const std::wstring& in) {
-			std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
-			std::string narrow = converter.to_bytes(in);
-			return narrow;
-		}
-
-    static std::string toNarrowString(wchar_t *in) {
-      std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
-      std::string narrow = converter.to_bytes(in);
-      return narrow;
-    }
-
-    static std::string toNarrowString(char *in) {
-      return std::string(in);
-    }
-
-    static std::string toNarrowString(std::string const&in) {
-      return std::string(in);
-    }
-
-	private:
-		template <typename TArg, typename enable = void>
-		inline static std::string toString(const TArg& arg) {
-			std::ostringstream stream;
-			stream << arg;
-			return stream.str();
-		}
-
-		template <
-			typename TArg, 
-			typename std::enable_if<std::is_floating_point<TArg>::value, TArg>::type
-		>
-		inline static std::string toString(const float& arg) {
-			std::ostringstream stream;
-			stream << std::setprecision(12) << arg;
-			return stream.str();
-		}
-
-		template <std::size_t argCount>
-		inline static void formatArguments(std::array<std::string, argCount>&) {
-			// No forwarded arguments. ArgCount should be 0.
-		}
-
-		template <std::size_t argCount, typename TArg, typename... TArgs>
-		inline static void formatArguments(
-			std::array<std::string, argCount>     &outFormatted,
-			TArg                                 &&inArg,
-			TArgs                             &&...inArgs) {
-			// Executed for each, recursively until there's no param left.
-			outFormatted[argCount - 1 - sizeof...(TArgs)] = toString(inArg);
-			formatArguments(outFormatted, std::forward<TArgs>(inArgs)...);
-		}
-	};
-
-	template <typename... TArgs>
-	std::string String::format(
-		const std::string     &format,
-		TArgs             &&...args) 
-	{
-		std::array<std::string, sizeof...(args)> formattedArguments;
-		formatArguments(formattedArguments, std::forward<TArgs>(args)...);
-
-    if constexpr (sizeof...(args) == 0) {
-      return format;
-    }
-    else {
-      uint32_t number     = 0;
-      bool     readNumber = false;
-
-      std::ostringstream stream;
-      for(std::size_t k = 0; k < format.size(); ++k) {
-        switch(format[k]) {
-        case '%':
-          readNumber = true;
-          break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-          if(readNumber) {
-            number *= 10;
-            number += (uint32_t)(format[k] - '0');
-            break;
-          } // If not, fall through to default handling...
-        default:
-          if(readNumber) {
-            stream << formattedArguments[std::size_t(number)];
-            readNumber = false;
-            number     = 0;
-          }
-
-          stream << format[k];
-          break;
+        if constexpr (sizeof...(aArgs) == 0)
+        {
+            return aFormat;
         }
-      }
+        else {
+            uint32_t number     = 0;
+            bool     readNumber = false;
 
-      if(readNumber) {
-        stream << formattedArguments[std::size_t(number)];
-        readNumber = false;
-        number     = 0;
-      }
+            std::ostringstream stream;
 
-      return stream.str();
+            for(std::size_t k = 0; k < aFormat.size(); ++k)
+            {
+                switch(aFormat[k])
+                {
+                case '%':
+                    readNumber = true;
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    if(readNumber)
+                    {
+                        number *= 10;
+                        number += static_cast<uint32_t>(aFormat[k] - '0');
+                        break;
+                    }
+                default:
+                    if(readNumber)
+                    {
+                        stream << formattedArguments[std::size_t(number)];
+                        readNumber = false;
+                        number     = 0;
+                    }
+
+                    stream << aFormat[k];
+                    break;
+                }
+            }
+
+            if(readNumber)
+            {
+                stream << formattedArguments[std::size_t(number)];
+                readNumber = false;
+                number     = 0;
+            }
+
+            return stream.str();
+        }
     }
-	}
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    std::wstring CString::widen(std::string const &aInput)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+
+        std::wstring const widened = converter.from_bytes(aInput);
+        return widened;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    std::wstring CString::widen(char *aInput)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+
+        std::wstring const widened = converter.from_bytes(aInput);
+        return widened;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    std::string CString::narrow(std::wstring const &aInput)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+
+        std::string const narrowed = converter.to_bytes(aInput);
+        return narrowed;
+    }
+
+    std::string CString::narrow(wchar_t *aInput)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+
+        std::string const narrowed = converter.to_bytes(aInput);
+        return narrowed;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename TArg, typename enable>
+    std::string CString::toString(TArg const &aArg)
+    {
+        std::ostringstream stream;
+        stream << aArg;
+        return stream.str();
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <
+            typename TArg,
+            typename std::enable_if<std::is_floating_point<TArg>::value, TArg>::type
+            >
+    std::string CString::toString(const float& arg) {
+        std::ostringstream stream;
+        stream << std::setprecision(12) << arg;
+        return stream.str();
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <std::size_t argCount>
+    void CString::formatArguments(std::array<std::string, argCount> const&aArgs)
+    {
+        SHIRABE_UNUSED(aArgs);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <std::size_t argCount, typename TArg, typename... TArgs>
+    void CString::formatArguments(
+            std::array<std::string, argCount>     &outFormatted,
+            TArg                                 &&inArg,
+            TArgs                             &&...inArgs)
+    {
+        // Executed for each, recursively until there's no param left.
+        uint32_t const index = (argCount - 1 - sizeof...(TArgs));
+        outFormatted[index] = toString(inArg);
+
+        formatArguments(outFormatted, std::forward<TArgs>(inArgs)...);
+    }
+    //<-----------------------------------------------------------------------------
 }
 
 #endif

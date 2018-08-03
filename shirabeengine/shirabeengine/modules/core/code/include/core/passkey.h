@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_DESIGN_PASSKEY_H__
 #define __SHIRABE_DESIGN_PASSKEY_H__
 
-namespace Engine {
+namespace engine {
 
   template <typename TAccessor>
   class PassKey {

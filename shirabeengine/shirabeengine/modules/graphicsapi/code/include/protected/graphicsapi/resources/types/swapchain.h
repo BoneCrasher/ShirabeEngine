@@ -13,7 +13,7 @@
 #include "GraphicsAPI/Resources/Types/Texture.h"
 #include "GraphicsAPI/Resources/Types/TextureView.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
     using namespace Resources;
 

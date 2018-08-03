@@ -2,7 +2,7 @@
 
 #include "core/benchmarking/timer/itimespan.h"
 
-namespace Engine
+namespace engine
 {
     //<-----------------------------------------------------------------------------
     //<

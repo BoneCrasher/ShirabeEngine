@@ -8,7 +8,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
     typedef std::string PublicResourceId_t;

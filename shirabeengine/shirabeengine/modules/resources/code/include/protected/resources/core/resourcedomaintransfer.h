@@ -9,7 +9,7 @@
 #include "Resources/Core/EResourceType.h"
 #include "Resources/Core/ResourceDTO.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
     
     /**********************************************************************************************//**

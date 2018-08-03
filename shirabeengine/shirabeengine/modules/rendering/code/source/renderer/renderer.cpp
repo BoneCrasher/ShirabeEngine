@@ -9,7 +9,7 @@
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 #include "Renderer/FrameGraph/FrameGraphSerialization.h"
 
-namespace Engine {
+namespace engine {
   namespace Rendering {
 
     Renderer::Renderer()
@@ -70,8 +70,8 @@ namespace Engine {
     EEngineStatus
       Renderer::renderScene()
     {
-      using namespace Engine;
-      using namespace Engine::FrameGraph;
+      using namespace engine;
+      using namespace engine::FrameGraph;
             
       OSDisplayDescriptor const&displayDesc = m_appEnvironment->primaryDisplay();
 
@@ -132,7 +132,7 @@ namespace Engine {
         lightingExportData.lightAccumulationBuffer,
         backBuffer);
 
-      UniqueCStdSharedPtr_t<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
+      UniqueCStdSharedPtr_t<engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
 
       CStdSharedPtr_t<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
       serializer->initialize();

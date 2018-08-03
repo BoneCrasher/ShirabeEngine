@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <base/declaration.h>
 
-namespace Engine
+namespace engine
 {
     namespace Core
     {

@@ -1,6 +1,6 @@
 #include "String.h"
 
-namespace Engine {
+namespace engine {
 	// std::wstring String::toWideString(const std::string& in) {
 	// 	std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
 	// 	std::wstring wide = converter.from_bytes(in);

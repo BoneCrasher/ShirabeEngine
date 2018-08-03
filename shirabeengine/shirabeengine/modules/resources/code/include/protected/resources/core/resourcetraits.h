@@ -3,7 +3,7 @@
 
 #include "Resources/Core/EResourceType.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
     /**********************************************************************************************//**

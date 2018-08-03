@@ -1,6 +1,6 @@
 #include "GraphicsAPI/Resources/Types/Texture.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
     TextureInfo::TextureInfo()

@@ -5,7 +5,7 @@
 #include <new>
 #include <limits>
 
-namespace Engine {
+namespace engine {
 	namespace Memory {
 
 

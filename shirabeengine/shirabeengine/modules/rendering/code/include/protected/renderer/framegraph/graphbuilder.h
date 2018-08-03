@@ -18,11 +18,11 @@
 #include "Renderer/FrameGraph/FrameGraph.h"
 #include "Renderer/FrameGraph/Pass.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
-    using namespace Engine::Core;
-    using namespace Engine::Resources;
+    using namespace engine::Core;
+    using namespace engine::Resources;
 
     /**********************************************************************************************//**
      * \class GraphBuilder

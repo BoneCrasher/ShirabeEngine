@@ -5,9 +5,9 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
-    using namespace Engine::Resources;
+    using namespace engine::Resources;
 
     EEngineStatus
       VulkanResourceTaskBackend::

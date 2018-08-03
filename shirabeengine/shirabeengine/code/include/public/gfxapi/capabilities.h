@@ -9,9 +9,9 @@
 
 #include "GFXAPI/Definitions.h"
 
-namespace Engine {
+namespace engine {
 	namespace GFXAPI {
-		using namespace Engine::Resources;
+		using namespace engine::Resources;
 
 		struct GAPIOutputMode {
       uint32_t modeIndex;

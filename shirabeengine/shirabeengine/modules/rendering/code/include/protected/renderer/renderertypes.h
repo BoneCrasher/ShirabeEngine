@@ -6,7 +6,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-namespace Engine {
+namespace engine {
   namespace Rendering {
 
     using MeshId_t     = uint64_t;

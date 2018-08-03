@@ -10,7 +10,7 @@
     #endif
 #endif
 
-namespace Engine {
+namespace engine {
 	namespace GFXAPI {
 
 	}

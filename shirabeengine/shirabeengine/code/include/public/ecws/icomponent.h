@@ -5,7 +5,7 @@
 #include <core/enginestatus.h>
 #include <core/benchmarking/timer/timer.h>
 
-namespace Engine {
+namespace engine {
 
     class IComponent
     {

@@ -7,7 +7,7 @@
 #include "Memory/New.h"
 #include "Memory/Types.h"
 
-namespace Engine {
+namespace engine {
 	namespace Memory {
 
 		template<typename T, std::size_t S>

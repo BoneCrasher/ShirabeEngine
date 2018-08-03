@@ -36,21 +36,19 @@
 // Go on and check for the compiler and define related settings
 #  ifdef _MSC_VER
 #    define SHIRABE_COMPILER_MSVC
+#  endif
 // This is for public exports
-#  else
-#    ifdef __linux__
-#      define SHIRABE_PLATFORM_LINUX
-#      ifdef __GNUC__
-#        define SHIRABE_COMPILER_GCC
-#      endif
-#    endif
+#elif defined __linux__
+#  define SHIRABE_PLATFORM_LINUX
+#  ifdef __GNUC__
+#    define SHIRABE_COMPILER_GCC
 #  endif
+#endif
 
-#  ifdef _DEBUG
-#    define SHIRABE_CONFIGURATION_DEBUG
-#  else 
-#    define SHIRABE_CONFIGURATION_RELEASE
-#  endif
+#ifdef _DEBUG
+#  define SHIRABE_CONFIGURATION_DEBUG
+#else
+#  define SHIRABE_CONFIGURATION_RELEASE
 #endif
 
 #endif

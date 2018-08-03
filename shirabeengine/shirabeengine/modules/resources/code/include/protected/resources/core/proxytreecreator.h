@@ -3,7 +3,7 @@
 
 #include "Resources/Core/ResourceProxyFactory.h"
 
-namespace Engine {
+namespace engine {
 	namespace Resources {
 
 

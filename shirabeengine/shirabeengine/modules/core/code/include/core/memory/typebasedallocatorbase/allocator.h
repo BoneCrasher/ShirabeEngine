@@ -8,7 +8,7 @@
 #include "Core/Memory/TypeBasedAllocatorBase/AllocatorPolicy.h"
 #include "Core/Memory/TypeBasedAllocatorBase/AllocatorTraits.h"
 
-namespace Engine {
+namespace engine {
 	namespace Memory {
 
 		template<typename T>

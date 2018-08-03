@@ -10,10 +10,10 @@
 #include "Vulkan/VulkanImport.h"
 #include "Vulkan/VulkanEnvironment.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
-    using namespace Engine::Resources;
-    using namespace Engine::GFXAPI;
+    using namespace engine::Resources;
+    using namespace engine::GFXAPI;
 
     /**********************************************************************************************//**
      * \def	DxTypes__

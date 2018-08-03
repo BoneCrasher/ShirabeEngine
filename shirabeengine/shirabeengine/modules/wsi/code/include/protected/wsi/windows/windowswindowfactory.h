@@ -6,10 +6,10 @@
 #define WIN32_LEAN_AND_MEAN // Exclude unnecessary sh**
 #include <Windows.h>
 
-namespace Engine {
+namespace engine {
   namespace WSI {
     namespace Windows {
-      using namespace Engine;
+      using namespace engine;
 
       class SHIRABE_LIBRARY_EXPORT WindowsWindowFactory
         : public IWindowFactory {

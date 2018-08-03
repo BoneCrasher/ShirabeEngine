@@ -1,6 +1,6 @@
 #include "core/enginestatus.h"
 
-namespace Engine
+namespace engine
 {
     //<-----------------------------------------------------------------------------
     //<

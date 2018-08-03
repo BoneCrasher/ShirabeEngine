@@ -1,6 +1,6 @@
 #include "Renderer/FrameGraph/Modules/GBufferGeneration.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData
@@ -66,7 +66,7 @@ namespace Engine {
       },
         [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, CStdSharedPtr_t<IFrameGraphRenderContext>&context) -> bool
       {
-        using namespace Engine::Rendering;
+        using namespace engine::Rendering;
 
         Log::Verbose(logTag(), "GBufferGeneration");
 

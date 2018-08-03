@@ -4,54 +4,104 @@
 #include <iostream>
 #include <wchar.h>
 
-namespace Engine {
-  namespace Benchmarking {
-    template <typename ParameterT, typename ValueT>
-    class MeasurementChunk {
-    public:
-      typedef ParameterT param_type;
-      typedef ValueT     value_type;
+#include <base/declaration.h>
 
-      inline explicit MeasurementChunk(const param_type param = 0, const value_type value = 0) {
-        m_parameter = param;
-        m_value     = value;
-      }
+namespace engine
+{
+    namespace benchmarking
+    {
+        /**
+         * A Measurement chunk is a two dimensional assignment of key to value as a
+         * single object.
+         *
+         * @tparam TParameter
+         * @tparam TValue
+         */
+        template <typename TParameter, typename TValue>
+        class CMeasurementChunk
+        {
+        public_typedefs:
+            using ParameterType_t = TParameter;
+            using ValueType_t     = TValue    ;
 
-      template <typename ParamU, typename ValueU>
-      inline explicit MeasurementChunk(MeasurementChunk<ParamU, ValueU> const& instToCpy) {
-        m_parameter = instToCpy.parameter();
-        m_value     = instToCpy.value();
-      }
+        public_constructors:
+            /**
+             * Construct a chunk from a parameter and value.
+             *
+             * @param aParam
+             * @param aValue
+             */
+            explicit CMeasurementChunk(
+                    ParameterType_t const &aParam = 0,
+                    ValueType_t     const &aValue = 0)
+                : mParameter(aParam)
+                , mValue(aValue)
+            { }
+            /**
+             * Copy-Construct a chunk from another.
+             *
+             * @param aOther
+             */
+            explicit CMeasurementChunk(
+                    CMeasurementChunk<TParameter, TValue> const& aOther)
+                : mParameter(aOther.mParameter)
+                , mValue(aOther.mValue)
+            {}
 
-      inline ~MeasurementChunk() {}
+        public_destructors:
+            /**
+             * Destroy and run...
+             */
+            ~CMeasurementChunk() = default;
 
-    public:
-      /* Return a const reference to the contained parameter to protect it
-       * from being changed without having to copy it. */
-      virtual const param_type& parameter() const { return m_parameter; }
-      /* Return a const reference to the contained value to protect it
-       * from being changed without having to copy it */
-      virtual const value_type&     value()     const { return m_value; }
+        public_methods:
+            /**
+             * Return the stored parameter value.
+             *
+             * @return
+             */
+            ParameterType_t const &parameter() const { return mParameter; }
 
-    protected:
-      param_type m_parameter;
-      value_type m_value;
+            /**
+             * Return the stored value.
+             * @return
+             */
+            ValueType_t     const &value()     const { return mValue;     }
 
-      /* Stream operators for printing to console or basic stream derivates. */
-      friend std::basic_ostream<char> operator<<(
-        std::basic_ostream<char>&                       strm,
-        const MeasurementChunk<param_type, value_type>& chunk)
-      {
-        return (strm << chunk.parameter() << ": " << chunk.value());
-      }
-      friend std::basic_ostream<wchar_t> operator<<(
-        std::basic_ostream<wchar_t>&                       strm,
-        const MeasurementChunk<param_type, value_type>&    chunk)
-      {
-        return (strm << chunk.parameter() << L": " << chunk.value());
-      }
-    };
-  }
+        protected_members:
+            ParameterType_t mParameter;
+            ValueType_t     mValue;
+
+        private_methods:
+            /**
+             * Permit printing the chunk to byte stream.
+             *
+             * @param strm
+             * @param chunk
+             * @return
+             */
+            friend std::basic_ostream<char> operator<<(
+                    std::basic_ostream<char>                             &aStream,
+                    CMeasurementChunk<ParameterType_t, ValueType_t> const &aChunk)
+            {
+                return (aStream << aChunk.parameter() << ": " << aChunk.value());
+            }
+
+            /**
+             * Permit printing the chunk to 16-bit stream.
+             *
+             * @param strm
+             * @param chunk
+             * @return
+             */
+            friend std::basic_ostream<wchar_t> operator<<(
+                    std::basic_ostream<wchar_t>                          &aStream,
+                    CMeasurementChunk<ParameterType_t, ValueType_t> const &aChunk)
+            {
+                return (aStream << aChunk.parameter() << L": " << aChunk.value());
+            }
+        };
+    }
 }
 
 #endif

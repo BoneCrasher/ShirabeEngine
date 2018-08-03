@@ -3,9 +3,9 @@
 #include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
-    using namespace Engine::Rendering;
+    using namespace engine::Rendering;
 
     CStdSharedPtr_t<FrameGraphRenderContext>
       FrameGraphRenderContext::create(

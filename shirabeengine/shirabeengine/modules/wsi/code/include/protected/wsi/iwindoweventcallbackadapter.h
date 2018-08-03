@@ -6,7 +6,7 @@
 #include "Core/Functional/FunctionBinding.h"
 #include "WSI/IWindow.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     class WindowEventCallbackAdapter

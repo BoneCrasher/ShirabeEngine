@@ -3,7 +3,7 @@
 
 #include "Core/Memory/AllocatorBase/AllocatorBase.h"
 
-namespace Engine
+namespace engine
 {
 	namespace Memory
 	{

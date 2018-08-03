@@ -3,7 +3,7 @@
 #include "WSI/Windows/WindowsWindow.h"
 #include "WSI/Windows/WindowsWindowFactory.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
     namespace Windows {
 

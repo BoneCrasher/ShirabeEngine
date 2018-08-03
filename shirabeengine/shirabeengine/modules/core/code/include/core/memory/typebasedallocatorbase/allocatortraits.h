@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_CORE_MEMORY_TYPE_BASE_ALLOCATOR_TRAITS_BASE_H__
 #define __SHIRABE_CORE_MEMORY_TYPE_BASE_ALLOCATOR_TRAITS_BASE_H__
  
-namespace Engine {
+namespace engine {
 	namespace Memory {
 
 #ifdef construct

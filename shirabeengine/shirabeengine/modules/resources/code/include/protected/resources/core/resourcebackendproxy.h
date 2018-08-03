@@ -7,7 +7,7 @@
 #include "Resources/Core/IResourceProxy.h"
 #include "Resources/Core/ResourceDomainTransfer.h"
 
-namespace Engine {
+namespace engine {
 	namespace Resources {
 
 		template <typename TBackend, typename TResource>

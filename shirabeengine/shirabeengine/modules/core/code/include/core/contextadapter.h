@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_CORE_DDDCONTEXTADAPTER_H__
 #define __SHIRABE_CORE_DDDCONTEXTADAPTER_H__
 
-namespace Engine
+namespace engine
 {
 
   template <typename TSourceContext, typename TTargetContext>

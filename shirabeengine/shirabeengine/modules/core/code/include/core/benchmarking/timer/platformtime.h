@@ -7,11 +7,11 @@
 #include "platform/platform.h"
 #include "core/enginestatus.h"
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRBE_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 
-namespace Engine
+namespace engine
 {
     /**
      * Specifies valid time-units to be used for converting the internal time values.
@@ -26,9 +26,6 @@ namespace Engine
 		Hours,
 		Day
 	};
-
-
-
 
     /**
      * The PlatformTime-class is used to provide a common base interface and

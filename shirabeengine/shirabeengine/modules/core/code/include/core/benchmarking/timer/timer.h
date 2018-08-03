@@ -7,88 +7,76 @@
 
 #include <platform/platform.h>
 
-#ifdef PLATFORM_WINDOWS
-#pragma warning(push)
-#pragma warning(disable:4820)
-#include "core/benchmarking/timer/windowstime.h"
+#ifdef SHIRABE_PLATFORM_WINDOWS
+#  pragma warning(push)
+#  pragma warning(disable:4820)
+#  include "core/benchmarking/timer/windowstime.h"
 #else
-    #include "time.h"
+#  include "core/benchmarking/timer/linuxtime.h"
 #endif
 
-using namespace Engine::Benchmarking;
+using namespace engine::benchmarking;
 
-/**************************************************************************************************
- * Typedef:	MeasurementDataStore<MeasurementChunk<double, double>> FPSDataStore
- *
- * Summary:	Defines an alias representing the FPS data store.
- **************************************************************************************************/
-typedef CMeasurementDataStore<CMeasurementChunk<double, double>> FPSDataStore_t;
+using FPSDataStore_t = CMeasurementDataStore<CMeasurementChunk<double, double>>;
 
-namespace Engine {
+namespace engine
+{
 
-#ifdef PLATFORM_WINDOWS
-	typedef class Engine::WindowsTime Time, Time, *LPTime;
-#elif
-	typedef class Engine::Time_Base Time, Time, *LPTime;
+#ifdef SHIRABE_PLATFORM_WINDOWS
+    typedef class engine::CWindowsTime Time, Time, *LPTime;
+#else
+    typedef class engine::CLinuxTime Time, Time, *LPTime;
 #endif
 
-	/**************************************************************************************************
-	 * Class:	Timer
-	 *
-	 * Summary:
-	 *  The timer class will use a specific PlatformTime specialization to hook into platform time
-	 *  counters and evaluate total elapsed, elapsed since last frame and frames per second data.
-	 **************************************************************************************************/
-	class Timer {
-	public:
+    /**
+     * The timer class will use a specific PlatformTime specialization to hook into platform time
+     * counters and evaluate total elapsed, elapsed since last frame and frames per second data.
+     */
+    class CTimer
+    {
+    public_constructors:
+        CTimer();
 
-		Timer();
-		virtual ~Timer();
+    public_destructors:
+        virtual ~CTimer() final;
 
+    public_methods:
 		EEngineStatus initialize();
 		EEngineStatus update();
 		EEngineStatus cleanup();
 
-		double elapsed(ETimeUnit unit = ETimeUnit::Seconds);
-		double total_elapsed(ETimeUnit unit = ETimeUnit::Seconds);
+        double elapsed(ETimeUnit unit = ETimeUnit::Seconds);
+        double total_elapsed(ETimeUnit unit = ETimeUnit::Seconds());
 
 		float FPS();
 		
-	private:
+    private_typedefs:
 
-#ifdef PLATFORM_WINDOWS
-		typedef
-			WindowsTime
-			internal_time_type;
-#elif defined(PLATFORM_LINUX)
-		typedef
-			LinuxTime
-			internal_time_type;
+#ifdef SHIRABE_PLATFORM_WINDOWS
+        using InternalTimeType_t = CWindowsTime;
+#elif defined(SHIRABE_PLATFORM_LINUX)
+        using InternalTimeType_t = CLinuxTime;
 #endif
-		typedef
-			typename internal_time_type::internal_time_value_type
-			internal_time_value_type;
-		typedef
-			CStdSharedPtr_t<internal_time_type>
-			TimePtr;
+        using InternalTimeValueType_t = InternalTimeType_t::InternalTimeValueType_t;
 
-		void setTimeInterface(const TimePtr&);
+    private_methods:
+        void setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> aTimeInterface);
 
-		TimePtr                  m_timeInterface;
-		internal_time_value_type m_conversionConstant;
+    private_members:
+        CStdSharedPtr_t<InternalTimeType_t> m_timeInterface;
 
-		internal_time_value_type m_initial;
-		internal_time_value_type m_current;
-		internal_time_value_type m_elapsed;
+        InternalTimeValueType_t mConversionConstant;
+        InternalTimeValueType_t m_initial;
+        InternalTimeValueType_t m_current;
+        InternalTimeValueType_t m_elapsed;
 
-		FPSDataStore m_dataStore;
-		double       m_chunkPushCounter;
-		int          m_frames;
+        FPSDataStore_t mDataStore;
+        double         mChunkCounter;
+        int            mFrames;
 	};
-
 }
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #pragma warning(pop)
 #endif
 

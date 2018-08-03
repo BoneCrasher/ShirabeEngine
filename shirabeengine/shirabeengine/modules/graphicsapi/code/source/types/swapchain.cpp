@@ -1,7 +1,7 @@
 #include "GraphicsAPI/Resources/Types/SwapChain.h"
 
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
     SwapChainBufferDeclaration::

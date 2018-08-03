@@ -4,7 +4,7 @@
 #include "Core/EngineStatus.h"
 #include "ECWS/IComponent.h"
 
-namespace Engine {
+namespace engine {
 
 	class Entity {
 	public:

@@ -3,7 +3,7 @@
 
 #include "Util/Documents/XML.h"
 
-namespace Engine {
+namespace engine {
   namespace Documents {
 
     namespace xpath {

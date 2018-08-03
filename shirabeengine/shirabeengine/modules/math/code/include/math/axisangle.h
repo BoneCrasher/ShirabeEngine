@@ -3,9 +3,9 @@
 
 #include "math/vector.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         /**
          * An AxisAngle is a construct describing a regular rotation axis and a rotation angle around it.

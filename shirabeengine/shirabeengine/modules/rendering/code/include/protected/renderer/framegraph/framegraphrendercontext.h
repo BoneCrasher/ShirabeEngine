@@ -10,18 +10,18 @@
 #include "Renderer/RendererTypes.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"
 
-namespace Engine {
+namespace engine {
 
   namespace Rendering {
     class IRenderContext;
   }
 
   namespace FrameGraph {
-    using Engine::Asset::AssetId_t;
-    using Engine::Asset::IAssetStorage;
-    using namespace Engine::Resources;
-    using namespace Engine::GFXAPI;
-    using namespace Engine::Rendering;
+    using engine::Asset::AssetId_t;
+    using engine::Asset::IAssetStorage;
+    using namespace engine::Resources;
+    using namespace engine::GFXAPI;
+    using namespace engine::Rendering;
 
     DeclareInterface(IFrameGraphRenderContext);
 

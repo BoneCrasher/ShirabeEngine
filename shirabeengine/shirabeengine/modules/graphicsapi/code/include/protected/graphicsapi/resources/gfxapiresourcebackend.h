@@ -3,7 +3,7 @@
 
 #include "GraphicsAPI/Resources/GFXAPIResourceTaskBackend.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
     using namespace Resources;
 

@@ -7,7 +7,7 @@
 // #include "Platform/MathAdapter.h"
 #include <Math/Geometric/Rect.h>
 
-namespace Engine {
+namespace engine {
 
   Camera::Camera()
     : m_viewType(CameraViewType::FreeCamera)

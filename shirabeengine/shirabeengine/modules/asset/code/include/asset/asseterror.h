@@ -4,7 +4,7 @@
 #include <exception>
 #include <string>
 
-namespace Engine {
+namespace engine {
   namespace Asset {
 
     enum class AssetErrorCode {

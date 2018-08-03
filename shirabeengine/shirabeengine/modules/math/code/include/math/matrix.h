@@ -7,13 +7,13 @@
 #include "math/field.h"
 #include "math/matrixops.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
 
 		// Use private matrix algorithms from MatrixOps.h
-		using namespace Engine::Math::PRIVATE;
+        using namespace engine::math::PRIVATE;
 
 		/* NOTES
 		 *

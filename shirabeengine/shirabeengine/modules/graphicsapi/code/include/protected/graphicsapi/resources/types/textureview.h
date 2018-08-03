@@ -12,7 +12,7 @@
 #include "GraphicsAPI/Resources/Types/Definition.h"
 #include "GraphicsAPI/Resources/Types/Texture.h"
 
-namespace Engine {
+namespace engine {
 	namespace GFXAPI {
     
 		/**********************************************************************************************//**

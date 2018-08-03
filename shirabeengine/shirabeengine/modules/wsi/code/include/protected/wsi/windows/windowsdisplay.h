@@ -7,7 +7,7 @@
 
 #include "Windows.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     class WinAPIDisplay {
@@ -15,8 +15,8 @@ namespace Engine {
       SHIRABE_DECLARE_LOG_TAG(WinAPIDisplay);
 
       static BOOL CALLBACK handleDisplayMonitor(HMONITOR monitor, HDC hdc, LPRECT rect, LPARAM param) {
-        using namespace Engine;
-        using namespace Engine::OS;
+        using namespace engine;
+        using namespace engine::OS;
 
         Vector<OSDisplayDescriptor> *pDescriptors = reinterpret_cast<Vector<OSDisplayDescriptor> *>(param);
 
@@ -51,7 +51,7 @@ namespace Engine {
     public:
       static Vector<OS::OSDisplayDescriptor> GetDisplays(uint32_t &primaryDisplayIndex) 
       {
-        using namespace Engine::OS;
+        using namespace engine::OS;
 
         // Only primary screen
         // int screenWidth       = GetSystemMetrics(SM_CXSCREEN);

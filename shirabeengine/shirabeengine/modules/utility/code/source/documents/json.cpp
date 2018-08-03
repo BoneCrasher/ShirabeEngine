@@ -10,7 +10,7 @@
 
 #include "Util/Documents/JSON.h"
 
-namespace Engine {
+namespace engine {
   namespace Documents {
 
     class NLohmannJSONNode 

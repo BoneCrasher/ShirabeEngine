@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
-namespace Engine
+namespace engine
 {
     //<-----------------------------------------------------------------------------
     //<

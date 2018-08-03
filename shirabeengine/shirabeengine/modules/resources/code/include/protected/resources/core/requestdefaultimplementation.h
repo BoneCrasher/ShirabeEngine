@@ -7,10 +7,10 @@
 #include "Resources/Core/IResource.h"
 #include "Resources/Core/ResourceDataSource.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
-    using namespace Engine::Resources;
+    using namespace engine::Resources;
 
     class BaseDeclaration {
     public:

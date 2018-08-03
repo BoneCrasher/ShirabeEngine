@@ -4,10 +4,10 @@
 
 #include "Asset/AssetIndex.h"
 
-namespace Engine {
+namespace engine {
   namespace Asset {
 
-    namespace xml = Engine::Documents;
+    namespace xml = engine::Documents;
 
     void __readAssets(xml::XMLDocument const&file, AssetRegistry<Asset> &registry);
     void __readAsset(xmlNodePtr        const&assets, xml::XMLDocument const&file, AssetRegistry<Asset> &registry);

@@ -9,7 +9,7 @@
 #include "WSI/Windows/WindowsWindowFactory.h"
 #endif // PLATFORM_WINDOWS
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     WindowManager::WindowManager()

@@ -20,7 +20,7 @@
 #define SHIRABE_STR(m) #m
 #define SHIRABE_LOG_FUNCTION(...) SHIRABE_STR( __VA_ARGS__)
 
-namespace Engine
+namespace engine
 {
     /**
      *

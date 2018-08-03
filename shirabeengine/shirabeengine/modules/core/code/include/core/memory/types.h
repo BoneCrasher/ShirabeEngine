@@ -3,7 +3,7 @@
 
 #include <tchar.h>
 
-namespace Engine {
+namespace engine {
 	namespace Memory {
 
 		/* ShirabeEngine Datatype Definition

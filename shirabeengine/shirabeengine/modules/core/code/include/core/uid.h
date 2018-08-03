@@ -3,7 +3,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-namespace Engine {
+namespace engine {
   namespace Core {
 
     template <typename TUIDUnderlyingType>

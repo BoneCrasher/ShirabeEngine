@@ -12,7 +12,7 @@
 
 #include "OS/WindowHandleWrapper.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     class IWindow;

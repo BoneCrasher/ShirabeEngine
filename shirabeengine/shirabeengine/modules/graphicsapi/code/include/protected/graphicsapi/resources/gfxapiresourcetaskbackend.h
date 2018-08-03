@@ -24,7 +24,7 @@
 #include "GraphicsAPI/Resources/GFXAPI.h"
 #include "GraphicsAPI/Resources/Types/All.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
     using namespace Resources;
 

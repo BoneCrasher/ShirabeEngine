@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_THREADING_LOOPER_IMPL_H__
 #define __SHIRABE_THREADING_LOOPER_IMPL_H__
 
-namespace Engine {
+namespace engine {
   namespace Threading {
 
     template <typename TTaskResult>

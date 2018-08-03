@@ -1,6 +1,6 @@
 #include "OS/OSDisplay.h"
 
-namespace Engine {
+namespace engine {
   namespace OS {
 
     OSDisplayDescriptor::OSDisplayDescriptor()

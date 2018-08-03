@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace Engine {
+namespace engine {
 	namespace Memory {
 		// Creates a wrapper class around __FILE__ & __LINE__, which can then 
 		// be passed to the multiplication operator as the first argument.

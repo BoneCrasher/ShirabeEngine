@@ -3,9 +3,9 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         //<-----------------------------------------------------------------------------
         //<

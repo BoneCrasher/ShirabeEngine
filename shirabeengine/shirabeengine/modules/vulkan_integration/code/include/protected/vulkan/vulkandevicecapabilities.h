@@ -14,11 +14,11 @@
 // #include "GFXAPI/Capabilities.h"
 
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
 
-    using Engine::Resources::Format;
-    using Engine::Core::BitField;
+    using engine::Resources::Format;
+    using engine::Core::BitField;
 
     class VulkanDeviceCapsHelper {
       SHIRABE_DECLARE_LOG_TAG(VulkanDeviceCapsHelper)

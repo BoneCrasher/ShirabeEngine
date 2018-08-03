@@ -9,10 +9,10 @@
 #include "OS/OSDef.h"
 #include "Math/Geometric/Rect.h"
 
-namespace Engine {
+namespace engine {
   namespace OS {
 
-    using Engine::Math::Rect;
+    using engine::Math::Rect;
 
     struct SHIRABE_LIBRARY_EXPORT OSDisplayDescriptor {
       OSHandle     monitorHandle;

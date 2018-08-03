@@ -9,10 +9,10 @@
 #include "WSI/IWindow.h"
 #include "WSI/IWindowEventCallbackAdapter.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
     namespace Windows {
-      using namespace Engine;
+      using namespace engine;
       using namespace OS;
 
       class IWinAPIAdapter {

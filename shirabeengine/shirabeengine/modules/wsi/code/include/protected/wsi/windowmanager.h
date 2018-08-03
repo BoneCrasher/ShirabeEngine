@@ -8,7 +8,7 @@
 
 #include "WSI/IWindowFactory.h" // Includes IWindow.h
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     class WindowManager {

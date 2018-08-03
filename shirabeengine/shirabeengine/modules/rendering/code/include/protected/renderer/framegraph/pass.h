@@ -18,7 +18,7 @@
 
 #include "PassBuilder.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
     using namespace Rendering;
     using namespace Serialization;

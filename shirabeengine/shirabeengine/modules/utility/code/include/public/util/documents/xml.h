@@ -11,7 +11,7 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
-namespace Engine {
+namespace engine {
   namespace Documents {
           
     class XMLDocumentSelectError

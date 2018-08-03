@@ -11,7 +11,7 @@
 
 #include "Asset/AssetError.h"
 
-namespace Engine {
+namespace engine {
   namespace Asset {
 
     using AssetId_t = uint64_t;

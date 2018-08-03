@@ -54,6 +54,6 @@
 #define private_constants           private
 #define private_members             private
 
-#define SHIRABE_INLINE inline
-
+#define SHIRABE_INLINE    inline
+#define SHIRABE_UNUSED(x) (void)(x)
 #endif

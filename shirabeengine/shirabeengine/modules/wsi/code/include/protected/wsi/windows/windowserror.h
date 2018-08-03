@@ -8,10 +8,10 @@
 #include "Core/String.h"
 #include "Core/EngineStatus.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
     namespace Windows {
-      using namespace Engine;
+      using namespace engine;
 
       class WindowsException {
       public:
@@ -37,7 +37,7 @@ namespace Engine {
       static void HandleWindowsError(HRESULT hres, EEngineStatus const&engineStatus, std::string const&message) {
         if(FAILED(hres)) {
           std::string wrappedMessage
-            = Engine::String::format("Windows/WINAPI error occurred (HRESULT: %0, EngineStatus: %1): %2", hres, engineStatus, message);
+            = engine::String::format("Windows/WINAPI error occurred (HRESULT: %0, EngineStatus: %1): %2", hres, engineStatus, message);
 
           throw WindowsException(static_cast<int64_t>(hres), engineStatus, message);
         }

@@ -8,7 +8,7 @@
 
 #include "Resources/Core/IResourceProxy.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
     class ResourceProxyFactory 

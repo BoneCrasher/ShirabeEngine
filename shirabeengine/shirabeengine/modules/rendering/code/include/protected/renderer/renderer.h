@@ -5,9 +5,9 @@
 
 #include "Renderer/IRenderer.h"
 
-namespace Engine {
+namespace engine {
   namespace Rendering {
-    using Engine::FrameGraph::IFrameGraphRenderContext;
+    using engine::FrameGraph::IFrameGraphRenderContext;
 
     class Renderer 
       : public IRenderer

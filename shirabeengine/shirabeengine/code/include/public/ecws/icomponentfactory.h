@@ -4,7 +4,7 @@
 #include "Core/EngineTypeHelper.h"
 #include "ECWS/IComponent.h"
 
-namespace Engine {
+namespace engine {
 
 	DeclareInterface(IComponentFactory);
 

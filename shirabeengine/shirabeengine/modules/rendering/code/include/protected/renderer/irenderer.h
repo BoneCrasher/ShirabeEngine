@@ -11,12 +11,12 @@
 #include "Renderer/RendererTypes.h"
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
-namespace Engine {
+namespace engine {
   namespace Rendering {
     using namespace OS;
-    using namespace Engine::Resources;
+    using namespace engine::Resources;
 
-    using Engine::FrameGraph::IFrameGraphRenderContext;
+    using engine::FrameGraph::IFrameGraphRenderContext;
 
     DeclareInterface(IRenderContext);
     virtual EEngineStatus bindResource(PublicResourceId_t const&)   = 0;

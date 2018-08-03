@@ -8,7 +8,7 @@
 
 #include "BuildingBlocks/Transform.h"
 
-namespace Engine {
+namespace engine {
 	using namespace Math;
 
 	enum class CameraViewType {

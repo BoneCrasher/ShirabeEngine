@@ -14,9 +14,9 @@
 #include "GraphicsAPI/Resources/GFXAPIResourceBackend.h"
 #include "GraphicsAPI/Resources/GFXAPI.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
-    using namespace Engine::Resources;
+    using namespace engine::Resources;
 
 
     /**********************************************************************************************//**

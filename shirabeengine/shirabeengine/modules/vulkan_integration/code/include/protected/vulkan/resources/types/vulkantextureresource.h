@@ -3,7 +3,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
 
     struct VulkanTextureResource {

@@ -3,11 +3,11 @@
 #include "Vulkan/VulkanDeviceCapabilities.h"
 #include "GraphicsAPI/Definitions.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
 
-    using namespace Engine::Resources;
-    using Engine::Core::BitField;
+    using namespace engine::Resources;
+    using engine::Core::BitField;
 
     VkFormat VulkanDeviceCapsHelper::convertFormatToVk(const Format& fmt) {
       switch(fmt) {

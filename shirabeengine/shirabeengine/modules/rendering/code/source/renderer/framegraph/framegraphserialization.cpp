@@ -3,9 +3,9 @@
 #include "Renderer/FrameGraph/FrameGraph.h"
 #include "Renderer/FrameGraph/Pass.h"
 
-namespace Engine {
+namespace engine {
   namespace Serialization {
-    using namespace Engine::FrameGraph;
+    using namespace engine::FrameGraph;
 
     bool
       FrameGraphGraphVizSerializer::initialize()

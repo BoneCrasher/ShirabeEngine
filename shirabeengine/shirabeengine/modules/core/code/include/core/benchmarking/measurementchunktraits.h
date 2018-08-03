@@ -4,29 +4,55 @@
 #include <stddef.h>
 #include <vector>
 
-namespace Engine {
-	namespace Benchmarking {
+#include <base/declaration.h>
 
+namespace engine
+{
+    namespace benchmarking
+    {
+        /**
+         * MeasurementChunkTraits implement a set of functions used in a measurement data store
+         * specialized for TChunk and TStorage.
+         *
+         * @tparam TChunk   The specific chunk type used.
+         * @tparam TStorage The storage type used for the chunks.
+         */
+        template <
+                typename TChunk,
+                typename TStorage = std::vector<TChunk>
+                >
+        class CMeasurementChunkTraits
+        {
+        public:
+            using ChunkType_t     = TChunk;
+            using StorageType_t   = TStorage;
+            using ParameterType_t = typename ChunkType_t::ParameterType_t;
+            using ValueType_t     = typename ChunkType_t::ValueType_t;
+            using SizeType_t      = std::size_t;
 
-		template <typename ChunkT, typename StorageT = std::vector<ChunkT>>
-		class MeasurementChunkTraits {
-		public:
-			typedef ChunkT                          chunk_type;
-			typedef StorageT                        storage_type;
-			typedef typename chunk_type::param_type param_type;
-			typedef typename chunk_type::value_type value_type;
-			typedef std::size_t                     size_type;
+        public:
+            /**
+             * Average a contigious subset of chunks from a chunk storage using
+             * the arithmetic mean.
+             *
+             * @param aChunkStorage
+             * @param aOffset
+             * @param aCount
+             * @return
+             */
+            static SizeType_t average(
+                        StorageType_t const &aChunkStorage,
+                        SizeType_t    const &aOffset,
+                        SizeType_t    const &aCount)
+            {
+                SHIRABE_UNUSED(aChunkStorage);
+                SHIRABE_UNUSED(aOffset);
+                SHIRABE_UNUSED(aCount);
 
-		public:
-			static size_type average(const storage_type& chunks,
-									 const size_type     off,
-									 size_type           n)
-			{
-
-				return 0;
-			}
-		};
-	}
+                return 0;
+            }
+        };
+    }
 }
 
 #endif

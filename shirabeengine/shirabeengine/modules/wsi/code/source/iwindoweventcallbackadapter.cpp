@@ -1,6 +1,6 @@
 #include "WSI/IWindowEventCallbackAdapter.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     namespace __Private {

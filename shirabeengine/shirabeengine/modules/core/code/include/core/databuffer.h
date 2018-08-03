@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <base/declaration.h>
 
-namespace Engine {
+namespace engine {
 
     /**
      *

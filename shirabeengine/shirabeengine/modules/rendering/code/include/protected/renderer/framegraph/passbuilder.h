@@ -13,13 +13,13 @@
 
 #include "FrameGraphData.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     class PassBase;
 
-    using Engine::Core::IUIDGenerator;
-    using namespace Engine::Resources;
+    using engine::Core::IUIDGenerator;
+    using namespace engine::Resources;
     
     enum PassResourceConstraintFlags {
       None          = 0,

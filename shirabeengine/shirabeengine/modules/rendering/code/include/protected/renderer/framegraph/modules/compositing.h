@@ -10,7 +10,7 @@
 #include "Resources/Core/ResourceManager.h"
 #include "GraphicsAPI/Resources/Types/All.h"
 
-namespace Engine {
+namespace engine {
 	namespace FrameGraph {
 
     struct CompositingModuleTag_t {};

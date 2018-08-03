@@ -9,7 +9,7 @@
 #include "Asset/AssetError.h"
 #include "Asset/AssetTypes.h"
 
-namespace Engine {
+namespace engine {
   namespace Asset {
 
     /**********************************************************************************************//**

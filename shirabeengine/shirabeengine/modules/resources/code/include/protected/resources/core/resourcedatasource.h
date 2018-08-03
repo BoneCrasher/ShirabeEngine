@@ -5,7 +5,7 @@
 
 #include "Core/DataBuffer.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
     /**

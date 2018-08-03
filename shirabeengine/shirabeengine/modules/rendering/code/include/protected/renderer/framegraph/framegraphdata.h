@@ -20,11 +20,11 @@
 
 #include "Renderer/RendererTypes.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
     using Core::BitField;
-    using Engine::Range;
-    using namespace Engine::Rendering;
+    using engine::Range;
+    using namespace engine::Rendering;
 
     using FrameGraphResourceId_t = uint64_t;
     using PassUID_t              = uint64_t;
@@ -55,7 +55,7 @@ namespace Engine {
      *
      * \brief Values that represent texture and buffer formats
      **************************************************************************************************/
-    using FrameGraphFormat = Engine::Resources::Format;
+    using FrameGraphFormat = engine::Resources::Format;
 
     SHIRABE_TEST_EXPORT bool validateFormatCompatibility(FrameGraphFormat const&base, FrameGraphFormat const&derived);
 

@@ -1,6 +1,6 @@
 #include "GraphicsAPI/Resources/Types/DepthStencilState.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
     DepthStencilStateDeclaration::Descriptor

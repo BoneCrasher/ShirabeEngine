@@ -1,7 +1,7 @@
 #include "core/basictypes.h"
 #include "core/string.h"
 
-namespace Engine
+namespace engine
 {
     //<-----------------------------------------------------------------------------
     //<
@@ -52,7 +52,7 @@ namespace Engine
     template <>
     std::string to_string<CRange>(CRange const& aRange)
     {
-        return String::format("[off:%0,len:%1]", aRange.offset, aRange.length);
+        return CString::format("[off:%0,len:%1]", aRange.offset, aRange.length);
     }
     //<-----------------------------------------------------------------------------
 }

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "Renderer/FrameGraph/GraphBuilder.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     template <typename TUID>

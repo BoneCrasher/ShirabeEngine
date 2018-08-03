@@ -9,9 +9,9 @@
 #include <platform/platform.h>
 #include <math/geometric/rect.h>
 
-namespace Engine
+namespace engine
 {
-    using namespace Engine::Math;
+    using namespace engine::math;
 
     #ifdef min
     #undef min

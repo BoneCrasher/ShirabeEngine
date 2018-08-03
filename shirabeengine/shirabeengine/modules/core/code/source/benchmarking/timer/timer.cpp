@@ -1,19 +1,23 @@
-#include "Core/Benchmarking/Timer/Timer.h"
+#include "core/benchmarking/timer/timer.h"
 
-namespace Engine {
-
-	Timer::Timer() {
-		m_conversionConstant = m_initial = m_current = m_elapsed = 0;
+namespace engine
+{
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    CTimer::CTimer()
+    {
+        mConversionConstant = m_initial = m_current = m_elapsed = 0;
 
 		if (!CheckEngineError(initialize()))
 			return;
 	};
 
-	Timer::~Timer() {
-		this->cleanup();
+    CTimer::~CTimer() {
+        cleanup();
 	};
 
-	void Timer::setTimeInterface(const TimePtr& pInterface)
+    void CTimer::setTimeInterface(const TimePtr& pInterface)
 	{
 		if (!pInterface)
 			throw new std::invalid_argument("Cannot set time-interface to NULL.");
@@ -21,7 +25,7 @@ namespace Engine {
 		m_timeInterface = pInterface;
 	};
 
-	EEngineStatus Timer::initialize()
+    EEngineStatus CTimer::initialize()
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
@@ -36,7 +40,7 @@ namespace Engine {
 			}
 
 			// Get conversion constant
-			if (CheckEngineError(result = m_timeInterface->getConversionConstant(m_conversionConstant))) {
+            if (CheckEngineError(result = m_timeInterface->getConversionConstant(mConversionConstant))) {
 				printf("FATAL_ERROR: Timer::initialize: An error occured on requesting the proprietary time interface conversion constant from the time interface.\nAt: %s:%s", __FILE__, __LINE__); // might cause exceptions
 			}
 			// get initial timestamp
@@ -52,7 +56,7 @@ namespace Engine {
 		return result;
 	};
 
-	EEngineStatus Timer::cleanup()
+    EEngineStatus CTimer::cleanup()
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
@@ -63,13 +67,13 @@ namespace Engine {
 		return result;
 	};
 
-	EEngineStatus Timer::update() {
+    EEngineStatus CTimer::update() {
 		EEngineStatus result = EEngineStatus::Ok;
 
 		++m_frames;
 
 #ifdef _DEBUG
-		if (m_conversionConstant && m_timeInterface)
+        if (mConversionConstant && m_timeInterface)
 #elif
 		if (m_pTimeInterface)
 #endif
@@ -80,9 +84,9 @@ namespace Engine {
 			else {
 				m_elapsed = m_current - m_elapsed;
 
-				m_chunkPushCounter += this->elapsed(ETimeUnit::Seconds);
+                m_chunkPushCounter += elapsed(ETimeUnit::Seconds);
 				if (m_chunkPushCounter >= 1.0) {
-					m_dataStore.push_chunk(this->total_elapsed(ETimeUnit::Seconds), m_frames);
+                    m_dataStore.push_chunk(total_elapsed(ETimeUnit::Seconds), m_frames);
 
 					m_frames = 0;
 					m_chunkPushCounter -= 1.0;
@@ -93,25 +97,25 @@ namespace Engine {
 		return result;
 	};
 
-	double Timer::elapsed(ETimeUnit unit) {
+    double CTimer::elapsed(ETimeUnit unit) {
 		double factor = 1.0;
 
 		if (m_timeInterface)
 			factor = m_timeInterface->getConversionMask(unit);
 
-		return (((double)m_elapsed / (double)m_conversionConstant) * factor);
+        return (((double)m_elapsed / (double)mConversionConstant) * factor);
 	};
 
-	double Timer::total_elapsed(ETimeUnit unit) {
+    double CTimer::total_elapsed(ETimeUnit unit) {
 		double factor = 1.0;
 
 		if (m_timeInterface)
 			factor = m_timeInterface->getConversionMask(unit);
 
-		return (((m_current - m_initial) / (1.0*m_conversionConstant))*factor);
+        return (((m_current - m_initial) / (1.0*mConversionConstant))*factor);
 	};
 
-	float Timer::FPS() {
+    float CTimer::FPS() {
 		return (float)m_dataStore.average(m_dataStore.size() - 10, 10);
 	};
 }

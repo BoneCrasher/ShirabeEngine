@@ -9,10 +9,10 @@
 #include "Vulkan/VulkanDeviceCapabilities.h"
 #include "Vulkan/VulkanImport.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
-    using namespace Engine::OS;
-    using namespace Engine::GFXAPI;
+    using namespace engine::OS;
+    using namespace engine::GFXAPI;
 
     VulkanError::VulkanError(
       std::string const&message,

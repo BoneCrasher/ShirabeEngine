@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Engine {
+namespace engine {
     typedef struct ETimespanUnit {
     private:
         enum {

@@ -5,7 +5,7 @@
 
 #include "Core/Serialization/Serialization.h"
 
-namespace Engine {
+namespace engine {
   namespace Serialization {
 
     struct JSONOutputTag_t {};

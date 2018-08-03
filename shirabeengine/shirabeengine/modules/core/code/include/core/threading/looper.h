@@ -5,7 +5,7 @@
 #include <thread>
 #include <future>
 
-namespace Engine {
+namespace engine {
   namespace Threading {
     /**********************************************************************************************//**
      * \enum	Priority

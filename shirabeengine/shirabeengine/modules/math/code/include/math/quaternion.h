@@ -5,9 +5,9 @@
 #include "math/axisangle.h"
 #include "math/matrix.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
 		//
         // The set of CQuaternions is also known as the ring of Hamiltonian

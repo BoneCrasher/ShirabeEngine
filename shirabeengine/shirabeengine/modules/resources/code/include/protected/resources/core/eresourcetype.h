@@ -5,7 +5,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-namespace Engine {
+namespace engine {
 	namespace Resources {
 		enum class EResourceType 
 			: uint16_t

@@ -6,7 +6,7 @@
 
 #include "Core/EngineTypeHelper.h"
 
-namespace Engine {
+namespace engine {
   namespace Asset {
     using GFXAPI::TextureInfo;
 

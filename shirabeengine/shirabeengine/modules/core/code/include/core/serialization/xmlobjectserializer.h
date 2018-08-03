@@ -3,7 +3,7 @@
 
 #include "Core/Serialization/Serialization.h"
 
-namespace Engine {
+namespace engine {
   namespace Serialization {
 
     struct XMLOutputTag_t {};

@@ -12,12 +12,12 @@
 #include "GraphicsAPI/Resources/Types/Definition.h"
 #include "Vulkan/VulkanImport.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
 
     using OS::ApplicationEnvironment;
     using OS::WindowHandleWrapper;
-    using Engine::Resources::Format;
+    using engine::Resources::Format;
 
 
     /**

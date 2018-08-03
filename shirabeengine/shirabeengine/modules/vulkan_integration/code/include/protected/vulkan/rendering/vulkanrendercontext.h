@@ -5,9 +5,9 @@
 
 #include "Renderer/IRenderer.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
-    using namespace Engine::Rendering;
+    using namespace engine::Rendering;
 
     class VulkanRenderContext
       : public IRenderContext

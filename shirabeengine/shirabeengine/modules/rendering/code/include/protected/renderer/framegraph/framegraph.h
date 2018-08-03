@@ -15,7 +15,7 @@
 #include "Renderer/FrameGraph/FrameGraphData.h"
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     class SHIRABE_TEST_EXPORT Graph

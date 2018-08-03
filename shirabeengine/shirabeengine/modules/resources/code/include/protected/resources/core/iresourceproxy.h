@@ -12,7 +12,7 @@
 #include "Resources/Core/ResourceDTO.h"
 #include "Resources/Core/ResourceDomainTransfer.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
 
@@ -128,14 +128,14 @@ namespace Engine {
 
     template <typename TResource>
     class GenericProxyBase
-      : public Engine::Resources::IResourceProxy<TResource>
+      : public engine::Resources::IResourceProxy<TResource>
       , public ResourceCreationRequestAdapter<typename TResource::CreationRequest>
     {
     public:
       inline GenericProxyBase(
         EProxyType                          const&proxyType,
         typename TResource::CreationRequest const&request)
-        : Engine::Resources::IResourceProxy<TResource>()
+        : engine::Resources::IResourceProxy<TResource>()
         , ResourceCreationRequestAdapter<typename TResource::CreationRequest>(request)
         , m_type(proxyType)
         , m_loadState(ELoadState::UNKNOWN)

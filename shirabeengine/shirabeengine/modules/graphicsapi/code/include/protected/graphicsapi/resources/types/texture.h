@@ -14,7 +14,7 @@
 #include "GraphicsAPI/Resources/Types/Definition.h"
 
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
     struct Multisapmling {

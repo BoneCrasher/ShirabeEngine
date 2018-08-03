@@ -11,7 +11,7 @@
 
 #include "core/enginetypehelper.h"
 
-namespace Engine
+namespace engine
 {
 
     /**

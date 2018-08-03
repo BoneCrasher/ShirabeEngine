@@ -5,9 +5,9 @@
 
 #include "Core/UID.h"
 
-namespace Engine {
+namespace engine {
 	namespace Random {
-    using namespace Engine::Core;
+    using namespace engine::Core;
 
 		class RandomState 
       : public IUIDGenerator<std::mt19937_64::result_type>

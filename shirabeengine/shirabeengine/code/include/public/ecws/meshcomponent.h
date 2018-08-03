@@ -3,7 +3,7 @@
 
 #include "ECWS/IComponent.h"
 
-namespace Engine {
+namespace engine {
 
 	class MeshComponent 
 		: public IComponent

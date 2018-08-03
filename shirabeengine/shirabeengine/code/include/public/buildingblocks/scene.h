@@ -8,7 +8,7 @@
 #include "ECWS/Entity.h"
 #include "ECWS/IComponentFactory.h"
 
-namespace Engine {
+namespace engine {
 
 	class Scene {
 	public:

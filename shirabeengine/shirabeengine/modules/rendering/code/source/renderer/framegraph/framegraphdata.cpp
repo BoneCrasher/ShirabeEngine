@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-namespace Engine {
+namespace engine {
   using namespace FrameGraph;
 
   template <>

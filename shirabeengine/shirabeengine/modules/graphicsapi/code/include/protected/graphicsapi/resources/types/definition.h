@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace Engine {
+namespace engine {
   namespace Resources {
     enum class Format
       : uint16_t

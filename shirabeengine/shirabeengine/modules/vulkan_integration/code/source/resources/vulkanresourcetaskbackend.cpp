@@ -1,6 +1,6 @@
 #include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
 
     VulkanResourceTaskBackend::VulkanResourceTaskBackend(

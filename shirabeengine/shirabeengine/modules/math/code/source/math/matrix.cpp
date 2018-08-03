@@ -1,8 +1,8 @@
 #include "math/matrix.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         //<-----------------------------------------------------------------------------
         //

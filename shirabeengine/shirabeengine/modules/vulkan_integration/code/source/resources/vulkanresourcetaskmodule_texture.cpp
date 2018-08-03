@@ -2,9 +2,9 @@
 #include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 #include "Vulkan/Resources/Types/VulkanTextureResource.h"
 
-namespace Engine {
+namespace engine {
   namespace Vulkan {
-    using namespace Engine::Resources;
+    using namespace engine::Resources;
 
     EEngineStatus
       VulkanResourceTaskBackend::

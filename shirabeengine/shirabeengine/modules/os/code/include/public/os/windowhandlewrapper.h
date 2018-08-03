@@ -3,7 +3,7 @@
 
 #include "OS/ApplicationEnvironment.h"
 
-namespace Engine {
+namespace engine {
 	namespace OS {
 
 		class WindowHandleWrapper {

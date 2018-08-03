@@ -1,6 +1,6 @@
 #include "Renderer/FrameGraph/Modules/Compositing.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     FrameGraphModule<CompositingModuleTag_t>::ExportData

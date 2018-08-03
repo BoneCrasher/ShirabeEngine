@@ -12,7 +12,7 @@
 
 #include "Renderer/FrameGraph/FrameGraphData.h"
 
-namespace Engine {
+namespace engine {
   // Forward declarations in proper namespaces
   namespace FrameGraph {
     class Graph;

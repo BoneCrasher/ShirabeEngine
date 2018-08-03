@@ -8,9 +8,9 @@
 #include "platform/platform.h"
 #include "math/common.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         namespace PRIVATE
         {

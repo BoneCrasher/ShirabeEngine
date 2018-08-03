@@ -13,7 +13,7 @@
 #include "Resources/Core/ResourcePool.h"
 #include "Resources/Core/ResourceProxyFactory.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
     /**********************************************************************************************//**

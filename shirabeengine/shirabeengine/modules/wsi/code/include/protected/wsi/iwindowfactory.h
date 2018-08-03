@@ -10,7 +10,7 @@
 
 #include "WSI/IWindow.h"
 
-namespace Engine {
+namespace engine {
   namespace WSI {
 
     DeclareInterface(IWindowFactory);

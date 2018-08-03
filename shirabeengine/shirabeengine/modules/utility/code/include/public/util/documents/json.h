@@ -7,7 +7,7 @@
 #include "Platform/Platform.h"
 #include "Core/EngineTypeHelper.h"
 
-namespace Engine {
+namespace engine {
   namespace Documents {
 
     enum class JSONDocumentOpenState {

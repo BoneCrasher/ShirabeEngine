@@ -1,6 +1,6 @@
 #include "GraphicsAPI/Resources/GFXAPIResourceBackend.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
 

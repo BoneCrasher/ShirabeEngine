@@ -1,6 +1,6 @@
 #include "Resources/Core/ResourceManager.h"
 
-namespace Engine {
+namespace engine {
   namespace Resources {
 
     bool ResourceManager

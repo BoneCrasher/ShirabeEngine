@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 
-namespace Engine {
+namespace engine {
 	namespace Memory {
 
 #undef new

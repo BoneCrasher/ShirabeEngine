@@ -14,10 +14,10 @@
 
 #include "Resources/Core/ResourceDTO.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
-    using namespace Engine::Resources;
+    using namespace engine::Resources;
 
 
     struct GFXAPIResourceHandleAssignment {

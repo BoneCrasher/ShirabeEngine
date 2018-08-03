@@ -7,170 +7,236 @@
 #include <algorithm>
 
 #include "core/enginestatus.h"
-#include "core/memory/typebasedallocatorbase/allocator.h"
 #include "core/benchmarking/measurementchunk.h"
 #include "core/benchmarking/measurementchunktraits.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Benchmarking
+    namespace benchmarking
     {
 
 #define DEFAULT_CAPACITY 12
 
-        /**************************************************************************************************
-         * Class:	CMeasurementDataStore
+        /**
+         * A measurement data store can create and store an ordered list of chunks.
+         * This implementation permits providing a custom allocator for creating chunks.
          *
-         * Summary:	A measurement data store.
-         *
-         * Author:	Dotti Developer
-         *
-         * Date:	02/07/2017
-         *
-         * Typeparams:
-         * ChunkT -   	Type of the chunk t.
-         * ChunkT -   	Type of the chunk t.
-         **************************************************************************************************/
-
-        template <typename ChunkT,
-                  typename AllocT  = Engine::Memory::Allocator<ChunkT>,
-                  typename TraitsT = MeasurementChunkTraits<ChunkT, std::vector<ChunkT>>>
+         * @tparam TChunk The underlying chunk type to store.
+         * @tparam TAlloc The allocator to use.
+         * @tparam TTraits The chunk type specific trait implementation.
+         */
+        template <
+                typename TChunk,
+                typename TTraits = CMeasurementChunkTraits<TChunk, std::vector<TChunk>>
+                >
         class CMeasurementDataStore
         {
-        public:
-            typedef CMeasurementDataStore<ChunkT, AllocT, TraitsT> class_type;
-            typedef ChunkT                                         chunk_type;
-            typedef AllocT                                         alloc_type;
-            typedef TraitsT                                        traits_type;
-            typedef std::vector<chunk_type *>                      chunk_container_type;
-            typedef typename chunk_container_type::size_type       container_size_type;
+        public_typedefs:
+            using ClassType_t          = CMeasurementDataStore<TChunk, TTraits>;
+            using ChunkType_t          = TChunk                                        ;
+            using ChunkParameterType_t = typename TChunk::ParameterType_t              ;
+            using ChunkValueType_t     = typename TChunk::ValueType_t                  ;
+            using TraitsType_t         = TTraits                                       ;
+            using StorageType_t        = std::vector<ChunkType_t>                      ;
+            using StorageSizeType_t    = typename StorageType_t::size_type             ;
 
-            typedef typename AllocT::difference_type difference_type;
-            typedef typename AllocT::pointer         pointer;
-            typedef typename AllocT::const_pointer   const_pointer;
-            typedef typename AllocT::reference       reference;
-            typedef typename AllocT::const_reference const_reference;
-            typedef typename AllocT::size_type       size_type;
+        public_constructors:
+            /**
+             * Construct an empty data store and preset it's capacity.
+             *
+             * @param aMaxCapacity
+             */
+            CMeasurementDataStore(StorageSizeType_t const &aMaxCapacity = DEFAULT_CAPACITY);
 
-        public:
-            CMeasurementDataStore(const size_type aMaxCapacity = DEFAULT_CAPACITY);
-
+        public_destructors:
+            /**
+             * Destroy and run...
+             */
             virtual ~CMeasurementDataStore();
 
+        public_methods:
+            /**
+             * Remove all storage items.
+             */
             virtual void clear();
 
-            template <typename ParamT, typename ValT>
-            void push_chunk(const ParamT param, const ValT val);
+            /**
+             * Push a new chunk parameter and value into the storage.
+             *
+             * @param aParameter The parameter value of the chunk.
+             * @param aValue     The value of the chunk.
+             */
+            void push(
+                    ChunkParameterType_t const &aParameter,
+                    ChunkValueType_t     const &aValue);
 
-            template <typename ParamT, typename ValT>
-            pointer create(const ParamT param, const ValT val);
+            /**
+             * Return the chunk stored at index 'aIndex'.
+             *
+             * @param aIndex
+             * @param aOutChunk
+             * @return
+             */
+            bool at(
+                    StorageSizeType_t  const &aIndex,
+                    ChunkType_t              &aOutChunk) const;
 
-            const chunk_type *get_chunk_at(size_type index, EEngineStatus *statusFlag = NULL) const;
+            /**
+             * @brief maxChunks
+             * @return
+             */
+            SHIRABE_INLINE StorageSizeType_t const maxChunks() const { return mMaxChunks; }
 
-            const size_type max_size() const;
-            const size_type size()     const;
+            /**
+             * @brief size
+             * @return
+             */
+            SHIRABE_INLINE StorageSizeType_t const size() const { return mChunks.size(); }
 
-            const typename chunk_type::param_type average(
-                    difference_type off = 0,
-                    size_type       n   = 0) const;
+            /**
+             * @brief average
+             * @param aOffset
+             * @param aLength
+             * @return
+             */
+            ChunkParameterType_t average(
+                    StorageSizeType_t const &aOffset = 0,
+                    StorageSizeType_t const &aLength = 0) const;
 
         private:
-            void __validateChunkList();
+            void validateChunkList();
 
         private:
-            alloc_type            mAllocator;
-            size_type             mMaxChunks;
-            chunk_container_type  mChunks;
+            StorageSizeType_t mMaxChunks;
+            StorageType_t     mChunks;
         };
+        //<-----------------------------------------------------------------------------
 
-
-        CMeasurementDataStore(const size_type aMaxCapacity = DEFAULT_CAPACITY)
-            : m_max_chunks(aMaxCapacity)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+                typename TChunk,
+                typename TTraits
+                >
+        CMeasurementDataStore<TChunk, TTraits>::CMeasurementDataStore(StorageSizeType_t const &aMaxCapacity)
+            : mMaxChunks(aMaxCapacity)
         {}
+        //<-----------------------------------------------------------------------------
 
-        virtual ~CMeasurementDataStore()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+                typename TChunk,
+                typename TTraits
+                >
+        CMeasurementDataStore<TChunk, TTraits>::~CMeasurementDataStore()
         {
-            this->clear();
+            clear();
         }
+        //<-----------------------------------------------------------------------------
 
-        virtual void clear() {
-            if (m_chunks.size() <= 0)
-                return;
-
-            for (size_type chunkIdx = 0; chunkIdx < m_chunks.size(); ++chunkIdx)
-                this->m_allocator.deallocate(m_chunks.at(chunkIdx), 0);
-
-            m_chunks.clear();
-        }
-
-        template <typename ParamT, typename ValT>
-        void push_chunk(const ParamT param, const ValT val) {
-            /* Make sure that the chunklist is not null. */
-            this->__validateChunkList();
-
-            if (m_chunks.size() == m_max_chunks)
-                // first in, first out: pop first item in list.
-                m_chunks.erase(m_chunks.begin());
-
-            // insert back,
-            m_chunks.push_back(this->create<ParamT, ValT>(param, val));
-        }
-
-        template <typename ParamT, typename ValT>
-        pointer create(const ParamT param, const ValT val) {
-            pointer p = this->m_allocator.allocate(1);
-            this->m_allocator.construct(p, param, val);
-
-            return p;
-        }
-
-        const typename chunk_type *get_chunk_at(size_type index, EEngineStatus *statusFlag = NULL) const {
-            chunk_type *pChunk = NULL;
-
-            this->__validateChunkList();
-
-            if (m_chunks.size() > index)
-            {
-                pChunk = m_chunks.at(index);
-            } else
-                if (statusFlag) statusFlag = RESULT::INVALID_ARGUMENT;
-
-            return pChunk;
-        }
-
-        const size_type max_size() const { return m_max_chunks; }
-        const size_type size()     const { return m_chunks.size(); }
-
-        const typename chunk_type::param_type average(
-                difference_type off = 0,
-                size_type       n   = 0) const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+                typename TChunk,
+                typename TTraits
+                >
+        void CMeasurementDataStore<TChunk, TTraits>::clear()
         {
-            typename chunk_type::param_type av = 0;
+            mChunks.clear();
+        }
+        //<-----------------------------------------------------------------------------
 
-            /* At least two chunks required to calc average */
-            if (m_chunks.size() >= 2)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+                typename TChunk,
+                typename TTraits
+                >
+        void CMeasurementDataStore<TChunk, TTraits>::push(
+                ChunkParameterType_t const &aParameter,
+                ChunkValueType_t     const &aValue)
+        {
+            validateChunkList();
+
+            if (mChunks.size() == mMaxChunks)
             {
-                // Make sure off is in a valid boundary
-                off = std::min<uint32_t>((m_chunks.size() - 1u), std::max<uint32_t>(0u, off));
-                // Make sure to average m_n entries at max or less
-                // if there are not enough chunks stored starting
-                // from m_off.
-                n = std::min((m_chunks.size() - off - 1), n);
+                mChunks.erase(mChunks.begin());
+            }
 
-                typename chunk_type::param_type interval = 0;
-                interval = m_chunks.at(n)->parameter() - m_chunks.at(off)->parameter();
+            mChunks.push_back(ChunkType_t(aParameter, aValue));
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+                typename TChunk,
+                typename TTraits
+                >
+        bool CMeasurementDataStore<TChunk, TTraits>::at(
+                StorageSizeType_t const &aIndex,
+                ChunkType_t             &aOutChunk) const
+        {
+            validateChunkList();
+
+            if (mChunks.size() > aIndex)
+            {
+                aOutChunk = mChunks.at(aIndex);
+                return true;
+            }
+            else
+                return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <
+                typename TChunk,
+                typename TTraits
+                >
+        typename CMeasurementDataStore<TChunk, TTraits>::ChunkParameterType_t
+            CMeasurementDataStore<TChunk, TTraits>::average(
+                StorageSizeType_t const &aOffset,
+                StorageSizeType_t const &aLength) const
+        {
+            typename ChunkType_t::param_type average = 0;
+
+            StorageSizeType_t off = aOffset;
+            StorageSizeType_t len = aLength;
+
+            /* At least two chunks required to calc averageerage */
+            if (mChunks.size() >= 2)
+            {
+                off = std::max(0u,                    off);
+                off = std::min((mChunks.size() - 1u), off);
+                len = std::min((mChunks.size() - off - 1), len);
+
+                ChunkType_t &chunk0 = mChunks.at(off);
+                ChunkType_t &chunk1 = mChunks.at(len);
+
+                ChunkParameterType_t const interval = chunk1.parameter() - chunk0.parameter();
                 if (interval > 0)
                 {
-                    for (size_type k = 0; k < m_chunks.size(); ++k)
-                        av += m_chunks.at(k)->value();
+                    for(StorageSizeType_t k = 0; k < mChunks.size(); ++k)
+                    {
+                        average += mChunks.at(k)->value();
+                    }
 
-                    av = (typename chunk_type::param_type) ((av / interval) + 0.5);
+                    average = static_cast<ChunkParameterType_t>((average / interval) + 0.5);
                 }
             }
 
-            return av;
+            return average;
         }
-
+        //<-----------------------------------------------------------------------------
     }
 }
 

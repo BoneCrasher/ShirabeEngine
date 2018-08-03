@@ -9,7 +9,7 @@
 #include "Shader.h"
 #include "SwapChain.h"
 
-namespace Engine {
+namespace engine {
   namespace GFXAPI {
 
     #define EngineTypes   \

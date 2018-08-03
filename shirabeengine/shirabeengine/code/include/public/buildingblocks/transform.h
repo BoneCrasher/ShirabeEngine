@@ -7,7 +7,7 @@
 #include "Math/Matrix.h"
 #include "Math/Quaternion.h"
 
-namespace Engine {
+namespace engine {
 
 	using namespace Math;
 

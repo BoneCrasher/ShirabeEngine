@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_CORE_MEMORY__STL_TYPE_BASE_H__
 #define __SHIRABE_CORE_MEMORY__STL_TYPE_BASE_H__
 		
-namespace Engine {
+namespace engine {
 	namespace Memory {
 		template <typename T>
 		class STLTypeBase {

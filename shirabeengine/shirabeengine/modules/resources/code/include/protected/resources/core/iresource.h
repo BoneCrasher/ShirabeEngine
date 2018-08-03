@@ -5,7 +5,7 @@
 #include "Core/EngineStatus.h"
 #include "Core/IOC/Observer.h"
 
-namespace Engine {
+namespace engine {
 	namespace Resources {
 
 		template <typename TResource>

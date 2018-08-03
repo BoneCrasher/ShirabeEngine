@@ -11,7 +11,7 @@
 #include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 #include "Vulkan/Rendering/VulkanRenderContext.h"
 
-namespace Engine {
+namespace engine {
 
   class TestDummy
     : public IWindow::IEventCallback {
@@ -179,8 +179,8 @@ namespace Engine {
     std::function<void()> fnCreatePlatformRenderer
       = [&, this] () -> void
     {
-      using Engine::FrameGraph::IFrameGraphRenderContext;
-      using Engine::FrameGraph::FrameGraphRenderContext;
+      using engine::FrameGraph::IFrameGraphRenderContext;
+      using engine::FrameGraph::FrameGraphRenderContext;
 
       // How to decouple?
       CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;

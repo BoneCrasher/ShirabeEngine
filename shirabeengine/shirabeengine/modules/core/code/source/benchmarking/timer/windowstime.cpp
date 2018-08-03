@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace Engine {
+namespace engine {
 	WindowsTime::WindowsTime() 
 		: PlatformTime<LONGLONG>()
 	{

@@ -12,7 +12,7 @@
 #include "core/enginetypehelper.h"
 #include "core/benchmarking/timer/timespanunit.h"
 
-namespace Engine
+namespace engine
 {
 
     namespace Helper

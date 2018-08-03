@@ -3,7 +3,7 @@
 
 #include "Platform\Platform.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     template <typename TTag>

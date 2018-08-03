@@ -1,6 +1,6 @@
 #include "Core/BitField.h"
 
-namespace Engine {
+namespace engine {
   namespace Core {
 
 

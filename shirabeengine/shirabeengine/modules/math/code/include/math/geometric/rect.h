@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include "math/vector.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         /**
          * CRect defines a simple rectangle structure.

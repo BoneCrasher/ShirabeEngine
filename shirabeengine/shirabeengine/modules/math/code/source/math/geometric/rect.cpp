@@ -1,8 +1,8 @@
 #include "math/geometric/rect.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         //<-----------------------------------------------------------------------------
         //

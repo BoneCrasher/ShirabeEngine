@@ -1,6 +1,6 @@
 #include "Renderer/FrameGraph/Modules/Lighting.h"
 
-namespace Engine {
+namespace engine {
   namespace FrameGraph {
 
     FrameGraphModule<LightingModuleTag_t>::LightingExportData

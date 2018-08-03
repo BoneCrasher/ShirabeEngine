@@ -18,7 +18,7 @@
 #include "Core/EngineTypeHelper.h"
 #include "Core/Benchmarking/Timer/PlatformTime.h"
 
-namespace Engine
+namespace engine
 {
 	/**************************************************************************************************
 	 * Class:	WindowsTime

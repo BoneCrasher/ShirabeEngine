@@ -5,9 +5,9 @@
 #include <math.h>
 #include <cmath>
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
 
         static double deg_to_rad(double const &aDeg)

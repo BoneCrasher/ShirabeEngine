@@ -7,9 +7,9 @@
 
 #include "math/field.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
         #define SHIRABE_DEFINE_PERMUTATION_ACCESSOR_1D(a)                              \
             inline CVectorImpl<T, 1> a() const                                         \

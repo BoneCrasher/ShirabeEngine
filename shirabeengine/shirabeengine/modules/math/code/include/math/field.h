@@ -18,9 +18,9 @@
 #include "platform/platform.h"
 #include "base/declaration.h"
 
-namespace Engine
+namespace engine
 {
-    namespace Math
+    namespace math
     {
 
         #define SHIRABE_FIELD_DEFAULT_SIZE   1

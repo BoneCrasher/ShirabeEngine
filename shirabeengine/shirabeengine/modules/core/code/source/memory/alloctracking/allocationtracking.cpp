@@ -1,6 +1,6 @@
 #include "Core/Memory/AllocTracking/AllocationTracking.h"
 
-namespace Engine
+namespace engine
 {
 	namespace Memory
 	{
