@@ -1,13 +1,15 @@
-#include "OS/OSDisplay.h"
+#include "os/osdisplay.h"
 
-namespace engine {
-  namespace OS {
+namespace engine
+{
+    namespace os
+    {
 
-    OSDisplayDescriptor::OSDisplayDescriptor()
-      : monitorHandle(0)
-      , name("")
-      , bounds()
-      , isPrimary(false)
-    {}
-  }
+        SOSDisplayDescriptor::SOSDisplayDescriptor()
+            : monitorHandle(0)
+            , name("")
+            , bounds()
+            , isPrimary(false)
+        {}
+    }
 }

@@ -3,12 +3,12 @@
 
 #include <stdint.h>
 
-namespace engine {
-  namespace OS {
-
-    typedef uint64_t OSHandle;
-
-  }
+namespace engine
+{
+    namespace os
+    {
+        using OSHandle_t = uint64_t;
+    }
 }
 
 #endif

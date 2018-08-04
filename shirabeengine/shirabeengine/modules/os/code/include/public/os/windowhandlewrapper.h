@@ -1,22 +1,31 @@
 #ifndef __SHIRABE_OS_WINDOWHANDLEWRAPPER_H__
 #define __SHIRABE_OS_WINDOWHANDLEWRAPPER_H__
 
-#include "OS/ApplicationEnvironment.h"
+#include "os/applicationenvironment.h"
 
-namespace engine {
-	namespace OS {
-
-		class WindowHandleWrapper {
+namespace engine
+{
+    namespace os
+    {
+        /**
+         * Wraps an operating system window handle.
+         */
+        class WindowHandleWrapper
+        {
 		public:
-			typedef OSHandle Handle;
+            using Handle_t = OSHandle_t;
 
-			inline explicit WindowHandleWrapper(const Handle& handle)
-				: m_handle(handle) {}
+            SHIRABE_INLINE explicit WindowHandleWrapper(Handle_t const &handle)
+                : m_handle(handle)
+            {}
 
-			inline const Handle& handle() const { return m_handle; }
+            inline const Handle_t &handle() const
+            {
+                return mHandle;
+            }
 
 		private:
-			Handle m_handle;
+            Handle_t mHandle;
 		};
 
 	}

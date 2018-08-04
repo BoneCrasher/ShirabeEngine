@@ -4,30 +4,38 @@
 #include <stdint.h>
 #include <string>
 
-#include "Platform/Platform.h"
+#include <platform/platform.h>
+#include <math/geometric/rect.h>
 
-#include "OS/OSDef.h"
-#include "Math/Geometric/Rect.h"
+#include "os/osdef.h"
 
-namespace engine {
-  namespace OS {
+namespace engine
+{
+    namespace os
+    {
+        using engine::math::CRect;
 
-    using engine::Math::Rect;
+        /**
+         * Describes an operatin system display by OS specific handle and other attributes.
+         */
+        struct SHIRABE_LIBRARY_EXPORT SOSDisplayDescriptor
+        {
+            OSHandle_t   monitorHandle;
+            std::string  name;
+            CRect        bounds;
+            bool         isPrimary;
 
-    struct SHIRABE_LIBRARY_EXPORT OSDisplayDescriptor {
-      OSHandle     monitorHandle;
-      std::string  name;
-      Rect         bounds;
-      bool         isPrimary;
+            SOSDisplayDescriptor();
+        };
 
-      OSDisplayDescriptor();
-    };
-
-    template <typename TProvider>
-    class OSDisplay
-      : public TProvider
-    {};
-  }
+        /**
+         * ...
+         */
+        template <typename TProvider>
+        class OSDisplay
+                : public TProvider
+        {};
+    }
 }
 
 #endif
