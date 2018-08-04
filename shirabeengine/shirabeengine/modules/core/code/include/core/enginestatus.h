@@ -81,6 +81,9 @@ namespace engine
         DXDevice_DepthStencilStateCreationFailed                        = -100502,
         DXDevice_RasterizerStateCreationFailed                          = -100550,
         Timer_NoPlatformTimeInstance                                    = -300050,
+        Timer_PlatformTimeInstanceInitFailed                            = -300051,
+        Timer_PlatformTimeConversionConstantFetchFailed                 = -300052,
+        Timer_PlatformTimestampFetchFailed                              = -300053,
         Time_Win32__QueryPerformanceFrequencyFailed                     = -300101,
         Time_Win32__QueryPerformanceCounterFailed                       = -300102
 

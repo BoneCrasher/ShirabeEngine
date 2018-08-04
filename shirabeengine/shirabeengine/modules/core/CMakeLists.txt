@@ -6,8 +6,8 @@ include(project_default_template)
 set(SHIRABE_TEMPLATE "StaticLib")
 
 set(SHIRABE_EXCLUDED_SOURCES 
-	Serialization/JSONObjectSerializer.cpp 
-	Serialization/XMLObjectSerializer.cpp)
+        serialization/jsonobjectserializer.cpp
+        serialization/xmlobjectserializer.cpp)
 	
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS

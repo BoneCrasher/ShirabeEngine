@@ -26,7 +26,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     EEngineStatus CLinuxTime::getTimestamp(InternalTimeValueType_t &aBuffer) const
     {
-        EEngineStatus const result = queryPerformanceCounter(aBuffer);
+        EEngineStatus const result = getClockResolution(aBuffer);
 
         return result;
 	};
@@ -37,7 +37,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     EEngineStatus CLinuxTime::getConversionConstant(InternalTimeValueType_t &aBuffer) const
     {
-        EEngineStatus const result = queryPerformanceFrequency(aBuffer);
+        EEngineStatus const result = getClockResolution(aBuffer);
 
         return result;
 	};
@@ -48,24 +48,32 @@ namespace engine
     //<-----------------------------------------------------------------------------
     void CLinuxTime::requestSetConversionFactors(ConversionFactorMap_t &aOutMap)
     {
-        aOutMap.insert({ ETimeUnit::NanoSeconds,  1000000000 }); // might cause crash! be careful!
-        aOutMap.insert({ ETimeUnit::MicroSeconds, 1000000 });
-        aOutMap.insert({ ETimeUnit::MilliSeconds, 1000 });
-        aOutMap.insert({ ETimeUnit::Seconds,      1 });
-        aOutMap.insert({ ETimeUnit::Minutes,      0.0166666666666667 });
-        aOutMap.insert({ ETimeUnit::Hours,        2.777777777777778e-4 });
-        aOutMap.insert({ ETimeUnit::Day,          1.157407407407407e-5 });
+        aOutMap.insert({ ETimeUnit::NanoSeconds,  1 });
+        aOutMap.insert({ ETimeUnit::MicroSeconds, 0.001 });
+        aOutMap.insert({ ETimeUnit::MilliSeconds, 0.000001 });
+        aOutMap.insert({ ETimeUnit::Seconds,      0.000000001 });
+        aOutMap.insert({ ETimeUnit::Minutes,      1.66666666666667e-11 });
+        aOutMap.insert({ ETimeUnit::Hours,        2.777777777777778e-13 });
+        aOutMap.insert({ ETimeUnit::Day,          1.157407407407407e-14 });
 	}
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CLinuxTime::queryPerformanceFrequency(InternalTimeValueType_t &aBuffer) const
+    EEngineStatus CLinuxTime::getClockResolution(InternalTimeValueType_t &aBuffer) const
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-        int32_t const success = clock_getres(CLOCK_REALTIME, &aBuffer);
+        if(!clock_getres(CLOCK_REALTIME, &aBuffer))
+        {
+#ifdef _DEBUG
+            CLog::Error(logTag(),
+                        "FATAL_ERROR: getClockResolution: "
+                        "Cannot retrieve clock resolution.");
+#endif
+            result = EEngineStatus::Time_Win32__QueryPerformanceCounterFailed;
+        }
 
 		return result;
 	};
@@ -74,13 +82,16 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CLinuxTime::queryPerformanceCounter(InternalTimeValueType_t &aBuffer) const
+    EEngineStatus CLinuxTime::getClockTimestamp(InternalTimeValueType_t &aBuffer) const
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-		if (!QueryPerformanceCounter((LARGE_INTEGER *)&buffer)) {
+        if (!clock_gettime(CLOCK_REALTIME, &aBuffer))
+        {
 #ifdef _DEBUG
-			printf("FATAL_ERROR: Time_Win32::queryPerformanceCounter: Cannot retrieve QueryPerformanceCounter.");
+            CLog::Error(logTag(),
+                        "FATAL_ERROR: getClockTimestamp: "
+                        "Cannot retrieve timestamp.");
 #endif
 			result = EEngineStatus::Time_Win32__QueryPerformanceCounterFailed;
 		}
@@ -89,4 +100,5 @@ namespace engine
 
 		return result;
 	};
+    //<-----------------------------------------------------------------------------
 }

@@ -1,4 +1,4 @@
-#include "String.h"
+#include "string.h"
 
 namespace engine {
 	// std::wstring String::toWideString(const std::string& in) {

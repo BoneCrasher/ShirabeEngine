@@ -1,11 +1,13 @@
 #ifndef __SHIRABE__TIMER_H__
 #define __SHIRABE__TIMER_H__
 
+#include <platform/platform.h>
+#include <log/log.h>
+
 #include "core/enginetypehelper.h"
 #include "core/benchmarking/measurementdatastore.h"
 #include "core/benchmarking/timer/timespanunit.h"
 
-#include <platform/platform.h>
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
 #  pragma warning(push)
@@ -34,20 +36,61 @@ namespace engine
      */
     class CTimer
     {
+        SHIRABE_DECLARE_LOG_TAG(CTimer);
+
     public_constructors:
+        /**
+         * Default construct a timer instance.
+         */
         CTimer();
 
     public_destructors:
+        /**
+         * Destroy and run...
+         */
         virtual ~CTimer() final;
 
     public_methods:
+        /**
+         * Initialize this timer.
+         *
+         * @return EEngineStatus::Ok, if successful. An error flag otherwise.
+         */
 		EEngineStatus initialize();
+        /**
+         * Update this timer.
+         *
+         * @return
+         */
 		EEngineStatus update();
+        /**
+         * Shutdown and cleanup this timer.
+         *
+         * @return
+         */
 		EEngineStatus cleanup();
 
+        /**
+         * Return the elapsed time units since the last frame tick.
+         *
+         * @param unit
+         * @return
+         */
         double elapsed(ETimeUnit unit = ETimeUnit::Seconds);
-        double total_elapsed(ETimeUnit unit = ETimeUnit::Seconds());
+        /**
+         * Return the elapsed time units since timer initialization.
+         *
+         * @param unit
+         * @return
+         */
+        double total_elapsed(ETimeUnit unit = ETimeUnit::Seconds);
 
+        /**
+         * Return the current frames per second, averaged over a fixed number
+         * of timepoint chunks.
+         *
+         * @return
+         */
 		float FPS();
 		
     private_typedefs:
@@ -60,19 +103,24 @@ namespace engine
         using InternalTimeValueType_t = InternalTimeType_t::InternalTimeValueType_t;
 
     private_methods:
+        /**
+         * Set the time backend, depending on the runtime platform.
+         *
+         * @param aTimeInterface
+         */
         void setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> aTimeInterface);
 
     private_members:
-        CStdSharedPtr_t<InternalTimeType_t> m_timeInterface;
+        CStdSharedPtr_t<InternalTimeType_t> mTimeInterface;
 
-        InternalTimeValueType_t mConversionConstant;
-        InternalTimeValueType_t m_initial;
-        InternalTimeValueType_t m_current;
-        InternalTimeValueType_t m_elapsed;
+        InternalTimeValueType_t             mConversionConstant;
+        uint64_t             mInitial;
+        uint64_t             mCurrent;
+        uint64_t             mElapsed;
 
-        FPSDataStore_t mDataStore;
-        double         mChunkCounter;
-        int            mFrames;
+        FPSDataStore_t                      mDataStore;
+        double                              mChunkCounter;
+        int                                 mFrames;
 	};
 }
 

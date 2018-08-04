@@ -140,7 +140,7 @@ namespace engine
             prev = curr;
             curr = std::clock();
 
-            double const step = ((float) (curr - prev) / CLOCKS_PER_SEC) * 1000.0;
+            double const step = static_cast<double>( (((curr - prev) / CLOCKS_PER_SEC) * 1000.0) );
             ms += step;
 
             mElapsed.store(mElapsed.load() + ms);
@@ -168,7 +168,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     uint32_t CCallbackTimer::elapsedMs() const
     {
-        return mElapsed.load();
+        return static_cast<uint32_t>(mElapsed.load());
     }
     //<-----------------------------------------------------------------------------
 }

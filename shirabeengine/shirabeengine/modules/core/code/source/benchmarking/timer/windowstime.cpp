@@ -1,4 +1,7 @@
-#include "Core/Benchmarking/Timer/WindowsTime.h"
+#include <platform/platform.h>
+
+#ifdef SHIRABE_PLATFORM_WINDOWS
+#include "core/benchmarking/timer/windowstime.h"
 
 #include <iostream>
 
@@ -65,3 +68,4 @@ namespace engine {
 		return result;
 	};
 }
+#endif

@@ -56,4 +56,19 @@
 
 #define SHIRABE_INLINE    inline
 #define SHIRABE_UNUSED(x) (void)(x)
+
+#define SHIRABE_DEBUG_BREAK __builtin_trap()
+
+#define SHIRABE_ASSERT(condition)                   \
+            if(!(condition))                        \
+            {                                       \
+                SHIRABE_DEBUG_BREAK;                \
+            }
+
+#define SHIRABE_ASSERT_TEXT(condition, format, ...) \
+            if(!(condition))                        \
+            {                                       \
+                SHIRABE_DEBUG_BREAK;                \
+            }
+
 #endif

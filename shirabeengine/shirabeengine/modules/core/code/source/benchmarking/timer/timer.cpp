@@ -1,4 +1,9 @@
+#include <inttypes.h>
+
+#include <base/declaration.h>
+#include <log/log.h>
 #include "core/benchmarking/timer/timer.h"
+#include "core/string.h"
 
 namespace engine
 {
@@ -6,116 +11,177 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     CTimer::CTimer()
+        : mTimeInterface(nullptr)
+        , mConversionConstant(timespec())
+        , mInitial(0)
+        , mCurrent(0)
+        , mElapsed(0)
+        , mDataStore()
+        , mChunkCounter(0.0)
+        , mFrames(0)
+    { };
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CTimer::~CTimer()
     {
-        mConversionConstant = m_initial = m_current = m_elapsed = 0;
-
-		if (!CheckEngineError(initialize()))
-			return;
-	};
-
-    CTimer::~CTimer() {
         cleanup();
 	};
+    //<-----------------------------------------------------------------------------
 
-    void CTimer::setTimeInterface(const TimePtr& pInterface)
-	{
-		if (!pInterface)
-			throw new std::invalid_argument("Cannot set time-interface to NULL.");
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    void CTimer::setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> aTimeInterface)
+    {
+        SHIRABE_ASSERT_TEXT(nullptr != aTimeInterface, "The provided time interface is nullptr.");
 
-		m_timeInterface = pInterface;
+        mTimeInterface = aTimeInterface;
 	};
+    //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
     EEngineStatus CTimer::initialize()
-	{
+    {
 		EEngineStatus result = EEngineStatus::Ok;
 
-		setTimeInterface(makeCStdSharedPtr<internal_time_type>());
+        CStdSharedPtr_t<InternalTimeType_t> timeInterface =makeCStdSharedPtr<InternalTimeType_t>();
+        setTimeInterface(timeInterface);
 
-		if (!m_timeInterface) {
-			printf("FATAL_ERROR: Timer::initialize: Assigning by YTime::getInterface() failed. Interface-pointer is NULL.");
+        if (!mTimeInterface)
+        {
+            CLog::Error(logTag(), "FATAL_ERROR: Timer::initialize: Assigning by Time::getInterface() failed. Interface-pointer is NULL.");
 			result = EEngineStatus::Timer_NoPlatformTimeInstance;
-		} else {
-			if (CheckEngineError(result = m_timeInterface->initialize())) {
-				// ...
+        }
+        else
+        {
+            result = mTimeInterface->initialize();
+            if (CheckEngineError(result))
+            {
+                CLog::Error(logTag(),
+                            "FATAL_ERROR: TimeInterface::initialize:"
+                            " Initializing the internal time interface failed.");
+
+                result = EEngineStatus::Timer_PlatformTimeInstanceInitFailed;
 			}
 
-			// Get conversion constant
-            if (CheckEngineError(result = m_timeInterface->getConversionConstant(mConversionConstant))) {
-				printf("FATAL_ERROR: Timer::initialize: An error occured on requesting the proprietary time interface conversion constant from the time interface.\nAt: %s:%s", __FILE__, __LINE__); // might cause exceptions
-			}
-			// get initial timestamp
-			if (CheckEngineError(result = m_timeInterface->getTimestamp(m_initial))) {
-				printf("ERROR: Timer::initialize: An error occured on requesting the current timestamp from the time interface.\nAt: %s:%s", __FILE__, __LINE__); // might cause exceptions
+            timespec initial = {};
+            result = mTimeInterface->getTimestamp(initial);
+            if (CheckEngineError(result))
+            {
+                CLog::Error(logTag(),
+                            CString::format(
+                                "ERROR: Timer::initialize: "
+                                "An error occured on requesting the current timestamp from the time interface.\n"
+                                "At: %0:%1", __FILE__, __LINE__));
+
+                result = EEngineStatus::Timer_PlatformTimestampFetchFailed;
 			} else
-				m_current = m_initial; // init current for calculation of elapsed in the subsequent frame.
+                mCurrent = mInitial = static_cast<uint64_t>(initial.tv_sec * 1000000000) + initial.tv_nsec;
 		}
 
-		m_frames = 0;
-		m_chunkPushCounter = 0;
+        mFrames       = 0;
+        mChunkCounter = 0;
 
 		return result;
 	};
+    //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
     EEngineStatus CTimer::cleanup()
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-		m_dataStore.clear();
-
-		m_timeInterface = NULL;
+        mDataStore.clear();
+        mTimeInterface = nullptr;
 
 		return result;
 	};
+    //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
     EEngineStatus CTimer::update() {
 		EEngineStatus result = EEngineStatus::Ok;
 
-		++m_frames;
+        ++mFrames;
 
 #ifdef _DEBUG
-        if (mConversionConstant && m_timeInterface)
+        if (mTimeInterface && (mConversionConstant.tv_sec || mConversionConstant.tv_nsec))
 #elif
-		if (m_pTimeInterface)
+        if (mTimeInterface)
 #endif
 		{
-			m_elapsed = m_current; // Store in elapsed variable to save memory!
-			if (CheckEngineError(result = m_timeInterface->getTimestamp(m_current)))
-				printf("ERROR: Timer::update(): Failed at querying the current timestamp.\n%s: %s", __FILE__, __LINE__);
-			else {
-				m_elapsed = m_current - m_elapsed;
+            mElapsed = mCurrent;
 
-                m_chunkPushCounter += elapsed(ETimeUnit::Seconds);
-				if (m_chunkPushCounter >= 1.0) {
-                    m_dataStore.push_chunk(total_elapsed(ETimeUnit::Seconds), m_frames);
+            timespec current = {};
 
-					m_frames = 0;
-					m_chunkPushCounter -= 1.0;
+            result = mTimeInterface->getTimestamp(current);
+            if (CheckEngineError(result))
+                CLog::Error(logTag(),
+                            CString::format(
+                                "ERROR: Timer::update(): "
+                                "Failed at querying the current timestamp.\n%s: %" PRIu32, __FILE__, __LINE__));
+            else {
+                mCurrent = static_cast<uint64_t>(current.tv_sec * 1000000000) + static_cast<uint64_t>(current.tv_nsec);
+                mElapsed = (mCurrent - mElapsed);
+
+                mChunkCounter += elapsed(ETimeUnit::Seconds);
+                if (mChunkCounter >= 1.0)
+                {
+                    mDataStore.push(total_elapsed(ETimeUnit::Seconds), mFrames);
+
+                    mFrames        = 0;
+                    mChunkCounter -= 1.0;
 				}
 			}
 		}
 
 		return result;
 	};
+    //<-----------------------------------------------------------------------------
 
-    double CTimer::elapsed(ETimeUnit unit) {
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    double CTimer::elapsed(ETimeUnit unit)
+    {
 		double factor = 1.0;
 
-		if (m_timeInterface)
-			factor = m_timeInterface->getConversionMask(unit);
+        if (mTimeInterface)
+            factor = mTimeInterface->getConversionMask(unit);
 
-        return (((double)m_elapsed / (double)mConversionConstant) * factor);
+        return (static_cast<double>(mElapsed) * factor);
 	};
+    //<-----------------------------------------------------------------------------
 
-    double CTimer::total_elapsed(ETimeUnit unit) {
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    double CTimer::total_elapsed(ETimeUnit unit)
+    {
 		double factor = 1.0;
 
-		if (m_timeInterface)
-			factor = m_timeInterface->getConversionMask(unit);
+        if (mTimeInterface)
+            factor = mTimeInterface->getConversionMask(unit);
 
-        return (((m_current - m_initial) / (1.0*mConversionConstant))*factor);
+        return ((mCurrent - mInitial) * factor);
 	};
+    //<-----------------------------------------------------------------------------
 
-    float CTimer::FPS() {
-		return (float)m_dataStore.average(m_dataStore.size() - 10, 10);
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    float CTimer::FPS()
+    {
+        return static_cast<float>(mDataStore.average(mDataStore.size() - 10, 10));
 	};
+    //<-----------------------------------------------------------------------------
 }

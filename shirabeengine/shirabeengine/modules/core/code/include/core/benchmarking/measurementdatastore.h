@@ -207,7 +207,7 @@ namespace engine
                 StorageSizeType_t const &aOffset,
                 StorageSizeType_t const &aLength) const
         {
-            typename ChunkType_t::param_type average = 0;
+            ChunkParameterType_t average = 0;
 
             StorageSizeType_t off = aOffset;
             StorageSizeType_t len = aLength;
@@ -215,19 +215,19 @@ namespace engine
             /* At least two chunks required to calc averageerage */
             if (mChunks.size() >= 2)
             {
-                off = std::max(0u,                    off);
+                off = std::max(0ul,                   off);
                 off = std::min((mChunks.size() - 1u), off);
                 len = std::min((mChunks.size() - off - 1), len);
 
-                ChunkType_t &chunk0 = mChunks.at(off);
-                ChunkType_t &chunk1 = mChunks.at(len);
+                ChunkType_t const &chunk0 = mChunks.at(off);
+                ChunkType_t const &chunk1 = mChunks.at(len);
 
                 ChunkParameterType_t const interval = chunk1.parameter() - chunk0.parameter();
                 if (interval > 0)
                 {
                     for(StorageSizeType_t k = 0; k < mChunks.size(); ++k)
                     {
-                        average += mChunks.at(k)->value();
+                        average += mChunks.at(k).value();
                     }
 
                     average = static_cast<ChunkParameterType_t>((average / interval) + 0.5);

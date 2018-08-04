@@ -10,8 +10,8 @@
 
 #include <time.h>
 
-#include "platform/platform.h"
-
+#include <platform/platform.h>
+#include <log/log.h>
 #include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 #include "core/benchmarking/timer/platformtime.h"
@@ -24,6 +24,8 @@ namespace engine
     class CLinuxTime
         : public CPlatformTime<timespec>
 	{
+        SHIRABE_DECLARE_LOG_TAG(CLinuxTime)
+
     public_typedefs:
         using InternalTimeValueType_t = timespec;
 
@@ -48,7 +50,7 @@ namespace engine
 	protected:		
 
         /**
-         * Queries the performance frequency used to convert from the platform internal
+         * Queries the current clock resolution used to convert from the platform internal
          *   	   time/counter representation format to a Seconds-value.
          *
          *  This value maps directly to the conversion constant.
@@ -56,16 +58,16 @@ namespace engine
          * @param buffer
          * @return
          */
-        EEngineStatus queryPerformanceFrequency(InternalTimeValueType_t &aBuffer) const;
+        EEngineStatus getClockResolution(InternalTimeValueType_t &aBuffer) const;
 
         /**
-         *  Queries the performance counter to fetch the current counter value. For time calculations
+         *  Queries the current clock timestamp to fetch the current counter value. For time calculations
          *  this method has to be invoked at least once each frame!
          *
          * @param buffer
          * @return
          */
-        EEngineStatus queryPerformanceCounter(InternalTimeValueType_t &buffer) const;
+        EEngineStatus getClockTimestamp(InternalTimeValueType_t &buffer) const;
 	};
 }
 
