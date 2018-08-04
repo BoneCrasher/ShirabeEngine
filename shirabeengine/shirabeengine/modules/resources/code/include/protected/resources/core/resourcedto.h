@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 namespace engine {
   namespace Resources {

@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "Core/BasicTypes.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/Random.h"
 #include "Core/UID.h"
 #include "Log/Log.h"

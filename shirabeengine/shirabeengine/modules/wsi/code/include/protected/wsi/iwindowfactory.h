@@ -6,7 +6,7 @@
 #include <string>
 
 #include "Core/EngineStatus.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 #include "WSI/IWindow.h"
 

@@ -12,8 +12,11 @@
 
 namespace engine
 {
-    namespace Core
+    namespace core
     {
+        /**
+         * Wraps an enum class type and permits bit-field capabilities.
+         */
         template <typename TEnum>
         class CBitField
         {

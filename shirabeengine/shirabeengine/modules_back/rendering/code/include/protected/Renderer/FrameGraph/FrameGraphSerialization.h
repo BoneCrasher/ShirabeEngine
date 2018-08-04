@@ -4,7 +4,7 @@
 #include <sstream>
 #include <optional>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Log/Log.h"
 
 #include "Core/Serialization/JSONObjectSerializer.h"

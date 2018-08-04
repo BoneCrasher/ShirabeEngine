@@ -4,7 +4,7 @@
 #include "GFXAPI/DirectX/DX11/Common.h"
 #include "GFXAPI/DirectX/DX11/Linkage.h"
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 #include "Resources/Core/EResourceType.h"
 

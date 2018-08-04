@@ -1,9 +1,9 @@
 #ifndef __SHIRABE_SERIALIZATION_GRAPHVIZ_DOT_SERIALIZER_H__
 #define __SHIRABE_SERIALIZATION_GRAPHVIZ_DOT_SERIALIZER_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
-#include "Core/Serialization/Serialization.h"
+#include "core/serialization/serialization.h"
 
 namespace Engine {
   namespace Serialization {

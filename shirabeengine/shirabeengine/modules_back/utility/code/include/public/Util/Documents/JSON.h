@@ -5,7 +5,7 @@
 #include <stack>
 
 #include "Platform/Platform.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 namespace Engine {
   namespace Documents {

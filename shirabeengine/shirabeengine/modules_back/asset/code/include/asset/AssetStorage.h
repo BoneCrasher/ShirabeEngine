@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_ASSET_STORAGE_H__
 #define __SHIRABE_ASSET_STORAGE_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/DataBuffer.h"
 
 #include "GraphicsAPI/Resources/Types/Texture.h"

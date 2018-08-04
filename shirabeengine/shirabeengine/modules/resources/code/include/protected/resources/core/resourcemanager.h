@@ -6,7 +6,7 @@
 #include "Log/Log.h"
 #include "Platform/Platform.h"
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/Random.h"
 
 #include "Resources/Core/IResourceProxy.h"

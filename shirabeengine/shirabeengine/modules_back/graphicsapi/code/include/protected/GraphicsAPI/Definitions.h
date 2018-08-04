@@ -6,7 +6,7 @@
 #include "Platform/Platform.h"
 // #include "GFXAPI/Config.h"
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/BasicTypes.h"
 #include "GraphicsAPI/Resources/Types/Definition.h"
 

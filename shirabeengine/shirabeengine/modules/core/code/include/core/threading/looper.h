@@ -5,193 +5,682 @@
 #include <thread>
 #include <future>
 
-namespace engine {
-  namespace Threading {
-    /**********************************************************************************************//**
-     * \enum	Priority
-     *
-     * \brief	Values that represent priorities
-     **************************************************************************************************/
-    enum class Priority {
-      Least     =    1,
-      Less      =    2,
-      Normal    =    4,
-      Higher    =    8,
-      Highest   =   16,
-      TonyStark = 1337 // 04/10/2017 - 04:49: Now i want to watch Avengers...
-    };
+#include <base/declaration.h>
+#include <log/log.h>
+#include "core/enginetypehelper.h"
 
-    /**********************************************************************************************//**
-     * \fn	DeclareInterface(ILooper);
-     *
-     * \brief	Constructor
-     *
-     * \param	parameter1	The first parameter.
-     **************************************************************************************************/
-    template <typename TTaskResult>
-    class ILooper {
-    public:
-      virtual ~ILooper() = default;
-      ILooper(ILooper<TTaskResult> const&) = delete;
-      ILooper(ILooper<TTaskResult> &&)     = delete;
-      ILooper<TTaskResult>& operator=(ILooper<TTaskResult> const&) = delete;
-      ILooper<TTaskResult>& operator=(ILooper<TTaskResult> &&)     = delete;
-
-    protected:
-      ILooper() = default;
-
-    public:
-      class Task {
-      public:
-        friend class ILooper<TTaskResult>;
-
-        Task();
-
-        // Be consistent with the contained packaged_task
-        // No copy!
-        Task(const Task&)            = delete;
-        Task& operator=(const Task&) = delete;
-
-        Task(Task&& t)
-          : m_priority(t.m_priority)
-          , m_task(std::move(t.m_task))
-        {}
-
-        Task& operator=(Task&& t) {
-          _priority = t.m_priority;
-          _task     = std::move(t.m_task);
-
-          return *this;
-        }
-
-        operator bool() { return m_task.valid(); }
-
-        inline Priority priority() { return m_priority; }
-        inline Priority priority() const { return m_priority; }
-
-        inline void setPriority(const Priority& priority) { m_priority = priority; }
-
-        std::future<TTaskResult> bind(std::function<TTaskResult()>& fn);
-
-        void run() {
-          m_task(); // Return value is stored in the shared state wrapped by the future returned on bind!
-        }
-
-      private:
-        Priority                          m_priority;
-        std::packaged_task<TTaskResult()> m_task;
-      };
-      /**************************************************************************************************//**/
-
-      virtual bool initialize()   = 0;
-      virtual bool deinitialize() = 0;
-
-      /**********************************************************************************************//**
-       * \fn	virtual bool Looper::loop() = 0;
-       *
-       * \brief	Implementation of the effective loop function to be invoked.
-       * 			Will be provided with the next to be executed runnable.
-       *
-       * \return	True if it succeeds, false if it fails.
-       **************************************************************************************************/
-      virtual bool loop(typename ILooper<TTaskResult>::Task&& runnable) = 0;
-
-    };
-
-    template <typename TTaskResult>
-    using ILooperPtr = CStdSharedPtr_t<ILooper<TTaskResult>>;
-
-    /**********************************************************************************************//**
-     * \class	Looper
-     *
-     * \brief	A looper.
-     *
-     * \tparam	TDerivedRunnableType	Type of the derived runnable type used for this specific looper.
-     **************************************************************************************************/
-    template <typename TTaskResult>
-    class Looper
-      : public ILooper<TTaskResult>
+namespace engine
+{
+    namespace threading
     {
-      SHIRABE_DECLARE_LOG_TAG(Looper<TTaskResult>);
+        /**
+         * @brief The Priority enum
+         */
+        enum class ETaskPriority
+        {
+            Least     =    1,
+            Less      =    2,
+            Normal    =    4,
+            Higher    =    8,
+            Highest   =   16,
+            TonyStark = 1337 // 04/10/2017 - 04:49: Now i want to watch Avengers...
+        };
 
-    public:
-      using LooperType = Looper<TTaskResult>;
-      using TaskType   = typename ILooper<TTaskResult>::Task;
+        /**
+         * Interface and Task-Implementation for tasks returning a TTaskResult.
+         *
+         * @tparam Return type of tasks executed by this looper.
+         */
+        template <typename TTaskResult>
+        class ILooper
+        {
+            SHIRABE_DECLARE_INTERFACE(ILooper);
 
-      /**********************************************************************************************//**
-       * \class	Handler
-       *
-       * \brief	A handler.
-       **************************************************************************************************/
-      class Handler {
-        friend class Looper; // Allow the looper to access the private constructor.
+        public_classes:
+            /**
+             * @brief The CTask class
+             */
+            class CTask
+            {
+            public_typedefs:
+                friend class ILooper<TTaskResult>;
 
-      public:
-        bool post(TaskType&&);
-        bool postDelayed(TaskType&&, uint64_t timeoutMilliseconds = 0);
+            public_constructors:
+                /**
+                 * Construct an empty, unbound task.
+                 */
+                CTask();
 
-      private:
-        inline Handler(LooperType& l)
-          : m_assignedLooper(l)
-        {}
+                /**
+                 * Deny copy, since the task itself contains uncopyable objects.
+                 *
+                 * @param aOther
+                 */
+                CTask(CTask const &aOther) = delete;
 
-        void storeDelayedPostFuture(std::future<TTaskResult>& f);
+                /**
+                 * Move-Construct this task from another task instance.
+                 *
+                 * @param aOther
+                 */
+                CTask(CTask&& aOther)
+                    : mPriority(aOther.mPriority)
+                    , mTask(std::move(aOther.m_task))
+                {}
 
-        bool is_ready(std::future<TTaskResult> const& f);
+            public_operators:
+                /**
+                 * Move-Assign another task instance.
+                 *
+                 * @param aOther
+                 * @return
+                 */
+                CTask& operator=(CTask&& aOther)
+                {
+                    mPriority = aOther.mPriority;
+                    mTask     = std::move(aOther.v);
 
-        void checkDelayedPostFutures();
+                    return *this;
+                }
 
-        LooperType& m_assignedLooper;
+                /**
+                 * Copy-Assignment is denied, since uncopyable objects are contained.
+                 *
+                 * @param aOther
+                 * @return
+                 */
+                CTask& operator=(CTask const &aOther) = delete;
 
-        std::recursive_mutex                  m_delayedPostFuturesMutex;
-        std::vector<std::future<TTaskResult>> m_delayedPostFutures;
-      };
-      /**************************************************************************************************//**/
+                /**
+                 * Implicit bool conversion to check for validity.
+                 */
+                operator bool()
+                {
+                    return mTask.valid();
+                }
 
-      Looper();
-      ~Looper() = default;
+            public_methods:
+                /**
+                 * Return the current task priority attached.
+                 *
+                 * @return
+                 */
+                SHIRABE_INLINE ETaskPriority const &priority() const
+                {
+                    return mPriority;
+                }
 
-      // Loopers, like threads, may not be copied or moved.
-      Looper(const LooperType&)                = delete;
-      Looper(LooperType&&)                     = delete;
-      LooperType& operator=(const LooperType&) = delete;
-      LooperType& operator=(LooperType&&)      = delete;
+                /**
+                 * Set the task priority of this task to 'aPriority'.
+                 *
+                 * @param aPriority
+                 */
+                SHIRABE_INLINE void setPriority(ETaskPriority const &aPriority)
+                {
+                    mPriority = aPriority;
+                }
 
-      virtual bool initialize();
-      virtual bool deinitialize();
+                /**
+                 * Bind a function returning TTaskResult to this task.
+                 *
+                 * @param aFunction
+                 * @return
+                 */
+                std::future<TTaskResult> bind(std::function<TTaskResult()> &aFunction);
 
-      bool run();
-      bool running();
-      bool abortAndJoin(uint64_t timeoutMilliseconds = 10000);
+                /**
+                 * Execute the task.
+                 */
+                void run()
+                {
+                    mTask(); // Return value is stored in the shared state wrapped by the future returned on bind!
+                }
 
-      inline Handler& getHandler() { return m_handler; }
+            private:
+                ETaskPriority                     mPriority;
+                std::packaged_task<TTaskResult()> mTask;
+            };
 
-    protected:
-      inline void requestAbort() { m_abortRequested.store(true); }
-      inline bool abortRequested() const { return m_abortRequested.load(); }
+            /**
+             * Initialize the looper and run it.
+             *
+             * @return
+             */
+            virtual bool initialize()   = 0;
 
-      TaskType nextRunnable();
+            /**
+             * Stop and shutdown the looper.
+             *
+             * @return
+             */
+            virtual bool deinitialize() = 0;
 
-    private:
-      void runFunc();
+            /**
+             * 	Implementation of the effective loop function to be invoked.
+             * 	Will be provided with the next to be executed runnable.
+             *
+             * @param runnable
+             * @return
+             */
+            virtual bool loop(ILooper<TTaskResult>::CTask&& aRunnable) = 0;
 
-      bool loop(typename Threading::ILooper<TTaskResult>::Task&& runnable);
+        };
 
-      bool post(TaskType&&);
+        /**
+         * Defualt implementation of ILooper.
+         */
+        template <typename TTaskResult>
+        class Looper
+                : public ILooper<TTaskResult>
+        {
+            SHIRABE_DECLARE_LOG_TAG(Looper<TTaskResult>)
 
-      std::thread      m_thread;
-      std::atomic_bool m_running;
-      std::atomic_bool m_abortRequested;
+        public_typedefs:
+            using LooperType = Looper<TTaskResult>;
+            using TaskType   = typename ILooper<TTaskResult>::Task;
 
-      Handler m_handler;
+        public_classes:
+            /**
+             * The Handler is the public interface to the looper and provides various
+             * means of pushing a task over into the looper queue.
+             */
+            class Handler
+            {
+            public_typedefs:
+                friend class Looper; // Allow the looper to access the private constructor.
 
-      std::recursive_mutex  m_runnablesMutex;
-      std::vector<TaskType> m_runnables;
-    };
+            public_methods:
+                /**
+                 * Immediately append the task provided to the looper queue.
+                 *
+                 * @return True, if successful. False otherwise.
+                 */
+                bool post(TaskType &&aOther);
 
-  }
+                /**
+                 * Delay insert the task provided into the looper queue.
+                 *
+                 * @param aOther
+                 * @param aTimeoutMilliseconds
+                 * @return                     True, if successful. False otherwise.
+                 */
+                bool postDelayed(
+                        TaskType      &&aOther,
+                        uint64_t const &aTimeoutMilliseconds = 0);
+
+            private_constructors:
+                /**
+                 * Create a handler based on the provided looper.
+                 *
+                 * @param aLooper
+                 */
+                SHIRABE_INLINE Handler(LooperType &aLooper)
+                    : mAssignedLooper(aLooper)
+                {}
+
+            private_methods:
+                /**
+                 * Check, if the task was executed and finished, indicated by
+                 * the future having received any kind of result.
+                 *
+                 * @param f
+                 * @return
+                 */
+                bool is_ready(std::future<TTaskResult> const& f);
+
+                /**
+                 * In case of a delayed post, store the future in a list.
+                 * @param f
+                 */
+                void storeDelayedPostFuture(std::future<TTaskResult>& f);
+
+                /**
+                 * Review the list of delayed post handles and check if results
+                 * have been returned already.
+                 */
+                void checkDelayedPostFutures();
+
+            private_methods:
+                LooperType                            &mAssignedLooper;
+                std::recursive_mutex                   mDelayedPostFuturesMutex;
+                std::vector<std::future<TTaskResult>>  mDelayedPostFutures;
+            };
+
+        public_constructors:
+            /**
+             * Default create and empty looper.
+             */
+            Looper();
+
+            // Deny copy and move...
+            Looper(const LooperType&)                = delete;
+            Looper(LooperType&&)                     = delete;
+            LooperType& operator=(const LooperType&) = delete;
+            LooperType& operator=(LooperType&&)      = delete;
+
+        public_destructors:
+            /**
+             * Destroy and run...
+             */
+            ~Looper() = default;
+
+        public_methods:
+            /**
+             * Initialize this looper and make it ready to run.
+             *
+             * @return
+             */
+            virtual bool initialize();
+
+            /**
+             * Stop operation and deinitialize this looper.
+             *
+             * @return
+             */
+            virtual bool deinitialize();
+
+            /**
+             * Run the looper's loop.
+             *
+             * @return
+             */
+            bool run();
+
+            /**
+             * Check, whether the looper internal thread is running.
+             *
+             * @return
+             */
+            bool running();
+
+            /**
+             * Stop the thread and returned.
+             *
+             * @param timeoutMilliseconds
+             * @return
+             */
+            bool abortAndJoin(uint64_t const &timeoutMilliseconds = 10000);
+
+            /**
+             * Return the handler attached to the looper.
+             * @return
+             */
+            SHIRABE_INLINE Handler &getHandler()
+            {
+                return mHandler;
+            }
+
+         private_methods:
+            /**
+             * Signal the worker thread, that shutdown is required.
+             */
+            SHIRABE_INLINE void requestAbort()
+            {
+                mAbortRequested.store(true);
+            }
+
+            /**
+             * Check, whether shutdown was requested.
+             *
+             * @return
+             */
+            SHIRABE_INLINE bool abortRequested() const
+            {
+                return mAbortRequested.load();
+            }
+
+            /**
+             * Fetch the next task from the queue.
+             *
+             * @return
+             */
+            TaskType nextRunnable();
+
+            /**
+             * Thread func to be executed on the worker thread.
+             */
+            void runFunc();
+
+            /**
+             * Loop over one task and execute it.
+             *
+             * @param runnable
+             * @return
+             */
+            bool loop(typename threading::ILooper<TTaskResult>::Task&& aRunnable);
+
+            /**
+             * Post a task to the queue. Invoked exclusively by the attached handler.
+             *
+             * @return
+             */
+            bool post(TaskType &&aTask);
+
+        private_members:
+            std::thread           mThread;
+            std::atomic_bool      mRunning;
+            std::atomic_bool      mAbortRequested;
+
+            Handler               mHandler;
+
+            std::recursive_mutex  mRunnablesMutex;
+            std::vector<TaskType> mRunnables;
+        };
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        ILooper<TTaskResult>::CTask::CTask()
+            : mPriority(ETaskPriority::Normal)
+            , mTask()
+        { }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        std::future<TTaskResult>
+            ILooper<TTaskResult>::CTask::bind(std::function<TTaskResult()> &aFunction)
+        {
+            mTask = std::packaged_task<TTaskResult()>(aFunction);
+
+            return std::move(mTask.get_future());
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        void Looper<TTaskResult>::Handler::storeDelayedPostFuture(std::future<TTaskResult> &aFunction)
+        {
+            std::lock_guard<std::recursive_mutex> guard(mDelayedPostFuturesMutex);
+
+            mDelayedPostFutures.push_back(std::move(aFunction));
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::Handler::is_ready(std::future<TTaskResult> const &aFunction)
+        {
+            std::future_status const status = aFunction.wait_for(std::chrono::seconds(0));
+            bool               const ready  = (status == std::future_status::ready);
+
+            return ready;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        void Looper<TTaskResult>::Handler::checkDelayedPostFutures()
+        {
+            std::lock_guard<std::recursive_mutex> guard(mDelayedPostFuturesMutex);
+
+            if(mDelayedPostFutures.empty())
+            {
+                return;
+            }
+
+            // Convenience
+            using future_type = std::future<TTaskResult>;
+            using future_list = std::vector<future_type>;
+            using f_it        = typename future_list::const_iterator;
+            using f_it_list   = std::vector<typename future_list::const_iterator>;
+
+            f_it      it;
+            f_it_list readyFutures;
+
+            for(it  = mDelayedPostFutures.begin();
+                it != mDelayedPostFutures.end();
+                ++ it)
+            {
+                if(is_ready(*it))
+                    readyFutures.push_back(it);
+            }
+
+            for(f_it& readyIt : readyFutures)
+            {
+                mDelayedPostFutures.erase(readyIt);
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::Handler::post(TaskType &&aRunnable)
+        {
+            checkDelayedPostFutures();
+
+            return mAssignedLooper.post(std::move(aRunnable));
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::Handler
+        ::postDelayed(
+                TaskType      &&aRunnable,
+                uint64_t const &aTimeoutMilliseconds)
+        {
+            std::function<bool()> fn = [=] () -> bool
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(aTimeoutMilliseconds));
+                return mAssignedLooper.post(std::move(aRunnable));
+            };
+
+            try
+            {
+                std::future<bool> f = std::async(std::launch::async, fn);
+                storeDelayedPostFuture(std::move(f));
+                checkDelayedPostFutures();
+            }
+            catch(std::bad_alloc ba) {
+                return false;
+            }
+            catch(std::system_error se) {
+                return false;
+            }
+            catch(...) {
+                return false;
+            }
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::post(TaskType &&aRunnable)
+        {
+            try
+            {
+                std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
+
+                mRunnables.push_back(std::move(aRunnable));
+            }
+            catch(...) {
+                return false;
+            }
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        Looper<TTaskResult>::Looper()
+            : ILooper<TTaskResult>()
+            , mRunning(false)
+            , mAbortRequested(false)
+            , mHandler(*this)
+        { }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::initialize()
+        {
+            return true;
+        }
+
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::deinitialize()
+        {
+            if(running())
+            {
+                return false;
+            }
+
+            std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
+            if(!mRunnables.empty())
+                mRunnables.clear();
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        typename Looper<TTaskResult>::TaskType Looper<TTaskResult>::nextRunnable()
+        {
+            std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
+
+            if(mRunnables.empty())
+            {
+                throw std::runtime_error("Empty queue...");
+            }
+
+            // Implement dequeueing by priority with proper
+            // load balancing here.
+            typename Looper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
+            mRunnables.pop_back();
+
+            return std::move(runnable);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        void Looper<TTaskResult>::runFunc()
+        {
+            mRunning.store(true);
+
+            bool const shouldAbort = mAbortRequested.load();
+            while(!shouldAbort)
+            {
+                try {
+                    TaskType task = nextRunnable();
+                    if(!loop(std::move(task)))
+                    {
+                        throw std::runtime_error("Failed to execute loop function.");
+                    }
+                }
+                catch(std::runtime_error& e) {
+                    CLog::Error(logTag(), e.what());
+                }
+                catch(...) {
+                    CLog::Error(logTag(), "Unknown error.");
+                }
+            }
+
+            mRunning.store(false);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::run()
+        {
+            try {
+                mThread = std::thread(&Looper::runFunc, this);
+            }
+            catch(...) {
+                CLog::Error(logTag(), "Failed to start thread.");
+                return false;
+            }
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>
+        ::running()
+        {
+            return mRunning.load();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::abortAndJoin(uint64_t const &aTimeoutMilliseconds)
+        {
+            mAbortRequested.store(true);
+
+            // If the thread was detached, it won't be joinable.
+            // Consequently it should check for abortRequested().
+            // Otherwise: Do join!
+            if(mThread.joinable())
+                mThread.join();
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TTaskResult>
+        bool Looper<TTaskResult>::loop(typename ILooper<TTaskResult>::Task &&aRunnable)
+        {
+            //TTaskResult result = runnable.run();
+            try
+            {
+                if(aRunnable)
+                    aRunnable.run();
+
+                return true;
+            }
+            catch(std::exception aException)
+            {
+                CLog::Error(logTag(), std::string("Exception in Looper::loop(...): ") + aException.what());
+                return false;
+            }
+            catch(...)
+            {
+                CLog::Error(logTag(), "Unknown error in Looper::loop(...)...");
+                return false;
+            }
+        }
+        //<-----------------------------------------------------------------------------
+    }
 }
-
-#include "private\LooperImpl.h"
-
 #endif

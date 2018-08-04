@@ -1,7 +1,7 @@
 #ifndef __SHIRABE__TIMER_H__
 #define __SHIRABE__TIMER_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/Benchmarking/MeasurementDataStore.h"
 #include "Core/Benchmarking/Timer/TimespanUnit.h"
 

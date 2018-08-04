@@ -3,7 +3,7 @@
 
 #include "OS/ApplicationEnvironment.h"
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Log/Log.h"
 
 #include "WSI/IWindowFactory.h" // Includes IWindow.h

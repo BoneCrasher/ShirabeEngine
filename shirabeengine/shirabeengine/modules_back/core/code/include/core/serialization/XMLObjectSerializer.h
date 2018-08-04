@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_SERIALIZATION_XMLSERIALIZER_H__
 #define __SHIRABE_SERIALIZATION_XMLSERIALIZER_H__
 
-#include "Core/Serialization/Serialization.h"
+#include "core/serialization/serialization.h"
 
 namespace Engine {
   namespace Serialization {

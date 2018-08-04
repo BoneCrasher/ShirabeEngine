@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_FRAMEGRAPH_RENDERCONTEXT_H__
 #define __SHIRABE_FRAMEGRAPH_RENDERCONTEXT_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Log/Log.h"
 
 #include "Asset/AssetStorage.h"

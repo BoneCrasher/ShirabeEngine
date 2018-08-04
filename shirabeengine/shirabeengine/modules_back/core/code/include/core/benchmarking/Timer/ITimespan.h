@@ -9,7 +9,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Benchmarking/Timer/TimespanUnit.h"
 
 namespace Engine {

@@ -15,7 +15,7 @@
 #endif
 
 #include "Core/EngineStatus.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/Benchmarking/Timer/PlatformTime.h"
 
 namespace Engine

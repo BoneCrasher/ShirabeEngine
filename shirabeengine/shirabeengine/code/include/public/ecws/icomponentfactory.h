@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_ICOMPONENTFACTORY_H__
 #define __SHIRABE_ICOMPONENTFACTORY_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "ECWS/IComponent.h"
 
 namespace engine {

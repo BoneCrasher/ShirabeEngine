@@ -5,7 +5,7 @@
 #include "OS/ApplicationEnvironment.h"
 
 #include "Core/EngineStatus.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 #include "WSI/WindowManager.h"
 

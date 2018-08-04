@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_CORE_UID_H__
 #define __SHIRABE_CORE_UID_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 namespace Engine {
   namespace Core {

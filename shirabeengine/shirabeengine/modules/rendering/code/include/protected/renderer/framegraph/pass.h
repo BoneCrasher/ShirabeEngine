@@ -6,7 +6,7 @@
 #include <functional>
 #include <stdint.h>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/PassKey.h"
 #include "OS/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceDTO.h"

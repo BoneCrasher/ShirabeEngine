@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "OS/OSDisplay.h"
 #include "OS/OSDef.h"
 

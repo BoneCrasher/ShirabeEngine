@@ -8,7 +8,7 @@
 #include <stack>
 #include <utility>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/Random.h"
 #include "Core/UID.h"
 

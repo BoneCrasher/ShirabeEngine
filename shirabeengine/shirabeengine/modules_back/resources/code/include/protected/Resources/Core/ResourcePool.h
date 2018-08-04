@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 namespace Engine {
   namespace Resources {

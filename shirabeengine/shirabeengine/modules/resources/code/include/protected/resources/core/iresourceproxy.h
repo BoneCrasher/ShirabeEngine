@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/EngineStatus.h"
 
 #include "Resources/Core/EResourceType.h"

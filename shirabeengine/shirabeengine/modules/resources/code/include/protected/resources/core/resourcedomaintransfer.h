@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Resources/Core/EResourceType.h"
 #include "Resources/Core/ResourceDTO.h"
 

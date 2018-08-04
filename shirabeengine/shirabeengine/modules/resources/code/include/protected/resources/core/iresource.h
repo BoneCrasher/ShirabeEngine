@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_IRESOURCE_H__
 #define __SHIRABE_IRESOURCE_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/EngineStatus.h"
 #include "Core/IOC/Observer.h"
 

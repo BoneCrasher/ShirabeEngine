@@ -3,7 +3,7 @@
 
 #include <ostream>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 namespace engine {
 	namespace Resources {

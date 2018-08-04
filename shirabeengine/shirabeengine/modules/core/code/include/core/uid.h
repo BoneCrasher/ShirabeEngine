@@ -1,19 +1,30 @@
 #ifndef __SHIRABE_CORE_UID_H__
 #define __SHIRABE_CORE_UID_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
-namespace engine {
-  namespace Core {
+namespace engine
+{
+    namespace core
+    {
+        /**
+         * Generic interface for any kind of random generator to be used.
+         */
+        template <typename TUIDUnderlyingType>
+        class IUIDGenerator
+        {
+            SHIRABE_DECLARE_INTERFACE(IUIDGenerator);
 
-    template <typename TUIDUnderlyingType>
-    DeclareTemplatedInterface(IUIDGenerator, Template(IUIDGenerator<TUIDUnderlyingType>));
+        public_api:
+            /**
+             * Fetch the next random number from the underlying generator.
+             *
+             * @return
+             */
+            virtual TUIDUnderlyingType generate() = 0;
+        };
 
-    virtual TUIDUnderlyingType generate() = 0;
-
-    DeclareInterfaceEnd(IUIDGenerator);
-
-  }
+    }
 }
 
 #endif

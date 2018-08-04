@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_RESOURCESUBSYSTEMPROXY_H__
 #define __SHIRABE_RESOURCESUBSYSTEMPROXY_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/EngineStatus.h"
 
 #include "Resources/Core/IResourceProxy.h"

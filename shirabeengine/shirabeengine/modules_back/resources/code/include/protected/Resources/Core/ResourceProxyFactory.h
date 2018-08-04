@@ -3,7 +3,7 @@
 
 #include <variant>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/EngineStatus.h"
 
 #include "Resources/Core/IResourceProxy.h"

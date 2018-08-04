@@ -4,7 +4,7 @@
 
 #include "Asset/AssetStorage.h"
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 namespace engine {
   namespace Asset {

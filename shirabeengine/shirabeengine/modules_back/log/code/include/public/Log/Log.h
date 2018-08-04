@@ -25,7 +25,7 @@
 #include <cmath>
 
 // #include "Platform/ApplicationEnvironment.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/BitField.h"
 
 #include "Core/String.h"

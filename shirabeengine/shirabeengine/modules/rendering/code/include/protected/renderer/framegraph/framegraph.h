@@ -5,7 +5,7 @@
 #include <functional>
 #include <stack>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/PassKey.h"
 #include "Log/Log.h"
 #include "Resources/Core/ResourceDTO.h"

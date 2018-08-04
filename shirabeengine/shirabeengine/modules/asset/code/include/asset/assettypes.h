@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/DataBuffer.h"
 
 #include "GraphicsAPI/Resources/Types/Texture.h"

@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_ASSET_INDEX_H__
 #define __SHIRABE_ASSET_INDEX_H__
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 #include "Asset/AssetTypes.h"
 

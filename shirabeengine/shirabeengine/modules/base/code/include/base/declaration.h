@@ -71,4 +71,10 @@
                 SHIRABE_DEBUG_BREAK;                \
             }
 
+#define SHIRABE_RETURN_IF(condition, value) \
+            if(condition)                   \
+            {                               \
+                return value;               \
+            }
+
 #endif

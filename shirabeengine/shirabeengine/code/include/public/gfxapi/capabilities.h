@@ -3,7 +3,7 @@
 
 #include "Core/BasicTypes.h"
 #include "Core/EngineStatus.h"
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 
 #include "Log/Log.h"
 

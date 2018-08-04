@@ -15,7 +15,7 @@
 #include <assert.h>
 #include <map>
 
-#include "Core/EngineTypeHelper.h"
+#include "core/enginetypehelper.h"
 #include "Core/EngineStatus.h"
 #include "Core/IOC/Observer.h"
 #include "Core/Threading/Looper.h"

@@ -4,7 +4,7 @@
 #include "Renderer/FrameGraph/Pass.h"
 
 namespace engine {
-  namespace Serialization {
+  namespace serialization {
     using namespace engine::FrameGraph;
 
     bool
