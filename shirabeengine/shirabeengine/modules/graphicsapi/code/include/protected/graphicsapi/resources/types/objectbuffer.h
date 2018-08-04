@@ -2,7 +2,7 @@
 #define __SHIRABE_RESOURCETYPES_DEVICE_H__
 
 namespace engine {
-	namespace Resources {
+	namespace resources {
 
 		class VertexBuffer {
 		  

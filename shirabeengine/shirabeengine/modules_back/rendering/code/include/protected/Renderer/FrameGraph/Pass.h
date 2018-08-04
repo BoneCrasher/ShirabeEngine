@@ -9,7 +9,7 @@
 #include "core/enginetypehelper.h"
 #include "Core/PassKey.h"
 #include "OS/ApplicationEnvironment.h"
-#include "Resources/Core/ResourceDTO.h"
+#include "resources/core/resourcedto.h"
 
 #include "Renderer/IRenderer.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"

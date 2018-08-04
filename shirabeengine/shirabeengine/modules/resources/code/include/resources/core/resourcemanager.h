@@ -14,7 +14,7 @@
 #include "Resources/Core/ResourceProxyFactory.h"
 
 namespace engine {
-  namespace Resources {
+  namespace resources {
 
     /**********************************************************************************************//**
      * \fn	template <typename K, typename V> static bool __extractKeys(const std::map<K, V>& map, std::vector<K>& outKeys)

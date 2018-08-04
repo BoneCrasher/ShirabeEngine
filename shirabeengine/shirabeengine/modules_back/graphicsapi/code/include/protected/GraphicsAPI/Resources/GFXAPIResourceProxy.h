@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "Core/IOC/Observer.h"
 
 #include "Resources/Core/ResourceBackendProxy.h"

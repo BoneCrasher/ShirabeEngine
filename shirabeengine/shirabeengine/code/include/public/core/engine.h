@@ -4,7 +4,7 @@
 #include "Platform/Platform.h"
 #include "OS/ApplicationEnvironment.h"
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 
 #include "WSI/WindowManager.h"

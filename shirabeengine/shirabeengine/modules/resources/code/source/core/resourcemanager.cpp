@@ -1,7 +1,7 @@
 #include "Resources/Core/ResourceManager.h"
 
 namespace engine {
-  namespace Resources {
+  namespace resources {
 
     bool ResourceManager
       ::clear()

@@ -8,7 +8,7 @@
 
 #include "Core/Memory/TypeBasedAllocatorBase/Allocator.h"
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
 #include "Core/Benchmarking/MeasurementChunk.h"
 #include "Core/Benchmarking/MeasurementChunkTraits.h"

@@ -1,10 +1,10 @@
 #ifndef __SHIRABE_RESOURCES_TRAITS_H__
 #define __SHIRABE_RESOURCES_TRAITS_H__
 
-#include "Resources/Core/EResourceType.h"
+#include "resources/core/eresourcetype.h"
 
 namespace engine {
-  namespace Resources {
+  namespace resources {
 
     /**********************************************************************************************//**
      * \class ResourceTraits

@@ -6,8 +6,8 @@
 #include <string>
 
 #include "core/enginetypehelper.h"
-#include "Resources/Core/EResourceType.h"
-#include "Resources/Core/ResourceDTO.h"
+#include "resources/core/eresourcetype.h"
+#include "resources/core/resourcedto.h"
 
 namespace Engine {
   namespace Resources {

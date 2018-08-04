@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_IDXDEVICE_H__
 #define __SHIRABE_IDXDEVICE_H__
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 
 #include "GFXAPI/DirectX/DX11/Common.h"

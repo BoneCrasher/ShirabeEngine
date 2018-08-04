@@ -16,11 +16,11 @@
 #include <map>
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "Core/IOC/Observer.h"
 #include "Core/Threading/Looper.h"
 
-#include "Resources/Core/ResourceDomainTransfer.h"
+#include "resources/core/resourcedomaintransfer.h"
 #include "GraphicsAPI/Resources/GFXAPI.h"
 #include "GraphicsAPI/Resources/Types/All.h"
 

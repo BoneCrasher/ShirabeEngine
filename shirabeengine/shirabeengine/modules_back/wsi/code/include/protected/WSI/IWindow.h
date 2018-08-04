@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 
 #include "Core/BasicTypes.h"

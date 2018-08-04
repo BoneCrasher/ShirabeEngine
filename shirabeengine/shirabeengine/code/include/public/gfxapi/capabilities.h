@@ -2,7 +2,7 @@
 #define __SHIRABE_GAPI_DEVICECAPABILITIES_H__
 
 #include "Core/BasicTypes.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 
 #include "Log/Log.h"

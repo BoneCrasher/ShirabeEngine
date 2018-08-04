@@ -5,7 +5,7 @@
 #include <iostream>   // for printf
 
 #include "Platform/Platform.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
 #ifdef PLATFORM_WINDOWS
 #include <Windows.h>

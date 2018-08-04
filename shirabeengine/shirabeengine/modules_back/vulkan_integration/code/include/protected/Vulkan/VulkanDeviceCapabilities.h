@@ -4,7 +4,7 @@
 #include <vulkan/vulkan.h>
 
 #include "Core/BasicTypes.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 #include "Core/BitField.h"
 #include "Log/Log.h"

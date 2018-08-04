@@ -6,7 +6,7 @@
 
 #include "core/enginetypehelper.h"
 
-#include "Resources/Core/EResourceType.h"
+#include "resources/core/eresourcetype.h"
 
 namespace Engine {
 	namespace DX {

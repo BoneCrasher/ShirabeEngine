@@ -3,9 +3,9 @@
 
 #include "Platform/Platform.h"
 
-#include "Resources/Core/EResourceType.h"
-#include "Resources/Core/IResource.h"
-#include "Resources/Core/ResourceDomainTransfer.h"
+#include "resources/core/eresourcetype.h"
+#include "resources/core/iresource.h"
+#include "resources/core/resourcedomaintransfer.h"
 #include "Resources/Core/ResourceTraits.h"
 #include "Resources/Core/RequestDefaultImplementation.h"
 

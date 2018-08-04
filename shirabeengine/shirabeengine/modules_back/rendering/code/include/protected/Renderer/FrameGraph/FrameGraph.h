@@ -8,7 +8,7 @@
 #include "core/enginetypehelper.h"
 #include "Core/PassKey.h"
 #include "Log/Log.h"
-#include "Resources/Core/ResourceDTO.h"
+#include "resources/core/resourcedto.h"
 
 #include "Renderer/FrameGraph/FrameGraphSerialization.h"
 #include "Renderer/FrameGraph/Pass.h"

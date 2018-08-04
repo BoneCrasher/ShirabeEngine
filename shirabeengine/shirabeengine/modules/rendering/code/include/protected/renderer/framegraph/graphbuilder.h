@@ -13,7 +13,7 @@
 #include "Core/UID.h"
 
 #include "Log/Log.h"
-#include "Resources/Core/ResourceDTO.h"
+#include "resources/core/resourcedto.h"
 
 #include "Renderer/FrameGraph/FrameGraph.h"
 #include "Renderer/FrameGraph/Pass.h"

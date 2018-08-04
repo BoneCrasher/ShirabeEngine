@@ -4,7 +4,7 @@
 #include <variant>
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
 #include "Resources/Core/IResourceProxy.h"
 

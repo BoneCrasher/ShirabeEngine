@@ -2,10 +2,10 @@
 #define __SHIRABE_RESOURCESUBSYSTEMPROXY_H__
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
 #include "Resources/Core/IResourceProxy.h"
-#include "Resources/Core/ResourceDomainTransfer.h"
+#include "resources/core/resourcedomaintransfer.h"
 
 namespace Engine {
 	namespace Resources {

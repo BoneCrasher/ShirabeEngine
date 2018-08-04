@@ -6,23 +6,23 @@
 #include "Core/DataBuffer.h"
 
 namespace engine {
-  namespace Resources {
+  namespace resources {
 
     /**
-    * \class ResourceDataSource
+    * \class #include "resources/core/resourcedatasource.h"
     *
     * \brief A resource data source.
     **************************************************************************************************/
-    class ResourceDataSource {
+    class #include "resources/core/resourcedatasource.h" {
     public:
       using ResourceAccessFn_t = std::function<ByteBuffer()>;
 
       inline 
-        ResourceDataSource()
+        #include "resources/core/resourcedatasource.h"()
         : m_accessorFn(nullptr)
       {}
       inline
-        ResourceDataSource(ResourceAccessFn_t const&fn)
+        #include "resources/core/resourcedatasource.h"(ResourceAccessFn_t const&fn)
         : m_accessorFn(fn)
       {}
 

@@ -14,7 +14,7 @@
 #include <Windows.h>
 #endif
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "core/enginetypehelper.h"
 #include "Core/Benchmarking/Timer/PlatformTime.h"
 

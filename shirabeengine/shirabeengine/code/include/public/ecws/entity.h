@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_ENTITY_H__
 #define __SHIRABE_ENTITY_H__
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "ECWS/IComponent.h"
 
 namespace engine {

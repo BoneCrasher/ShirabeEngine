@@ -2,7 +2,7 @@
 #define __SHIRABE_IRENDERER_H__
 
 #include "Core/BasicTypes.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
 #include "OS/ApplicationEnvironment.h"
 #include "Resources/Core/ResourceManager.h"

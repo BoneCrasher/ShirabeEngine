@@ -1,7 +1,7 @@
 
 
 namespace engine {
-	namespace Resources {
+	namespace resources {
 
 
 

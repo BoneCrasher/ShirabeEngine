@@ -9,10 +9,10 @@
 #include <vector>
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "Core/IOC/Observer.h"
 
-#include "Resources/Core/ResourceDTO.h"
+#include "resources/core/resourcedto.h"
 
 namespace Engine {
   namespace GFXAPI {

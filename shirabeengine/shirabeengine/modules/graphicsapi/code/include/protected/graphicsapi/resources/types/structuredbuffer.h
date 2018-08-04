@@ -2,7 +2,7 @@
 #define __SHIRABE_RESOURCETYPES_STRUCTUREDBUFFER_H__
 
 namespace engine {
-	namespace Resources {
+	namespace resources {
 
 		class StructuredBuffer {
 		

@@ -6,7 +6,7 @@
 #include "core/enginetypehelper.h"
 
 namespace engine {
-  namespace Resources {
+  namespace resources {
 
     template <typename TIndex, typename TValue>
     class IndexedResourcePool {

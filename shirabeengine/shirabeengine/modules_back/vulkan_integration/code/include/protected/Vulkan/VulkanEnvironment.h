@@ -6,7 +6,7 @@
 #include "OS/ApplicationEnvironment.h"
 #include "OS/WindowHandleWrapper.h"
 
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "Log/Log.h"
 
 #include "GraphicsAPI/Resources/Types/Definition.h"

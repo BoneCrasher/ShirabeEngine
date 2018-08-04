@@ -2,7 +2,7 @@
 #define __SHIRABE_IRESOURCE_H__
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 #include "Core/IOC/Observer.h"
 
 namespace Engine {

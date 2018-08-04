@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "core/enginetypehelper.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
-#include "Resources/Core/EResourceType.h"
-#include "Resources/Core/ResourceDTO.h"
-#include "Resources/Core/ResourceDomainTransfer.h"
+#include "resources/core/eresourcetype.h"
+#include "resources/core/resourcedto.h"
+#include "resources/core/resourcedomaintransfer.h"
 
 namespace Engine {
   namespace Resources {

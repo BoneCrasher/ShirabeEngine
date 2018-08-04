@@ -6,7 +6,7 @@
 #include <Windows.h>
 
 #include "Core/String.h"
-#include "Core/EngineStatus.h"
+#include "core/enginestatus.h"
 
 namespace engine {
   namespace WSI {

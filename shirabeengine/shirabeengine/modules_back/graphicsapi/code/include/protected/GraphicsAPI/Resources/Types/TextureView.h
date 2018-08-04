@@ -1,10 +1,10 @@
 #ifndef __SHIRABE_RESOURCETYPES_TEXTUREVIEW_H__
 #define __SHIRABE_RESOURCETYPES_TEXTUREVIEW_H__
 
-#include "Resources/Core/EResourceType.h"
-#include "Resources/Core/IResource.h"
+#include "resources/core/eresourcetype.h"
+#include "resources/core/iresource.h"
 
-#include "Resources/Core/ResourceDomainTransfer.h"
+#include "resources/core/resourcedomaintransfer.h"
 #include "Resources/Core/ResourceTraits.h"
 #include "Resources/Core/RequestDefaultImplementation.h"
 

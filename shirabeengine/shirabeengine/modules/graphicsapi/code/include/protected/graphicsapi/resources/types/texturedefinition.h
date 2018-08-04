@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 namespace engine {
-  namespace Resources {
+  namespace resources {
   
   }
 }
