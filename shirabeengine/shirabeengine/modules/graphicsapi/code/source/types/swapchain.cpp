@@ -2,7 +2,7 @@
 
 
 namespace engine {
-  namespace GFXAPI {
+  namespace gfxapi {
 
     SwapChainBufferDeclaration::
       Descriptor::Descriptor()

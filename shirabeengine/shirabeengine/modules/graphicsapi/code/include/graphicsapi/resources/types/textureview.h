@@ -13,7 +13,7 @@
 #include "GraphicsAPI/Resources/Types/Texture.h"
 
 namespace engine {
-	namespace GFXAPI {
+	namespace gfxapi {
     
 		/**********************************************************************************************//**
 		 * \struct	RenderTargetDescriptorImpl

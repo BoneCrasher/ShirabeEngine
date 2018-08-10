@@ -15,7 +15,7 @@
 #include "GraphicsAPI/Resources/GFXAPI.h"
 
 namespace engine {
-  namespace GFXAPI {
+  namespace gfxapi {
     using namespace engine::Resources;
 
 

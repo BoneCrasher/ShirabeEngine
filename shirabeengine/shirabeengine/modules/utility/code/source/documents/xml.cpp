@@ -4,7 +4,7 @@
 #include "Util/Documents/XML.h"
 
 namespace engine {
-  namespace Documents {
+  namespace documents {
 
     namespace xpath {
       enum class XPathType {

@@ -27,7 +27,7 @@ namespace engine
                 EResourceType    TResourceType,
                 EResourceSubType TResourceSubtype
                 >
-        class DescriptorImplBase
+        class CDescriptorImplBase
         {
         public_static_constants:
             static const constexpr EResourceType    sResourceType    = TResourceType;

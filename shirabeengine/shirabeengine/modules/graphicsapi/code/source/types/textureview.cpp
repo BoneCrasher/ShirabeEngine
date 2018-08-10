@@ -1,7 +1,7 @@
 #include "GraphicsAPI/Resources/Types/TextureView.h"
 
 namespace engine {
-  namespace GFXAPI {
+  namespace gfxapi {
 
     TextureViewDeclaration::Descriptor
       ::Descriptor()

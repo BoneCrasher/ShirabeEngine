@@ -12,7 +12,7 @@
 #include <libxml/xpath.h>
 
 namespace engine {
-  namespace Documents {
+  namespace documents {
           
     class XMLDocumentSelectError
       : public std::exception

@@ -37,7 +37,10 @@ namespace engine
                  */
                 CCreationRequestBase(TDescriptor const &desc)
                     : mResourceDescriptor(desc)
-                {}
+                {}                
+
+            public_destructors:
+                virtual ~CCreationRequestBase() = default;
 
             public_methods:
                 /**

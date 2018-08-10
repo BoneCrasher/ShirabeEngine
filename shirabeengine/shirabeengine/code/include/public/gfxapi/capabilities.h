@@ -10,7 +10,7 @@
 #include "GFXAPI/Definitions.h"
 
 namespace engine {
-	namespace GFXAPI {
+	namespace gfxapi {
 		using namespace engine::Resources;
 
 		struct GAPIOutputMode {

@@ -11,7 +11,7 @@
 #endif
 
 namespace engine {
-	namespace GFXAPI {
+	namespace gfxapi {
 
 	}
 }

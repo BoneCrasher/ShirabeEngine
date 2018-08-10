@@ -1,7 +1,7 @@
 #include "GraphicsAPI/Resources/Types/DepthStencilState.h"
 
 namespace engine {
-  namespace GFXAPI {
+  namespace gfxapi {
 
     DepthStencilStateDeclaration::Descriptor
       ::Descriptor()

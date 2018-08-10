@@ -1,7 +1,7 @@
 #include "GraphicsAPI/Resources//Types/RasterizerState.h"
 
 namespace engine {
-  namespace GFXAPI {
+  namespace gfxapi {
 
     RasterizerStateDeclaration::Descriptor
       ::Descriptor()

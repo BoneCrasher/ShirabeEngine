@@ -11,7 +11,7 @@
 #include "Util/Documents/JSON.h"
 
 namespace engine {
-  namespace Documents {
+  namespace documents {
 
     class NLohmannJSONNode 
       : public IJSONNode
