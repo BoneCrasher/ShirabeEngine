@@ -1,81 +1,78 @@
-#include "GraphicsAPI/Resources/Types/TextureView.h"
+#include "graphicsapi/resources/types/textureview.h"
 
-namespace engine {
-  namespace gfxapi {
-
-    TextureViewDeclaration::Descriptor
-      ::Descriptor()
-      : name("")
-      , subjacentTexture()
-      , textureFormat(Format::Undefined)
-    {}
-
-    std::string
-      TextureViewDeclaration::Descriptor
-      ::toString() const {
-      std::stringstream ss;
-
-      ss
-        << "RenderTargetDescriptor ('" << name << "'): "
-        << " Format: " << (uint8_t)textureFormat << ";";
-
-      return ss.str();
-    }
-
-
-    TextureViewDeclaration::CreationRequest
-      ::CreationRequest(
-        Descriptor         const&desc,
-        PublicResourceId_t const&underlyingTextureHandle)
-      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-      , m_underlyingTextureHandle(underlyingTextureHandle)
-    {}
-    
-    PublicResourceId_t const&
-      TextureViewDeclaration::CreationRequest
-      ::underlyingTextureHandle() const
+namespace engine
+{
+    namespace gfxapi
     {
-      return m_underlyingTextureHandle;
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CTextureViewDeclaration::SDescriptor::SDescriptor()
+            : name("")
+            , subjacentTexture()
+            , textureFormat(Format::Undefined)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::string CTextureViewDeclaration::SDescriptor::toString() const
+        {
+            std::stringstream ss;
+            ss
+                    << "RenderTargetSDescriptor ('" << name << "'): "
+                    << " Format: " << (uint8_t)textureFormat << ";";
+
+            return ss.str();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CTextureViewDeclaration::CCreationRequest::CCreationRequest(
+                SDescriptor        const &aDescriptor,
+                PublicResourceId_t const &aUnderlyingTextureHandle)
+            : CBaseDeclaration::CCreationRequestBase<SDescriptor>(aDescriptor)
+            , mUnderlyingTextureHandle(aUnderlyingTextureHandle)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        PublicResourceId_t const &CTextureViewDeclaration::CCreationRequest::underlyingTextureHandle() const
+        {
+            return mUnderlyingTextureHandle;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::string CTextureViewDeclaration::CCreationRequest::toString() const
+        {
+            std::stringstream ss;
+            ss
+                    << "RenderTargetViewCreationRequest: \n"
+                    << "[\n"
+                    << resourceDescriptor().toString() << "\n"
+                    << "]"
+                    << std::endl;
+
+            return ss.str();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CTextureView::CTextureView(
+                const CTextureView::SDescriptor &aDescriptor)
+            : CTextureViewDeclaration()
+            , CResourceSDescriptorAdapter<CTextureViewDeclaration::SDescriptor>(aDescriptor)
+        {}
+        //<-----------------------------------------------------------------------------
     }
-
-    std::string TextureViewDeclaration::CreationRequest
-      ::toString() const {
-      std::stringstream ss;
-
-      ss
-        << "RenderTargetViewCreationRequest: \n"
-        << "[\n"
-        << resourceDescriptor().toString() << "\n"
-        << "]"
-        << std::endl;
-
-      return ss.str();
-    }
-
-    TextureViewDeclaration::UpdateRequest
-      ::UpdateRequest(
-        PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
-    {}
-
-    TextureViewDeclaration::DestructionRequest
-      ::DestructionRequest(
-        PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
-    {}
-
-    TextureViewDeclaration::Query
-      ::Query(
-        PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId)
-    {}
-
-    TextureView::
-      TextureView(
-        const TextureView::Descriptor &descriptor)
-      : TextureViewDeclaration()
-      , ResourceDescriptorAdapter<TextureViewDeclaration::Descriptor>(descriptor)
-    {}
-
-  }
 }

@@ -1,107 +1,135 @@
 #ifndef __SHIRABE_RESOURCETYPES_TEXTUREVIEW_H__
 #define __SHIRABE_RESOURCETYPES_TEXTUREVIEW_H__
 
-#include "resources/core/eresourcetype.h"
-#include "resources/core/iresource.h"
+#include <resources/core/eresourcetype.h>
+#include <resources/core/iresource.h>
+#include <resources/core/resourcedomaintransfer.h>
+#include <resources/core/resourcetraits.h>
+#include <resources/core/requestdefaultimplementation.h>
 
-#include "resources/core/resourcedomaintransfer.h"
-#include "Resources/Core/ResourceTraits.h"
-#include "Resources/Core/RequestDefaultImplementation.h"
+#include "graphicsapi/resources/gfxapi.h"
+#include "graphicsapi/resources/types/definition.h"
+#include "graphicsapi/resources/types/texture.h"
 
-#include "GraphicsAPI/Resources/GFXAPI.h"
-#include "GraphicsAPI/Resources/Types/Definition.h"
-#include "GraphicsAPI/Resources/Types/Texture.h"
+namespace engine
+{
+    namespace gfxapi
+    {
+        /**
+         * The CTextureViewDeclaration class describes a CTextureView's integration into the resource/backend.
+         */
+        class SHIRABE_TEST_EXPORT CTextureViewDeclaration
+        {
+        public_static_constants:
+            static const constexpr EResourceType    sResourceType    = EResourceType::GAPI_VIEW;
+            static const constexpr EResourceSubType sResourceSubtype = EResourceSubType::TEXTURE_VIEW;
 
-namespace engine {
-	namespace gfxapi {
-    
-		/**********************************************************************************************//**
-		 * \struct	RenderTargetDescriptorImpl
-		 *
-		 * \brief	A render target descriptor implementation.
-		 **************************************************************************************************/
-		
-    class SHIRABE_TEST_EXPORT TextureViewDeclaration {
-    public:
-      static const constexpr EResourceType    resource_type    = EResourceType::GAPI_VIEW;
-      static const constexpr EResourceSubType resource_subtype = EResourceSubType::TEXTURE_VIEW;
+        public_structs:
+            /**
+             * The SDescriptor struct provides all necessary information about a texture view.
+             */
+            struct SHIRABE_TEST_EXPORT SDescriptor
+                    : public CDescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::TEXTURE_VIEW>
+            {
+            public_constructors:
+                /**
+                 * Default-Construct an empty SDescriptor.
+                 */
+                SDescriptor();
 
+            public_methods:
+                /**
+                 * Describe this descriptor as string.
+                 *
+                 * @return See brief.
+                 */
+                std::string toString() const;
 
-      struct SHIRABE_TEST_EXPORT Descriptor
-        : public DescriptorImplBase<EResourceType::GAPI_VIEW, EResourceSubType::TEXTURE_VIEW>
-      {
-        std::string name;
-        TextureInfo subjacentTexture;
-        Format      textureFormat;
-        ArraySlices arraySlices;
-        MipSlices   mipMapSlices;
-        // TODO: Distinguish binding and read/write mode
+            public_members:
+                std::string   name;
+                STextureInfo  subjacentTexture;
+                Format        textureFormat;
+                ArraySlices_t arraySlices;
+                MipSlices_t   mipMapSlices;
+                // TODO: Distinguish binding and read/write mode
+            };
 
-        Descriptor();
+            /**
+             * The CreationRequest struct describes how a texture view should be created.
+             */
+            struct SHIRABE_TEST_EXPORT CCreationRequest
+                    : public CBaseDeclaration::CCreationRequestBase<SDescriptor>
+            {
+            public_constructors:
+                /**
+                 * Construct a creation request from a descriptor and underlying texture handle
+                 * upon which the texture view should be based.
+                 *
+                 * @param aDescriptor              The texture view descriptor to be used for creation.
+                 * @param aUnderlyingTextureHandle The texture handle to base the descriptor on.
+                 */
+                CCreationRequest(
+                        SDescriptor        const& aDescriptor,
+                        PublicResourceId_t const& aUnderlyingTextureHandle);
 
-        std::string toString() const;
-      };
+            public_methods:
+                /**
+                 * Return the texture handle of this view.
+                 *
+                 * @return See brief.
+                 */
+                PublicResourceId_t const &underlyingTextureHandle() const;
 
-      struct SHIRABE_TEST_EXPORT CreationRequest
-        : public BaseDeclaration::CreationRequestBase<Descriptor> 
-      {
-      public:
-        CreationRequest(
-          Descriptor         const&desc,
-          PublicResourceId_t const&underlyingTextureHandle);
+                /**
+                 * Describe this creation request as string.
+                 *
+                 * @return See brief.
+                 */
+                std::string toString() const;
 
-        PublicResourceId_t const& underlyingTextureHandle() const;
+            private_members:
+                PublicResourceId_t mUnderlyingTextureHandle;
+            };
 
-        std::string toString() const;
+            /**
+             * TBDone
+             */
+            using UpdateRequest = CBaseDeclaration::CUpdateRequestBase;
 
-      private:
-        PublicResourceId_t m_underlyingTextureHandle;
-      };
+            /**
+             * TBDone
+             */
+            using DestructionRequest = CBaseDeclaration::CDestructionRequestBase;
 
-      class SHIRABE_TEST_EXPORT UpdateRequest
-        : public BaseDeclaration::UpdateRequestBase
-      {
-      public:
-        UpdateRequest(
-          PublicResourceId_t const& inPublicResourceId);
-      };
+            /**
+             * TBDone
+             */
+            using Query = CBaseDeclaration::CQueryBase;
+        };
 
-      class SHIRABE_TEST_EXPORT DestructionRequest
-        : public BaseDeclaration::DestructionRequestBase
-      {
-      public:
-        DestructionRequest(
-          PublicResourceId_t const& inPublicResourceId);
-      };
+        /**
+         * TextureView implementation for all texture views in the engine
+         */
+        class SHIRABE_TEST_EXPORT CTextureView
+                : public CTextureViewDeclaration
+                , public CResourceDescriptorAdapter<CTextureViewDeclaration::SDescriptor>
+        {
+        public_typedefs:
+            using MyType_t = CTextureView;
 
-      class SHIRABE_TEST_EXPORT Query
-        : public BaseDeclaration::QueryBase
-      {
-      public:
-        Query(
-          PublicResourceId_t const& inPublicResourceId);
-      };
-    };
+        public_constructors:
+            /**
+             * Construct a texture view from a texture view descriptor.
+             * @param aDescriptor
+             */
+            CTextureView(CTextureView::SDescriptor const &aDescriptor);
+        };
 
-		/**********************************************************************************************//**
-		 * \class	GFXAPIRenderTarget
-		 *
-		 * \brief	A gfxapi render target.
-		 **************************************************************************************************/
-		class SHIRABE_TEST_EXPORT TextureView
-			: public TextureViewDeclaration
-      , public ResourceDescriptorAdapter<TextureViewDeclaration::Descriptor>
-		{
-		public:
-			using my_type = TextureView;
-
-      TextureView(
-        const TextureView::Descriptor &descriptor);
-		};
-
-		DeclareSharedPointerType(TextureView);
-    DefineTraitsPublicTypes(TextureView);
-	}
+        /**
+         *
+         */
+        SHIRABE_DEFINE_PUBLIC_TRAITS_TYPES(CTextureView);
+    }
 }
 
 #endif
