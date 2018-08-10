@@ -1,82 +1,155 @@
 #ifndef __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 #define __SHIRABE_RESOURCES_REQUEST_DEFAULT_IMPL_H__
 
-#include "resources/core/resourcedto.h"
 #include "resources/core/resourcedomaintransfer.h"
 #include "resources/core/eresourcetype.h"
 #include "resources/core/iresource.h"
 #include "resources/core/resourcedatasource.h"
 
-namespace engine {
-    namespace resources {
+namespace engine
+{
+    namespace resources
+    {
 
         using namespace engine::resources;
 
-        class BaseDeclaration {
+        /**
+         * Container-Class around base request default implementations.
+         */
+        class CBaseDeclaration
+        {
         public:
-
+            /**
+             * Base implementation for any CreationRequest within the resource system.
+             * Each CreationRequest encapsulates at least a resource descriptor,
+             * accessible calling the "resourceDescriptor"-method.
+             *
+             * @tparam TDescriptor Describes the resource descriptor type to encapsulate.
+             */
             template <typename TDescriptor>
-            class CreationRequestBase {
-            public:
-                CreationRequestBase(
-                        TDescriptor const&desc)
-                    : m_resourceDescriptor(desc)
+            class CCreationRequestBase
+            {
+            public_constructors:
+                /**
+                 * Construct a new CreationRequest from a descriptor.
+                 *
+                 * @param desc
+                 */
+                CCreationRequestBase(TDescriptor const &desc)
+                    : mResourceDescriptor(desc)
                 {}
 
-                TDescriptor const& resourceDescriptor() const { return m_resourceDescriptor; }
+            public_methods:
+                /**
+                 * Return the encapsulated resource descriptor.
+                 *
+                 * @return See brief.
+                 */
+                TDescriptor const &resourceDescriptor() const
+                {
+                    return mResourceDescriptor;
+                }
 
-                bool serializeOnDestruct() const { return m_serializeOnDestruct; }
+                /**
+                 * Check, whether the descriptor should be serialized on destruction.
+                 *
+                 * @return
+                 */
+                bool serializeOnDestruct() const
+                {
+                    return mSerializeOnDestruct;
+                }
 
+                /**
+                 * Return a string representation of the descriptor.
+                 *
+                 * @return
+                 */
                 virtual std::string toString() const = 0;
 
-            private:
-                TDescriptor m_resourceDescriptor;
-
-                bool m_serializeOnDestruct;
+            private_members:
+                TDescriptor mResourceDescriptor;
+                bool        mSerializeOnDestruct;
             };
 
-            class ExistingResourceRequestBase {
-            public:
-                inline
-                ExistingResourceRequestBase(
-                        PublicResourceId_t    const& inPublicResourceId)
-                    : m_publicResourceId(inPublicResourceId)
+            /**
+             * Base implementation for any request, which is based on a previously created resource,
+             * encapsulating a public resource id.
+             */
+            class CExistingResourceRequestBase
+            {
+            public_constructors:
+                /**
+                 * Construct a new request for a provided public resource id.
+                 *
+                 * @param inPublicResourceId
+                 */
+                SHIRABE_INLINE CExistingResourceRequestBase(PublicResourceId_t const &aPublicResourceId)
+                    : mPublicResourceId(aPublicResourceId)
                 {}
 
-                inline PublicResourceId_t    const& publicResourceId()    const { return m_publicResourceId;   }
+            public_methods:
+                /**
+                 * Return the encapsulated public resource id.
+                 *
+                 * @return See brief.
+                 */
+                SHIRABE_INLINE PublicResourceId_t const &publicResourceId() const
+                {
+                    return mPublicResourceId;
+                }
 
-            private:
-                PublicResourceId_t    m_publicResourceId;
+            private_members:
+                PublicResourceId_t mPublicResourceId;
             };
 
-
-            class UpdateRequestBase
-                    : public ExistingResourceRequestBase
+            /**
+             * Base request for any resource update operation.
+             */
+            class CUpdateRequestBase
+                    : public CExistingResourceRequestBase
             {
-            public:
-                inline UpdateRequestBase(
-                        PublicResourceId_t    const& inPublicResourceId)
-                    : ExistingResourceRequestBase(inPublicResourceId)
+            public_constructors:
+                /**
+                 * Construct a new request from a public resource id.
+                 *
+                 * @param inPublicResourceId
+                 */
+                SHIRABE_INLINE CUpdateRequestBase(PublicResourceId_t const &aPublicResourceId)
+                    : CExistingResourceRequestBase(aPublicResourceId)
                 {}
             };
 
-            class DestructionRequestBase
-                    : public ExistingResourceRequestBase
+            /**
+             * Base request for any resource descrution operation.
+             */
+            class CDestructionRequestBase
+                    : public CExistingResourceRequestBase
             {
-            public:
-                inline DestructionRequestBase(
-                        PublicResourceId_t    const& inPublicResourceId)
-                    : ExistingResourceRequestBase(inPublicResourceId)
+            public_constructors:
+                /**
+                 * Construct a new request from a public resource id.
+                 *
+                 * @param aPublicResourceId
+                 */
+                SHIRABE_INLINE CDestructionRequestBase(PublicResourceId_t const &aPublicResourceId)
+                    : CExistingResourceRequestBase(aPublicResourceId)
                 {}
             };
 
-            class QueryBase
-                    : public ExistingResourceRequestBase
+            /**
+             * Base request for any resource query operation.
+             */
+            class CQueryBase
+                    : public CExistingResourceRequestBase
             {
             public:
-                inline QueryBase(
-                        PublicResourceId_t    const& inPublicResourceId)
-                    : ExistingResourceRequestBase(inPublicResourceId)
+                /**
+                 * Construct a new request from a public resource id.
+                 * @param inPublicResourceId
+                 */
+                SHIRABE_INLINE CQueryBase(PublicResourceId_t const &aPublicResourceId)
+                    : CExistingResourceRequestBase(aPublicResourceId)
                 {}
             };
         };

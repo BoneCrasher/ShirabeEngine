@@ -4,127 +4,186 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "core/enginetypehelper.h"
 #include "resources/core/eresourcetype.h"
-#include "resources/core/resourcedto.h"
 
-namespace engine {
-  namespace resources {
-    
-    /**********************************************************************************************//**
-     * \class DescriptorImplBase
-     *
-     * \brief A descriptor implementation base.
-     *
-     * \tparam  TResource Type of the resource.
-     **************************************************************************************************/
-    template <EResourceType resource_type, EResourceSubType resource_subtype>
-    class DescriptorImplBase {
-      static const constexpr EResourceType    resource_type    = resource_type;
-      static const constexpr EResourceSubType resource_subtype = resource_subtype;
-      
-    public:
-      EResourceType    type()    const { return resource_type;    }
-      EResourceSubType subtype() const { return resource_subtype; }   
+namespace engine
+{
+    namespace resources
+    {
+        using PublicResourceId_t       = std::string;
+        using PublicResourceIdList_t   = std::vector<PublicResourceId_t>;
+        template <typename TValue>
+        using PublicResourceIdMapTo_t  = std::unordered_map<PublicResourceId_t, TValue>;
+        using SubjacentResourceId_t    = uint64_t;
 
-      std::string          name;
-      PublicResourceIdList dependencies;
+        /**
+         * Resource descriptor base implementation providing information about the
+         * resource types, name, and dependencies.
+         */
+        template <
+                EResourceType    TResourceType,
+                EResourceSubType TResourceSubtype
+                >
+        class DescriptorImplBase
+        {
+        public_static_constants:
+            static const constexpr EResourceType    sResourceType    = TResourceType;
+            static const constexpr EResourceSubType sResourceSubtype = TResourceSubtype;
 
-      virtual std::string toString() const {
-        std::stringstream ss;
-        ss
-          << "DescriptorImplementationBase<" << resource_type << ", " << resource_subtype << "> {\n"
-          << "  Name: " << name << "\n"
-          << "  Dependencies: \n";
-        for(PublicResourceId_t const&id : dependencies)
-          ss << id << ", \n";
+        public:
+            /**
+             * Return the resource type of the described resource.
+             *
+             * @return See brief.
+             */
+            EResourceType type() const { return sResourceType; }
 
-        return ss.str();
-      }
-    };
+            /**
+             * Return the resource subtype of the described resource.
+             *
+             * @return See brief.
+             */
+            EResourceSubType subtype() const { return sResourceSubtype; }
 
-    // An adapter class will hold the implementation of a DomainTransferObject, e.g.
-    // the descriptor_impl_type of ResourceDescriptor<TextureND<1>>.
-    // Since the ResourceDescriptor<T> specializiation will derive from the impl. type
-    // slicing at this point won't be an issue. 
-    // The only thing of matter could be static downcasting and public Interface issues 
-    // with knowing the capabilities of the underlying resource class.
+            /**
+             * Return the human readable name of the resource.
+             *
+             * @return See brief.
+             */
+            std::string const &name() const { return mName; }
 
-    #define DeclareAdapter(type, alias, name)                    \
-		template <typename Impl>                                 \
-		class type##Adapter {								                     \
-		public:												                           \
-			typedef typename Impl alias##_impl;                    \
-															                               \
-			inline type##Adapter(							                     \
-				const Impl& name)						                         \
-			  : _##name(name)					 			                       \
-			{}												                             \
-															                               \
-		  virtual ~type##Adapter() = default;                    \
-															                               \
-			inline const Impl        				                       \
-				name() const { return static_cast<Impl>(_##name); }  \
-															                               \
-    private:											                           \
-      alias##_impl _##name;									                 \
-		};			
+            /**
+             * Return the list of dependencies of this resources.
+             *
+             * @return See brief.
+             */
+            PublicResourceIdList_t const &dependencies() const { return mDependencies; }
 
-    DeclareAdapter(ResourceDescriptor,
-                   descriptor_type,
-                   descriptor);
+            /**
+             * Return a string representation of this descriptor.
+             *
+             * @return See brief.
+             */
+            virtual std::string toString() const
+            {
+                std::stringstream ss;
+                ss
+                        << "DescriptorImplementationBase<" << sResourceType << ", " << sResourceSubtype << "> {\n"
+                        << "  Name: " << mName << "\n"
+                        << "  Dependencies: \n";
+                for(PublicResourceId_t const&id : mDependencies)
+                    ss << id << ", \n";
 
-    DeclareAdapter(ResourceBinding, 
-                   binding_type, 
-                   binding);
+                return ss.str();
+            }
 
-    DeclareAdapter(ResourceCreationRequest,
-                   creation_request_type, 
-                   creationRequest);
+        private_members:
+            std::string            mName;
+            PublicResourceIdList_t mDependencies;
+        };
 
-    DeclareAdapter(ResourceUpdateRequest,
-                   update_request_type,
-                   updateRequest);
+        // An adapter class will hold the implementation of a DomainTransferObject, e.g.
+        // the descriptor_impl_type of ResourceDescriptor<TextureND<1>>.
+        // Since the ResourceDescriptor<T> specializiation will derive from the impl. type
+        // slicing at this point won't be an issue.
+        // The only thing of matter could be static downcasting and public Interface issues
+        // with knowing the capabilities of the underlying resource class.
 
-    DeclareAdapter(ResourceQueryRequest, 
-                   query_request_type, 
-                   queryRequest);
+        #define DeclareAdapter(type, name)                                           \
+            /**
+            *
+            */                                                                       \
+            template <typename TImplementation>                                      \
+            class C##type##Adapter                                                   \
+            {								                                         \
+            public_typedefs:								                         \
+                using type##Implementation_t = TImplementation;                      \
+                                                                                     \
+            public_constructors:                                                     \
+                SHIRABE_INLINE C##type##Adapter(type##Implementation_t const &aName) \
+                    : m##name(aName)					 	                         \
+                {}											                         \
+            public_destructors:                                                      \
+                virtual ~C##type##Adapter() = default;                               \
+                                                                                     \
+                SHIRABE_INLINE const type##Implementation_t name() const             \
+                {                                                                    \
+                    return static_cast<type##Implementation_t>(m##name);             \
+                }                                                                    \
+                                                                                     \
+            private_members:                                                         \
+                type##Implementation_t m##name;                                      \
+            };
 
-    DeclareAdapter(ResourceDestructionRequest,
-                   destruction_request_type, 
-                   destructionRequest);
+        DeclareAdapter(ResourceDescriptor,
+                       descriptor);
 
-    template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::Binding const& d) {
-      return (s << d.toString());
+        DeclareAdapter(ResourceBinding,
+                       binding);
+
+        DeclareAdapter(ResourceCreationRequest,
+                       creationRequest);
+
+        DeclareAdapter(ResourceUpdateRequest,
+                       updateRequest);
+
+        DeclareAdapter(ResourceQueryRequest,
+                       queryRequest);
+
+        DeclareAdapter(ResourceDestructionRequest,
+                       destructionRequest);
+
+        template <typename TResource>
+        static inline std::ostream &operator<<(
+                std::ostream                      &s,
+                typename TResource::Binding const &d)
+        {
+            return (s << d.toString());
+        }
+
+        template <typename TResource>
+        static inline std::ostream &operator<<(
+                std::ostream                         &s,
+                typename TResource::Descriptor const &d)
+        {
+            return (s << d.toString());
+        }
+
+        template <typename TResource>
+        static inline std::ostream &operator<<(
+                std::ostream                              &s,
+                typename TResource::CreationRequest const &d)
+        {
+            return (s << d.toString());
+        }
+
+        template <typename TResource>
+        static inline std::ostream &operator<<(
+                std::ostream                            &s,
+                typename TResource::UpdateRequest const &d)
+        {
+            return (s << d.toString());
+        }
+
+        template <typename TResource>
+        static inline std::ostream &operator<<(
+                std::ostream                    &s,
+                typename TResource::Query const &d)
+        {
+            return (s << d.toString());
+        }
+
+        template <typename TResource>
+        static inline std::ostream &operator<<(
+                std::ostream                                 &s,
+                typename TResource::DestructionRequest const &d)
+        {
+            return (s << d.toString());
+        }
     }
-
-    template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::Descriptor const& d) {
-      return (s << d.toString());
-    }
-
-    template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::CreationRequest const& d) {
-      return (s << d.toString());
-    }
-
-    template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::UpdateRequest const& d) {
-      return (s << d.toString());
-    }
-
-    template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::Query const& d) {
-      return (s << d.toString());
-    }
-
-    template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::DestructionRequest const& d) {
-      return (s << d.toString());
-    }
-  }
 }
 
 #endif

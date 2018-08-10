@@ -3,83 +3,94 @@
 
 #include "resources/core/eresourcetype.h"
 
-namespace engine {
-  namespace resources {
+namespace engine
+{
+    namespace resources
+    {
 
-    /**********************************************************************************************//**
-     * \class ResourceTraits
-     *
-     * \brief Convenience base class for any engine resource integration.
-     *
-     * \tparam  type                Type of the type.
-     * \tparam  subtype             Type of the subtype.
-     * \tparam  TBinding            Type of the binding.
-     * \tparam  TDescriptor         Type of the descriptor.
-     * \tparam  TCreationRequest    Type of the creation request.
-     * \tparam  TUpdateRequest      Type of the update request.
-     * \tparam  TQueryRequest       Type of the query request.
-     * \tparam  TDestructionRequest Type of the destruction request.
-     **************************************************************************************************/
-    template<
-      typename TClass,
-      EResourceType    type,
-      EResourceSubType subtype,
-      typename TBinding,
-      typename TDescriptor,
-      typename TCreationRequest,
-      typename TUpdateRequest,
-      typename TQueryRequest,
-      typename TDestructionRequest
-    >
-      class ResourceTraits {
-      public:
-        static const constexpr EResourceType    resource_type    = type;
-        static const constexpr EResourceSubType resource_subtype = subtype;
+        /**
+         * Traits class to describe specific type-definitions for a resource,
+         * binding together all related resource information for a specific
+         * resource type.
+         *
+         * @tparam TClass
+         * @tparam TType
+         * @tparam TSubType
+         * @tparam TBinding
+         * @tparam TDescriptor
+         * @tparam TCreationRequest
+         * @tparam TUpdateRequest
+         * @tparam TQueryRequest
+         * @tparam TDestructionRequest
+         */
+        template<
+                typename         TClass,
+                EResourceType    TType,
+                EResourceSubType TSubType,
+                typename         TBinding,
+                typename         TDescriptor,
+                typename         TCreationRequest,
+                typename         TUpdateRequest,
+                typename         TQueryRequest,
+                typename         TDestructionRequest
+                >
+        class CResourceTraits
+        {
+        public_static_constants:
+            static const constexpr EResourceType    sResourceType    = TType;
+            static const constexpr EResourceSubType sResourceSubType = TSubType;
 
-        typedef TClass              class_type;
-        typedef TDescriptor         descriptor_impl_type;
-        typedef TCreationRequest    creation_request_impl_type;
-        typedef TUpdateRequest      update_request_impl_type;
-        typedef TQueryRequest       query_request_impl_type;
-        typedef TDestructionRequest destruction_request_impl_type;
+        public_typedefs:
+            using class_type                    = TClass             ;
+            using descriptor_impl_type          = TDescriptor        ;
+            using creation_request_impl_type    = TCreationRequest   ;
+            using update_request_impl_type      = TUpdateRequest     ;
+            using query_request_impl_type       = TQueryRequest      ;
+            using destruction_request_impl_type = TDestructionRequest;
 
-    };
+        };
 
-    template <typename T>
-    class ResourcePublicTraits {
-    public:
-      typedef typename T::Descriptor         descriptor_public_type;
-      typedef typename T::CreationRequest    creation_request_public_type;
-      typedef typename T::UpdateRequest      update_request_public_type;
-      typedef typename T::Query              query_request_public_type;
-      typedef typename T::DestructionRequest destruction_request_public_type;
-    };
+        /**
+         * Binds together publicly relevant resource type typedefs.
+         *
+         * @tparam T Type of the resource to bind typedefs together for.
+         */
+        template <typename T>
+        class CResourcePublicTraits
+        {
+        public:
+            using descriptor_public_type          = typename T::Descriptor        ;
+            using creation_request_public_type    = typename T::CreationRequest   ;
+            using update_request_public_type      = typename T::UpdateRequest     ;
+            using query_request_public_type       = typename T::Query             ;
+            using destruction_request_public_type = typename T::DestructionRequest;
+        };
 
-#define DeclareResourceTraits(Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction) \
-    class Prefix##Traits                                                                                               \
-      : public ResourceTraits<Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction>         \
-    {};
+        #define DeclareResourceTraits(Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction)\
+            class C##Prefix##Traits                                                                                  \
+            : public CResourceTraits<Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction>         \
+                {};
 
-#define DeclareTemplatedResourceTraits(Tpl, Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction) \
-    Tpl                                                                                                                              \
-    class Prefix##Traits                                                                                                             \
-      : public ResourceTraits<Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction>                       \
-    {};
+        #define DeclareTemplatedResourceTraits(Tpl, Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction)\
+            Tpl                                                                                                                    \
+            class C##Prefix##Traits                                                                                                \
+            : public CResourceTraits<Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction>                       \
+                {};
 
-#define DefineTraitsPublicTypes(Type)                                                               \
-    using Type##Descriptor           = ResourcePublicTraits<Type>::descriptor_public_type         ; \
-    using Type##CreationRequest      = ResourcePublicTraits<Type>::creation_request_public_type   ; \
-    using Type##UpdateRequest        = ResourcePublicTraits<Type>::update_request_public_type     ; \
-    using Type##QueryRequest         = ResourcePublicTraits<Type>::query_request_public_type      ; \
-    using Type##DesctructionRequest  = ResourcePublicTraits<Type>::destruction_request_public_type; 
+        #define DefineTraitsPublicTypes(Type)                                                                  \
+            using C##Type##Descriptor           = ResourcePublicTraits<Type>::descriptor_public_type         ; \
+            using C##Type##CreationRequest      = ResourcePublicTraits<Type>::creation_request_public_type   ; \
+            using C##Type##UpdateRequest        = ResourcePublicTraits<Type>::update_request_public_type     ; \
+            using C##Type##QueryRequest         = ResourcePublicTraits<Type>::query_request_public_type      ; \
+            using C##Type##DesctructionRequest  = ResourcePublicTraits<Type>::destruction_request_public_type;
 
-#define DefineTraitsPublicTemplateTypes(Tpl, Prefix, Type)                                                         \
-    Tpl using Prefix##Descriptor           = typename ResourcePublicTraits<Type>::descriptor_public_type         ; \
-    Tpl using Prefix##CreationRequest      = typename ResourcePublicTraits<Type>::creation_request_public_type   ; \
-    Tpl using Prefix##UpdateRequest        = typename ResourcePublicTraits<Type>::update_request_public_type     ; \
-    Tpl using Prefix##QueryRequest         = typename ResourcePublicTraits<Type>::query_request_public_type      ; \
-    Tpl using Prefix##DesctructionRequest  = typename ResourcePublicTraits<Type>::destruction_request_public_type; 
-  }
+        #define DefineTraitsPublicTemplateTypes(Tpl, Prefix, Type)                                                            \
+            Tpl using C##Prefix##Descriptor           = typename ResourcePublicTraits<Type>::descriptor_public_type         ; \
+            Tpl using C##Prefix##CreationRequest      = typename ResourcePublicTraits<Type>::creation_request_public_type   ; \
+            Tpl using C##Prefix##UpdateRequest        = typename ResourcePublicTraits<Type>::update_request_public_type     ; \
+            Tpl using C##Prefix##QueryRequest         = typename ResourcePublicTraits<Type>::query_request_public_type      ; \
+            Tpl using C##Prefix##DesctructionRequest  = typename ResourcePublicTraits<Type>::destruction_request_public_type;
+    }
 }
 
 #endif

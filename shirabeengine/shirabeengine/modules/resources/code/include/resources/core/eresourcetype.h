@@ -10,7 +10,8 @@ namespace engine
     namespace resources
     {
         /**
-         * @brief The EResourceType enum
+         * The EResourceType describes the major category of resources
+         * to be created in the resource system.
          */
         enum class EResourceType
                 : uint16_t
@@ -26,7 +27,8 @@ namespace engine
         };
 
         /**
-         * @brief The EResourceSubType enum
+         * The EResourceSubType describes subcategories to specify specific
+         * resources in a more granular fashion.
          */
         enum class EResourceSubType
                 : uint16_t
@@ -65,7 +67,8 @@ namespace engine
         };
 
         /**
-         * @brief operator <<
+         * OutStream operator overload to print out an EResourceType.
+         *
          * @param aStream
          * @param aType
          * @return
@@ -79,6 +82,8 @@ namespace engine
         }
 
         /**
+         * OutStream operator overload to print out an EResourceSubType.
+         *
          * @brief operator <<
          * @param aStream
          * @param aType

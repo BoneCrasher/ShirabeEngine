@@ -6,68 +6,100 @@
 #include "core/enginetypehelper.h"
 #include "core/enginestatus.h"
 
-#include "Resources/Core/IResourceProxy.h"
+#include "resources/core/iresourceproxy.h"
 
-namespace engine {
-  namespace resources {
-
-    class ResourceProxyFactory 
+namespace engine
+{
+    namespace resources
     {
-      using CreatorMap_t = Map<EResourceType, Any>;
+        /**
+         * The resource proxy factory is responsible for creating the correct proxy for a given proxy type and creation request.
+         */
+        class ResourceProxyFactory
+        {
+        public_typedefs:
+            using CreatorMap_t = Map<EResourceSubType, Any>;
 
-    public:
-      template <typename TResource>
-      using CreatorFn_t  = std::function<CStdSharedPtr_t<IResourceProxy<TResource>>(EProxyType const&, typename TResource::CreationRequest const&)>;
+            template <typename TResource>
+            using CreatorFn_t  = std::function<
+                                        CStdSharedPtr_t<IResourceProxy<TResource>>(
+                                            EProxyType                          const&,
+                                            typename TResource::CreationRequest const&)>;
 
-      template <typename TResource>
-      CStdSharedPtr_t<IResourceProxy<TResource>> create(
-        EProxyType                          const&proxyType,
-        typename TResource::CreationRequest const&creationRequest);
+        public_methods:
+            /**
+             * Create a new resource proxy given a specific proxy type and it's creation request.
+             *
+             * @tparam TResource       The resource type to create a proxy for.
+             * @param aProxyType       The type of type of the proxy to be created.
+             * @param aCreationRequest The creation request of the resource to be created.
+             * @return
+             */
+            template <typename TResource>
+            CStdSharedPtr_t<IResourceProxy<TResource>> create(
+                    EProxyType                          const &aProxyType,
+                    typename TResource::CreationRequest const &aCreationRequest);
 
-      template <typename TResource>
-      bool addCreator(
-        EResourceType          const&type,
-        CreatorFn_t<TResource> const&creatorFn);
-      
-    private:      
-      CreatorMap_t m_creators;
-    };
+            /**
+             * Register a new creator function for a provided resource type.
 
-    template <typename TResource>
-    CStdSharedPtr_t<IResourceProxy<TResource>>
-      ResourceProxyFactory::create(
-        EProxyType                          const&proxyType,
-        typename TResource::CreationRequest const&creationRequest)
-    {
-      EResourceType type = creationRequest.resourceDescriptor().type();
+             * @tparam TResource The resource type of the creator.
+             * @param aSubtype   The subtype of the resource to create.
+             * @param aCreatorFn The function creating instances of type/subtype.
+             * @return           True, of successful. False otherwise.
+             */
+            template <typename TResource>
+            bool addCreator(
+                    EResourceSubType       const &aSubtype,
+                    CreatorFn_t<TResource> const &aCreatorFn);
 
-      if(m_creators.find(type) == m_creators.end())
-        return nullptr;
+        private_members:
+            CreatorMap_t m_creators;
+        };
+        //<-----------------------------------------------------------------------------
 
-      Any                    anyCreator = m_creators.at(type);
-      CreatorFn_t<TResource> creator    = std::any_cast<CreatorFn_t<TResource>>(anyCreator);
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TResource>
+        CStdSharedPtr_t<IResourceProxy<TResource>>
+        ResourceProxyFactory::create(
+                EProxyType                          const &aProxyType,
+                typename TResource::CreationRequest const &aCreationRequest)
+        {
+            EResourceSubType const type = aCreationRequest.resourceDescriptor().subtype();
 
-      CStdSharedPtr_t<IResourceProxy<TResource>> proxy = creator(proxyType, creationRequest);
-      if(!proxy)
-        throw std::runtime_error("Cannot create proxy.");
+            if(m_creators.find(type) == m_creators.end())
+                return nullptr;
 
-      return proxy;
+            Any                    const &anyCreator = m_creators.at(type);
+            CreatorFn_t<TResource> const &creator    = std::any_cast<CreatorFn_t<TResource>>(anyCreator);
+
+            CStdSharedPtr_t<IResourceProxy<TResource>> const proxy = creator(aProxyType, aCreationRequest);
+            if(!proxy)
+                throw std::runtime_error("Cannot create proxy.");
+
+            return proxy;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TResource>
+        bool ResourceProxyFactory::addCreator(
+                EResourceSubType       const &aType,
+                CreatorFn_t<TResource> const &aCreatorFn)
+        {
+            if(m_creators.find(aType) != m_creators.end())
+                return false;
+
+            m_creators[aType] = aCreatorFn;
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
     }
-    
-    template <typename TResource>
-    bool 
-      ResourceProxyFactory::addCreator(
-        EResourceType          const&type, 
-        CreatorFn_t<TResource> const&creatorFn)
-    {
-      if(m_creators.find(type) != m_creators.end())
-        return false;
-
-      m_creators[type] = creatorFn;
-
-      return true;
-    }
-  }
 }
 
 #endif

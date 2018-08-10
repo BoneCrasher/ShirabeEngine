@@ -1,46 +1,61 @@
-#include "Resources/Core/ResourceManager.h"
+#include "resources/core/resourcemanager.h"
 
-namespace engine {
-  namespace resources {
-
-    bool ResourceManager
-      ::clear()
+namespace engine
+{
+    namespace resources
     {
-      return true;
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CResourceManager::CResourceManager(CStdSharedPtr_t<ResourceProxyFactory> const &aProxyFactory)
+            : mProxyFactory(aProxyFactory)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CResourceManager::~CResourceManager()
+        {
+            // m_resources->clear();
+            mProxyFactory = nullptr;
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CResourceManager::clear()
+        {
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CResourceManager::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> proxy, PublicResourceIdList_t const&dependencies)
+        {
+            EEngineStatus const status = proxy->loadSync(dependencies);
+            std::string   const msg    = "Failed to load underlying resource of resource proxy.";
+            HandleEngineStatusError(status, msg);
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CResourceManager
+        ::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy)
+        {
+            EEngineStatus const status = aProxy->unloadSync();
+
+            HandleEngineStatusError(status, "Failed to unload underlying resource of resource proxy.");
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
     }
-    
-    /**********************************************************************************************//**
-     * \fn	EEngineStatus ResourceManager::proxyLoad(const ResourceHandle& handle, const AnyProxy& proxy)
-     *
-     * \brief	Load dependencies and root of resource tree. This function only deals with root
-     * 			elements of a resource-tree.
-     *
-     * \param	handle	The handle.
-     * \param	proxy 	The proxy.
-     *
-     * \return	The EEngineStatus.
-     **************************************************************************************************/
-    EEngineStatus ResourceManager
-      ::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> &proxy, PublicResourceIdList const&dependencies)
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-
-      std::string msg = "Failed to load underlying resource of resource proxy.";
-      HandleEngineStatusError(proxy->loadSync(dependencies), msg);
-
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus ResourceManager
-      ::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &proxy)
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-
-      // Deal with dependers?
-
-      HandleEngineStatusError(proxy->unloadSync(), "Failed to unload underlying resource of resource proxy.");
-
-      return EEngineStatus::Ok;
-    }
-  }
 }
