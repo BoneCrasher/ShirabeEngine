@@ -50,21 +50,21 @@ namespace Engine {
       };
 
 
-      class UpdateRequestBase
+      class CUpdateRequestBase
         : public ExistingResourceRequestBase
       {
       public:
-        inline UpdateRequestBase(
+        inline CUpdateRequestBase(
           PublicResourceId_t    const& inPublicResourceId)
           : ExistingResourceRequestBase(inPublicResourceId)
         {}
       };
 
-      class DestructionRequestBase
+      class CDestructionRequestBase
         : public ExistingResourceRequestBase
       {
       public:
-        inline DestructionRequestBase(
+        inline CDestructionRequestBase(
           PublicResourceId_t    const& inPublicResourceId)
           : ExistingResourceRequestBase(inPublicResourceId)
         {}

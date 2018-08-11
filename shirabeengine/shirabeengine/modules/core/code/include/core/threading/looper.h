@@ -170,13 +170,13 @@ namespace engine
          * Defualt implementation of ILooper.
          */
         template <typename TTaskResult>
-        class Looper
+        class CLooper
                 : public ILooper<TTaskResult>
         {
             SHIRABE_DECLARE_LOG_TAG(Looper<TTaskResult>)
 
         public_typedefs:
-            using LooperType = Looper<TTaskResult>;
+            using LooperType = CLooper<TTaskResult>;
             using TaskType   = typename ILooper<TTaskResult>::Task;
 
         public_classes:
@@ -184,10 +184,10 @@ namespace engine
              * The Handler is the public interface to the looper and provides various
              * means of pushing a task over into the looper queue.
              */
-            class Handler
+            class CHandler
             {
             public_typedefs:
-                friend class Looper; // Allow the looper to access the private constructor.
+                friend class CLooper; // Allow the looper to access the private constructor.
 
             public_methods:
                 /**
@@ -214,7 +214,7 @@ namespace engine
                  *
                  * @param aLooper
                  */
-                SHIRABE_INLINE Handler(LooperType &aLooper)
+                SHIRABE_INLINE CHandler(LooperType &aLooper)
                     : mAssignedLooper(aLooper)
                 {}
 
@@ -250,11 +250,11 @@ namespace engine
             /**
              * Default create and empty looper.
              */
-            Looper();
+            CLooper();
 
             // Deny copy and move...
-            Looper(const LooperType&)                = delete;
-            Looper(LooperType&&)                     = delete;
+            CLooper(const LooperType&)                = delete;
+            CLooper(LooperType&&)                     = delete;
             LooperType& operator=(const LooperType&) = delete;
             LooperType& operator=(LooperType&&)      = delete;
 
@@ -262,7 +262,7 @@ namespace engine
             /**
              * Destroy and run...
              */
-            ~Looper() = default;
+            ~CLooper() = default;
 
         public_methods:
             /**
@@ -305,7 +305,7 @@ namespace engine
              * Return the handler attached to the looper.
              * @return
              */
-            SHIRABE_INLINE Handler &getHandler()
+            SHIRABE_INLINE CHandler &getHandler()
             {
                 return mHandler;
             }
@@ -361,7 +361,7 @@ namespace engine
             std::atomic_bool      mRunning;
             std::atomic_bool      mAbortRequested;
 
-            Handler               mHandler;
+            CHandler               mHandler;
 
             std::recursive_mutex  mRunnablesMutex;
             std::vector<TaskType> mRunnables;
@@ -394,7 +394,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        void Looper<TTaskResult>::Handler::storeDelayedPostFuture(std::future<TTaskResult> &aFunction)
+        void CLooper<TTaskResult>::CHandler::storeDelayedPostFuture(std::future<TTaskResult> &aFunction)
         {
             std::lock_guard<std::recursive_mutex> guard(mDelayedPostFuturesMutex);
 
@@ -406,7 +406,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::Handler::is_ready(std::future<TTaskResult> const &aFunction)
+        bool CLooper<TTaskResult>::CHandler::is_ready(std::future<TTaskResult> const &aFunction)
         {
             std::future_status const status = aFunction.wait_for(std::chrono::seconds(0));
             bool               const ready  = (status == std::future_status::ready);
@@ -419,7 +419,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        void Looper<TTaskResult>::Handler::checkDelayedPostFutures()
+        void CLooper<TTaskResult>::CHandler::checkDelayedPostFutures()
         {
             std::lock_guard<std::recursive_mutex> guard(mDelayedPostFuturesMutex);
 
@@ -456,7 +456,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::Handler::post(TaskType &&aRunnable)
+        bool CLooper<TTaskResult>::CHandler::post(TaskType &&aRunnable)
         {
             checkDelayedPostFutures();
 
@@ -468,7 +468,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::Handler
+        bool CLooper<TTaskResult>::CHandler
         ::postDelayed(
                 TaskType      &&aRunnable,
                 uint64_t const &aTimeoutMilliseconds)
@@ -503,7 +503,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::post(TaskType &&aRunnable)
+        bool CLooper<TTaskResult>::post(TaskType &&aRunnable)
         {
             try
             {
@@ -523,7 +523,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        Looper<TTaskResult>::Looper()
+        CLooper<TTaskResult>::CLooper()
             : ILooper<TTaskResult>()
             , mRunning(false)
             , mAbortRequested(false)
@@ -535,13 +535,13 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::initialize()
+        bool CLooper<TTaskResult>::initialize()
         {
             return true;
         }
 
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::deinitialize()
+        bool CLooper<TTaskResult>::deinitialize()
         {
             if(running())
             {
@@ -560,7 +560,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        typename Looper<TTaskResult>::TaskType Looper<TTaskResult>::nextRunnable()
+        typename CLooper<TTaskResult>::TaskType CLooper<TTaskResult>::nextRunnable()
         {
             std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
 
@@ -571,7 +571,7 @@ namespace engine
 
             // Implement dequeueing by priority with proper
             // load balancing here.
-            typename Looper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
+            typename CLooper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
             mRunnables.pop_back();
 
             return std::move(runnable);
@@ -582,7 +582,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        void Looper<TTaskResult>::runFunc()
+        void CLooper<TTaskResult>::runFunc()
         {
             mRunning.store(true);
 
@@ -612,10 +612,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::run()
+        bool CLooper<TTaskResult>::run()
         {
             try {
-                mThread = std::thread(&Looper::runFunc, this);
+                mThread = std::thread(&CLooper::runFunc, this);
             }
             catch(...) {
                 CLog::Error(logTag(), "Failed to start thread.");
@@ -630,7 +630,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>
+        bool CLooper<TTaskResult>
         ::running()
         {
             return mRunning.load();
@@ -641,7 +641,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::abortAndJoin(uint64_t const &aTimeoutMilliseconds)
+        bool CLooper<TTaskResult>::abortAndJoin(uint64_t const &aTimeoutMilliseconds)
         {
             mAbortRequested.store(true);
 
@@ -659,7 +659,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool Looper<TTaskResult>::loop(typename ILooper<TTaskResult>::Task &&aRunnable)
+        bool CLooper<TTaskResult>::loop(typename ILooper<TTaskResult>::Task &&aRunnable)
         {
             //TTaskResult result = runnable.run();
             try

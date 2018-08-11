@@ -31,8 +31,8 @@ namespace Engine {
 
   #define DeclareTaskBuilderModule(Type)                                                                                                                  \
           EEngineStatus fn##Type##CreationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##UpdateTask     (Type::UpdateRequest      const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus fn##Type##DestructionTask(Type::DestructionRequest const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##UpdateTask     (Type::CUpdateRequest      const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus fn##Type##DestructionTask(Type::CDestructionRequest const&request, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
           EEngineStatus fn##Type##QueryTask      (Type::Query              const&request, GFXAPIResourceHandleAssignment const&, ResourceTaskFn_t &outTask);                                               
 
   namespace Vulkan {

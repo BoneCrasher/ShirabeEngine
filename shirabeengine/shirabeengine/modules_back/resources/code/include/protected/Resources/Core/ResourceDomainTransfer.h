@@ -85,7 +85,7 @@ namespace Engine {
 
     DeclareAdapter(ResourceUpdateRequest,
                    update_request_type,
-                   updateRequest);
+                   CUpdateRequest);
 
     DeclareAdapter(ResourceQueryRequest, 
                    query_request_type, 
@@ -93,7 +93,7 @@ namespace Engine {
 
     DeclareAdapter(ResourceDestructionRequest,
                    destruction_request_type, 
-                   destructionRequest);
+                   CDestructionRequest);
 
     template <typename TResource>
     static inline std::ostream& operator <<(std::ostream& s, typename TResource::Binding const& d) {
@@ -111,7 +111,7 @@ namespace Engine {
     }
 
     template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::UpdateRequest const& d) {
+    static inline std::ostream& operator <<(std::ostream& s, typename TResource::CUpdateRequest const& d) {
       return (s << d.toString());
     }
 
@@ -121,7 +121,7 @@ namespace Engine {
     }
 
     template <typename TResource>
-    static inline std::ostream& operator <<(std::ostream& s, typename TResource::DestructionRequest const& d) {
+    static inline std::ostream& operator <<(std::ostream& s, typename TResource::CDestructionRequest const& d) {
       return (s << d.toString());
     }
   }

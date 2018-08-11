@@ -54,12 +54,12 @@ namespace Engine {
         ResourceTaskFn_t                  &outTask) = 0;
 
       virtual EEngineStatus updateTask(
-        typename T::UpdateRequest    const&inRequest,
+        typename T::CUpdateRequest    const&inRequest,
         ResolvedDependencyCollection const&inDependencies,
         ResourceTaskFn_t                  &outTask) = 0;
 
       virtual EEngineStatus destructionTask(
-        typename T::DestructionRequest const&inRequest,
+        typename T::CDestructionRequest const&inRequest,
         ResolvedDependencyCollection   const&inDependencies,
         ResourceTaskFn_t                    &outTask) = 0;
 
@@ -74,10 +74,10 @@ namespace Engine {
       using CreatorFn_t = std::function<EEngineStatus(typename TResource::CreationRequest const&, ResolvedDependencyCollection const&, ResourceTaskFn_t&)>;
 
       template <typename TResource>
-      using UpdaterFn_t = std::function<EEngineStatus(typename TResource::UpdateRequest const&, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&, ResourceTaskFn_t&)>;
+      using UpdaterFn_t = std::function<EEngineStatus(typename TResource::CUpdateRequest const&, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&, ResourceTaskFn_t&)>;
 
       template <typename TResource>
-      using DestructorFn_t = std::function<EEngineStatus(typename TResource::DestructionRequest const&, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&, ResourceTaskFn_t&)>;
+      using DestructorFn_t = std::function<EEngineStatus(typename TResource::CDestructionRequest const&, GFXAPIResourceHandleAssignment const&, ResolvedDependencyCollection const&, ResourceTaskFn_t&)>;
 
       template <typename TResource>
       using QueryFn_t = std::function<EEngineStatus(typename TResource::Query const&, GFXAPIResourceHandleAssignment const&, ResourceTaskFn_t&)>;
@@ -91,14 +91,14 @@ namespace Engine {
 
       template <typename TResource>
       EEngineStatus updateTask(
-        typename TResource::UpdateRequest const&inRequest,
+        typename TResource::CUpdateRequest const&inRequest,
         GFXAPIResourceHandleAssignment    const&assignment,
         ResolvedDependencyCollection      const&inDependencies,
         ResourceTaskFn_t                       &outTask);
 
       template <typename TResource>
       EEngineStatus destructionTask(
-        typename TResource::DestructionRequest const&inRequest,
+        typename TResource::CDestructionRequest const&inRequest,
         GFXAPIResourceHandleAssignment         const&assignment,
         ResolvedDependencyCollection           const&inDependencies,
         ResourceTaskFn_t                            &outTask);
@@ -196,7 +196,7 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus
       GFXAPIResourceTaskBackend::updateTask(
-        typename TResource::UpdateRequest const&inRequest,
+        typename TResource::CUpdateRequest const&inRequest,
         GFXAPIResourceHandleAssignment    const&assignment,
         ResolvedDependencyCollection      const&inDependencies,
         ResourceTaskFn_t                       &outTask)
@@ -218,7 +218,7 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus
       GFXAPIResourceTaskBackend::destructionTask(
-        typename TResource::DestructionRequest const&inRequest,
+        typename TResource::CDestructionRequest const&inRequest,
         GFXAPIResourceHandleAssignment         const&assignment,
         ResolvedDependencyCollection           const&inDependencies,
         ResourceTaskFn_t                            &outTask)

@@ -33,8 +33,8 @@ namespace Engine {
 
   #define DeclareTaskBuilderModule(Type)                                                                                                                  \
           EEngineStatus creationTask   (Type::CreationRequest    const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
-          EEngineStatus destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus updateTask     (Type::CUpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
+          EEngineStatus destructionTask(Type::CDestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask); \
           EEngineStatus queryTask      (Type::Query              const&request, ResourceTaskFn_t &outTask);                                               
 
   namespace DX {

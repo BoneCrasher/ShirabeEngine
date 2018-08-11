@@ -59,7 +59,7 @@ namespace engine {
   //EEngineStatus
   //  DX11ResourceTaskBackend::
   //  updateTask(
-  //    SwapChain::UpdateRequest     const&request,
+  //    SwapChain::CUpdateRequest     const&request,
   //    ResolvedDependencyCollection const&resolvedDependencies,
   //    ResourceTaskFn_t                  &outTask)
   //{
@@ -71,7 +71,7 @@ namespace engine {
   //EEngineStatus
   //  DX11ResourceTaskBackend::
   //  destructionTask(
-  //    SwapChain::DestructionRequest const&request,
+  //    SwapChain::CDestructionRequest const&request,
   //    ResolvedDependencyCollection  const&resolvedDependencies,
   //    ResourceTaskFn_t                   &outTask)
   //{
@@ -133,7 +133,7 @@ namespace engine {
   //EEngineStatus
   //  DX11ResourceTaskBackend::
   //  updateTask(
-  //    SwapChainBuffer::UpdateRequest     const&request,
+  //    SwapChainBuffer::CUpdateRequest     const&request,
   //    ResolvedDependencyCollection       const&resolvedDependencies,
   //    ResourceTaskFn_t                        &outTask)
   //{
@@ -145,7 +145,7 @@ namespace engine {
   //EEngineStatus
   //  DX11ResourceTaskBackend::
   //  destructionTask(
-  //    SwapChainBuffer::DestructionRequest const&request,
+  //    SwapChainBuffer::CDestructionRequest const&request,
   //    ResolvedDependencyCollection        const&resolvedDependencies,
   //    ResourceTaskFn_t                         &outTask)
   //{

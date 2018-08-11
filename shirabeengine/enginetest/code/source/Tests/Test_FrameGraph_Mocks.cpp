@@ -202,7 +202,7 @@ namespace Test {
                                                               \
       EEngineStatus MockResourceManager::update##resource(    \
         PublicResourceId_t      const&inId,                   \
-        resource::UpdateRequest const&inRequest               \
+        resource::CUpdateRequest const&inRequest               \
       ) {                                                     \
         Log::Verbose(logTag(), String::format("update%0(...);", #resource));    \
         return EEngineStatus::Ok;                             \
@@ -248,7 +248,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::updateTask     (Type::UpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::updateTask     (Type::CUpdateRequest      const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("updateTask<%0>(...)", #Type));                                                                                                 \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \
@@ -260,7 +260,7 @@ namespace Test {
             };                                                                                                                                                                    \
             return EEngineStatus::Ok;                                                                                                                                             \
           }                                                                                                                                                                       \
-          EEngineStatus MockGFXAPITaskBackend::destructionTask(Type::DestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
+          EEngineStatus MockGFXAPITaskBackend::destructionTask(Type::CDestructionRequest const&request, ResolvedDependencyCollection const&depencies, ResourceTaskFn_t &outTask)   \
           {                                                                                                                                                                       \
             Log::Verbose(logTag(), String::format("destructionTask<%0>(...)", #Type));                                                                                            \
             outTask = [&, this] () -> GFXAPIResourceHandleAssignment                                                                                                              \

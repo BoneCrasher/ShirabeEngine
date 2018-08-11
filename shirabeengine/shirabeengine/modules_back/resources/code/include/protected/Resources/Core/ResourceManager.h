@@ -114,7 +114,7 @@ namespace Engine {
       template <typename TResource>
       EEngineStatus updateResource(
         std::string                       const&resourceId,
-        typename TResource::UpdateRequest const&request);
+        typename TResource::CUpdateRequest const&request);
 
       template <typename TResource>
       EEngineStatus unloadResource(
@@ -274,7 +274,7 @@ namespace Engine {
     EEngineStatus ResourceManager
       ::updateResource(
         std::string                       const&resourceId,
-        typename TResource::UpdateRequest const&request)
+        typename TResource::CUpdateRequest const&request)
     {
       return EEngineStatus::Ok;
     }

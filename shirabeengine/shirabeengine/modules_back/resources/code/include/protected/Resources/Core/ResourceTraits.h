@@ -50,9 +50,9 @@ namespace Engine {
     public:
       typedef typename T::Descriptor         descriptor_public_type;
       typedef typename T::CreationRequest    creation_request_public_type;
-      typedef typename T::UpdateRequest      update_request_public_type;
+      typedef typename T::CUpdateRequest      update_request_public_type;
       typedef typename T::Query              query_request_public_type;
-      typedef typename T::DestructionRequest destruction_request_public_type;
+      typedef typename T::CDestructionRequest destruction_request_public_type;
     };
 
 #define DeclareResourceTraits(Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction) \

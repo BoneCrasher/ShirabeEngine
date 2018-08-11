@@ -74,7 +74,7 @@ namespace Engine {
 
       template <typename TResource>
       EEngineStatus unload(
-        typename TResource::DestructionRequest const&inRequest);
+        typename TResource::CDestructionRequest const&inRequest);
 
       EEngineStatus registerResource(
         PublicResourceId_t const&id,
@@ -91,7 +91,7 @@ namespace Engine {
 
       template <typename TResource>
       EEngineStatus unloadImpl(
-        typename TResource::DestructionRequest const&inRequest,
+        typename TResource::CDestructionRequest const&inRequest,
         GFXAPIResourceHandleAssignment         const&assignment,
         ResolvedDependencyCollection           const&resolvedDependencies,
         DeferredResourceOperationHandle             &outHandle);
@@ -178,7 +178,7 @@ namespace Engine {
     EEngineStatus
       GFXAPIResourceBackend
       ::unload(
-        typename TResource::DestructionRequest const&inRequest)
+        typename TResource::CDestructionRequest const&inRequest)
     {
       ResourceTaskFn_t::result_type resourceHandle ={ };
 
@@ -246,7 +246,7 @@ namespace Engine {
     template <typename TResource>
     EEngineStatus GFXAPIResourceBackend
       ::unloadImpl(
-        typename TResource::DestructionRequest const&inRequest,
+        typename TResource::CDestructionRequest const&inRequest,
         GFXAPIResourceHandleAssignment         const&assignment,
         ResolvedDependencyCollection           const&resolvedDependencies,
         DeferredResourceOperationHandle             &outHandle)

@@ -94,17 +94,17 @@ namespace engine
             /**
              * TBDone
              */
-            using UpdateRequest = CBaseDeclaration::CUpdateRequestBase;
+            using CUpdateRequest = CBaseDeclaration::CUpdateRequestBase;
 
             /**
              * TBDone
              */
-            using DestructionRequest = CBaseDeclaration::CDestructionRequestBase;
+            using CDestructionRequest = CBaseDeclaration::CDestructionRequestBase;
 
             /**
              * TBDone
              */
-            using Query = CBaseDeclaration::CQueryBase;
+            using CQuery = CBaseDeclaration::CQueryBase;
         };
 
         /**

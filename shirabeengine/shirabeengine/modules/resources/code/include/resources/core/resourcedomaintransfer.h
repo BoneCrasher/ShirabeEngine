@@ -146,40 +146,40 @@ namespace engine
 
         template <typename TResource>
         static inline std::ostream &operator<<(
-                std::ostream                         &s,
-                typename TResource::Descriptor const &d)
+                std::ostream                          &s,
+                typename TResource::SDescriptor const &d)
         {
             return (s << d.toString());
         }
 
         template <typename TResource>
         static inline std::ostream &operator<<(
-                std::ostream                              &s,
-                typename TResource::CreationRequest const &d)
+                std::ostream                               &s,
+                typename TResource::CCreationRequest const &d)
         {
             return (s << d.toString());
         }
 
         template <typename TResource>
         static inline std::ostream &operator<<(
-                std::ostream                            &s,
-                typename TResource::UpdateRequest const &d)
+                std::ostream                             &s,
+                typename TResource::CUpdateRequest const &d)
         {
             return (s << d.toString());
         }
 
         template <typename TResource>
         static inline std::ostream &operator<<(
-                std::ostream                    &s,
-                typename TResource::Query const &d)
+                std::ostream                     &s,
+                typename TResource::CQuery const &d)
         {
             return (s << d.toString());
         }
 
         template <typename TResource>
         static inline std::ostream &operator<<(
-                std::ostream                                 &s,
-                typename TResource::DestructionRequest const &d)
+                std::ostream                                  &s,
+                typename TResource::CDestructionRequest const &d)
         {
             return (s << d.toString());
         }

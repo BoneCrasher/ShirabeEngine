@@ -5,8 +5,8 @@
 
 #include "resources/core/iresource.h"
 #include "resources/core/resourcedomaintransfer.h"
-#include "Resources/Core/ResourceTraits.h"
-#include "Resources/Core/RequestDefaultImplementation.h"
+#include "resources/core/resourcetraits.h"
+#include "resources/core/requestdefaultimplementation.h"
 
 #include "GraphicsAPI/Resources/GFXAPI.h"
 #include "GraphicsAPI/Resources/Types/Definition.h"
@@ -58,19 +58,19 @@ namespace Engine {
         PublicResourceId_t m_swapChainId;
       };
 
-      class UpdateRequest
-        : public BaseDeclaration::UpdateRequestBase
+      class CUpdateRequest
+        : public BaseDeclaration::CUpdateRequestBase
       {
       public:
-        UpdateRequest(
+        CUpdateRequest(
           PublicResourceId_t const& inPublicResourceId);
       };
 
-      class DestructionRequest
-        : public BaseDeclaration::DestructionRequestBase
+      class CDestructionRequest
+        : public BaseDeclaration::CDestructionRequestBase
       {
       public:
-        DestructionRequest(
+        CDestructionRequest(
           PublicResourceId_t const& inPublicResourceId);
       };
 
@@ -154,19 +154,19 @@ namespace Engine {
         std::string toString() const;
       };
 
-      class UpdateRequest
-        : public BaseDeclaration::UpdateRequestBase
+      class CUpdateRequest
+        : public BaseDeclaration::CUpdateRequestBase
       {
       public:
-        UpdateRequest(
+        CUpdateRequest(
           PublicResourceId_t const& inPublicResourceId);
       };
 
-      class DestructionRequest
-        : public BaseDeclaration::DestructionRequestBase
+      class CDestructionRequest
+        : public BaseDeclaration::CDestructionRequestBase
       {
       public:
-        DestructionRequest(
+        CDestructionRequest(
           PublicResourceId_t const& inPublicResourceId);
       };
 

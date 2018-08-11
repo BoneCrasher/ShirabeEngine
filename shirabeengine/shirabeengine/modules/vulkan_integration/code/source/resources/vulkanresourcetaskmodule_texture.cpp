@@ -111,7 +111,7 @@ namespace engine {
     EEngineStatus
       VulkanResourceTaskBackend::
       fnTextureUpdateTask(
-        Texture::UpdateRequest         const&request,
+        Texture::CUpdateRequest         const&request,
         GFXAPIResourceHandleAssignment const&assignment,
         ResolvedDependencyCollection   const&resolvedDependencies,
         ResourceTaskFn_t                  &outTask)
@@ -124,7 +124,7 @@ namespace engine {
     EEngineStatus
       VulkanResourceTaskBackend::
       fnTextureDestructionTask(
-        Texture::DestructionRequest    const&request,
+        Texture::CDestructionRequest    const&request,
         GFXAPIResourceHandleAssignment const&inAssignment,
         ResolvedDependencyCollection   const&resolvedDependencies,
         ResourceTaskFn_t                    &outTask)

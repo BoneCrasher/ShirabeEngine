@@ -44,15 +44,15 @@ namespace engine {
     }
 
     SwapChainBufferDeclaration::
-      UpdateRequest::UpdateRequest(
+      CUpdateRequest::CUpdateRequest(
         PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
+      : BaseDeclaration::CUpdateRequestBase(inPublicResourceId)
     {}
 
     SwapChainBufferDeclaration::
-      DestructionRequest::DestructionRequest(
+      CDestructionRequest::CDestructionRequest(
         PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
+      : BaseDeclaration::CDestructionRequestBase(inPublicResourceId)
     {}
 
     SwapChainBufferDeclaration::
@@ -123,15 +123,15 @@ namespace engine {
 
 
     SwapChainDeclaration::
-      UpdateRequest::UpdateRequest(
+      CUpdateRequest::CUpdateRequest(
         PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
+      : BaseDeclaration::CUpdateRequestBase(inPublicResourceId)
     {}
 
     SwapChainDeclaration::
-      DestructionRequest::DestructionRequest(
+      CDestructionRequest::CDestructionRequest(
         PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
+      : BaseDeclaration::CDestructionRequestBase(inPublicResourceId)
     {}
 
 

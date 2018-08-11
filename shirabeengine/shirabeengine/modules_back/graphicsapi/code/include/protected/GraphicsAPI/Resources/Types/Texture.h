@@ -6,8 +6,8 @@
 #include "resources/core/eresourcetype.h"
 #include "resources/core/iresource.h"
 #include "resources/core/resourcedomaintransfer.h"
-#include "Resources/Core/ResourceTraits.h"
-#include "Resources/Core/RequestDefaultImplementation.h"
+#include "resources/core/resourcetraits.h"
+#include "resources/core/requestdefaultimplementation.h"
 
 #include "GraphicsAPI/Definitions.h"
 #include "GraphicsAPI/Resources/GFXAPI.h"
@@ -85,19 +85,19 @@ namespace Engine {
         std::string toString() const;
       };
 
-      class SHIRABE_TEST_EXPORT UpdateRequest
-        : public BaseDeclaration::UpdateRequestBase
+      class SHIRABE_TEST_EXPORT CUpdateRequest
+        : public BaseDeclaration::CUpdateRequestBase
       {
       public:
-        UpdateRequest(
+        CUpdateRequest(
           PublicResourceId_t    const& inPublicResourceId);
       };
 
-      class SHIRABE_TEST_EXPORT DestructionRequest
-        : public BaseDeclaration::DestructionRequestBase
+      class SHIRABE_TEST_EXPORT CDestructionRequest
+        : public BaseDeclaration::CDestructionRequestBase
       {
       public:
-        DestructionRequest(
+        CDestructionRequest(
           PublicResourceId_t    const& inPublicResourceId);
       };
 

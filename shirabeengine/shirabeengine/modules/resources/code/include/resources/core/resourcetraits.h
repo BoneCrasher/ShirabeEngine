@@ -59,11 +59,11 @@ namespace engine
         class CResourcePublicTraits
         {
         public:
-            using descriptor_public_type          = typename T::Descriptor        ;
-            using creation_request_public_type    = typename T::CreationRequest   ;
-            using update_request_public_type      = typename T::UpdateRequest     ;
-            using query_request_public_type       = typename T::Query             ;
-            using destruction_request_public_type = typename T::DestructionRequest;
+            using descriptor_public_type          = typename T::SDescriptor        ;
+            using creation_request_public_type    = typename T::CreationRequest    ;
+            using update_request_public_type      = typename T::CUpdateRequest     ;
+            using query_request_public_type       = typename T::CQuery             ;
+            using destruction_request_public_type = typename T::CDestructionRequest;
         };
 
         #define SHIRABE_DEFINE_RESOURCE_TRAITS(Prefix, Class, Type, Subtype, Descriptor, Creation, Update, Query, Destruction)\

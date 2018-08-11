@@ -18,7 +18,7 @@ namespace engine {
     EEngineStatus
       VulkanResourceTaskBackend::
       updateTask(
-        RasterizerState::UpdateRequest    const&request,
+        RasterizerState::CUpdateRequest    const&request,
         ResolvedDependencyCollection      const&resolvedDependencies,
         ResourceTaskFn_t                       &outTask)
     {
@@ -30,7 +30,7 @@ namespace engine {
     EEngineStatus
       VulkanResourceTaskBackend::
       destructionTask(
-        RasterizerState::DestructionRequest const&request,
+        RasterizerState::CDestructionRequest const&request,
         ResolvedDependencyCollection        const&resolvedDependencies,
         ResourceTaskFn_t                         &outTask)
     {

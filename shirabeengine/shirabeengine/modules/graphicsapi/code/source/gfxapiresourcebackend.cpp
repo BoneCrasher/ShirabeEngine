@@ -9,8 +9,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CGFXAPIResourceBackend
         ::CGFXAPIResourceBackend()
-            : m_resourceThread()
-            , m_resourceThreadHandler(m_resourceThread.getHandler())
+            : mResourceThread()
+            , mResourceThreadHandler(mResourceThread.getHandler())
         {}
         //<-----------------------------------------------------------------------------
 
@@ -21,11 +21,11 @@ namespace engine
         ::initialize()
         {
             // Do not catch those as it will prevent all iteration.
-            if(!m_resourceThread.initialize()) {
+            if(!mResourceThread.initialize()) {
                 throw EngineException(EEngineStatus::Error, "Cannot initialize resource backend thread.");
             }
 
-            if(!m_resourceThread.run()) {
+            if(!mResourceThread.run()) {
                 throw EngineException(EEngineStatus::Error, "Cannot run resource backend thread.");
             }
 
@@ -33,18 +33,18 @@ namespace engine
         }
 
         bool
-        GFXAPIResourceBackend
+        CGFXAPIResourceBackend
         ::deinitialize()
         {
-            if(m_resourceThread.running()) {
-                m_resourceThread.abortAndJoin();
+            if(mResourceThread.running()) {
+                mResourceThread.abortAndJoin();
             }
 
-            return m_resourceThread.deinitialize();
+            return mResourceThread.deinitialize();
         }
 
         EEngineStatus
-        GFXAPIResourceBackend::registerResource(
+        CGFXAPIResourceBackend::registerResource(
                 PublicResourceId_t const&id,
                 CStdSharedPtr_t<void>                resource)
         {
@@ -67,7 +67,7 @@ namespace engine
      * \return	The EEngineStatus.
      **************************************************************************************************/
         EEngineStatus
-        GFXAPIResourceBackend
+        CGFXAPIResourceBackend
         ::enqueue(
                 ResourceTaskFn_t                             &inTask,
                 std::future<ResourceTaskFn_t::result_type>   &outSharedFuture)
@@ -83,12 +83,12 @@ namespace engine
 
             EEngineStatus status = EEngineStatus::Ok;
 
-            bool enqueued = m_resourceThreadHandler.post(std::move(looperTask));
+            bool enqueued = mResourceThreadHandler.post(std::move(looperTask));
             return (enqueued ? EEngineStatus::Ok : EEngineStatus::GFXAPI_SubsystemThreadEnqueueFailed);
         }
 
         void
-        GFXAPIResourceBackend
+        CGFXAPIResourceBackend
         ::setResourceTaskBackend(ResourceTaskBackendPtr const& backend)
         {
             assert(backend != nullptr);

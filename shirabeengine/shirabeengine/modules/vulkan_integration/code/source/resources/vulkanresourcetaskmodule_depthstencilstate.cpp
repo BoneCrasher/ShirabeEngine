@@ -19,7 +19,7 @@ namespace engine {
     EEngineStatus
       VulkanResourceTaskBackend::
       updateTask(
-        DepthStencilState::UpdateRequest    const&request,
+        DepthStencilState::CUpdateRequest    const&request,
         ResolvedDependencyCollection        const&resolvedDependencies,
         ResourceTaskFn_t                         &outTask)
     {
@@ -31,7 +31,7 @@ namespace engine {
     EEngineStatus
       VulkanResourceTaskBackend::
       destructionTask(
-        DepthStencilState::DestructionRequest const&request,
+        DepthStencilState::CDestructionRequest const&request,
         ResolvedDependencyCollection          const&resolvedDependencies,
         ResourceTaskFn_t                           &outTask)
     {

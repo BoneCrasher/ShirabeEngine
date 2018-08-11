@@ -44,13 +44,13 @@ namespace Engine {
 
       EEngineStatus unloadSync();
 
-      typename TResource::DestructionRequest const&destructionRequest() const { return m_destructionRequest; }
+      typename TResource::CDestructionRequest const&destructionRequest() const { return m_destructionRequest; }
 
     protected:
-      void setDestructionRequest(typename TResource::DestructionRequest const&request) { m_destructionRequest = request; }
+      void setDestructionRequest(typename TResource::CDestructionRequest const&request) { m_destructionRequest = request; }
 
     private:
-      typename TResource::DestructionRequest m_destructionRequest;
+      typename TResource::CDestructionRequest m_destructionRequest;
     };
 
     /**********************************************************************************************//**
@@ -93,7 +93,7 @@ namespace Engine {
         HandleEngineStatusError(EEngineStatus::GFXAPI_LoadResourceFailed, String::format("Failed to load GFXAPI resource '%0'", rd.name));
       }
 
-      this->setDestructionRequest(typename TResource::DestructionRequest(rd.name));
+      this->setDestructionRequest(typename TResource::CDestructionRequest(rd.name));
       this->setLoadState(ELoadState::LOADED);
 
       return EEngineStatus::Ok;
@@ -104,7 +104,7 @@ namespace Engine {
       ::unloadSync()
     {
       EEngineStatus status = EEngineStatus::Ok;
-      status = resourceBackend()->unload<TResource>(TResource::DestructionRequest(this->destructionRequest()));
+      status = resourceBackend()->unload<TResource>(TResource::CDestructionRequest(this->destructionRequest()));
 
       if(CheckEngineError(status)) {
         this->setLoadState(ELoadState::UNKNOWN);

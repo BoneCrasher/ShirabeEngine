@@ -92,7 +92,7 @@ namespace engine
              * @return              EEngineStatus::Ok, if successful. Error flags otherwise.
              */
             virtual EEngineStatus updateTask(
-                    typename T::UpdateRequest      const&aRequest,
+                    typename T::CUpdateRequest      const&aRequest,
                     ResolvedDependencyCollection_t const&aDependencies,
                     ResourceTaskFn_t                    &aOutTask) = 0;
 
@@ -106,7 +106,7 @@ namespace engine
              * @return
              */
             virtual EEngineStatus destructionTask(
-                    typename T::DestructionRequest const&aRequest,
+                    typename T::CDestructionRequest const&aRequest,
                     ResolvedDependencyCollection_t const&aDependencies,
                     ResourceTaskFn_t                    &aOutTask) = 0;
 
@@ -150,7 +150,7 @@ namespace engine
             template <typename TResource>
             using UpdaterFn_t = std::function<
                                     EEngineStatus(
-                                        typename TResource::UpdateRequest const &,
+                                        typename TResource::CUpdateRequest const &,
                                         SGFXAPIResourceHandleAssignment   const &,
                                         ResolvedDependencyCollection_t    const &,
                                         ResourceTaskFn_t                        &)>;
@@ -163,7 +163,7 @@ namespace engine
             template <typename TResource>
             using DestructorFn_t = std::function<
                                     EEngineStatus(
-                                        typename TResource::DestructionRequest const &,
+                                        typename TResource::CDestructionRequest const &,
                                         SGFXAPIResourceHandleAssignment        const &,
                                         ResolvedDependencyCollection_t         const &,
                                         ResourceTaskFn_t                             &)>;
@@ -208,7 +208,7 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus updateTask(
-                    typename TResource::UpdateRequest const&aRequest,
+                    typename TResource::CUpdateRequest const&aRequest,
                     SGFXAPIResourceHandleAssignment   const&aAssignment,
                     ResolvedDependencyCollection_t    const&aDependencies,
                     ResourceTaskFn_t                       &aOutTask);
@@ -225,7 +225,7 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus destructionTask(
-                    typename TResource::DestructionRequest const &aRequest,
+                    typename TResource::CDestructionRequest const &aRequest,
                     SGFXAPIResourceHandleAssignment        const &aAssignment,
                     ResolvedDependencyCollection_t         const &aDependencies,
                     ResourceTaskFn_t                             &aOutTask);
@@ -358,7 +358,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CGFXAPIResourceTaskBackend::updateTask(
-                typename TResource::UpdateRequest const&aRequest,
+                typename TResource::CUpdateRequest const&aRequest,
                 SGFXAPIResourceHandleAssignment   const&aAssignment,
                 ResolvedDependencyCollection_t    const&aDependencies,
                 ResourceTaskFn_t                       &aOutTask)
@@ -387,7 +387,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CGFXAPIResourceTaskBackend::destructionTask(
-                typename TResource::DestructionRequest const &aRequest,
+                typename TResource::CDestructionRequest const &aRequest,
                 SGFXAPIResourceHandleAssignment        const &aAssignment,
                 ResolvedDependencyCollection_t         const &aDependencies,
                 ResourceTaskFn_t                             &aOutTask)

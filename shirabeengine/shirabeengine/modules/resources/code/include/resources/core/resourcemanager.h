@@ -103,9 +103,9 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus createResource(
-                    typename TResource::CreationRequest const &aRequest,
-                    std::string                         const &aResourceId,
-                    bool                                       aCreationDeferred = false);
+                    typename TResource::CCreationRequest const &aRequest,
+                    std::string                          const &aResourceId,
+                    bool                                        aCreationDeferred = false);
 
             /**
              * Load a resource in it's respective backend, if not done so yet.
@@ -127,8 +127,8 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus updateResource(
-                    std::string                       const &aResourceId,
-                    typename TResource::UpdateRequest const &aRequest);
+                    std::string                        const &aResourceId,
+                    typename TResource::CUpdateRequest const &aRequest);
 
             /**
              * Unload a resource in it's backend. This will not remove it from the resourcemanager.
@@ -208,9 +208,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CResourceManager::createResource(
-                typename TResource::CreationRequest const &aRequest,
-                std::string                         const &aResourceId,
-                bool                                       aCreationDeferred)
+                typename TResource::CCreationRequest const &aRequest,
+                std::string                          const &aResourceId,
+                bool                                        aCreationDeferred)
         {
             typename TResource::Descriptor const& desc = aRequest.resourceDescriptor();
 
@@ -313,7 +313,7 @@ namespace engine
         template <typename TResource>
         EEngineStatus CResourceManager::updateResource(
                 std::string                       const &aResourceId,
-                typename TResource::UpdateRequest const &aRequest)
+                typename TResource::CUpdateRequest const &aRequest)
         {
             return EEngineStatus::Ok;
         }

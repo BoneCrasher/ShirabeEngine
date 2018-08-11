@@ -46,16 +46,16 @@ namespace engine {
       return ss.str();
     }
 
-    RasterizerStateDeclaration::UpdateRequest
-      ::UpdateRequest(
+    RasterizerStateDeclaration::CUpdateRequest
+      ::CUpdateRequest(
         PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::UpdateRequestBase(inPublicResourceId)
+      : BaseDeclaration::CUpdateRequestBase(inPublicResourceId)
     {}
 
-    RasterizerStateDeclaration::DestructionRequest
-      ::DestructionRequest(
+    RasterizerStateDeclaration::CDestructionRequest
+      ::CDestructionRequest(
         PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::DestructionRequestBase(inPublicResourceId)
+      : BaseDeclaration::CDestructionRequestBase(inPublicResourceId)
     {}
 
     RasterizerStateDeclaration::Query

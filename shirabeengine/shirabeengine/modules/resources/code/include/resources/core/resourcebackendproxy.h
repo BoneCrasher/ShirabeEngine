@@ -21,7 +21,7 @@ namespace engine
                 typename TBackend,
                 typename TResource
                 >
-        class ResourceBackendProxy
+        class CResourceBackendProxy
                 : public CGenericProxyBase<TResource>
         {
         public_constructors:
@@ -33,10 +33,10 @@ namespace engine
              * @param resourceBackend
              * @param request
              */
-            ResourceBackendProxy(
-                    EProxyType                          const &aProxyType,
-                    CStdSharedPtr_t<TBackend>           const &aResourceBackend,
-                    typename TResource::CreationRequest const &aRequest)
+            CResourceBackendProxy(
+                    EProxyType                           const &aProxyType,
+                    CStdSharedPtr_t<TBackend>            const &aResourceBackend,
+                    typename TResource::CCreationRequest const &aRequest)
                 : CGenericProxyBase<TResource>(aProxyType, aRequest)
                 , m_backend(aResourceBackend)
             { }
