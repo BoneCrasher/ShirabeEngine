@@ -52,10 +52,10 @@ namespace Engine {
 
         std::string toString() const;
         
-        inline PublicResourceId_t swapChainId() const { return m_swapChainId; }
+        inline PublicResourceId_t swapChainId() const { return mSwapChainId; }
 
       private:
-        PublicResourceId_t m_swapChainId;
+        PublicResourceId_t mSwapChainId;
       };
 
       class CUpdateRequest

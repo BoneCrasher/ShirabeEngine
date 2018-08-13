@@ -49,7 +49,7 @@ namespace Engine {
         CStdSharedPtr_t<DX11Environment> m_dx11Environment;
 
         PublicResourceId_t
-          m_swapChainId,
+          mSwapChainId,
           m_defaultDepthStencilTextureId,
           m_defaultDepthStencilStateId;
 

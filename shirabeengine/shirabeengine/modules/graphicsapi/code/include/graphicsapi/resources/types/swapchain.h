@@ -8,215 +8,200 @@
 #include "resources/core/resourcetraits.h"
 #include "resources/core/requestdefaultimplementation.h"
 
-#include "GraphicsAPI/Resources/GFXAPI.h"
-#include "GraphicsAPI/Resources/Types/Definition.h"
-#include "GraphicsAPI/Resources/Types/Texture.h"
-#include "GraphicsAPI/Resources/Types/TextureView.h"
+#include "graphicsapi/resources/gfxapi.h"
+#include "graphicsapi/resources/types/definition.h"
+#include "graphicsapi/resources/types/texture.h"
+#include "graphicsapi/resources/types/textureview.h"
 
-namespace engine {
-  namespace gfxapi {
-    using namespace Resources;
-
-    class SwapChainBufferDeclaration {
-    public:
-      static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-      static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN_BUFFER;
-
-      /**********************************************************************************************//**
-       * \struct	SwapChainDescriptorImpl
-       *
-       * \brief	Implementation of the SwapChainDescriptor wrapper.
-       **************************************************************************************************/
-      struct Descriptor
-        : public DescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN_BUFFER>
-      {
-        std::string         name;
-        Texture::Descriptor texture;
-        uint32_t            backBufferIndex;
-
-        Descriptor();
-
-        std::string toString() const;
-      };
-
-      /**********************************************************************************************//**
-       * \struct	SwapChainCreationRequestImpl
-       *
-       * \brief	A swap chain creation request implementation.
-       **************************************************************************************************/
-      struct CreationRequest
-        : public BaseDeclaration::CreationRequestBase<Descriptor>
-      {
-      public:
-        CreationRequest(Descriptor const& desc);
-
-        std::string toString() const;
-        
-        inline PublicResourceId_t swapChainId() const { return m_swapChainId; }
-
-      private:
-        PublicResourceId_t m_swapChainId;
-      };
-
-      class CUpdateRequest
-        : public BaseDeclaration::CUpdateRequestBase
-      {
-      public:
-        CUpdateRequest(
-          PublicResourceId_t const& inPublicResourceId);
-      };
-
-      class CDestructionRequest
-        : public BaseDeclaration::CDestructionRequestBase
-      {
-      public:
-        CDestructionRequest(
-          PublicResourceId_t const& inPublicResourceId);
-      };
-
-      class Query
-        : public BaseDeclaration::QueryBase
-      {
-      public:
-        Query(
-          PublicResourceId_t const& inPublicResourceId);
-      };
-
-    };
-
-    /**********************************************************************************************//**
-     * \class	GAPISwapChain
-     *
-     * \brief	A gapi swap chain.
-     **************************************************************************************************/
-    class SwapChainBuffer
-      : public SwapChainBufferDeclaration
-      , public ResourceDescriptorAdapter<SwapChainBufferDeclaration::Descriptor>
+namespace engine
+{
+    namespace gfxapi
     {
-    public:
-      using my_type = SwapChainBuffer;
+        using namespace resources;
 
-      //
-      // GAPISwapChain<TGAPIResource> implementation
-      // 
-      // EEngineStatus bind(...);
-      // 
-      // EEngineStatus present(bool verticallySynchronized = true);
+        /**
+         * The CSwapChainBufferDeclaration class is the integration of a swap chain buffer into the
+         * resource system.
+         */
+        class CSwapChainBufferDeclaration
+        {
+        public_static_constants:
+            static const constexpr EResourceType    sResourceType    = EResourceType::GAPI_COMPONENT;
+            static const constexpr EResourceSubType sResourceSubtype = EResourceSubType::SWAP_CHAIN_BUFFER;
 
-      inline static CStdSharedPtr_t<SwapChainBuffer> create(
-        const SwapChainBuffer::Descriptor &desc);
+        public_structs:
+            /**
+             * The SDescriptor struct describes all data required to create a swapchain buffer.
+             */
+            struct SDescriptor
+                    : public CDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN_BUFFER>
+            {
+                std::string           name;
+                CTexture::SDescriptor texture;
+                uint32_t              backBufferIndex;
 
-    private:
-      inline SwapChainBuffer(
-        const SwapChainBuffer::Descriptor &descriptor);
-    };
+                SDescriptor();
 
+                std::string toString() const;
+            };
 
-    DeclareSharedPointerType(SwapChainBuffer);
-    DefineTraitsPublicTypes(SwapChainBuffer);
+            /**
+             * The CCreationRequest struct contains all data for swap chain buffer resource creation.
+             */
+            struct CCreationRequest
+                    : public CBaseDeclaration::CCreationRequestBase<SDescriptor>
+            {
+            public_constructors:
+                CCreationRequest(SDescriptor const &aDescriptor);
 
-    class SwapChainDeclaration {
-    public:
-      static const constexpr EResourceType    resource_type    = EResourceType::GAPI_COMPONENT;
-      static const constexpr EResourceSubType resource_subtype = EResourceSubType::SWAP_CHAIN;
+            public_methods:
+                SHIRABE_INLINE PublicResourceId_t swapChainId() const { return mSwapChainId; }
 
-      /**********************************************************************************************//**
-       * \struct	SwapChainDescriptorImpl
-       *
-       * \brief	Implementation of the SwapChainDescriptor wrapper.
-       **************************************************************************************************/
-      struct Descriptor
-        : public DescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
-      {
-        std::string         name;
-        Texture::Descriptor texture;
-        bool                vsyncEnabled;
-        bool                fullscreen;
-        unsigned int        windowHandle;
-        unsigned int        backBufferCount;
-        unsigned int        refreshRateNumerator;
-        unsigned int        refreshRateDenominator;
+                std::string toString() const;
 
-        std::string toString() const;
-      };
+            private_members:
+                PublicResourceId_t mSwapChainId;
+            };
 
-      /**********************************************************************************************//**
-       * \struct	SwapChainCreationRequestImpl
-       *
-       * \brief	A swap chain creation request implementation.
-       **************************************************************************************************/
-      struct CreationRequest
-        : public BaseDeclaration::CreationRequestBase<Descriptor> {
-      public:
-        CreationRequest(
-          Descriptor const& desc);
+            using CUpdateRequest      = CBaseDeclaration::CUpdateRequestBase;
+            using CDestructionRequest = CBaseDeclaration::CDestructionRequestBase;
+            using CQuery              = CBaseDeclaration::CQueryBase;
+        };
 
-        std::string toString() const;
-      };
+        /**
+         * The SwapChainBuffer class is the engine entity representing a swap chain buffer instance.
+         */
+        class CSwapChainBuffer
+                : public CSwapChainBufferDeclaration
+                , public CResourceDescriptorAdapter<CSwapChainBufferDeclaration::SDescriptor>
+        {
+        public_typedefs:
+            using my_type = CSwapChainBuffer;
 
-      class CUpdateRequest
-        : public BaseDeclaration::CUpdateRequestBase
-      {
-      public:
-        CUpdateRequest(
-          PublicResourceId_t const& inPublicResourceId);
-      };
+            //
+            // GAPISwapChain<TGAPIResource> implementation
+            //
+            // EEngineStatus bind(...);
+            //
+            // EEngineStatus present(bool verticallySynchronized = true);
 
-      class CDestructionRequest
-        : public BaseDeclaration::CDestructionRequestBase
-      {
-      public:
-        CDestructionRequest(
-          PublicResourceId_t const& inPublicResourceId);
-      };
+        public_methods:
+            static SHIRABE_INLINE CStdSharedPtr_t<CSwapChainBuffer> create(CSwapChainBuffer::SDescriptor const &aDescriptor);
 
-      class Query
-        : public BaseDeclaration::QueryBase
-      {
-      public:
-        Query(
-          PublicResourceId_t const& inPublicResourceId);
-      };
-    };
+        private_constructors:
+            SHIRABE_INLINE CSwapChainBuffer(CSwapChainBuffer::SDescriptor const &aDescriptor);
+        };
 
-    /**********************************************************************************************//**
-     * \class	GAPISwapChain
-     *
-     * \brief	A gapi swap chain.
-     **************************************************************************************************/
-    class SwapChain
-      : public SwapChainDeclaration
-      , public ResourceDescriptorAdapter<SwapChainDeclaration::Descriptor>
-    {
-    public:
-      using my_type = SwapChain;
+        SHIRABE_DEFINE_PUBLIC_TRAITS_TYPES(CSwapChainBuffer);
 
-      //
-      // GAPISwapChain<TGAPIResource> implementation
-      // 
-      // EEngineStatus bind(...);
-      // 
-      // EEngineStatus present(bool verticallySynchronized = true);
+        /**
+         * The SwapChainDeclaration class is the integration of the swapchain into the resource system.
+         */
+        class CSwapChainDeclaration
+        {
+        public_static_constants:
+            static const constexpr EResourceType    sResourceType    = EResourceType::GAPI_COMPONENT;
+            static const constexpr EResourceSubType sResourceSubtype = EResourceSubType::SWAP_CHAIN;
 
-      inline static CStdSharedPtr_t<SwapChain> create(
-        const SwapChain::Descriptor &desc);
+        public_structs:
+            /**
+             * The SDescriptor struct describes all data required to create a swapchain.
+             */
+            struct SDescriptor
+                    : public CDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
+            {
+            public_methods:
+                /**
+                 * Describe this descriptor as string.
+                 *
+                 * @return See brief.
+                 */
+                std::string toString() const;
 
-      CStdSharedPtr_t<TextureView> const& getBackBufferRenderTargetView(uint32_t const& index);
+            public_members:
+                std::string           name;
+                CTexture::SDescriptor texture;
+                bool                  vsyncEnabled;
+                bool                  fullscreen;
+                unsigned int          windowHandle;
+                unsigned int          backBufferCount;
+                unsigned int          refreshRateNumerator;
+                unsigned int          refreshRateDenominator;
+            };
 
-      CStdSharedPtr_t<TextureView> const& getCurrentBackBufferRenderTargetView();
+            struct CCreationRequest
+                    : public CBaseDeclaration::CCreationRequestBase<SDescriptor>
+            {
+            public:
+                CCreationRequest(
+                        SDescriptor const& desc);
 
-    private:
-      inline SwapChain(
-        const SwapChain::Descriptor &descriptor);
+                std::string toString() const;
+            };
 
-      std::size_t                        m_currentBackBufferIndex;
-      std::vector<CStdSharedPtr_t<TextureView>> m_backBufferRenderTargetViews;
-    };
+            using CUpdateRequest      = CBaseDeclaration::CUpdateRequestBase;
+            using CDestructionRequest = CBaseDeclaration::CDestructionRequestBase;
+            using CQuery              = CBaseDeclaration::CQueryBase;
+        };
 
-    DeclareSharedPointerType(SwapChain);
-    DefineTraitsPublicTypes(SwapChain);
+        /**
+         * The SwapChain class is the engine entity to represent swap chains.
+         */
+        class CSwapChain
+                : public CSwapChainDeclaration
+                , public CResourceDescriptorAdapter<CSwapChainDeclaration::SDescriptor>
+        {
+        public_typedefs:
+            using my_type = CSwapChain;
 
-  }
+            //
+            // GAPISwapChain<TGAPIResource> implementation
+            //
+            // EEngineStatus bind(...);
+            //
+            // EEngineStatus present(bool verticallySynchronized = true);
+
+        public_static_functions:
+            /**
+             * Create a new swap chain entity for the provided descriptor.
+             *
+             * @param aDescriptor
+             * @return A pointer to a CSwapChain instance, or nullptr;
+             */
+            static SHIRABE_INLINE CStdSharedPtr_t<CSwapChain> create(CSwapChain::SDescriptor const &aDescriptor);
+
+        public_methods:
+            /**
+             * Access a back buffer render target view for a given back buffer index.
+             *
+             * @param aIndex
+             * @return A valid texture view pointer or nullptr on error.
+             */
+            CStdSharedPtr_t<CTextureView> const getBackBufferRenderTargetView(uint32_t const &aIndex);
+
+            /**
+             * Get the currently selected back buffer pointer in case of double, triple or more buffering.
+             *
+             * @return A valid texture view pointer or nullptr on error.
+             */
+            CStdSharedPtr_t<CTextureView> const getCurrentBackBufferRenderTargetView();
+
+        private_constructors:
+            /**
+             * Create a swap chain initialized with it's creation descriptor.
+             *
+             * @param aDescriptor
+             */
+             CSwapChain(CSwapChain::SDescriptor const &aDescriptor);
+
+        private_members:
+            std::size_t                                mCurrentBackBufferIndex;
+            std::vector<CStdSharedPtr_t<CTextureView>> mBackBufferRenderTargetViews;
+        };
+
+        SHIRABE_DEFINE_PUBLIC_TRAITS_TYPES(CSwapChain);
+
+    }
 }
 
 #endif

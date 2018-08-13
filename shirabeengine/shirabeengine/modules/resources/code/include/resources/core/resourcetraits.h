@@ -60,7 +60,7 @@ namespace engine
         {
         public:
             using descriptor_public_type          = typename T::SDescriptor        ;
-            using creation_request_public_type    = typename T::CreationRequest    ;
+            using creation_request_public_type    = typename T::CCreationRequest   ;
             using update_request_public_type      = typename T::CUpdateRequest     ;
             using query_request_public_type       = typename T::CQuery             ;
             using destruction_request_public_type = typename T::CDestructionRequest;

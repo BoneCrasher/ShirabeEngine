@@ -1,74 +1,66 @@
-#include "GraphicsAPI/Resources//Types/RasterizerState.h"
+#include "graphicsapi/resources/types/rasterizerstate.h"
 
-namespace engine {
-  namespace gfxapi {
-
-    RasterizerStateDeclaration::Descriptor
-      ::Descriptor()
-      : name("")
-      , fillMode(FillMode::Solid)
-      , cullMode(CullMode::Back)
-      , antialiasRasterLines(false)
-      , multisamplingEnabled(false)
-      , scissorEnabled(false)
-      , depthClipEnabled(true)
-    {}
-
-    std::string
-      RasterizerStateDeclaration::Descriptor
-      ::toString() const {
-      std::stringstream ss;
-
-      ss
-        << "RasterizerStateDescriptor('" << name << "'):\n";
-
-      return ss.str();
-    }
-
-    RasterizerStateDeclaration::CreationRequest
-      ::CreationRequest(Descriptor const&desc)
-      : BaseDeclaration::CreationRequestBase<Descriptor>(desc)
-    {}
-
-    std::string
-      RasterizerStateDeclaration::CreationRequest
-      ::toString() const
+namespace engine
+{
+    namespace gfxapi
     {
-      std::stringstream ss;
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CRasterizerStateDeclaration::SDescriptor
+        ::SDescriptor()
+            : name("")
+            , fillMode(EFillMode::Solid)
+            , cullMode(ECullMode::Back)
+            , antialiasRasterLines(false)
+            , multisamplingEnabled(false)
+            , scissorEnabled(false)
+            , depthClipEnabled(true)
+        {}
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        std::string CRasterizerStateDeclaration::SDescriptor::toString() const
+        {
+            std::stringstream ss;
+            ss << "RasterizerStateSDescriptor('" << name << "'):\n";
 
-      ss
-        << "RasterizerStateCreationRequest: \n"
-        << "[\n"
-        << resourceDescriptor().toString() << "\n"
-        << "]"
-        << std::endl;
+            return ss.str();
+        }
+        //<-----------------------------------------------------------------------------
 
-      return ss.str();
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CRasterizerStateDeclaration::CCreationRequest::CCreationRequest(SDescriptor const &aDescriptor)
+            : CBaseDeclaration::CCreationRequestBase<SDescriptor>(aDescriptor)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::string CRasterizerStateDeclaration::CCreationRequest::toString() const
+        {
+            std::stringstream ss;
+            ss
+                    << "RasterizerStateCreationRequest: \n"
+                    << "[\n"
+                    << resourceDescriptor().toString() << "\n"
+                    << "]"
+                    << std::endl;
+
+            return ss.str();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CRasterizerState::CRasterizerState(CRasterizerState::SDescriptor const &aDescriptor)
+            : CRasterizerStateDeclaration()
+            , CResourceDescriptorAdapter<CRasterizerState::SDescriptor>(aDescriptor)
+        {}
+        //<-----------------------------------------------------------------------------
     }
-
-    RasterizerStateDeclaration::CUpdateRequest
-      ::CUpdateRequest(
-        PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::CUpdateRequestBase(inPublicResourceId)
-    {}
-
-    RasterizerStateDeclaration::CDestructionRequest
-      ::CDestructionRequest(
-        PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::CDestructionRequestBase(inPublicResourceId)
-    {}
-
-    RasterizerStateDeclaration::Query
-      ::Query(
-        PublicResourceId_t const& inPublicResourceId)
-      : BaseDeclaration::QueryBase(inPublicResourceId)
-    {}
-
-    RasterizerState
-      ::RasterizerState(
-        RasterizerState::Descriptor const &descriptor)
-      : RasterizerStateDeclaration()
-      , ResourceDescriptorAdapter<RasterizerState::Descriptor>(descriptor)
-    {}
-  }
 }

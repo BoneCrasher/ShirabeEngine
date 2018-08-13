@@ -177,7 +177,7 @@ namespace engine
 
         public_typedefs:
             using LooperType = CLooper<TTaskResult>;
-            using TaskType   = typename ILooper<TTaskResult>::Task;
+            using TaskType   = typename ILooper<TTaskResult>::CTask;
 
         public_classes:
             /**
@@ -347,7 +347,7 @@ namespace engine
              * @param runnable
              * @return
              */
-            bool loop(typename threading::ILooper<TTaskResult>::Task&& aRunnable);
+            bool loop(typename threading::ILooper<TTaskResult>::CTask&& aRunnable);
 
             /**
              * Post a task to the queue. Invoked exclusively by the attached handler.
@@ -560,7 +560,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        typename CLooper<TTaskResult>::TaskType CLooper<TTaskResult>::nextRunnable()
+        typename CLooper<TTaskResult>::CTaskType CLooper<TTaskResult>::nextRunnable()
         {
             std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
 
@@ -571,7 +571,7 @@ namespace engine
 
             // Implement dequeueing by priority with proper
             // load balancing here.
-            typename CLooper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
+            typename CLooper<TTaskResult>::CTaskType runnable = std::move(mRunnables.back());
             mRunnables.pop_back();
 
             return std::move(runnable);
@@ -659,7 +659,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool CLooper<TTaskResult>::loop(typename ILooper<TTaskResult>::Task &&aRunnable)
+        bool CLooper<TTaskResult>::loop(typename ILooper<TTaskResult>::CTask &&aRunnable)
         {
             //TTaskResult result = runnable.run();
             try
