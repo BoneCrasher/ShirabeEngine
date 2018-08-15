@@ -31,7 +31,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CSwapChainBufferDeclaration::CCreationRequest::CCreationRequest(SDescriptor const& desc)
-            : CBaseDeclaration::CreationRequestBase<SDescriptor>(desc)
+            : CBaseDeclaration::CCreationRequestBase<SDescriptor>(desc)
         {}
         //<-----------------------------------------------------------------------------
 

@@ -65,7 +65,7 @@ namespace engine
                  */
                 CTask(CTask&& aOther)
                     : mPriority(aOther.mPriority)
-                    , mTask(std::move(aOther.m_task))
+                    , mTask(std::move(aOther.mTask))
                 {}
 
             public_operators:
@@ -560,7 +560,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        typename CLooper<TTaskResult>::CTaskType CLooper<TTaskResult>::nextRunnable()
+        typename CLooper<TTaskResult>::TaskType CLooper<TTaskResult>::nextRunnable()
         {
             std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
 
@@ -571,7 +571,7 @@ namespace engine
 
             // Implement dequeueing by priority with proper
             // load balancing here.
-            typename CLooper<TTaskResult>::CTaskType runnable = std::move(mRunnables.back());
+            typename CLooper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
             mRunnables.pop_back();
 
             return std::move(runnable);

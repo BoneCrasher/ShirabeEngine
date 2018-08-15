@@ -85,11 +85,11 @@ namespace engine
             //
             // EEngineStatus present(bool verticallySynchronized = true);
 
+        public_constructors:
+            SHIRABE_INLINE CSwapChainBuffer(CSwapChainBuffer::SDescriptor const &aDescriptor);
+
         public_methods:
             static SHIRABE_INLINE CStdSharedPtr_t<CSwapChainBuffer> create(CSwapChainBuffer::SDescriptor const &aDescriptor);
-
-        private_constructors:
-            SHIRABE_INLINE CSwapChainBuffer(CSwapChainBuffer::SDescriptor const &aDescriptor);
         };
 
         SHIRABE_DEFINE_PUBLIC_TRAITS_TYPES(CSwapChainBuffer);
@@ -170,6 +170,14 @@ namespace engine
              */
             static SHIRABE_INLINE CStdSharedPtr_t<CSwapChain> create(CSwapChain::SDescriptor const &aDescriptor);
 
+        public_constructors:
+            /**
+             * Create a swap chain initialized with it's creation descriptor.
+             *
+             * @param aDescriptor
+             */
+             CSwapChain(CSwapChain::SDescriptor const &aDescriptor);
+
         public_methods:
             /**
              * Access a back buffer render target view for a given back buffer index.
@@ -185,14 +193,6 @@ namespace engine
              * @return A valid texture view pointer or nullptr on error.
              */
             CStdSharedPtr_t<CTextureView> const getCurrentBackBufferRenderTargetView();
-
-        private_constructors:
-            /**
-             * Create a swap chain initialized with it's creation descriptor.
-             *
-             * @param aDescriptor
-             */
-             CSwapChain(CSwapChain::SDescriptor const &aDescriptor);
 
         private_members:
             std::size_t                                mCurrentBackBufferIndex;

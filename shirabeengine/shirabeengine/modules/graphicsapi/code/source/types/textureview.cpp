@@ -71,7 +71,7 @@ namespace engine
         CTextureView::CTextureView(
                 const CTextureView::SDescriptor &aDescriptor)
             : CTextureViewDeclaration()
-            , CResourceSDescriptorAdapter<CTextureViewDeclaration::SDescriptor>(aDescriptor)
+            , CResourceDescriptorAdapter<CTextureViewDeclaration::SDescriptor>(aDescriptor)
         {}
         //<-----------------------------------------------------------------------------
     }
