@@ -1,7 +1,7 @@
 #include "Renderer/FrameGraph/Pass.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
 
 
     PassBase::Accessor::Accessor(PassBase const*pass)

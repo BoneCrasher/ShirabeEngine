@@ -48,7 +48,7 @@ namespace engine
             public_members:
                 std::string   name;
                 STextureInfo  subjacentTexture;
-                Format        textureFormat;
+                EFormat        textureFormat;
                 ArraySlices_t arraySlices;
                 MipSlices_t   mipMapSlices;
                 // TODO: Distinguish binding and read/write mode

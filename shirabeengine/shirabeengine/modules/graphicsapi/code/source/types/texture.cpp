@@ -11,7 +11,7 @@ namespace engine
             : width(0)
             , height(1)
             , depth(1)
-            , format(Format::Undefined)
+            , format(EFormat::Undefined)
             , arraySize(1)
             , mipLevels(1)
             , multisampling()

@@ -1,7 +1,7 @@
 #include "Renderer/FrameGraph/Modules/GBufferGeneration.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
 
     FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData
       FrameGraphModule<GBufferModuleTag_t>::addGBufferGenerationPass(

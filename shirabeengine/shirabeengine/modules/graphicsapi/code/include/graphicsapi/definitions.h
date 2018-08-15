@@ -69,7 +69,7 @@ namespace engine
             GreaterEqual = Greater | Equal,
         };
 
-        using Format = resources::Format;
+        using Format = resources::EFormat;
     }
 }
 

@@ -4,34 +4,48 @@
 #include <exception>
 #include <string>
 
-namespace engine {
-  namespace Asset {
+#include <core/enginetypehelper.h>
 
-    enum class AssetErrorCode {
-      Ok,
-      AssetNotFound,
-      AssetAlreadyAdded,
-    };
-
-    class AssetError
-      : public std::runtime_error
+namespace engine
+{
+    namespace asset
     {
-    public:
-      inline
-      AssetError(
-        std::string    const&msg,
-        AssetErrorCode const&code)
-        : std::runtime_error(msg)
-        , m_code(code)
-      {}
+        /**
+         * The EAssetErrorCode enum describes all possible states of asset interaction.
+         */
+        enum class EAssetErrorCode
+        {
+            Ok,
+            AssetNotFound,
+            AssetAlreadyAdded,
+        };
 
-      inline AssetErrorCode code() const { return m_code; }
+        /**
+         * The CAssetError class wraps an error message and asset error code as an
+         * std::exception compatible type.
+         */
+        class CAssetError
+                : public std::runtime_error
+        {
+        public_constructors:
+            SHIRABE_INLINE CAssetError(
+                    std::string     const &aMessage,
+                    EAssetErrorCode const &aErrorCode)
+                : std::runtime_error(aMessage)
+                , mCode(aErrorCode)
+            {}
 
-    private:
-      AssetErrorCode m_code;
-    };
+        public_members:
+            SHIRABE_INLINE EAssetErrorCode code() const
+            {
+                return mCode;
+            }
 
-  }
+        private_members:
+            EAssetErrorCode mCode;
+        };
+
+    }
 }
 
 #endif

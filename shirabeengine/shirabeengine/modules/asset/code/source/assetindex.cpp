@@ -1,72 +1,107 @@
 #include <experimental/filesystem>
 
-#include "Core/String.h"
+#include <core/string.h>
+#include "asset/assetindex.h"
 
-#include "Asset/AssetIndex.h"
-
-namespace engine {
-  namespace Asset {
-
-    namespace xml = engine::Documents;
-
-    void __readAssets(xml::XMLDocument const&file, AssetRegistry<Asset> &registry);
-    void __readAsset(xmlNodePtr        const&assets, xml::XMLDocument const&file, AssetRegistry<Asset> &registry);
-
-    AssetRegistry<Asset>
-      AssetIndex::loadIndexById(std::string const&indexId)
+namespace engine
+{
+    namespace asset
     {
-      namespace fs  = std::experimental::filesystem;
 
-      AssetRegistry<Asset> reg{ };
+        namespace xml = engine::documents;
 
-      std::string filename = String::format("./assets/%0.assetindex.xml", indexId);
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        /**
+         * Helper function to read an asset registry from a file.
+         *
+         * @param aFile        The XML-document containing all asset data.
+         * @param aOutRegistry Filled up registry output handle
+         */
+        void __readAssets(
+                xml::CXMLDocument      const &aFile,
+                CAssetRegistry<SAsset>       &aOutRegistry);
+        /**
+         * Read an asset entry from XML.
+         *
+         * @param aAsset       XML-node pointer to a list of assets.
+         * @param aFile        The XML-document containing the above node pointer.
+         * @param aOutRegistry Filled up registry output handle
+         */
+        void __readAsset(
+                xmlNodePtr             const &aAsset,
+                xml::CXMLDocument      const &aFile,
+                CAssetRegistry<SAsset>       &aOutRegistry);
+        //<-----------------------------------------------------------------------------
 
-      xml::XMLDocument file{};
-      xml::XMLDocumentOpenState state = xml::XMLDocumentOpenState::FILE_OK;
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CAssetRegistry<SAsset> CAssetIndex::loadIndexById(std::string const&indexId)
+        {
+            namespace fs  = std::experimental::filesystem;
 
-      state = file.openFile(filename);
-      switch(state) {
-      case xml::XMLDocumentOpenState::FILE_NOT_FOUND:
-      case xml::XMLDocumentOpenState::FILE_ERROR:
-      case xml::XMLDocumentOpenState::FILE_EMPTY:
-      default:
-        break;
-      case xml::XMLDocumentOpenState::FILE_OK:
-        __readAssets(file, reg);
-        break;
-      }
+            CAssetRegistry<SAsset> reg = {};
 
-      return reg;
+            std::string const filename = CString::format("./assets/%0.assetindex.xml", indexId);
+
+            xml::CXMLDocument          file  = {};
+            xml::EXMLDocumentOpenState state = xml::EXMLDocumentOpenState::FILE_OK;
+
+            state = file.openFile(filename);
+            switch(state)
+            {
+            case xml::EXMLDocumentOpenState::FILE_NOT_FOUND:
+            case xml::EXMLDocumentOpenState::FILE_ERROR:
+            case xml::EXMLDocumentOpenState::FILE_EMPTY:
+                break;
+            case xml::EXMLDocumentOpenState::FILE_OK:
+                __readAssets(file, reg);
+                break;
+            }
+
+            return reg;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void __readAssets(
+                xml::CXMLDocument      const &aFile,
+                CAssetRegistry<SAsset>       &aOutRegistry)
+        {
+            std::string   const path   = CString::format("/Index/Asset");
+            xmlNodeSetPtr const assets = aFile.xmlSelect(path);
+
+            for(uint32_t k=0; k<assets->nodeNr; ++k)
+            {
+                xmlNodePtr const asset = assets->nodeTab[k];
+                __readAsset(asset, aFile, aOutRegistry);
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void __readAsset(
+                xmlNodePtr             const &aAsset,
+                xml::CXMLDocument      const &aFile,
+                CAssetRegistry<SAsset>       &aOutRegistry)
+        {
+            std::string const aid  = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"aid"));
+            std::string const type = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"type"));
+            std::string const uri  = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"uri"));
+
+            SAsset a = {};
+            a.id     = from_string<AssetId_t>(aid);
+            a.type   = from_string<EAssetType>(type);
+            a.URI    = uri;
+
+            aOutRegistry.addAsset(a.id, a);
+        }
+        //<-----------------------------------------------------------------------------
     }
-
-    void __readAssets(
-      xml::XMLDocument     const&file,
-      AssetRegistry<Asset>      &registry)
-    {
-      std::string path = String::format("/Index/Asset");
-
-      xmlNodeSetPtr assets = file.xmlSelect(path);
-      for(uint32_t k=0; k<assets->nodeNr; ++k) {
-        xmlNodePtr asset = assets->nodeTab[k];
-        __readAsset(asset, file, registry);
-      }
-    }
-
-    void __readAsset(
-      xmlNodePtr           const&asset,
-      xml::XMLDocument     const&file,
-      AssetRegistry<Asset>      &registry)
-    {
-      std::string aid  = String::format("%0", (unsigned char*)xmlGetProp(asset, (const xmlChar *)"aid"));
-      std::string type = String::format("%0", (unsigned char*)xmlGetProp(asset, (const xmlChar *)"type"));
-      std::string uri  = String::format("%0", (unsigned char*)xmlGetProp(asset, (const xmlChar *)"uri"));
-
-      Asset a{};
-      a.id   = from_string<AssetId_t>(aid);
-      a.type = from_string<AssetType>(type);
-      a.URI  = uri;
-
-      registry.addAsset(a.id, a);
-    }
-  }
 }

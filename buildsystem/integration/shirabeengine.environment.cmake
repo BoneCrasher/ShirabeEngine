@@ -21,7 +21,7 @@ macro(INIT)
     set(APPS_DIR                     ${SHIRABE_WORKSPACE_ROOT_DIR}/apps)
     set(COMPONENT_DIR                ${SHIRABE_WORKSPACE_ROOT_DIR}/components)
     set(ENGINE_DIR                   ${SHIRABE_WORKSPACE_ROOT_DIR}/engine)
-    set(THIRD_PARTY_DIR              ${SHIRABE_WORKSPACE_ROOT_DIR}/thirdparty)
+    set(THIRD_PARTY_DIR              ${SHIRABE_WORKSPACE_ROOT_DIR}/../thirdparty)
 
     set(SHIRABE_PUBLIC_BUILD_ROOT    ${SHIRABE_WORKSPACE_ROOT_DIR}/_build)
     set(SHIRABE_PUBLIC_DEPLOY_ROOT   ${SHIRABE_WORKSPACE_ROOT_DIR}/_deploy)

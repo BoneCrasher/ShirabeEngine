@@ -1,7 +1,7 @@
 #include "Renderer/FrameGraph/Modules/Compositing.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
 
     FrameGraphModule<CompositingModuleTag_t>::ExportData
       FrameGraphModule<CompositingModuleTag_t>::addDefaultCompositingPass(

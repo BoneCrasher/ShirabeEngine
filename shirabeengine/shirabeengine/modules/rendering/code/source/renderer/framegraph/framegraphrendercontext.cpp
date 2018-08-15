@@ -4,7 +4,7 @@
 #include "Renderer/FrameGraph/FrameGraphRenderContext.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
     using namespace engine::Rendering;
 
     CStdSharedPtr_t<FrameGraphRenderContext>

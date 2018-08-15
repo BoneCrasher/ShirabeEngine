@@ -1,7 +1,7 @@
 #include "Renderer/FrameGraph/Modules/Lighting.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
 
     FrameGraphModule<LightingModuleTag_t>::LightingExportData
       FrameGraphModule<LightingModuleTag_t>::addLightingPass(

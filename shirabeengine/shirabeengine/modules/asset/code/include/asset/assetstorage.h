@@ -1,69 +1,121 @@
 #ifndef __SHIRABE_ASSET_STORAGE_H__
 #define __SHIRABE_ASSET_STORAGE_H__
 
-#include "core/enginetypehelper.h"
-#include "Core/DataBuffer.h"
+#include <core/enginetypehelper.h>
+#include <core/databuffer.h>
+#include <graphicsapi/resources/types/texture.h>
+#include "asset/asseterror.h"
+#include "asset/assettypes.h"
 
-#include "GraphicsAPI/Resources/Types/Texture.h"
-
-#include "Asset/AssetError.h"
-#include "Asset/AssetTypes.h"
-
-namespace engine {
-  namespace Asset {
-
-    /**********************************************************************************************//**
-     * \fn  DeclareInterface(IAssetStorage);
-     *
-     * \brief Constructor
-     *
-     * \param parameter1  The first parameter.
-     **************************************************************************************************/
-    DeclareInterface(IAssetStorage);
-    virtual AssetId_t createDynamicTextureAsset(
-      std::string         const&,
-      GFXAPI::TextureInfo const&) = 0;
-
-    virtual Asset      loadAsset(AssetId_t const&) = 0;
-    virtual ByteBuffer loadAssetData(Asset const&) = 0;
-    DeclareInterfaceEnd(IAssetStorage);
-
-    DeclareSharedPointerType(IAssetStorage);
-
-    /**********************************************************************************************//**
-     * \class AssetStorage
-     *
-     * \brief An asset storage.
-     **************************************************************************************************/
-    class SHIRABE_TEST_EXPORT AssetStorage
-      : public IAssetStorage
+namespace engine
+{
+    namespace asset
     {
-      using TextureAssetData = AssetRegistry<TextureAsset>;
-      using BufferAssetData  = AssetRegistry<BufferAsset>;
-    public:
-      using AssetIndex = AssetRegistry<Asset>;
+        /**
+         * The IAssetStorage class describes the basic means of interaction with an asset storage.
+         */
+        class IAssetStorage
+        {
+            SHIRABE_DECLARE_INTERFACE(IAssetStorage);
 
-      AssetStorage();
+        public_api:
+            /**
+             * Create a dynamic texture asset on disk during editing/runtime.
+             *
+             * @param aAssetName   Name of the texture asset to create.
+             * @param aTextureInfo Texture information for resource creation.
+             * @return             A valid AssetId (> 0) if successful. 0 otherwise.
+             */
+            virtual AssetId_t createDynamicTextureAsset(
+                    std::string          const &aAssetName,
+                    gfxapi::STextureInfo const &aTextureInfo) = 0;
 
-      void readIndex(AssetIndex const&);
+            /**
+             * Load an asset from the respective asset source.
+             *
+             * @param aAssetUID The UID of the asset to load.
+             * @return          A valid asset if successful. Empty otherwise.
+             */
+            virtual SAsset loadAsset(AssetId_t const &aAssetUID) = 0;
 
-      AssetId_t createDynamicTextureAsset(
-        std::string         const&,
-        GFXAPI::TextureInfo const&);
+            /**
+             * Load the byte data for a provided asset descriptor.
+             *
+             * @param aAsset The asset descriptor for which byte data should be loaded.
+             * @return       A filled byte buffer if successful. False otherwise.
+             */
+            virtual ByteBuffer loadAssetData(SAsset const &aAsset) = 0;
+        };
 
-      Asset      loadAsset(AssetId_t const&);
-      ByteBuffer loadAssetData(Asset const&);
+        /**
+         * The AssetStorage class provides a default asset storage implementation.
+         */
+        class SHIRABE_TEST_EXPORT CAssetStorage
+                : public IAssetStorage
+        {
+        private_typedefs:
+            using TextureAssetData = CAssetRegistry<STextureAsset>;
+            using BufferAssetData  = CAssetRegistry<SBufferAsset>;
 
-    private:
-      ByteBuffer loadBufferAsset(Asset const&);
-      ByteBuffer loadTextureAsset(Asset const&);
+        public_typedefs:
+            using AssetIndex_t = CAssetRegistry<SAsset>;
 
-      AssetIndex       m_assetIndex;
-      TextureAssetData m_textureAssets;
-      BufferAssetData  m_bufferAssets;
-    };
-    DeclareSharedPointerType(AssetStorage);
-  }
+        public_constructors:
+            CAssetStorage();
+
+        public_methods:
+            void readIndex(AssetIndex_t const &aIndex);
+
+            /**
+             * Create a dynamic texture asset on disk during editing/runtime.
+             *
+             * @param aAssetName   Name of the texture asset to create.
+             * @param aTextureInfo Texture information for resource creation.
+             * @return             A valid AssetId (> 0) if successful. 0 otherwise.
+             */
+            AssetId_t createDynamicTextureAsset(
+                    std::string          const &aName,
+                    gfxapi::STextureInfo const &aTextureInfo);
+
+            /**
+             * Load an asset from the respective asset source.
+             *
+             * @param aAssetUID The UID of the asset to load.
+             * @return          A valid asset if successful. Empty otherwise.
+             */
+            SAsset loadAsset(AssetId_t const &aAssetUID);
+
+            /**
+             * Load the byte data for a provided asset descriptor.
+             *
+             * @param aAsset The asset descriptor for which byte data should be loaded.
+             * @return       A filled byte buffer if successful. False otherwise.
+             */
+            ByteBuffer loadAssetData(SAsset const &aAsset);
+
+        private_methods:
+            /**
+             * Implementation of loading a buffer asset from disc.
+             *
+             * @param aAsset Asset descriptor of the buffer resource.
+             * @return       A filled bytebuffer if successful. An empty buffer othwerise.
+             */
+            ByteBuffer loadBufferAsset(SAsset const &aAsset);
+
+            /**
+             * Implementation of loading texture assets from disc.
+             *
+             * @param aAsset Asset descriptor of the buffer resource.
+             * @return       A filled bytebuffer if successful. An empty buffer othwerise.
+             */
+            ByteBuffer loadTextureAsset(SAsset const &aAsset);
+
+        private_members:
+            AssetIndex_t     mAssetIndex;
+            TextureAssetData mTextureAssets;
+            BufferAssetData  mBufferAssets;
+        };
+    }
 }
 
 #endif

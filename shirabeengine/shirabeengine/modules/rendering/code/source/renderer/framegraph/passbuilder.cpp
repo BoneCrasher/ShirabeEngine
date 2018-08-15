@@ -5,7 +5,7 @@
 #include "Renderer/FrameGraph/GraphBuilder.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
     /**********************************************************************************************//**
      * \fn  template <typename TPassImplementation> PassBuilder<TPassImplementation>::PassBuilder( CStdSharedPtr_t<Pass<TPassImplementation>> &pass)
      *

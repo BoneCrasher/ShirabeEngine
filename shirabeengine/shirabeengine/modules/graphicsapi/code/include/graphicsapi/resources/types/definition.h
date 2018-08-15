@@ -5,7 +5,7 @@
 
 namespace engine {
   namespace resources {
-    enum class Format
+    enum class EFormat
       : uint16_t
     {
       Undefined = 0,

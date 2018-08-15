@@ -6,7 +6,7 @@ include(project_default_template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
 
-set(SHIRABE_EXCLUDED_SOURCES documents/json.cpp documents/xml.cpp)
+set(SHIRABE_EXCLUDED_SOURCES documents/json.cpp)
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS

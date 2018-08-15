@@ -2,7 +2,7 @@
 #include "Renderer/FrameGraph/GraphBuilder.h"
 
 namespace engine {
-  namespace FrameGraph {
+  namespace framegraph {
 
     template <typename TUID>
     static std::function<bool(std::vector<TUID> const&, TUID const&)> alreadyRegisteredFn =
