@@ -10,7 +10,7 @@ namespace engine
         CTextureViewDeclaration::SDescriptor::SDescriptor()
             : name("")
             , subjacentTexture()
-            , textureFormat(Format::Undefined)
+            , textureFormat(EFormat::Undefined)
         {}
         //<-----------------------------------------------------------------------------
 

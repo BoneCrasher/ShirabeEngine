@@ -24,59 +24,55 @@ namespace engine
         using namespace rendering;
         using namespace serialization;
 
-        class GraphBuilder;
-        class Graph;
+        class CGraphBuilder;
+        class CGraph;
 
-        class PassBase
+        class CPassBase
                 : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
         {
         public:
-            class Accessor {
+            class CAccessor
+            {
             public:
-                Accessor(PassBase const*);
+                CAccessor(CPassBase const*);
 
                 FrameGraphResourceIdList const&resourceReferences() const;
 
             private:
-                PassBase const*m_pass;
+                CPassBase const*m_pass;
             };
 
             class MutableAccessor
-                    : public Accessor
+                    : public CAccessor
             {
             public:
-                MutableAccessor(PassBase *);
+                MutableAccessor(CPassBase *);
 
                 FrameGraphResourceIdList &mutableResourceReferences();
 
                 bool registerResource(FrameGraphResourceId_t const&id);
 
             private:
-                PassBase *m_pass;
+                CPassBase *m_pass;
             };
 
-            UniqueCStdSharedPtr_t<Accessor>
-            getAccessor(PassKey<GraphBuilder>&&) const;
+            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<GraphBuilder>&&) const;
 
-            UniqueCStdSharedPtr_t<MutableAccessor>
-            getMutableAccessor(PassKey<GraphBuilder>&&);
+            CStdUniquePtr_t<MutableAccessor> getMutableAccessor(PassKey<GraphBuilder>&&);
 
-            UniqueCStdSharedPtr_t<Accessor>
-            getAccessor(PassKey<PassBuilder>&&) const;
+            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<PassBuilder>&&) const;
 
-            UniqueCStdSharedPtr_t<MutableAccessor>
-            getMutableAccessor(PassKey<PassBuilder>&&);
+            CStdUniquePtr_t<MutableAccessor> getMutableAccessor(PassKey<PassBuilder>&&);
 
-            UniqueCStdSharedPtr_t<Accessor>
-            getAccessor(PassKey<Graph>&&) const;
+            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<Graph>&&) const;
 
-            PassBase(
+            CPassBase(
                     PassUID_t   const&passUID,
                     std::string const&passName);
 
             virtual bool setup(PassBuilder&);
             virtual bool execute(
-                    FrameGraphResources           const&frameGraphResources,
+                    CFrameGraphResources           const&frameGraphResources,
                     CStdSharedPtr_t<IFrameGraphRenderContext>      &context);
 
             std::string const&passName() const;
@@ -97,17 +93,16 @@ namespace engine
             FrameGraphResourceIdList m_resourceReferences;
         };
 
-        DeclareSharedPointerType(PassBase);
-        DeclareListType(CStdSharedPtr_t<PassBase>, PassBase);
-        DeclareMapType(PassUID_t, CStdSharedPtr_t<PassBase>, Pass);
+        SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<CPassBase>, CPassBase);
+        SHIRABE_DECLARE_MAP_OF_TYPES(PassUID_t, CStdSharedPtr_t<CPassBase>, Pass);
 
         template <typename TPassData>
         class CallbackPass
-                : public PassBase
+                : public CPassBase
         {
         public:
             using SetupCallback_t = std::function<bool(PassBuilder&, TPassData&)>;
-            using ExecCallback_t  = std::function<bool(TPassData const&, FrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&)>;
+            using ExecCallback_t  = std::function<bool(TPassData const&, CFrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&)>;
 
             CallbackPass(
                     PassUID_t       const&passId,
@@ -116,7 +111,7 @@ namespace engine
                     ExecCallback_t      &&execCb);
 
             bool setup(PassBuilder&builder);
-            bool execute(FrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&);
+            bool execute(CFrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&);
 
             TPassData const&passData() const { return m_passData; }
 
@@ -136,7 +131,7 @@ namespace engine
                 std::string     const&passName,
                 SetupCallback_t     &&setupCb,
                 ExecCallback_t      &&execCb)
-            : PassBase(passUID, passName)
+            : CPassBase(passUID, passName)
             , setupCallback(setupCb)
             , execCallback(execCb)
             , m_passData()
@@ -160,7 +155,7 @@ namespace engine
 
         template <typename TPassData>
         bool
-        CallbackPass<TPassData>::execute(FrameGraphResources const&resources, CStdSharedPtr_t<IFrameGraphRenderContext>&context)
+        CallbackPass<TPassData>::execute(CFrameGraphResources const&resources, CStdSharedPtr_t<IFrameGraphRenderContext>&context)
         {
             try {
                 return execCallback(m_passData, resources, context);

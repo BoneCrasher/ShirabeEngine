@@ -1,207 +1,342 @@
 #include <assert.h>
 
-#include "Renderer/IRenderer.h"
-#include "Renderer/FrameGraph/FrameGraphRenderContext.h"
+#include "renderer/irenderer.h"
+#include "renderer/framegraph/framegraphrendercontext.h"
 
-namespace engine {
-  namespace framegraph {
-    using namespace engine::Rendering;
-
-    CStdSharedPtr_t<FrameGraphRenderContext>
-      FrameGraphRenderContext::create(
-        CStdSharedPtr_t<IAssetStorage>   assetStorage,
-        CStdSharedPtr_t<ResourceManager> resourceManager,
-        CStdSharedPtr_t<IRenderContext>  renderer)
+namespace engine
+{
+    namespace framegraph
     {
-      assert(assetStorage    != nullptr);
-      assert(resourceManager != nullptr);
-      assert(renderer        != nullptr);
+        using namespace engine::rendering;
 
-      CStdSharedPtr_t<FrameGraphRenderContext> context = CStdSharedPtr_t<FrameGraphRenderContext>(new FrameGraphRenderContext(assetStorage, resourceManager, renderer));
-      if(!context)
-        Log::Error(logTag(), "Failed to create render context from renderer and resourcemanager.");
-      return context;
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CStdSharedPtr_t<CFrameGraphRenderContext> CFrameGraphRenderContext::create(
+                CStdSharedPtr_t<IAssetStorage>    aAssetStorage,
+                CStdSharedPtr_t<CResourceManager> aResourceManager,
+                CStdSharedPtr_t<IRenderContext>   aRenderer)
+        {
+            assert(aAssetStorage    != nullptr);
+            assert(aResourceManager != nullptr);
+            assert(aRenderer        != nullptr);
+
+            CStdSharedPtr_t<CFrameGraphRenderContext> context = nullptr;
+            context = CStdSharedPtr_t<CFrameGraphRenderContext>(new CFrameGraphRenderContext(aAssetStorage, aResourceManager, aRenderer));
+            if(!context)
+                CLog::Error(logTag(), "Failed to create render context from renderer and resourcemanager.");
+
+            return context;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CFrameGraphRenderContext::CFrameGraphRenderContext(
+                CStdSharedPtr_t<IAssetStorage>    aAssetStorage,
+                CStdSharedPtr_t<CResourceManager> aResourceManager,
+                CStdSharedPtr_t<IRenderContext>   aRenderer)
+            : mAssetStorage(aAssetStorage)
+            , mResourceManager(aResourceManager)
+            , mGraphicsAPIRenderContext(aRenderer)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphRenderContext::mapFrameGraphToInternalResource(
+                std::string        const &aName,
+                PublicResourceId_t const &aResourceId)
+        {
+            mResourceMap[aName].push_back(aResourceId);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        Vector<PublicResourceId_t> CFrameGraphRenderContext::getMappedInternalResourceIds(std::string const &aName) const
+        {
+            if(mResourceMap.find(aName) == mResourceMap.end())
+                return {};
+
+            return mResourceMap.at(aName);
+        }
+
+        void CFrameGraphRenderContext::removeMappedInternalResourceIds(std::string const &aName)
+        {
+            mResourceMap.erase(aName);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
+        {
+            PublicResourceId_t const pid = "";
+            mapFrameGraphToInternalResource(aTexture.readableName, pid);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::createTexture(SFrameGraphTexture const&texture)
+        {
+            CTexture::SDescriptor desc{};
+            desc.name        = texture.readableName;
+            desc.textureInfo = texture;
+
+            if(texture.requestedUsage.check(EFrameGraphResourceUsage::RenderTarget))
+                desc.gpuBinding.set(EBufferBinding::ColorAttachement);
+            if(texture.requestedUsage.check(EFrameGraphResourceUsage::DepthTarget))
+                desc.gpuBinding.set(EBufferBinding::DepthAttachement);
+            if(texture.requestedUsage.check(EFrameGraphResourceUsage::ImageResource))
+                desc.gpuBinding.set(EBufferBinding::InputAttachement);
+
+            desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
+
+            CTexture::CCreationRequest const request(desc);
+
+            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(texture)));
+
+            EEngineStatus status = mResourceManager->createResource<CTexture>(request, texture.readableName, false);
+            if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
+                return EEngineStatus::Ok;
+            else
+                HandleEngineStatusError(status, "Failed to create texture.");
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::createTextureView(
+                SFrameGraphTexture     const &aTexture,
+                SFrameGraphTextureView const &aView)
+        {
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+
+            CTextureView::SDescriptor desc{ };
+            desc.name             = aView.readableName;
+            desc.textureFormat    = aView.format;
+            desc.subjacentTexture = aTexture;
+            desc.arraySlices      = aView.arraySliceRange;
+            desc.mipMapSlices     = aView.mipSliceRange;
+            desc.dependencies.push_back(aTexture.readableName);
+
+            CTextureView::CCreationRequest const request(desc, aTexture.readableName);
+
+            EEngineStatus status = mResourceManager->createResource<CTextureView>(request, aView.readableName, false);
+            HandleEngineStatusError(status, "Failed to create texture.");
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::createBuffer(
+                FrameGraphResourceId_t const &aResourceId,
+                SFrameGraphResource    const &aResource,
+                SFrameGraphBuffer      const &aBuffer)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::createBufferView(
+                FrameGraphResourceId_t const &aResourceId,
+                SFrameGraphResource    const &aResource,
+                SFrameGraphBufferView  const &aBufferView)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::loadTextureAsset(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::loadBufferAsset(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::bindTextureView(SFrameGraphTextureView const &aView)
+        {
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+
+            Vector<PublicResourceId_t> const &subjacentResources = getMappedInternalResourceIds(aView.readableName);
+            for(PublicResourceId_t const&pid : subjacentResources)
+                mGraphicsAPIRenderContext->bindResource(pid);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t  const &aResourceId)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::bindMesh(AssetId_t const&aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::unbindTextureView(SFrameGraphTextureView const &aView)
+        {
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+
+            Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(aView.readableName);
+            for(PublicResourceId_t const&pid : subjacentResources)
+                mGraphicsAPIRenderContext->unbindResource(pid);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::unbindMesh(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::unloadTextureAsset(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::unloadBufferAsset(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetUID)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::destroyTexture(SFrameGraphTexture const &aTexture)
+        {
+            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
+
+            EEngineStatus status = mResourceManager->destroyResource<CTexture>(aTexture.readableName);
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::destroyTextureView(SFrameGraphTextureView  const &aView)
+        {
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+
+            EEngineStatus status = EEngineStatus::Ok;
+            status = mResourceManager->destroyResource<CTextureView>(aView.readableName);
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::destroyBuffer(FrameGraphResourceId_t const &aResourceId)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::destroyBufferView(FrameGraphResourceId_t const &aResourceId)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::render(SRenderable const &aRenderable)
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
     }
-
-    FrameGraphRenderContext::FrameGraphRenderContext(
-      CStdSharedPtr_t<IAssetStorage>   assetStorage,
-      CStdSharedPtr_t<ResourceManager> resourceManager,
-      CStdSharedPtr_t<IRenderContext>  renderer)
-      : m_assetStorage(assetStorage)
-      , m_resourceManager(resourceManager)
-      , m_platformRenderContext(renderer)
-    {}
-
-    void FrameGraphRenderContext::mapFrameGraphToInternalResource(
-      std::string        const&id,
-      PublicResourceId_t const&pid)
-    {
-      m_resourceMap[id].push_back(pid);
-    }
-
-    Vector<PublicResourceId_t>
-      FrameGraphRenderContext::getMappedInternalResourceIds(std::string const&id) const
-    {
-      if(m_resourceMap.find(id) == m_resourceMap.end())
-        return {};
-
-      return m_resourceMap.at(id);
-    }
-
-    void
-      FrameGraphRenderContext::removeMappedInternalResourceIds(std::string const&id)
-    {
-      m_resourceMap.erase(id);
-    }
-
-    EEngineStatus FrameGraphRenderContext::importTexture(
-      FrameGraphTexture const&texture)
-    {
-      PublicResourceId_t pid = "";
-      mapFrameGraphToInternalResource(texture.readableName, pid);
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createTexture(
-      FrameGraphTexture const&texture)
-    {
-      Texture::Descriptor desc{};
-      desc.name        = texture.readableName;
-      desc.textureInfo = texture;
-      if(texture.requestedUsage.check(FrameGraphResourceUsage::RenderTarget))
-        desc.gpuBinding.set(BufferBinding::ColorAttachement);
-      if(texture.requestedUsage.check(FrameGraphResourceUsage::DepthTarget))
-        desc.gpuBinding.set(BufferBinding::DepthAttachement);
-      if(texture.requestedUsage.check(FrameGraphResourceUsage::ImageResource))
-        desc.gpuBinding.set(BufferBinding::InputAttachement);
-
-      desc.cpuGpuUsage = ResourceUsage::CPU_None_GPU_ReadWrite;
-
-      Texture::CreationRequest request(desc);
-
-      Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
-
-      EEngineStatus status = m_resourceManager->createResource<Texture>(request, texture.readableName, false);
-      if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
-        return EEngineStatus::Ok;
-      else 
-        HandleEngineStatusError(status, "Failed to create texture.");
-
-      return status;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createTextureView(
-      FrameGraphTexture      const&texture,
-      FrameGraphTextureView  const&view)
-    {
-      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
-      
-      TextureView::Descriptor desc{ };
-      desc.name             = view.readableName;
-      desc.textureFormat    = view.format;
-      desc.subjacentTexture = texture;
-      desc.arraySlices      = view.arraySliceRange;
-      desc.mipMapSlices     = view.mipSliceRange;
-      desc.dependencies.push_back(texture.readableName);
-
-      TextureView::CreationRequest request(desc, texture.readableName);
-
-      EEngineStatus status = m_resourceManager->createResource<TextureView>(request, view.readableName, false);
-      HandleEngineStatusError(status, "Failed to create texture.");
-
-      return status;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createBuffer(
-      FrameGraphResourceId_t const&id,
-      FrameGraphResource     const&resource,
-      FrameGraphBuffer       const&buffer)
-    {
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus FrameGraphRenderContext::createBufferView(
-      FrameGraphResourceId_t const&id,
-      FrameGraphResource     const&resource,
-      FrameGraphBufferView   const&view)
-    {
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus FrameGraphRenderContext::loadTextureAsset(AssetId_t const&) { return EEngineStatus::Ok; }
-    EEngineStatus FrameGraphRenderContext::loadBufferAsset(AssetId_t const&) { return EEngineStatus::Ok; }
-    EEngineStatus FrameGraphRenderContext::loadMeshAsset(AssetId_t const&) { return EEngineStatus::Ok; }
-
-    EEngineStatus FrameGraphRenderContext::bindTextureView(
-      FrameGraphTextureView const&view)
-    {
-      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
-
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
-      for(PublicResourceId_t const&pid : subjacentResources)
-        m_platformRenderContext->bindResource(pid);
-
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus FrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t  const&) { return EEngineStatus::Ok; }
-    EEngineStatus FrameGraphRenderContext::bindMesh(AssetId_t const&) { return EEngineStatus::Ok; }
-
-    EEngineStatus FrameGraphRenderContext::unbindTextureView(
-     FrameGraphTextureView const&view)
-    {
-      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
-
-      Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(view.readableName);
-      for(PublicResourceId_t const&pid : subjacentResources)
-        m_platformRenderContext->unbindResource(pid);
-
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus FrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t  const&) { return EEngineStatus::Ok; }
-    EEngineStatus FrameGraphRenderContext::unbindMesh(AssetId_t const&) { return EEngineStatus::Ok; }
-
-    EEngineStatus FrameGraphRenderContext::unloadTextureAsset(AssetId_t const&) { return EEngineStatus::Ok; }
-    EEngineStatus FrameGraphRenderContext::unloadBufferAsset(AssetId_t  const&) { return EEngineStatus::Ok; }
-    EEngineStatus FrameGraphRenderContext::unloadMeshAsset(AssetId_t    const&) { return EEngineStatus::Ok; }
-
-    EEngineStatus
-      FrameGraphRenderContext::destroyTexture(FrameGraphTexture const&texture)
-    {
-      Log::Verbose(logTag(), String::format("Texture:\n%0", to_string(texture)));
-
-      EEngineStatus status = m_resourceManager->destroyResource<Texture>(texture.readableName);
-
-      return status;
-    }
-
-    EEngineStatus
-      FrameGraphRenderContext::destroyTextureView(
-        FrameGraphTextureView  const&view)
-    {
-      Log::Verbose(logTag(), String::format("TextureView:\n%0", to_string(view)));
-
-      EEngineStatus status = EEngineStatus::Ok;
-      status = m_resourceManager->destroyResource<TextureView>(view.readableName);
-
-      return status;
-    }
-
-    EEngineStatus
-      FrameGraphRenderContext::destroyBuffer(FrameGraphResourceId_t const&id)
-    {
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus
-      FrameGraphRenderContext::destroyBufferView(FrameGraphResourceId_t const&id)
-    {
-      return EEngineStatus::Ok;
-    }
-
-    EEngineStatus FrameGraphRenderContext::render(Renderable const&renderable) { return EEngineStatus::Ok; }
-
-
-  }
 }

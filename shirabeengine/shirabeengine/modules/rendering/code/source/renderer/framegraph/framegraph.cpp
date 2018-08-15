@@ -7,198 +7,261 @@ namespace engine
 {
     namespace framegraph
     {
-
-        Graph::Accessor::Accessor(Graph const*graph)
-            : m_graph(graph)
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CGraph::CAccessor::CAccessor(CGraph const *aGraph)
+            : m_graph(aGraph)
         { }
+        //<-----------------------------------------------------------------------------
 
-        AdjacencyListMap<PassUID_t> const&
-        Graph::Accessor::passAdjacency() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        AdjacencyListMap_t<PassUID_t> const &CGraph::CAccessor::passAdjacency() const
         {
-            return m_graph->m_passAdjacency;
+            return m_graph->mPassAdjacency;
         }
+        //<-----------------------------------------------------------------------------
 
-        std::stack<PassUID_t> const&
-        Graph::Accessor::passExecutionOrder() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::stack<PassUID_t> const &CGraph::CAccessor::passExecutionOrder() const
         {
-            return m_graph->m_passExecutionOrder;
+            return m_graph->mPassExecutionOrder;
         }
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphResourceIdList const&
-        Graph::Accessor::resources() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceIdList const &CGraph::CAccessor::resources() const
         {
-            return m_graph->m_resources;
+            return m_graph->mResources;
         }
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphMutableResources const&
-        Graph::Accessor::resourceData() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CFrameGraphMutableResources const &CGraph::CAccessor::resourceData() const
         {
-            return m_graph->m_resourceData;
+            return m_graph->mResourceData;
         }
+        //<-----------------------------------------------------------------------------
 
-        AdjacencyListMap<FrameGraphResourceId_t> const&
-        Graph::Accessor::resourceAdjacency() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        AdjacencyListMap_t<FrameGraphResourceId_t> const &CGraph::CAccessor::resourceAdjacency() const
         {
-            return m_graph->m_resourceAdjacency;
+            return m_graph->mResourceAdjacency;
         }
+        //<-----------------------------------------------------------------------------
 
-        std::stack<FrameGraphResourceId_t> const&
-        Graph::Accessor::resourceOrder() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::stack<FrameGraphResourceId_t> const &CGraph::CAccessor::resourceOrder() const
         {
-            return m_graph->m_resourceOrder;
+            return m_graph->mResourceOrder;
         }
+        //<-----------------------------------------------------------------------------
 
-        AdjacencyListMap<PassUID_t, FrameGraphResourceId_t> const&
-        Graph::Accessor::passToResourceAdjacency() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &CGraph::CAccessor::passToResourceAdjacency() const
         {
-            return m_graph->m_passToResourceAdjacency;
+            return m_graph->mPassToResourceAdjacency;
         }
+        //<-----------------------------------------------------------------------------
 
-        Graph::MutableAccessor::MutableAccessor(Graph *graph)
-            : Accessor(graph)
-            , m_graph(graph)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CGraph::CMutableAccessor::CMutableAccessor(CGraph *aGraph)
+            : CAccessor(aGraph)
+            , mGraph(aGraph)
         {}
+        //<-----------------------------------------------------------------------------
 
-        AdjacencyListMap<PassUID_t>&
-        Graph::MutableAccessor::mutablePassAdjacency()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        AdjacencyListMap_t<PassUID_t> &CGraph::CMutableAccessor::mutablePassAdjacency()
         {
-            return m_graph->m_passAdjacency;
+            return mGraph->mPassAdjacency;
         }
 
-        std::stack<PassUID_t>&
-        Graph::MutableAccessor::mutablePassExecutionOrder()
+        std::stack<PassUID_t> &CGraph::CMutableAccessor::mutablePassExecutionOrder()
         {
-            return m_graph->m_passExecutionOrder;
+            return mGraph->mPassExecutionOrder;
         }
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphResourceIdList&
-        Graph::MutableAccessor::mutableResources()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceIdList &CGraph::CMutableAccessor::mutableResources()
         {
-            return m_graph->m_resources;
+            return mGraph->mResources;
         }
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphMutableResources&
-        Graph::MutableAccessor::mutableResourceData()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CFrameGraphMutableResources &CGraph::CMutableAccessor::mutableResourceData()
         {
-            return m_graph->m_resourceData;
+            return mGraph->mResourceData;
         }
+        //<-----------------------------------------------------------------------------
 
-        AdjacencyListMap<FrameGraphResourceId_t>&
-        Graph::MutableAccessor::mutableResourceAdjacency()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        AdjacencyListMap_t<FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutableResourceAdjacency()
         {
-            return m_graph->m_resourceAdjacency;
+            return mGraph->mResourceAdjacency;
         }
+        //<-----------------------------------------------------------------------------
 
-        std::stack<FrameGraphResourceId_t>&
-        Graph::MutableAccessor::mutableResourceOrder()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::stack<FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutableResourceOrder()
         {
-            return m_graph->m_resourceOrder;
+            return mGraph->mResourceOrder;
         }
+        //<-----------------------------------------------------------------------------
 
-        AdjacencyListMap<PassUID_t, FrameGraphResourceId_t>&
-        Graph::MutableAccessor::mutablePassToResourceAdjacency()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutablePassToResourceAdjacency()
         {
-            return m_graph->m_passToResourceAdjacency;
+            return mGraph->mPassToResourceAdjacency;
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        Graph::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> &aSerializer) const
         {
-            s->serializeGraph(*this);
+            aSerializer->serializeGraph(*this);
         }
+        //<-----------------------------------------------------------------------------
 
-
-        void
-        Graph::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> &aDeserializer)
         {
-            d->deserializeGraph(*this);
+            aDeserializer->deserializeGraph(*this);
         }
+        //<-----------------------------------------------------------------------------
 
-        Graph&
-        Graph::operator=(Graph const&other)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CGraph& CGraph::operator=(CGraph const &aOther)
         {
-            m_passes                  = other.m_passes;
-            m_passAdjacency           = other.m_passAdjacency;
-            m_passExecutionOrder      = other.m_passExecutionOrder;
-            m_resourceAdjacency       = other.m_resourceAdjacency;
-            m_resourceOrder           = other.m_resourceOrder;
-            m_passToResourceAdjacency = other.m_passToResourceAdjacency;
+            mPasses                  = aOther.mPasses;
+            mPassAdjacency           = aOther.mPassAdjacency;
+            mPassExecutionOrder      = aOther.mPassExecutionOrder;
+            mResourceAdjacency       = aOther.mResourceAdjacency;
+            mResourceOrder           = aOther.mResourceOrder;
+            mPassToResourceAdjacency = aOther.mPassToResourceAdjacency;
 
             return (*this);
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        Graph::execute(CStdSharedPtr_t<IFrameGraphRenderContext>&renderContext)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::execute(CStdSharedPtr_t<IFrameGraphRenderContext> &aRendercontext)
         {
-            assert(renderContext != nullptr);
+            assert(aRendercontext != nullptr);
 
-            std::stack<PassUID_t> copy = m_passExecutionOrder;
-            while(!copy.empty()) {
-                PassUID_t                     passUID  = copy.top();
-                CStdSharedPtr_t<PassBase>                 pass     = m_passes.at(passUID);
-                UniqueCStdSharedPtr_t<PassBase::Accessor> accessor = pass->getAccessor(PassKey<Graph>());
+            std::stack<PassUID_t> copy = mPassExecutionOrder;
+            while(!copy.empty())
+            {
+                PassUID_t                             const passUID  = copy.top();
+                CStdSharedPtr_t<CPassBase>            const pass     = mPasses.at(passUID);
+                CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(PassKey<CGraph>());
 
-                FrameGraphResourceIdList const&passResources = accessor->resourceReferences();
+                FrameGraphResourceIdList const &passResources = accessor->resourceReferences();
 
-                bool initialized = initializeResources(renderContext, passResources);
-                bool bound       = bindResources(renderContext, passResources);
+                bool const initialized = initializeResources(aRendercontext, passResources);
+                bool const bound       = bindResources(aRendercontext, passResources);
 
-                bool executed = pass->execute(m_resourceData, renderContext);
+                bool executed = pass->execute(mResourceData, aRendercontext);
                 if(!executed) {
-                    Log::Error(logTag(), String::format("Failed to execute pass %0", pass->passUID()));
+                    CLog::Error(logTag(), CString::format("Failed to execute pass %0", pass->passUID()));
                 }
 
-                bool unbound       = unbindResources(renderContext, passResources);
-                bool deinitialized = deinitializeResources(renderContext, passResources);
+                bool const unbound       = unbindResources(aRendercontext, passResources);
+                bool const deinitialized = deinitializeResources(aRendercontext, passResources);
 
                 copy.pop();
             }
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::initializeResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
-                FrameGraphResourceIdList      const&resourceIds)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::initializeResources(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                FrameGraphResourceIdList                  const &aResourceIds)
         {
             bool initialized = true;
 
-            for(FrameGraphResourceId_t const&id : resourceIds)
+            for(FrameGraphResourceId_t const&id : aResourceIds)
             {
-                CStdSharedPtr_t<FrameGraphResource>    subjacent   = nullptr;
-                CStdSharedPtr_t<FrameGraphTexture>     texture     = nullptr;
-                CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
+                CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
+                CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
+                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
-                FrameGraphResourceIdList::const_iterator it = m_instantiatedResources.end();
+                FrameGraphResourceIdList::const_iterator it = mInstantiatedResources.end();
 
-                CStdSharedPtr_t<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
-                switch(resource->type) {
-                case FrameGraphResourceType::Texture:
-                    texture = std::static_pointer_cast<FrameGraphTexture>(resource);
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
+                switch(resource->type)
+                {
+                case EFrameGraphResourceType::Texture:
+                    texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
 
-                    it = std::find(m_instantiatedResources.begin(), m_instantiatedResources.end(), texture->resourceId);
-                    if(it == m_instantiatedResources.end()) {
+                    it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
+                    if(it == mInstantiatedResources.end())
+                    {
                         initialized |=
                                 initializeTexture(
-                                    renderContext,
+                                    aRenderContext,
                                     texture);
-                        m_instantiatedResources.push_back(texture->resourceId);
+                        mInstantiatedResources.push_back(texture->resourceId);
                     }
 
                     break;
-                case FrameGraphResourceType::TextureView:
-                    subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
-                    texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
-                    textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+                case EFrameGraphResourceType::TextureView:
+                    subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                    texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
+                    textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 
-                    it = std::find(m_instantiatedResources.begin(), m_instantiatedResources.end(), textureView->resourceId);
-                    if(it == m_instantiatedResources.end()) {
+                    it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), textureView->resourceId);
+                    if(it == mInstantiatedResources.end())
+                    {
                         initialized |=
                                 initializeTextureView(
-                                    renderContext,
+                                    aRenderContext,
                                     texture,
                                     textureView);
-                        m_instantiatedResources.push_back(textureView->resourceId);
+                        mInstantiatedResources.push_back(textureView->resourceId);
                     }
                     break;
                 }
@@ -206,27 +269,31 @@ namespace engine
 
             return initialized;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::bindResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
-                FrameGraphResourceIdList      const&resourceIds)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::bindResources(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                FrameGraphResourceIdList                  const &aResourceIds)
         {
             EEngineStatus status = EEngineStatus::Ok;
 
             bool bound = true;
 
-            for(FrameGraphResourceId_t const&id : resourceIds)
+            for(FrameGraphResourceId_t const&id : aResourceIds)
             {
-                CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
+                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
                 switch(resource->type) {
-                case FrameGraphResourceType::Texture:
+                case EFrameGraphResourceType::Texture:
                     break;
-                case FrameGraphResourceType::TextureView:
-                    textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+                case EFrameGraphResourceType::TextureView:
+                    textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 
-                    status = renderContext->bindTextureView(*textureView);
+                    status = aRenderContext->bindTextureView(*textureView);
                     bound |= CheckEngineError(status);
                     break;
                 }
@@ -234,27 +301,32 @@ namespace engine
 
             return bound;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::unbindResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
-                FrameGraphResourceIdList      const&resourceIds)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::unbindResources(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                FrameGraphResourceIdList                  const &aResourceIds)
         {
             EEngineStatus status = EEngineStatus::Ok;
 
             bool unbound = true;
 
-            for(FrameGraphResourceId_t const&id : resourceIds)
+            for(FrameGraphResourceId_t const&id : aResourceIds)
             {
-                CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
+                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<FrameGraphResource> const resource = m_resourceData.get<FrameGraphResource>(id);
-                switch(resource->type) {
-                case FrameGraphResourceType::Texture:
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
+                switch(resource->type)
+                {
+                case EFrameGraphResourceType::Texture:
                     break;
-                case FrameGraphResourceType::TextureView:
-                    textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+                case EFrameGraphResourceType::TextureView:
+                    textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 
-                    status = renderContext->unbindTextureView(*textureView);
+                    status = aRenderContext->unbindTextureView(*textureView);
                     unbound |= CheckEngineError(status);
                     break;
                 }
@@ -262,57 +334,80 @@ namespace engine
 
             return unbound;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::deinitializeResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       renderContext,
-                FrameGraphResourceIdList      const&resourceIds)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::deinitializeResources(
+                CStdSharedPtr_t<IFrameGraphRenderContext>      &aRenderContext,
+                FrameGraphResourceIdList                  const&aResourceIds)
         {
             std::function<bool(FrameGraphResourceId_t const&, bool)> recurse = nullptr;
-            recurse = [&, this] (FrameGraphResourceId_t const&id, bool includeSubjacent) -> bool
+
+            recurse = [&, this] (FrameGraphResourceId_t const &aId, bool aIncludeSubjacent) -> bool
             {
                 bool deinitialized = true;
 
-                CStdSharedPtr_t<FrameGraphResource> resource = m_resourceData.getMutable<FrameGraphResource>(id);
+                CStdSharedPtr_t<SFrameGraphResource>    resource    = mResourceData.getMutable<SFrameGraphResource>(aId);
+                CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
+                CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
+                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<FrameGraphResource>    subjacent   = nullptr;
-                CStdSharedPtr_t<FrameGraphTexture>     texture     = nullptr;
-                CStdSharedPtr_t<FrameGraphTextureView> textureView = nullptr;
+                switch(resource->type)
+                {
+                case EFrameGraphResourceType::Texture:
+                    if(aIncludeSubjacent)
+                    {
+                        if(resource->referenceCount == 0)
+                        {
+                            texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
 
-                switch(resource->type) {
-                case FrameGraphResourceType::Texture:
-                    if(includeSubjacent) {
-                        if(resource->referenceCount == 0) {
-                            texture = std::static_pointer_cast<FrameGraphTexture>(resource);
                             deinitialized |=
                                     deinitializeTexture(
-                                        renderContext,
+                                        aRenderContext,
                                         texture);
-                            std::remove_if(m_instantiatedResources.begin(), m_instantiatedResources.end(), [&] (FrameGraphResourceId_t const&id) -> bool { return (id == texture->resourceId); });
+                            std::remove_if(
+                                        mInstantiatedResources.begin(),
+                                        mInstantiatedResources.end(),
+                                        [&] (FrameGraphResourceId_t const &aId) -> bool
+                            {
+                                return (aId == texture->resourceId);
+                            });
                         }
                     }
                     break;
-                case FrameGraphResourceType::TextureView:
+                case EFrameGraphResourceType::TextureView:
                     // Decrease the texture view's count
                     --(resource->referenceCount);
-                    std::cout
-                            << String::format("TextureView Id %0 -> RefCount: %1\n", resource->resourceId, resource->referenceCount);
 
-                    if(resource->referenceCount == 0) {
-                        subjacent   = m_resourceData.get<FrameGraphResource>(resource->subjacentResource);
-                        texture     = std::static_pointer_cast<FrameGraphTexture>(subjacent);
-                        textureView = std::static_pointer_cast<FrameGraphTextureView>(resource);
+                    std::cout << CString::format("TextureView Id %0 -> RefCount: %1\n", resource->resourceId, resource->referenceCount);
+
+                    if(resource->referenceCount == 0)
+                    {
+                        subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                        texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
+                        textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
+
                         deinitialized |=
                                 deinitializeTextureView(
-                                    renderContext,
+                                    aRenderContext,
                                     texture,
                                     textureView);
-                        std::remove_if(m_instantiatedResources.begin(), m_instantiatedResources.end(), [&] (FrameGraphResourceId_t const&id) -> bool { return (id == textureView->resourceId); });
+                        std::remove_if(
+                                    mInstantiatedResources.begin(),
+                                    mInstantiatedResources.end(),
+                                    [&] (FrameGraphResourceId_t const &aId) -> bool
+                        {
+                            return (aId == textureView->resourceId);
+                        });
 
                         --(texture->referenceCount);
-                        std::cout
-                                << String::format("Texture Id %0 -> RefCount: %1\n", texture->resourceId, texture->referenceCount);
 
-                        if(texture->referenceCount == 0) {
+                        std::cout << CString::format("Texture Id %0 -> RefCount: %1\n", texture->resourceId, texture->referenceCount);
+
+                        if(texture->referenceCount == 0)
+                        {
                             deinitialized &= recurse(texture->resourceId, true);
                         }
                     }
@@ -325,58 +420,76 @@ namespace engine
 
             bool deinitialized = true;
 
-            for(FrameGraphResourceId_t const&id : resourceIds)
-                deinitialized &= recurse(id, false);
+            for(FrameGraphResourceId_t const&id : aResourceIds)
+            {
+                deinitialized = deinitialized && recurse(id, false);
+            }
 
             return deinitialized;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::initializeTexture(
-                CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
-                CStdSharedPtr_t<FrameGraphTexture>        texture)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::initializeTexture(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture)
         {
             EEngineStatus status = EEngineStatus::Ok;
 
-            if(texture->isExternalResource)
-                status = renderContext->importTexture(*texture);
+            if(aTexture->isExternalResource)
+                status = aRenderContext->importTexture(*aTexture);
             else
-                status = renderContext->createTexture(*texture);
+                status = aRenderContext->createTexture(*aTexture);
 
             HandleEngineStatusError(status, "Failed to load texture for FrameGraphExecution.");
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::initializeTextureView(
-                CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
-                CStdSharedPtr_t<FrameGraphTexture>        texture,
-                CStdSharedPtr_t<FrameGraphTextureView>    textureView)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::initializeTextureView(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
+                CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView)
         {
-            FrameGraphResourceId_t id = textureView->resourceId;
+            FrameGraphResourceId_t id = aTextureView->resourceId;
 
-            EEngineStatus status = renderContext->createTextureView(*texture, *textureView);
+            EEngineStatus status = aRenderContext->createTextureView(*aTexture, *aTextureView);
             HandleEngineStatusError(status, "Failed to load texture view for FrameGraphExecution.");
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::deinitializeTextureView(
-                CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
-                CStdSharedPtr_t<FrameGraphTexture>        texture,
-                CStdSharedPtr_t<FrameGraphTextureView>    textureView)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::deinitializeTextureView(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
+                CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView)
         {
-            EEngineStatus status = renderContext->destroyTextureView(*textureView);
+            EEngineStatus status = aRenderContext->destroyTextureView(*aTextureView);
             HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
 
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool Graph::deinitializeTexture(
-                CStdSharedPtr_t<IFrameGraphRenderContext> renderContext,
-                CStdSharedPtr_t<FrameGraphTexture>        texture)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::deinitializeTexture(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture)
         {
-            if(texture->isExternalResource)
+            if(aTexture->isExternalResource)
                 return true;
 
             // EEngineStatus status = renderContext->destroyTexture(*texture);
@@ -384,23 +497,29 @@ namespace engine
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        PassMap const&
-        Graph::passes() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        PassMap const &CGraph::passes() const
         {
-            return m_passes;
+            return mPasses;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        Graph::addPass(CStdSharedPtr_t<PassBase> const&pass)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::addPass(CStdSharedPtr_t<CPassBase> const &aPass)
         {
-            if(m_passes.find(pass->passUID()) != m_passes.end())
+            if(mPasses.find(aPass->passUID()) != mPasses.end())
                 return false;
 
-            m_passes[pass->passUID()] = pass;
+            mPasses[aPass->passUID()] = aPass;
 
             return true;
         }
-
+        //<-----------------------------------------------------------------------------
     }
 }

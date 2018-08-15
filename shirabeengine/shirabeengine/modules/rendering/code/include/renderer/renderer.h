@@ -35,7 +35,7 @@ namespace engine
              */
             EEngineStatus initialize(
                     CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
-                    RendererConfiguration                    const &aConfiguration,
+                    SRendererConfiguration                    const &aConfiguration,
                     CStdSharedPtr_t<IFrameGraphRenderContext>      &aFrameGraphRenderContext) ;
 
             /**
@@ -80,7 +80,7 @@ namespace engine
             EEngineStatus renderScene();
 
         private_members:
-            RendererConfiguration                     mConfiguration;
+            SRendererConfiguration                     mConfiguration;
             CStdSharedPtr_t<SApplicationEnvironment>  mAppEnvironment;
             CStdSharedPtr_t<IFrameGraphRenderContext> mFrameGraphRenderContext;
             std::atomic<bool>                         mPaused;

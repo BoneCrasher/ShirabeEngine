@@ -84,7 +84,7 @@ namespace engine
              * Descriptor implementation for all texture resource types.
              */
             struct SHIRABE_TEST_EXPORT SDescriptor
-                    : public CDescriptorImplBase<EResourceType::TEXTURE, EResourceSubType::UNKNOWN>
+                    : public SDescriptorImplBase<EResourceType::TEXTURE, EResourceSubType::UNKNOWN>
             {
             public_methods:
                 /**

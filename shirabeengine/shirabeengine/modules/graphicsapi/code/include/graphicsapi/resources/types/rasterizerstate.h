@@ -48,7 +48,7 @@ namespace engine
              * This descriptor provides all information required to create a engine rasterizer state.
              */
             struct SDescriptor
-                    : public CDescriptorImplBase<EResourceType::GAPI_STATE, EResourceSubType::RASTERIZER_STATE>
+                    : public SDescriptorImplBase<EResourceType::GAPI_STATE, EResourceSubType::RASTERIZER_STATE>
             {
             public_constructors:
                 /**

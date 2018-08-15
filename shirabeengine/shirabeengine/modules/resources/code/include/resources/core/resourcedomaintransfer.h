@@ -27,13 +27,13 @@ namespace engine
                 EResourceType    TResourceType,
                 EResourceSubType TResourceSubtype
                 >
-        class CDescriptorImplBase
+        struct SDescriptorImplBase
         {
         public_static_constants:
             static const constexpr EResourceType    sResourceType    = TResourceType;
             static const constexpr EResourceSubType sResourceSubtype = TResourceSubtype;
 
-        public:
+        public_methods:
             /**
              * Return the resource type of the described resource.
              *
@@ -49,20 +49,6 @@ namespace engine
             EResourceSubType subtype() const { return sResourceSubtype; }
 
             /**
-             * Return the human readable name of the resource.
-             *
-             * @return See brief.
-             */
-            std::string const &name() const { return mName; }
-
-            /**
-             * Return the list of dependencies of this resources.
-             *
-             * @return See brief.
-             */
-            PublicResourceIdList_t const &dependencies() const { return mDependencies; }
-
-            /**
              * Return a string representation of this descriptor.
              *
              * @return See brief.
@@ -72,17 +58,17 @@ namespace engine
                 std::stringstream ss;
                 ss
                         << "DescriptorImplementationBase<" << sResourceType << ", " << sResourceSubtype << "> {\n"
-                        << "  Name: " << mName << "\n"
+                        << "  Name: " << name << "\n"
                         << "  Dependencies: \n";
-                for(PublicResourceId_t const&id : mDependencies)
+                for(PublicResourceId_t const&id : dependencies)
                     ss << id << ", \n";
 
                 return ss.str();
             }
 
-        private_members:
-            std::string            mName;
-            PublicResourceIdList_t mDependencies;
+        public_members:
+            std::string            name;
+            PublicResourceIdList_t dependencies;
         };
 
         // An adapter class will hold the implementation of a DomainTransferObject, e.g.

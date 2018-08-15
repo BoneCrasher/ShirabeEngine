@@ -34,7 +34,7 @@ namespace engine
              * The SDescriptor struct describes all data required to create a swapchain buffer.
              */
             struct SDescriptor
-                    : public CDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN_BUFFER>
+                    : public SDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN_BUFFER>
             {
                 std::string           name;
                 CTexture::SDescriptor texture;
@@ -108,7 +108,7 @@ namespace engine
              * The SDescriptor struct describes all data required to create a swapchain.
              */
             struct SDescriptor
-                    : public CDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
+                    : public SDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::SWAP_CHAIN>
             {
             public_methods:
                 /**

@@ -48,7 +48,7 @@ namespace engine
 
     #define SHIRABE_DECLARE_LOG_TAG(className)                                 \
         constexpr static  char const* const kLogTag = #className;              \
-        constexpr static inline char const* const logTag() { return kLogTag; }
+        constexpr static inline char const* logTag() { return kLogTag; }
 
     /**
      * Static entry point for any kind of log-calls.

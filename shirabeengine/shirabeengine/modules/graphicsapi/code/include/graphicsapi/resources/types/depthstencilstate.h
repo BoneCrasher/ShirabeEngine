@@ -32,7 +32,7 @@ namespace engine
              * of a depth stencil state.
              */
             struct SDescriptor
-                    : public CDescriptorImplBase<EResourceType::GAPI_STATE, EResourceSubType::DEPTH_STENCIL_STATE>
+                    : public SDescriptorImplBase<EResourceType::GAPI_STATE, EResourceSubType::DEPTH_STENCIL_STATE>
             {
             public_enums:
                 /**
