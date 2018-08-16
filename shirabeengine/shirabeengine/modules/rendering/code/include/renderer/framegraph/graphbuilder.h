@@ -102,8 +102,7 @@ namespace engine
                     typename    TPass,
                     typename... TPassCreationArgs
                     >
-            CStdSharedPtr_t<TPass>
-            spawnPass(
+            CStdSharedPtr_t<TPass> spawnPass(
                     std::string       const&aName,
                     TPassCreationArgs  &&...aArgs);
 

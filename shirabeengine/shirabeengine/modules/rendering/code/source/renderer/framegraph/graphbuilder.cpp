@@ -1,194 +1,238 @@
-#include <assert.h>
+﻿#include <assert.h>
 #include "renderer/framegraph/graphbuilder.h"
 
 namespace engine
 {
     namespace framegraph
     {
-
+        /**
+         * Function signature used for a check for a uid within a list of UIDs.
+         */
         template <typename TUID>
-        static std::function<bool(std::vector<TUID> const&, TUID const&)> alreadyRegisteredFn =
+        using AlreadyRegisteredFn_t = std::function<bool(std::vector<TUID> const&, TUID const&)>;
+
+        /**
+         *
+         */
+        template <typename TUID>
+        static AlreadyRegisteredFn_t<TUID> alreadyRegisteredFn =
                 [] (std::vector<TUID> const&adjacency, TUID const&possiblyAdjacent)
         {
             return std::find(adjacency.begin(), adjacency.end(), possiblyAdjacent) != adjacency.end();
         };
 
-        class SequenceUIDGenerator
+        /**
+         * The SequenceUIDGenerator class implements IUIDGenerator so that it
+         * increments a FrameGraphResourceId_t linearly on each call to 'generate',
+         * starting at 'aInitialID' provided to the constructor.
+         */
+        class CSequenceUIDGenerator
                 : public IUIDGenerator<FrameGraphResourceId_t>
         {
-        public:
-            SequenceUIDGenerator(FrameGraphResourceId_t const&initialID = 1)
-                : m_id(initialID)
-            {};
+        public_constructors:
+            /**
+             * Default-Construct the generator with an initial Id to start incrementing from.
+             *
+             * @param aInitialID See brief.
+             */
+            CSequenceUIDGenerator(FrameGraphResourceId_t const &aInitialID = 1)
+                : mId(aInitialID)
+            {}
 
-            inline FrameGraphResourceId_t generate() {
-                return (m_id++);
+        public_methods:
+            /**
+             * Increment the counter and return it as a new id.
+             *
+             * @return See brief.
+             */
+            FrameGraphResourceId_t generate()
+            {
+                return (mId++);
             }
 
-        private:
-            FrameGraphResourceId_t m_id;
+        private_members:
+            FrameGraphResourceId_t mId;
         };
 
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         CGraphBuilder::CGraphBuilder()
-            : mPassUIDGenerator(std::make_shared<SequenceUIDGenerator>(0))
-            , mResourceUIDGenerator(std::make_shared<SequenceUIDGenerator>(1))
+            : mPassUIDGenerator(std::make_shared<CSequenceUIDGenerator>(0))
+            , mResourceUIDGenerator(std::make_shared<CSequenceUIDGenerator>(1))
             , mFrameGraph(nullptr)
             , mImportedResources()
-        {
-        }
+        {}
+        //<-----------------------------------------------------------------------------
 
-        CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>>
-        CGraphBuilder::resourceUIDGenerator()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> CGraphBuilder::resourceUIDGenerator()
         {
             return mResourceUIDGenerator;
         }
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphResourceId_t
-        CGraphBuilder::generatePassUID()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceId_t CGraphBuilder::generatePassUID()
         {
             return mPassUIDGenerator->generate();
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::initialize()
-     *
-     * \brief Initializes this GraphBuilder
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::initialize(
-                CStdSharedPtr_t<ApplicationEnvironment> const&environment)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CGraph> &CGraphBuilder::graph()
         {
-            assert(environment != nullptr);
-            applicationEnvironment()   = environment;
-            graph() = makeCStdUniquePtr<Graph>();
-
-            // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
-            spawnPass<CallbackPass<bool>>(
-                        "Pseudo-Pass",
-                        [] (PassBuilder const&, bool&)                                               -> bool { return true; },
-            [] (bool const&, FrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&) -> bool { return true; });
-
-            return true;
+            return mFrameGraph;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::deinitialize()
-     *
-     * \brief De-initialises this GraphBuilder and frees any resources it is using
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::deinitialize()
-        {
-            graph() = nullptr;
-            applicationEnvironment()   = nullptr;
-
-            return true;
-        }
-
-        CStdSharedPtr_t<ApplicationEnvironment>&
-        CGraphBuilder::applicationEnvironment()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdSharedPtr_t<SApplicationEnvironment> &CGraphBuilder::applicationEnvironment()
         {
             return mApplicationEnvironment;
         }
+        //<-----------------------------------------------------------------------------
 
-
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::importExternalResource( std::string const&resourceName, PublicResourceId_t const&resourceId)
-     *
-     * \brief Import persistent resource
-     *
-     * \param resourceName          The identifier.
-     * \param resourceId  Identifier for the resource.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        FrameGraphResource
-        CGraphBuilder::registerTexture(
-                std::string       const&readableName,
-                FrameGraphTexture const&texture)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::initialize(CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment)
         {
-            try {
-                FrameGraphTexture &resource = mResourceData.spawnResource<FrameGraphTexture>();
+            assert(aApplicationEnvironment != nullptr);
+
+            applicationEnvironment() = aApplicationEnvironment;
+            graph()                  = makeCStdUniquePtr<CGraph>();
+
+            auto const pseudoSetup = [] (PassBuilder const&, bool&) -> bool
+            {
+                return true;
+            };
+
+            auto const pseudoExec = [] (
+                    bool                                      const&,
+                    CFrameGraphResources                      const&,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &) -> bool
+            {
+                return true;
+            };
+
+            // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
+            spawnPass<CallbackPass<bool>>("Pseudo-Pass", pseudoSetup, pseudoExec);
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::deinitialize()
+        {
+            graph()                  = nullptr;
+            applicationEnvironment() = nullptr;
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SFrameGraphResource CGraphBuilder::registerTexture(
+                std::string        const &aReadableName,
+                SFrameGraphTexture const &aTexture)
+        {
+            try
+            {
+                SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
                 resource.assignedPassUID    = 0; // Pre-Pass
                 resource.parentResource     = 0; // No internal tree, has to be resolved differently.
-                resource.type               = FrameGraphResourceType::Texture;
-                resource.readableName       = readableName;
+                resource.type               = EFrameGraphResourceType::Texture;
+                resource.readableName       = aReadableName;
                 resource.isExternalResource = true;
-                resource.assignTextureParameters(texture);
+                resource.assignTextureParameters(aTexture);
 
                 mResources.push_back(resource.resourceId);
 
-                UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(PassKey<CGraphBuilder>());
+                CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(PassKey<CGraphBuilder>());
                 accessor->mutableResourceReferences().push_back(resource.resourceId);
 
                 return resource;
             }
-            catch(std::exception) {
-                Log::Error(logTag(), String::format("Failed to register texture %0", readableName));
+            catch(std::exception)
+            {
+                CLog::Error(logTag(), CString::format("Failed to register texture %0", aReadableName));
                 throw;
             }
         }
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphResource
-        CGraphBuilder::registerRenderables(
-                std::string               const&readableIdentifier,
-                Rendering::RenderableList const&renderables)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SFrameGraphResource CGraphBuilder::registerRenderables(
+                std::string               const &aReadableIdentifier,
+                rendering::RenderableList const &aRenderables)
         {
-            try {
-                FrameGraphRenderableList &resource = mResourceData.spawnResource<FrameGraphRenderableList>();
+            try
+            {
+                SFrameGraphRenderableList &resource = mResourceData.spawnResource<SFrameGraphRenderableList>();
                 resource.assignedPassUID    = 0; // Pre-Pass
                 resource.parentResource     = 0; // No internal tree, has to be resolved differently.
-                resource.type               = FrameGraphResourceType::RenderableList;
-                resource.readableName       = readableIdentifier;
+                resource.type               = EFrameGraphResourceType::RenderableList;
+                resource.readableName       = aReadableIdentifier;
                 resource.isExternalResource = true;
-                resource.renderableList     = renderables;
+                resource.renderableList     = aRenderables;
 
                 mResources.push_back(resource.resourceId);
 
                 return resource;
             }
-            catch(std::exception) {
-                Log::Error(logTag(), String::format("Failed to register renderable list %0", readableIdentifier));
+            catch(std::exception)
+            {
+                CLog::Error(logTag(), CString::format("Failed to register renderable list %0", aReadableIdentifier));
                 throw;
             }
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  UniqueCStdSharedPtr_t<Graph> GraphBuilder::compile()
-     *
-     * \brief Gets the compile
-     *
-     * \return  An UniquePtr&lt;Graph&gt;
-     **************************************************************************************************/
-        UniqueCStdSharedPtr_t<Graph>
-        CGraphBuilder::compile()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CGraph> CGraphBuilder::compile()
         {
-            UniqueCStdSharedPtr_t<Graph::MutableAccessor> accessor = graph()->getMutableAccessor(PassKey<CGraphBuilder>());
+            CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(PassKey<CGraphBuilder>());
 
-            for(PassMap::value_type const&assignment : graph()->passes())
+            for(PassMap::value_type const &assignment : graph()->passes())
                 assert(true == collectPass(assignment.second));
 
-            bool topologicalPassSortSuccessful = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
-            if(!topologicalPassSortSuccessful) {
-                Log::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
+            bool const topologicalPassSortSuccessful = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
+            if(!topologicalPassSortSuccessful)
+            {
+                CLog::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
                 return nullptr;
             }
 
-            bool topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(accessor->mutableResourceOrder());
-            if(!topologicalResourceSortSuccessful) {
-                Log::Error(logTag(), "Failed to perform topologicalSort(...) for resources on graph compilation.");
+            bool const topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(accessor->mutableResourceOrder());
+            if(!topologicalResourceSortSuccessful)
+            {
+                CLog::Error(logTag(), "Failed to perform topologicalSort(...) for resources on graph compilation.");
                 return nullptr;
             }
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
 
-            bool validationSuccessful = validate(accessor->passExecutionOrder());
+            bool const validationSuccessful = validate(accessor->passExecutionOrder());
             if(!validationSuccessful) {
-                Log::Error(logTag(), "Failed to perform validation(...) on graph compilation.");
+                CLog::Error(logTag(), "Failed to perform validation(...) on graph compilation.");
                 return nullptr;
             }
 
@@ -204,161 +248,155 @@ namespace engine
 
             return std::move(graph());
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  UniqueCStdSharedPtr_t<Graph>& GraphBuilder::graph()
-     *
-     * \brief Gets the graph
-     *
-     * \return  A reference to an UniquePtr&lt;Graph&gt;
-     **************************************************************************************************/
-        UniqueCStdSharedPtr_t<Graph>&
-        CGraphBuilder::graph()
-        {
-            return mFrameGraph;
-        }
-
-        /**********************************************************************************************//**
-     * \fn  template <typename T> std::optional<T&> getResource(FrameGraphResourceId_t const&id)
-     *
-     * \brief Gets a resource
-     *
-     * \exception std::runtime_error  Raised when a runtime error condition occurs.
-     *
-     * \tparam  T Generic type parameter.
-     * \param id  The identifier.
-     *
-     * \return  The resource.
-     **************************************************************************************************/
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template <typename T>
-        std::optional<T&> getResource(FrameGraphResourceId_t const&id) {
-            if((m_resources.find(id) == m_resources.end()))
+        std::optional<T&> getResource(FrameGraphResourceId_t const &aResourceId)
+        {
+            if((mResources.find(aResourceId) == mResources.end()))
                 throw std::runtime_error("Resource not found");
 
-            try {
-                std::optional<T&> optional = std::get<T>(m_resources.at(id));
+            try
+            {
+                std::optional<T&> optional = std::get<T>(mResources.at(aResourceId));
                 return optional;
             }
-            catch(std::bad_variant_access const&bve) {
-                Log::Error(logTag(), bve.what());
+            catch(std::bad_variant_access const &aBVE)
+            {
+                CLog::Error(logTag(), aBVE.what());
                 return std::optional<T&>();
             }
-            catch(std::runtime_error const&rte) {
-                Log::Error(logTag(), rte.what());
+            catch(std::runtime_error const &aRTE)
+            {
+                CLog::Error(logTag(), aRTE.what());
                 return std::optional<T&>();
             }
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  FrameGraphResourceId_t GraphBuilder::findSubjacentResource( FrameGraphResourceMap const&resources, FrameGraphResource const&start)
-     *
-     * \brief Searches for the first subjacent resource
-     *
-     * \exception std::runtime_error  Raised when a runtime error condition occurs.
-     *
-     * \param resources The resources.
-     * \param start     The start.
-     *
-     * \return  The found subjacent resource.
-     **************************************************************************************************/
-        FrameGraphResourceId_t
-        CGraphBuilder::findSubjacentResource(
-                FrameGraphResourceMap const&resources,
-                FrameGraphResource    const&start)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceId_t CGraphBuilder::findSubjacentResource(
+               SFrameGraphResourceMap const &aResources,
+               SFrameGraphResource    const &aStart)
         {
-            if(start.parentResource == 0) {
-                return start.resourceId;
+            if(aStart.parentResource == 0)
+            {
+                return aStart.resourceId;
             }
             else {
-                if(resources.find(start.parentResource) != resources.end())
-                    return findSubjacentResource(resources, resources.at(start.parentResource));
+                if(aResources.find(aStart.parentResource) != aResources.end())
+                {
+                    return findSubjacentResource(aResources, aResources.at(aStart.parentResource));
+                }
                 else
                     throw std::runtime_error("Resource not found...");
             }
         }
+        //<-----------------------------------------------------------------------------
 
-
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::collectPass(PassBuilder&passBuilder)
-     *
-     * \brief Collect pass
-     *
-     * \param [in,out]  passBuilder The pass builder.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::collectPass(CStdSharedPtr_t<PassBase> pass)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::collectPass(CStdSharedPtr_t<CPassBase> aPass)
         {
-            assert(nullptr != pass);
+            assert(nullptr != aPass);
 
-            UniqueCStdSharedPtr_t<PassBase::MutableAccessor> accessor = pass->getMutableAccessor(PassKey<CGraphBuilder>());
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(PassKey<CGraphBuilder>());
 
             // Derive:
             // - Resource creation requests.
             // - Edges: pass->pass and resource[view]->resource[view] for graph generation!
             // - ???
-            FrameGraphResourceIdList  resources        = accessor->mutableResourceReferences();
+            FrameGraphResourceIdList  resources = accessor->mutableResourceReferences();
+
             for(FrameGraphResourceId_t const&resource : resources)
             {
-                FrameGraphResource&r = *mResourceData.getMutable<FrameGraphResource>(resource);
+                SFrameGraphResource &r = *mResourceData.getMutable<SFrameGraphResource>(resource);
 
                 // For each underlying OR imported resource (textures/buffers or whatever importable)
-                if(r.parentResource == 0) {
-                    switch(r.type) {
-                    case FrameGraphResourceType::Imported:
+                if(r.parentResource == 0)
+                {
+                    switch(r.type)
+                    {
+                    case EFrameGraphResourceType::Imported:
                         break;
-                    case FrameGraphResourceType::RenderableList:
-                    case FrameGraphResourceType::Buffer:
-                    case FrameGraphResourceType::Texture:
+                    case EFrameGraphResourceType::RenderableList:
+                    case EFrameGraphResourceType::Buffer:
+                    case EFrameGraphResourceType::Texture:
                         // And map the resources to it's pass appropriately
-                        if(!alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[pass->passUID()], r.resourceId)) {
-                            mPassToResourceAdjacency[pass->passUID()].push_back(r.resourceId);
+                        bool const alreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[aPass->passUID()], r.resourceId);
+                        if(!alreadyRegistered)
+                        {
+                            mPassToResourceAdjacency[aPass->passUID()].push_back(r.resourceId);
                         }
                         break;
                     }
                 }
                 // For each derived resource (views)
-                else {
+                else
+                {
                     // Avoid internal references for passes!
                     // If the edge from pass k to pass k+1 was not added yet.
                     // Create edge: Parent-->Source
-                    FrameGraphResource const&parentResource = *mResourceData.get<FrameGraphResource>(r.parentResource);
-                    if(parentResource.assignedPassUID != pass->passUID()) {
-                        if(!alreadyRegisteredFn<PassUID_t>(mPassAdjacency[parentResource.assignedPassUID], pass->passUID())) {
-                            mPassAdjacency[parentResource.assignedPassUID].push_back(pass->passUID());
+                    SFrameGraphResource const &parentResource = *mResourceData.get<SFrameGraphResource>(r.parentResource);
+                    PassUID_t           const &passUID        = aPass->passUID();
+
+                    if(parentResource.assignedPassUID != passUID)
+                    {
+                        bool const passAlreadyRegistered = alreadyRegisteredFn<PassUID_t>(mPassAdjacency[parentResource.assignedPassUID], passUID);
+                        if(!passAlreadyRegistered)
+                        {
+                            mPassAdjacency[parentResource.assignedPassUID].push_back(passUID);
                         }
                     }
 
                     // Do the same for the resources!
-                    if(!alreadyRegisteredFn<FrameGraphResourceId_t>(mResourceAdjacency[parentResource.resourceId], r.resourceId)) {
+                    bool const resourceAdjacencyAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mResourceAdjacency[parentResource.resourceId], r.resourceId);
+                    if(!resourceAdjacencyAlreadyRegistered)
+                    {
                         mResourceAdjacency[parentResource.resourceId].push_back(r.resourceId);
                     }
 
                     // And map the resources to it's pass appropriately
-                    if(!alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[pass->passUID()], r.resourceId)) {
-                        mPassToResourceAdjacency[pass->passUID()].push_back(r.resourceId);
+                    bool const resourceEdgeAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[passUID], r.resourceId);
+                    if(!resourceEdgeAlreadyRegistered)
+                    {
+                        mPassToResourceAdjacency[passUID].push_back(r.resourceId);
                     }
 
-                    if(r.type == FrameGraphResourceType::TextureView) {
-                        FrameGraphTexture     &texture     = *mResourceData.getMutable<FrameGraphTexture>(r.subjacentResource);
-                        FrameGraphTextureView &textureView = *mResourceData.getMutable<FrameGraphTextureView>(r.resourceId);
+                    if(r.type == EFrameGraphResourceType::TextureView)
+                    {
+                        SFrameGraphTexture     &texture     = *mResourceData.getMutable<SFrameGraphTexture>    (r.subjacentResource);
+                        SFrameGraphTextureView &textureView = *mResourceData.getMutable<SFrameGraphTextureView>(r.resourceId);
 
 
                         // Auto adjust format if requested
-                        if(textureView.format == FrameGraphFormat::Automatic)
+                        if(textureView.format == FrameGraphFormat_t::Automatic)
+                        {
                             textureView.format = texture.format;
+                        }
 
                         // Flag required usage flags, so that the subjacent texture is properly created.
-                        if(textureView.mode.check(FrameGraphViewAccessMode::Read))
-                            texture.requestedUsage.set(FrameGraphResourceUsage::ImageResource);
+                        if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
+                        {
+                            texture.requestedUsage.set(EFrameGraphResourceUsage::ImageResource);
+                        }
                         else
-                            texture.requestedUsage.set(FrameGraphResourceUsage::RenderTarget);
+                        {
+                            texture.requestedUsage.set(EFrameGraphResourceUsage::RenderTarget);
+                        }
                     }
-                    else if(r.type == FrameGraphResourceType::BufferView) {
+                    else if(r.type == EFrameGraphResourceType::BufferView)
+                    {
                         // TODO
                     }
-                    else if(r.type == FrameGraphResourceType::RenderableListView) {
+                    else if(r.type == EFrameGraphResourceType::RenderableListView)
+                    {
                         // TODO
                     }
                 }
@@ -366,44 +404,42 @@ namespace engine
 
             // Now that the internal resource references were adjusted and duplicates removed, confirm the index in the graph builder
             for(FrameGraphResourceId_t const&id : accessor->resourceReferences())
+            {
                 mResources.push_back(id);
+            }
 
 #ifdef SHIRABE_DEBUG
-            Log::Verbose(logTag(), String::format("Current Adjacency State collecting pass '%0':", pass->passUID()));
-            for(AdjacencyListMap<PassUID_t>::value_type const&pa : mPassAdjacency) {
-                Log::Verbose(logTag(), String::format("  Pass-UID: %0", pa.first));
-                for(PassUID_t const&puid : pa.second) {
-                    Log::Verbose(logTag(), String::format("    Adjacent Pass-UID: %0", puid));
+            CLog::Verbose(logTag(), CString::format("Current Adjacency State collecting pass '%0':", aPass->passUID()));
+            for(auto const &[uid, adjacentUIDs] : mPassAdjacency)
+            {
+                CLog::Verbose(logTag(), CString::format("  Pass-UID: %0", uid));
+
+                for(PassUID_t const &adjacentUID : adjacentUIDs)
+                {
+                    CLog::Verbose(logTag(), CString::format("    Adjacent Pass-UID: %0", adjacentUID));
                 }
             }
 #endif
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::validate(std::stack<PassUID_t> const&passOrder)
-     *
-     * \brief Validates the given pass order
-     *
-     * \param passOrder The pass order.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::validate(std::stack<PassUID_t> const&passOrder)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::validate(std::stack<PassUID_t> const &aPassOrder)
         {
             bool allBindingsValid = true;
 
-            for(RefIndex::value_type const&textureViewRef : mResourceData.textureViews()) {
-                FrameGraphTextureView const&textureView = *mResourceData.get<FrameGraphTextureView>(textureViewRef);
+            for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())
+            {
+                SFrameGraphTextureView const &textureView = *mResourceData.get<SFrameGraphTextureView>(textureViewRef);
 
                 // Adjust resource access flags in the subjacent resource to have the texture creation configure
                 // everything appropriately.
-                FrameGraphResourceId_t subjacentResourceId = textureView.subjacentResource;
-
-                FrameGraphTexture const&texture = *mResourceData.get<FrameGraphTexture>(subjacentResourceId);
+                FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
+                SFrameGraphTexture     const &texture             = *mResourceData.get<SFrameGraphTexture>(subjacentResourceId);
 
                 bool viewBindingValid = validateTextureView(texture, textureView);
                 allBindingsValid &= viewBindingValid;
@@ -412,60 +448,44 @@ namespace engine
 
             return (allBindingsValid);
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::validateTextureView(FrameGraphTexture const&texture, FrameGraphTextureView const&textureView)
-     *
-     * \brief Validates the texture view
-     *
-     * \param texture     The texture.
-     * \param textureView The texture view.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::validateTextureView(FrameGraphTexture const&texture, FrameGraphTextureView const&textureView)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::validateTextureView(
+                SFrameGraphTexture     const& aTexture,
+                SFrameGraphTextureView const& atextureView)
         {
-            bool usageValid             = validateTextureUsage(texture);
-            bool formatValid            = validateTextureFormat(texture, textureView);
-            bool subresourceAccessValid = validateTextureSubresourceAccess(texture, textureView);
+            bool const usageValid             = validateTextureUsage(aTexture);
+            bool const formatValid            = validateTextureFormat(aTexture, atextureView);
+            bool const subresourceAccessValid = validateTextureSubresourceAccess(aTexture, atextureView);
 
             return (usageValid && formatValid && subresourceAccessValid);
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::validateTextureUsage(FrameGraphTexture const&texture)
-     *
-     * \brief Validates the texture usage described by texture
-     *
-     * \param texture The texture.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         bool
-        CGraphBuilder::validateTextureUsage(FrameGraphTexture const&texture)
+        CGraphBuilder::validateTextureUsage(SFrameGraphTexture const &aTexture)
         {
             // Cross both bitsets... permittedUsage should fully contain requestedUsage
-            return texture.permittedUsage.check(texture.requestedUsage);
+            return aTexture.permittedUsage.check(aTexture.requestedUsage);
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::validateTextureFormat(FrameGraphTexture const&texture, FrameGraphTextureView const&textureView)
-     *
-     * \brief Validates the texture format
-     *
-     * \param texture     The texture.
-     * \param textureView The texture view.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::validateTextureFormat(FrameGraphTexture const&texture, FrameGraphTextureView const&textureView)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::validateTextureFormat(
+                SFrameGraphTexture     const &aTexture,
+                SFrameGraphTextureView const &aTextureView)
         {
-            using FrameGraphFormat_t = std::underlying_type_t<FrameGraphFormat>;
+            using FormatValue_t = std::underlying_type_t<FrameGraphFormat_t>;
 
-            std::function<uint64_t(FrameGraphFormat_t)> nearestPowerOf2Ceil =
-                    [] (FrameGraphFormat_t value) -> uint64_t
+            auto const nearestPowerOf2Ceil = [] (FormatValue_t value) -> uint64_t
             {
                 uint64_t power = 2;
                 while(value >>= 1)
@@ -473,23 +493,23 @@ namespace engine
                 return power;
             };
 
-            FrameGraphFormat const&source = texture.format;
-            FrameGraphFormat const&target = textureView.format;
+            FrameGraphFormat_t const &source = aTexture.format;
+            FrameGraphFormat_t const &target = aTextureView.format;
 
             bool formatsCompatible = false;
 
             switch(target) {
-            case FrameGraphFormat::Undefined:
-            case FrameGraphFormat::Structured:
+            case FrameGraphFormat_t::Undefined:
+            case FrameGraphFormat_t::Structured:
                 // Invalid!
                 formatsCompatible = false;
                 break;
-            case FrameGraphFormat::Automatic:
+            case FrameGraphFormat_t::Automatic:
                 // Should never be accessed as automatic is resolved beforehand though...
                 break;
             default:
-                FrameGraphFormat_t sourceUID = static_cast<FrameGraphFormat_t>(source);
-                FrameGraphFormat_t targetUID = static_cast<FrameGraphFormat_t>(target);
+                FormatValue_t sourceUID = static_cast<FormatValue_t>(source);
+                FormatValue_t targetUID = static_cast<FormatValue_t>(target);
                 // For now -> Simple test: Bitdepth...
                 formatsCompatible = (nearestPowerOf2Ceil(sourceUID) == nearestPowerOf2Ceil(targetUID));
                 break;
@@ -497,33 +517,29 @@ namespace engine
 
             return formatsCompatible;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**********************************************************************************************//**
-     * \fn  bool GraphBuilder::validateTextureSubresourceAccess(FrameGraphTexture const&texture, FrameGraphTextureView const&textureView)
-     *
-     * \brief Validates the texture subresource access
-     *
-     * \param texture     The texture.
-     * \param textureView The texture view.
-     *
-     * \return  True if it succeeds, false if it fails.
-     **************************************************************************************************/
-        bool
-        CGraphBuilder::validateTextureSubresourceAccess(FrameGraphTexture const&texture, FrameGraphTextureView const&textureView)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::validateTextureSubresourceAccess(
+                SFrameGraphTexture     const &aTexture,
+                SFrameGraphTextureView const &aTextureView)
         {
-            Range const&arraySliceRange = textureView.arraySliceRange;
-            Range const&mipSliceRange   = textureView.mipSliceRange;
+            CRange const &arraySliceRange = aTextureView.arraySliceRange;
+            CRange const &mipSliceRange   = aTextureView.mipSliceRange;
 
             bool arraySliceRangeValid = true;
-            arraySliceRangeValid &= (arraySliceRange.offset < texture.arraySize);
-            arraySliceRangeValid &= ((arraySliceRange.offset + arraySliceRange.length) <= texture.arraySize);
+            arraySliceRangeValid &= (arraySliceRange.offset < aTexture.arraySize);
+            arraySliceRangeValid &= ((arraySliceRange.offset + arraySliceRange.length) <= aTexture.arraySize);
 
             bool mipSliceRangeValid = true;
-            mipSliceRangeValid &= (mipSliceRange.offset < texture.mipLevels);
-            mipSliceRangeValid &= ((mipSliceRange.offset + mipSliceRange.length) <= texture.mipLevels);
+            mipSliceRangeValid &= (mipSliceRange.offset < aTexture.mipLevels);
+            mipSliceRangeValid &= ((mipSliceRange.offset + mipSliceRange.length) <= aTexture.mipLevels);
 
-            return (arraySliceRangeValid && mipSliceRangeValid);
+            bool const valid = (arraySliceRangeValid && mipSliceRangeValid);
+            return valid;
         }
-
+        //<-----------------------------------------------------------------------------
     }
 }
