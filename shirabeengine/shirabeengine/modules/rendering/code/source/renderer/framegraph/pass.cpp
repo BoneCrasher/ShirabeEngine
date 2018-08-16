@@ -1,115 +1,117 @@
-#include "Renderer/FrameGraph/Pass.h"
+#include "renderer/framegraph/pass.h"
 
-namespace engine {
-  namespace framegraph {
-
-
-    PassBase::Accessor::Accessor(PassBase const*pass)
-      : m_pass(pass)
-    {}
-
-    FrameGraphResourceIdList const&
-      PassBase::Accessor::resourceReferences() const
+namespace engine
+{
+    namespace framegraph
     {
-      return m_pass->m_resourceReferences;
-    }
 
-    PassBase::MutableAccessor::MutableAccessor(PassBase *pass)
-      : Accessor(pass)
-      , m_pass(pass)
-    {}
 
-    FrameGraphResourceIdList&
-      PassBase::MutableAccessor::mutableResourceReferences()
-    {
-      return m_pass->m_resourceReferences;
-    }
+        PassBase::Accessor::Accessor(PassBase const*pass)
+            : mPass(pass)
+        {}
 
-    bool
-      PassBase::MutableAccessor::registerResource(FrameGraphResourceId_t const&id)
-    {
-      return m_pass->registerResource(id);
-    }
+        FrameGraphResourceIdList const&
+        PassBase::Accessor::resourceReferences() const
+        {
+            return mPass->m_resourceReferences;
+        }
 
-    UniqueCStdSharedPtr_t<PassBase::Accessor>
-      PassBase::getAccessor(PassKey<GraphBuilder>&&) const
-    {
-      return std::move(std::make_unique<PassBase::Accessor>(this));
-    }
+        PassBase::MutableAccessor::MutableAccessor(PassBase *pass)
+            : Accessor(pass)
+            , mPass(pass)
+        {}
 
-    UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
-      PassBase::getMutableAccessor(PassKey<GraphBuilder>&&)
-    {
-      return std::move(std::make_unique<PassBase::MutableAccessor>(this));
-    }
+        FrameGraphResourceIdList&
+        PassBase::MutableAccessor::mutableResourceReferences()
+        {
+            return mPass->m_resourceReferences;
+        }
 
-    UniqueCStdSharedPtr_t<PassBase::Accessor>
-      PassBase::getAccessor(PassKey<PassBuilder>&&) const
-    {
-      return std::move(std::make_unique<PassBase::Accessor>(this));
-    }
+        bool
+        PassBase::MutableAccessor::registerResource(FrameGraphResourceId_t const&id)
+        {
+            return mPass->registerResource(id);
+        }
 
-    UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
-      PassBase::getMutableAccessor(PassKey<PassBuilder>&&)
-    {
-      return std::move(std::make_unique<PassBase::MutableAccessor>(this));
-    }
+        UniqueCStdSharedPtr_t<PassBase::Accessor>
+        PassBase::getAccessor(PassKey<GraphBuilder>&&) const
+        {
+            return std::move(std::make_unique<PassBase::Accessor>(this));
+        }
 
-    UniqueCStdSharedPtr_t<PassBase::Accessor>
-      PassBase::getAccessor(PassKey<Graph>&&) const
-    {
-      return std::move(std::make_unique<PassBase::Accessor>(this));
-    }
+        UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
+        PassBase::getMutableAccessor(PassKey<GraphBuilder>&&)
+        {
+            return std::move(std::make_unique<PassBase::MutableAccessor>(this));
+        }
 
-    PassBase::PassBase(
-      PassUID_t   const&passUID,
-      std::string const&passName)
-      : m_passUID(passUID)
-      , m_passName(passName)
-    {}
+        UniqueCStdSharedPtr_t<PassBase::Accessor>
+        PassBase::getAccessor(PassKey<PassBuilder>&&) const
+        {
+            return std::move(std::make_unique<PassBase::Accessor>(this));
+        }
 
-    bool
-      PassBase::setup(PassBuilder&)
-    {
-      return true;
-    }
-    bool
-      PassBase::execute(
-        FrameGraphResources           const&frameGraphResources,
-        CStdSharedPtr_t<IFrameGraphRenderContext>      &pass)
-    {
-      return true;
-    }
+        UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
+        PassBase::getMutableAccessor(PassKey<PassBuilder>&&)
+        {
+            return std::move(std::make_unique<PassBase::MutableAccessor>(this));
+        }
 
-    std::string const&
-      PassBase::passName() const
-    {
-      return m_passName;
-    }
-    PassUID_t const&
-      PassBase::passUID() const
-    {
-      return m_passUID;
-    }
+        UniqueCStdSharedPtr_t<PassBase::Accessor>
+        PassBase::getAccessor(PassKey<Graph>&&) const
+        {
+            return std::move(std::make_unique<PassBase::Accessor>(this));
+        }
 
-    void
-      PassBase::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s)
-    {
-      s->serializePass(*this);
-    }
+        PassBase::PassBase(
+                PassUID_t   const&passUID,
+                std::string const&passName)
+            : mPassUID(passUID)
+            , mPassName(passName)
+        {}
 
-    void
-      PassBase::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d)
-    {
-      d->deserializePass(*this);
-    }
+        bool
+        PassBase::setup(PassBuilder&)
+        {
+            return true;
+        }
+        bool
+        PassBase::execute(
+                FrameGraphResources           const&frameGraphResources,
+                CStdSharedPtr_t<IFrameGraphRenderContext>      &pass)
+        {
+            return true;
+        }
 
-    bool
-      PassBase::registerResource(FrameGraphResourceId_t const&id)
-    {
-      m_resourceReferences.push_back(id);
-      return true;
-    }
+        std::string const&
+        PassBase::passName() const
+        {
+            return mPassName;
+        }
+        PassUID_t const&
+        PassBase::passUID() const
+        {
+            return mPassUID;
+        }
 
-  }
+        void
+        PassBase::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s)
+        {
+            s->serializePass(*this);
+        }
+
+        void
+        PassBase::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d)
+        {
+            d->deserializePass(*this);
+        }
+
+        bool
+        PassBase::registerResource(FrameGraphResourceId_t const&id)
+        {
+            m_resourceReferences.push_back(id);
+            return true;
+        }
+
+    }
 }

@@ -27,44 +27,55 @@ namespace engine
         class CGraphBuilder;
         class CGraph;
 
+        /**
+         * Pass base implementation providing UID, name and resource references.
+         */
         class CPassBase
                 : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
         {
-        public:
+        public_classes:
+            /**
+             * @brief The CAccessor class
+             */
             class CAccessor
             {
-            public:
-                CAccessor(CPassBase const*);
+            public_constructors:
+                CAccessor(CPassBase const *aPass);
 
-                FrameGraphResourceIdList const&resourceReferences() const;
+            public_methods:
+                FrameGraphResourceIdList const &resourceReferences() const;
 
-            private:
-                CPassBase const*m_pass;
+            private_members:
+                CPassBase const *mPass;
             };
 
-            class MutableAccessor
+            /**
+             * @brief The MutableAccessor class
+             */
+            class CMutableAccessor
                     : public CAccessor
             {
-            public:
-                MutableAccessor(CPassBase *);
+            public_constructors:
+                CMutableAccessor(CPassBase *aPass);
 
+            public_methods:
                 FrameGraphResourceIdList &mutableResourceReferences();
 
-                bool registerResource(FrameGraphResourceId_t const&id);
+                bool registerResource(FrameGraphResourceId_t const &aResourceId);
 
-            private:
-                CPassBase *m_pass;
+            private_members:
+                CPassBase *mPass;
             };
 
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<GraphBuilder>&&) const;
+            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<CGraphBuilder>&&) const;
 
-            CStdUniquePtr_t<MutableAccessor> getMutableAccessor(PassKey<GraphBuilder>&&);
+            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(PassKey<CGraphBuilder>&&);
 
             CStdUniquePtr_t<CAccessor> getAccessor(PassKey<PassBuilder>&&) const;
 
-            CStdUniquePtr_t<MutableAccessor> getMutableAccessor(PassKey<PassBuilder>&&);
+            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(PassKey<PassBuilder>&&);
 
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<Graph>&&) const;
+            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<CGraph>&&) const;
 
             CPassBase(
                     PassUID_t   const&passUID,
@@ -78,11 +89,9 @@ namespace engine
             std::string const&passName() const;
             PassUID_t   const&passUID()  const;
 
-            virtual
-            void acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s);
+            virtual void acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> &aSerializer) const;
 
-            virtual
-            void acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d);
+            virtual void acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const &aDeserializer);
 
         private:
             bool registerResource(FrameGraphResourceId_t const&id);
