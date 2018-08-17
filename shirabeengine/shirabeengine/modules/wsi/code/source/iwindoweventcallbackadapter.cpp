@@ -1,72 +1,114 @@
-#include "WSI/IWindowEventCallbackAdapter.h"
+#include "wsi/iwindoweventcallbackadapter.h"
 
-namespace engine {
-  namespace WSI {
-
-    namespace __Private {
-      static bool __checkContainsCallbackPtr(
-        IWindow::IEventCallbackList                 const&collection,
-        IWindow::IEventCallbackPtr                  const&element,
-        IWindow::IEventCallbackList::const_iterator      *iterator)
-      {
-        IWindow::IEventCallbackList::const_iterator it;
-        it = std::find(collection.begin(), collection.end(), element);
-
-        if(iterator) *iterator = it;
-
-        return (it != collection.end());
-      }
-    }
-
-    WindowEventCallbackAdapter::WindowEventCallbackAdapter()
-      : m_eventCallbacks()
-    {}
-
-    WindowEventCallbackAdapter::~WindowEventCallbackAdapter() {
-      if(!callbacks().empty()) {
-        mutableCallbacks().clear();
-      }
-    }
-
-    EEngineStatus WindowEventCallbackAdapter::registerCallback(
-      IWindow::IEventCallbackPtr const&cb
-    ) {
-      if(!cb)
-        return EEngineStatus::NullPointer;
-
-      if(__Private::__checkContainsCallbackPtr(callbacks(), cb, nullptr)) {
-        return EEngineStatus::ObjectAlreadyAddedToCollection;
-      }
-
-      try {
-        std::lock_guard<std::mutex> guard(m_eventCallbackMutex);
-        mutableCallbacks().insert(m_eventCallbacks.end(), cb);
-        return EEngineStatus::Ok;
-      }
-      catch(...) {
-        return EEngineStatus::CollectionInsertException;
-      }
-    }
-
-    EEngineStatus WindowEventCallbackAdapter::unregisterCallback(
-      IWindow::IEventCallbackPtr const&cb)
+namespace engine
+{
+    namespace wsi
     {
-      if(!cb)
-        return EEngineStatus::NullPointer;
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        namespace PRIVATE
+        {
+            /**
+             * Helper to check whether a callback is already registered or not.
+             *
+             * @param aCollection  The reference collection.
+             * @param aElement     The element to check for.
+             * @param aOutIterator The iterator referrering the found element or collection.end().
+             * @return             True if found. False otherwise.
+             */
+            static bool checkContainsCallbackPtr(
+                    IWindow::IEventCallbackList                 const &aCollection,
+                    CStdSharedPtr_t<IWindow::IEventCallback>    const &aElement,
+                    IWindow::IEventCallbackList::const_iterator       &aOutIterator)
+            {
+                aOutIterator = std::find(aCollection.begin(), aCollection.end(), aElement);
 
-      IWindow::IEventCallbackList::const_iterator it;
-      if(__Private::__checkContainsCallbackPtr(callbacks(), cb, &it)) {
-        return EEngineStatus::ObjectNotAddedToCollection;
-      }
+                bool const found = (aOutIterator != aCollection.end());
+                return found;
+            }
+        }
+        //<-----------------------------------------------------------------------------
 
-      try {
-        std::lock_guard<std::mutex> guard(m_eventCallbackMutex);
-        mutableCallbacks().erase(it);
-        return EEngineStatus::Ok;
-      }
-      catch(...) {
-        return EEngineStatus::CollectionEraseException;
-      }
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CWindowEventCallbackAdapter::CWindowEventCallbackAdapter()
+            : mEventCallbacks()
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CWindowEventCallbackAdapter::~CWindowEventCallbackAdapter()
+        {
+            if(!callbacks().empty()) {
+                mutableCallbacks().clear();
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CWindowEventCallbackAdapter::registerCallback(
+                CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+        {
+            if(!aCallback)
+            {
+                return EEngineStatus::NullPointer;
+            }
+
+            IWindow::IEventCallbackList::const_iterator position{};
+            if(PRIVATE::checkContainsCallbackPtr(callbacks(), aCallback, position))
+            {
+                return EEngineStatus::ObjectAlreadyAddedToCollection;
+            }
+
+            try
+            {
+                std::lock_guard<std::mutex> guard(mEventCallbackMutex);
+
+                mutableCallbacks().insert(mEventCallbacks.end(), aCallback);
+                return EEngineStatus::Ok;
+            }
+            catch(...)
+            {
+                return EEngineStatus::CollectionInsertException;
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CWindowEventCallbackAdapter::unregisterCallback(
+                CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+        {
+            if(!aCallback)
+            {
+                return EEngineStatus::NullPointer;
+            }
+
+            IWindow::IEventCallbackList::const_iterator position{};
+            if(PRIVATE::checkContainsCallbackPtr(callbacks(), aCallback, position))
+            {
+                return EEngineStatus::ObjectNotAddedToCollection;
+            }
+
+            try
+            {
+                std::lock_guard<std::mutex> guard(mEventCallbackMutex);
+
+                mutableCallbacks().erase(position);
+                return EEngineStatus::Ok;
+            }
+            catch(...)
+            {
+                return EEngineStatus::CollectionEraseException;
+            }
+        }
+        //<-----------------------------------------------------------------------------
     }
-  }
 }

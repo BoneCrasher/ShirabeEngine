@@ -9,7 +9,7 @@
 #include "WSI/IWindowFactory.h" // Includes IWindow.h
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
 
     class WindowManager {
       SHIRABE_DECLARE_LOG_TAG(WindowManager);

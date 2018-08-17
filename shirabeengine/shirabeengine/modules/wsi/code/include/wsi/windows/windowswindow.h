@@ -10,7 +10,7 @@
 #include "WSI/IWindowEventCallbackAdapter.h"
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
     namespace Windows {
       using namespace engine;
       using namespace OS;
@@ -48,7 +48,7 @@ namespace engine {
       DeclareSharedPointerType(IWinAPIAdapter)
 
         class SHIRABE_LIBRARY_EXPORT WindowsWindow
-        : public WSI::IWindow
+        : public wsi::IWindow
         , public IWinAPIAdapter
       {
       public:

@@ -9,7 +9,7 @@
 #include "core/enginestatus.h"
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
     namespace Windows {
       using namespace engine;
 

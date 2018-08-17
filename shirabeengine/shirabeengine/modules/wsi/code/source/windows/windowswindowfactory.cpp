@@ -4,7 +4,7 @@
 #include "WSI/Windows/WindowsWindowFactory.h"
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
     namespace Windows {
 
       namespace WinAPIFunctions {

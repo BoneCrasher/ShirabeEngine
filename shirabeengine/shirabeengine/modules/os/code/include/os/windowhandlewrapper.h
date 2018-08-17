@@ -10,7 +10,7 @@ namespace engine
         /**
          * Wraps an operating system window handle.
          */
-        class WindowHandleWrapper
+        class CWindowHandleWrapper
         {
         public_typedefs:
             using Handle_t = OSHandle_t;
@@ -21,7 +21,7 @@ namespace engine
              *
              * @param aHandle Handle to wrap.
              */
-            SHIRABE_INLINE explicit WindowHandleWrapper(Handle_t const &aHandle)
+            SHIRABE_INLINE explicit CWindowHandleWrapper(Handle_t const &aHandle)
                 : mHandle(aHandle)
             {}
 

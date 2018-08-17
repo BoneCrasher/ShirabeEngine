@@ -10,7 +10,7 @@
 #endif // PLATFORM_WINDOWS
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
 
     WindowManager::WindowManager()
       : m_windows(),

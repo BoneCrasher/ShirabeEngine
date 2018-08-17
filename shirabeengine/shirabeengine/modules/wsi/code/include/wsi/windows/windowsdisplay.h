@@ -8,7 +8,7 @@
 #include "Windows.h"
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
 
     class WinAPIDisplay {
     private:

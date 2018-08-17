@@ -14,6 +14,7 @@
 // IMPORTANT:
 //   Discuss as exception to the rule, to have the code look natural.
 #define public_typedefs             public
+#define public_interfaces           public
 #define public_classes              public
 #define public_structs              public
 #define public_enums                public
@@ -28,6 +29,7 @@
 #define public_members              public
 #define public_api                  public
 #define protected_typedefs          protected
+#define protected_interfaces        protected
 #define protected_classes           protected
 #define protected_structs           protected
 #define protected_enums             protected
@@ -41,6 +43,7 @@
 #define protected_constants         protected
 #define protected_members           protected
 #define private_typedefs            private
+#define private_interfaces          private
 #define private_classes             private
 #define private_structs             private
 #define private_enums               private

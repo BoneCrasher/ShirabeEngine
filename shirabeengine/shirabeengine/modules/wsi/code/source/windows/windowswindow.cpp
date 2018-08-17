@@ -2,7 +2,7 @@
 #include "WSI/Windows/WindowsWindow.h"
 
 namespace engine {
-  namespace WSI {
+  namespace wsi {
     namespace Windows {
 
       WindowsWindow::WindowsWindow(
