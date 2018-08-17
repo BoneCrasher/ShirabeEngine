@@ -12,6 +12,35 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult::CFrameGraphSerializationResult(std::string const &aResult)
+            : IResult()
+            , mResult(aResult)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult::asString(std::string &aOutString) const
+        {
+            aOutString = mResult;
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult::asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const
+        {
+            aOutBuffer = std::vector<uint8_t>(mResult.begin(), mResult.end());
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         bool CFrameGraphGraphVizSerializer::initialize()
         {
             return true;
@@ -26,40 +55,72 @@ namespace engine
             mStream.str("");
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        using FilterElementCompareCallbackFunction_t =
-        std::function<bool(FrameGraphResource const&)>;
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        using FilterElementCompareCallbackFunction_t = std::function<bool(SFrameGraphResource const&)>;
+        //<-----------------------------------------------------------------------------
 
-        using
-        FilterFunction_t =
-        std::function<FrameGraphResourceIdList(FrameGraphResourceIdList const&, FilterElementCompareCallbackFunction_t const&)>;
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        using FilterFunction_t = std::function<FrameGraphResourceIdList(FrameGraphResourceIdList const&, FilterElementCompareCallbackFunction_t const&)>;
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::serializeGraph(CGraph const&graph)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizSerializer::serialize(
+                CGraph                   const &aSource,
+                CStdSharedPtr_t<IResult>       &aOutResult)
         {
-            UniqueCStdSharedPtr_t<CGraph::CAccessor> accessor = graph.getAccessor(PassKey<CFrameGraphGraphVizSerializer>());
+            CStdSharedPtr_t<CFrameGraphSerializationResult> result = nullptr;
 
-            FrameGraphResources const&resources = accessor->resourceData();
+            bool const serialized = serializeGraph(aSource);
+            if(serialized)
+            {
+                result = makeCStdSharedPtr<CFrameGraphSerializationResult>(mStream.str());
+                mStream.str(std::string());
+            }
 
-            FilterFunction_t filter =[&](
-                    FrameGraphResourceIdList               const&ids,
-                    FilterElementCompareCallbackFunction_t const&cb) -> FrameGraphResourceIdList
+            aOutResult = result;
+
+            return serialized;
+        }
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizSerializer::serializeGraph(CGraph const &aGraph)
+        {
+            CStdUniquePtr_t<CGraph::CAccessor> accessor = aGraph.getAccessor(CPassKey<CFrameGraphGraphVizSerializer>());
+
+            CFrameGraphResources const &resources = accessor->resourceData();
+
+            FilterFunction_t const filter = [&](
+                    FrameGraphResourceIdList               const &aUIDs,
+                    FilterElementCompareCallbackFunction_t const &aCallback) -> FrameGraphResourceIdList
             {
                 FrameGraphResourceIdList output{ };
-                if(ids.empty())
+                if(aUIDs.empty())
                     return output;
 
                 std::copy_if(
-                            ids.begin(),
-                            ids.end(),
+                            aUIDs.begin(),
+                            aUIDs.end(),
                             std::back_inserter(output),
-                            [&] (FrameGraphResourceId_t const&id) -> bool
+                            [&] (FrameGraphResourceId_t const &aId) -> bool
                 {
-                    if(resources.resources().size() <= id)
+                    if(resources.resources().size() <= aId)
                         return false;
 
-                    if(cb)
-                        return cb(*resources.get<FrameGraphResource>(id));
+                    if(aCallback)
+                        return aCallback(*resources.get<SFrameGraphResource>(aId));
+
+                    return false;
                 });
 
                 return output;
@@ -68,81 +129,107 @@ namespace engine
             beginGraph();
 
             // Write registered resources
-            for(RefIndex::value_type const&textureRef : resources.textures()) {
-                FrameGraphTexture const&texture = *resources.get<FrameGraphTexture>(textureRef);
+            for(RefIndex_t::value_type const &textureRef : resources.textures())
+            {
+                SFrameGraphTexture const &texture = *resources.get<SFrameGraphTexture>(textureRef);
                 writeTextureResource(texture);
             }
 
-            for(RefIndex::value_type const&textureViewRef : resources.textureViews()) {
-                FrameGraphTextureView const&view   = *resources.get<FrameGraphTextureView>(textureViewRef);
-                FrameGraphResource    const&parent = *resources.get<FrameGraphResource>(view.parentResource);
+            for(RefIndex_t::value_type const &textureViewRef : resources.textureViews())
+            {
+                SFrameGraphTextureView const &view   = *resources.get<SFrameGraphTextureView>(textureViewRef);
+                SFrameGraphResource    const &parent = *resources.get<SFrameGraphResource>(view.parentResource);
 
                 writeTextureResourceView(parent, view);
             }
 
-            for(RefIndex::value_type const&renderableListRef : resources.renderablesLists()) {
-                FrameGraphRenderableList const&list = *resources.get<FrameGraphRenderableList>(renderableListRef);
+            for(RefIndex_t::value_type const &renderableListRef : resources.renderablesLists())
+            {
+                SFrameGraphRenderableList const &list = *resources.get<SFrameGraphRenderableList>(renderableListRef);
+
                 writeRenderableList(list);
             }
 
-            for(RefIndex::value_type const&renderableListViewRef : resources.renderableListViews()) {
-                FrameGraphRenderableListView const&view   = *resources.get<FrameGraphRenderableListView>(renderableListViewRef);
-                FrameGraphResource           const&parent = *resources.get<FrameGraphResource>(view.parentResource);
+            for(RefIndex_t::value_type const &renderableListViewRef : resources.renderableListViews())
+            {
+                SFrameGraphRenderableListView const &view   = *resources.get<SFrameGraphRenderableListView>(renderableListViewRef);
+                SFrameGraphResource           const &parent = *resources.get<SFrameGraphResource>(view.parentResource);
                 writeRenderableListView(parent, view);
             }
 
             // Write passes and adjacent resources
-            AdjacencyListMap<PassUID_t>
-                    const&passAdjacency = accessor->passAdjacency();
-            AdjacencyListMap<PassUID_t, FrameGraphResourceId_t>
-                    const&passResourcesAdj = accessor->passToResourceAdjacency();
+            AdjacencyListMap_t<PassUID_t>                         const &passAdjacency    = accessor->passAdjacency();
+            AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &passResourcesAdj = accessor->passToResourceAdjacency();
 
-            std::stack<PassUID_t>
-                    passOrderCopy = accessor->passExecutionOrder();
+            std::stack<PassUID_t> passOrderCopy = accessor->passExecutionOrder();
 
-            while(!passOrderCopy.empty()) {
+            while(!passOrderCopy.empty())
+            {
                 // Write all passes and their connections
-                PassUID_t sourceUID  = passOrderCopy.top();
-                if(sourceUID == 0) { // Pseudo-Pass
+                PassUID_t const sourceUID  = passOrderCopy.top();
+                if(sourceUID == 0)
+                { // Pseudo-Pass
                 }
-                else {
-                    mStream
-                            << String::format("\n  subgraph pass%0 {\n", sourceUID);
+                else
+                {
+                    mStream << CString::format("\n  subgraph pass%0 {\n", sourceUID);
 
-                    CStdSharedPtr_t<PassBase> sourcePass = graph.passes().at(sourceUID);
-                    sourcePass->acceptSerializer(makeCStdSharedFromThis(this));
+                    CStdSharedPtr_t<CPassBase> sourcePass = aGraph.passes().at(sourceUID);
+
+                    sourcePass->acceptSerializer(*this);
 
                     // Write out the passes' resources
-                    if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end()) {
-                        FrameGraphResourceIdList const&passResources = passResourcesAdj.at(sourceUID);
+                    if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end())
+                    {
+                        FrameGraphResourceIdList const &passResources = passResourcesAdj.at(sourceUID);
+
                         // Create Texture
-                        std::vector<FrameGraphResourceId_t> creations = filter(passResources, [] (FrameGraphResource const&r) -> bool {
-                                return (r.type == FrameGraphResourceType::Texture && r.assignedPassUID != 0);
-                    });
+                        auto textureCreateFilterFn = [] (SFrameGraphResource const &aInput) -> bool
+                        {
+                                return (aInput.type == EFrameGraphResourceType::Texture && aInput.assignedPassUID != 0);
+                        };
+                        std::vector<FrameGraphResourceId_t> const creations = filter(passResources, textureCreateFilterFn);
+
                         if(!creations.empty())
-                            for(FrameGraphResourceId_t const&id : creations) {
-                                FrameGraphTexture const&texture = *resources.get<FrameGraphTexture>(id);
+                        {
+                            for(FrameGraphResourceId_t const &id : creations)
+                            {
+                                SFrameGraphTexture const &texture = *resources.get<SFrameGraphTexture>(id);
                                 writePass2TextureResourceEdge(texture);
                             }
+                        }
+
                         // Read/Write Texture
-                        std::vector<FrameGraphResourceId_t> readViews = filter(passResources, [] (FrameGraphResource const&r) -> bool {
-                                return (r.type == FrameGraphResourceType::TextureView);
-                    });
-                        if(!readViews.empty()) {
-                            for(FrameGraphResourceId_t const&id : readViews) {
-                                FrameGraphTextureView const&view           = *resources.get<FrameGraphTextureView>(id);
-                                FrameGraphResource    const&parentResource = *resources.get<FrameGraphResource>(view.parentResource);
+                        auto const textureViewfilterFn = [] (SFrameGraphResource const &aInput) -> bool
+                        {
+                            return (aInput.type == EFrameGraphResourceType::TextureView);
+                        };
+                        std::vector<FrameGraphResourceId_t> readViews = filter(passResources, textureViewfilterFn);
+
+                        if(!readViews.empty())
+                        {
+                            for(FrameGraphResourceId_t const &id : readViews)
+                            {
+                                SFrameGraphTextureView const &view           = *resources.get<SFrameGraphTextureView>(id);
+                                SFrameGraphResource    const &parentResource = *resources.get<SFrameGraphResource>(view.parentResource);
+
                                 writeTextureResourceViewEdge(sourceUID, parentResource, view);
                             }
                         }
+
                         // Use Renderables
-                        std::vector<FrameGraphResourceId_t> renderableListViews = filter(passResources, [] (FrameGraphResource const&r) -> bool {
-                                return (r.type == FrameGraphResourceType::RenderableListView);
-                    });
-                        if(!renderableListViews.empty()) {
-                            for(FrameGraphResourceId_t const&id : renderableListViews) {
-                                FrameGraphRenderableListView const&view           = *resources.get<FrameGraphRenderableListView>(id);
-                                FrameGraphResource           const&parentResource = *resources.get<FrameGraphResource>(view.parentResource);
+                        auto const renderableFilterFn = [] (SFrameGraphResource const &aInput) -> bool
+                        {
+                            return (aInput.type == EFrameGraphResourceType::RenderableListView);
+                        };
+                        std::vector<FrameGraphResourceId_t> renderableListViews = filter(passResources, renderableFilterFn);
+
+                        if(!renderableListViews.empty())
+                        {
+                            for(FrameGraphResourceId_t const &id : renderableListViews)
+                            {
+                                SFrameGraphRenderableListView const&view           = *resources.get<SFrameGraphRenderableListView>(id);
+                                SFrameGraphResource           const&parentResource = *resources.get<SFrameGraphResource>(view.parentResource);
 
                                 writeRenderableResourceViewEdge(parentResource, view);
                             }
@@ -151,8 +238,10 @@ namespace engine
 
                     mStream << "  }\n\n";
 
-                    if(passAdjacency.find(sourceUID) != passAdjacency.end()) {
-                        for(PassUID_t const&targetUID : passAdjacency.at(sourceUID)) {
+                    if(passAdjacency.find(sourceUID) != passAdjacency.end())
+                    {
+                        for(PassUID_t const&targetUID : passAdjacency.at(sourceUID))
+                        {
                             writePassEdge(sourceUID, targetUID);
                         }
                     }
@@ -165,62 +254,60 @@ namespace engine
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::serializePass(PassBase const&pass)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizSerializer::serializePass(CPassBase const &aPass)
         {
-            writePass(pass);
+            writePass(aPass);
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::serializeResource(FrameGraphResource const&resource)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizSerializer::serializeResource(SFrameGraphResource const &aResource)
         {
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::deserializeGraph(CGraph &graph)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizDeserializer::deserializeGraph(CGraph &aGraph)
         {
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::deserializePass(PassBase &pass)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizDeserializer::deserializePass(CPassBase &aPass)
         {
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::deserializeResource(FrameGraphResource &resource)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CFrameGraphGraphVizDeserializer::deserializeResource(SFrameGraphResource &aResource)
         {
             return true;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        CFrameGraphGraphVizSerializer::writeToFile(
-                std::string const&filename)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::beginGraph()
         {
-            try {
-                std::ofstream out(std::string(filename).append(".gv"));
-                out << mStream.str();
-                out.close();
-
-                return true;
-            }
-            catch(...) {
-                return false;
-            }
-        }
-
-        std::string
-        CFrameGraphGraphVizSerializer::serializeResultToString()
-        {
-            return mStream.str();
-        }
-
-        void CFrameGraphGraphVizSerializer::beginGraph() {
             mStream
                     << "strict digraph FrameGraph {\n"
                     << "  rankdir=LR;\n"
@@ -232,104 +319,131 @@ namespace engine
                        //<< "  graph [nodesep=1.5,ranksep=1.5,clusterrank=local];\n"
                        /*<< "  node [];\n"*/;
         }
+        //<-----------------------------------------------------------------------------
 
-        void CFrameGraphGraphVizSerializer::endGraph() {
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::endGraph()
+        {
             mStream << "}";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writePass(
-                PassBase const&pass)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writePass(CPassBase const &aPass)
         {
-            std::string passLabel = String::format(
+            std::string const passLabel = CString::format(
                         "<<table bgcolor=\"#429692\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Pass (PID: %0)</b></font></td></tr>"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"16\">%1</font></td></tr>"
                         "</table>>",
-                        pass.passUID(),
-                        pass.passName());
+                        aPass.passUID(),
+                        aPass.passName());
 
-            mStream << "    Pass" << pass.passUID() << " [shape=none, label=" << passLabel << "];\n";
+            mStream << "    Pass" << aPass.passUID() << " [shape=none, label=" << passLabel << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writePassEdge(
-                PassUID_t const&source,
-                PassUID_t const&target)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writePassEdge(
+                PassUID_t const &aSource,
+                PassUID_t const &aTarget)
         {
             static constexpr char const*passEdgeStyle = "style=bold,color=\"#d95d39\",tailport=e,headport=w";
-            mStream << "  Pass" << source << " -> " << "Pass" << target << " [" << passEdgeStyle << "];\n";
+            mStream << "  Pass" << aSource << " -> " << "Pass" << aTarget << " [" << passEdgeStyle << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writeRenderableList(
-                FrameGraphRenderableList const&list)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writeRenderableList(
+                SFrameGraphRenderableList const &aList)
         {
             static constexpr char const*listStyle = "shape=none";
-            std::string listLabel =
-                    String::format(
+            std::string const listLabel =
+                    CString::format(
                         "<<table bgcolor=\"#edb036\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\">&lt;&lt;%0&gt;&gt;</font></td></tr>"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>RenderableList (RID: %1)</b></font></td></tr>"
                         "</table>>",
                         "import",
-                        list.resourceId,
-                        list.readableName);
+                        aList.resourceId,
+                        aList.readableName);
 
-            mStream << "    RenderableList" << list.resourceId << " [" << listStyle << ",label=" << listLabel << "];\n";
+            mStream << "    RenderableList" << aList.resourceId << " [" << listStyle << ",label=" << listLabel << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writeRenderableListView(
-                FrameGraphResource           const&parentResource,
-                FrameGraphRenderableListView const&view)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writeRenderableListView(
+                SFrameGraphResource           const &aParentResource,
+                SFrameGraphRenderableListView const &aView)
         {
-            std::string viewId   = String::format("RenderableListView%0", view.resourceId);
+            std::string viewId = CString::format("RenderableListView%0", aView.resourceId);
 
             static constexpr char const*viewStyle = "shape=none";
             std::string viewLabel =
-                    String::format(
+                    CString::format(
                         "<<table bgcolor=\"#%0\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\"><b>RenderableListView (RID: %1)</b></font></td></tr>"
                         "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">%2</td></tr>"
                         "</table>>",
                         "f46e5d",
-                        view.resourceId,
-                        view.subjacentResource);
+                        aView.resourceId,
+                        aView.subjacentResource);
 
             mStream << "    " << viewId << " [" << viewStyle << ",label=" << viewLabel << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writeRenderableResourceViewEdge(
-                FrameGraphResource           const&parentResource,
-                FrameGraphRenderableListView const&view)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writeRenderableResourceViewEdge(
+                SFrameGraphResource           const &aParentResource,
+                SFrameGraphRenderableListView const &aView)
         {
-            std::string passId   = String::format("Pass%0", view.assignedPassUID);
-            std::string viewId   = String::format("RenderableListView%0", view.resourceId); std::string parentId = "";
-            if(parentResource.type == FrameGraphResourceType::RenderableList)
-                parentId = String::format("RenderableList%0", parentResource.resourceId);
-            else
-                parentId = String::format("RenderableListView%0", parentResource.resourceId);
+            std::string const passId   = CString::format("Pass%0", aView.assignedPassUID);
+            std::string const viewId   = CString::format("RenderableListView%0", aView.resourceId);
+            std::string       parentId = "";
 
-            static constexpr char const*pass2ViewEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
+            if(aParentResource.type == EFrameGraphResourceType::RenderableList)
+            {
+                parentId = CString::format("RenderableList%0", aParentResource.resourceId);
+            }
+            else
+            {
+                parentId = CString::format("RenderableListView%0", aParentResource.resourceId);
+            }
+
+            static constexpr char const *pass2ViewEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
             mStream << "    " << viewId << " -> " << passId  << " [" << pass2ViewEdgeStyle << "];\n";
 
-            static constexpr char const*parent2ViewStyle = "tailport=e,headport=w,weight=1,color=\"#bbbbbb\"";
+            static constexpr char const *parent2ViewStyle = "tailport=e,headport=w,weight=1,color=\"#bbbbbb\"";
             mStream << "    " << parentId << " -> " << viewId << " [" << parent2ViewStyle << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writeTextureResource(
-                FrameGraphTexture const&texture)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writeTextureResource(SFrameGraphTexture const &aTexture)
         {
             std::string mode = "create";
-            if(texture.assignedPassUID == 0)
+            if(aTexture.assignedPassUID == 0)
                 mode = "import";
 
-            static constexpr char const*textureStyle = "shape=none";
-            std::string textureLabel =
-                    String::format(
+            static constexpr char const *textureStyle = "shape=none";
+            std::string const textureLabel =
+                    CString::format(
                         "<<table bgcolor=\"#e0b867\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\">&lt;&lt;%0&gt;&gt;</font></td></tr>"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Texture (RID: %1)</b></font></td></tr>"
@@ -342,40 +456,45 @@ namespace engine
                         "<tr><td align=\"left\">Reference-Count:</td><td align=\"left\">%10</td></tr>"
                         "</table>>",
                         mode,
-                        texture.resourceId,
-                        texture.readableName,
-                        texture.width, texture.height, texture.depth,
-                        to_string(texture.format),
-                        texture.arraySize,
-                        texture.mipLevels,
-                        to_string(texture.initialState),
-                        texture.referenceCount);
+                        aTexture.resourceId,
+                        aTexture.readableName,
+                        aTexture.width, aTexture.height, aTexture.depth,
+                        to_string(aTexture.format),
+                        aTexture.arraySize,
+                        aTexture.mipLevels,
+                        to_string(aTexture.initialState),
+                        aTexture.referenceCount);
 
-            mStream << "    Texture" << texture.resourceId << " [" << textureStyle << ",label=" << textureLabel << "];\n";
+            mStream << "    Texture" << aTexture.resourceId << " [" << textureStyle << ",label=" << textureLabel << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writePass2TextureResourceEdge(
-                FrameGraphTexture      const&texture)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writePass2TextureResourceEdge(SFrameGraphTexture const &aTexture)
         {
-            static constexpr char const*pass2TextureEdgeStyle = "style=dotted,weight=2";
-            mStream << "    Pass" << texture.assignedPassUID << " -> Texture" << texture.resourceId << " [" << pass2TextureEdgeStyle << ",constraint=false];\n";
-            mStream << "    { rank=same; Pass" << texture.assignedPassUID << "; Texture" << texture.resourceId << "}\n";
+            static constexpr char const *pass2TextureEdgeStyle = "style=dotted,weight=2";
+            mStream << "    Pass" << aTexture.assignedPassUID << " -> Texture" << aTexture.resourceId << " [" << pass2TextureEdgeStyle << ",constraint=false];\n";
+            mStream << "    { rank=same; Pass" << aTexture.assignedPassUID << "; Texture" << aTexture.resourceId << "}\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writeTextureResourceView(
-                FrameGraphResource     const&parentResource,
-                FrameGraphTextureView  const&view)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writeTextureResourceView(
+                SFrameGraphResource     const &aParentResource,
+                SFrameGraphTextureView  const &aView)
         {
-            bool viewIsReadMode  = view.mode.check(FrameGraphViewAccessMode::Read);
-            bool viewIsWriteMode = view.mode.check(FrameGraphViewAccessMode::Write);
+            bool const viewIsReadMode  = aView.mode.check(EFrameGraphViewAccessMode::Read);
+            bool const viewIsWriteMode = aView.mode.check(EFrameGraphViewAccessMode::Write);
 
-            std::string viewId   = String::format("TextureView%0", view.resourceId);
+            std::string viewId   = CString::format("TextureView%0", aView.resourceId);
 
-            static constexpr char const*viewStyle = "shape=none";
-            std::string viewLabel =
-                    String::format(
+            static constexpr char const *viewStyle = "shape=none";
+            std::string const viewLabel =
+                    CString::format(
                         "<<table bgcolor=\"#%0\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\"><b>TextureView (RID: %1)</b></font></td></tr>"
                         "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">%2</td></tr>"
@@ -386,56 +505,69 @@ namespace engine
                         "<tr><td align=\"left\">Reference-Count:</td><td align=\"left\">%7</td></tr>"
                         "</table>>",
                         (viewIsReadMode ? "68a357" : "c97064"),
-                        view.resourceId,
-                        view.subjacentResource,
+                        aView.resourceId,
+                        aView.subjacentResource,
                         (viewIsReadMode ? "Read" : "Write"),
-                        to_string(view.format),
-                        to_string(view.arraySliceRange),
-                        to_string(view.mipSliceRange),
-                        view.referenceCount);
+                        to_string(aView.format),
+                        to_string(aView.arraySliceRange),
+                        to_string(aView.mipSliceRange),
+                        aView.referenceCount);
 
             mStream << "    " << viewId << " [" << viewStyle << ",label=" << viewLabel << "];\n";
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        CFrameGraphGraphVizSerializer::writeTextureResourceViewEdge(
-                PassUID_t              const&passUID,
-                FrameGraphResource     const&parentResource,
-                FrameGraphTextureView  const&view)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphGraphVizSerializer::writeTextureResourceViewEdge(
+                PassUID_t               const &aPassUID,
+                SFrameGraphResource     const &aParentResource,
+                SFrameGraphTextureView  const &aView)
         {
-            bool parentResourceIsTexture     = (parentResource.type == FrameGraphResourceType::Texture);
-            bool parentResourceIsTextureView = (parentResource.type == FrameGraphResourceType::TextureView);
-            bool viewIsReadMode              = view.mode.check(FrameGraphViewAccessMode::Read);
-            bool viewIsWriteMode             = view.mode.check(FrameGraphViewAccessMode::Write);
+            bool parentResourceIsTexture     = (aParentResource.type == EFrameGraphResourceType::Texture);
+            bool parentResourceIsTextureView = (aParentResource.type == EFrameGraphResourceType::TextureView);
+            bool viewIsReadMode              = aView.mode.check(EFrameGraphViewAccessMode::Read);
+            bool viewIsWriteMode             = aView.mode.check(EFrameGraphViewAccessMode::Write);
 
-            std::string passId   = String::format("Pass%0", passUID);
-            std::string viewId   = String::format("TextureView%0", view.resourceId);
-            std::string parentId = "";
+            std::string const passId   = CString::format("Pass%0", aPassUID);
+            std::string const viewId   = CString::format("TextureView%0", aView.resourceId);
+            std::string       parentId = "";
+
             if(parentResourceIsTexture)
-                parentId = String::format("Texture%0", parentResource.resourceId);
+            {
+                parentId = CString::format("Texture%0", aParentResource.resourceId);
+
+            }
             else if(parentResourceIsTextureView)
-                parentId = String::format("TextureView%0", parentResource.resourceId);
+            {
+                parentId = CString::format("TextureView%0", aParentResource.resourceId);
+            }
 
             std::string color = "black";
 
-            if(viewIsReadMode) {
+            if(viewIsReadMode)
+            {
                 static constexpr char const*viewRead2PassEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
                 mStream << "    " << viewId << " -> " << passId << " [" << viewRead2PassEdgeStyle << ",color=" << color << "];\n";
             }
-            else if(viewIsWriteMode) {
+            else if(viewIsWriteMode)
+            {
                 static constexpr char const*pass2ViewWriteEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
                 mStream << "    " << passId << " -> " << viewId  << " [" << pass2ViewWriteEdgeStyle << ",color=" << color << "];\n";
             }
 
-            if(parentResourceIsTextureView) {
+            if(parentResourceIsTextureView)
+            {
                 static constexpr char const*parent2ViewStyle = "tailport=e,headport=w,weight=1,style=dashed";
                 mStream << "    " << parentId << " -> " << viewId << " [" << parent2ViewStyle << ",color=" << color << "];\n";
             }
-            else {
+            else
+            {
                 static constexpr char const*parent2ViewStyle = "tailport=e,headport=w,weight=1,color=\"#bbbbbb\"";
                 mStream << "    " << parentId << " -> " << viewId << " [" << parent2ViewStyle << "];\n";
             }
         }
-
+        //<-----------------------------------------------------------------------------
     }
 }

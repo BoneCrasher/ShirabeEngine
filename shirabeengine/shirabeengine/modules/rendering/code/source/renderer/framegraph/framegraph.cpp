@@ -149,18 +149,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraph::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> &aSerializer) const
+        bool CGraph::acceptSerializer(IFrameGraphSerializer &aSerializer) const
         {
-            aSerializer->serializeGraph(*this);
+            aSerializer.serializeGraph(*this);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraph::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> &aDeserializer)
+        bool CGraph::acceptDeserializer(IFrameGraphDeserializer &aDeserializer)
         {
-            aDeserializer->deserializeGraph(*this);
+            aDeserializer.deserializeGraph(*this);
         }
         //<-----------------------------------------------------------------------------
 
@@ -192,7 +192,7 @@ namespace engine
             {
                 PassUID_t                             const passUID  = copy.top();
                 CStdSharedPtr_t<CPassBase>            const pass     = mPasses.at(passUID);
-                CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(PassKey<CGraph>());
+                CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
 
                 FrameGraphResourceIdList const &passResources = accessor->resourceReferences();
 

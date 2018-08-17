@@ -1,48 +1,74 @@
 #ifndef __SHIRABE_FRAMEGRAPH_MODULE_LIGHTING_H__
 #define __SHIRABE_FRAMEGRAPH_MODULE_LIGHTING_H__
 
-#include "Log/Log.h"
+#include <log/log.h>
+#include <resources/core/resourcemanager.h>
+#include <graphicsapi/resources/types/all.h>
+#include "renderer/framegraph/graphbuilder.h"
+#include "renderer/framegraph/passbuilder.h"
+#include "renderer/framegraph/modules/module.h"
 
-#include "Renderer/FrameGraph/GraphBuilder.h"
-#include "Renderer/FrameGraph/PassBuilder.h"
-#include "Renderer/FrameGraph/Modules/Module.h"
+namespace engine
+{
+    namespace framegraph
+    {
+        /**
+         * Template specialization selector for the lighting module.
+         */
+        struct SLightingModuleTag_t {};
 
-#include "Resources/Core/ResourceManager.h"
-#include "GraphicsAPI/Resources/Types/All.h"
+        /**
+         * The FrameGraphModule<SLightingModuleTag_t> class implements all lighting
+         * related data structs and passes.
+         */
+        template<>
+        class SHIRABE_TEST_EXPORT CFrameGraphModule<SLightingModuleTag_t>
+        {
+            SHIRABE_DECLARE_LOG_TAG(FrameGraphModule<SLightingModuleTag_t>);
 
-namespace engine {
-	namespace framegraph {
+        public_structs:
+            /**
+             * The SLightingImportData struct describes all imported data for the
+             * lighting pass.
+             */
+            struct SLightingImportData
+            {
+                SFrameGraphResource gbuffer0;
+                SFrameGraphResource gbuffer1;
+                SFrameGraphResource gbuffer2;
+                SFrameGraphResource gbuffer3;
+            };
 
-    struct LightingModuleTag_t {};
+            /**
+             * The SLightingExportData struct describes all exported data for the
+             * lighting pass.
+             */
+            struct SLightingExportData
+            {
+                SFrameGraphResource lightAccumulationBuffer;
+            };
 
-    template<>
-    class SHIRABE_TEST_EXPORT FrameGraphModule<LightingModuleTag_t> {
-      SHIRABE_DECLARE_LOG_TAG(FrameGraphModule<LightingModuleTag_t>);
-    public:
-      struct LightingImportData {
-        FrameGraphResource
-          gbuffer0,
-          gbuffer1,
-          gbuffer2,
-          gbuffer3;
-      };
+        public_methods:
+            /**
+             * Add a lighting pass to the render graph.
+             *
+             * @param aGraphBuilder The graph builder to source from.
+             * @param aGbuffer0     GBuffer source containing relevant information for lighting.
+             * @param aGbuffer1     GBuffer source containing relevant information for lighting.
+             * @param aGbuffer2     GBuffer source containing relevant information for lighting.
+             * @param aGbuffer3     GBuffer source containing relevant information for lighting.
+             * @return              Export data of this pass to chain it with other passes' inputs.
+             */
+            SLightingExportData addLightingPass(
+                    CGraphBuilder             &aGraphBuilder,
+                    SFrameGraphResource const &aGbuffer0,
+                    SFrameGraphResource const &aGbuffer1,
+                    SFrameGraphResource const &aGbuffer2,
+                    SFrameGraphResource const &aGbuffer3);
 
-      struct LightingExportData {
-        FrameGraphResource
-          lightAccumulationBuffer;
-      };
+        };
 
-      LightingExportData addLightingPass(
-        GraphBuilder            &graphBuilder,
-        FrameGraphResource const&gbuffer0,
-        FrameGraphResource const&gbuffer1,
-        FrameGraphResource const&gbuffer2,
-        FrameGraphResource const&gbuffer3);
-
-    private:
-    };
-
-	}
+    }
 }
 
 #endif

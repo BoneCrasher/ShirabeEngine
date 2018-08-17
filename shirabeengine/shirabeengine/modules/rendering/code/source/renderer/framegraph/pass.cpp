@@ -4,114 +4,152 @@ namespace engine
 {
     namespace framegraph
     {
-
-
-        PassBase::Accessor::Accessor(PassBase const*pass)
-            : mPass(pass)
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CPassBase::CAccessor::CAccessor(CPassBase const *aPass)
+            : mPass(aPass)
         {}
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphResourceIdList const&
-        PassBase::Accessor::resourceReferences() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceIdList const &CPassBase::CAccessor::resourceReferences() const
         {
-            return mPass->m_resourceReferences;
+            return mPass->mResourceReferences;
         }
+        //<-----------------------------------------------------------------------------
 
-        PassBase::MutableAccessor::MutableAccessor(PassBase *pass)
-            : Accessor(pass)
-            , mPass(pass)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CPassBase::CMutableAccessor::CMutableAccessor(CPassBase *aPass)
+            : CAccessor(aPass)
+            , mPass(aPass)
         {}
+        //<-----------------------------------------------------------------------------
 
-        FrameGraphResourceIdList&
-        PassBase::MutableAccessor::mutableResourceReferences()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceIdList &CPassBase::CMutableAccessor::mutableResourceReferences()
         {
-            return mPass->m_resourceReferences;
+            return mPass->mResourceReferences;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        PassBase::MutableAccessor::registerResource(FrameGraphResourceId_t const&id)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CPassBase::CMutableAccessor::registerResource(FrameGraphResourceId_t const &aResourceUID)
         {
-            return mPass->registerResource(id);
+            return mPass->registerResource(aResourceUID);
         }
+        //<-----------------------------------------------------------------------------
 
-        UniqueCStdSharedPtr_t<PassBase::Accessor>
-        PassBase::getAccessor(PassKey<GraphBuilder>&&) const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const
         {
-            return std::move(std::make_unique<PassBase::Accessor>(this));
+            return std::move(CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this)));
         }
+        //<-----------------------------------------------------------------------------
 
-        UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
-        PassBase::getMutableAccessor(PassKey<GraphBuilder>&&)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey)
         {
-            return std::move(std::make_unique<PassBase::MutableAccessor>(this));
+            return std::move(CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this)));
         }
+        //<-----------------------------------------------------------------------------
 
-        UniqueCStdSharedPtr_t<PassBase::Accessor>
-        PassBase::getAccessor(PassKey<PassBuilder>&&) const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CPassBuilder> &&aPassKey) const
         {
-            return std::move(std::make_unique<PassBase::Accessor>(this));
+            return std::move(CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this)));
         }
+        //<-----------------------------------------------------------------------------
 
-        UniqueCStdSharedPtr_t<PassBase::MutableAccessor>
-        PassBase::getMutableAccessor(PassKey<PassBuilder>&&)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey)
         {
-            return std::move(std::make_unique<PassBase::MutableAccessor>(this));
+            return std::move(CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this)));
         }
+        //<-----------------------------------------------------------------------------
 
-        UniqueCStdSharedPtr_t<PassBase::Accessor>
-        PassBase::getAccessor(PassKey<Graph>&&) const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraph> &&aPassKey) const
         {
-            return std::move(std::make_unique<PassBase::Accessor>(this));
+            return std::move(CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this)));
         }
+        //<-----------------------------------------------------------------------------
 
-        PassBase::PassBase(
-                PassUID_t   const&passUID,
-                std::string const&passName)
-            : mPassUID(passUID)
-            , mPassName(passName)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CPassBase::CPassBase(
+                PassUID_t   const &aPassUID,
+                std::string const &aPassName)
+            : mPassUID(aPassUID)
+            , mPassName(aPassName)
         {}
+        //<-----------------------------------------------------------------------------
 
-        bool
-        PassBase::setup(PassBuilder&)
-        {
-            return true;
-        }
-        bool
-        PassBase::execute(
-                FrameGraphResources           const&frameGraphResources,
-                CStdSharedPtr_t<IFrameGraphRenderContext>      &pass)
-        {
-            return true;
-        }
-
-        std::string const&
-        PassBase::passName() const
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::string const &CPassBase::passName() const
         {
             return mPassName;
         }
-        PassUID_t const&
-        PassBase::passUID() const
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        PassUID_t const &CPassBase::passUID() const
         {
             return mPassUID;
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        PassBase::acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> s)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CPassBase::acceptSerializer(IFrameGraphSerializer &aSerializer) const
         {
-            s->serializePass(*this);
+            bool const serialized = aSerializer.serializePass(*this);
+            return serialized;
         }
+        //<-----------------------------------------------------------------------------
 
-        void
-        PassBase::acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const&d)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CPassBase::acceptDeserializer(IFrameGraphDeserializer &aDeserializer)
         {
-            d->deserializePass(*this);
+            bool const deserialized = aDeserializer.deserializePass(*this);
+            return deserialized;
         }
+        //<-----------------------------------------------------------------------------
 
-        bool
-        PassBase::registerResource(FrameGraphResourceId_t const&id)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CPassBase::registerResource(FrameGraphResourceId_t const &aResourceUID)
         {
-            m_resourceReferences.push_back(id);
+            mResourceReferences.push_back(aResourceUID);
             return true;
         }
-
+        //<-----------------------------------------------------------------------------
     }
 }

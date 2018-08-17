@@ -143,7 +143,7 @@ namespace engine
         template <typename TResource>
         class CGenericProxyBase
                 : public IResourceProxy<TResource>
-                , public CResourceCreationRequestAdapter<typename TResource::CreationRequest>
+                , public CResourceCreationRequestAdapter<typename TResource::CCreationRequest>
         {
         public_constructors:
             /**
@@ -154,9 +154,9 @@ namespace engine
              */
             CGenericProxyBase(
                     EProxyType                          const &aProxyType,
-                    typename TResource::CreationRequest const &aCreationRequest)
+                    typename TResource::CCreationRequest const &aCreationRequest)
                 : IResourceProxy<TResource>()
-                , CResourceCreationRequestAdapter<typename TResource::CreationRequest>(aCreationRequest)
+                , CResourceCreationRequestAdapter<typename TResource::CCreationRequest>(aCreationRequest)
                 , mProxyType(proxyType)
                 , mProxyLoadState(ELoadState::UNKNOWN)
             { }

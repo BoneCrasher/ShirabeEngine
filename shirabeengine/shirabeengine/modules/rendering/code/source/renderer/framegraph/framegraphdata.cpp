@@ -8,15 +8,15 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<ESFrameGraphResourceType>(ESFrameGraphResourceType const&type)
+    std::string to_string<EFrameGraphResourceType>(EFrameGraphResourceType const&type)
     {
         switch(type) {
         default:
-        case ESFrameGraphResourceType::Undefined:   return "Undefined";
-        case ESFrameGraphResourceType::Texture:     return "Texture";
-        case ESFrameGraphResourceType::Buffer:      return "Buffer";
-        case ESFrameGraphResourceType::TextureView: return "TextureView";
-        case ESFrameGraphResourceType::BufferView:  return "BufferView";
+        case EFrameGraphResourceType::Undefined:   return "Undefined";
+        case EFrameGraphResourceType::Texture:     return "Texture";
+        case EFrameGraphResourceType::Buffer:      return "Buffer";
+        case EFrameGraphResourceType::TextureView: return "TextureView";
+        case EFrameGraphResourceType::BufferView:  return "BufferView";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -79,16 +79,16 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::ESFrameGraphResourceUsage>(framegraph::ESFrameGraphResourceUsage const &aUsage)
+    std::string to_string<framegraph::EFrameGraphResourceUsage>(framegraph::EFrameGraphResourceUsage const &aUsage)
     {
         switch(aUsage)
         {
-        case ESFrameGraphResourceUsage::Undefined:      return "Undefined";
-        case ESFrameGraphResourceUsage::BufferResource: return "BufferResource";
-        case ESFrameGraphResourceUsage::BufferTarget:   return "BufferTarget";
-        case ESFrameGraphResourceUsage::ImageResource:  return "ImageResource";
-        case ESFrameGraphResourceUsage::RenderTarget:   return "RenderTarget";
-        case ESFrameGraphResourceUsage::DepthTarget:    return "DepthTarget";
+        case EFrameGraphResourceUsage::Undefined:      return "Undefined";
+        case EFrameGraphResourceUsage::BufferResource: return "BufferResource";
+        case EFrameGraphResourceUsage::BufferTarget:   return "BufferTarget";
+        case EFrameGraphResourceUsage::ImageResource:  return "ImageResource";
+        case EFrameGraphResourceUsage::RenderTarget:   return "RenderTarget";
+        case EFrameGraphResourceUsage::DepthTarget:    return "DepthTarget";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::ESFrameGraphResourceAccessibility>(framegraph::ESFrameGraphResourceAccessibility const &aAccessibility)
+    std::string to_string<framegraph::EFrameGraphResourceAccessibility>(framegraph::EFrameGraphResourceAccessibility const &aAccessibility)
     {
         return "";
     }
@@ -117,12 +117,12 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::ESFrameGraphResourceInitState>(framegraph::ESFrameGraphResourceInitState const &aState)
+    std::string to_string<framegraph::EFrameGraphResourceInitState>(framegraph::EFrameGraphResourceInitState const &aState)
     {
         switch(aState)
         {
-        case ESFrameGraphResourceInitState::Undefined: return "Undefined";
-        case ESFrameGraphResourceInitState::Clear:     return "Clear";
+        case EFrameGraphResourceInitState::Undefined: return "Undefined";
+        case EFrameGraphResourceInitState::Clear:     return "Clear";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        std::ostream& operator<<(std::ostream &strm, ESFrameGraphResourceType const&e)
+        std::ostream& operator<<(std::ostream &strm, EFrameGraphResourceType const&e)
         {
             strm << to_string(e).c_str();
             return strm;

@@ -106,7 +106,7 @@ namespace engine
              * @param aKey PassKey creatable only by GraphBuilder instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<class GraphBuilder> &&aKey) const
+            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<class CGraphBuilder> &&aKey) const
             {
                 return std::move(std::make_unique<CAccessor>(this));
             }
@@ -117,7 +117,7 @@ namespace engine
              * @param aKey PassKey creatable only by GraphBuilder instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(PassKey<class GraphBuilder> &&aKey)
+            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<class CGraphBuilder> &&aKey)
             {
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
@@ -128,7 +128,7 @@ namespace engine
              * @param aKey PassKey creatable only by graphvizserializer instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<CFrameGraphGraphVizSerializer> &&aKey) const
+            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey) const
             {
                 return std::move(std::make_unique<CAccessor>(this));
             }
@@ -139,7 +139,7 @@ namespace engine
              * @param aKey PassKey creatable only by graphvizserializer instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(PassKey<CFrameGraphGraphVizSerializer> &&aKey)
+            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey)
             {
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
@@ -157,7 +157,7 @@ namespace engine
              * @param aSerializer The serializer instance to accept.
              * @return            True, if successful. False otherwise.
              */
-            virtual bool acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> &aSerializer) const;
+            virtual bool acceptSerializer(IFrameGraphSerializer &aSerializer) const;
 
             /**
              * Double-Dispatch accept for the graph to accept any kind of frame graph deserializer instance.
@@ -165,7 +165,7 @@ namespace engine
              * @param aDeserializer The deserializer instance to accept.
              * @return            True, if successful. False otherwise.
              */
-            virtual bool acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> &aDeserializer);
+            virtual bool acceptDeserializer(IFrameGraphDeserializer &aDeserializer);
 
             /**
              * Assign another graph to this instance.

@@ -1,72 +1,89 @@
-#include "Renderer/FrameGraph/Modules/Lighting.h"
+#include "renderer/framegraph/modules/lighting.h"
 
-namespace engine {
-  namespace framegraph {
-
-    FrameGraphModule<LightingModuleTag_t>::LightingExportData
-      FrameGraphModule<LightingModuleTag_t>::addLightingPass(
-        GraphBuilder            &graphBuilder,
-        FrameGraphResource const&gbuffer0,
-        FrameGraphResource const&gbuffer1,
-        FrameGraphResource const&gbuffer2,
-        FrameGraphResource const&gbuffer3)
+namespace engine
+{
+    namespace framegraph
     {
-      struct State {
-        FrameGraphResource
-          lightAccumulationBufferTextureId;
-      };
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData
+        CFrameGraphModule<SLightingModuleTag_t>::addLightingPass(
+                CGraphBuilder             &aGraphBuilder,
+                SFrameGraphResource const &aGbuffer0,
+                SFrameGraphResource const &aGbuffer1,
+                SFrameGraphResource const &aGbuffer2,
+                SFrameGraphResource const &aGbuffer3)
+        {
+            /**
+             * The SState struct is the internal state of the lighting pass.
+             */
+            struct SState
+            {
+                SFrameGraphResource lightAccumulationBufferTextureId;
+            };
 
-      struct PassData {
-        LightingImportData importData;
-        LightingExportData exportData;
+            /**
+             * The SPassData struct declares the externally managed pass data
+             * for the pass to be created.
+             */
+            struct SPassData
+            {
+                SLightingImportData importData;
+                SLightingExportData exportData;
 
-        State state;
-      };
+                SState state;
+            };
 
-      auto pass = graphBuilder.spawnPass<CallbackPass<PassData>>(
-        "LightAccumulation",
-        [&] (PassBuilder&builder, PassData&passData) -> bool
-      {
-        FrameGraphTexture gbufferTexture = *graphBuilder.getResources().get<FrameGraphTexture>(gbuffer0.subjacentResource);
+            auto const setup = [&] (
+                    CPassBuilder &aBuilder,
+                    SPassData    &aOutPassData) -> bool
+            {
+                SFrameGraphTexture gbufferTexture = *aGraphBuilder.getResources().get<SFrameGraphTexture>(aGbuffer0.subjacentResource);
 
-        FrameGraphTexture lightAccBufferDesc ={ };
-        lightAccBufferDesc.width          = gbufferTexture.width;
-        lightAccBufferDesc.height         = gbufferTexture.height;
-        lightAccBufferDesc.depth          = 1;
-        lightAccBufferDesc.format         = FrameGraphFormat::R32_FLOAT;
-        lightAccBufferDesc.mipLevels      = 1;
-        lightAccBufferDesc.arraySize      = 1;
-        lightAccBufferDesc.initialState   = FrameGraphResourceInitState::Clear;
-        lightAccBufferDesc.permittedUsage = FrameGraphResourceUsage::ImageResource | FrameGraphResourceUsage::RenderTarget;
+                SFrameGraphTexture lightAccBufferDesc ={ };
+                lightAccBufferDesc.width          = gbufferTexture.width;
+                lightAccBufferDesc.height         = gbufferTexture.height;
+                lightAccBufferDesc.depth          = 1;
+                lightAccBufferDesc.format         = FrameGraphFormat_t::R32_FLOAT;
+                lightAccBufferDesc.mipLevels      = 1;
+                lightAccBufferDesc.arraySize      = 1;
+                lightAccBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
+                lightAccBufferDesc.permittedUsage = EFrameGraphResourceUsage::ImageResource | EFrameGraphResourceUsage::RenderTarget;
 
-        passData.state.lightAccumulationBufferTextureId = builder.createTexture("Light Accumulation Buffer", lightAccBufferDesc);
+                aOutPassData.state.lightAccumulationBufferTextureId = aBuilder.createTexture("Light Accumulation Buffer", lightAccBufferDesc);
 
-        FrameGraphReadTextureFlags readFlags{ };
-        readFlags.requiredFormat = FrameGraphFormat::Automatic;
-        readFlags.source         = FrameGraphReadSource::Color;
+                SFrameGraphReadTextureFlags readFlags{ };
+                readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
+                readFlags.source         = EFrameGraphReadSource::Color;
 
-        passData.importData.gbuffer0 = builder.readTexture(gbuffer0, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer1 = builder.readTexture(gbuffer1, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer2 = builder.readTexture(gbuffer2, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer3 = builder.readTexture(gbuffer3, readFlags, Range(0, 1), Range(0, 1));
+                aOutPassData.importData.gbuffer0 = aBuilder.readTexture(aGbuffer0, readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.gbuffer1 = aBuilder.readTexture(aGbuffer1, readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.gbuffer2 = aBuilder.readTexture(aGbuffer2, readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.gbuffer3 = aBuilder.readTexture(aGbuffer3, readFlags, CRange(0, 1), CRange(0, 1));
 
-        FrameGraphWriteTextureFlags writeFlags{ };
-        writeFlags.requiredFormat = FrameGraphFormat::Automatic;
-        writeFlags.writeTarget    = FrameGraphWriteTarget::Color;
+                SFrameGraphWriteTextureFlags writeFlags{ };
+                writeFlags.requiredFormat = FrameGraphFormat_t::Automatic;
+                writeFlags.writeTarget    = EFrameGraphWriteTarget::Color;
 
-        passData.exportData.lightAccumulationBuffer = builder.writeTexture(passData.state.lightAccumulationBufferTextureId, writeFlags, Range(0, 1), Range(0, 1));
+                aOutPassData.exportData.lightAccumulationBuffer = aBuilder.writeTexture(aOutPassData.state.lightAccumulationBufferTextureId, writeFlags, CRange(0, 1), CRange(0, 1));
 
-        return true;
-      },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, CStdSharedPtr_t<IFrameGraphRenderContext>&context) -> bool
-      {
-        Log::Verbose(logTag(), "Lighting");
+                return true;
+            };
 
-        return true;
-      });
+            auto const execute = [=] (
+                    SPassData                                 const&aPassData,
+                    CFrameGraphResources                      const&aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+            {
+                CLog::Verbose(logTag(), "Lighting");
 
-      return pass->passData().exportData;
+                return true;
+            };
+
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>("LightAccumulation", setup, execute);
+            return pass->passData().exportData;
+        }
+        //<-----------------------------------------------------------------------------
     }
-
-  }
 }

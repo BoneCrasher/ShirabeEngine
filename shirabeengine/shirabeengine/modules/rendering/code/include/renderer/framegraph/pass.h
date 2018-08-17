@@ -39,16 +39,26 @@ namespace engine
         {
         public_classes:
             /**
-             * @brief The CAccessor class
+             * This accessor provides guarded immutable access to the internals of a CPassBase.
              */
             class CAccessor
             {
                 friend class CPassBase;
 
             public_methods:
+                /**
+                 * Return the currently attached resources of the referred pass.
+                 *
+                 * @return See brief.
+                 */
                 FrameGraphResourceIdList const &resourceReferences() const;
 
             private_constructors:
+                /**
+                 * Construct an accessor from a pass to refer to.
+                 *
+                 * @param aPass The pass to refer to.
+                 */
                 CAccessor(CPassBase const *aPass);
 
             private_members:
@@ -56,7 +66,7 @@ namespace engine
             };
 
             /**
-             * @brief The MutableAccessor class
+             * Extends CAccessor by mutable access to the referred to pass' internals.
              */
             class CMutableAccessor
                     : public CAccessor
@@ -64,86 +74,219 @@ namespace engine
                 friend class CPassBase;
 
             public_methods:
+                /**
+                 * Return the currently attached resources of the referred pass.
+                 *
+                 * @return See brief.
+                 */
                 FrameGraphResourceIdList &mutableResourceReferences();
 
+                /**
+                 * Register a resource in the referred to pass.
+                 *
+                 * @param aResourceId The resource id of the resource to store.
+                 * @return            True, if successful. False, otherwise.
+                 */
                 bool registerResource(FrameGraphResourceId_t const &aResourceId);
 
             private_constructors:
+                /**
+                 * Construct an accessor from a pass to refer to.
+                 *
+                 * @param aPass The pass to refer to.
+                 */
                 CMutableAccessor(CPassBase *aPass);
 
             private_members:
                 CPassBase *mPass;
             };
 
-        public_methods:
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<CGraphBuilder>&&) const;
-
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(PassKey<CGraphBuilder>&&);
-
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<PassBuilder>&&) const;
-
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(PassKey<PassBuilder>&&);
-
-            CStdUniquePtr_t<CAccessor> getAccessor(PassKey<CGraph>&&) const;
-
+        public_constructors:
+            /**
+             * Construct a base pass from UID and name.
+             *
+             * @param aPassUID  The pass UID assigned to this pass.
+             * @param aPassName The pass name assigned to this pass.
+             */
             CPassBase(
-                    PassUID_t   const &passUID,
-                    std::string const &passName);
+                    PassUID_t   const &aPassUID,
+                    std::string const &aPassName);
 
-            virtual bool setup(PassBuilder&) = 0;
+        public_methods:
+            /**
+             * Return an accessor to CGraphBuilder instances.
+             *
+             * @param aPassKey Pass-Key instance creatable by CGraphBuilder instances only.
+             * @return         See brief.
+             */
+            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const;
+
+            /**
+             * Return an accessor to CGraphBuilder instances.
+             *
+             * @param aPassKey Pass-Key instance creatable by CGraphBuilder instances only.
+             * @return         See brief.
+             */
+            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey);
+
+            /**
+             * Return an accessor to PassBuilder instances.
+             *
+             * @param aPassKey Pass-Key instance creatable by PassBuilder instances only.
+             * @return         See brief.
+             */
+            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CPassBuilder> &&aPassKey) const;
+
+            /**
+             * Return an accessor to PassBuilder instances.
+             *
+             * @param aPassKey Pass-Key instance creatable by PassBuilder instances only.
+             * @return         See brief.
+             */
+            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey);
+
+            /**
+             * Return an accessor to CGraph instances.
+             *
+             * @param aPassKey Pass-Key instance creatable by CGraph instances only.
+             * @return         See brief.
+             */
+            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CGraph> &&aPassKey) const;
+
+            /**
+             * Return the UID assigned to this pass.
+             *
+             * @return See brief.
+             */
+            PassUID_t const &passUID() const;
+
+            /**
+             * Return the name assigned to this pass.
+             *
+             * @return See brief.
+             */
+            std::string const &passName() const;
+
+            /**
+             * Double-Dispatch serialization integration to serialize this pass.
+             *
+             * @param aSerializer Serializer to accept for pass serialization.
+             */
+            virtual bool acceptSerializer(IFrameGraphSerializer &aSerializer) const;
+
+            /**
+             * Double-Dispatch serialization integration to deserialize this pass.
+             *
+             * @param aDeserializer Deserializer to accept for pass serialization.
+             */
+            virtual bool acceptDeserializer(IFrameGraphDeserializer &aDeserializer);
+
+            /**
+             * Interface method for all passes' setup.
+             * To be implemented by specific pass classes.
+             *
+             * @param aPassBuilder The pass builder instance to use for setup.
+             * @return             True, if successful. False otherwise.
+             */
+            virtual bool setup(CPassBuilder &aPassBuilder) = 0;
+
+            /**
+             * Interface method for all passes' execution.
+             * To be implemented by specific pass classes.
+             *
+             * @param aFrameGraphResources A collection of resolved and loaded resources requested during
+             *                             setup for use during exeuction.
+             * @param aContext             The render context of the framegraph interfacing with all subsystems.
+             * @return                     True, if successful. False otherwise.
+             */
             virtual bool execute(
-                    CFrameGraphResources           const&frameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &context) = 0;
+                    CFrameGraphResources                      const&aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) = 0;
 
-            std::string const&passName() const;
-            PassUID_t   const&passUID()  const;
-
-            virtual void acceptSerializer(CStdSharedPtr_t<IFrameGraphSerializer> &aSerializer) const;
-
-            virtual void acceptDeserializer(CStdSharedPtr_t<IFrameGraphDeserializer> const &aDeserializer);
+        private_methods:
+            /**
+             * Register a resource in this pass instance.
+             *
+             * @param aResourceUID The resource uid of the resource to register.
+             * @return             True, if successful. False otherwise.
+             */
+            bool registerResource(FrameGraphResourceId_t const &aResourceUID);
 
         private_members:
-            bool registerResource(FrameGraphResourceId_t const&id);
-
-            PassUID_t   m_passUID;
-            std::string m_passName;
-
-            FrameGraphResourceIdList m_resourceReferences;
+            PassUID_t                mPassUID;
+            std::string              mPassName;
+            FrameGraphResourceIdList mResourceReferences;
         };
 
         SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<CPassBase>, CPassBase);
         SHIRABE_DECLARE_MAP_OF_TYPES(PassUID_t, CStdSharedPtr_t<CPassBase>, Pass);
 
         /**
+         * The CallbackPass is a pass implementation, which accepts callbacks for setup and execute,
+         * permitting a very elegant way to implement passes without thousands of separate classes.
+         * Each CallbackPass operates on a 'TPassData' instance, i.e. the input, state and output data
+         * of the pass, being externally managed and provided to the callback pass on execution.
          *
+         * @tparam TPassData The data struct of the pass to externally manage and provide on execution.
          */
         template <typename TPassData>
         class CallbackPass
                 : public CPassBase
         {
-        public:
-            using SetupCallback_t = std::function<bool(PassBuilder&, TPassData&)>;
+        public_typedefs:
+            using SetupCallback_t = std::function<bool(CPassBuilder&, TPassData&)>;
             using ExecCallback_t  = std::function<bool(TPassData const&, CFrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&)>;
 
+        public_constructors:
+            /**
+             * Construct a callback pass from a UID, name, setup callback and execute callback.
+             *
+             * @param aPassUID  The UID assigned to this pass.
+             * @param aPassName The name assigned to this pass.
+             * @param aSetupCb  The setup callback for this pass, immediately invoked on construction.
+             * @param aExecCb   The execution callback invoked deferred.
+             */
             CallbackPass(
-                    PassUID_t       const&passId,
-                    std::string     const&passName,
-                    SetupCallback_t     &&setupCb,
-                    ExecCallback_t      &&execCb);
+                    PassUID_t       const  &aPassUID,
+                    std::string     const  &aPassName,
+                    SetupCallback_t       &&aSetupCb,
+                    ExecCallback_t        &&aExecCb);
 
-            bool setup(PassBuilder&builder);
-            bool execute(CFrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&);
+            /**
+             * Setup implementation, invoking the setup callback.
+             *
+             * @param aBuilder The pass builder to use for setup.
+             * @return         True, if successful. False otherwise.
+             */
+            bool setup(CPassBuilder &aBuilder);
 
-            TPassData const&passData() const { return m_passData; }
+            /**
+             * Execute implementation, invoking the execute callback.
+             *
+             * @param aFrameGraphResources A collection of resolved and loaded resources requested during
+             *                             setup for use during exeuction.
+             * @param aContext             The render context of the framegraph interfacing with all subsystems.
+             * @return                     True, if successful. False otherwise.
+             */
+            bool execute(
+                    CFrameGraphResources                      const &aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aContext);
 
-        private:
-            SetupCallback_t setupCallback;
-            ExecCallback_t  execCallback;
+            /**
+             * Return the pass data struct associated with this callback pass.
+             *
+             * @return See brief.
+             */
+            TPassData const &passData() const
+            {
+                return mPassData;
+            }
 
-            FrameGraphResourceIdList
-            m_resources;
-            TPassData
-            m_passData;
+        private_members:
+            SetupCallback_t          mSetupCallback;
+            ExecCallback_t           mExecCallback;
+            FrameGraphResourceIdList mResources;
+            TPassData                mPassData;
         };
         //<-----------------------------------------------------------------------------
 
@@ -157,12 +300,12 @@ namespace engine
                 SetupCallback_t     &&setupCb,
                 ExecCallback_t      &&execCb)
             : CPassBase(passUID, passName)
-            , setupCallback(setupCb)
-            , execCallback(execCb)
-            , m_passData()
+            , mSetupCallback(setupCb)
+            , mExecCallback(execCb)
+            , mPassData()
         {
-            assert(setupCallback != nullptr);
-            assert(execCallback  != nullptr);
+            assert(nullptr != mSetupCallback);
+            assert(nullptr != mExecCallback );
         }
         //<-----------------------------------------------------------------------------
 
@@ -170,11 +313,12 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
-        bool CallbackPass<TPassData>::setup(PassBuilder&builder)
+        bool CallbackPass<TPassData>::setup(CPassBuilder &aBuilder)
         {
             TPassData passData{ };
-            if(setupCallback(builder, passData)) {
-                m_passData = passData;
+            if(mSetupCallback(aBuilder, passData))
+            {
+                mPassData = passData;
                 return true;
             }
             else
@@ -186,10 +330,13 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
-        bool CallbackPass<TPassData>::execute(CFrameGraphResources const&resources, CStdSharedPtr_t<IFrameGraphRenderContext>&context)
+        bool CallbackPass<TPassData>::execute(
+                CFrameGraphResources                      const &aFrameGraphResources,
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aContext)
         {
-            try {
-                return execCallback(m_passData, resources, context);
+            try
+            {
+                return mExecCallback(mPassData, aFrameGraphResources, aContext);
             }
             catch(...) {
                 return false;

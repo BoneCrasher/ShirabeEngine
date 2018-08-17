@@ -1,101 +1,121 @@
-#include "Renderer/FrameGraph/Modules/GBufferGeneration.h"
+#include "renderer/framegraph/modules/gbuffergeneration.h"
 
-namespace engine {
-  namespace framegraph {
-
-    FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData
-      FrameGraphModule<GBufferModuleTag_t>::addGBufferGenerationPass(
-        GraphBuilder            &graphBuilder,
-        FrameGraphResource const&renderableInput)
+namespace engine
+{
+    namespace framegraph
     {
-      struct State {
-        FrameGraphResource
-          gbufferTextureArrayId;
-      };
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
+        CFrameGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
+                CGraphBuilder             &aGraphBuilder,
+                SFrameGraphResource const &aRenderableInput)
+        {
+            /**
+             * The SState struct is the internal state of the gbuffer generation pass.
+             */
+            struct SState
+            {
+                SFrameGraphResource gbufferTextureArrayId;
+            };
 
-      struct PassData {
-        GBufferGenerationImportData importData;
-        GBufferGenerationExportData exportData;
+            /**
+             * The SPassData struct declares the externally managed pass data
+             * for the pass to be created.
+             */
+            struct SPassData
+            {
+                SGBufferGenerationImportData importData;
+                SGBufferGenerationExportData exportData;
 
-        State state;
-      };
+                SState state;
+            };
 
-      auto pass = graphBuilder.spawnPass<CallbackPass<PassData>>(
-        "GBufferGeneration",
-        [&] (PassBuilder&builder, PassData&passData) -> bool
-      {
-        uint32_t
-          width  = 1920,
-          height = 1080;
+            auto const setup = [&] (
+                    CPassBuilder &aBuilder,
+                    SPassData    &aOutPassData) -> bool
+            {
+                uint32_t width  = 1920;
+                uint32_t height = 1080;
 
-        CStdSharedPtr_t<ApplicationEnvironment> environment = graphBuilder.env();
-        if(environment) {
-          OSDisplayDescriptor const&displayDesc = environment->primaryDisplay();
-          width  = displayDesc.bounds.size.x();
-          height = displayDesc.bounds.size.y();
+                CStdSharedPtr_t<SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
+                if(environment)
+                {
+                    SOSDisplayDescriptor const &displayDesc = environment->primaryDisplay();
+                    width  = displayDesc.bounds.size.x();
+                    height = displayDesc.bounds.size.y();
+                }
+
+                SFrameGraphTexture gbufferDesc={ };
+                gbufferDesc.width          = width;
+                gbufferDesc.height         = height;
+                gbufferDesc.depth          = 1;
+                gbufferDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
+                gbufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
+                gbufferDesc.arraySize      = 4;
+                gbufferDesc.mipLevels      = 1;
+                gbufferDesc.permittedUsage = EFrameGraphResourceUsage::ImageResource | EFrameGraphResourceUsage::RenderTarget;
+
+                // Basic underlying output buffer to be linked
+                aOutPassData.state.gbufferTextureArrayId = aBuilder.createTexture("GBuffer Array Texture", gbufferDesc);
+
+                // This will create a list of render targets for the texutre array to render to.
+                // They'll be internally created and managed.
+                SFrameGraphWriteTextureFlags flags = {};
+                flags.requiredFormat = gbufferDesc.format;
+                flags.writeTarget    = EFrameGraphWriteTarget::Color;
+
+                aOutPassData.exportData.gbuffer0 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.exportData.gbuffer1 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(1, 1), CRange(0, 1));
+                aOutPassData.exportData.gbuffer2 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(2, 1), CRange(0, 1));
+                aOutPassData.exportData.gbuffer3 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(3, 1), CRange(0, 1));
+
+                // Import renderable objects based on selector, flags, or whatever should be supported...
+                aOutPassData.importData.renderableListView = aBuilder.importRenderables("SceneRenderables", aRenderableInput);
+
+                return true;
+            };
+
+            auto const execute = [=] (
+                    SPassData                                 const&aPassData,
+                    CFrameGraphResources                      const&aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+            {
+                using namespace engine::rendering;
+
+                CLog::Verbose(logTag(), "GBufferGeneration");
+
+                CStdSharedPtr_t<SFrameGraphRenderableListView> const &renderableView =
+                        aFrameGraphResources.get<SFrameGraphRenderableListView>(aPassData.importData.renderableListView.resourceId);
+
+#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+                if(!renderableView)
+                    throw std::runtime_error(CString::format("Renderable view with id %0 not found.", aPassData.importData.renderableListView.resourceId));
+#endif
+
+                CStdSharedPtr_t<SFrameGraphRenderableList> const&renderableList =
+                        aFrameGraphResources.get<SFrameGraphRenderableList>(aPassData.importData.renderableListView.subjacentResource);
+
+#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
+                if(!renderableList)
+                    throw std::runtime_error(CString::format("Renderable list with id %0 not found.", aPassData.importData.renderableListView.subjacentResource));
+#endif
+
+                for(FrameGraphResourceId_t const &renderableId : renderableView->renderableRefIndices)
+                {
+                    FrameGraphRenderable_t const &renderable = renderableList->renderableList.at(renderableId);
+
+                    EEngineStatus status = aContext->render(renderable);
+                    HandleEngineStatusError(status, "Failed to render renderable.");
+                }
+
+                return true;
+            };
+
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>("GBufferGeneration", setup, execute);
+            return pass->passData().exportData;
         }
-
-        FrameGraphTexture gbufferDesc={ };
-        gbufferDesc.width          = width;
-        gbufferDesc.height         = height;
-        gbufferDesc.depth          = 1;
-        gbufferDesc.format         = FrameGraphFormat::R8G8B8A8_UNORM;
-        gbufferDesc.initialState   = FrameGraphResourceInitState::Clear;
-        gbufferDesc.arraySize      = 4;
-        gbufferDesc.mipLevels      = 1;
-        gbufferDesc.permittedUsage = FrameGraphResourceUsage::ImageResource | FrameGraphResourceUsage::RenderTarget;
-
-        // Basic underlying output buffer to be linked
-        passData.state.gbufferTextureArrayId = builder.createTexture("GBuffer Array Texture", gbufferDesc);
-
-        // This will create a list of render targets for the texutre array to render to.
-        // They'll be internally created and managed.
-        FrameGraphWriteTextureFlags flags{ };
-        flags.requiredFormat = gbufferDesc.format;
-        flags.writeTarget    = FrameGraphWriteTarget::Color;
-
-        passData.exportData.gbuffer0 = builder.writeTexture(passData.state.gbufferTextureArrayId, flags, Range(0, 1), Range(0, 1));
-        passData.exportData.gbuffer1 = builder.writeTexture(passData.state.gbufferTextureArrayId, flags, Range(1, 1), Range(0, 1));
-        passData.exportData.gbuffer2 = builder.writeTexture(passData.state.gbufferTextureArrayId, flags, Range(2, 1), Range(0, 1));
-        passData.exportData.gbuffer3 = builder.writeTexture(passData.state.gbufferTextureArrayId, flags, Range(3, 1), Range(0, 1));
-
-        // Import renderable objects based on selector, flags, or whatever should be supported...
-        passData.importData.renderableListView = builder.importRenderables("SceneRenderables", renderableInput);
-
-        return true;
-      },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, CStdSharedPtr_t<IFrameGraphRenderContext>&context) -> bool
-      {
-        using namespace engine::Rendering;
-
-        Log::Verbose(logTag(), "GBufferGeneration");
-
-        CStdSharedPtr_t<FrameGraphRenderableListView> const&renderableView = frameGraphResources.get<FrameGraphRenderableListView>(passData.importData.renderableListView.resourceId);
-        
-        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        if(!renderableView)
-          throw std::runtime_error(String::format("Renderable view with id %0 not found.", passData.importData.renderableListView.resourceId));
-        #endif
-
-        CStdSharedPtr_t<FrameGraphRenderableList> const&renderableList = frameGraphResources.get<FrameGraphRenderableList>(passData.importData.renderableListView.subjacentResource);
-        
-        #if defined SHIRABE_DEBUG || defined SHIRABE_TEST 
-        if(!renderableList)
-          throw std::runtime_error(String::format("Renderable list with id %0 not found.", passData.importData.renderableListView.subjacentResource));
-        #endif
-
-        for(FrameGraphResourceId_t const&renderableId : renderableView->renderableRefIndices) {
-          FrameGraphRenderable const&renderable = renderableList->renderableList.at(renderableId);
-
-          EEngineStatus status = context->render(renderable);
-          HandleEngineStatusError(status, "Failed to render renderable.");
-        }
-
-        return true;
-      });
-
-      return pass->passData().exportData;
+        //<-----------------------------------------------------------------------------
     }
-
-  }
 }

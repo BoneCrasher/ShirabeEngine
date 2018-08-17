@@ -12,7 +12,7 @@ namespace engine
      * @tparam The class which wants access to private data.
      */
     template <typename TAccessor>
-    class PassKey
+    class CPassKey
     {
     private_typedefs:
         friend TAccessor;
@@ -21,11 +21,11 @@ namespace engine
         /**
          * Construct an empty pass key.
          */
-        PassKey() = default;
+        CPassKey() = default;
         /**
          * Copy one pass key to another.
          */
-        PassKey(PassKey const&) = default;
+        CPassKey(CPassKey const&) = default;
 
     private_operators:
         /**
@@ -33,7 +33,7 @@ namespace engine
          *
          * @return Self-Ref.
          */
-        PassKey& operator=(PassKey const&) = delete;
+        CPassKey& operator=(CPassKey const&) = delete;
     };
 
 }

@@ -41,17 +41,17 @@ namespace engine
                      * @param aSerializer The serializer instance to perform serialization with.
                      * @return            True, if serialization was successful. False otherwise.
                      */
-                virtual bool acceptSerializer(TInterfaceSerialization   &aSerializer) const = 0;
+                virtual bool acceptSerializer(TInterfaceSerialization &aSerializer) const = 0;
 
-            /*!
-             * Accept a specific serializer and conduct the type serialization process
-             * with it.
-             *
-             * @param aDeserializer The deserializer instance to perform deserialization with.
-             * @return              True, if deserialization was successful. False otherwise.
-             * @return
-             */
-            virtual bool acceptDeserializer(TInterfaceDeserialization &aDeserializer)       = 0;
+                /*!
+                 * Accept a specific serializer and conduct the type serialization process
+                 * with it.
+                 *
+                 * @param aDeserializer The deserializer instance to perform deserialization with.
+                 * @return              True, if deserialization was successful. False otherwise.
+                 * @return
+                 */
+                virtual bool acceptDeserializer(TInterfaceDeserialization &aDeserializer) = 0;
         };
 
         /*!

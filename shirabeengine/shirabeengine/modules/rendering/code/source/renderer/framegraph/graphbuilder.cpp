@@ -111,7 +111,7 @@ namespace engine
             applicationEnvironment() = aApplicationEnvironment;
             graph()                  = makeCStdUniquePtr<CGraph>();
 
-            auto const pseudoSetup = [] (PassBuilder const&, bool&) -> bool
+            auto const pseudoSetup = [] (CPassBuilder const&, bool&) -> bool
             {
                 return true;
             };
@@ -162,7 +162,7 @@ namespace engine
 
                 mResources.push_back(resource.resourceId);
 
-                CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(PassKey<CGraphBuilder>());
+                CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(CPassKey<CGraphBuilder>());
                 accessor->mutableResourceReferences().push_back(resource.resourceId);
 
                 return resource;
@@ -209,7 +209,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CStdUniquePtr_t<CGraph> CGraphBuilder::compile()
         {
-            CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(PassKey<CGraphBuilder>());
+            CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             for(PassMap::value_type const &assignment : graph()->passes())
                 assert(true == collectPass(assignment.second));
@@ -253,33 +253,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template <typename T>
-        std::optional<T&> getResource(FrameGraphResourceId_t const &aResourceId)
-        {
-            if((mResources.find(aResourceId) == mResources.end()))
-                throw std::runtime_error("Resource not found");
-
-            try
-            {
-                std::optional<T&> optional = std::get<T>(mResources.at(aResourceId));
-                return optional;
-            }
-            catch(std::bad_variant_access const &aBVE)
-            {
-                CLog::Error(logTag(), aBVE.what());
-                return std::optional<T&>();
-            }
-            catch(std::runtime_error const &aRTE)
-            {
-                CLog::Error(logTag(), aRTE.what());
-                return std::optional<T&>();
-            }
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         FrameGraphResourceId_t CGraphBuilder::findSubjacentResource(
                SFrameGraphResourceMap const &aResources,
                SFrameGraphResource    const &aStart)
@@ -306,7 +279,7 @@ namespace engine
         {
             assert(nullptr != aPass);
 
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(PassKey<CGraphBuilder>());
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             // Derive:
             // - Resource creation requests.

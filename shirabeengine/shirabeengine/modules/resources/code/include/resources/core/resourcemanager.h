@@ -212,7 +212,7 @@ namespace engine
                 std::string                          const &aResourceId,
                 bool                                        aCreationDeferred)
         {
-            typename TResource::Descriptor const& desc = aRequest.resourceDescriptor();
+            typename TResource::SDescriptor const& desc = aRequest.resourceDescriptor();
 
             AnyProxy resourceProxy = getResourceProxy(aResourceId);
             if(!resourceProxy)
@@ -255,8 +255,8 @@ namespace engine
             if(!genericProxy)
                 HandleEngineStatusError(EEngineStatus::Error, "Proxy is not a GenericResourceProxy");
 
-            typename TResource::CreationRequest const &creator = genericProxy->creationRequest();
-            typename TResource::Descriptor      const &desc    = creator.resourceDescriptor();
+            typename TResource::CCreationRequest const &creator = genericProxy->creationRequest();
+            typename TResource::SDescriptor      const &desc    = creator.resourceDescriptor();
 
             PublicResourceIdList_t dependencies = desc.dependencies;
             if(!dependencies.empty())

@@ -1,59 +1,77 @@
-#include "Renderer/FrameGraph/Modules/Compositing.h"
+#include "renderer/framegraph/modules/compositing.h"
 
-namespace engine {
-  namespace framegraph {
-
-    FrameGraphModule<CompositingModuleTag_t>::ExportData
-      FrameGraphModule<CompositingModuleTag_t>::addDefaultCompositingPass(
-        GraphBuilder            &graphBuilder,
-        FrameGraphResource const&gbuffer0,
-        FrameGraphResource const&gbuffer1,
-        FrameGraphResource const&gbuffer2,
-        FrameGraphResource const&gbuffer3,
-        FrameGraphResource const&lightAccumulationBuffer,
-        FrameGraphResource const&backBuffer)
+namespace engine
+{
+    namespace framegraph
     {
-      struct State {
-      };
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CFrameGraphModule<SCompositingModuleTag_t>::SExportData
+        CFrameGraphModule<SCompositingModuleTag_t>::addDefaultCompositingPass(
+                CGraphBuilder             &aGraphBuilder,
+                SFrameGraphResource const &aGbuffer0,
+                SFrameGraphResource const &aGbuffer1,
+                SFrameGraphResource const &aGbuffer2,
+                SFrameGraphResource const &aGbuffer3,
+                SFrameGraphResource const &aLightAccumulationBuffer,
+                SFrameGraphResource const &aBackBuffer)
+        {
+            /**
+             * The SState struct is the internal state of the compositing pass.
+             */
+            struct SState
+            {
+            };
 
-      struct PassData {
-        ImportData importData;
-        ExportData exportData;
+            /**
+             * The SPassData struct declares the externally managed pass data
+             * for the pass to be created.
+             */
+            struct SPassData
+            {
+                SImportData importData;
+                SExportData exportData;
 
-        State state;
-      };
+                SState state;
+            };
 
-      auto pass = graphBuilder.spawnPass<CallbackPass<PassData>>(
-        "Compositing",
-        [&] (PassBuilder&builder, PassData&passData) -> bool
-      {
-        FrameGraphReadTextureFlags readFlags{ };
-        readFlags.requiredFormat = FrameGraphFormat::Automatic;
-        readFlags.source         = FrameGraphReadSource::Color;
+            auto const setup = [&] (
+                    CPassBuilder &aBuilder,
+                    SPassData    &aOutPassData) -> bool
+            {
+                SFrameGraphReadTextureFlags readFlags{ };
+                readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
+                readFlags.source         = EFrameGraphReadSource::Color;
 
-        passData.importData.gbuffer0                = builder.readTexture(gbuffer0, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer1                = builder.readTexture(gbuffer1, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer2                = builder.readTexture(gbuffer2, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.gbuffer3                = builder.readTexture(gbuffer3, readFlags, Range(0, 1), Range(0, 1));
-        passData.importData.lightAccumulationBuffer = builder.readTexture(lightAccumulationBuffer, readFlags, Range(0, 1), Range(0, 1));
+                aOutPassData.importData.gbuffer0                = aBuilder.readTexture(aGbuffer0,                readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.gbuffer1                = aBuilder.readTexture(aGbuffer1,                readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.gbuffer2                = aBuilder.readTexture(aGbuffer2,                readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.gbuffer3                = aBuilder.readTexture(aGbuffer3,                readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.lightAccumulationBuffer = aBuilder.readTexture(aLightAccumulationBuffer, readFlags, CRange(0, 1), CRange(0, 1));
 
-        FrameGraphWriteTextureFlags writeFlags{ };
-        writeFlags.requiredFormat = FrameGraphFormat::Automatic;
-        writeFlags.writeTarget    = FrameGraphWriteTarget::Color;
+                SFrameGraphWriteTextureFlags writeFlags{ };
+                writeFlags.requiredFormat = FrameGraphFormat_t::Automatic;
+                writeFlags.writeTarget    = EFrameGraphWriteTarget::Color;
 
-        passData.exportData.output = builder.writeTexture(backBuffer, writeFlags, Range(0, 1), Range(0, 1));
+                aOutPassData.exportData.output = aBuilder.writeTexture(aBackBuffer, writeFlags, CRange(0, 1), CRange(0, 1));
 
-        return true;
-      },
-        [=] (PassData const&passData, FrameGraphResources const&frameGraphResources, CStdSharedPtr_t<IFrameGraphRenderContext>&context) -> bool
-      {
-        Log::Verbose(logTag(), "Compositing");
+                return true;
+            };
 
-        return true;
-      });
+            auto const execute = [=] (
+                    SPassData                                 const&aPassData,
+                    CFrameGraphResources                      const&aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+            {
+                CLog::Verbose(logTag(), "Compositing");
 
-      return pass->passData().exportData;
+                return true;
+            };
+
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>("Compositing", setup, execute);
+            return pass->passData().exportData;
+        }
+        //<-----------------------------------------------------------------------------
     }
-
-  }
 }

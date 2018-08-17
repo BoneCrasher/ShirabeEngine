@@ -90,6 +90,25 @@ namespace engine
         {
             SHIRABE_DECLARE_LOG_TAG(CFrameGraphGraphVizSerializer);
 
+        public_structs:
+            /*!
+             * The IResult interface of the ISerializer<T> interface declares required
+             * signatures for result retrieval from a serialization process.
+             */
+            class CFrameGraphSerializationResult
+                    : public IResult
+            {
+            public_constructors:
+                CFrameGraphSerializationResult(std::string const &aResult);
+
+            public_methods:
+                bool asString      (std::string          &aOutString) const;
+                bool asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const;
+
+            private_members:
+                std::string const mResult;
+            };
+
         public_methods:
             /**
              * Initialize the serializer and prepare for serialization calls.
@@ -103,7 +122,18 @@ namespace engine
              *
              * @return True, if successful. False otherwise.
              */
-            bool deinitialize();
+            bool deinitialize();            
+
+            /*!
+             * Serialize an instance of type CGraph into whichever internal representation and
+             * provide it using a pointer to IResult.
+             *
+             * @param aSource    Input data for serialization.
+             * @param aOutResult Result-Instance holding the serialized data, providing access to
+             *                   it in various output formats.
+             * @return
+             */
+            bool serialize(CGraph const &aSource, CStdSharedPtr_t<IResult> &aOutResult);
 
             /**
              * Serialize the graph itself. This is the main entry point of serialization.

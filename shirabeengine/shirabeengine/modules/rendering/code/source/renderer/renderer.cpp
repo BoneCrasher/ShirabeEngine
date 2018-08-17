@@ -53,7 +53,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus Renderer::deinitialize()
+        EEngineStatus CRenderer::deinitialize()
         {
             return EEngineStatus::Ok;
         }
@@ -101,28 +101,28 @@ namespace engine
         EEngineStatus CRenderer::renderScene()
         {
             using namespace engine;
-            using namespace engine::FrameGraph;
+            using namespace engine::framegraph;
             
-            OSDisplayDescriptor const &displayDesc = mAppEnvironment->primaryDisplay();
+            SOSDisplayDescriptor const &displayDesc = mAppEnvironment->primaryDisplay();
 
             uint32_t
                     width  = displayDesc.bounds.size.x(),
                     height = displayDesc.bounds.size.y();
 
-            GraphBuilder graphBuilder{ };
+            CGraphBuilder graphBuilder{ };
             graphBuilder.initialize(mAppEnvironment);
 
-            FrameGraphTexture backBufferTextureDesc{ };
+            SFrameGraphTexture backBufferTextureDesc{ };
             backBufferTextureDesc.width          = width;
             backBufferTextureDesc.height         = height;
             backBufferTextureDesc.depth          = 1;
-            backBufferTextureDesc.format         = FrameGraphFormat::R8G8B8A8_UNORM;
-            backBufferTextureDesc.initialState   = FrameGraphResourceInitState::Clear;
+            backBufferTextureDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
+            backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
             backBufferTextureDesc.arraySize      = 1;
             backBufferTextureDesc.mipLevels      = 1;
-            backBufferTextureDesc.permittedUsage = FrameGraphResourceUsage::RenderTarget;
+            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget;
 
-            FrameGraphResource backBuffer{ };
+            SFrameGraphResource backBuffer{ };
             backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
 
             RenderableList renderableCollection ={
@@ -130,19 +130,19 @@ namespace engine
                 { "Sphere",  0, 0 },
                 { "Pyramid", 0, 0 }
             };
-            FrameGraphResource renderables{ };
+            SFrameGraphResource renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
             // GBuffer
-            FrameGraphModule<GBufferModuleTag_t> gbufferModule{ };
-            FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData gbufferExportData{ };
+            CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule    { };
+            CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
             gbufferExportData = gbufferModule.addGBufferGenerationPass(
                         graphBuilder,
                         renderables);
 
             // Lighting
-            FrameGraphModule<LightingModuleTag_t> lightingModule{ };
-            FrameGraphModule<LightingModuleTag_t>::LightingExportData lightingExportData{ };
+            CFrameGraphModule<SLightingModuleTag_t>                      lightingModule    { };
+            CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
             lightingExportData = lightingModule.addLightingPass(
                         graphBuilder,
                         gbufferExportData.gbuffer0,
@@ -151,8 +151,8 @@ namespace engine
                         gbufferExportData.gbuffer3);
 
             // Compositing
-            FrameGraphModule<CompositingModuleTag_t> compositingModule{ };
-            FrameGraphModule<CompositingModuleTag_t>::ExportData compositingExportData{ };
+            CFrameGraphModule<SCompositingModuleTag_t>              compositingModule    { };
+            CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData = compositingModule.addDefaultCompositingPass(
                         graphBuilder,
                         gbufferExportData.gbuffer0,
@@ -162,15 +162,13 @@ namespace engine
                         lightingExportData.lightAccumulationBuffer,
                         backBuffer);
 
-            UniqueCStdSharedPtr_t<engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
+            CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
-            CStdSharedPtr_t<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
-            serializer->initialize();
-
-            frameGraph->acceptSerializer(serializer);
-            serializer->writeToFile("FrameGraphTest");
-
-            serializer->deinitialize();
+            CStdSharedPtr_t<CFrameGraphGraphVizSerializer::IResult> result     = nullptr;
+            CStdSharedPtr_t<CFrameGraphGraphVizSerializer>          serializer = std::make_shared<CFrameGraphGraphVizSerializer>();
+            bool const initialized  = serializer->initialize();
+            bool const serialized   = serializer->serialize(*frameGraph, result);
+            bool const deserialized = serializer->deinitialize();
             serializer = nullptr;
 
             system("makeGraphPNG.bat");

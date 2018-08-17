@@ -279,12 +279,12 @@ namespace engine
         {
             if(!graph())
             {
-                return false;
+                return nullptr;
             }
 
             try
             {
-                CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(PassKey<CGraphBuilder>());
+                CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
                 PassUID_t const uid = generatePassUID();
 
@@ -301,7 +301,7 @@ namespace engine
                 //   - Read
                 //   - Write
                 //   - Import
-                PassBuilder passBuilder(uid, pass, mResourceData);
+                CPassBuilder passBuilder(uid, pass, mResourceData);
 
                 bool const passSetupSuccessful = pass->setup(passBuilder);
                 if(!passSetupSuccessful)

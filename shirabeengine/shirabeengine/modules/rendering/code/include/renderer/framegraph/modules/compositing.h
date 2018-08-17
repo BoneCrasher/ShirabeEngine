@@ -1,51 +1,79 @@
 #ifndef __SHIRABE_FRAMEGRAPH_MODULE_COMPOSITING_H__
 #define __SHIRABE_FRAMEGRAPH_MODULE_COMPOSITING_H__
 
-#include "Log/Log.h"
+#include <log/log.h>
+#include <resources/core/resourcemanager.h>
+#include <graphicsapi/resources/types/all.h>
+#include "renderer/framegraph/graphbuilder.h"
+#include "renderer/framegraph/passbuilder.h"
+#include "renderer/framegraph/modules/module.h"
 
-#include "Renderer/FrameGraph/GraphBuilder.h"
-#include "Renderer/FrameGraph/PassBuilder.h"
-#include "Renderer/FrameGraph/Modules/Module.h"
+namespace engine
+{
+    namespace framegraph
+    {
 
-#include "Resources/Core/ResourceManager.h"
-#include "GraphicsAPI/Resources/Types/All.h"
+        /**
+         * Template specialization selector for the compositing module.
+         */
+        struct SCompositingModuleTag_t {};
 
-namespace engine {
-	namespace framegraph {
+        /**
+         * The FrameGraphModule<SGBufferModuleTag_t> class implements all compositing
+         * related data structs and passes.
+         */
+        template<>
+        class SHIRABE_TEST_EXPORT CFrameGraphModule<SCompositingModuleTag_t>
+        {
+            SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SCompositingModuleTag_t>);
 
-    struct CompositingModuleTag_t {};
+        public_structs:
+            /**
+             * The SImportData struct describes all imported data for the
+             * compositing pass.
+             */
+            struct SImportData
+            {
+                SFrameGraphResource gbuffer0;
+                SFrameGraphResource gbuffer1;
+                SFrameGraphResource gbuffer2;
+                SFrameGraphResource gbuffer3;
+                SFrameGraphResource lightAccumulationBuffer;
+            };
 
-    template<>
-    class SHIRABE_TEST_EXPORT FrameGraphModule<CompositingModuleTag_t> {
-      SHIRABE_DECLARE_LOG_TAG(FrameGraphModule<CompositingModuleTag_t>);
-    public:
-      struct ImportData {
-        FrameGraphResource
-          gbuffer0,
-          gbuffer1,
-          gbuffer2,
-          gbuffer3,
-          lightAccumulationBuffer;
-      };
+            /**
+             * The SExportData struct describes all exported data for the
+             * compositing pass.
+             */
+            struct SExportData
+            {
+                SFrameGraphResource output;
+            };
 
-      struct ExportData {
-        FrameGraphResource
-          output;
-      };
+        public_methods:
+            /**
+             * Add a compositing pass to the render graph.
+             *
+             * @param aGraphBuilder            The graph builder to source from.
+             * @param aGbuffer0                GBuffer source containing relevant information for lighting.
+             * @param aGbuffer1                GBuffer source containing relevant information for lighting.
+             * @param aGbuffer2                GBuffer source containing relevant information for lighting.
+             * @param aGbuffer3                GBuffer source containing relevant information for lighting.
+             * @param aLightAccumulationBuffer Light Accumulation data for compositing.
+             * @param aBackBuffer              Target texture for the render graph final output.
+             * @return                         Export data of this pass to chain it with other passes' inputs.
+             */
+            SExportData addDefaultCompositingPass(
+                    CGraphBuilder             &aGraphBuilder,
+                    SFrameGraphResource const &aGbuffer0,
+                    SFrameGraphResource const &aGbuffer1,
+                    SFrameGraphResource const &aGbuffer2,
+                    SFrameGraphResource const &aGbuffer3,
+                    SFrameGraphResource const &aLightAccumulationBuffer,
+                    SFrameGraphResource const &aBackBuffer);
+        };
 
-      ExportData addDefaultCompositingPass(
-        GraphBuilder            &graphBuilder,
-        FrameGraphResource const&gbuffer0,
-        FrameGraphResource const&gbuffer1,
-        FrameGraphResource const&gbuffer2,
-        FrameGraphResource const&gbuffer3,
-        FrameGraphResource const&lightAccumulationBuffer,
-        FrameGraphResource const&backBuffer);
-
-    private:
-    };
-
-	}
+    }
 }
 
 #endif

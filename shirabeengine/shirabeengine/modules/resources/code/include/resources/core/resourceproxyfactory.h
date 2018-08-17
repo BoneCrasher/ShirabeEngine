@@ -23,8 +23,8 @@ namespace engine
             template <typename TResource>
             using CreatorFn_t  = std::function<
                                         CStdSharedPtr_t<IResourceProxy<TResource>>(
-                                            EProxyType                          const&,
-                                            typename TResource::CreationRequest const&)>;
+                                            EProxyType                           const&,
+                                            typename TResource::CCreationRequest const&)>;
 
         public_methods:
             /**
@@ -37,8 +37,8 @@ namespace engine
              */
             template <typename TResource>
             CStdSharedPtr_t<IResourceProxy<TResource>> create(
-                    EProxyType                          const &aProxyType,
-                    typename TResource::CreationRequest const &aCreationRequest);
+                    EProxyType                           const &aProxyType,
+                    typename TResource::CCreationRequest const &aCreationRequest);
 
             /**
              * Register a new creator function for a provided resource type.
@@ -64,8 +64,8 @@ namespace engine
         template <typename TResource>
         CStdSharedPtr_t<IResourceProxy<TResource>>
         ResourceProxyFactory::create(
-                EProxyType                          const &aProxyType,
-                typename TResource::CreationRequest const &aCreationRequest)
+                EProxyType                           const &aProxyType,
+                typename TResource::CCreationRequest const &aCreationRequest)
         {
             EResourceSubType const type = aCreationRequest.resourceDescriptor().subtype();
 
