@@ -19,19 +19,26 @@ namespace engine
 {
     namespace os
     {
+        /**
+         * The SApplicationEnvironment struct encapsulates information about the
+         * running process, operatin system integration as well as current operating
+         * system hardware state like monitors, selected resolutions etc...
+         */
         struct SApplicationEnvironment
         {
+        public_methods:
+            SHIRABE_INLINE SOSDisplayDescriptor const &primaryDisplay() const
+            {
+                return osDisplays[primaryDisplayIndex];
+            }
+
+        public_members:
             OSHandle_t instanceHandle;
             OSHandle_t previousInstanceHandle;
             OSHandle_t primaryWindowHandle;
 
             uint32_t                     primaryDisplayIndex;
             Vector<SOSDisplayDescriptor> osDisplays;
-
-            SHIRABE_INLINE SOSDisplayDescriptor const &primaryDisplay() const
-            {
-                return osDisplays[primaryDisplayIndex];
-            }
         };
 
     }

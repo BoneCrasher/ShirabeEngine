@@ -12,14 +12,26 @@ namespace engine
          */
         class WindowHandleWrapper
         {
-		public:
+        public_typedefs:
             using Handle_t = OSHandle_t;
 
-            SHIRABE_INLINE explicit WindowHandleWrapper(Handle_t const &handle)
-                : m_handle(handle)
+        public_constructors:
+            /**
+             * Construct a handle wrapper around a provided window handle.
+             *
+             * @param aHandle Handle to wrap.
+             */
+            SHIRABE_INLINE explicit WindowHandleWrapper(Handle_t const &aHandle)
+                : mHandle(aHandle)
             {}
 
-            inline const Handle_t &handle() const
+        public_methods:
+            /**
+             * Return the currently stored window handle.
+             *
+             * @return See brief.
+             */
+            SHIRABE_INLINE const Handle_t &handle() const
             {
                 return mHandle;
             }

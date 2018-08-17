@@ -20,12 +20,14 @@ namespace engine
          */
         struct SHIRABE_LIBRARY_EXPORT SOSDisplayDescriptor
         {
+        public_constructors:
+            SOSDisplayDescriptor();
+
+        public_members:
             OSHandle_t   monitorHandle;
             std::string  name;
             CRect        bounds;
             bool         isPrimary;
-
-            SOSDisplayDescriptor();
         };
 
         /**
