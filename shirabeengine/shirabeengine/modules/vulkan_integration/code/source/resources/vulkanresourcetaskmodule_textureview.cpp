@@ -6,7 +6,7 @@
 #include <vulkan/vulkan.h>
 
 namespace engine {
-  namespace Vulkan {
+  namespace vulkan {
     using namespace engine::Resources;
 
     EEngineStatus

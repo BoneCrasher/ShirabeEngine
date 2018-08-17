@@ -4,7 +4,7 @@
 #include "GraphicsAPI/Definitions.h"
 
 namespace engine {
-  namespace Vulkan {
+  namespace vulkan {
 
     using namespace engine::Resources;
     using engine::Core::BitField;

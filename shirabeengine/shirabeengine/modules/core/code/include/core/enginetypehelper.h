@@ -165,6 +165,28 @@ namespace engine
     template <typename T>
     using RefWrapper = std::reference_wrapper<T>;
 
+
+    /**
+    * @brief bind a member function of type T with a variable number of arguments and a specific instance of
+    *        type T together as a callable std::function.
+    * @param instance
+    * @return
+    */
+    template <typename    T,         // Instance type containing a member function
+              typename    TFnReturn, // Member function return-type
+              typename... TFnParams> // Member function parameters
+    static std::function<TFnReturn(TFnParams...)> bindMethod(
+        T            &instance,
+        TFnReturn(T::*fn)(TFnParams...))
+    {
+        auto const function = [&instance, fn](TFnParams... args) mutable -> TFnReturn
+        {
+            return (instance.*fn)(args...);
+        };
+
+        return function;
+    }
+
 }
 
 #endif

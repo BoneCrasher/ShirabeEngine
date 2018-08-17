@@ -1,6 +1,6 @@
 #include "BuildingBlocks/Camera.h"
 
-//#ifdef PLATFORM_WINDOWS 
+//#ifdef SHIRABE_PLATFORM_WINDOWS 
 //#include <DirectXMath.h>
 //#endif
 

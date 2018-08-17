@@ -1,7 +1,7 @@
 #include "Vulkan/Resources/VulkanResourceTaskBackend.h"
 
 namespace engine {
-  namespace Vulkan {
+  namespace vulkan {
     using namespace engine::Resources;
 /*
     EEngineStatus

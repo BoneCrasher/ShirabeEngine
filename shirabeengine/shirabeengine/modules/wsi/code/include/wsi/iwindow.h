@@ -162,6 +162,8 @@ namespace engine
             virtual EEngineStatus unregisterCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback) = 0;
         };
 
+        SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<IWindow>, IWindow);
+
     }
 }
 

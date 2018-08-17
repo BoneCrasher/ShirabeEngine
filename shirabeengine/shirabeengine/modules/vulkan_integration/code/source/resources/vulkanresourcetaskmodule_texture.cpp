@@ -3,7 +3,7 @@
 #include "Vulkan/Resources/Types/VulkanTextureResource.h"
 
 namespace engine {
-  namespace Vulkan {
+  namespace vulkan {
     using namespace engine::Resources;
 
     EEngineStatus

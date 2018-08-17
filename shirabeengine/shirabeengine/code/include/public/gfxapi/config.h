@@ -3,7 +3,7 @@
 
 #include "Platform/Platform.h"
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
     #define GAPI_USE_DX 
     #ifdef GAPI_USE_DX
         #define GAPI_DX_VERSION 11.0

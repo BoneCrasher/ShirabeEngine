@@ -7,7 +7,7 @@
 #include "OS/OSDisplay.h"
 #include "OS/OSDef.h"
 
-//#ifdef PLATFORM_WINDOWS
+//#ifdef SHIRABE_PLATFORM_WINDOWS
 //    #ifndef STRICT 
 //      #define STRICT // Enhanced type safety including windows header
 //    #endif           

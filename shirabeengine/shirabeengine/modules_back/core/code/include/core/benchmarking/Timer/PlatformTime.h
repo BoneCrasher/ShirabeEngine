@@ -7,7 +7,7 @@
 #include "Platform/Platform.h"
 #include "core/enginestatus.h"
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 

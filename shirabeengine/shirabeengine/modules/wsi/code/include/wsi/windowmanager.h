@@ -1,49 +1,105 @@
 #ifndef __SHIRABE_WINDOWMANAGER_H__
 #define __SHIRABE_WINDOWMANAGER_H__
 
-#include "OS/ApplicationEnvironment.h"
+#include <log/log.h>
+#include <core/enginetypehelper.h>
+#include <os/applicationenvironment.h>
+#include "wsi/iwindowfactory.h"
 
-#include "core/enginetypehelper.h"
-#include "Log/Log.h"
+namespace engine
+{
+    namespace wsi
+    {
+        /**
+         * The CWindowManager class is used to create, access and destroy various
+         * engine window instances during runtime.
+         */
+        class CWindowManager
+        {
+            SHIRABE_DECLARE_LOG_TAG(CWindowManager);
 
-#include "WSI/IWindowFactory.h" // Includes IWindow.h
+        public_enums:
+            /**
+             * The EWindowManagerError enum describes error flags related
+             * to window manager operations.
+             */
+            enum class EWindowManagerError
+                    : int8_t
+            {
+                Ok                     =    0,
+                InitializationFailed   = -100,
+                UpdateFailed           = -101,
+                DeinitializationFailed = -102
+            };
 
-namespace engine {
-  namespace wsi {
+        public_constructors:
+            /**
+             * Default-Construct an empty window manager.
+             */
+            CWindowManager();
 
-    class WindowManager {
-      SHIRABE_DECLARE_LOG_TAG(WindowManager);
-    public:
-      enum class EWindowManagerError
-        : int8_t {
-        Ok                     =    0,
-        InitializationFailed   = -100,
-        UpdateFailed           = -101,
-        DeinitializationFailed = -102
-      };
+        public_destructors:
+            /**
+             * Destroy and run...
+             */
+            ~CWindowManager();
 
-      WindowManager();
-      ~WindowManager();
+        public_methods:
+            /**
+             *
+             * Initialize the window manager with an application environment instance.
+             *
+             * @param aApplicationEnvironment The environment to initialize the manager with.
+             * @return                        EWindowManagerError::Ok if successful. An error code otherwise.
+             */
+            EWindowManagerError initialize(os::SApplicationEnvironment const &aApplicationEnvironment);
 
-      EWindowManagerError initialize(OS::ApplicationEnvironment const&environment);
-      EWindowManagerError deinitialize();
+            /**
+             * Deinitialize the window manager.
+             *
+             * @return EWindowManagerError::Ok if successful. An error code otherwise.
+             */
+            EWindowManagerError deinitialize();
 
-      EWindowManagerError update();
+            /**
+             * @brief update
+             * @return EWindowManagerError::Ok if successful. An error code otherwise.
+             */
+            EWindowManagerError update();
 
-      CStdSharedPtr_t<IWindow> createWindow(std::string const&name, Rect const&initialBounds);
+            /**
+             * Create a new window from a name and initial bounds.
+             *
+             * @param aName          The name of the new window.
+             * @param aInitialBounds The initial bounds of the new window.
+             * @return               A pointer to the new window if successful. nullptr otherwise.
+             */
+            CStdSharedPtr_t<IWindow> createWindow(std::string const &aName, CRect const &aInitialBounds);
 
-      CStdSharedPtr_t<IWindow> getWindowByName(std::string const&name);
-      CStdSharedPtr_t<IWindow> getWindowByHandle(OS::WindowHandleWrapper::Handle const&handle);
+            /**
+             * Try to find a window by name.
+             *
+             * @param aName The name of the window to find.
+             * @return      A pointer to the window if successful. nullptr otherwise.
+             */
+            CStdSharedPtr_t<IWindow> getWindowByName(std::string const &aName);
 
-    private:
-      IWindowList         m_windows;
-      CStdSharedPtr_t<IWindowFactory> m_windowFactory;
-    };
-    DeclareSharedPointerType(WindowManager)
+            /**
+             * Try to find a window by handle.
+             *
+             * @param aHandle The handle of the window to find.
+             * @return        A pointer to the window if successful. nullptr otherwise.
+             */
+            CStdSharedPtr_t<IWindow> getWindowByHandle(os::CWindowHandleWrapper::Handle_t const &aHandle);
 
-      #define CheckWindowManagerError(status) \
+        private_members:
+            IWindowList                     mWindows;
+            CStdSharedPtr_t<IWindowFactory> mWindowFactory;
+        };
+
+        #define CheckWindowManagerError(status) \
             (static_cast<std::underlying_type_t<WindowManager::EWindowManagerError>>(status) < 0)
-  }
+    }
 }
 
 #endif

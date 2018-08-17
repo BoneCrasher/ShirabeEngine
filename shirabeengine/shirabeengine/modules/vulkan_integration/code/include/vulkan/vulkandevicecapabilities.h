@@ -15,7 +15,7 @@
 
 
 namespace engine {
-  namespace Vulkan {
+  namespace vulkan {
 
     using engine::Resources::Format;
     using engine::Core::BitField;

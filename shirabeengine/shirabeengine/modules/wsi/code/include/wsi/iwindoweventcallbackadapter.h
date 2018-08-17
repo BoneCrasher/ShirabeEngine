@@ -154,7 +154,7 @@ namespace engine
 
                 for(CStdSharedPtr_t<IWindow::IEventCallback> const &callback : aCollection)
                 {
-                    NotificationCallback_t<TFnReturn, TFnArgs...> const bound = std::bind(*callback.get(), aFunction);
+                    NotificationCallback_t<TFnReturn, TFnArgs...> const bound = bindMethod(*callback.get(), aFunction);
                     if(bound)
                     {
                         bound(std::forward<TFnArgs>(aArgs)...);

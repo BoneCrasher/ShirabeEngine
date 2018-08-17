@@ -10,7 +10,7 @@
 
 #include "Platform/Platform.h"
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 

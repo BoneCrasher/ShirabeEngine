@@ -6,7 +6,7 @@
 #include "Core/Benchmarking/Timer/TimespanUnit.h"
 
 #include "Platform/Platform.h"
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #pragma warning(push)
 #pragma warning(disable:4820)
 #include "WindowsTime.h"
@@ -25,7 +25,7 @@ typedef MeasurementDataStore<MeasurementChunk<double, double>> FPSDataStore;
 
 namespace Engine {
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 	typedef class Engine::WindowsTime Time, Time, *LPTime;
 #elif
 	typedef class Engine::Time_Base Time, Time, *LPTime;
@@ -55,7 +55,7 @@ namespace Engine {
 		
 	private:
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 		typedef
 			WindowsTime
 			internal_time_type;
@@ -87,7 +87,7 @@ namespace Engine {
 
 }
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #pragma warning(pop)
 #endif
 

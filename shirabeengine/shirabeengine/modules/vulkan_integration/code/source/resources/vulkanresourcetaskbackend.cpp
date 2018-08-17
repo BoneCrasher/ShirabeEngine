@@ -1,25 +1,74 @@
-#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "vulkan/resources/vulkanresourcetaskbackend.h"
 
-namespace engine {
-  namespace Vulkan {
-
-    VulkanResourceTaskBackend::VulkanResourceTaskBackend(
-      CStdSharedPtr_t<VulkanEnvironment> const& vulkanEnvironment)
-      : GFXAPIResourceTaskBackend()
-      , m_vulkanEnvironment(vulkanEnvironment)
+namespace engine
+{
+    namespace vulkan
     {
-      assert(vulkanEnvironment != nullptr);
-    }
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CVulkanResourceTaskBackend::CVulkanResourceTaskBackend(CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment)
+            : CGFXAPIResourceTaskBackend()
+            , mVulkanEnvironment(aVulkanEnvironment)
+        {
+            assert(mVulkanEnvironment != nullptr);
+        }
+        //<-----------------------------------------------------------------------------
 
-    #define ImplementTasksFor(Type) \
-      addCreator<Type>   (std::bind(&VulkanResourceTaskBackend::fn##Type##CreationTask,    this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));                        \
-      addUpdater<Type>   (std::bind(&VulkanResourceTaskBackend::fn##Type##UpdateTask,      this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)); \
-      addDestructor<Type>(std::bind(&VulkanResourceTaskBackend::fn##Type##DestructionTask, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)); \
-      addQuery<Type>     (std::bind(&VulkanResourceTaskBackend::fn##Type##QueryTask,       this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        #define ImplementTasksFor(Type)                                             \
+            addCreator<Type>(                                                       \
+                    std::bind(                                                      \
+                            &CVulkanResourceTaskBackend::fn##Type##CreationTask,    \
+                            this,                                                   \
+                            std::placeholders::_1,                                  \
+                            std::placeholders::_2,                                  \
+                            std::placeholders::_3));                                \
+            addUpdater<Type>(                                                       \
+                    std::bind(                                                      \
+                            &CVulkanResourceTaskBackend::fn##Type##UpdateTask,      \
+                            this,                                                   \
+                            std::placeholders::_1,                                  \
+                            std::placeholders::_2,                                  \
+                            std::placeholders::_3,                                  \
+                            std::placeholders::_4));                                \
+            addDestructor<Type>(                                                    \
+                    std::bind                                                       \
+                            &CVulkanResourceTaskBackend::fn##Type##DestructionTask, \
+                            this,                                                   \
+                            std::placeholders::_1,                                  \
+                            std::placeholders::_2,                                  \
+                            std::placeholders::_3,                                  \
+                            std::placeholders::_4));                                \
+            addQuery<Type>(                                                         \
+                    std::bind(                                                      \
+                            &CVulkanResourceTaskBackend::fn##Type##QueryTask,       \
+                            this,                                                   \
+                            std::placeholders::_1,                                  \
+                            std::placeholders::_2,                                  \
+                            std::placeholders::_3));
+        //<-----------------------------------------------------------------------------
 
-    void VulkanResourceTaskBackend::initialize() {
-      ImplementTasksFor(Texture);
-      ImplementTasksFor(TextureView);
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanResourceTaskBackend::initialize()
+        {
+            ImplementTasksFor(CTexture);
+            ImplementTasksFor(CTextureView);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanResourceTaskBackend::deinitialize()
+        {
+            ImplementTasksFor(CTexture);
+            ImplementTasksFor(CTextureView);
+        }
+        //<-----------------------------------------------------------------------------
     }
-  }
 }

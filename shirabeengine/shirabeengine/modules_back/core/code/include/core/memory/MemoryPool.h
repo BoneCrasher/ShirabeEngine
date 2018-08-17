@@ -7,7 +7,7 @@
 namespace ShirabeCORE {
 	namespace Memory {
 
-#if defined(PLATFORM_WINDOWS)
+#if defined(SHIRABE_PLATFORM_WINDOWS)
 #include <Windows.h>
 #define Malloc m_aligned_malloc
 #else 

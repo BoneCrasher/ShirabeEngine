@@ -6,7 +6,7 @@
 #include "Math/Matrix.h"
 #include "Math/Quaternion.h"
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #include <DirectXMath.h>
 #endif
 
@@ -14,7 +14,7 @@ namespace Platform {
 	namespace Math {
 		using namespace Engine::Math;
 
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 		using namespace DirectX;
 		const constexpr unsigned int SZ_VEC = 4 * sizeof(float);
 		const constexpr unsigned int SZ_MAT = 4 * SZ_VEC;

@@ -25,7 +25,7 @@
 // #define SHIRABE_TEST_EXPORT
 
 #if defined _WIN32
-#  define PLATFORM_WINDOWS
+#  define SHIRABE_PLATFORM_WINDOWS
 
 // Check for address model
 #  ifdef _WIN64

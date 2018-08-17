@@ -26,7 +26,7 @@ namespace engine
              */
             virtual CStdSharedPtr_t<IWindow> createWindow(
                     std::string const &aName,
-                    CRect       const &aInitialBounds) = 0;#
+                    CRect       const &aInitialBounds) = 0;
         };
 
     }

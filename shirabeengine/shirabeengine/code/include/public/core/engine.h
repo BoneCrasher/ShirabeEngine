@@ -13,7 +13,7 @@
 #include "Resources/Core/ResourceProxyFactory.h"
 
 #include "Renderer/IRenderer.h"
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
 #include "WSI/Windows/WindowsError.h"
 #include "Vulkan/VulkanEnvironment.h"
 
@@ -58,7 +58,7 @@ namespace engine {
     CStdSharedPtr_t<ResourceManager>      m_resourceManager;
 
     // Rendering
-#ifdef PLATFORM_WINDOWS
+#ifdef SHIRABE_PLATFORM_WINDOWS
     CStdSharedPtr_t<VulkanEnvironment> m_vulkanEnvironment;
 #endif
 		IRendererPtr m_renderer;

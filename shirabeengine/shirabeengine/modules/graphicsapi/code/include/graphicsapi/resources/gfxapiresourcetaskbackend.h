@@ -79,7 +79,7 @@ namespace engine
              * @return              EEngineStatus::Ok, if successful. Error flags otherwise.
              */
             virtual EEngineStatus creationTask(
-                    typename T::CreationRequest    const&aRequest,
+                    typename T::CCreationRequest   const&aRequest,
                     ResolvedDependencyCollection_t const&aDependencies,
                     ResourceTaskFn_t                    &aOutTask) = 0;
 
@@ -92,7 +92,7 @@ namespace engine
              * @return              EEngineStatus::Ok, if successful. Error flags otherwise.
              */
             virtual EEngineStatus updateTask(
-                    typename T::CUpdateRequest      const&aRequest,
+                    typename T::CUpdateRequest     const&aRequest,
                     ResolvedDependencyCollection_t const&aDependencies,
                     ResourceTaskFn_t                    &aOutTask) = 0;
 
@@ -107,8 +107,8 @@ namespace engine
              */
             virtual EEngineStatus destructionTask(
                     typename T::CDestructionRequest const&aRequest,
-                    ResolvedDependencyCollection_t const&aDependencies,
-                    ResourceTaskFn_t                    &aOutTask) = 0;
+                    ResolvedDependencyCollection_t  const&aDependencies,
+                    ResourceTaskFn_t                     &aOutTask) = 0;
 
             /**
              * Spawn a query task for a given request.
@@ -118,8 +118,8 @@ namespace engine
              * @return              EEngineStatus::Ok, if successful. Error flags otherwise.
              */
             virtual EEngineStatus queryTask(
-                    typename T::Query const &aRequest,
-                    ResourceTaskFn_t        &aOutTask) = 0;
+                    typename T::CQuery const &aRequest,
+                    ResourceTaskFn_t         &aOutTask) = 0;
         };
 
         /**
@@ -138,9 +138,9 @@ namespace engine
             template <typename TResource>
             using CreatorFn_t = std::function<
                                     EEngineStatus(
-                                        typename TResource::CreationRequest const &,
-                                        ResolvedDependencyCollection_t      const &,
-                                        ResourceTaskFn_t                          &)>;
+                                        typename TResource::CCreationRequest const &,
+                                        ResolvedDependencyCollection_t       const &,
+                                        ResourceTaskFn_t                           &)>;
 
             /**
              * Type-alias describing the structure of an updater function.
@@ -176,7 +176,7 @@ namespace engine
             template <typename TResource>
             using QueryFn_t = std::function<
                                     EEngineStatus(
-                                        typename TResource::Query       const &,
+                                        typename TResource::CQuery      const &,
                                         SGFXAPIResourceHandleAssignment const &,
                                         ResourceTaskFn_t                      &)>;
 
@@ -192,9 +192,9 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus creationTask(
-                    typename TResource::CreationRequest const &aRequest,
-                    ResolvedDependencyCollection_t      const &aDependencies,
-                    ResourceTaskFn_t                          &aOutTask);
+                    typename TResource::CCreationRequest const &aRequest,
+                    ResolvedDependencyCollection_t       const &aDependencies,
+                    ResourceTaskFn_t                           &aOutTask);
 
             /**
              * Templated function to spawn a update task for a specific resource type.
@@ -240,7 +240,7 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus queryTask(
-                    typename TResource::Query       const &aRequest,
+                    typename TResource::CQuery      const &aRequest,
                     SGFXAPIResourceHandleAssignment const &aAssignment,
                     ResourceTaskFn_t                      &aOutTask);
 
@@ -330,9 +330,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CGFXAPIResourceTaskBackend::creationTask(
-                typename TResource::CreationRequest const &aRequest,
-                ResolvedDependencyCollection_t      const &aDependencies,
-                ResourceTaskFn_t                          &aOutTask)
+                typename TResource::CCreationRequest const &aRequest,
+                ResolvedDependencyCollection_t       const &aDependencies,
+                ResourceTaskFn_t                           &aOutTask)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mCreatorFunctions.find(typeIndex) == mCreatorFunctions.end())
@@ -359,9 +359,9 @@ namespace engine
         template <typename TResource>
         EEngineStatus CGFXAPIResourceTaskBackend::updateTask(
                 typename TResource::CUpdateRequest const&aRequest,
-                SGFXAPIResourceHandleAssignment   const&aAssignment,
-                ResolvedDependencyCollection_t    const&aDependencies,
-                ResourceTaskFn_t                       &aOutTask)
+                SGFXAPIResourceHandleAssignment    const&aAssignment,
+                ResolvedDependencyCollection_t     const&aDependencies,
+                ResourceTaskFn_t                        &aOutTask)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mUpdateFunctions.find(typeIndex) == mUpdateFunctions.end())
@@ -388,9 +388,9 @@ namespace engine
         template <typename TResource>
         EEngineStatus CGFXAPIResourceTaskBackend::destructionTask(
                 typename TResource::CDestructionRequest const &aRequest,
-                SGFXAPIResourceHandleAssignment        const &aAssignment,
-                ResolvedDependencyCollection_t         const &aDependencies,
-                ResourceTaskFn_t                             &aOutTask)
+                SGFXAPIResourceHandleAssignment         const &aAssignment,
+                ResolvedDependencyCollection_t          const &aDependencies,
+                ResourceTaskFn_t                              &aOutTask)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mDestructorFunctions.find(typeIndex) == mDestructorFunctions.end())
@@ -416,7 +416,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CGFXAPIResourceTaskBackend::queryTask(
-                typename TResource::Query       const &aRequest,
+                typename TResource::CQuery      const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
                 ResourceTaskFn_t                      &aOutTask)
         {

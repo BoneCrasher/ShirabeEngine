@@ -5,6 +5,13 @@ include(project_default_template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
 
+if(MSVC)
+elseif(UNIX AND NOT APPLE)
+    set(SHIRABE_EXCLUDED_SOURCES
+            windows/windowswindow.cpp
+            windows/windowswindowfactory.cpp)
+endif()
+
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEOS         
