@@ -1,8 +1,4 @@
-﻿#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xos.h>
-
-#include <log/log.h>
+﻿#include <log/log.h>
 #include <core/string.h>
 
 #include "wsi/x11/x11window.h"
@@ -157,24 +153,10 @@ namespace engine
 
                         XNextEvent(display, &event);
 
-                        if(Expose == event.type)
+                        bool const handled = handleEvent(display, window, event);
+                        if(!handled)
                         {
-                            // Window was exposed. Redraw it.
-                            if(0 == event.xexpose.count)
-                            {
-
-                            }
-                        }
-
-                        if(ConfigureNotify == event.type)
-                        {
-                            uint32_t const windowOffsetX = event.xconfigure.x;
-                            uint32_t const windowOffsetY = event.xconfigure.y;
-                            uint32_t const windowWidth   = event.xconfigure.width;
-                            uint32_t const windowHeight  = event.xconfigure.height;
-
-                            onMove(windowOffsetX, windowOffsetY);
-                            onResize(windowWidth, windowHeight);
+                            // ??? further handling?
                         }
                     }
 
@@ -185,6 +167,74 @@ namespace engine
                     CLog::Error(logTag(), CString::format("Failed to update message queue of window '%0'", name()));
                     return EEngineStatus::WindowMessageHandlerError;
                 }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            bool CX11Window::handleEvent(
+                    Display       *aDisplay,
+                    Window  const &aWindow,
+                    XEvent  const &aEvent)
+            {
+                if(CreateNotify == aEvent.type)
+                {
+
+                    return true;
+                }
+
+                if(DestroyNotify == aEvent.type)
+                {
+
+                    return true;
+                }
+
+                if(ReparentNotify == aEvent.type)
+                {
+
+                    return true;
+                }
+
+                if(MapNotify == aEvent.type)
+                {
+
+                    return true;
+                }
+
+                if(UnmapNotify == aEvent.type)
+                {
+
+                    return true;
+                }
+
+                if(ConfigureNotify == aEvent.type)
+                {
+                    uint32_t const windowOffsetX = aEvent.xconfigure.x;
+                    uint32_t const windowOffsetY = aEvent.xconfigure.y;
+                    uint32_t const windowWidth   = aEvent.xconfigure.width;
+                    uint32_t const windowHeight  = aEvent.xconfigure.height;
+
+                    onMove(windowOffsetX, windowOffsetY);
+                    onResize(windowWidth, windowHeight);
+
+                    return true;
+                }
+
+                if(Expose == aEvent.type)
+                {
+                    // Window was exposed. Redraw it.
+                    if(0 == aEvent.xexpose.count)
+                    {
+                        // If the expose count is zero, no more expose events
+                        // will follow, thus rerender entirely.
+
+                    }
+
+                    return true;
+                }
+
+                return false; // Unhandled
             }
             //<-----------------------------------------------------------------------------
 

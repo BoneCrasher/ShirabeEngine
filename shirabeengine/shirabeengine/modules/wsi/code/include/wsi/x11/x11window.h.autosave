@@ -225,9 +225,9 @@ namespace engine
 
             private_methods:
                 bool handleEvent(
-                        Display *aDisplay,
-                        Window  &aWindow,
-                        XEvent  &aEvent);
+                        Display       *aDisplay,
+                        Window  const &aWindow,
+                        XEvent  const &aEvent);
 
             private_members:
                 std::string                 mName;
