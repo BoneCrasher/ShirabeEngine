@@ -1,0 +1,312 @@
+﻿#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+
+#include <log/log.h>
+#include <core/string.h>
+
+#include "wsi/x11/x11window.h"
+
+namespace engine
+{
+    namespace wsi
+    {
+        namespace x11
+        {
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            CX11Window::CX11Window(
+                    std::string const &aName,
+                    CRect       const &aInitialBounds)
+                : IWindow()
+                , IX11Adapter()
+                , mName(aName)
+                , mBounds(aInitialBounds)
+                , mActive(false)
+                , mHandleWrapper(0)
+                , mCallbackAdapter()
+            { }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            CX11Window::~CX11Window()
+            {
+                if(mActive.load())
+                {
+                    mActive.store(false);
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            wsi::CWindowHandleWrapper::Handle_t const &CX11Window::handle() const
+            {
+                return mHandleWrapper.handle();
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            std::string const &CX11Window::name() const
+            {
+                return mName;
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            CRect const &CX11Window::bounds() const
+            {
+                return mBounds;
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::show()
+            {
+                try
+                {
+                    Display       *display = mWindowManager->display();
+                    Window  const &window  = mHandleWrapper.handle();
+
+                    XMapWindow(display, window);
+
+                    return EEngineStatus::Ok;
+                }
+                catch(...)
+                {
+                    CLog::Error(logTag(), CString::format("Failed to show window '%0'", name()));
+                    return EEngineStatus::WindowEventError;
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::hide()
+            {
+                try
+                {
+                    Display       *display = mWindowManager->display();
+                    Window  const &window  = mHandleWrapper.handle();
+
+                    XUnmapWindow(display, window);
+
+                    return EEngineStatus::Ok;
+                }
+                catch(...)
+                {
+                    CLog::Error(logTag(), CString::format("Failed to hide window '%0'", name()));
+                    return EEngineStatus::WindowEventError;
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::resume()
+            {
+                try
+                {
+                    mActive.store(true);
+                    mCallbackAdapter.onResume(makeCStdSharedFromThis(this));
+
+                    return EEngineStatus::Ok;
+                }
+                catch(...)
+                {
+                    CLog::Error(logTag(), CString::format("Failed to show window '%0'", name()));
+                    return EEngineStatus::WindowEventError;
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::update()
+            {
+                if(!mActive.load())
+                    return EEngineStatus::Ok;
+
+                Display       *display = mWindowManager->display();
+                Window  const &window  = mHandleWrapper.handle();
+
+                XEvent event = {};
+
+                try
+                {
+                    // Asynchronously, there could be more and more events coming in,
+                    // but we select a snapshot of events here and process only the next
+                    // 'eventCount' events in this update cycle.
+                    int32_t const eventCount = XPending(display);
+                    for(int32_t k=0; k<eventCount; ++k)
+                    {
+                        XEvent event{};
+
+                        XNextEvent(display, &event);
+
+                        if(Expose == event.type)
+                        {
+                            // Window was exposed. Redraw it.
+                            if(0 == event.xexpose.count)
+                            {
+
+                            }
+                        }
+
+                        if(ConfigureNotify == event.type)
+                        {
+                            uint32_t const windowOffsetX = event.xconfigure.x;
+                            uint32_t const windowOffsetY = event.xconfigure.y;
+                            uint32_t const windowWidth   = event.xconfigure.width;
+                            uint32_t const windowHeight  = event.xconfigure.height;
+
+                            onMove(windowOffsetX, windowOffsetY);
+                            onResize(windowWidth, windowHeight);
+                        }
+                    }
+
+                    return EEngineStatus::Ok;
+                }
+                catch(...)
+                {
+                    CLog::Error(logTag(), CString::format("Failed to update message queue of window '%0'", name()));
+                    return EEngineStatus::WindowMessageHandlerError;
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::pause()
+            {
+                try
+                {
+                    mActive.store(false);
+                    mCallbackAdapter.onPause(makeCStdSharedFromThis(this));
+
+                    return EEngineStatus::Ok;
+                }
+                catch(...)
+                {
+                    CLog::Error(logTag(), CString::format("Failed to show window '%0'", name()));
+                    return EEngineStatus::WindowEventError;
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::registerCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+            {
+                return mCallbackAdapter.registerCallback(aCallback);
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            EEngineStatus CX11Window::unregisterCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+            {
+                return mCallbackAdapter.unregisterCallback(aCallback);
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onCreate(uint32_t const &aScreenHandle)
+            {
+                mHandleWrapper = CWindowHandleWrapper((OSHandle_t)aScreenHandle);
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onEnabled()
+            {
+
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onShow()
+            {
+                mCallbackAdapter.onShow(makeCStdSharedFromThis(this));
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onHide()
+            {
+                mCallbackAdapter.onHide(makeCStdSharedFromThis(this));
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onDisabled()
+            {
+
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onClose()
+            {
+                mCallbackAdapter.onClose(makeCStdSharedFromThis(this));
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onMove(
+                    uint32_t const &aPositionX,
+                    uint32_t const &aPositionY)
+            {
+                mBounds.position.x(aPositionX);
+                mBounds.position.y(aPositionY);
+
+                mCallbackAdapter.onBoundsChanged(makeCStdSharedFromThis(this), mBounds);
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onResize(
+                    uint32_t const &aWidth,
+                    uint32_t const &aHeight)
+            {
+                mBounds.size.x(aWidth);
+                mBounds.size.y(aHeight);
+
+                mCallbackAdapter.onBoundsChanged(makeCStdSharedFromThis(this), mBounds);
+            }
+            //<-----------------------------------------------------------------------------
+        }
+    }
+}

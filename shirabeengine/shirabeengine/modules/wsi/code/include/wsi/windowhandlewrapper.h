@@ -5,8 +5,10 @@
 
 namespace engine
 {
-    namespace os
+    namespace wsi
     {
+        using engine::os::OSHandle_t;
+
         /**
          * Wraps an operating system window handle.
          */

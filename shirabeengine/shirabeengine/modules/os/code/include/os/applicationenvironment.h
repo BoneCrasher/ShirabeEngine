@@ -8,12 +8,12 @@
 #include "os/osdef.h"
 
 //#ifdef SHIRABE_PLATFORM_WINDOWS
-//    #ifndef STRICT 
+//    #ifndef STRICT
 //      #define STRICT // Enhanced type safety including windows header
-//    #endif           
+//    #endif
 //    #define WIN32_LEAN_AND_MEAN // Exclude unnecessary sh**
 //    #include <Windows.h>
-//#endif 
+//#endif
 
 namespace engine
 {
@@ -35,7 +35,6 @@ namespace engine
         public_members:
             OSHandle_t instanceHandle;
             OSHandle_t previousInstanceHandle;
-            OSHandle_t primaryWindowHandle;
 
             uint32_t                     primaryDisplayIndex;
             Vector<SOSDisplayDescriptor> osDisplays;
@@ -44,4 +43,4 @@ namespace engine
     }
 }
 
-#endif 
+#endif
