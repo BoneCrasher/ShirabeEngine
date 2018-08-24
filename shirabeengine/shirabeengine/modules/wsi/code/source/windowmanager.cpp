@@ -3,10 +3,15 @@
 
 #include <platform/platform.h>
 #include <core/string.h>
+
 #include "wsi/windowmanager.h"
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
-// #include "WSI/Windows/WindowsWindowFactory.h"
+    #include "wsi/windows/windowsdisplay.h"
+    #include "wsi/windows/windowswindowfactory.h"
+#elif defined SHIRABE_PLATFORM_LINUX
+    #include "wsi/x11/x11display.h"
+    #include "wsi/x11/x11windowfactory.h"
 #endif // SHIRABE_PLATFORM_WINDOWS
 
 namespace engine
@@ -46,16 +51,25 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CWindowManager::EWindowManagerError CWindowManager::initialize(os::SApplicationEnvironment const &aApplicationEnvironment)
         {
+            CStdSharedPtr_t<CWSIDisplay>    display = nullptr;
+            CStdSharedPtr_t<IWindowFactory> factory = nullptr;
+
 #ifdef SHIRABE_PLATFORM_WINDOWS
-            mWindowFactory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
+            factory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
+#elif defined SHIRABE_PLATFORM_LINUX
+            display = makeCStdSharedPtr<CX11Display>();
+            factory = makeCStdSharedPtr<CX11WindowFactory>(display);
 #endif // SHIRABE_PLATFORM_WINDOWS
 
-            if(!mWindowFactory)
+            if(!factory)
             {
                 CLog::Error(logTag(), "Failed to initialize the window factory.");
 
                 return EWindowManagerError::InitializationFailed;
             }
+
+            mDisplay       = display;
+            mWindowFactory = factory;
 
             return EWindowManagerError::Ok;
         }

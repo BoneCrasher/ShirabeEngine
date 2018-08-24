@@ -9,6 +9,7 @@
 
 #include <log/log.h>
 #include "wsi/windowhandlewrapper.h"
+#include "wsi/windowmanager.h"
 #include "wsi/iwindow.h"
 #include "wsi/iwindoweventcallbackadapter.h"
 
@@ -35,7 +36,7 @@ namespace engine
                  *
                  * @param aScreenHandle The window handle assigned from the window manager.
                  */
-                virtual void onCreate(uint32_t const &aScreenHandle) = 0;
+                virtual void onCreate(uint64_t const &aScreenHandle) = 0;
                 /**
                  * Invoked, when the window was enabled in the system and can operate.
                  */
@@ -56,6 +57,10 @@ namespace engine
                  * Invoked, when a window is being closed.
                  */
                 virtual void onClose() = 0;
+                /**
+                 * Invoked, when a window instances is being destroyed.
+                 */
+                virtual void onDestroy() = 0;
 
                 /**
                  * Invoked, when a window was moved.
@@ -181,7 +186,7 @@ namespace engine
                  *
                  * @param aScreenHandle The window handle assigned from the window manager.
                  */
-                void onCreate(uint32_t const &aScreenHandle);
+                void onCreate(uint64_t const &aScreenHandle);
                 /**
                  * Invoked, when the window was enabled in the system and can operate.
                  */
@@ -202,6 +207,10 @@ namespace engine
                  * Invoked, when a window is being closed.
                  */
                 void onClose();
+                /**
+                 * Invoked, when a window instances is being destroyed.
+                 */
+                void onDestroy();
 
                 /**
                  * Invoked, when a window was moved.
@@ -225,16 +234,17 @@ namespace engine
 
             private_methods:
                 bool handleEvent(
-                        Display *aDisplay,
-                        Window  &aWindow,
-                        XEvent  &aEvent);
+                        Display       *aDisplay,
+                        Window  const &aWindow,
+                        XEvent  const &aEvent);
 
             private_members:
-                std::string                 mName;
-                CRect                       mBounds;
-                std::atomic_bool            mActive;
-                CWindowHandleWrapper        mHandleWrapper;
-                CWindowEventCallbackAdapter mCallbackAdapter;
+                CStdSharedPtr_t<CWindowManager> mWindowManager;
+                std::string                     mName;
+                CRect                           mBounds;
+                std::atomic_bool                mActive;
+                CWindowHandleWrapper            mHandleWrapper;
+                CWindowEventCallbackAdapter     mCallbackAdapter;
 
             };
         }

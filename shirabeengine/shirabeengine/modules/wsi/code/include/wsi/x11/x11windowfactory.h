@@ -1,35 +1,57 @@
-#ifndef __SHIRABE_WINDOWSWINDOWFACTORY_H__
-#define __SHIRABE_WINDOWSWINDOWFACTORY_H__
+#ifndef __SHIRABE_X11_WINDOWFACTORY_H__
+#define __SHIRABE_X11_WINDOWFACTORY_H__
 
-#include "WSI/IWindowFactory.h"
+#include "wsi/iwindowfactory.h"
+#include "wsi/x11/x11display.h"
 
-#define WIN32_LEAN_AND_MEAN // Exclude unnecessary sh**
-#include <Windows.h>
+namespace engine
+{
+    namespace wsi
+    {
+        namespace x11
+        {
+            using namespace engine;
 
-namespace engine {
-  namespace wsi {
-    namespace Windows {
-      using namespace engine;
+            /**
+             * The CX11WindowFactory implementing IWindowFactory is capable
+             * of creating IWindow-conformant x11 window instances, usable
+             * from within a window manager.
+             */
+            class SHIRABE_LIBRARY_EXPORT CX11WindowFactory
+                    : public IWindowFactory
+            {
+            public_constructors:
+                /**
+                 * Create a window factory attached to a specific display.
+                 *
+                 * @param aDisplay The x11 display to attach to.
+                 */
+                CX11WindowFactory(CStdSharedPtr_t<CX11Display> const &aDisplay);
 
-      class SHIRABE_LIBRARY_EXPORT WindowsWindowFactory
-        : public IWindowFactory {
-      public:
-        WindowsWindowFactory(HINSTANCE instanceHandle);
-        ~WindowsWindowFactory();
+            public_destructors:
+                /**
+                 * Destroy and run... quickly...
+                 */
+                virtual ~CX11WindowFactory() final;
 
-        //
-        // IWindowFactory implementation
-        //
-        IWindowPtr createWindow(
-          std::string const&name,
-          Rect        const&initialBounds);
+            public_methods:
+                /**
+                 * Create a new window instance for a given name and initial bounds.
+                 *
+                 * @param aName          The name of the new window to create.
+                 * @param aInitialBounds The initial bounds of the new window.
+                 * @return               A pointer to a new x11 window or nullptr on error.
+                 */
+                CStdSharedPtr_t<IWindow> createWindow(
+                        std::string const &aName,
+                        CRect       const &aInitialBounds);
 
-      private:
-        HINSTANCE m_instanceHandle;
-      };
+            private_members:
+                CStdSharedPtr_t<CWSIDisplay> mX11Display;
+            };
 
+        }
     }
-  }
 }
 
 #endif

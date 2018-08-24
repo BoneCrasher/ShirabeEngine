@@ -76,11 +76,18 @@ namespace engine
                 virtual void onPause(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
 
                 /**
-                 * Invoked, just before a window is closed and destroyed to perform any kind of shutdown and cleanup operations.
+                 * Invoked, just before a window is closed to perform any kind of shutdown and cleanup operations.
                  *
                  * @param aWindow The window to be closed.
                  */
                 virtual void onClose(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+
+                /**
+                 * Invoked, just before a window instance is destroyed.
+                 *
+                 * @param aWindow The window to be destroyed.
+                 */
+                virtual void onDestroy(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
             };
 
         public_typedefs:

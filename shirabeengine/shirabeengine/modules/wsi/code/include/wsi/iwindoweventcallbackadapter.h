@@ -124,6 +124,16 @@ namespace engine
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onClose, aWindow);
             }
 
+            /**
+             * Invoked, just before a window instance is destroyed.
+             *
+             * @param aWindow The window to be destroyed.
+             */
+            SHIRABE_INLINE void onDestroy(CStdSharedPtr_t<IWindow> const &aWindow)
+            {
+                notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onDestroy, aWindow);
+            }
+
         private_typedefs:
             /**
              * Convenience alias to declare a notification callback function.

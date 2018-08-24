@@ -180,12 +180,16 @@ namespace engine
             {
                 if(CreateNotify == aEvent.type)
                 {
+                    XCreateWindowEvent const &event = aEvent.xcreatewindow;
+
+                    onCreate(event.window);
 
                     return true;
                 }
 
                 if(DestroyNotify == aEvent.type)
                 {
+                    onDestroy();
 
                     return true;
                 }
@@ -198,12 +202,14 @@ namespace engine
 
                 if(MapNotify == aEvent.type)
                 {
+                    onShow();
 
                     return true;
                 }
 
                 if(UnmapNotify == aEvent.type)
                 {
+                    onHide();
 
                     return true;
                 }
@@ -279,7 +285,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            void CX11Window::onCreate(uint32_t const &aScreenHandle)
+            void CX11Window::onCreate(uint64_t const &aScreenHandle)
             {
                 mHandleWrapper = CWindowHandleWrapper((OSHandle_t)aScreenHandle);
             }
@@ -327,6 +333,15 @@ namespace engine
             void CX11Window::onClose()
             {
                 mCallbackAdapter.onClose(makeCStdSharedFromThis(this));
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //<
+            //<-----------------------------------------------------------------------------
+            void CX11Window::onDestroy()
+            {
+                mCallbackAdapter.onDestroy(makeCStdSharedFromThis(this));
             }
             //<-----------------------------------------------------------------------------
 

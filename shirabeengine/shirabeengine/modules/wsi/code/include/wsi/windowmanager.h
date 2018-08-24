@@ -5,6 +5,7 @@
 #include <core/enginetypehelper.h>
 #include <os/applicationenvironment.h>
 #include "wsi/iwindowfactory.h"
+#include "wsi/display.h"
 
 namespace engine
 {
@@ -94,6 +95,7 @@ namespace engine
 
         private_members:
             IWindowList                     mWindows;
+            CStdSharedPtr_t<CWSIDisplay>    mDisplay;
             CStdSharedPtr_t<IWindowFactory> mWindowFactory;
         };
 
