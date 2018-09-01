@@ -18,33 +18,33 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        #define ImplementTasksFor(Type)                                             \
-            addCreator<Type>(                                                       \
+        #define SHIRABE_IMPLEMENT_TASKS_FOR(type)                                   \
+            addCreator<C##type>(                                                    \
                     std::bind(                                                      \
-                            &CVulkanResourceTaskBackend::fn##Type##CreationTask,    \
+                            &CVulkanResourceTaskBackend::fn##type##CreationTask,    \
                             this,                                                   \
                             std::placeholders::_1,                                  \
                             std::placeholders::_2,                                  \
                             std::placeholders::_3));                                \
-            addUpdater<Type>(                                                       \
+            addUpdater<C##type>(                                                    \
                     std::bind(                                                      \
-                            &CVulkanResourceTaskBackend::fn##Type##UpdateTask,      \
+                            &CVulkanResourceTaskBackend::fn##type##UpdateTask,      \
                             this,                                                   \
                             std::placeholders::_1,                                  \
                             std::placeholders::_2,                                  \
                             std::placeholders::_3,                                  \
                             std::placeholders::_4));                                \
-            addDestructor<Type>(                                                    \
-                    std::bind                                                       \
-                            &CVulkanResourceTaskBackend::fn##Type##DestructionTask, \
+            addDestructor<C##type>(                                                 \
+                    std::bind(                                                      \
+                            &CVulkanResourceTaskBackend::fn##type##DestructionTask, \
                             this,                                                   \
                             std::placeholders::_1,                                  \
                             std::placeholders::_2,                                  \
                             std::placeholders::_3,                                  \
                             std::placeholders::_4));                                \
-            addQuery<Type>(                                                         \
+            addQuery<C##type>(                                                      \
                     std::bind(                                                      \
-                            &CVulkanResourceTaskBackend::fn##Type##QueryTask,       \
+                            &CVulkanResourceTaskBackend::fn##type##QueryTask,       \
                             this,                                                   \
                             std::placeholders::_1,                                  \
                             std::placeholders::_2,                                  \
@@ -56,8 +56,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void CVulkanResourceTaskBackend::initialize()
         {
-            ImplementTasksFor(CTexture);
-            ImplementTasksFor(CTextureView);
+            SHIRABE_IMPLEMENT_TASKS_FOR(Texture)
+            SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
         }
         //<-----------------------------------------------------------------------------
 
@@ -66,8 +66,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void CVulkanResourceTaskBackend::deinitialize()
         {
-            ImplementTasksFor(CTexture);
-            ImplementTasksFor(CTextureView);
+            SHIRABE_IMPLEMENT_TASKS_FOR(Texture);
+            SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
         }
         //<-----------------------------------------------------------------------------
     }

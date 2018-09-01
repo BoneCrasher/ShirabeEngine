@@ -1,11 +1,13 @@
-#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "vulkan/resources/CVulkanResourceTaskBackend.h"
 
-namespace engine {
-  namespace vulkan {
-    using namespace engine::Resources;
-/*
+namespace engine
+{
+    namespace vulkan
+    {
+        using namespace engine::Resources;
+        /*
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       creationTask(
         DepthStencilState::CreationRequest  const&request,
         ResolvedDependencyCollection        const&resolvedDependencies,
@@ -17,7 +19,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       updateTask(
         DepthStencilState::CUpdateRequest    const&request,
         ResolvedDependencyCollection        const&resolvedDependencies,
@@ -29,7 +31,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       destructionTask(
         DepthStencilState::CDestructionRequest const&request,
         ResolvedDependencyCollection          const&resolvedDependencies,
@@ -41,7 +43,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       queryTask(
         DepthStencilState::Query const&request,
         ResourceTaskFn_t              &outTask)
@@ -52,5 +54,5 @@ namespace engine {
     }
 */
 
-  }
+    }
 }

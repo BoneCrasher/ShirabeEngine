@@ -31,8 +31,7 @@ namespace engine
                     std::string const &aName,
                     CRect       const &aInitialBounds)
             {
-
-                CStdSharedPtr_t<IWindow> window = makeCStdSharedPtr<CX11Window>(aName, aInitialBounds);
+                CStdSharedPtr_t<IWindow> window = nullptr;
 
                 Display *const display = reinterpret_cast<Display *const>(mX11Display->displayHandle());
                 uint64_t const x       = aInitialBounds.position.x();
@@ -43,11 +42,13 @@ namespace engine
                 try
                 {
                     Window const x11Window = XCreateWindow(display, 0, x, y, w, h, 1, CopyFromParent, InputOutput, nullptr, 0, nullptr);
+
+                    window = makeCStdSharedPtr<CX11Window>(x11Window, aName, aInitialBounds);
                 }
                 catch(...)
                 {
                     // TBDone: Log
-                    return 0;
+                    return nullptr;
                 }
 
                 return window;

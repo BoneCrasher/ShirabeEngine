@@ -1,10 +1,12 @@
-#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "vulkan/resources/CVulkanResourceTaskBackend.h"
 
-namespace engine {
-  namespace vulkan {
-/*
+namespace engine
+{
+    namespace vulkan
+    {
+        /*
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       creationTask(
         RasterizerState::CreationRequest  const&request,
         ResolvedDependencyCollection      const&resolvedDependencies,
@@ -16,7 +18,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       updateTask(
         RasterizerState::CUpdateRequest    const&request,
         ResolvedDependencyCollection      const&resolvedDependencies,
@@ -28,7 +30,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       destructionTask(
         RasterizerState::CDestructionRequest const&request,
         ResolvedDependencyCollection        const&resolvedDependencies,
@@ -40,7 +42,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       queryTask(
         RasterizerState::Query const&request,
         ResourceTaskFn_t            &outTask)
@@ -50,6 +52,6 @@ namespace engine {
       return status;
     }
 */
-  }
+    }
 
 }

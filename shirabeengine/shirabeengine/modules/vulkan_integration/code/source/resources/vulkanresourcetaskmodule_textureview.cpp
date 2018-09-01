@@ -1,5 +1,5 @@
 #include "Vulkan/VulkanDeviceCapabilities.h"
-#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "Vulkan/Resources/CVulkanResourceTaskBackend.h"
 #include "Vulkan/Resources/Types/VulkanTextureResource.h"
 #include "Vulkan/Resources/Types/VulkanTextureViewResource.h"
 
@@ -10,7 +10,7 @@ namespace engine {
     using namespace engine::Resources;
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       fnTextureViewCreationTask(
         TextureView::CreationRequest   const&request,
         ResolvedDependencyCollection   const&resolvedDependencies,
@@ -96,7 +96,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       fnTextureViewUpdateTask(
         TextureView::CUpdateRequest     const&request,
         GFXAPIResourceHandleAssignment const&assignment,
@@ -109,7 +109,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       fnTextureViewDestructionTask(
         TextureView::CDestructionRequest const&request,
         GFXAPIResourceHandleAssignment  const&inAssignment,
@@ -139,7 +139,7 @@ namespace engine {
     }
 
     EEngineStatus
-      VulkanResourceTaskBackend::
+      CVulkanResourceTaskBackend::
       fnTextureViewQueryTask(
         TextureView::Query             const&request,
         GFXAPIResourceHandleAssignment const&assignment,

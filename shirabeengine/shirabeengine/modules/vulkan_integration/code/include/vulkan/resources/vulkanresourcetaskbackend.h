@@ -25,30 +25,30 @@ namespace engine
             VkShaderModule
     }
 
-    #define DeclareTaskBuilderModule(Type)                                     \
-        EEngineStatus fn##Type##CreationTask(                                  \
-                            Type::CCreationRequest         const &aRequest,    \
+    #define SHIRABE_DECLARE_TASK_BUILDER_MODULE(type)                          \
+        EEngineStatus fn##type##CreationTask(                                  \
+                            C##type::CCreationRequest      const &aRequest,    \
                             ResolvedDependencyCollection_t const &aDepencies,  \
                             ResourceTaskFn_t                     &aOutTask);   \
-        EEngineStatus fn##Type##UpdateTask(                                    \
-                            Type::CUpdateRequest            const &aRequest,   \
+        EEngineStatus fn##type##UpdateTask(                                    \
+                            C##type::CUpdateRequest         const &aRequest,   \
                             SGFXAPIResourceHandleAssignment const &aAssignment,\
                             ResolvedDependencyCollection_t  const &aDepencies, \
                             ResourceTaskFn_t                      &aOutTask);  \
-        EEngineStatus fn##Type##DestructionTask(                               \
-                            Type::CDestructionRequest       const &aRequest,   \
+        EEngineStatus fn##type##DestructionTask(                               \
+                            C##type::CDestructionRequest    const &aRequest,   \
                             SGFXAPIResourceHandleAssignment const &aAssignment,\
                             ResolvedDependencyCollection_t  const &aDepencies, \
                             ResourceTaskFn_t                      &aOutTask);  \
-        EEngineStatus fn##Type##QueryTask(                                     \
-                            Type::CQuery                    const &aRequest,   \
+        EEngineStatus fn##type##QueryTask(                                     \
+                            C##type::CQuery                 const &aRequest,   \
                             SGFXAPIResourceHandleAssignment const &aAssignment,\
                             ResourceTaskFn_t                      &aOutTask);
 
     namespace vulkan
     {
         /**
-         * The VulkanResourceTaskBackend class implements the graphics API resource task
+         * The CVulkanResourceTaskBackend class implements the graphics API resource task
          * backend for the vulkan API.
          */
         class CVulkanResourceTaskBackend
@@ -74,8 +74,8 @@ namespace engine
             void deinitialize();
 
         private_methods:
-            DeclareTaskBuilderModule(CTexture);
-            DeclareTaskBuilderModule(CTextureView);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(Texture);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(TextureView);
             //DeclareTaskBuilderModule(Buffer);
             //DeclareTaskBuilderModule(BufferView);
 

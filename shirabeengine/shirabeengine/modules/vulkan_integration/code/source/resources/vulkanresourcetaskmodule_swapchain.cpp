@@ -1,4 +1,5 @@
-namespace engine {
+namespace engine
+{
 
   //EEngineStatus
   //  DX11ResourceTaskBackend::

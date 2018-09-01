@@ -8,7 +8,7 @@
 
 #include "GraphicsAPI/Resources/GFXAPIResourceBackend.h"
 #include "GraphicsAPI/Resources/GFXAPIResourceProxy.h"
-#include "Vulkan/Resources/VulkanResourceTaskBackend.h"
+#include "Vulkan/Resources/CVulkanResourceTaskBackend.h"
 #include "Vulkan/Rendering/VulkanRenderContext.h"
 
 namespace engine {
@@ -166,7 +166,7 @@ namespace engine {
       m_resourceManager = manager;
 
       if(gfxApi == EGFXAPI::Vulkan) {
-        CStdSharedPtr_t<VulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<VulkanResourceTaskBackend>(m_vulkanEnvironment);
+        CStdSharedPtr_t<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<CVulkanResourceTaskBackend>(m_vulkanEnvironment);
         vkResourceTaskBackend->initialize();
 
         resourceTaskBackend = vkResourceTaskBackend;

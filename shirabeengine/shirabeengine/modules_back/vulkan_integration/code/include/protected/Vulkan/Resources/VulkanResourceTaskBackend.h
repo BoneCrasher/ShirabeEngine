@@ -42,11 +42,11 @@ namespace Engine {
      *
      * \brief	Glue...
      **************************************************************************************************/
-    class VulkanResourceTaskBackend
+    class CVulkanResourceTaskBackend
       : public GFXAPIResourceTaskBackend
     {
     public:
-      VulkanResourceTaskBackend(CStdSharedPtr_t<VulkanEnvironment> const&);
+      CVulkanResourceTaskBackend(CStdSharedPtr_t<VulkanEnvironment> const&);
 
       void initialize();
 
