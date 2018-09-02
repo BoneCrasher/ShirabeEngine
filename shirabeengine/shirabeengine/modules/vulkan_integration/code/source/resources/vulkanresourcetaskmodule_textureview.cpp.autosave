@@ -67,7 +67,7 @@ namespace engine
 
                 VkImageViewCreateInfo vkImageViewCreateInfo ={ };
                 vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-                vkImageViewCreateInfo.format                          = VulkanDeviceCapsHelper::convertFormatToVk(desc.textureFormat);
+                vkImageViewCreateInfo.format                          = CVulkanDeviceCapsHelper::convertFormatToVk(desc.textureFormat);
                 vkImageViewCreateInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT; // TODO: Care about the specific aspect bits here in more detail.
                 vkImageViewCreateInfo.subresourceRange.baseArrayLayer = desc.arraySlices.offset;
                 vkImageViewCreateInfo.subresourceRange.layerCount     = desc.arraySlices.length;

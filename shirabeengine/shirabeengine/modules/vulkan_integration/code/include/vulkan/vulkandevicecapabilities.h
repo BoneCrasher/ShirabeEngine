@@ -3,49 +3,77 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Core/BasicTypes.h"
-#include "core/enginestatus.h"
-#include "core/enginetypehelper.h"
-#include "Core/BitField.h"
-#include "Log/Log.h"
+#include <core/basictypes.h>
+#include <core/enginestatus.h>
+#include <core/enginetypehelper.h>
+#include <core/bitfield.h>
+#include <log/log.h>
+#include <graphicsapi/resources/types/definition.h>
 
-#include "GraphicsAPI/Resources/Types/Definition.h"
+namespace engine
+{
+    namespace vulkan
+    {
+        using engine::resources::EFormat;
+        using engine::core::CBitField;
 
-// #include "GFXAPI/Capabilities.h"
+        /**
+         * Wrapper-class around several static helper functions related to vulkan API.
+         */
+        class CVulkanDeviceCapsHelper
+        {
+            SHIRABE_DECLARE_LOG_TAG(VulkanDeviceCapsHelper);
 
+        public_static_functions:
+            /**
+             * Convert an engine internal format to the suitable vulkan format.
+             *
+             * @param aFormat Engine internal format value.
+             * @return        Vulkan-format value.
+             */
+            static VkFormat convertFormatToVk(EFormat const &aFormat);
 
-namespace engine {
-  namespace vulkan {
+            /**
+             * Convert a vulkan format to the suitable engine internal format.
+             *
+             * @param aFormat Vulkan-format value.
+             * @return        Engine internal format value.
+             */
+            static EFormat convertFormatFromVk(VkFormat const &aFormat);
 
-    using engine::Resources::Format;
-    using engine::Core::BitField;
+            /**
+             * Determine an appropriate memory type index on a specific physical device
+             * by an externally provided memory type value and memory property flags.
+             *
+             * @param aPhysicalDevice The physical device on which a memory type index should be determined.
+             * @param aRequiredType   The required memory type to look for.
+             * @param aProperties     Additional property type flags to be matched by the lookup.
+             * @return
+             */
+            static uint32_t determineMemoryType(
+                    VkPhysicalDevice      const &aPhysicalDevice,
+                    uint32_t              const &aRequiredType,
+                    VkMemoryPropertyFlags const &aProperties)
+            {
+                VkPhysicalDeviceMemoryProperties memProperties;
+                vkGetPhysicalDeviceMemoryProperties(aPhysicalDevice, &memProperties);
 
-    class VulkanDeviceCapsHelper {
-      SHIRABE_DECLARE_LOG_TAG(VulkanDeviceCapsHelper)
-    public:
+                for(uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+                {
+                    uint32_t const typeFlag = (aRequiredType & (1 << i));
+                    bool     const propFlag = ((memProperties.memoryTypes[i].propertyFlags & aProperties) == aProperties);
 
-      static VkFormat convertFormatToVk(const Format& fmt);
-      static Format   convertFormatFromVk(const VkFormat& fmt);
-      static uint32_t determineMemoryType(
-        VkPhysicalDevice      const&physicalDevice,
-        uint32_t              const&requiredType,
-        VkMemoryPropertyFlags const&properties)
-      {
-        VkPhysicalDeviceMemoryProperties memProperties;
-        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+                    if(typeFlag && propFlag)
+                    {
+                        return i;
+                    }
+                }
 
-        for(uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-          uint32_t typeFlag = (requiredType & (1 << i));
-          bool     propFlag = ((memProperties.memoryTypes[i].propertyFlags & properties) == properties);
-          if(typeFlag && propFlag)
-            return i;
-        }
+                throw std::runtime_error("failed to find suitable memory type!");
+            }
+        };
 
-        throw std::runtime_error("failed to find suitable memory type!");
-      }
-    };
-
-  }
+    }
 }
 
 #endif

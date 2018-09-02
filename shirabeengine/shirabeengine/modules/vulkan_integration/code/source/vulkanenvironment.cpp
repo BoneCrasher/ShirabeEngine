@@ -106,7 +106,11 @@ namespace engine
         {
             SHIRABE_DECLARE_LOG_TAG(ValidationLayers);
         }
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         static VKAPI_ATTR VkBool32 VKAPI_CALL __vkValidationLayerReportCallback(
                 VkDebugReportFlagsEXT      aFlags,
                 VkDebugReportObjectTypeEXT aObjType,
@@ -118,7 +122,7 @@ namespace engine
                 void*                      aUserData)
         {
 
-            std::string message =
+            std::string const message =
                     CString::format(
                         "[%0][%1(%2)]@'%3' -> (%4) in layer %5:\n%6",
                         aFlags, aObjType, (void*)aObj, aLocation, aCode, aLayerPrefix, aMsg);
@@ -143,9 +147,9 @@ namespace engine
 
             std::vector<char const*> const layers =
             {
-#ifdef SHIRABE_DEBUG
+    #ifdef SHIRABE_DEBUG
                 "VK_LAYER_LUNARG_standard_validation"
-#endif
+    #endif
             };
 
             std::vector<char const*> const extensions =
@@ -252,7 +256,7 @@ namespace engine
                 throw CVulkanError("Cannot load vulkan extension function 'vkCreateDebugReportCallbackEXT'", VkResult::VK_ERROR_INITIALIZATION_FAILED);
             }
 
-            VkDebugReportCallbackEXT vkDebugReportCallback = 0;
+            VkDebugReportCallbackEXT vkDebugReportCallback = nullptr;
             result = vkCreateDebugReportCallbackEXT(instance, &vkDebugReportCallbackCreateInfo, nullptr, &vkDebugReportCallback);
             if(VkResult::VK_SUCCESS != result)
             {
@@ -267,7 +271,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CVulkanEnvironment::createVulkanSurface(os::SApplicationEnvironment const &aApplicationEnvironment)
+        void CVulkanEnvironment::createVulkanSurface(
+                os::SApplicationEnvironment const &aApplicationEnvironment)
         {
             VkSurfaceKHR surface{};
 
@@ -322,8 +327,8 @@ namespace engine
         {
             VkResult result = VkResult::VK_SUCCESS;
 
-            std::vector<char const*> requiredLayers{};
-            std::vector<char const*> requiredExtensions{};
+            std::vector<char const*> requiredLayers     ={};
+            std::vector<char const*> requiredExtensions ={};
             requiredExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
             std::vector<SVulkanPhysicalDevice> supportedPhysicalDevices = {};
@@ -339,26 +344,26 @@ namespace engine
 
                 for(uint64_t k = 0; k < vkPhysicalDevices.size(); ++k)
                 {
-                    VkPhysicalDevice const&vkPhysicalDevice = vkPhysicalDevices.at(k);
+                    VkPhysicalDevice const &vkPhysicalDevice = vkPhysicalDevices.at(k);
 
                     //
                     // Check Physical Device Props and Features
                     //
-                    VkPhysicalDeviceProperties vkPhysicalDeviceProperties{};
+                    VkPhysicalDeviceProperties vkPhysicalDeviceProperties = {};
                     vkGetPhysicalDeviceProperties(vkPhysicalDevice, &vkPhysicalDeviceProperties);
 
-                    VkPhysicalDeviceFeatures vkPhysicalDeviceFeatures{};
+                    VkPhysicalDeviceFeatures vkPhysicalDeviceFeatures = {};
                     vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &vkPhysicalDeviceFeatures);
 
-                    bool isDiscreteGPU              = (vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU);
-                    bool supportsGeometryShaders    = vkPhysicalDeviceFeatures.geometryShader;
-                    bool supportsTesselationShaders = vkPhysicalDeviceFeatures.tessellationShader;
-                    bool supportsLogicalBlendOps    = vkPhysicalDeviceFeatures.logicOp;
-                    bool supportsNonSolidDrawing    = vkPhysicalDeviceFeatures.fillModeNonSolid;
-                    bool supportsAnisotropicSampler = vkPhysicalDeviceFeatures.samplerAnisotropy;
-                    bool supportsBlockCompressedFmt = vkPhysicalDeviceFeatures.textureCompressionBC;
+                    bool const isDiscreteGPU              = (vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU);
+                    bool const supportsGeometryShaders    = vkPhysicalDeviceFeatures.geometryShader;
+                    bool const supportsTesselationShaders = vkPhysicalDeviceFeatures.tessellationShader;
+                    bool const supportsLogicalBlendOps    = vkPhysicalDeviceFeatures.logicOp;
+                    bool const supportsNonSolidDrawing    = vkPhysicalDeviceFeatures.fillModeNonSolid;
+                    bool const supportsAnisotropicSampler = vkPhysicalDeviceFeatures.samplerAnisotropy;
+                    bool const supportsBlockCompressedFmt = vkPhysicalDeviceFeatures.textureCompressionBC;
 
-                    bool allFeaturesSupported = (
+                    bool const allFeaturesSupported = (
                                 isDiscreteGPU              &&
                                 supportsGeometryShaders    &&
                                 supportsTesselationShaders &&
@@ -368,16 +373,19 @@ namespace engine
                                 supportsBlockCompressedFmt);
 
                     if(!allFeaturesSupported)
+                    {
                         continue;
+                    }
 
                     //
                     // Check Extension support
                     //
-                    std::vector<VkExtensionProperties> supportedExtensions{ };
+                    std::vector<VkExtensionProperties> supportedExtensions     = {};
                     uint32_t                           supportedExtensionCount = 0;
 
                     result = vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &supportedExtensionCount, nullptr);
-                    if(VkResult::VK_SUCCESS == result) {
+                    if(VkResult::VK_SUCCESS == result)
+                    {
                         supportedExtensions.resize(supportedExtensionCount);
                         vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &supportedExtensionCount, supportedExtensions.data());
                     }
@@ -385,9 +393,12 @@ namespace engine
                     std::set<std::string> extensions(requiredExtensions.begin(), requiredExtensions.end());
 
                     for(VkExtensionProperties const&extension : supportedExtensions)
+                    {
                         extensions.erase(extension.extensionName);
+                    }
 
-                    if(!extensions.empty()) {
+                    if(!extensions.empty())
+                    {
                         // Not all extensions supported, skip
                         continue;
                     }
@@ -402,11 +413,11 @@ namespace engine
                     vkQueueFamilies.resize(vkQueueFamilyCount);
                     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &vkQueueFamilyCount, vkQueueFamilies.data());
 
-                    VulkanQueueFamilyRegistry supportingQueueFamilies{};
+                    CVulkanEnvironment::SVulkanQueueFamilyRegistry supportingQueueFamilies{};
 
                     for(uint32_t k=0; k<vkQueueFamilyCount; ++k)
                     {
-                        VkQueueFamilyProperties const&properties = vkQueueFamilies.at(k);
+                        VkQueueFamilyProperties const &properties = vkQueueFamilies.at(k);
 
                         bool enoughQueues     = (properties.queueCount > 0);
                         bool supportsGraphics = (properties.queueFlags & VK_QUEUE_GRAPHICS_BIT);
@@ -421,7 +432,9 @@ namespace engine
                                     supportsCompute);
 
                         if(!queueValid)
+                        {
                             continue;
+                        }
 
                         // Store queue family in common lists and specific lists
                         supportingQueueFamilies.supportingQueueFamilyIndices.push_back(k);
@@ -434,8 +447,10 @@ namespace engine
                     }
 
                     if(supportingQueueFamilies.supportingQueueFamilyIndices.empty())
+                    {
                         // Physical device provides no single supporting queue family
                         continue;
+                    }
 
                     //
                     // Check Memory support
@@ -446,7 +461,7 @@ namespace engine
                     //
                     // Create and store collection of information for this device
                     //
-                    VulkanPhysicalDevice physicalDevice{};
+                    SVulkanPhysicalDevice physicalDevice = {};
                     physicalDevice.handle           = vkPhysicalDevice;
                     physicalDevice.properties       = vkPhysicalDeviceProperties;
                     physicalDevice.features         = vkPhysicalDeviceFeatures;
@@ -458,25 +473,24 @@ namespace engine
             }
 
             if(supportedPhysicalDevices.empty())
+            {
                 throw CVulkanError("No supporting physical devices found.", VkResult::VK_SUBOPTIMAL_KHR);
+            }
 
             mVkState.deviceLayers             = requiredLayers;
             mVkState.deviceExtensions         = requiredExtensions;
             mVkState.supportedPhysicalDevices = supportedPhysicalDevices;
         }
+        //<-----------------------------------------------------------------------------
 
-        /**
-     * \fn  void CVulkanEnvironment::selectPhysicalDevice(uint32_t index)
-     *
-     * \brief Select physical device
-     *
-     * \param index Zero-based index of the.
-     **************************************************************************************************/
-        void CVulkanEnvironment::selectPhysicalDevice(uint32_t index)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::selectPhysicalDevice(uint32_t const &aIndex)
         {
-            mVkState.selectedPhysicalDevice = index;
+            mVkState.selectedPhysicalDevice = aIndex;
 
-            VulkanPhysicalDevice physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
+            SVulkanPhysicalDevice const &physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
 
             std::vector<float> queuePriorities{};
             queuePriorities.push_back(1.0f);
@@ -504,23 +518,29 @@ namespace engine
             VkDevice vkLogicalDevice = VK_NULL_HANDLE;
             VkResult result = vkCreateDevice(physicalDevice.handle, &vkDeviceCreateInfo, nullptr, &vkLogicalDevice);
             if(VkResult::VK_SUCCESS != result)
-                throw CVulkanError(String::format("Failed to create logical device for physical device at index %0.", index), result);
+            {
+                throw CVulkanError(CString::format("Failed to create logical device for physical device at index %0.", aIndex), result);
+            }
 
             mVkState.selectedLogicalDevice = vkLogicalDevice;
         }
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         void CVulkanEnvironment::createSwapChain(
-                Rect            const&requestedBackBufferSize,
-                VkFormat        const&requestedFormat,
-                VkColorSpaceKHR const&colorSpace)
+                math::CRect     const &aRequestedBackBufferSize,
+                VkFormat        const &aRequestedFormat,
+                VkColorSpaceKHR const &aColorSpace)
         {
-            VulkanPhysicalDevice const&vkPhysicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
-            VkSurfaceKHR         const&vkSurface        = mVkState.surface;
+            SVulkanPhysicalDevice const &vkPhysicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
+            VkSurfaceKHR          const &vkSurface        = mVkState.surface;
 
             //
             // Extract capabilities
             //
-            VkSurfaceCapabilitiesKHR vkSurfaceCapabilities{};
+            VkSurfaceCapabilitiesKHR vkSurfaceCapabilities = {};
 
             VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceCapabilities);
             if(VkResult::VK_SUCCESS != result)
@@ -528,28 +548,36 @@ namespace engine
             //
             // Determine backbuffer extents
             //
-            VkExtent2D vkBackBufferExtents{};
+            VkExtent2D vkBackBufferExtents = {};
             // Test, whether either the width or height in currentExtent were set to uint32_t::max.
             // In this case, we can differ from the window size and enforce our requested backbuffer size.
-            if(vkSurfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+            if(vkSurfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+            {
                 vkBackBufferExtents = vkSurfaceCapabilities.currentExtent;
             }
-            else {
-                bool requestedBackBufferSizeSupported =
-                        (vkSurfaceCapabilities.minImageExtent.width  <= requestedBackBufferSize.size.x()) &&
-                        (vkSurfaceCapabilities.minImageExtent.height <= requestedBackBufferSize.size.y()) &&
-                        (vkSurfaceCapabilities.maxImageExtent.width  >= requestedBackBufferSize.size.x()) &&
-                        (vkSurfaceCapabilities.maxImageExtent.height >= requestedBackBufferSize.size.y());
+            else
+            {
+                bool const requestedBackBufferSizeSupported =
+                        (vkSurfaceCapabilities.minImageExtent.width  <= aRequestedBackBufferSize.size.x()) &&
+                        (vkSurfaceCapabilities.minImageExtent.height <= aRequestedBackBufferSize.size.y()) &&
+                        (vkSurfaceCapabilities.maxImageExtent.width  >= aRequestedBackBufferSize.size.x()) &&
+                        (vkSurfaceCapabilities.maxImageExtent.height >= aRequestedBackBufferSize.size.y());
                 if(!requestedBackBufferSizeSupported)
-                    Log::Warning(
+                {
+                    CLog::Warning(
                                 logTag(),
-                                String::format(
+                                CString::format(
                                     "Requested backbuffer extents %0 x %1 unsupported. Clamping the extents.",
-                                    requestedBackBufferSize.size.x(),
-                                    requestedBackBufferSize.size.y()));
+                                    aRequestedBackBufferSize.size.x(),
+                                    aRequestedBackBufferSize.size.y()));
+                }
 
-                VkExtent2D actualExtent ={ requestedBackBufferSize.size.x(), requestedBackBufferSize.size.y() };
-                actualExtent.width  = std::max(vkSurfaceCapabilities.minImageExtent.width, std::min(vkSurfaceCapabilities.maxImageExtent.width, actualExtent.width));
+                VkExtent2D actualExtent = {
+                    aRequestedBackBufferSize.size.x(),
+                    aRequestedBackBufferSize.size.y()
+                };
+
+                actualExtent.width  = std::max(vkSurfaceCapabilities.minImageExtent.width,  std::min(vkSurfaceCapabilities.maxImageExtent.width, actualExtent.width));
                 actualExtent.height = std::max(vkSurfaceCapabilities.minImageExtent.height, std::min(vkSurfaceCapabilities.maxImageExtent.height, actualExtent.height));
 
                 vkBackBufferExtents = actualExtent;
@@ -559,14 +587,18 @@ namespace engine
             // Extract Formats
             //
             uint32_t                        vkSurfaceFormatCount = 0;
-            std::vector<VkSurfaceFormatKHR> vkSurfaceFormats{};
+            std::vector<VkSurfaceFormatKHR> vkSurfaceFormats     = {};
 
             result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceFormatCount, nullptr);
             if(VkResult::VK_SUCCESS != result)
+            {
                 throw CVulkanError("Failed to query the supported surface formats.", result);
+            }
 
             if(vkSurfaceFormatCount == 0)
+            {
                 throw CVulkanError("No supported surface formats.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+            }
 
             vkSurfaceFormats.resize(vkSurfaceFormatCount);
             vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceFormatCount, vkSurfaceFormats.data());
@@ -575,14 +607,18 @@ namespace engine
             // Extract PresentModes
             //
             uint32_t                      vkSurfacePresentModeCount = 0;
-            std::vector<VkPresentModeKHR> vkSurfacePresentModes{ };
+            std::vector<VkPresentModeKHR> vkSurfacePresentModes     = {};
 
             result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfacePresentModeCount, nullptr);
             if(VkResult::VK_SUCCESS != result)
+            {
                 throw CVulkanError("Failed to query the supported surface formats.", result);
+            }
 
             if(vkSurfacePresentModeCount == 0)
+            {
                 throw CVulkanError("No supported surface present modes.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+            }
 
             vkSurfacePresentModes.resize(vkSurfacePresentModeCount);
             vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfacePresentModeCount, vkSurfacePresentModes.data());
@@ -590,17 +626,22 @@ namespace engine
             //
             // Determine format, color space
             //
-            VkSurfaceFormatKHR vkSelectedFormat{};
+            VkSurfaceFormatKHR vkSelectedFormat = {};
 
-            if(vkSurfaceFormats.size() == 1 && vkSurfaceFormats.at(0).format == VK_FORMAT_UNDEFINED) {
+            if(vkSurfaceFormats.size() == 1 && vkSurfaceFormats.at(0).format == VK_FORMAT_UNDEFINED)
+            {
                 // We can use any format desired.
-                vkSelectedFormat ={ requestedFormat, VK_COLORSPACE_SRGB_NONLINEAR_KHR };
+                vkSelectedFormat = { aRequestedFormat, VK_COLORSPACE_SRGB_NONLINEAR_KHR };
             }
-            else {
+            else
+            {
                 bool found = false;
-                for(VkSurfaceFormatKHR const&surfaceFormat : vkSurfaceFormats) {
-                    found = (surfaceFormat.format == requestedFormat);
-                    if(found) {
+
+                for(VkSurfaceFormatKHR const &surfaceFormat : vkSurfaceFormats)
+                {
+                    found = (surfaceFormat.format == aRequestedFormat);
+                    if(found)
+                    {
                         vkSelectedFormat = surfaceFormat;
                         break;
                     }
@@ -608,16 +649,20 @@ namespace engine
 
                 // No immediately suitable format found. Take the first available.
                 if(!found)
+                {
                     vkSelectedFormat = vkSurfaceFormats.at(0);
+                }
             }
 
             //
             // Determine present mode
             //
             VkPresentModeKHR vkSelectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Guaranteed to be available.
-            for(VkPresentModeKHR const&presentMode : vkSurfacePresentModes) {
+            for(VkPresentModeKHR const &presentMode : vkSurfacePresentModes)
+            {
                 // Try to find a mailbox present mode, as it will allow us to implement triple buffering
-                if(presentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+                if(presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+                {
                     vkSelectedPresentMode = presentMode;
                     break;
                 }
@@ -635,10 +680,13 @@ namespace engine
 
             // Should give us triple buffering with fallback to double buffering...
             uint32_t swapChainImageCount = (vkSurfaceCapabilities.minImageCount + 1);
-            if(vkSurfaceCapabilities.maxImageCount > 0) // We have a limited amount of images possible. Clamp!
+            if(vkSurfaceCapabilities.maxImageCount > 0)
+            {
+                // We have a limited amount of images possible. Clamp!
                 swapChainImageCount = std::min(vkSurfaceCapabilities.maxImageCount, swapChainImageCount);
+            }
 
-            VkSwapchainCreateInfoKHR vkSwapChainCreateInfo{};
+            VkSwapchainCreateInfoKHR vkSwapChainCreateInfo = {};
             vkSwapChainCreateInfo.sType                 = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             vkSwapChainCreateInfo.surface               = mVkState.surface;
             vkSwapChainCreateInfo.minImageCount         = swapChainImageCount;
@@ -659,30 +707,37 @@ namespace engine
             vkSwapChainCreateInfo.pNext                 = nullptr;
 
 
-            VulkanQueueFamilyRegistry const&queueFamilies = vkPhysicalDevice.queueFamilies;
+            SVulkanQueueFamilyRegistry const &queueFamilies = vkPhysicalDevice.queueFamilies;
 
             std::vector<uint32_t> supportedGraphicsQueueFamilyIndices{};
 
             VkBool32 supported = VK_FALSE;
             for(uint32_t k=0; k<queueFamilies.graphicsQueueFamilyIndices.size(); ++k)
             {
-                uint32_t index  = queueFamilies.graphicsQueueFamilyIndices.at(k);
-                VkResult result = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, index, vkSurface, &supported);
+                uint32_t const index  = queueFamilies.graphicsQueueFamilyIndices.at(k);
+                VkResult const result = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, index, vkSurface, &supported);
                 if(VkResult::VK_SUCCESS != result)
+                {
                     throw CVulkanError("Failed to check for surface support.", result);
+                }
 
-                if(VK_TRUE == supported) {
+                if(VK_TRUE == supported)
+                {
                     supportedGraphicsQueueFamilyIndices.push_back(index);
                     supported = VK_FALSE;
                 }
             }
 
             if(supportedGraphicsQueueFamilyIndices.empty())
+            {
                 throw CVulkanError("No supported queue family indices found which support the swapchain on the given surface.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+            }
 
             result = vkCreateSwapchainKHR(mVkState.selectedLogicalDevice, &vkSwapChainCreateInfo, nullptr, &vkSwapChain);
             if(VkResult::VK_SUCCESS != result)
+            {
                 throw CVulkanError("Failed to create swapchain.", result);
+            }
 
             //
             // Finally: Extract SwapChain images
@@ -692,7 +747,9 @@ namespace engine
 
             result = vkGetSwapchainImagesKHR(mVkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, nullptr);
             if(VkResult::VK_SUCCESS != result)
+            {
                 throw CVulkanError("Failed to fetch swapchain image handles.", result);
+            }
 
             swapChainImages.resize(createdSwapChainImageCount);
             vkGetSwapchainImagesKHR(mVkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, swapChainImages.data());
@@ -700,7 +757,7 @@ namespace engine
             //
             // Apply to state
             //
-            VulkanSwapChain swapChain{ };
+            SVulkanSwapChain swapChain = {};
             swapChain.capabilities          = vkSurfaceCapabilities;
             swapChain.supportedFormats      = vkSurfaceFormats;
             swapChain.supportedPresentModes = vkSurfacePresentModes;
@@ -712,47 +769,56 @@ namespace engine
 
             mVkState.swapChain = swapChain;
         }
+        //<-----------------------------------------------------------------------------
 
-        EEngineStatus
-        CVulkanEnvironment::initialize(
-                ApplicationEnvironment const& applicationEnvironment)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanEnvironment::initialize(SApplicationEnvironment const &aApplicationEnvironment)
         {
             try {
                 EEngineStatus status = EEngineStatus::Ok;
 
-                VkFormat requiredFormat = VulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
+                VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
 
                 createVulkanInstance("ShirabeEngine Demo");
-                createVulkanSurface(applicationEnvironment);
+                createVulkanSurface(aApplicationEnvironment);
                 determinePhysicalDevices();
                 selectPhysicalDevice(0);
                 createSwapChain(
-                            applicationEnvironment.primaryDisplay().bounds,
+                            aApplicationEnvironment.primaryDisplay().bounds,
                             requiredFormat,
                             VK_COLORSPACE_SRGB_NONLINEAR_KHR);
 
                 return status;
             }
-            catch(CVulkanError const&ve) {
-                Log::Error(logTag(), String::format("CVulkanError (VkResult: %0):\n%1", ve.vulkanResult(), ve.what()));
+            catch(CVulkanError const&ve)
+            {
+                CLog::Error(logTag(), CString::format("CVulkanError (VkResult: %0):\n%1", ve.vulkanResult(), ve.what()));
                 return EEngineStatus::Error;
             }
-            catch(EngineException const e) {
-                Log::Error(logTag(), e.message());
+            catch(CEngineException const e)
+            {
+                CLog::Error(logTag(), e.message());
                 return e.status();
             }
-            catch(std::exception const stde) {
-                Log::Error(logTag(), stde.what());
+            catch(std::exception const stde)
+            {
+                CLog::Error(logTag(), stde.what());
                 return EEngineStatus::Error;
             }
-            catch(...) {
-                Log::Error(logTag(), "Unknown error occurred.");
+            catch(...)
+            {
+                CLog::Error(logTag(), "Unknown error occurred.");
                 return EEngineStatus::Error;
             }
         }
+        //<-----------------------------------------------------------------------------
 
-        EEngineStatus
-        CVulkanEnvironment::deinitialize()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanEnvironment::deinitialize()
         {
             // Wait for the logical device to finish up all work.
             vkDeviceWaitIdle(mVkState.selectedLogicalDevice);
@@ -763,31 +829,44 @@ namespace engine
             // Remember to destroy the debug report callback...
             PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT =
                     (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(mVkState.instance, "vkDestroyDebugReportCallbackEXT");
+
             if(!vkDestroyDebugReportCallbackEXT)
-                Log::Warning(logTag(), "Failed to fetch vulkan extension function 'vkDestroyDebugReportCallbackEXT'");
+            {
+                CLog::Warning(logTag(), "Failed to fetch vulkan extension function 'vkDestroyDebugReportCallbackEXT'");
+            }
             else
+            {
                 vkDestroyDebugReportCallbackEXT(mVkState.instance, mVkState.debugReportCallback, nullptr);
+            }
 #endif
 
             vkDestroyInstance(mVkState.instance, nullptr);
 
             return EEngineStatus::Ok;
         }
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         VkQueue CVulkanEnvironment::getGraphicsQueue()
         {
-            VulkanPhysicalDevice const&physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
+            SVulkanPhysicalDevice const&physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
 
             VkQueue queue = VK_NULL_HANDLE;
             vkGetDeviceQueue(mVkState.selectedLogicalDevice, physicalDevice.queueFamilies.graphicsQueueFamilyIndices.at(0), 0, &queue);
 
             return queue;
         }
+        //<-----------------------------------------------------------------------------
 
-        CVulkanEnvironment::VulkanState&
-        CVulkanEnvironment::getState()
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CVulkanEnvironment::SVulkanState &CVulkanEnvironment::getState()
         {
             return mVkState;
         }
+        //<-----------------------------------------------------------------------------
     }
 }
