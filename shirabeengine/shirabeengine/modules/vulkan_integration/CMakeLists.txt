@@ -7,7 +7,9 @@ set(SHIRABE_TEMPLATE "StaticLib")
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
+        SHIRABEMODULEWSI
         SHIRABEMODULEGRAPHICSAPI
+        SHIRABEMODULERENDERING
         SHIRABEMODULERESOURCES  
         SHIRABEMODULEOS         
         SHIRABEMODULECORE       
@@ -26,4 +28,6 @@ add_dependencies(vulkan_integration INSTALL_core)
 add_dependencies(vulkan_integration INSTALL_os)
 add_dependencies(vulkan_integration INSTALL_math)
 add_dependencies(vulkan_integration INSTALL_resources)
+add_dependencies(vulkan_integration INSTALL_rendering)
 add_dependencies(vulkan_integration INSTALL_graphicsapi)
+add_dependencies(vulkan_integration INSTALL_wsi)

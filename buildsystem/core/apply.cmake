@@ -11,7 +11,7 @@
 # SHIRABE_PROJECT_TARGET_SUFFIX_SHARED    .dll/.so
 # SHIRABE_PROJECT_TARGET_SUFFIX_STATIC    .lib/.a
 # SHIRABE_PROJECT_TARGET_SUFFIX_APP       .app
-# SHIRABE_REQUEST_x64_BUILD               True, if SHIRABE_REQUEST_x64_BUILD_CFG is passed as TRUE from the CMakeSettings for the
+# SHIRABE_ADDRESSMODEL_64BIT               True, if SHIRABE_REQUEST_x64_BUILD_CFG is passed as TRUE from the CMakeSettings for the
 #                                     current VS config.
 # SHIRABE_PLATFORM_TARGET                 Win32|Win64|Linux32|Linux64
 # SHIRABE_PLATFORM_CONFIG                 Debug|Release

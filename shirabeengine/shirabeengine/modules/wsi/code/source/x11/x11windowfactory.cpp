@@ -43,7 +43,7 @@ namespace engine
                 {
                     Window const x11Window = XCreateWindow(display, 0, x, y, w, h, 1, CopyFromParent, InputOutput, nullptr, 0, nullptr);
 
-                    window = makeCStdSharedPtr<CX11Window>(x11Window, aName, aInitialBounds);
+                    window = makeCStdSharedPtr<CX11Window>(display, x11Window, aName, aInitialBounds);
                 }
                 catch(...)
                 {

@@ -7,11 +7,11 @@ function(linkLibrary)
     set(BINARY_NAME asset)
 	set(LINK_STATIC OFF)
 
-	formatPlatformConfigName(
+    formatPlatformConfigName(
         ${BINARY_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
-        OFF
+        ON
         BINARY_NAME
         )
 
@@ -21,16 +21,16 @@ function(linkLibrary)
         ${SHIRABE_PROJECT_DEPLOY_DIR}/include
         )
 		
-	# -L
+    # -L
     append_parentscope(
         SHIRABE_PROJECT_LIBRARY_DIRECTORIES
         ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib
         )
 
-	# -l
-	append_parentscope(
-		SHIRABE_PROJECT_LIBRARY_TARGETS
-		${BINARY_NAME}
-		)
+    # -l
+    append_parentscope(
+            SHIRABE_PROJECT_LIBRARY_TARGETS
+            ${BINARY_NAME}
+            )
 
 endfunction(linkLibrary)

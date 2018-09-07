@@ -51,14 +51,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CWindowManager::EWindowManagerError CWindowManager::initialize(os::SApplicationEnvironment const &aApplicationEnvironment)
         {
-            CStdSharedPtr_t<CWSIDisplay>    display = nullptr;
             CStdSharedPtr_t<IWindowFactory> factory = nullptr;
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
             factory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
 #elif defined SHIRABE_PLATFORM_LINUX
-            display = makeCStdSharedPtr<CX11Display>();
-            factory = makeCStdSharedPtr<CX11WindowFactory>(display);
+            CStdSharedPtr_t<x11::CX11Display> display = nullptr;
+            display = makeCStdSharedPtr<x11::CX11Display>();
+            factory = makeCStdSharedPtr<x11::CX11WindowFactory>(display);
 #endif // SHIRABE_PLATFORM_WINDOWS
 
             if(!factory)
@@ -68,7 +68,6 @@ namespace engine
                 return EWindowManagerError::InitializationFailed;
             }
 
-            mDisplay       = display;
             mWindowFactory = factory;
 
             return EWindowManagerError::Ok;
@@ -155,7 +154,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IWindow> CWindowManager::getWindowByHandle(os::CWindowHandleWrapper::Handle_t const &aHandle)
+        CStdSharedPtr_t<IWindow> CWindowManager::getWindowByHandle(wsi::CWindowHandleWrapper::Handle_t const &aHandle)
         {
             auto const predicate = [&] (CStdSharedPtr_t<IWindow> const &aCompare) -> bool
             {

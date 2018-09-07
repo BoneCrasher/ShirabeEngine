@@ -7,7 +7,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CResourceManager::CResourceManager(CStdSharedPtr_t<ResourceProxyFactory> const &aProxyFactory)
+        CResourceManager::CResourceManager(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory)
             : mProxyFactory(aProxyFactory)
         {}
         //<-----------------------------------------------------------------------------

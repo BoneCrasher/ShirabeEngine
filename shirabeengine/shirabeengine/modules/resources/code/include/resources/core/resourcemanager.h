@@ -74,7 +74,7 @@ namespace engine
              *
              * @param aProxyFactory A point to a resource factory.
              */
-            CResourceManager(CStdSharedPtr_t<ResourceProxyFactory> const &aProxyFactory);
+            CResourceManager(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory);
 
         public_destructors:
             /**
@@ -198,7 +198,7 @@ namespace engine
 
         private_members:
             random::RandomState                               mUIDGenerator;
-            CStdSharedPtr_t<ResourceProxyFactory>             mProxyFactory;
+            CStdSharedPtr_t<CResourceProxyFactory>             mProxyFactory;
             IndexedResourcePool<PublicResourceId_t, AnyProxy> mResources;
         };
         //<-----------------------------------------------------------------------------

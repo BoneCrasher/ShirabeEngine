@@ -8,7 +8,7 @@
 #include <core/enginetypehelper.h>
 #include <core/enginestatus.h>
 #include <core/basictypes.h>
-#include <os/windowhandlewrapper.h>
+#include "wsi/windowhandlewrapper.h"
 
 namespace engine
 {
@@ -100,7 +100,7 @@ namespace engine
              *
              * @return See brief.
              */
-            virtual const os::CWindowHandleWrapper::Handle_t& handle() const = 0;
+            virtual const wsi::CWindowHandleWrapper::Handle_t& handle() const = 0;
 
             /**
              * Return the name of the window.

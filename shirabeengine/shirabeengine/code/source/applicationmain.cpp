@@ -1,56 +1,65 @@
-#include "Platform/ApplicationEnvironment.h"
+//#include <os/applicationenvironment.h>
+//#include <core/engine.h>
+//#include <log/log.h>
 
-#include "Core/Engine.h"
-#include "Log/Log.h"
+//namespace Main
+//{
+//	SHIRABE_DECLARE_LOG_TAG(ApplicationMain)
+//}
 
-namespace Main {
-	SHIRABE_DECLARE_LOG_TAG(ApplicationMain)
-}
+//#if defined SHIRABE_PLATFORM_WINDOWS
+//int WINAPI WinMain(
+//		HINSTANCE hInstance,
+//		HINSTANCE hPrevInstance,
+//		PSTR      szCmdLine,
+//		int       iCmdShow)
+//#elif defined SHIRABE_PLATFORM_LINUX
+//int main(int aArgc, char **aArgv)
+//#endif
+//{
 
-int WINAPI WinMain(
-		HINSTANCE hInstance, 
-		HINSTANCE hPrevInstance,
-		PSTR      szCmdLine, 
-		int       iCmdShow)
-{
-	using namespace Engine;
+//    using namespace engine;
 
-  #ifdef _DEBUG
-	InitializeConsole();
-  #endif
+//  #ifdef _DEBUG
+//    CConsole::InitializeConsole();
+//  #endif
 
-	Log::setLineWidth(80);
-	Log::Status(Main::logTag(), "SAE5300 - Application", Log::Style::CENTRE);
+//    CLog::Status(Main::logTag(), "SAE5300 - Application");
 
-	CStdSharedPtr_t<Platform::ApplicationEnvironment> appEnvironment = makeCStdSharedPtr<Platform::ApplicationEnvironment>();
-	appEnvironment->instanceHandle         = hInstance;
-	appEnvironment->previousInstanceHandle = hPrevInstance;
-	appEnvironment->osDisplays             = Platform::OSDisplay::GetDisplays();
+//    CStdSharedPtr_t<os::SApplicationEnvironment> appEnvironment = makeCStdSharedPtr<os::SApplicationEnvironment>();
+//#if defined SHIRABE_PLATFORM_WINDOWS
+//	appEnvironment->instanceHandle         = hInstance;
+//	appEnvironment->previousInstanceHandle = hPrevInstance;
+//#endif
+//    // appEnvironment->osDisplays = os::SOSDisplay::GetDisplays();
 
-	// TODO: Configuation
-	// EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);
+//	// TODO: Configuation
+//	// EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);
 
-	EngineInstancePtr pEngine = makeCStdSharedPtr<EngineInstance>(appEnvironment/*, engineConfiguration*/);
-	if (CheckEngineError(pEngine->initialize())) {
-		Log::Error(Main::logTag(), "Failed to initialize engine instance.");
-	}
+//    CStdSharedPtr_t<CEngineInstance> engine = makeCStdSharedPtr<CEngineInstance>(appEnvironment/*, engineConfiguration*/);
+//    if (CheckEngineError(engine->initialize()))
+//    {
+//        CLog::Error(Main::logTag(), "Failed to initialize engine instance.");
+//	}
 
-	while (!CheckEngineError(pEngine->update())) {
-		// Just run the shit out of the engine...
-		// If it returns we had an error or something had it close.
-		// Drop out automatically in this case and perform cleanup.
-	}
+//    while (!CheckEngineError(engine->update()))
+//    {
+//		// Just run the shit out of the engine...
+//		// If it returns we had an error or something had it close.
+//		// Drop out automatically in this case and perform cleanup.
+//	}
 
-	if (CheckEngineError(pEngine->deinitialize())) {
-		Log::Error(Main::logTag(), "Failed to deinitialize engine instance.");
-	}
+//    if (CheckEngineError(engine->deinitialize()))
+//    {
+//        CLog::Error(Main::logTag(), "Failed to deinitialize engine instance.");
+//	}
 
-	pEngine.reset();
-	pEngine = nullptr;
+//    engine.reset();
+//    engine = nullptr;
 
-  #ifdef _DEBUG
-	DeinitializeConsole();
-  #endif
+//  #ifdef _DEBUG
+//    CConsole::DeinitializeConsole();
+//  #endif
 
-	return 0;
-}
+//	return 0;
+//}

@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_OS_WINDOWHANDLEWRAPPER_H__
-#define __SHIRABE_OS_WINDOWHANDLEWRAPPER_H__
+#ifndef __SHIRABE_WSI_WINDOWHANDLEWRAPPER_H__
+#define __SHIRABE_WSI_WINDOWHANDLEWRAPPER_H__
 
 #include "os/applicationenvironment.h"
 

@@ -8,11 +8,11 @@ function(linkLibrary)
 	set(LINK_STATIC OFF)
 
 	formatPlatformConfigName(
-        ${BINARY_NAME}
-        SHIRABE_ADDRESSMODEL_64BIT
-        SHIRABE_PLATFORM_CONFIG
-        OFF
-        BINARY_NAME
+            ${BINARY_NAME}
+            SHIRABE_ADDRESSMODEL_64BIT
+            SHIRABE_PLATFORM_CONFIG
+            ON
+            BINARY_NAME
         )
 
     # -I

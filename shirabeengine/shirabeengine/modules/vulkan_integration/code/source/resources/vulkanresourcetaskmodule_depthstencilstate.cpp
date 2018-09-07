@@ -1,10 +1,10 @@
-#include "vulkan/resources/CVulkanResourceTaskBackend.h"
+#include "vulkan/resources/vulkanresourcetaskbackend.h"
 
 namespace engine
 {
     namespace vulkan
     {
-        using namespace engine::Resources;
+        using namespace engine::resources;
         /*
     EEngineStatus
       CVulkanResourceTaskBackend::

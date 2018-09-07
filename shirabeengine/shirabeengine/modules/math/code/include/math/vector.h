@@ -1107,7 +1107,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 1>::x(ValueType_t const &aValue)
         {
-            this->m_field[ 0 ] = aValue;
+            this->mField[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1185,7 +1185,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 2>::x(ValueType_t const &aValue)
         {
-            this->m_field[ 0 ] = aValue;
+            this->mField[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1195,7 +1195,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 2>::y(ValueType_t const &aValue)
         {
-            this->m_field[ 1 ] = aValue;
+            this->mField[ 1 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1296,7 +1296,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 3>::x(ValueType_t const &aValue)
         {
-            this->m_field[ 0 ] = aValue;
+            this->mField[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1306,7 +1306,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 3>::y(ValueType_t const &aValue)
         {
-            this->m_field[ 1 ] = aValue;
+            this->mField[ 1 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1316,7 +1316,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 3>::z(ValueType_t const &aValue)
         {
-            this->m_field[ 2 ] = aValue;
+            this->mField[ 2 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1326,7 +1326,7 @@ namespace engine
         template <typename T>
         CVectorImpl<T, 3> CVectorImpl<T, 3>::forward( )
         {
-            return CVectorImpl<T, 3>({ 1, 0, 0 });
+            return CVectorImpl<T, 3>( 1, 0, 0 );
         }
         //<-----------------------------------------------------------------------------
 
@@ -1336,7 +1336,7 @@ namespace engine
         template <typename T>
         CVectorImpl<T, 3> CVectorImpl<T, 3>::right( )
         {
-            return CVectorImpl<T, 3>({ 0, 1, 0 });
+            return CVectorImpl<T, 3>( 0, 1, 0 );
         }
         //<-----------------------------------------------------------------------------
 
@@ -1346,7 +1346,7 @@ namespace engine
         template <typename T>
         CVectorImpl<T, 3> CVectorImpl<T, 3>::up( )
         {
-            return CVectorImpl<T, 3>({ 0, 0, 1 });
+            return CVectorImpl<T, 3>( 0, 0, 1 );
         }
         //<-----------------------------------------------------------------------------
 

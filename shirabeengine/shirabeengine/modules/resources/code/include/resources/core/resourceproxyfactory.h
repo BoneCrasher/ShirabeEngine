@@ -15,7 +15,7 @@ namespace engine
         /**
          * The resource proxy factory is responsible for creating the correct proxy for a given proxy type and creation request.
          */
-        class ResourceProxyFactory
+        class CResourceProxyFactory
         {
         public_typedefs:
             using CreatorMap_t = Map<EResourceSubType, Any>;
@@ -63,7 +63,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         CStdSharedPtr_t<IResourceProxy<TResource>>
-        ResourceProxyFactory::create(
+        CResourceProxyFactory::create(
                 EProxyType                           const &aProxyType,
                 typename TResource::CCreationRequest const &aCreationRequest)
         {
@@ -87,7 +87,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        bool ResourceProxyFactory::addCreator(
+        bool CResourceProxyFactory::addCreator(
                 EResourceSubType       const &aType,
                 CreatorFn_t<TResource> const &aCreatorFn)
         {

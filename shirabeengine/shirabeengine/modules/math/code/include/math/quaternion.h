@@ -44,7 +44,7 @@ namespace engine
              * @param aMatrix
              * @return
              */
-            static CQuaternion CQuaternionFromRotationMatrix(
+            static CQuaternion quaternionFromRotationMatrix(
                     CMatrix4x4 const &aMatrix);
 
             /**
@@ -54,7 +54,7 @@ namespace engine
              * @param aPhi
              * @return
              */
-            static CQuaternion CQuaternionFromAxisAngle(
+            static CQuaternion quaternionFromAxisAngle(
                     CVector3D_t const &aAxis,
                     ValueType_t const &aPhi);
 
@@ -64,14 +64,14 @@ namespace engine
              * @param aQuaternion
              * @return
              */
-            static CVector4D_t axisAngleFromCQuaternion(CQuaternion const &aQuaternion);
+            static CVector4D_t axisAngleFromQuaternion(CQuaternion const &aQuaternion);
             /**
              * Extract the x, y and z euler angles from a quaternion.
              *
              * @param aQuaternion
              * @return
              */
-            static CVector3D_t eulerFromCQuaternion(CQuaternion const &aQuaternion);
+            static CVector3D_t eulerFromQuaternion(CQuaternion const &aQuaternion);
 
             /**
              * Extract a rotation matrix from a quaternion.
@@ -79,7 +79,7 @@ namespace engine
              * @param aQuaternion
              * @return
              */
-            static CMatrix4x4  rotationMatrixFromCQuaternion(CQuaternion const &aQuaternion);
+            static CMatrix4x4  rotationMatrixFromQuaternion(CQuaternion const &aQuaternion);
 
         public_constructors:
             /**
@@ -240,7 +240,7 @@ namespace engine
              * @param aZ
              * @return
              */
-            static CQuaternion CQuaternionFromEuler(
+            static CQuaternion quaternionFromEuler(
                     ValueType_t const &aX,
                     ValueType_t const &aY,
                     ValueType_t const &aZ);

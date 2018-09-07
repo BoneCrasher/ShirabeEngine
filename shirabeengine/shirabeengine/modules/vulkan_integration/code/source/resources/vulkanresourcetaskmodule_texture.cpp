@@ -55,7 +55,7 @@ namespace engine
                 vkImageCreateInfo.extent.depth  = desc.textureInfo.depth;
                 vkImageCreateInfo.mipLevels     = desc.textureInfo.mipLevels;
                 vkImageCreateInfo.arrayLayers   = desc.textureInfo.arraySize;
-                vkImageCreateInfo.format        = VulkanDeviceCapsHelper::convertFormatToVk(desc.textureInfo.format);
+                vkImageCreateInfo.format        = CVulkanDeviceCapsHelper::convertFormatToVk(desc.textureInfo.format);
                 vkImageCreateInfo.usage         = imageUsage;
                 vkImageCreateInfo.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
                 vkImageCreateInfo.tiling        = VkImageTiling::VK_IMAGE_TILING_OPTIMAL;
@@ -82,7 +82,7 @@ namespace engine
                 vkMemoryAllocateInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
                 vkMemoryAllocateInfo.allocationSize  = vkMemoryRequirements.size;
                 vkMemoryAllocateInfo.memoryTypeIndex =
-                        VulkanDeviceCapsHelper::determineMemoryType(
+                        CVulkanDeviceCapsHelper::determineMemoryType(
                             vkPhysicalDevice,
                             vkMemoryRequirements.memoryTypeBits,
                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);

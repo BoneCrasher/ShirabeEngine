@@ -300,9 +300,9 @@ endmacro(formatPlatformConfigName)
 # setupTargetAndConfig: 
 #     --> Use <MODULE_NAME>, <SHIRABE_REQUEST_x64_BUILD_CFG> and <SHIRABE_DEBUG>
 #          to determine basic project properties:
-#            SHIRABE_REQUEST_x64_BUILD: Are we building for x64?
-#            SHIRABE_PLATFORM_TARGET:   Win32|Win64|Linux32|Linux64
-#            SHIRABE_PLATFORM_CONFIG:   Debug|Release
+#            SHIRABE_ADDRESSMODEL_64BIT: Are we building for x64?
+#            SHIRABE_PLATFORM_TARGET:    Win32|Win64|Linux32|Linux64
+#            SHIRABE_PLATFORM_CONFIG:    Debug|Release
 #            SHIRABE_PLATFORM_CONFIG_SUFFIX:
 #               Suffix-path used in many many cases.
 #               E.g.: Win32/Debug
@@ -321,9 +321,9 @@ macro(setupTargetAndConfig MODULE_NAME)
     #
     # Define the build target
     #
-    set(SHIRABE_REQUEST_x64_BUILD OFF)
+    set(SHIRABE_ADDRESSMODEL_64BIT OFF)
     if(SHIRABE_REQUEST_x64_BUILD_CFG)
-        set(SHIRABE_REQUEST_x64_BUILD ON)
+        set(SHIRABE_ADDRESSMODEL_64BIT ON)
         LogStatus(MESSAGES "Building x64")
     endif(SHIRABE_REQUEST_x64_BUILD_CFG)
 
@@ -339,7 +339,7 @@ macro(setupTargetAndConfig MODULE_NAME)
 
         set(SHIRABE_PROJECT_ARCHITECTURE ${SHIRABE_ARCH})
     else()
-        if(SHIRABE_REQUEST_x64_BUILD)
+        if(NOT SHIRABE_ADDRESSMODEL_64BIT)
             set(SHIRABE_PROJECT_ARCHITECTURE x86)
         else()
             set(SHIRABE_PROJECT_ARCHITECTURE x86_64)
@@ -362,7 +362,7 @@ macro(setupTargetAndConfig MODULE_NAME)
         set(SHIRABE_PLATFORM_PREFIX linux)
     endif()    
     
-    if(SHIRABE_REQUEST_x64_BUILD)
+    if(SHIRABE_ADDRESSMODEL_64BIT)
         set(SHIRABE_PLATFORM_ADDRESS_SIZE 64)
     else()
         set(SHIRABE_PLATFORM_ADDRESS_SIZE 32)
@@ -384,7 +384,7 @@ macro(setupTargetAndConfig MODULE_NAME)
         set(SHIRABE_MODULE_OUTPUT_NAME ${MODULE_NAME}) # Predeclare basic name to have the subsequent function work.
     formatPlatformConfigName(
         ${MODULE_NAME}
-        SHIRABE_REQUEST_x64_BUILD
+        SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
         SHIRABE_BUILD_STATICLIB
         SHIRABE_MODULE_OUTPUT_NAME

@@ -1,262 +1,332 @@
-#include "Core/Engine.h"
+#include <asset/assetindex.h>
+#include <resources/core/resourcemanager.h>
+#include <resources/core/resourceproxyfactory.h>
+#include <renderer/renderer.h>
+#include <renderer/framegraph/framegraphrendercontext.h>
+#include <graphicsapi/resources/gfxapiresourcebackend.h>
+#include <graphicsapi/resources/gfxapiresourceproxy.h>
+#include <graphicsapi/resources/types/all.h>
+#include <vulkan/resources/vulkanresourcetaskbackend.h>
+#include <vulkan/rendering/vulkanrendercontext.h>
 
-#include "Asset/AssetIndex.h"
-#include "Resources/Core/ResourceManager.h"
+#include "core/engine.h"
 
-#include "Renderer/Renderer.h"
-#include "Renderer/FrameGraph/FrameGraphRenderContext.h"
-
-#include "GraphicsAPI/Resources/GFXAPIResourceBackend.h"
-#include "GraphicsAPI/Resources/GFXAPIResourceProxy.h"
-#include "Vulkan/Resources/CVulkanResourceTaskBackend.h"
-#include "Vulkan/Rendering/VulkanRenderContext.h"
-
-namespace engine {
-
-  class TestDummy
-    : public IWindow::IEventCallback {
-  public:
-    SHIRABE_DECLARE_LOG_TAG("TestDummy")
-
-      void onResume(IWindowPtr const&) {
-      //Log::Status(logTag(), "OnResume");
-    }
-
-    void onShow(IWindowPtr const&) {
-      //Log::Status(logTag(), "onShow");
-    }
-
-    void onBoundsChanged(IWindowPtr const&,
-      Rect const& r) {
-      //Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
-    }
-
-    void onHide(IWindowPtr const&) {
-      //Log::Status(logTag(), "onHide");
-    }
-
-    void onPause(IWindowPtr const&) {
-      //Log::Status(logTag(), "onPause");
-    }
-
-    void onClose(IWindowPtr const&) {
-      //Log::Status(logTag(), "onClose");
-      PostQuitMessage(0);
-    }
-
-  };
-
-  EngineInstance::EngineInstance(
-    CStdSharedPtr_t<OS::ApplicationEnvironment> const&environment)
-    : m_environment(environment)
-    , m_windowManager(nullptr)   // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
-    , m_mainWindow(nullptr)
-    , m_vulkanEnvironment(nullptr)
-  {
-  }
-
-  EngineInstance::~EngineInstance() {
-    // Fool-Proof redundant check
-    if(m_windowManager)
-      m_windowManager = nullptr;
-  }
-
-  template <typename TResource>
-  struct SpawnProxy {
-    static ResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(
-      CStdSharedPtr_t<GFXAPIResourceBackend> backend)
+namespace engine
+{
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    class CTestDummy
+            : public IWindow::IEventCallback
     {
-      return
-        [=]()
-        -> ResourceProxyFactory::CreatorFn_t<TResource>
-      {
-        return 
-          [=](EProxyType const&type, typename TResource::CreationRequest const&request)
-          -> CStdSharedPtr_t<IResourceProxy<TResource>>
+        SHIRABE_DECLARE_LOG_TAG("TestDummy")
+
+        public_methods:
+            void onResume(CStdSharedPtr_t<IWindow> const &)
         {
-          return makeCStdSharedPtr<GFXAPIResourceProxy<TResource>>(type, backend, request);
-        };
-      }();
-    }
-  };
-
-  EEngineStatus EngineInstance::initialize() {
-
-    EEngineStatus status = EEngineStatus::Ok;
-
-    unsigned long const& windowWidth  = m_environment->osDisplays[0].bounds.size.x();
-    unsigned long const& windowHeight = m_environment->osDisplays[0].bounds.size.y();
-
-    EGFXAPI        gfxApi        = EGFXAPI::Vulkan;
-    EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
-
-    std::function<void()> fnCreatePlatformWindowSystem
-      = [&, this] () -> void
-    {
-      EEngineStatus status = EEngineStatus::Ok;
-
-      m_windowManager = makeCStdSharedPtr<WindowManager>();
-      if(!(m_windowManager && !CheckWindowManagerError(m_windowManager->initialize(*m_environment)))) {
-        status = EEngineStatus::EngineComponentInitializationError;
-        HandleEngineStatusError(status, "Failed to create WindowManager.");
-      }
-
-      m_mainWindow = m_windowManager->createWindow("MainWindow", Rect(0, 0, windowWidth, windowHeight));
-      if(!m_mainWindow) {
-        status = EEngineStatus::WindowCreationError;
-        HandleEngineStatusError(status, "Failed to create main window in WindowManager.");
-      }
-      else {
-        m_environment->primaryWindowHandle = m_mainWindow->handle();
-
-        status = m_mainWindow->resume();
-        HandleEngineStatusError(status, "Failed to resume operation in main window.");
-
-        if(!CheckEngineError(status)) {
-          status = m_mainWindow->show();
-          HandleEngineStatusError(status, "Failed to show main window.");
+            //Log::Status(logTag(), "OnResume");
         }
-      }
 
-      IWindow::IEventCallbackPtr dummy = makeCStdSharedPtr<TestDummy>();
-      m_mainWindow->registerCallback(dummy);
+        void onShow(CStdSharedPtr_t<IWindow> const &)
+        {
+            //Log::Status(logTag(), "onShow");
+        }
+
+        void onBoundsChanged(
+                CStdSharedPtr_t<IWindow> const &,
+                CRect                    const &)
+        {
+            //Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
+        }
+
+        void onHide(CStdSharedPtr_t<IWindow> const &)
+        {
+            //Log::Status(logTag(), "onHide");
+        }
+
+        void onPause(CStdSharedPtr_t<IWindow> const &)
+        {
+            //Log::Status(logTag(), "onPause");
+        }
+
+        void onClose(CStdSharedPtr_t<IWindow> const &)
+        {
+            // Log::Status(logTag(), "onClose");
+            // PostQuitMessage(0);
+        }
+
+        void onDestroy(CStdSharedPtr_t<IWindow> const &)
+        {
+
+        }
     };
+    //<-----------------------------------------------------------------------------
 
-    RendererConfiguration rendererConfiguration;
-    rendererConfiguration.enableVSync             = true;
-    rendererConfiguration.frustum                 ={ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f };
-    rendererConfiguration.preferredBackBufferSize ={ windowWidth, windowHeight };
-    rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
-    rendererConfiguration.requestFullscreen       = false;
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CEngineInstance::CEngineInstance(CStdSharedPtr_t<os::SApplicationEnvironment> const &aEnvironment)
+        : mApplicationEnvironment(aEnvironment)
+        , mWindowManager    (nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
+        , mMainWindow       (nullptr)
+        , mAssetStorage     (nullptr)
+        , mProxyFactory     (nullptr)
+        , mResourceManager  (nullptr)
+        , mVulkanEnvironment(nullptr)
+        , mRenderer         (nullptr)
+    { }
+    //<-----------------------------------------------------------------------------
 
-    std::function<void()> fnCreateDefaultGFXAPI
-      = [&, this] () -> void
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CEngineInstance::~CEngineInstance()
     {
-      m_vulkanEnvironment = makeCStdSharedPtr<VulkanEnvironment>();
+        // Fool-Proof redundant check
+        if(mWindowManager)
+        {
+            mWindowManager = nullptr;
+        }
+    }
+    //<-----------------------------------------------------------------------------
 
-      EEngineStatus status = m_vulkanEnvironment->initialize(*m_environment);
-      HandleEngineStatusError(status, "Vulkan initialization failed.");
-    };
-
-    std::function<void()> fnCreatePlatformResourceSystem
-      = [&, this] () -> void
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    /**
+     * Templated helper struct to spawn a typed gfxapi backend resource proxy creator functor.
+     */
+    template <typename TResource>
+    struct SSpawnProxy
     {
-      // Instantiate the appropriate gfx api from engine config, BUT match it against 
-      // the platform capabilities!
-      // --> #ifndef WIN32 Fallback to Vk. If Vk is not available, fallback to OpenGL, put that into "ChooseGfxApi(preferred) : EGfxApiID"
+        /**
+         * Create and return a gfxapi resource backend proxy creation functor from TResource.
+         *
+         * @param aBackend The backend to create a proxy for.
+         * @return         A valid creation functor for a proxy of type TResource.
+         */
+        static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(CStdSharedPtr_t<CGFXAPIResourceBackend> aBackend)
+        {
+            auto const creator = [=]() -> CResourceProxyFactory::CreatorFn_t<TResource>
+            {
+                return
+                        [=](resources::EProxyType const &aType, typename TResource::CCreationRequest const &aRequest)
+                        -> CStdSharedPtr_t<IResourceProxy<TResource>>
+                {
+                    return makeCStdSharedPtr<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
+                };
+            };
 
-      // Create all necessary subsystems.
-      // Their life-cycle management will become the manager's task.
-      // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
-      // 
-
-      AssetStorage::AssetIndex assetIndex ={}; // AssetIndex::loadIndexById("");
-      CStdSharedPtr_t<AssetStorage> assetStorage = makeCStdSharedPtr<AssetStorage>();
-      m_assetStorage->readIndex(assetIndex);
-      m_assetStorage = assetStorage;
-
-      CStdSharedPtr_t<GFXAPIResourceBackend>     resourceBackend     = makeCStdSharedPtr<GFXAPIResourceBackend>();
-      CStdSharedPtr_t<GFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
-
-      m_proxyFactory = makeCStdSharedPtr<ResourceProxyFactory>();
-      m_proxyFactory->addCreator<Texture>(EResourceType::TEXTURE, SpawnProxy<Texture>::forGFXAPIBackend(resourceBackend));
-      m_proxyFactory->addCreator<TextureView>(EResourceType::GAPI_VIEW, SpawnProxy<TextureView>::forGFXAPIBackend(resourceBackend));
-
-      CStdSharedPtr_t<ResourceManager> manager = makeCStdSharedPtr<ResourceManager>(m_proxyFactory);
-      m_resourceManager = manager;
-
-      if(gfxApi == EGFXAPI::Vulkan) {
-        CStdSharedPtr_t<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<CVulkanResourceTaskBackend>(m_vulkanEnvironment);
-        vkResourceTaskBackend->initialize();
-
-        resourceTaskBackend = vkResourceTaskBackend;
-      }
-
-      resourceBackend->setResourceTaskBackend(resourceTaskBackend);
-      resourceBackend->initialize();
+            return creator();
+        }
     };
+    //<-----------------------------------------------------------------------------
 
-    std::function<void()> fnCreatePlatformRenderer
-      = [&, this] () -> void
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    EEngineStatus CEngineInstance::initialize()
     {
-      using engine::FrameGraph::IFrameGraphRenderContext;
-      using engine::FrameGraph::FrameGraphRenderContext;
+        EEngineStatus status = EEngineStatus::Ok;
 
-      // How to decouple?
-      CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;
-      if(gfxApi == EGFXAPI::Vulkan)
-        gfxApiRenderContext = makeCStdSharedPtr<VulkanRenderContext>();
+        uint32_t const windowWidth  = mApplicationEnvironment->osDisplays[0].bounds.size.x();
+        uint32_t const windowHeight = mApplicationEnvironment->osDisplays[0].bounds.size.y();
 
-      CStdSharedPtr_t<IFrameGraphRenderContext> frameGraphRenderContext = FrameGraphRenderContext::create(m_assetStorage, m_resourceManager, gfxApiRenderContext);
+        EGFXAPI        const gfxApi        = EGFXAPI::Vulkan;
+        EGFXAPIVersion const gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
 
-      m_renderer = makeCStdSharedPtr<Renderer>();
-      status = m_renderer->initialize(m_environment, rendererConfiguration, frameGraphRenderContext);
-      if(!CheckEngineError(status)) {
-        status = m_scene.initialize();
-      }
-    };
+        auto const fnCreatePlatformWindowSystem = [&, this] () -> void
+        {
+            EEngineStatus status = EEngineStatus::Ok;
 
-    try {
-      fnCreatePlatformWindowSystem();
-      fnCreateDefaultGFXAPI();
-      fnCreatePlatformResourceSystem();
-      fnCreatePlatformRenderer();
+            mWindowManager = makeCStdSharedPtr<CWindowManager>();
 
+            CWindowManager::EWindowManagerError windowManagerError = mWindowManager->initialize(*mApplicationEnvironment);
+            if(!(mWindowManager && !CheckWindowManagerError(windowManagerError)))
+            {
+                status = EEngineStatus::EngineComponentInitializationError;
+                HandleEngineStatusError(status, "Failed to create WindowManager.");
+            }
+
+            mMainWindow = mWindowManager->createWindow("MainWindow", CRect(0, 0, windowWidth, windowHeight));
+            if(!mMainWindow)
+            {
+                status = EEngineStatus::WindowCreationError;
+                HandleEngineStatusError(status, "Failed to create main window in WindowManager.");
+            }
+            else
+            {
+                status = mMainWindow->resume();
+                HandleEngineStatusError(status, "Failed to resume operation in main window.");
+
+                if(!CheckEngineError(status))
+                {
+                    status = mMainWindow->show();
+                    HandleEngineStatusError(status, "Failed to show main window.");
+                }
+            }
+
+            CStdSharedPtr_t<IWindow::IEventCallback> dummy = makeCStdSharedPtr<CTestDummy>();
+            mMainWindow->registerCallback(dummy);
+        };
+
+        SRendererConfiguration rendererConfiguration = {};
+        rendererConfiguration.enableVSync             = true;
+        rendererConfiguration.frustum                 = CVector4D_t({ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f });
+        rendererConfiguration.preferredBackBufferSize = CVector2D<uint32_t>({ windowWidth, windowHeight });
+        rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
+        rendererConfiguration.requestFullscreen       = false;
+
+        std::function<void()> fnCreateDefaultGFXAPI
+                = [&, this] () -> void
+        {
+            mVulkanEnvironment = makeCStdSharedPtr<CVulkanEnvironment>();
+
+            EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
+            HandleEngineStatusError(status, "Vulkan initialization failed.");
+        };
+
+        std::function<void()> fnCreatePlatformResourceSystem
+                = [&, this] () -> void
+        {
+            // Instantiate the appropriate gfx api from engine config, BUT match it against
+            // the platform capabilities!
+            // --> #ifndef WIN32 Fallback to Vk. If Vk is not available, fallback to OpenGL, put that into "ChooseGfxApi(preferred) : EGfxApiID"
+
+            // Create all necessary subsystems.
+            // Their life-cycle management will become the manager's task.
+            // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
+            //
+
+            CAssetStorage::AssetIndex_t assetIndex ={}; // AssetIndex::loadIndexById("");
+            CStdSharedPtr_t<CAssetStorage> assetStorage = makeCStdSharedPtr<CAssetStorage>();
+            mAssetStorage->readIndex(assetIndex);
+            mAssetStorage = assetStorage;
+
+            CStdSharedPtr_t<CGFXAPIResourceBackend>     resourceBackend     = makeCStdSharedPtr<CGFXAPIResourceBackend>();
+            CStdSharedPtr_t<CGFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
+
+            mProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
+            mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
+
+            CStdSharedPtr_t<CResourceManager> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
+            mResourceManager = manager;
+
+            if(gfxApi == EGFXAPI::Vulkan) {
+                CStdSharedPtr_t<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<CVulkanResourceTaskBackend>(mVulkanEnvironment);
+                vkResourceTaskBackend->initialize();
+
+                resourceTaskBackend = vkResourceTaskBackend;
+            }
+
+            resourceBackend->setResourceTaskBackend(resourceTaskBackend);
+            resourceBackend->initialize();
+        };
+
+        auto const fnCreatePlatformRenderer
+                = [&, this] () -> void
+        {
+            using engine::framegraph::IFrameGraphRenderContext;
+            using engine::framegraph::CFrameGraphRenderContext;
+
+            // How to decouple?
+            CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;
+            if(gfxApi == EGFXAPI::Vulkan)
+                gfxApiRenderContext = makeCStdSharedPtr<CVulkanRenderContext>();
+
+            CStdSharedPtr_t<IFrameGraphRenderContext> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
+
+            mRenderer = makeCStdSharedPtr<CRenderer>();
+            status = mRenderer->initialize(mApplicationEnvironment, rendererConfiguration, frameGraphRenderContext);
+            if(!CheckEngineError(status))
+            {
+                status = mScene.initialize();
+            }
+        };
+
+        try
+        {
+            fnCreatePlatformWindowSystem();
+            fnCreateDefaultGFXAPI();
+            fnCreatePlatformResourceSystem();
+            fnCreatePlatformRenderer();
+
+        }
+        catch(CEngineException const e)
+        {
+            CLog::Error(logTag(), e.message());
+            return e.status();
+        }
+        catch(std::exception const stde)
+        {
+            CLog::Error(logTag(), stde.what());
+            return EEngineStatus::Error;
+        }
+        catch(...)
+        {
+            CLog::Error(logTag(), "Unknown error occurred.");
+            return EEngineStatus::Error;
+        }
+
+        return status;
     }
-    catch(EngineException const e) {
-      Log::Error(logTag(), e.message());
-      return e.status();
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    EEngineStatus CEngineInstance::deinitialize()
+    {
+        EEngineStatus status = EEngineStatus::Ok;
+
+        if(mResourceManager)
+        {
+            mResourceManager->clear(); // Will implicitely clear all subsystems!
+            mResourceManager = nullptr;
+        }
+
+        if(mProxyFactory)
+        {
+            mProxyFactory = nullptr;
+        }
+
+        if(mRenderer)
+        {
+                status = mRenderer->deinitialize();
+        }
+
+        if(mMainWindow)
+        {
+                mMainWindow->hide();
+                mMainWindow->pause();
+                // TODO: Handle errors
+                mMainWindow = nullptr;
+        }
+
+        mWindowManager = nullptr;
+
+        return status;
+   }
+
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    EEngineStatus CEngineInstance::update()
+    {
+        if(CheckWindowManagerError(mWindowManager->update()))
+        {
+                CLog::Error(logTag(), "Failed to update window manager.");
+                return EEngineStatus::EngineComponentUpdateError;
+        }
+
+        mScene.update();
+
+        mRenderer->renderScene();
+
+        return EEngineStatus::Ok;
     }
-    catch(std::exception const stde) {
-      Log::Error(logTag(), stde.what());
-      return EEngineStatus::Error;
-    }
-    catch(...) {
-      Log::Error(logTag(), "Unknown error occurred.");
-      return EEngineStatus::Error;
-    }
-
-    return status;
-  }
-
-  EEngineStatus EngineInstance::deinitialize() {
-    EEngineStatus status = EEngineStatus::Ok;
-
-    if(m_resourceManager) {
-      m_resourceManager->clear(); // Will implicitely clear all subsystems!
-      m_resourceManager = nullptr;
-    }
-
-    if(m_proxyFactory) {
-      m_proxyFactory = nullptr;
-    }
-
-    if(m_renderer) {
-      status = m_renderer->deinitialize();
-    }
-
-    if(m_mainWindow) {
-      m_mainWindow->hide();
-      m_mainWindow->pause();
-      // TODO: Handle errors
-      m_mainWindow = nullptr;
-    }
-
-    m_windowManager = nullptr;
-
-    return EEngineStatus::Ok;
-  }
-
-  EEngineStatus EngineInstance::update() {
-    if(CheckWindowManagerError(m_windowManager->update())) {
-      Log::Error(logTag(), "Failed to update window manager.");
-      return EEngineStatus::EngineComponentUpdateError;
-    }
-
-    m_scene.update();
-
-    m_renderer->renderScene();
-
-    return EEngineStatus::Ok;
-  }
+    //<-----------------------------------------------------------------------------
 }

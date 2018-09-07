@@ -4,14 +4,14 @@ function(linkLibrary)
         ${SHIRABE_ADDRESSMODEL_64BIT}
         ${SHIRABE_PLATFORM_CONFIG})
 
-    set(BINARY_NAME vulkan)
+    set(BINARY_NAME vulkan_integration)
 	set(LINK_STATIC OFF)
 
 	formatPlatformConfigName(
         ${BINARY_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
-        OFF
+        ON
         BINARY_NAME
         )
 

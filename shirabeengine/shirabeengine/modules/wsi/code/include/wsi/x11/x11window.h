@@ -7,11 +7,16 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 
+#ifdef Status
+#undef Status
+#endif
+
 #include <log/log.h>
 #include "wsi/windowhandlewrapper.h"
 #include "wsi/windowmanager.h"
 #include "wsi/iwindow.h"
 #include "wsi/iwindoweventcallbackadapter.h"
+#include "wsi/x11/x11display.h"
 
 namespace engine
 {
@@ -100,10 +105,14 @@ namespace engine
                 /**
                  * Construct a new X11 window.
                  *
+                 * @param aDisplay       The X11 display the window is attached to.
+                 * @param aWindow        Underlying X11 window handle.
                  * @param aName          Name of the window to create.
                  * @param aInitialBounds Initial bounding rectangle of the window to create.
                  */
                 CX11Window(
+                        Display           *aDisplay,
+                        Window      const &aWindow,
                         std::string const &aName,
                         CRect       const &aInitialBounds);
 
@@ -240,6 +249,7 @@ namespace engine
 
             private_members:
                 CStdSharedPtr_t<CWindowManager> mWindowManager;
+                Display                        *mDisplay;
                 std::string                     mName;
                 CRect                           mBounds;
                 std::atomic_bool                mActive;

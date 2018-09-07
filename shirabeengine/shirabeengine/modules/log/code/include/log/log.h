@@ -72,8 +72,13 @@ namespace engine
         };
 
     public_static_functions:
-        static std::string ELogLevelToString(
-                ELogLevel const &aLevel);
+        /**
+         * Convert a log level to it's string representation.
+         *
+         * @param aLevel The loglevel to convert.
+         * @return       A string representation of the provided log level.
+         */
+        static std::string ELogLevelToString(ELogLevel const &aLevel);
 
         /**
          * Log-call for very descriptive output, usually just for

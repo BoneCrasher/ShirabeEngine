@@ -216,7 +216,7 @@ function(link)
     elseif(UNIX AND NOT APPLE)
         linkLinuxOSEnvironment(
             OS_LIBRARY_LINK_TARGETS
-                stdc++fs
+                stdc++
                 dl)
     else()
         message(STATUS "Unknown platform" " ")

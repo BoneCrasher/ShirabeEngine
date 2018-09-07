@@ -41,8 +41,8 @@ namespace engine
              * @param aResourceBackend The resource backend to request resource creation in.
              */
             CGFXAPIResourceProxy(
-                    EProxyType                             const &aProxyType,
-                    typename TResource::CreationRequest    const &aRequest,
+                    EProxyType                              const &aProxyType,
+                    typename TResource::CCreationRequest    const &aRequest,
                     CStdSharedPtr_t<CGFXAPIResourceBackend> const &aResourceBackend)
                 : CResourceBackendProxy<CGFXAPIResourceBackend, TResource>(aProxyType, aResourceBackend, aRequest)
                 , mDestructionRequest("")
@@ -116,10 +116,10 @@ namespace engine
 
             EEngineStatus status = EEngineStatus::Ok;
 
-            typename TResource::CreationRequest const &creationRequest = static_cast<CGenericProxyBase<TResource>*>(this)->creationRequest();
-            typename TResource::Descriptor      const &rd              = creationRequest.resourceDescriptor();
+            typename TResource::CCreationRequest const &creationRequest = static_cast<CGenericProxyBase<TResource>*>(this)->creationRequest();
+            typename TResource::SDescriptor      const &rd              = creationRequest.resourceDescriptor();
 
-            status = resourceBackend()->load<TResource>(creationRequest, aResolvedDependencies, ETaskSynchronization::Sync, nullptr);
+            status = this->resourceBackend()->template load<TResource>(creationRequest, aResolvedDependencies, ETaskSynchronization::Sync, nullptr);
             if(CheckEngineError(status))
             {
                 // MBT TODO: Consider distinguishing the above returned status a little more in
@@ -143,7 +143,7 @@ namespace engine
         EEngineStatus CGFXAPIResourceProxy<TResource>::unloadSync()
         {
             EEngineStatus status = EEngineStatus::Ok;
-            status = resourceBackend()->unload<TResource>(TResource::CDestructionRequest(this->destructionRequest()));
+            status = this->resourceBackend()->template unload<TResource>(typename TResource::CDestructionRequest(this->destructionRequest()));
 
             if(CheckEngineError(status)) {
                 this->setLoadState(ELoadState::UNKNOWN);

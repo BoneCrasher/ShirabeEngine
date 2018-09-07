@@ -153,11 +153,11 @@ namespace engine
              * @param aCreationRequest The creation request used for dynamic load/unload
              */
             CGenericProxyBase(
-                    EProxyType                          const &aProxyType,
+                    EProxyType                           const &aProxyType,
                     typename TResource::CCreationRequest const &aCreationRequest)
                 : IResourceProxy<TResource>()
                 , CResourceCreationRequestAdapter<typename TResource::CCreationRequest>(aCreationRequest)
-                , mProxyType(proxyType)
+                , mProxyType(aProxyType)
                 , mProxyLoadState(ELoadState::UNKNOWN)
             { }
 

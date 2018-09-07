@@ -27,7 +27,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CQuaternion::CQuaternion(CAxisAngle const &aAxisAngle)
-            : CQuaternion(CQuaternion::CQuaternionFromAxisAngle(aAxisAngle.axis(), aAxisAngle.phi()))
+            : CQuaternion(CQuaternion::quaternionFromAxisAngle(aAxisAngle.axis(), aAxisAngle.phi()))
         {}
         //<-----------------------------------------------------------------------------
 
@@ -248,7 +248,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CQuaternion CQuaternion::CQuaternionFromEuler(
+        CQuaternion CQuaternion::quaternionFromEuler(
                 ValueType_t const &aX,
                 ValueType_t const &aY,
                 ValueType_t const &aZ)
@@ -297,7 +297,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CQuaternion CQuaternion::CQuaternionFromRotationMatrix(CMatrix4x4 const &aMatrix) {
+        CQuaternion CQuaternion::quaternionFromRotationMatrix(CMatrix4x4 const &aMatrix) {
             ValueType_t const r00 = aMatrix.r00();
             ValueType_t const r11 = aMatrix.r11();
             ValueType_t const r22 = aMatrix.r22();
@@ -348,7 +348,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CQuaternion CQuaternion::CQuaternionFromAxisAngle(
+        CQuaternion CQuaternion::quaternionFromAxisAngle(
                 CVector3D_t const &aAxis,
                 ValueType_t const &aPhi)
         {
@@ -369,7 +369,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t CQuaternion::eulerFromCQuaternion(CQuaternion const &aQuaternion)
+        CVector3D_t CQuaternion::eulerFromQuaternion(CQuaternion const &aQuaternion)
         {
             CVector3D_t v {};
 
@@ -424,7 +424,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CMatrix4x4 CQuaternion::rotationMatrixFromCQuaternion(CQuaternion const &aQuaternion)
+        CMatrix4x4 CQuaternion::rotationMatrixFromQuaternion(CQuaternion const &aQuaternion)
         {
             ValueType_t const r11 = 1 - (2 * (aQuaternion.y() * aQuaternion.y())) - (2 * (aQuaternion.z() * aQuaternion.z()));
             ValueType_t const r12 =     (2 * (aQuaternion.x() * aQuaternion.y())) - (2 * (aQuaternion.w() * aQuaternion.z()));
@@ -446,7 +446,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector4D_t CQuaternion::axisAngleFromCQuaternion(CQuaternion const &aQuaternion)
+        CVector4D_t CQuaternion::axisAngleFromQuaternion(CQuaternion const &aQuaternion)
         {
             CQuaternion p = aQuaternion;
 

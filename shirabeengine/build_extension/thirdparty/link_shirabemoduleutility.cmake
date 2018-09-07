@@ -11,7 +11,7 @@ function(linkLibrary)
         ${BINARY_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
-        OFF
+        ON
         BINARY_NAME
         )
 

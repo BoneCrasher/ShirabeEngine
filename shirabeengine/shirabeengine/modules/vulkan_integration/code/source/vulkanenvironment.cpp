@@ -117,11 +117,10 @@ namespace engine
                 uint64_t                   aObj,
                 size_t                     aLocation,
                 int32_t                    aCode,
-                const char*                aLayerPrefix,
-                const char*                aMsg,
-                void*                      aUserData)
+                char                const *aLayerPrefix,
+                char                const *aMsg,
+                void                      *aUserData)
         {
-
             std::string const message =
                     CString::format(
                         "[%0][%1(%2)]@'%3' -> (%4) in layer %5:\n%6",
@@ -296,24 +295,6 @@ namespace engine
                 throw CVulkanError("Failed to create window surface!", result);
             }
 #elif defined SHIRABE_PLATFORM_LINUX
-            VkXlibSurfaceCreateInfoKHR vkXlibSurfaceCreateInfo{};
-            vkXlibSurfaceCreateInfo.sType  = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-            vkXlibSurfaceCreateInfo.dpy    = display;
-            vkXlibSurfaceCreateInfo.window = window;
-            vkXlibSurfaceCreateInfo.flags  = 0;
-            vkXlibSurfaceCreateInfo.pNext  = nullptr;
-
-            auto CreateXLibSurfaceKHR = (PFN_vkCreateXlibSurfaceKHR)vkGetInstanceProcAddr(mVkState.instance, "vkCreateXlibSurfaceKHR");
-            if(!CreateXLibSurfaceKHR)
-            {
-                throw CVulkanError("Cannot find vulkan function 'vkCreateXlibSurfaceKHR'.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
-            }
-
-            VkResult result = CreateXLibSurfaceKHR(mVkState.instance, &vkXlibSurfaceCreateInfo, nullptr, &surface);
-            if(VkResult::VK_SUCCESS != result)
-            {
-                throw CVulkanError("Failed to create window surface!", result);
-            }
 #endif
 
             mVkState.surface = surface;
@@ -782,9 +763,9 @@ namespace engine
                 VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
 
                 createVulkanInstance("ShirabeEngine Demo");
-                createVulkanSurface(aApplicationEnvironment);
                 determinePhysicalDevices();
                 selectPhysicalDevice(0);
+                createVulkanSurface(aApplicationEnvironment);
                 createSwapChain(
                             aApplicationEnvironment.primaryDisplay().bounds,
                             requiredFormat,

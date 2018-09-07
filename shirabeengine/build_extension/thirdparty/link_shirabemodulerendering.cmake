@@ -1,9 +1,8 @@
 function(linkLibrary)
     
-	LogStatus(MESSAGES 
-	
-        ${SHIRABE_ADDRESSMODEL_64BIT}
-        ${SHIRABE_PLATFORM_CONFIG})
+	LogStatus(MESSAGES 	
+            ${SHIRABE_ADDRESSMODEL_64BIT}
+            ${SHIRABE_PLATFORM_CONFIG})
 
     set(BINARY_NAME rendering)
 	set(LINK_STATIC OFF)
@@ -12,7 +11,7 @@ function(linkLibrary)
         ${BINARY_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
-        OFF
+        ON
         BINARY_NAME
         )
 

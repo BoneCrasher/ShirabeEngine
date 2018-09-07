@@ -6,6 +6,7 @@
 #include <os/applicationenvironment.h>
 #include "wsi/iwindowfactory.h"
 #include "wsi/display.h"
+#include "wsi/windowhandlewrapper.h"
 
 namespace engine
 {
@@ -91,7 +92,7 @@ namespace engine
              * @param aHandle The handle of the window to find.
              * @return        A pointer to the window if successful. nullptr otherwise.
              */
-            CStdSharedPtr_t<IWindow> getWindowByHandle(os::CWindowHandleWrapper::Handle_t const &aHandle);
+            CStdSharedPtr_t<IWindow> getWindowByHandle(wsi::CWindowHandleWrapper::Handle_t const &aHandle);
 
         private_members:
             IWindowList                     mWindows;
@@ -100,7 +101,7 @@ namespace engine
         };
 
         #define CheckWindowManagerError(status) \
-            (static_cast<std::underlying_type_t<WindowManager::EWindowManagerError>>(status) < 0)
+            (static_cast<std::underlying_type_t<CWindowManager::EWindowManagerError>>(status) < 0)
     }
 }
 

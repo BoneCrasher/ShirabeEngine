@@ -20,12 +20,13 @@ set(
             "-fpermissive"  # Actually bad... Try to remove!
             "-fexceptions"  # Enable std exceptions
             "-pthread"      # Enforce to use of pthread, as all ext. libs do
+            "-fPIC"         # Enable position independent code
 )
 
 # Make sure the compiler uses the correct address model
 if(SHIRABE_PROJECT_CROSS_BUILD_ARMHF)
     append(SHIRABE_GCC_CL_COMMON_FLAGS "-marm")
-elseif(SHIRABE_REQUEST_x64_BUILD)
+elseif(SHIRABE_ADDRESSMODEL_64BIT)
     append(SHIRABE_GCC_CL_COMMON_FLAGS "-m64")
 else()
     append(SHIRABE_GCC_CL_COMMON_FLAGS "-m32")

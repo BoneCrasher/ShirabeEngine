@@ -103,7 +103,7 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus load(
-                    typename TResource::CreationRequest  const &aRequest,
+                    typename TResource::CCreationRequest const &aRequest,
                     PublicResourceIdList_t               const &aDependencies,
                     ETaskSynchronization                 const &aSyncMode,
                     CStdSharedPtr_t<IAsyncLoadCallback>  const &aCallback);
@@ -148,9 +148,9 @@ namespace engine
              */
             template <typename TResource>
             EEngineStatus loadImpl(
-                    typename TResource::CreationRequest const &aRequest,
-                    ResolvedDependencyCollection_t      const &aResolvedDependencies,
-                    SDeferredResourceOperationHandle          &aOutHandle);
+                    typename TResource::CCreationRequest const &aRequest,
+                    ResolvedDependencyCollection_t       const &aResolvedDependencies,
+                    SDeferredResourceOperationHandle           &aOutHandle);
 
             /**
              * Implementation of the unload operation.
@@ -193,7 +193,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CGFXAPIResourceBackend::load(
-                typename TResource::CreationRequest  const &aRequest,
+                typename TResource::CCreationRequest const &aRequest,
                 PublicResourceIdList_t               const &aDependencies,
                 ETaskSynchronization                 const &aSyncMode,
                 CStdSharedPtr_t<IAsyncLoadCallback>  const &aCallback)
@@ -294,9 +294,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResource>
         EEngineStatus CGFXAPIResourceBackend::loadImpl(
-                typename TResource::CreationRequest const &aRequest,
-                ResolvedDependencyCollection_t      const &aResolvedDependencies,
-                SDeferredResourceOperationHandle          &aOutHandle)
+                typename TResource::CCreationRequest const &aRequest,
+                ResolvedDependencyCollection_t       const &aResolvedDependencies,
+                SDeferredResourceOperationHandle           &aOutHandle)
         {
             ResourceTaskFn_t task = nullptr;
 

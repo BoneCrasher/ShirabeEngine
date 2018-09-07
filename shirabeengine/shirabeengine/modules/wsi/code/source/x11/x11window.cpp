@@ -13,14 +13,18 @@ namespace engine
             //
             //<-----------------------------------------------------------------------------
             CX11Window::CX11Window(
+                    Display           *aDisplay,
+                    Window      const &aWindow,
                     std::string const &aName,
                     CRect       const &aInitialBounds)
                 : IWindow()
                 , IX11Adapter()
+                , mWindowManager(nullptr)
+                , mDisplay(aDisplay)
                 , mName(aName)
                 , mBounds(aInitialBounds)
                 , mActive(false)
-                , mHandleWrapper(0)
+                , mHandleWrapper(aWindow)
                 , mCallbackAdapter()
             { }
             //<-----------------------------------------------------------------------------
@@ -71,10 +75,9 @@ namespace engine
             {
                 try
                 {
-                    Display       *display = mWindowManager->display();
-                    Window  const &window  = mHandleWrapper.handle();
+                    Window const &window = mHandleWrapper.handle();
 
-                    XMapWindow(display, window);
+                    XMapWindow(mDisplay, window);
 
                     return EEngineStatus::Ok;
                 }
@@ -93,10 +96,9 @@ namespace engine
             {
                 try
                 {
-                    Display       *display = mWindowManager->display();
-                    Window  const &window  = mHandleWrapper.handle();
+                    Window const &window = mHandleWrapper.handle();
 
-                    XUnmapWindow(display, window);
+                    XUnmapWindow(mDisplay, window);
 
                     return EEngineStatus::Ok;
                 }
@@ -136,8 +138,7 @@ namespace engine
                 if(!mActive.load())
                     return EEngineStatus::Ok;
 
-                Display       *display = mWindowManager->display();
-                Window  const &window  = mHandleWrapper.handle();
+                Window const &window = mHandleWrapper.handle();
 
                 XEvent event = {};
 
@@ -146,14 +147,14 @@ namespace engine
                     // Asynchronously, there could be more and more events coming in,
                     // but we select a snapshot of events here and process only the next
                     // 'eventCount' events in this update cycle.
-                    int32_t const eventCount = XPending(display);
+                    int32_t const eventCount = XPending(mDisplay);
                     for(int32_t k=0; k<eventCount; ++k)
                     {
                         XEvent event{};
 
-                        XNextEvent(display, &event);
+                        XNextEvent(mDisplay, &event);
 
-                        bool const handled = handleEvent(display, window, event);
+                        bool const handled = handleEvent(mDisplay, window, event);
                         if(!handled)
                         {
                             // ??? further handling?

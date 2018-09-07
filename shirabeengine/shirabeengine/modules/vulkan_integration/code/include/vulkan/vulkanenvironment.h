@@ -6,9 +6,10 @@
 #include <log/log.h>
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
-#include <os/windowhandlewrapper.h>
 #include <math/geometric/rect.h>
 #include <graphicsapi/resources/types/definition.h>
+#include <wsi/windowhandlewrapper.h>
+#include <wsi/windowhandlewrapper.h>
 #include "vulkan/vulkanimport.h"
 
 namespace engine
@@ -16,7 +17,7 @@ namespace engine
     namespace vulkan
     {
         using os::SApplicationEnvironment;
-        using os::CWindowHandleWrapper;
+        using engine::wsi::CWindowHandleWrapper;
         using engine::resources::EFormat;
 
         /**

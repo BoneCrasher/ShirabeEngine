@@ -6,6 +6,10 @@
 
 #include <X11/Xlib.h>
 
+#ifdef Status
+#undef Status
+#endif
+
 #include <core/enginestatus.h>
 #include <core/string.h>
 
