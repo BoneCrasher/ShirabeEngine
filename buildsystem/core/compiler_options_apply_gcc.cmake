@@ -10,6 +10,9 @@ set(SHIRABE_GCC_CL_COMMON_FLAGS)
 set(SHIRABE_GCC_CL_CFLAGS)
 set(SHIRABE_GCC_CL_CXXFLAGS)
 
+set(SHIRABE_GCC_LD_COMMON_FLAGS)
+set(SHIRABE_GCC_LD_CFLAGS)
+set(SHIRABE_GCC_LD_CXXFLAGS)
 #
 # Set default non-configurable options
 #
@@ -21,7 +24,14 @@ set(
             "-fexceptions"  # Enable std exceptions
             "-pthread"      # Enforce to use of pthread, as all ext. libs do
             "-fPIC"         # Enable position independent code
+            "-Wl,-fPIC"
 )
+
+# set(SHIRABE_GCC_CL_CXXFLAGS "--whole-archive")
+
+set(
+    SHIRABE_GCC_LD_COMMON_FLAGS
+            )
 
 # Make sure the compiler uses the correct address model
 if(SHIRABE_PROJECT_CROSS_BUILD_ARMHF)

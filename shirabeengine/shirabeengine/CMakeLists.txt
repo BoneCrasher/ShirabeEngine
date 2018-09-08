@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # Module name for export declaration
 set(SHIRABE_MODULE_TARGET_NAME SHIRABEENGINE)
+
 # Add modules
 add_subdirectory(modules/platform)
 add_subdirectory(modules/base)

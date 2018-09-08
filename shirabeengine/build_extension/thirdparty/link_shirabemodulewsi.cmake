@@ -28,9 +28,17 @@ function(linkLibrary)
         )
 
 	# -l
-	append_parentscope(
-		SHIRABE_PROJECT_LIBRARY_TARGETS
-		${BINARY_NAME}
-		)
+
+        if(SHIRABE_BUILD_STATICLIB)
+            append_parentscope(
+                    SHIRABE_PROJECT_LIBRARY_TARGETS
+                    ${BINARY_NAME}
+                    )
+        else()
+            append_parentscope(
+                    SHIRABE_PROJECT_LIBRARY_MODULES
+                    ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a
+                    )
+        endif()
 
 endfunction(linkLibrary)

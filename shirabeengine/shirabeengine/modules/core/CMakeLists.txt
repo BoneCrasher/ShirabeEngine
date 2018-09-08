@@ -15,7 +15,8 @@ set(
         SHIRABEMODULELOG     
         SHIRABEMODULEPLATFORM
         JSON                 
-        XML2)
+        #XML2
+        )
 
 include(project_setup)
 

@@ -57,7 +57,7 @@ endif()
 
 # Precompiled header settings
 # Set to YES to use a PCH...
-set(SHIRABE_PCH_ENABLED  YES)
+set(SHIRABE_PCH_ENABLED  NO)
 # ...and uncomment this and set the appropriate filename.
 set(SHIRABE_PCH_FILENAME SHIRABE_pch.h)
 

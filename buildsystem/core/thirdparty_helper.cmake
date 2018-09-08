@@ -216,7 +216,7 @@ function(link)
     elseif(UNIX AND NOT APPLE)
         linkLinuxOSEnvironment(
             OS_LIBRARY_LINK_TARGETS
-                stdc++
+                stdc++_pic
                 dl)
     else()
         message(STATUS "Unknown platform" " ")
@@ -232,4 +232,5 @@ function(link)
     set(SHIRABE_PROJECT_INCLUDEPATH         ${SHIRABE_PROJECT_INCLUDEPATH}         PARENT_SCOPE)
     set(SHIRABE_PROJECT_LIBRARY_DIRECTORIES ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES} PARENT_SCOPE)
     set(SHIRABE_PROJECT_LIBRARY_TARGETS     ${SHIRABE_PROJECT_LIBRARY_TARGETS}     PARENT_SCOPE)
+    set(SHIRABE_PROJECT_LIBRARY_MODULES     ${SHIRABE_PROJECT_LIBRARY_MODULES}     PARENT_SCOPE)
 endfunction(link)

@@ -99,7 +99,7 @@ namespace engine
     /**
      * @brief The EngineException class
      */
-    class CEngineException
+    class SHIRABE_LIBRARY_EXPORT CEngineException
             : public std::runtime_error
     {
     public:
@@ -128,11 +128,11 @@ namespace engine
         EEngineStatus mStatus;
     };
 
-    static inline EEngineStatus HandleEngineStatusError(
+    static SHIRABE_LIBRARY_EXPORT EEngineStatus HandleEngineStatusError(
             EEngineStatus const &aStatus,
             std::string   const &aMessage);
 
-    static inline std::ostream& operator<<(std::ostream &aStream, const EEngineStatus &aStatus);
+    static std::ostream& operator<<(std::ostream &aStream, EEngineStatus const &aStatus);
 }
 
 #endif

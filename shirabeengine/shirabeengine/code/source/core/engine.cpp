@@ -1,4 +1,5 @@
 #include <asset/assetindex.h>
+#include <core/enginestatus.h>
 #include <resources/core/resourcemanager.h>
 #include <resources/core/resourceproxyfactory.h>
 #include <renderer/renderer.h>

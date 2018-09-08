@@ -57,7 +57,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::ostream &operator<<(std::ostream& stream, const EEngineStatus& status)
+    std::ostream &operator<<(std::ostream& stream, EEngineStatus const &status)
     {
         return (stream << static_cast<std::underlying_type_t<EEngineStatus>>(status));
     }
