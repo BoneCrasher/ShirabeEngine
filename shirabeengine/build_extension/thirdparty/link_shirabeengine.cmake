@@ -25,7 +25,7 @@ function(linkLibrary)
 	# -L
     append_parentscope(
         SHIRABE_PROJECT_LIBRARY_DIRECTORIES
-        ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib
+        ${SHIRABE_PROJECT_DEPLOY_DIR}/lib
         )
 
 	# -l

@@ -6,7 +6,7 @@
 #include <functional>
 #include <future>
 
-#include "Tests/Test_FrameGraph.h"
+#include "tests/test_framegraph.h"
 
 // #include <Util/Documents/JSON.h>
 
