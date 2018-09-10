@@ -18,7 +18,7 @@ namespace engine
         class CResourceProxyFactory
         {
         public_typedefs:
-            using CreatorMap_t = Map<EResourceSubType, Any>;
+            using CreatorMap_t = Map<EResourceSubType, Any_t>;
 
             template <typename TResource>
             using CreatorFn_t  = std::function<
@@ -72,7 +72,7 @@ namespace engine
             if(m_creators.find(type) == m_creators.end())
                 return nullptr;
 
-            Any                    const &anyCreator = m_creators.at(type);
+            Any_t                    const &anyCreator = m_creators.at(type);
             CreatorFn_t<TResource> const &creator    = std::any_cast<CreatorFn_t<TResource>>(anyCreator);
 
             CStdSharedPtr_t<IResourceProxy<TResource>> const proxy = creator(aProxyType, aCreationRequest);

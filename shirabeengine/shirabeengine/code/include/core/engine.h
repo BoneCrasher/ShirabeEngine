@@ -81,7 +81,7 @@ namespace engine
         // Assets & Resources
         CStdSharedPtr_t<CAssetStorage>         mAssetStorage;
         CStdSharedPtr_t<CResourceProxyFactory> mProxyFactory;
-        CStdSharedPtr_t<CResourceManager>      mResourceManager;
+        CStdSharedPtr_t<CResourceManagerBase>  mResourceManager;
 
         // Rendering
         CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;

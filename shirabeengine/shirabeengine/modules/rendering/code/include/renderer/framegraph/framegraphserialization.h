@@ -96,7 +96,7 @@ namespace engine
              * signatures for result retrieval from a serialization process.
              */
             class CFrameGraphSerializationResult
-                    : public IResult
+                    : public ISerializer<CGraph>::IResult
             {
             public_constructors:
                 CFrameGraphSerializationResult(std::string const &aResult);

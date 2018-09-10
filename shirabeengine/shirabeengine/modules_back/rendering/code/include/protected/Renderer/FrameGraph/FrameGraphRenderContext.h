@@ -5,7 +5,7 @@
 #include "Log/Log.h"
 
 #include "Asset/AssetStorage.h"
-#include "Resources/Core/ResourceManager.h"
+#include "Resources/Core/resourcemanagerbase.h"
 
 #include "Renderer/RendererTypes.h"
 #include "Renderer/FrameGraph/FrameGraphData.h"

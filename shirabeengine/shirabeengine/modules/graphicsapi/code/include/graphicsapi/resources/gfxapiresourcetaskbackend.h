@@ -20,7 +20,7 @@
 #include <core/patterns/observer.h>
 #include <core/threading/looper.h>
 
-#include "resources/core/resourcedomaintransfer.h"
+#include <resources/core/resourcedomaintransfer.h>
 #include "graphicsapi/resources/gfxapi.h"
 #include "graphicsapi/resources/types/all.h"
 
@@ -209,9 +209,9 @@ namespace engine
             template <typename TResource>
             EEngineStatus updateTask(
                     typename TResource::CUpdateRequest const&aRequest,
-                    SGFXAPIResourceHandleAssignment   const&aAssignment,
-                    ResolvedDependencyCollection_t    const&aDependencies,
-                    ResourceTaskFn_t                       &aOutTask);
+                    SGFXAPIResourceHandleAssignment    const&aAssignment,
+                    ResolvedDependencyCollection_t     const&aDependencies,
+                    ResourceTaskFn_t                        &aOutTask);
 
             /**
              * Templated function to spawn a destruction task for a specific resource type.
@@ -226,9 +226,9 @@ namespace engine
             template <typename TResource>
             EEngineStatus destructionTask(
                     typename TResource::CDestructionRequest const &aRequest,
-                    SGFXAPIResourceHandleAssignment        const &aAssignment,
-                    ResolvedDependencyCollection_t         const &aDependencies,
-                    ResourceTaskFn_t                             &aOutTask);
+                    SGFXAPIResourceHandleAssignment         const &aAssignment,
+                    ResolvedDependencyCollection_t          const &aDependencies,
+                    ResourceTaskFn_t                              &aOutTask);
 
             /**
              * Templated function to spawn a query task for a specific resource type.
@@ -258,10 +258,10 @@ namespace engine
             bool addQuery(QueryFn_t<TResource> const &aQuery);
 
         private_members:
-            Map<std::type_index, Any> mCreatorFunctions;
-            Map<std::type_index, Any> mUpdateFunctions;
-            Map<std::type_index, Any> mQueryFunctions;
-            Map<std::type_index, Any> mDestructorFunctions;
+            Map<std::type_index, Any_t> mCreatorFunctions;
+            Map<std::type_index, Any_t> mUpdateFunctions;
+            Map<std::type_index, Any_t> mQueryFunctions;
+            Map<std::type_index, Any_t> mDestructorFunctions;
         };
         //<-----------------------------------------------------------------------------
 
@@ -338,7 +338,7 @@ namespace engine
             if(mCreatorFunctions.find(typeIndex) == mCreatorFunctions.end())
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
-            Any function = mCreatorFunctions.at(typeIndex);
+            Any_t function = mCreatorFunctions.at(typeIndex);
             try
             {
                 CreatorFn_t<TResource> f = std::any_cast<CreatorFn_t<TResource>>(function);
@@ -367,7 +367,7 @@ namespace engine
             if(mUpdateFunctions.find(typeIndex) == mUpdateFunctions.end())
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
-            Any function = mUpdateFunctions.at(typeIndex);
+            Any_t function = mUpdateFunctions.at(typeIndex);
             try
             {
                 UpdaterFn_t<TResource> f = std::any_cast<UpdaterFn_t<TResource>>(function);
@@ -396,7 +396,7 @@ namespace engine
             if(mDestructorFunctions.find(typeIndex) == mDestructorFunctions.end())
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
-            Any function = mDestructorFunctions.at(typeIndex);
+            Any_t function = mDestructorFunctions.at(typeIndex);
             try
             {
                 DestructorFn_t<TResource> f = std::any_cast<DestructorFn_t<TResource>>(function);
@@ -424,7 +424,7 @@ namespace engine
             if(mQueryFunctions.find(typeIndex) == mQueryFunctions.end())
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
 
-            Any function = mQueryFunctions.at(typeIndex);
+            Any_t function = mQueryFunctions.at(typeIndex);
             try
             {
                 QueryFn_t<TResource> f = std::any_cast<QueryFn_t<TResource>>(function);

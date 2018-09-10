@@ -243,7 +243,7 @@ namespace engine
                         true,
                         true);
 
-            Optional<RefWrapper<SFrameGraphTextureView>> ref{};
+            Optional_t<RefWrapper_t<SFrameGraphTextureView>> ref{};
 
             // Can we cull?
             bool duplicateFound = false;
@@ -341,7 +341,7 @@ namespace engine
                         false,
                         true);
 
-            Optional<RefWrapper<SFrameGraphTextureView>> ref{};
+            Optional_t<RefWrapper_t<SFrameGraphTextureView>> ref{};
 
             // Can we cull?
             bool duplicateFound = false;

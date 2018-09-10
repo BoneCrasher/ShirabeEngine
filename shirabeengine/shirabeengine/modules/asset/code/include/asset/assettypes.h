@@ -104,7 +104,7 @@ namespace engine
              * @param aAssetId UID of the asset to fetch.
              * @return         A filled optional of requested asset type T, or an empty optional.
              */
-            Optional<T> getAsset(AssetId_t const &aAssetId);
+            Optional_t<T> getAsset(AssetId_t const &aAssetId);
 
             // Iterator compatibility
             typename Index_t::iterator       begin()       { return mIndex.begin(); }
@@ -138,9 +138,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        Optional<T> CAssetRegistry<T>::getAsset(AssetId_t const &aAssetId)
+        Optional_t<T> CAssetRegistry<T>::getAsset(AssetId_t const &aAssetId)
         {
-            Optional<T> result{ };
+            Optional_t<T> result{ };
 
             if(mIndex.find(aAssetId) != mIndex.end())
                 result = mIndex.at(aAssetId);

@@ -3,7 +3,7 @@
 
 #include <platform/platform.h>
 #include <log/log.h>
-#include <resources/core/resourcemanager.h>
+#include <resources/core/resourcemanagerbase.h>
 #include <graphicsapi/resources/types/all.h>
 #include "renderer/framegraph/graphbuilder.h"
 #include "renderer/framegraph/passbuilder.h"

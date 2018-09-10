@@ -13,9 +13,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CStdSharedPtr_t<CFrameGraphRenderContext> CFrameGraphRenderContext::create(
-                CStdSharedPtr_t<IAssetStorage>    aAssetStorage,
-                CStdSharedPtr_t<CResourceManager> aResourceManager,
-                CStdSharedPtr_t<IRenderContext>   aRenderer)
+                CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
+                CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
+                CStdSharedPtr_t<IRenderContext>       aRenderer)
         {
             assert(aAssetStorage    != nullptr);
             assert(aResourceManager != nullptr);
@@ -34,9 +34,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CFrameGraphRenderContext::CFrameGraphRenderContext(
-                CStdSharedPtr_t<IAssetStorage>    aAssetStorage,
-                CStdSharedPtr_t<CResourceManager> aResourceManager,
-                CStdSharedPtr_t<IRenderContext>   aRenderer)
+                CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
+                CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
+                CStdSharedPtr_t<IRenderContext>       aRenderer)
             : mAssetStorage(aAssetStorage)
             , mResourceManager(aResourceManager)
             , mGraphicsAPIRenderContext(aRenderer)
@@ -77,7 +77,9 @@ namespace engine
         EEngineStatus CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
             PublicResourceId_t const pid = "";
+
             mapFrameGraphToInternalResource(aTexture.readableName, pid);
+
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -85,26 +87,26 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CFrameGraphRenderContext::createTexture(SFrameGraphTexture const&texture)
+        EEngineStatus CFrameGraphRenderContext::createTexture(SFrameGraphTexture const &aTexture)
         {
-            CTexture::SDescriptor desc{};
-            desc.name        = texture.readableName;
-            desc.textureInfo = texture;
+            CTexture::SDescriptor desc = {};
+            desc.name        = aTexture.readableName;
+            desc.textureInfo = aTexture;
 
-            if(texture.requestedUsage.check(EFrameGraphResourceUsage::RenderTarget))
+            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::RenderTarget))
                 desc.gpuBinding.set(EBufferBinding::ColorAttachement);
-            if(texture.requestedUsage.check(EFrameGraphResourceUsage::DepthTarget))
+            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::DepthTarget))
                 desc.gpuBinding.set(EBufferBinding::DepthAttachement);
-            if(texture.requestedUsage.check(EFrameGraphResourceUsage::ImageResource))
+            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::ImageResource))
                 desc.gpuBinding.set(EBufferBinding::InputAttachement);
 
             desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 
             CTexture::CCreationRequest const request(desc);
 
-            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(texture)));
+            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
 
-            EEngineStatus status = mResourceManager->createResource<CTexture>(request, texture.readableName, false);
+            EEngineStatus status = mResourceManager->createResource<CTexture>(request, aTexture.readableName, false);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
                 return EEngineStatus::Ok;
             else
@@ -123,7 +125,7 @@ namespace engine
         {
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
-            CTextureView::SDescriptor desc{ };
+            CTextureView::SDescriptor desc = { };
             desc.name             = aView.readableName;
             desc.textureFormat    = aView.format;
             desc.subjacentTexture = aTexture;
@@ -199,8 +201,11 @@ namespace engine
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
             Vector<PublicResourceId_t> const &subjacentResources = getMappedInternalResourceIds(aView.readableName);
+
             for(PublicResourceId_t const&pid : subjacentResources)
+            {
                 mGraphicsAPIRenderContext->bindResource(pid);
+            }
 
             return EEngineStatus::Ok;
         }
@@ -232,8 +237,11 @@ namespace engine
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
             Vector<PublicResourceId_t> const&subjacentResources = getMappedInternalResourceIds(aView.readableName);
+
             for(PublicResourceId_t const&pid : subjacentResources)
+            {
                 mGraphicsAPIRenderContext->unbindResource(pid);
+            }
 
             return EEngineStatus::Ok;
         }

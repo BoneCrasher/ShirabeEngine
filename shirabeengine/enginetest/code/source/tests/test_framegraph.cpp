@@ -4,11 +4,12 @@
 #include <asset/assetindex.h>
 #include <asset/assetstorage.h>
 #include <graphicsapi/resources/types/all.h>
-#include <resources/core/resourcemanager.h>
+#include <resources/core/resourcemanagerbase.h>
 #include <resources/core/resourceproxyfactory.h>
 
 
 #include <renderer/irenderer.h>
+#include <renderer/framegraph/framegraph.h>
 #include <renderer/framegraph/graphbuilder.h>
 #include <renderer/framegraph/passbuilder.h>
 #include <renderer/framegraph/modules/gbuffergeneration.h>
@@ -16,6 +17,8 @@
 #include <renderer/framegraph/modules/compositing.h>
 #include <renderer/framegraph/framegraphrendercontext.h>
 #include <renderer/framegraph/framegraphserialization.h>
+
+#include <resource_management/resourcemanager.h>
 
 #include "tests/test_framegraph.h"
 #include "tests/test_framegraph_mocks.h"
@@ -74,42 +77,42 @@ namespace Test
             gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
 
             CStdSharedPtr_t<CResourceProxyFactory> resourceProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>(gfxApiResourceBackend);
-            CStdSharedPtr_t<CResourceManager>      proxyResourceManager = makeCStdSharedPtr<CResourceManager>(resourceProxyFactory);
-            proxyResourceManager->setResourceBackend(gfxApiResourceBackend);
+            CStdSharedPtr_t<CResourceManagerBase>  proxyResourceManager = makeCStdSharedPtr<CResourceManager>(resourceProxyFactory);
 
-            CStdSharedPtr_t<IResourceManager> resourceManager = std::static_pointer_cast<IResourceManager>(proxyResourceManager);
+
+            // proxyResourceManager->setResourceBackend(gfxApiResourceBackend);
 
             gfxApiResourceBackend->initialize();
 
             //
             // RENDERING
             //
-            RendererConfiguration rendererConfiguration{};
-            Ptr<IRenderContext> renderer = MakeSharedPointerType<MockRenderContext>();
+            SRendererConfiguration rendererConfiguration{};
+            CStdSharedPtr_t<IRenderContext> renderer = makeCStdSharedPtr<CMockRenderContext>();
             // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
             //
-            Ptr<IFrameGraphRenderContext> renderContext = FrameGraphRenderContext::create(assetStorage, resourceManager, renderer);
+            CStdSharedPtr_t<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer);
 
-            OSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
+            SOSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
 
             uint32_t
                     width  = displayDesc.bounds.size.x(),
                     height = displayDesc.bounds.size.y();
 
-            GraphBuilder graphBuilder{};
+            CGraphBuilder graphBuilder{};
             graphBuilder.initialize(appEnvironment);
 
-            FrameGraphTexture backBufferTextureDesc{};
+            SFrameGraphTexture backBufferTextureDesc{};
             backBufferTextureDesc.width          = width;
             backBufferTextureDesc.height         = height;
             backBufferTextureDesc.depth          = 1;
-            backBufferTextureDesc.format         = FrameGraphFormat::R8G8B8A8_UNORM;
-            backBufferTextureDesc.initialState   = FrameGraphResourceInitState::Clear;
+            backBufferTextureDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
+            backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
             backBufferTextureDesc.arraySize      = 1;
             backBufferTextureDesc.mipLevels      = 1;
-            backBufferTextureDesc.permittedUsage = FrameGraphResourceUsage::RenderTarget;
+            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget;
 
-            FrameGraphResource backBuffer{ };
+            SFrameGraphResource backBuffer{ };
             backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
 
             RenderableList renderableCollection ={
@@ -117,19 +120,19 @@ namespace Test
                 { "Sphere",  0, 0 },
                 { "Pyramid", 0, 0 }
             };
-            FrameGraphResource renderables{ };
+            SFrameGraphResource renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
             // GBuffer
-            FrameGraphModule<GBufferModuleTag_t> gbufferModule{};
-            FrameGraphModule<GBufferModuleTag_t>::GBufferGenerationExportData gbufferExportData{};
+            CFrameGraphModule<SGBufferModuleTag_t> gbufferModule{};
+            CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{};
             gbufferExportData = gbufferModule.addGBufferGenerationPass(
                         graphBuilder,
                         renderables);
 
             // Lighting
-            FrameGraphModule<LightingModuleTag_t> lightingModule{};
-            FrameGraphModule<LightingModuleTag_t>::LightingExportData lightingExportData{};
+            CFrameGraphModule<SLightingModuleTag_t> lightingModule{};
+            CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{};
             lightingExportData = lightingModule.addLightingPass(
                         graphBuilder,
                         gbufferExportData.gbuffer0,
@@ -138,8 +141,8 @@ namespace Test
                         gbufferExportData.gbuffer3);
 
             // Compositing
-            FrameGraphModule<CompositingModuleTag_t> compositingModule{ };
-            FrameGraphModule<CompositingModuleTag_t>::ExportData compositingExportData{ };
+            CFrameGraphModule<SCompositingModuleTag_t> compositingModule{ };
+            CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData = compositingModule.addDefaultCompositingPass(
                         graphBuilder,
                         gbufferExportData.gbuffer0,
@@ -149,13 +152,19 @@ namespace Test
                         lightingExportData.lightAccumulationBuffer,
                         backBuffer);
 
-            UniquePtr<Engine::FrameGraph::Graph> frameGraph = graphBuilder.compile();
+            CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
-            Ptr<FrameGraphGraphVizSerializer> serializer = std::make_shared<FrameGraphGraphVizSerializer>();
+            CStdSharedPtr_t<IFrameGraphSerializer> serializer = makeCStdSharedPtr<CFrameGraphGraphVizSerializer>();
             serializer->initialize();
 
-            frameGraph->acceptSerializer(serializer);
-            serializer->writeToFile("FrameGraphTest");
+            CStdSharedPtr_t<ISerializer<CGraph>::IResult> result = nullptr;
+
+            bool const serialized = serializer->serialize(*frameGraph, result);
+
+            CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
+                    std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
+
+
 
             serializer->deinitialize();
             serializer = nullptr;

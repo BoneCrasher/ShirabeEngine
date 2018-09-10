@@ -1,4 +1,4 @@
-#include "resources/core/resourcemanager.h"
+#include "resources/core/resourcemanagerbase.h"
 
 namespace engine
 {
@@ -7,7 +7,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CResourceManager::CResourceManager(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory)
+        CResourceManagerBase::CResourceManagerBase(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory)
             : mProxyFactory(aProxyFactory)
         {}
         //<-----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CResourceManager::~CResourceManager()
+        CResourceManagerBase::~CResourceManagerBase()
         {
             // m_resources->clear();
             mProxyFactory = nullptr;
@@ -25,8 +25,34 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CResourceManager::clear()
+        EEngineStatus CResourceManagerBase::initialize()
         {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CResourceManagerBase::deinitialize()
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CResourceManagerBase::clear()
+        {
+            mCreatorFunctions.clear();
+            mLoadFunctions.clear();
+            mUpdateFunctions.clear();
+            mUnloadFunctions.clear();
+            mDestructorFunctions.clear();
+
+
+
             return true;
         }
         //<-----------------------------------------------------------------------------
@@ -34,7 +60,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CResourceManager::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> proxy, PublicResourceIdList_t const&dependencies)
+        EEngineStatus CResourceManagerBase::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> proxy, PublicResourceIdList_t const&dependencies)
         {
             EEngineStatus const status = proxy->loadSync(dependencies);
             std::string   const msg    = "Failed to load underlying resource of resource proxy.";
@@ -47,7 +73,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CResourceManager
+        EEngineStatus CResourceManagerBase
         ::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy)
         {
             EEngineStatus const status = aProxy->unloadSync();

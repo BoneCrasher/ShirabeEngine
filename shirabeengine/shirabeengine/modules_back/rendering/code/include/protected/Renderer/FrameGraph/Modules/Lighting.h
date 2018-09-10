@@ -7,7 +7,7 @@
 #include "Renderer/FrameGraph/PassBuilder.h"
 #include "Renderer/FrameGraph/Modules/Module.h"
 
-#include "Resources/Core/ResourceManager.h"
+#include "Resources/Core/resourcemanagerbase.h"
 #include "GraphicsAPI/Resources/Types/All.h"
 
 namespace Engine {

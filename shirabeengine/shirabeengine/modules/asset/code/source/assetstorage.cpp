@@ -63,9 +63,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         SAsset CAssetStorage::loadAsset(AssetId_t const &aAssetUID)
         {
-            Optional<SAsset> asset = mAssetIndex.getAsset(aAssetUID);
+            Optional_t<SAsset> asset = mAssetIndex.getAsset(aAssetUID);
             if(!asset.has_value())
+            {
                 throw std::runtime_error("Asset not found.");
+            }
 
             return *asset;
         }

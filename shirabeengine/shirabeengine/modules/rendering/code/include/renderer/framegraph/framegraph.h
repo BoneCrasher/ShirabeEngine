@@ -334,7 +334,7 @@ namespace engine
                     TPassCreationArgs       &&...aArgs);
 
         private_members:
-            CStdSharedPtr_t<CResourceManager> m_resourceManager;
+            CStdSharedPtr_t<CResourceManagerBase>                 mResourceManager;
 
             PassMap                                               mPasses;
             AdjacencyListMap_t<PassUID_t>                         mPassAdjacency;

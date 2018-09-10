@@ -4,7 +4,7 @@
 #include <core/basictypes.h>
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
-#include <resources/core/resourcemanager.h>
+#include <resources/core/resourcemanagerbase.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"
 #include "renderer/framegraph/framegraphrendercontext.h"

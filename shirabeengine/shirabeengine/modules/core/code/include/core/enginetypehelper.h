@@ -151,19 +151,19 @@ namespace engine
     /**
      *
      */
-    using Any = std::any;
+    using Any_t = std::any;
 
     /**
      *
      */
     template <typename T>
-    using Optional = std::optional<T>;
+    using Optional_t = std::optional<T>;
 
     /**
      *
      */
     template <typename T>
-    using RefWrapper = std::reference_wrapper<T>;
+    using RefWrapper_t = std::reference_wrapper<T>;
 
 
     /**

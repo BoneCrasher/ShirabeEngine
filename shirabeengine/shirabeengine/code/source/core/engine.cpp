@@ -1,6 +1,6 @@
 #include <asset/assetindex.h>
 #include <core/enginestatus.h>
-#include <resources/core/resourcemanager.h>
+#include <resources/core/resourcemanagerbase.h>
 #include <resources/core/resourceproxyfactory.h>
 #include <renderer/renderer.h>
 #include <renderer/framegraph/framegraphrendercontext.h>
@@ -10,6 +10,7 @@
 #include <vulkan/resources/vulkanresourcetaskbackend.h>
 #include <vulkan/rendering/vulkanrendercontext.h>
 
+#include "resource_management/resourcemanager.h"
 #include "core/engine.h"
 
 namespace engine
@@ -211,7 +212,7 @@ namespace engine
             mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
 
-            CStdSharedPtr_t<CResourceManager> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
+            CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
             mResourceManager = manager;
 
             if(gfxApi == EGFXAPI::Vulkan) {

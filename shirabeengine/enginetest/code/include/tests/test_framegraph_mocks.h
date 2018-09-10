@@ -7,7 +7,7 @@
 #include <graphicsapi/resources/types/all.h>
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
 #include <graphicsapi/resources/gfxapiresourcetaskbackend.h>
-#include <resources/core/resourcemanager.h>
+#include <resources/core/resourcemanagerbase.h>
 #include <resources/core/resourceproxyfactory.h>
 #include <renderer/irenderer.h>
 #include <renderer/framegraph/graphbuilder.h>

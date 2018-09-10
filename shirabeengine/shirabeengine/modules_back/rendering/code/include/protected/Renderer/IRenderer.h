@@ -5,7 +5,7 @@
 #include "core/enginestatus.h"
 
 #include "OS/ApplicationEnvironment.h"
-#include "Resources/Core/ResourceManager.h"
+#include "Resources/Core/resourcemanagerbase.h"
 
 #include "Renderer/RendererConfiguration.h"
 #include "Renderer/RendererTypes.h"
