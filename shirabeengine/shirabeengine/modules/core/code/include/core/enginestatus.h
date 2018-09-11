@@ -94,7 +94,7 @@ namespace engine
      * @param status
      * @return
      */
-    static bool CheckEngineError(EEngineStatus const &aStatus);
+    bool CheckEngineError(EEngineStatus const &aStatus);
 
     /**
      * @brief The EngineException class
@@ -128,11 +128,11 @@ namespace engine
         EEngineStatus mStatus;
     };
 
-    static SHIRABE_LIBRARY_EXPORT EEngineStatus HandleEngineStatusError(
+    SHIRABE_LIBRARY_EXPORT EEngineStatus HandleEngineStatusError(
             EEngineStatus const &aStatus,
             std::string   const &aMessage);
 
-    static std::ostream& operator<<(std::ostream &aStream, EEngineStatus const &aStatus);
+    std::ostream& operator<<(std::ostream &aStream, EEngineStatus const &aStatus);
 }
 
 #endif

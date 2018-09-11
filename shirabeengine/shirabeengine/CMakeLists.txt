@@ -58,10 +58,12 @@ set(
         SHIRABEMODULEOS         
         SHIRABEMODULEPLATFORM   
         VULKANSDK
+        XLIB
         STBI
         FXGLTF
         JSON
-        XML2)
+        XML2
+        ZLIB)
 
 include(project_setup)
 

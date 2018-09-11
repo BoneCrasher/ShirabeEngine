@@ -78,7 +78,18 @@ namespace engine
          * @param aLevel The loglevel to convert.
          * @return       A string representation of the provided log level.
          */
-        static std::string ELogLevelToString(ELogLevel const &aLevel);
+        static std::string ELogLevelToString(ELogLevel const &aLevel)
+        {
+            switch(aLevel)
+            {
+            case CLog::ELogLevel::Verbose: return "VERBOSE";
+            case CLog::ELogLevel::Debug:   return "DEBUG";
+            case CLog::ELogLevel::Status:  return "STATUS";
+            case CLog::ELogLevel::Warning: return "WARNING";
+            case CLog::ELogLevel::Error:   return "ERROR";
+            case CLog::ELogLevel::WTF:     return "WTF";
+            }
+        }
 
         /**
          * Log-call for very descriptive output, usually just for
@@ -89,7 +100,10 @@ namespace engine
          */
         static void Verbose(
                 std::string const &aLogTag,
-                std::string const &aMessage);
+                std::string const &aMessage)
+        {
+            LogImpl(ELogLevel::Verbose, aLogTag, aMessage);
+        }
 
         /**
          * Log-call to trace events and status in the system.
@@ -99,7 +113,10 @@ namespace engine
          */
         static void Status(
                 std::string const &aLogTag,
-                std::string const &aMessage);
+                std::string const &aMessage)
+        {
+            LogImpl(ELogLevel::Status, aLogTag, aMessage);
+        }
         /**
          * Log-call for debug output, usally printing state and
          * values or intermediate positional output.
@@ -109,7 +126,10 @@ namespace engine
          */
         static void Debug(
                 std::string const &aLogTag,
-                std::string const &aMessage);
+                std::string const &aMessage)
+        {
+            LogImpl(ELogLevel::Debug, aLogTag, aMessage);
+        }
         /**
          * Log-call for abnormal state or behaviour, which can be
          * caught or recovered but require attention.
@@ -119,7 +139,10 @@ namespace engine
          */
         static void Warning(
                 std::string const &aLogTag,
-                std::string const &aMessage);
+                std::string const &aMessage)
+        {
+            LogImpl(ELogLevel::Warning, aLogTag, aMessage);
+        }
         /**
          * Log-call for abnormal state or behaviour, which requires
          * handling or cleanup and abort.
@@ -129,7 +152,10 @@ namespace engine
          */
         static void Error(
                 std::string const &aLogTag,
-                std::string const &aMessage);
+                std::string const &aMessage)
+        {
+            LogImpl(ELogLevel::Error, aLogTag, aMessage);
+        }
         /**
          * Log-call for errors that should never have happened.
          *
@@ -138,7 +164,10 @@ namespace engine
          */
         static void WTF(
                 std::string const &aLogTag,
-                std::string const &aMessage);
+                std::string const &aMessage)
+        {
+            LogImpl(ELogLevel::WTF, aLogTag, aMessage);
+        }
 
     private_static_functions:
         /**
@@ -152,7 +181,33 @@ namespace engine
         static void LogImpl(
                 ELogLevel       const &aLevel,
                 std::string     const &aLogTag,
-                std::string     const &aMessage);
+                std::string     const &aMessage)
+        {
+            if(MinimumLogLevel > aLevel)
+                // Only print in case of a valid loglevel
+                return;
+
+            std::stringstream ss;
+            ss
+                << std::setw(7)  << ELogLevelToString(aLevel) << "): "
+                << std::setw(20) << "[" << aLogTag << "]"     << " --> "
+                << aMessage      << "\n";
+
+            std::string const formatted = ss.str();
+
+            #ifdef SHIRABE_PLATFORM_WINDOWS
+            #ifdef _UNICODE
+                    std::wstring wmsg = String::toWideString(msg);
+                    DWORD       written = 0;
+                    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), wmsg.c_str(), ((DWORD)msg.size()), &written, nullptr);
+            #else
+                    DWORD       written = 0;
+                    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), msg.c_str(), ((DWORD)msg.size()), &written, nullptr);
+            #endif
+            #else
+            std::cout << formatted << std::endl;
+            #endif
+        }
     };
 
     /**

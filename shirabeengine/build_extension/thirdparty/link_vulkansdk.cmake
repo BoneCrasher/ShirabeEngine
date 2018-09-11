@@ -27,7 +27,7 @@ function(linkLibrary)
         ${DIR}/lib
         )
     # -l
-   #append_parentscope(
-   #    SHIRABE_PROJECT_LIBRARY_TARGETS
-   #    vulkan)
+    append_parentscope(
+        SHIRABE_PROJECT_LIBRARY_TARGETS
+        vulkan)
 endfunction(linkLibrary)

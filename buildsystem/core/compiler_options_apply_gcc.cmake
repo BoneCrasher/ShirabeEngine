@@ -23,9 +23,15 @@ set(
             "-fpermissive"  # Actually bad... Try to remove!
             "-fexceptions"  # Enable std exceptions
             "-pthread"      # Enforce to use of pthread, as all ext. libs do
-            "-fPIC"         # Enable position independent code
-            "-Wl,-fPIC"
 )
+
+if(SHIRABE_BUILD_SHAREDLIB OR SHIRABE_BUILD_STATICLIB)
+    append(SHIRABE_GCC_CL_COMMON_FLAGS "-fPIC -Wl,-fPIC") # Enable position independent code
+else()
+    if(SHIRABE_BUILD_APPLICATION)
+        append(SHIRABE_GCC_CL_COMMON_FLAGS "-fPIE") # Enable position independent code
+    endif()
+endif()
 
 # set(SHIRABE_GCC_CL_CXXFLAGS "--whole-archive")
 

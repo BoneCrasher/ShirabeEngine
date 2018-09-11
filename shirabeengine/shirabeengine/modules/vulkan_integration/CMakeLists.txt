@@ -17,6 +17,7 @@ set(
         SHIRABEMODULELOG        
         SHIRABEMODULEPLATFORM
         VULKANSDK
+        XLIB
         JSON
         XML2)
 

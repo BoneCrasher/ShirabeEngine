@@ -16,8 +16,7 @@ function(linkLibrary)
 
     # -l
     append_parentscope(
-        SHIRABE_PROJECT_LIBRARY_TARGETS
-        minizip
+        SHIRABE_PROJECT_LIBRARY_TARGETS        
         z
         )
 endfunction(linkLibrary)

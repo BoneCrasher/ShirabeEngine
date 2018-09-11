@@ -4,6 +4,7 @@
 #include <asset/assetindex.h>
 #include <asset/assetstorage.h>
 #include <graphicsapi/resources/types/all.h>
+#include <graphicsapi/resources/gfxapiresourceproxy.h>
 #include <resources/core/resourcemanagerbase.h>
 #include <resources/core/resourceproxyfactory.h>
 
@@ -47,6 +48,38 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        /**
+         * Templated helper struct to spawn a typed gfxapi backend resource proxy creator functor.
+         */
+        template <typename TResource>
+        struct SSpawnProxy
+        {
+            /**
+             * Create and return a gfxapi resource backend proxy creation functor from TResource.
+             *
+             * @param aBackend The backend to create a proxy for.
+             * @return         A valid creation functor for a proxy of type TResource.
+             */
+            static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(CStdSharedPtr_t<CGFXAPIResourceBackend> aBackend)
+            {
+                auto const creator = [=]() -> CResourceProxyFactory::CreatorFn_t<TResource>
+                {
+                    return
+                            [=](resources::EProxyType const &aType, typename TResource::CCreationRequest const &aRequest)
+                            -> CStdSharedPtr_t<IResourceProxy<TResource>>
+                    {
+                        return makeCStdSharedPtr<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
+                    };
+                };
+
+                return creator();
+            }
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         bool Test__FrameGraph::testGraphBuilder()
         {
             using namespace engine;
@@ -76,11 +109,11 @@ namespace Test
             CStdSharedPtr_t<CGFXAPIResourceBackend> gfxApiResourceBackend = makeCStdSharedPtr<CGFXAPIResourceBackend>();
             gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
 
-            CStdSharedPtr_t<CResourceProxyFactory> resourceProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>(gfxApiResourceBackend);
+            CStdSharedPtr_t<CResourceProxyFactory> resourceProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
+            resourceProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(gfxApiResourceBackend));
+            resourceProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(gfxApiResourceBackend));
+
             CStdSharedPtr_t<CResourceManagerBase>  proxyResourceManager = makeCStdSharedPtr<CResourceManager>(resourceProxyFactory);
-
-
-            // proxyResourceManager->setResourceBackend(gfxApiResourceBackend);
 
             gfxApiResourceBackend->initialize();
 

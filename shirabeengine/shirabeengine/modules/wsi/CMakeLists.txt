@@ -19,6 +19,7 @@ set(
         SHIRABEMODULEMATH       
         SHIRABEMODULELOG        
         SHIRABEMODULEPLATFORM
+        XLIB
         JSON
         XML2)
 

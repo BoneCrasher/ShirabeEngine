@@ -215,7 +215,14 @@ namespace engine
             CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
             mResourceManager = manager;
 
-            if(gfxApi == EGFXAPI::Vulkan) {
+            // The graphics API resource backend is static and does not have to be replaced.
+            // On switching the graphics API the task backend (also containing the effective API handles),
+            // will be reset and replaced!
+            // This way, the resources can simply be reloaded on demand.
+            // Nonetheless, a regular backend reset has to take place in order to have the proxies remain in a valid state!
+            // The reset of the taskbackend should thus occur through the resource backend.
+            if(gfxApi == EGFXAPI::Vulkan)
+            {
                 CStdSharedPtr_t<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<CVulkanResourceTaskBackend>(mVulkanEnvironment);
                 vkResourceTaskBackend->initialize();
 
