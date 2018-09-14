@@ -289,19 +289,41 @@ namespace engine
         /**
          * Return the sum of two quaternions.
          *
-         * @param aQuaternion
-         * @param aOther
+         * @param aQuaternionLHS
+         * @param aQuaternionRHS
          * @return
          */
-        static CQuaternion operator+(CQuaternion const &aQuaternion, CQuaternion const &aOther);
+        static CQuaternion operator+(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)
+        {
+            CQuaternion const q
+                    = CQuaternion(
+                        aQuaternionLHS.w() + aQuaternionRHS.w(),
+                        aQuaternionLHS.x() + aQuaternionRHS.x(),
+                        aQuaternionLHS.y() + aQuaternionRHS.y(),
+                        aQuaternionLHS.z() + aQuaternionRHS.z());
+
+            return q;
+        }
+
         /**
          * Return the difference of two quaternions.
          *
-         * @param aQuaternion
-         * @param aOther
+         * @param aQuaternionLHS
+         * @param aQuaternionRHS
          * @return
          */
-        static CQuaternion operator-(CQuaternion const &aQuaternion, CQuaternion const &aOther);
+        static CQuaternion operator-(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)
+        {
+            CQuaternion const q
+                    =CQuaternion(
+                        aQuaternionLHS.w() - aQuaternionRHS.w(),
+                        aQuaternionLHS.x() - aQuaternionRHS.x(),
+                        aQuaternionLHS.y() - aQuaternionRHS.y(),
+                        aQuaternionLHS.z() - aQuaternionRHS.z());
+
+            return q;
+        }
+
         /**
          * Return the product of a quaternion and a scale factor.
          *
@@ -309,7 +331,18 @@ namespace engine
          * @param aFactor
          * @return
          */
-        static CQuaternion operator*(CQuaternion const &aQuaternion, CQuaternion::ValueType_t const& aFactor);
+        static CQuaternion operator*(CQuaternion const &aQuaternion, CQuaternion::ValueType_t const& aFactor)
+        {
+            CQuaternion const q
+                    = CQuaternion(
+                        (aQuaternion.w() * aFactor),
+                        (aQuaternion.x() * aFactor),
+                        (aQuaternion.y() * aFactor),
+                        (aQuaternion.z() * aFactor));
+
+            return q;
+        }
+
         /**
          * Return the product of a scale factor and a quaternion.
          *
@@ -317,7 +350,18 @@ namespace engine
          * @param aQuaternion
          * @return
          */
-        static CQuaternion operator*(CQuaternion::ValueType_t const& aFactor, CQuaternion const &aQuaternion);
+        static CQuaternion operator*(CQuaternion::ValueType_t const& aFactor, CQuaternion const &aQuaternion)
+        {
+            CQuaternion const q
+                    = CQuaternion(
+                        (aFactor * aQuaternion.w()),
+                        (aFactor * aQuaternion.x()),
+                        (aFactor * aQuaternion.y()),
+                        (aFactor * aQuaternion.z()));
+
+            return q;
+        }
+
         /**
          * Return the product of a quaternion and a vector.
          *
@@ -325,7 +369,20 @@ namespace engine
          * @param aVector
          * @return
          */
-        static CQuaternion operator*(CQuaternion const &aQuaternion, CVector3D_t const &aVector);
+        static CQuaternion operator*(CQuaternion const &aQuaternion, CVector3D_t const &aVector)
+        {
+            // qp = (nq*0 - dot(vq, vp)) + (nq*vp + 0*vq + cross(vq, vp))ijk
+
+            CQuaternion q
+                    = CQuaternion(
+                        -((aQuaternion.x() * aVector.x()) + (aQuaternion.y() * aVector.y()) + (aQuaternion.z() * aVector.z())),
+                        +((aQuaternion.w() * aVector.x()) + (aQuaternion.y() * aVector.z()) - (aQuaternion.z() * aVector.y())),
+                        +((aQuaternion.w() * aVector.y()) + (aQuaternion.z() * aVector.x()) - (aQuaternion.x() * aVector.z())),
+                        +((aQuaternion.w() * aVector.z()) + (aQuaternion.x() * aVector.y()) - (aQuaternion.y() * aVector.x()))
+                        );
+
+            return q;
+        }
 
         /**
          * Return the product of a vector and a quaternion.
@@ -334,15 +391,42 @@ namespace engine
          * @param aQuaternion
          * @return
          */
-        static CQuaternion operator*(CVector3D_t const &aVector, CQuaternion const &aQuaternion);
+        static CQuaternion operator*(CVector3D_t const &aVector, CQuaternion const &aQuaternion)
+        {
+            // qp = (0*0 - dot(vq, vp)) + (0*vp + 0*vq + cross(vq, vp))ijk
+
+            CQuaternion q
+                    = CQuaternion(
+                        -((aQuaternion.x() * aVector.x()) + (aQuaternion.y() * aVector.y()) + (aQuaternion.z() * aVector.z())),
+                        +((aQuaternion.w() * aVector.x()) + (aQuaternion.z() * aVector.y()) - (aQuaternion.y() * aVector.z())),
+                        +((aQuaternion.w() * aVector.y()) + (aQuaternion.x() * aVector.z()) - (aQuaternion.z() * aVector.x())),
+                        +((aQuaternion.w() * aVector.z()) + (aQuaternion.y() * aVector.x()) - (aQuaternion.x() * aVector.y()))
+                        );
+
+            return q;
+        }
+
         /**
          * Return the product of two quaternions.
          *
-         * @param aQuaternion
-         * @param aOther
+         * @param aQuaternionLHS
+         * @param aQuaternionRHS
          * @return
          */
-        static CQuaternion operator*(CQuaternion const &aQuaternion, CQuaternion const &aOther);
+        static CQuaternion operator*(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)
+        {
+            // qp = (nq*np - dot(vq, vp)) + (nq*vp + np*vq + cross(vq, vp))ijk
+
+            CQuaternion q
+                    = CQuaternion(
+                        (aQuaternionLHS.w() * aQuaternionRHS.w()) - (aQuaternionLHS.x() * aQuaternionRHS.x()) - (aQuaternionLHS.y() * aQuaternionRHS.y()) - (aQuaternionLHS.z() * aQuaternionRHS.z()),
+                        (aQuaternionLHS.w() * aQuaternionRHS.x()) + (aQuaternionLHS.x() * aQuaternionRHS.w()) + (aQuaternionLHS.y() * aQuaternionRHS.z()) - (aQuaternionLHS.z() * aQuaternionRHS.y()),
+                        (aQuaternionLHS.w() * aQuaternionRHS.y()) + (aQuaternionLHS.y() * aQuaternionRHS.w()) + (aQuaternionLHS.z() * aQuaternionRHS.x()) - (aQuaternionLHS.x() * aQuaternionRHS.z()),
+                        (aQuaternionLHS.w() * aQuaternionRHS.z()) + (aQuaternionLHS.z() * aQuaternionRHS.w()) + (aQuaternionLHS.x() * aQuaternionRHS.y()) - (aQuaternionLHS.y() * aQuaternionRHS.x())
+                        );
+
+            return q;
+        }
 
         /**
          * Divide a quaternion by a scale factor.
@@ -351,8 +435,18 @@ namespace engine
          * @param aFactor
          * @return
          */
-        static CQuaternion operator/(CQuaternion const &aQuaternion, CQuaternion::ValueType_t const&aFactor);
-	}
+        static CQuaternion operator/(CQuaternion const &aQuaternion, CQuaternion::ValueType_t const&aFactor)
+        {
+            CQuaternion q
+                    = CQuaternion(
+                        (aQuaternion.w() / aFactor),
+                        (aQuaternion.x() / aFactor),
+                        (aQuaternion.y() / aFactor),
+                        (aQuaternion.z() / aFactor));
+
+            return q;
+        }
+    }
 }
 
 #endif

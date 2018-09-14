@@ -103,10 +103,10 @@ namespace engine
                     StorageSizeType_t const &aOffset = 0,
                     StorageSizeType_t const &aLength = 0) const;
 
-        private:
-            void validateChunkList();
+        private_methods:
+            void validateChunkList() {}
 
-        private:
+        private_members:
             StorageSizeType_t mMaxChunks;
             StorageType_t     mChunks;
         };

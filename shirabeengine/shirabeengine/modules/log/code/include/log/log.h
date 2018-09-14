@@ -222,12 +222,12 @@ namespace engine
          * Create, initialize and bind a console instance to the running
          * application and prepare it for STDOUT/IN/ERR I/O.
          */
-        static void InitializeConsole();
+        static void InitializeConsole() { }
         /**
          * Unbind, deinitialize and destroy a console instance from a running
          * application, if any.
          */
-        static void DeinitializeConsole();
+        static void DeinitializeConsole() { }
     };
 }
 
