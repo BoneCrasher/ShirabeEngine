@@ -53,15 +53,22 @@ namespace engine
         private_members:
             FrameGraphResourceId_t mId;
         };
-
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         CGraphBuilder::CGraphBuilder()
-            : mPassUIDGenerator(std::make_shared<CSequenceUIDGenerator>(0))
+            : mApplicationEnvironment(nullptr)
+            , mDisplay(nullptr)
+            , mPassUIDGenerator(std::make_shared<CSequenceUIDGenerator>(0))
             , mResourceUIDGenerator(std::make_shared<CSequenceUIDGenerator>(1))
-            , mFrameGraph(nullptr)
             , mImportedResources()
+            , mPasses()
+            , mResources()
+            , mResourceData()
+            , mResourceAdjacency()
+            , mPassAdjacency()
+            , mPassToResourceAdjacency()
+            , mFrameGraph(nullptr)
         {}
         //<-----------------------------------------------------------------------------
 
@@ -104,11 +111,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::initialize(CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment)
+        CStdSharedPtr_t<wsi::CWSIDisplay> const &CGraphBuilder::display()
         {
-            assert(aApplicationEnvironment != nullptr);
+            return mDisplay;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::initialize(
+                CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
+                CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay)
+        {
+            assert(nullptr != aApplicationEnvironment);
+            assert(nullptr != aDisplay               );
 
             applicationEnvironment() = aApplicationEnvironment;
+            mDisplay                 = aDisplay;
             graph()                  = makeCStdUniquePtr<CGraph>();
 
             auto const pseudoSetup = [] (CPassBuilder const&, bool&) -> bool

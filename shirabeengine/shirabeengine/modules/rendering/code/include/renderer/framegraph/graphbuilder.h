@@ -13,6 +13,7 @@
 #include <core/random.h>
 #include <core/uid.h>
 #include <resources/core/resourcedomaintransfer.h>
+#include <wsi/display.h>
 #include "renderer/framegraph/framegraph.h"
 #include "renderer/framegraph/pass.h"
 
@@ -53,7 +54,9 @@ namespace engine
              *                                graph builder and pass setup routines.
              * @return                        True, if successful. False otherwise.
              */
-            bool initialize(CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment);
+            bool initialize(
+                    CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
+                    CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay);
 
             /**
              * Clear all state and shutdown...
@@ -75,6 +78,13 @@ namespace engine
              * @return A pionter to the registered application environment.
              */
             CStdSharedPtr_t<SApplicationEnvironment> &applicationEnvironment();
+
+            /**
+             * Return the display pointer attached to this graph builder.
+             *
+             * @return See brief.
+             */
+            CStdSharedPtr_t<wsi::CWSIDisplay> const &display();
 
             /**
              * Return all current resources stored in the builder.
@@ -253,6 +263,7 @@ namespace engine
 
         private_members:
             CStdSharedPtr_t<SApplicationEnvironment>               mApplicationEnvironment;
+            CStdSharedPtr_t<wsi::CWSIDisplay>                      mDisplay;
             CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;
             CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
             Map<std::string, PublicResourceId_t>                   mImportedResources;

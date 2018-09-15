@@ -42,7 +42,9 @@ namespace engine
                 CStdSharedPtr_t<SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
                 if(environment)
                 {
-                    SOSDisplayDescriptor const &displayDesc = environment->primaryDisplay();
+                    CStdSharedPtr_t<wsi::CWSIDisplay> const &display = aGraphBuilder.display();
+
+                    SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
                     width  = displayDesc.bounds.size.x();
                     height = displayDesc.bounds.size.y();
                 }

@@ -21,6 +21,13 @@
 
 #include <resource_management/resourcemanager.h>
 
+#include <wsi/display.h>
+#if defined SHIRABE_PLATFORM_LINUX
+#include <wsi/x11/x11display.h>
+#elif defined SHIRABE_PLATFORM_WINDOWS
+#include <wsi/windows/windowsdisplay.h>
+#endif
+
 #include "tests/test_framegraph.h"
 #include "tests/test_framegraph_mocks.h"
 
@@ -31,6 +38,7 @@ namespace Test
         using namespace engine;
         using namespace engine::rendering;
         using namespace engine::framegraph;
+        using namespace engine::wsi;
 
         //<-----------------------------------------------------------------------------
         //
@@ -94,6 +102,16 @@ namespace Test
             // appEnvironment->osDisplays = os::SOSDisplay::GetDisplays();
 
             //
+            // DISPLAY
+            //
+            CStdSharedPtr_t<CWSIDisplay> display = nullptr;
+#if defined SHIRABE_PLATFORM_LINUX
+            display = makeCStdSharedPtr<x11::CX11Display>();
+#elif defined SHIRABE_PLATFORM_WINDOWS
+#endif
+            EEngineStatus status = display->initialize();
+
+            //
             // ASSET STORAGE
             //
             asset::CAssetRegistry<asset::SAsset> registry = asset::CAssetIndex::loadIndexById("Default");
@@ -126,7 +144,7 @@ namespace Test
             //
             CStdSharedPtr_t<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer);
 
-            SOSDisplayDescriptor const&displayDesc = appEnvironment->primaryDisplay();
+            SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
 
             uint32_t
                     width  = displayDesc.bounds.size.x(),
