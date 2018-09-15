@@ -52,6 +52,7 @@ namespace engine
              *
              * @param aApplicationEnvironment The application environment to source from within the
              *                                graph builder and pass setup routines.
+             * @param aDisplay                WSI display to bind against the current hardware monitor config.
              * @return                        True, if successful. False otherwise.
              */
             bool initialize(

@@ -151,7 +151,7 @@ namespace Test
                     height = displayDesc.bounds.size.y();
 
             CGraphBuilder graphBuilder{};
-            graphBuilder.initialize(appEnvironment);
+            graphBuilder.initialize(appEnvironment, display);
 
             SFrameGraphTexture backBufferTextureDesc{};
             backBufferTextureDesc.width          = width;

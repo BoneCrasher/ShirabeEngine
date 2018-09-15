@@ -17,7 +17,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CRenderer::CRenderer()
             : mConfiguration()
-            , mAppEnvironment()
+            , mAppEnvironment(nullptr)
+            , mDisplay(nullptr)
             , mFrameGraphRenderContext(nullptr)
             , mPaused(true)
         {}
@@ -36,14 +37,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CRenderer::initialize(
                 CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
-                SRendererConfiguration                    const &aConfiguration,
+                CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay,
+                SRendererConfiguration                   const &aConfiguration,
                 CStdSharedPtr_t<IFrameGraphRenderContext>      &aFrameGraphRenderContext)
         {
             assert(nullptr != aApplicationEnvironment);
+            assert(nullptr != aDisplay);
             assert(nullptr != aFrameGraphRenderContext);
 
             mConfiguration           = aConfiguration;
             mAppEnvironment          = aApplicationEnvironment;
+            mDisplay                 = aDisplay;
             mFrameGraphRenderContext = aFrameGraphRenderContext;
 
             return EEngineStatus::Ok;
@@ -102,15 +106,15 @@ namespace engine
         {
             using namespace engine;
             using namespace engine::framegraph;
-            
-            SOSDisplayDescriptor const &displayDesc = mAppEnvironment->primaryDisplay();
+
+            SOSDisplayDescriptor const&displayDesc = mDisplay->screenInfo()[mDisplay->primaryScreenIndex()];
 
             uint32_t
                     width  = displayDesc.bounds.size.x(),
                     height = displayDesc.bounds.size.y();
 
             CGraphBuilder graphBuilder{ };
-            graphBuilder.initialize(mAppEnvironment);
+            graphBuilder.initialize(mAppEnvironment, mDisplay);
 
             SFrameGraphTexture backBufferTextureDesc{ };
             backBufferTextureDesc.width          = width;

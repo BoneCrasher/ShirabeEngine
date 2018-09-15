@@ -10,6 +10,13 @@
 #include <vulkan/resources/vulkanresourcetaskbackend.h>
 #include <vulkan/rendering/vulkanrendercontext.h>
 
+#include <wsi/display.h>
+#if defined SHIRABE_PLATFORM_LINUX
+#include <wsi/x11/x11display.h>
+#elif defined SHIRABE_PLATFORM_WINDOWS
+#include <wsi/windows/windowsdisplay.h>
+#endif
+
 #include "resource_management/resourcemanager.h"
 #include "core/engine.h"
 
@@ -131,8 +138,18 @@ namespace engine
     {
         EEngineStatus status = EEngineStatus::Ok;
 
-        uint32_t const windowWidth  = mApplicationEnvironment->osDisplays[0].bounds.size.x();
-        uint32_t const windowHeight = mApplicationEnvironment->osDisplays[0].bounds.size.y();
+        CStdSharedPtr_t<CWSIDisplay> display = nullptr;
+#if defined SHIRABE_PLATFORM_LINUX
+        display = makeCStdSharedPtr<x11::CX11Display>();
+#elif defined SHIRABE_PLATFORM_WINDOWS
+#endif
+        status = display->initialize();
+
+        SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
+
+        uint32_t const
+                windowWidth  = displayDesc.bounds.size.x(),
+                windowHeight = displayDesc.bounds.size.y();
 
         EGFXAPI        const gfxApi        = EGFXAPI::Vulkan;
         EGFXAPIVersion const gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
@@ -247,7 +264,7 @@ namespace engine
             CStdSharedPtr_t<IFrameGraphRenderContext> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeCStdSharedPtr<CRenderer>();
-            status = mRenderer->initialize(mApplicationEnvironment, rendererConfiguration, frameGraphRenderContext);
+            status = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext);
             if(!CheckEngineError(status))
             {
                 status = mScene.initialize();

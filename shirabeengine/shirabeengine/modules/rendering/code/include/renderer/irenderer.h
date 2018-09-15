@@ -5,6 +5,7 @@
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
 #include <resources/core/resourcemanagerbase.h>
+#include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
@@ -64,15 +65,17 @@ namespace engine
              * Initialize the renderer.
              *
              * @param aApplicationEnvironment  Hardware and software environment of the running application.
+             * @param aDisplay                 WSI display to bind against the current hardware monitor config.
              * @param aConfiguration           Renderer configuration as provided from the engine default config
              *                                 and dynamic engine configuration.
              * @param aFrameGraphRenderContext Rendercontext for the framegraph.
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             virtual EEngineStatus initialize(
-                    CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
+                    CStdSharedPtr_t<SApplicationEnvironment>  const &aApplicationEnvironment,
+                    CStdSharedPtr_t<wsi::CWSIDisplay>         const &aDisplay,
                     SRendererConfiguration                    const &aConfiguration,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aFrameGraphRenderContext) = 0;
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aFrameGraphRenderContext) = 0;
 
             /**
              * Deinitialize and clear the renderer.

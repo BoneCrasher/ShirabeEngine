@@ -2,7 +2,6 @@
 #define __SHIRABE_RENDERER_H__
 
 #include <atomic>
-
 #include "renderer/irenderer.h"
 
 namespace engine
@@ -28,15 +27,17 @@ namespace engine
              * Initialize the renderer.
              *
              * @param aApplicationEnvironment  Hardware and software environment of the running application.
+             * @param aDisplay                 WSI display instance to bind against the currently selected monitor config.
              * @param aConfiguration           Renderer configuration as provided from the engine default config
              *                                 and dynamic engine configuration.
              * @param aFrameGraphRenderContext Rendercontext for the framegraph.
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             EEngineStatus initialize(
-                    CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
+                    CStdSharedPtr_t<SApplicationEnvironment>  const &aApplicationEnvironment,
+                    CStdSharedPtr_t<wsi::CWSIDisplay>         const &aDisplay,
                     SRendererConfiguration                    const &aConfiguration,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aFrameGraphRenderContext) ;
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aFrameGraphRenderContext) ;
 
             /**
              * Deinitialize and clear the renderer.
@@ -80,8 +81,9 @@ namespace engine
             EEngineStatus renderScene();
 
         private_members:
-            SRendererConfiguration                     mConfiguration;
+            SRendererConfiguration                    mConfiguration;
             CStdSharedPtr_t<SApplicationEnvironment>  mAppEnvironment;
+            CStdSharedPtr_t<wsi::CWSIDisplay>         mDisplay;
             CStdSharedPtr_t<IFrameGraphRenderContext> mFrameGraphRenderContext;
             std::atomic<bool>                         mPaused;
 
