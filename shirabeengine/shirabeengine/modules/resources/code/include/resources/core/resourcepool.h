@@ -157,7 +157,9 @@ namespace engine
                 TIndex const&index) const
         {
             if(!hasResource(index))
-                throw std::runtime_error("Resource not found!");
+            {
+                return {};
+            }
 
             return mResources.at(index);
         }
@@ -172,7 +174,9 @@ namespace engine
                 TIndex const&index)
         {
             if(!hasResource(index))
-                throw std::runtime_error("Resource not found!");
+            {
+                return {};
+            }
 
             return mResources.at(index);
         }

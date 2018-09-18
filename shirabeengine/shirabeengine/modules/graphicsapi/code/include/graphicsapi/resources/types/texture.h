@@ -77,14 +77,14 @@ namespace engine
         {
         public_static_constants:
             static const constexpr EResourceType    sResourceType    = EResourceType::TEXTURE;
-            static const constexpr EResourceSubType sResourceSubtype = EResourceSubType::UNKNOWN;
+            static const constexpr EResourceSubType sResourceSubtype = EResourceSubType::TEXTURE_2D;
 
         public_structs:
             /**
              * Descriptor implementation for all texture resource types.
              */
             struct SHIRABE_TEST_EXPORT SDescriptor
-                    : public SDescriptorImplBase<EResourceType::TEXTURE, EResourceSubType::UNKNOWN>
+                    : public SDescriptorImplBase<EResourceType::TEXTURE, EResourceSubType::TEXTURE_2D>
             {
             public_methods:
                 /**

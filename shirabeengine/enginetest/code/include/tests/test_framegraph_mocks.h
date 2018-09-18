@@ -127,6 +127,44 @@ namespace Test
 
             CStdSharedPtr_t<IRenderContext> mRenderer;
         };
+
+#define SHIRABE_DECLARE_MOCK_TASK_BUILDER_MODULE(type)                         \
+        EEngineStatus fn##type##CreationTask(                                  \
+                            C##type::CCreationRequest      const &aRequest,    \
+                            ResolvedDependencyCollection_t const &aDepencies,  \
+                            ResourceTaskFn_t                     &aOutTask);   \
+        EEngineStatus fn##type##UpdateTask(                                    \
+                            C##type::CUpdateRequest         const &aRequest,   \
+                            SGFXAPIResourceHandleAssignment const &aAssignment,\
+                            ResolvedDependencyCollection_t  const &aDepencies, \
+                            ResourceTaskFn_t                      &aOutTask);  \
+        EEngineStatus fn##type##DestructionTask(                               \
+                            C##type::CDestructionRequest    const &aRequest,   \
+                            SGFXAPIResourceHandleAssignment const &aAssignment,\
+                            ResolvedDependencyCollection_t  const &aDepencies, \
+                            ResourceTaskFn_t                      &aOutTask);  \
+        EEngineStatus fn##type##QueryTask(                                     \
+                            C##type::CQuery                 const &aRequest,   \
+                            SGFXAPIResourceHandleAssignment const &aAssignment,\
+                            ResourceTaskFn_t                      &aOutTask);
+
+
+        /**
+         * Mock implementation of a resource task backend.
+         */
+        class CMockGFXAPIResourceTaskBackend
+                : public CGFXAPIResourceTaskBackend
+        {
+            SHIRABE_DECLARE_LOG_TAG(CMockGFXAPIResourceTaskBackend)
+
+        public_methods:
+            EEngineStatus initialize();
+
+            EEngineStatus deinitialize();
+
+            SHIRABE_DECLARE_MOCK_TASK_BUILDER_MODULE(Texture)
+            SHIRABE_DECLARE_MOCK_TASK_BUILDER_MODULE(TextureView)
+        };
     }
 }
 

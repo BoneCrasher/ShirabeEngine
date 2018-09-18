@@ -66,12 +66,12 @@ namespace engine
             /**
              * Initialize the backend.
              */
-            void initialize();
+            EEngineStatus initialize();
 
             /**
              * Deinitialize the backend.
              */
-            void deinitialize();
+            EEngineStatus deinitialize();
 
         private_methods:
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(Texture);

@@ -586,8 +586,7 @@ namespace engine
         {
             mRunning.store(true);
 
-            bool const shouldAbort = mAbortRequested.load();
-            while(!shouldAbort)
+            while(!mAbortRequested.load())
             {
                 try {
                     TaskType task = nextRunnable();
@@ -597,10 +596,10 @@ namespace engine
                     }
                 }
                 catch(std::runtime_error& e) {
-                    CLog::Error(logTag(), e.what());
+                    //CLog::Error(logTag(), e.what());
                 }
                 catch(...) {
-                    CLog::Error(logTag(), "Unknown error.");
+                    //CLog::Error(logTag(), "Unknown error.");
                 }
             }
 

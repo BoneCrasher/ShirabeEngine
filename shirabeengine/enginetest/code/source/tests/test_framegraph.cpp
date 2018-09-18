@@ -40,6 +40,33 @@ namespace Test
         using namespace engine::framegraph;
         using namespace engine::wsi;
 
+        /*!
+         * Helper-Macro: If '_aCondition' is valid and evaluates to true, return '_aValue'.
+         */
+        #define SR_RETURN_IF( _aCondition, _aValue ) if( ( _aCondition) ) { return _aValue; }
+
+        /*!
+         * Write a string to a file.
+         *
+         * @param [in] aFilename The output filename of the file to write.
+         * @param [in] aData     The string data to write into the file.
+         * @return               True, if successful. False, otherwise.
+         */
+        bool writeFile(const std::string& aFilename, const std::string& aData)
+        {
+            SR_RETURN_IF(aFilename.empty(), false);
+            SR_RETURN_IF(aData.empty(),     false);
+
+            std::ofstream file(aFilename, std::ios::out);
+
+            SR_RETURN_IF(file.bad(), false);
+
+            file << aData;
+
+            // File will be closed when leaving scope.
+            return true;
+        }
+
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
@@ -122,7 +149,8 @@ namespace Test
             //
             // RESOURCE MANAGEMENT
             //
-            CStdSharedPtr_t<CGFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = makeCStdSharedPtr<CGFXAPIResourceTaskBackend>();
+            CStdSharedPtr_t<CGFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = makeCStdSharedPtr<CMockGFXAPIResourceTaskBackend>();
+            gfxApiResourceTaskBackend->initialize();
 
             CStdSharedPtr_t<CGFXAPIResourceBackend> gfxApiResourceBackend = makeCStdSharedPtr<CGFXAPIResourceBackend>();
             gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
@@ -215,17 +243,21 @@ namespace Test
             CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
                     std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
 
-
+            std::string serializedData {};
+            bool const dataFetched = typedResult->asString(serializedData);
+            writeFile("FrameGraphTest.gv", serializedData);
 
             serializer->deinitialize();
             serializer = nullptr;
 
-            system("makeGraphPNG.bat");
+            system("tools/makeFrameGraphPNG.sh");
 
             // Renderer will call.
             if(frameGraph)
                 frameGraph->execute(renderContext);
 
+            gfxApiResourceTaskBackend->deinitialize();
+            proxyResourceManager->deinitialize();
             gfxApiResourceBackend->deinitialize();
 
             return true;

@@ -295,5 +295,261 @@ namespace Test
 
             return EEngineStatus::Ok;
         }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+#define SHIRABE_IMPLEMENT_TASKS_FOR(type)                                   \
+        addCreator<C##type>(                                                    \
+                std::bind(                                                      \
+                        &CMockGFXAPIResourceTaskBackend::fn##type##CreationTask,    \
+                        this,                                                   \
+                        std::placeholders::_1,                                  \
+                        std::placeholders::_2,                                  \
+                        std::placeholders::_3));                                \
+        addUpdater<C##type>(                                                    \
+                std::bind(                                                      \
+                        &CMockGFXAPIResourceTaskBackend::fn##type##UpdateTask,      \
+                        this,                                                   \
+                        std::placeholders::_1,                                  \
+                        std::placeholders::_2,                                  \
+                        std::placeholders::_3,                                  \
+                        std::placeholders::_4));                                \
+        addDestructor<C##type>(                                                 \
+                std::bind(                                                      \
+                        &CMockGFXAPIResourceTaskBackend::fn##type##DestructionTask, \
+                        this,                                                   \
+                        std::placeholders::_1,                                  \
+                        std::placeholders::_2,                                  \
+                        std::placeholders::_3,                                  \
+                        std::placeholders::_4));                                \
+        addQuery<C##type>(                                                      \
+                std::bind(                                                      \
+                        &CMockGFXAPIResourceTaskBackend::fn##type##QueryTask,       \
+                        this,                                                   \
+                        std::placeholders::_1,                                  \
+                        std::placeholders::_2,                                  \
+                        std::placeholders::_3));
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::initialize()
+        {
+            SHIRABE_IMPLEMENT_TASKS_FOR(Texture);
+            SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::deinitialize()
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureCreationTask(
+                CTexture::CCreationRequest     const &aRequest,
+                ResolvedDependencyCollection_t const &aDepencies,
+                ResourceTaskFn_t                     &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CTexture::SDescriptor const &descriptor = aRequest.resourceDescriptor();
+                CLog::Debug(logTag(), CString::format("Creating texture:\n%0", descriptor.toString()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureUpdateTask(
+                CTexture::CUpdateRequest        const &aRequest,
+                SGFXAPIResourceHandleAssignment const &aAssignment,
+                ResolvedDependencyCollection_t  const &aDepencies,
+                ResourceTaskFn_t                      &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CLog::Debug(logTag(), CString::format("Updating texture:\n%0", aRequest.publicResourceId()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureDestructionTask(
+                CTexture::CDestructionRequest   const &aRequest,
+                SGFXAPIResourceHandleAssignment const &aAssignment,
+                ResolvedDependencyCollection_t  const &aDepencies,
+                ResourceTaskFn_t                      &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CLog::Debug(logTag(), CString::format("Destroying texture:\n%0", aRequest.publicResourceId()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureQueryTask(
+                CTexture::CQuery                const &aRequest,
+                SGFXAPIResourceHandleAssignment const &aAssignment,
+                ResourceTaskFn_t                      &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CLog::Debug(logTag(), CString::format("Querying texture:\n%0", aRequest.publicResourceId()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureViewCreationTask(
+                CTextureView::CCreationRequest const &aRequest,
+                ResolvedDependencyCollection_t const &aDepencies,
+                ResourceTaskFn_t                     &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CTextureView::SDescriptor const &descriptor = aRequest.resourceDescriptor();
+                CLog::Debug(logTag(), CString::format("Creating textureview:\n%0", descriptor.toString()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureViewUpdateTask(
+                CTextureView::CUpdateRequest    const &aRequest,
+                SGFXAPIResourceHandleAssignment const &aAssignment,
+                ResolvedDependencyCollection_t  const &aDepencies,
+                ResourceTaskFn_t                      &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CLog::Debug(logTag(), CString::format("Updating textureview:\n%0", aRequest.publicResourceId()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureViewDestructionTask(
+                CTextureView::CDestructionRequest const &aRequest,
+                SGFXAPIResourceHandleAssignment   const &aAssignment,
+                ResolvedDependencyCollection_t    const &aDepencies,
+                ResourceTaskFn_t                        &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CLog::Debug(logTag(), CString::format("Destroying textureview:\n%0", aRequest.publicResourceId()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CMockGFXAPIResourceTaskBackend::fnTextureViewQueryTask(
+                CTextureView::CQuery            const &aRequest,
+                SGFXAPIResourceHandleAssignment const &aAssignment,
+                ResourceTaskFn_t                      &aOutTask)
+        {
+            EEngineStatus status = EEngineStatus::Ok;
+
+            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            {
+                CLog::Debug(logTag(), CString::format("Querying textureview:\n%0", aRequest.publicResourceId()));
+
+                SGFXAPIResourceHandleAssignment assignment ={ };
+                assignment.publicResourceHandle   = 1;
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                return assignment;
+            };
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
     }
 }

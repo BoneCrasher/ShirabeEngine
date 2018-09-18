@@ -54,20 +54,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CVulkanResourceTaskBackend::initialize()
+        EEngineStatus CVulkanResourceTaskBackend::initialize()
         {
             SHIRABE_IMPLEMENT_TASKS_FOR(Texture)
             SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CVulkanResourceTaskBackend::deinitialize()
+        EEngineStatus CVulkanResourceTaskBackend::deinitialize()
         {
             SHIRABE_IMPLEMENT_TASKS_FOR(Texture);
             SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
     }

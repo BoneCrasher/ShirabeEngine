@@ -180,6 +180,12 @@ namespace engine
                                         SGFXAPIResourceHandleAssignment const &,
                                         ResourceTaskFn_t                      &)>;
 
+        public_destructors:
+            /**
+             * Destroy and run...
+             */
+            virtual ~CGFXAPIResourceTaskBackend() = default;
+
         public_methods:
             /**
              * Templated function to spawn a creation task for a specific resource type.
@@ -244,6 +250,20 @@ namespace engine
                     SGFXAPIResourceHandleAssignment const &aAssignment,
                     ResourceTaskFn_t                      &aOutTask);
 
+            /**
+             * Initialize this task backend instance.
+             *
+             * @return EEngineStatus::Ok, if successful. False otherwise.
+             */
+            virtual EEngineStatus initialize() = 0;
+
+            /**
+             * Deinitialize this task backend instance.
+             *
+             * @return EEngineStatus::Ok, if successful. False otherwise.
+             */
+            virtual EEngineStatus deinitialize() = 0;
+
         protected_methods:
             template <typename TResource>
             bool addCreator(CreatorFn_t<TResource> const &aCreator);
@@ -273,7 +293,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mCreatorFunctions.find(typeIndex) != mCreatorFunctions.end())
+            {
                 return false;
+            }
 
             mCreatorFunctions[typeIndex] = aFunction;
             return true;
@@ -288,7 +310,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mUpdateFunctions.find(typeIndex) != mUpdateFunctions.end())
+            {
                 return false;
+            }
 
             mUpdateFunctions[typeIndex] = aFunction;
             return true;
@@ -303,7 +327,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mDestructorFunctions.find(typeIndex) != mDestructorFunctions.end())
+            {
                 return false;
+            }
 
             mDestructorFunctions[typeIndex] = aFunction;
             return true;
@@ -318,7 +344,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mQueryFunctions.find(typeIndex) != mQueryFunctions.end())
+            {
                 return false;
+            }
 
             mQueryFunctions[typeIndex] = aFunction;
             return true;
@@ -336,7 +364,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mCreatorFunctions.find(typeIndex) == mCreatorFunctions.end())
+            {
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
+            }
 
             Any_t function = mCreatorFunctions.at(typeIndex);
             try
@@ -365,7 +395,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mUpdateFunctions.find(typeIndex) == mUpdateFunctions.end())
+            {
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
+            }
 
             Any_t function = mUpdateFunctions.at(typeIndex);
             try
@@ -394,7 +426,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mDestructorFunctions.find(typeIndex) == mDestructorFunctions.end())
+            {
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
+            }
 
             Any_t function = mDestructorFunctions.at(typeIndex);
             try
@@ -422,7 +456,9 @@ namespace engine
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
             if(mQueryFunctions.find(typeIndex) == mQueryFunctions.end())
+            {
                 return EEngineStatus::ResourceTaskBackend_FunctionNotFound;
+            }
 
             Any_t function = mQueryFunctions.at(typeIndex);
             try
