@@ -688,7 +688,6 @@ namespace engine
             vkSwapChainCreateInfo.oldSwapchain          = mVkState.swapChain.handle;
             vkSwapChainCreateInfo.pNext                 = nullptr;
 
-
             SVulkanQueueFamilyRegistry const &queueFamilies = vkPhysicalDevice.queueFamilies;
 
             std::vector<uint32_t> supportedGraphicsQueueFamilyIndices{};
@@ -761,16 +760,9 @@ namespace engine
             try {
                 EEngineStatus status = EEngineStatus::Ok;
 
-                VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
-
                 createVulkanInstance("ShirabeEngine Demo");
                 determinePhysicalDevices();
                 selectPhysicalDevice(0);
-                // createVulkanSurface(aApplicationEnvironment);
-                // createSwapChain(
-                //             aApplicationEnvironment.primaryDisplay().bounds,
-                //             requiredFormat,
-                //             VK_COLORSPACE_SRGB_NONLINEAR_KHR);
 
                 return status;
             }

@@ -50,10 +50,11 @@ namespace engine
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CStdSharedPtr_t<void> privateDependencyHandle = aDepencies.at(aRequest.underlyingTextureHandle());
+                PublicResourceId_t const &underlyingTextureHandle = aRequest.underlyingTextureHandle();
+                CStdSharedPtr_t<void> privateDependencyHandle = aDepencies.at(underlyingTextureHandle);
                 if(!privateDependencyHandle)
                 {
-                    HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create RTV due to missing dependency.");
+                    HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create TextureView due to missing dependency.");
                 }
 
                 CStdSharedPtr_t<SVulkanTextureResource> texture = std::static_pointer_cast<SVulkanTextureResource>(privateDependencyHandle);

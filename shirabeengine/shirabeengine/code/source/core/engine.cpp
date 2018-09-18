@@ -272,6 +272,7 @@ namespace engine
 
             resourceBackend->setResourceTaskBackend(resourceTaskBackend);
             resourceBackend->initialize();
+            mResourceManager->initialize();
         };
 
         auto const fnCreatePlatformRenderer
@@ -299,8 +300,8 @@ namespace engine
         {
             fnCreatePlatformWindowSystem();
             fnCreateDefaultGFXAPI();
-            // fnCreatePlatformResourceSystem();
-            // fnCreatePlatformRenderer();
+            fnCreatePlatformResourceSystem();
+            fnCreatePlatformRenderer();
 
         }
         catch(CEngineException const e)
