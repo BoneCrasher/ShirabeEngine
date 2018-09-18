@@ -37,7 +37,11 @@ namespace engine
                     SPassData    &aOutPassData) -> bool
             {
                 aOutPassData.importData.backBufferInput = aBackBuffer;
-                aOutPassData.exportData.backbuffer      = aBuilder.forwardResource(aBackBuffer.readableName, aBackBuffer);
+
+                SFrameGraphResourceFlags flags{};
+                flags.requiredFormat = FrameGraphFormat_t::Automatic;
+
+                aOutPassData.exportData.backbuffer = aBuilder.forwardTexture(aBackBuffer, flags);
 
                 return true;
             };

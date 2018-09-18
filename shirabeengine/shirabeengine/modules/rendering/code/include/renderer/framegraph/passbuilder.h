@@ -104,14 +104,18 @@ namespace engine
             /**
              * Request a forward-op of a texture.
              *
-             * @param aName     Name of the resource to forward.
-             * @param aResource Descriptor of the resource to forward..
-             * @return          Return a framegraph resource handle for the resource
-             *                  forward op.
+             * @param aSubjacentTargetResource The resource id of the texture to forward.
+             * @param aFlags                   Flags detailing the texture forward operation.
+             * @param aArraySliceRange         The array range within the texture to forward.
+             * @param aMipSliceRange           The mip-range of within the texture to forward.
+             * @return                         Return a framegraph resource handle for the texture
+             *                                 forwarding.
              */
-            SFrameGraphResource forwardResource(
-                    std::string         const &aName,
-                    SFrameGraphResource const &aResource);
+            SFrameGraphResource forwardTexture(
+                    SFrameGraphResource      const &aSubjacentTargetResource,
+                    SFrameGraphResourceFlags const &aFlags,
+                    CRange                   const &aArraySliceRange = CRange(0, 1),
+                    CRange                   const &aMipSliceRange   = CRange(0, 1));
 
             /**
              * Request a write operation on a subjacent texture instance.

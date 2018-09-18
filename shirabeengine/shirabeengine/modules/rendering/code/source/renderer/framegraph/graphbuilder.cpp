@@ -232,7 +232,10 @@ namespace engine
             CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             for(PassMap::value_type const &assignment : graph()->passes())
-                assert(true == collectPass(assignment.second));
+            {
+                bool const collected = collectPass(assignment.second);
+                assert(true == collected);
+            }
 
             bool const topologicalPassSortSuccessful = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
             if(!topologicalPassSortSuccessful)
@@ -379,9 +382,13 @@ namespace engine
                         {
                             texture.requestedUsage.set(EFrameGraphResourceUsage::ImageResource);
                         }
-                        else
+                        else if(textureView.mode.check(EFrameGraphViewAccessMode::Write))
                         {
                             texture.requestedUsage.set(EFrameGraphResourceUsage::RenderTarget);
+                        }
+                        else
+                        {
+                            texture.requestedUsage.set(EFrameGraphResourceUsage::Unused);
                         }
                     }
                     else if(r.type == EFrameGraphResourceType::BufferView)

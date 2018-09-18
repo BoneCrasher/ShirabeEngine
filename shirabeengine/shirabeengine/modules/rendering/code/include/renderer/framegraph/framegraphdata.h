@@ -71,18 +71,30 @@ namespace engine
         enum class EFrameGraphResourceUsage
                 : uint8_t
         {
-            Undefined      =  0,
-            ImageResource  =  1,
-            BufferResource =  2,
-            RenderTarget   =  4,
-            DepthTarget    =  8,
-            BufferTarget   = 16
+            Undefined      =   0,
+            ImageResource  =   1,
+            BufferResource =   2,
+            RenderTarget   =   4,
+            DepthTarget    =   8,
+            BufferTarget   =  16,
+            Unused         = 128
         };
 
         /**
          * The EFrameGraphWriteTarget enum describes how an image resource output should be processed.
          */
         enum class EFrameGraphWriteTarget
+                : uint8_t
+        {
+            Undefined = 0,
+            Color,
+            Depth
+        };
+
+        /**
+         * The EFrameGraphForwardTarget enum describes how an image resource forwarding should be processed.
+         */
+        enum class EFrameGraphForwardTarget
                 : uint8_t
         {
             Undefined = 0,
@@ -142,8 +154,9 @@ namespace engine
                 : uint8_t
         {
             Undefined = 0,
-            Read,
-            Write
+            Forward   = 1,
+            Read      = 2,
+            Write     = 4
         };
 
         /**
@@ -181,14 +194,14 @@ namespace engine
             }
 
         public_members:
-            uint32_t               referenceCount;
-            PassUID_t              assignedPassUID;
-            FrameGraphResourceId_t resourceId;
-            FrameGraphResourceId_t parentResource;
-            FrameGraphResourceId_t subjacentResource;
-            std::string            readableName;
+            uint32_t                referenceCount;
+            PassUID_t               assignedPassUID;
+            FrameGraphResourceId_t  resourceId;
+            FrameGraphResourceId_t  parentResource;
+            FrameGraphResourceId_t  subjacentResource;
+            std::string             readableName;
             EFrameGraphResourceType type;
-            bool                   isExternalResource;
+            bool                    isExternalResource;
         };
 
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphResource, SFrameGraphResource);
@@ -287,7 +300,6 @@ namespace engine
             EFrameGraphResourceInitState        initialState;
             CBitField<EFrameGraphResourceUsage> permittedUsage;
             CBitField<EFrameGraphResourceUsage> requestedUsage;
-
         };
 
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTexture, SFrameGraphTexture);

@@ -186,7 +186,7 @@ namespace engine
                         // Create Texture
                         auto textureCreateFilterFn = [] (SFrameGraphResource const &aInput) -> bool
                         {
-                                return (aInput.type == EFrameGraphResourceType::Texture && aInput.assignedPassUID != 0);
+                                return (aInput.type == EFrameGraphResourceType::Texture /* && aInput.assignedPassUID != 0 */);
                         };
                         std::vector<FrameGraphResourceId_t> const creations = filter(passResources, textureCreateFilterFn);
 
@@ -474,8 +474,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void CFrameGraphGraphVizSerializer::writePass2TextureResourceEdge(SFrameGraphTexture const &aTexture)
         {
-            static constexpr char const *pass2TextureEdgeStyle = "style=dotted,weight=2";
-            mStream << "    Pass" << aTexture.assignedPassUID << " -> Texture" << aTexture.resourceId << " [" << pass2TextureEdgeStyle << ",constraint=false];\n";
+            bool const isImported = aTexture.isExternalResource;
+
+            if(isImported)
+            {
+                static constexpr char const *pass2TextureEdgeStyle = "style=dotted,weight=2";
+                mStream << "    Texture" << aTexture.resourceId << " -> Pass" << aTexture.assignedPassUID << " [" << pass2TextureEdgeStyle << ",constraint=false];\n";
+            }
+            else
+            {
+                static constexpr char const *pass2TextureEdgeStyle = "style=dotted,weight=2";
+                mStream << "    Pass" << aTexture.assignedPassUID << " -> Texture" << aTexture.resourceId << " [" << pass2TextureEdgeStyle << ",constraint=false];\n";
+            }
+
             mStream << "    { rank=same; Pass" << aTexture.assignedPassUID << "; Texture" << aTexture.resourceId << "}\n";
         }
         //<-----------------------------------------------------------------------------
@@ -489,6 +500,7 @@ namespace engine
         {
             bool const viewIsReadMode  = aView.mode.check(EFrameGraphViewAccessMode::Read);
             bool const viewIsWriteMode = aView.mode.check(EFrameGraphViewAccessMode::Write);
+            bool const viewIsFwdMode   = aView.mode.check(EFrameGraphViewAccessMode::Forward);
 
             std::string viewId   = CString::format("TextureView%0", aView.resourceId);
 
@@ -504,10 +516,18 @@ namespace engine
                         "<tr><td align=\"left\">MipRange:</td><td align=\"left\">%6</td></tr>"
                         "<tr><td align=\"left\">Reference-Count:</td><td align=\"left\">%7</td></tr>"
                         "</table>>",
-                        (viewIsReadMode ? "68a357" : "c97064"),
+                        (viewIsReadMode
+                            ? "68a357"
+                            : (viewIsWriteMode
+                               ? "c97064"
+                               : "c82d33" )),
                         aView.resourceId,
                         aView.subjacentResource,
-                        (viewIsReadMode ? "Read" : "Write"),
+                        (viewIsReadMode
+                            ? "Read"
+                            : (viewIsWriteMode
+                               ? "Write"
+                               : "Forward" )),
                         to_string(aView.format),
                         to_string(aView.arraySliceRange),
                         to_string(aView.mipSliceRange),
@@ -555,6 +575,11 @@ namespace engine
             {
                 static constexpr char const*pass2ViewWriteEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
                 mStream << "    " << passId << " -> " << viewId  << " [" << pass2ViewWriteEdgeStyle << ",color=" << color << "];\n";
+            }
+            else
+            {
+                static constexpr char const*pass2ViewForwardEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
+                mStream << "    " << passId << " -> " << viewId  << " [" << pass2ViewForwardEdgeStyle << ",color=" << color << "];\n";
             }
 
             if(parentResourceIsTextureView)

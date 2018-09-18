@@ -157,7 +157,7 @@ namespace engine
             backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
             backBufferTextureDesc.arraySize      = 1;
             backBufferTextureDesc.mipLevels      = 1;
-            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget;
+            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget | EFrameGraphResourceUsage::Unused;
 
             SFrameGraphResource backBuffer{ };
             backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
@@ -176,6 +176,8 @@ namespace engine
             prepassExportData = prepassModule.addPrepass(
                         graphBuilder,
                         backBuffer);
+
+            SFrameGraphTexture const &tex = *graphBuilder.getResources().get<SFrameGraphTexture>(backBuffer.resourceId);
 
             // GBuffer
             CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule    { };

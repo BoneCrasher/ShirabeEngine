@@ -50,24 +50,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphResource CPassBuilder::forwardResource(
-                std::string         const &aName,
-                SFrameGraphResource const &aDescriptor)
-        {
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
-
-            if(EFrameGraphResourceType::Texture == aDescriptor.type)
-            {
-                accessor->registerResource(aDescriptor.resourceId);
-            }
-
-            return aDescriptor;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         FrameGraphResourceId_t CPassBuilder::findDuplicateTextureView(
                 FrameGraphResourceId_t               const &aSubjacentResourceId,
                 FrameGraphFormat_t                   const &aFormat,
@@ -178,39 +160,127 @@ namespace engine
                 bool                        aValidateWrites)
         {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-            bool const isBeingRead =
-                    isTextureBeingReadInSubresourceRange(
-                        aResourceData.textureViews(),
-                        aResourceData,
-                        aSourceResource,
-                        aArraySliceRange,
-                        aMipSliceRange);
+            if(aValidateReads)
+            {
+                bool const isBeingRead =
+                        isTextureBeingReadInSubresourceRange(
+                            aResourceData.textureViews(),
+                            aResourceData,
+                            aSourceResource,
+                            aArraySliceRange,
+                            aMipSliceRange);
 
-            if(isBeingRead)
-                throw std::runtime_error(
-                        CString::format(
-                            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
-                            aArraySliceRange.offset,
-                            aArraySliceRange.length,
-                            aMipSliceRange.offset,
-                            aMipSliceRange.length).c_str());
+                if(isBeingRead)
+                    throw std::runtime_error(
+                            CString::format(
+                                "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
+                                aArraySliceRange.offset,
+                                aArraySliceRange.length,
+                                aMipSliceRange.offset,
+                                aMipSliceRange.length).c_str());
+            }
 
-            bool const isBeingWritten =
-                    isTextureBeingWrittenInSubresourceRange(
-                        aResourceData.textureViews(),
-                        aResourceData, aSourceResource,
-                        aArraySliceRange,
-                        aMipSliceRange);
+            if(aValidateWrites)
+            {
+                bool const isBeingWritten =
+                        isTextureBeingWrittenInSubresourceRange(
+                            aResourceData.textureViews(),
+                            aResourceData, aSourceResource,
+                            aArraySliceRange,
+                            aMipSliceRange);
 
-            if(isBeingWritten)
-                throw std::runtime_error(
-                        CString::format(
-                            "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
-                            aArraySliceRange.offset,
-                            aArraySliceRange.length,
-                            aMipSliceRange.offset,
-                            aMipSliceRange.length).c_str());
+                if(isBeingWritten)
+                    throw std::runtime_error(
+                            CString::format(
+                                "Resource is already being read or written at the specified ranges (Array: %0[%1]; Mip: %2[%3])",
+                                aArraySliceRange.offset,
+                                aArraySliceRange.length,
+                                aMipSliceRange.offset,
+                                aMipSliceRange.length).c_str());
+            }
 #endif
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SFrameGraphResource CPassBuilder::forwardTexture(
+                SFrameGraphResource      const &aSubjacentTargetResource,
+                SFrameGraphResourceFlags const &aFlags,
+                CRange                   const &aArraySliceRange,
+                CRange                   const &aMipSliceRange)
+        {
+            FrameGraphResourceId_t const subjacentResourceId =
+                    (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
+                     ? aSubjacentTargetResource.resourceId
+                     : aSubjacentTargetResource.subjacentResource;
+
+            EFrameGraphViewAccessMode const mode = EFrameGraphViewAccessMode::Forward;
+
+            EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
+
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+
+            CRange adjustedArraySliceRange = aArraySliceRange;
+            CRange adjustedMipSliceRange   = aMipSliceRange;
+
+            adjustArrayAndMipSliceRanges(
+                        mResourceData,
+                        aSubjacentTargetResource,
+                        aArraySliceRange,
+                        aMipSliceRange,
+                        adjustedArraySliceRange,
+                        adjustedMipSliceRange);
+
+            Optional_t<RefWrapper_t<SFrameGraphTextureView>> ref{};
+
+            // Can we cull?
+            bool duplicateFound = false;
+            if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
+            {
+                FrameGraphResourceId_t const duplicateViewId =
+                        findDuplicateTextureView(
+                            subjacentResourceId,
+                            aFlags.requiredFormat,
+                            source,
+                            adjustedArraySliceRange,
+                            adjustedMipSliceRange,
+                            mode);
+
+                duplicateFound = (duplicateViewId > 0);
+                if(duplicateFound)
+                {
+                    SFrameGraphTextureView &view = *mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+
+                    ref = view;
+                }
+            }
+
+            if(!duplicateFound)
+            {
+                SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
+                view.arraySliceRange    = adjustedArraySliceRange;
+                view.mipSliceRange      = adjustedMipSliceRange;
+                view.format             = aFlags.requiredFormat;
+                view.source             = source;
+                view.assignedPassUID    = mPassUID;
+                view.parentResource     = aSubjacentTargetResource.resourceId;
+                view.subjacentResource  = subjacentResourceId;
+                view.readableName       = CString::format("TextureView ID %0 - Forward #%1", view.resourceId, aSubjacentTargetResource.resourceId);
+                view.type               = EFrameGraphResourceType::TextureView;
+                view.mode.set(mode);
+
+                CStdSharedPtr_t<SFrameGraphResource> subjacent = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
+                ++subjacent->referenceCount;
+
+                ref = view;
+            }
+
+            accessor->registerResource(ref->get().resourceId);
+            ++(ref->get().referenceCount);
+
+            return *ref;
         }
         //<-----------------------------------------------------------------------------
 
@@ -468,7 +538,9 @@ namespace engine
                 SFrameGraphTextureView const&view = *aResources.get<SFrameGraphTextureView>(viewRef);
                 bool correctMode = view.mode.check(EFrameGraphViewAccessMode::Read);
                 if(!correctMode)
+                {
                     continue;
+                }
 
                 bool const commonPass      = aSourceResource.assignedPassUID   == view.assignedPassUID;
                 bool const commonId        = aSourceResource.resourceId        == view.resourceId;
