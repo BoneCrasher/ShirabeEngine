@@ -57,10 +57,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CGFXAPIResourceBackend::registerResource(
                 PublicResourceId_t    const &aId,
-                CStdSharedPtr_t<void> const &aResource)
+                CStdSharedPtr_t<void> const &aResource,
+                EImportStorageMode    const &aImportStorageMode)
         {
-            if(mStorage.find(aId) != mStorage.end())
+            bool const alreadyRegistered = (mStorage.find(aId) != mStorage.end());
+            if(alreadyRegistered && (EImportStorageMode::NoOverwrite == aImportStorageMode))
+            {
                 return EEngineStatus::Error;
+            }
 
             mStorage[aId] = aResource;
             return EEngineStatus::Ok;

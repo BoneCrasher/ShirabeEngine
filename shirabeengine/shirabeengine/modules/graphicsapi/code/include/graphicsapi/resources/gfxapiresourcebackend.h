@@ -68,6 +68,17 @@ namespace engine
         public_typedefs:
             using ResourceTaskBackend_t = CGFXAPIResourceTaskBackend;
 
+        public_enums:
+            /**
+             * The EImportStorageMode enum describes flags for resource imports in case
+             * a resource with an equal identifier was already stored.
+             */
+            enum class EImportStorageMode
+            {
+                NoOverwrite = 1,
+                Overwrite   = 2
+            };
+
         public_constructors:
             /**
              * Construct an empty resource task backend.
@@ -127,7 +138,8 @@ namespace engine
              */
             EEngineStatus registerResource(
                     PublicResourceId_t    const &aId,
-                    CStdSharedPtr_t<void> const &aResource);
+                    CStdSharedPtr_t<void> const &aResource,
+                    EImportStorageMode    const &aImportStorageMode = EImportStorageMode::NoOverwrite);
 
             /**
              * Register a resource task backend used for creating specific op-tasks based
