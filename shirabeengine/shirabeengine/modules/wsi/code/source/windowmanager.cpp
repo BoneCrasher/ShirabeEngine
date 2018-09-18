@@ -49,26 +49,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CWindowManager::EWindowManagerError CWindowManager::initialize(os::SApplicationEnvironment const &aApplicationEnvironment)
+        CWindowManager::EWindowManagerError CWindowManager::initialize(
+                os::SApplicationEnvironment     const &aApplicationEnvironment,
+                CStdSharedPtr_t<IWindowFactory> const &aFactory)
         {
-            CStdSharedPtr_t<IWindowFactory> factory = nullptr;
-
-#ifdef SHIRABE_PLATFORM_WINDOWS
-            factory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
-#elif defined SHIRABE_PLATFORM_LINUX
-            CStdSharedPtr_t<x11::CX11Display> display = nullptr;
-            display = makeCStdSharedPtr<x11::CX11Display>();
-            factory = makeCStdSharedPtr<x11::CX11WindowFactory>(display);
-#endif // SHIRABE_PLATFORM_WINDOWS
-
-            if(!factory)
-            {
-                CLog::Error(logTag(), "Failed to initialize the window factory.");
-
-                return EWindowManagerError::InitializationFailed;
-            }
-
-            mWindowFactory = factory;
+            mWindowFactory = aFactory;
 
             return EWindowManagerError::Ok;
         }

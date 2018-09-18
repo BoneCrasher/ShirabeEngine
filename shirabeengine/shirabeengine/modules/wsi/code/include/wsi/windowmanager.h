@@ -52,9 +52,12 @@ namespace engine
              * Initialize the window manager with an application environment instance.
              *
              * @param aApplicationEnvironment The environment to initialize the manager with.
+             * @param aFactory                The window factory attached to the manager.
              * @return                        EWindowManagerError::Ok if successful. An error code otherwise.
              */
-            EWindowManagerError initialize(os::SApplicationEnvironment const &aApplicationEnvironment);
+            EWindowManagerError initialize(
+                    os::SApplicationEnvironment     const &aApplicationEnvironment,
+                    CStdSharedPtr_t<IWindowFactory> const &aFactory);
 
             /**
              * Deinitialize the window manager.

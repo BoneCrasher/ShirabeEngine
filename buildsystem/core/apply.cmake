@@ -490,22 +490,22 @@ if(SHIRABE_BUILD_APPLICATION)
     #
 
     # Exe
-    install(
-        TARGETS
-            ${SHIRABE_MODULE_NAME}
-        RUNTIME DESTINATION
-            ${SHIRABE_PROJECT_DEPLOY_DIR}/bin)
+    #install(
+    #    TARGETS
+    #        ${SHIRABE_MODULE_NAME}
+    #    RUNTIME DESTINATION
+    #        ${SHIRABE_PROJECT_DEPLOY_DIR}/bin)
 
     #
     # PUBLIC EXPORT
     #
 
     # Exe
-    install(
-        TARGETS
-            ${SHIRABE_MODULE_NAME}
-        RUNTIME DESTINATION
-            ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin)
+    # install(
+    #    TARGETS
+    #        ${SHIRABE_MODULE_NAME}
+    #    RUNTIME DESTINATION
+    #        ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin)
 
     LogStatus(
         MESSAGES

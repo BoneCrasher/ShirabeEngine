@@ -4,6 +4,7 @@ project(shirabedevelopment)
 
 add_subdirectory(shirabeengine)
 add_subdirectory(enginetest)
+add_subdirectory(game)
 
 add_dependencies(enginetest INSTALL_shirabeengine)
         

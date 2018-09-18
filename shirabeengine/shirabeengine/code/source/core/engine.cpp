@@ -13,8 +13,10 @@
 #include <wsi/display.h>
 #if defined SHIRABE_PLATFORM_LINUX
 #include <wsi/x11/x11display.h>
+#include <wsi/x11/x11windowfactory.h>
 #elif defined SHIRABE_PLATFORM_WINDOWS
 #include <wsi/windows/windowsdisplay.h>
+#include <wsi/windows/windowswindowfactory.h>
 #endif
 
 #include "resource_management/resourcemanager.h"
@@ -140,7 +142,8 @@ namespace engine
 
         CStdSharedPtr_t<CWSIDisplay> display = nullptr;
 #if defined SHIRABE_PLATFORM_LINUX
-        display = makeCStdSharedPtr<x11::CX11Display>();
+        CStdSharedPtr_t<x11::CX11Display> x11Display = makeCStdSharedPtr<x11::CX11Display>();
+        display = x11Display;
 #elif defined SHIRABE_PLATFORM_WINDOWS
 #endif
         status = display->initialize();
@@ -158,9 +161,17 @@ namespace engine
         {
             EEngineStatus status = EEngineStatus::Ok;
 
+            CStdSharedPtr_t<IWindowFactory> factory = nullptr;
+
+#ifdef SHIRABE_PLATFORM_WINDOWS
+            factory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
+#elif defined SHIRABE_PLATFORM_LINUX
+            factory = makeCStdSharedPtr<x11::CX11WindowFactory>(x11Display);
+#endif // SHIRABE_PLATFORM_WINDOWS
+
             mWindowManager = makeCStdSharedPtr<CWindowManager>();
 
-            CWindowManager::EWindowManagerError windowManagerError = mWindowManager->initialize(*mApplicationEnvironment);
+            CWindowManager::EWindowManagerError windowManagerError = mWindowManager->initialize(*mApplicationEnvironment, factory);
             if(!(mWindowManager && !CheckWindowManagerError(windowManagerError)))
             {
                 status = EEngineStatus::EngineComponentInitializationError;
