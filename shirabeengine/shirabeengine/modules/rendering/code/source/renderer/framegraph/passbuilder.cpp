@@ -50,6 +50,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        SFrameGraphResource CPassBuilder::forwardResource(
+                std::string         const &aName,
+                SFrameGraphResource const &aDescriptor)
+        {
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+
+            if(EFrameGraphResourceType::Texture == aDescriptor.type)
+            {
+                accessor->registerResource(aDescriptor.resourceId);
+            }
+
+            return aDescriptor;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         FrameGraphResourceId_t CPassBuilder::findDuplicateTextureView(
                 FrameGraphResourceId_t               const &aSubjacentResourceId,
                 FrameGraphFormat_t                   const &aFormat,

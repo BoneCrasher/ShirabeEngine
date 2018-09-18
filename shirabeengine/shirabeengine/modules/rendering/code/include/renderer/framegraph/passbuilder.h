@@ -102,6 +102,18 @@ namespace engine
             // create~?
 
             /**
+             * Request a forward-op of a texture.
+             *
+             * @param aName     Name of the resource to forward.
+             * @param aResource Descriptor of the resource to forward..
+             * @return          Return a framegraph resource handle for the resource
+             *                  forward op.
+             */
+            SFrameGraphResource forwardResource(
+                    std::string         const &aName,
+                    SFrameGraphResource const &aResource);
+
+            /**
              * Request a write operation on a subjacent texture instance.
              *
              * @param aSubjacentTargetResource The resource id of the texture to write.

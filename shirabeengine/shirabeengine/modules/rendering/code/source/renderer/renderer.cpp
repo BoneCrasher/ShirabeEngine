@@ -1,5 +1,6 @@
 #include "renderer/framegraph/graphbuilder.h"
 #include "renderer/framegraph/passbuilder.h"
+#include "renderer/framegraph/modules/prepass.h"
 #include "renderer/framegraph/modules/gbuffergeneration.h"
 #include "renderer/framegraph/modules/lighting.h"
 #include "renderer/framegraph/modules/compositing.h"
@@ -102,6 +103,38 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+
+        /*!
+         * Helper-Macro: If '_aCondition' is valid and evaluates to true, return '_aValue'.
+         */
+        #define SR_RETURN_IF( _aCondition, _aValue ) if( ( _aCondition) ) { return _aValue; }
+
+        /*!
+         * Write a string to a file.
+         *
+         * @param [in] aFilename The output filename of the file to write.
+         * @param [in] aData     The string data to write into the file.
+         * @return               True, if successful. False, otherwise.
+         */
+        bool writeFile(const std::string& aFilename, const std::string& aData)
+        {
+            SR_RETURN_IF(aFilename.empty(), false);
+            SR_RETURN_IF(aData.empty(),     false);
+
+            std::ofstream file(aFilename, std::ios::out);
+
+            SR_RETURN_IF(file.bad(), false);
+
+            file << aData;
+
+            // File will be closed when leaving scope.
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CRenderer::renderScene()
         {
             using namespace engine;
@@ -137,6 +170,13 @@ namespace engine
             SFrameGraphResource renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
+            // Prepass
+            CFrameGraphModule<SPrepassModuleTag_t>                     prepassModule    { };
+            CFrameGraphModule<SPrepassModuleTag_t>::SPrepassExportData prepassExportData{ };
+            prepassExportData = prepassModule.addPrepass(
+                        graphBuilder,
+                        backBuffer);
+
             // GBuffer
             CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule    { };
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
@@ -164,18 +204,33 @@ namespace engine
                         gbufferExportData.gbuffer2,
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer,
-                        backBuffer);
+                        prepassExportData.backbuffer);
 
             CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
-            CStdSharedPtr_t<CFrameGraphGraphVizSerializer::IResult> result     = nullptr;
-            CStdSharedPtr_t<CFrameGraphGraphVizSerializer>          serializer = std::make_shared<CFrameGraphGraphVizSerializer>();
-            bool const initialized  = serializer->initialize();
-            bool const serialized   = serializer->serialize(*frameGraph, result);
-            bool const deserialized = serializer->deinitialize();
-            serializer = nullptr;
+            static bool serializedOnce = false;
+            if(!serializedOnce)
+            {
+                serializedOnce = true;
 
-            system("makeGraphPNG.bat");
+                CStdSharedPtr_t<CFrameGraphGraphVizSerializer::IResult> result     = nullptr;
+                CStdSharedPtr_t<CFrameGraphGraphVizSerializer>          serializer = std::make_shared<CFrameGraphGraphVizSerializer>();
+                bool const initialized  = serializer->initialize();
+                bool const serialized   = serializer->serialize(*frameGraph, result);
+
+
+                CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
+                        std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
+
+                std::string serializedData {};
+                bool const dataFetched = typedResult->asString(serializedData);
+                writeFile("FrameGraphTest.gv", serializedData);
+
+                bool const deserialized = serializer->deinitialize();
+                serializer = nullptr;
+
+                system("tools/makeFrameGraphPNG.sh");
+            }
 
             // CRenderer will call.
             if(frameGraph)

@@ -18,4 +18,6 @@ set(
 
 include(project_setup)
 
+install(DIRECTORY ${SHIRABE_WORKSPACE_ROOT_DIR}/tools DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin USE_SOURCE_PERMISSIONS)
+
 add_dependencies(game INSTALL_shirabeengine)
