@@ -165,6 +165,8 @@ namespace engine
     template <typename T>
     using RefWrapper_t = std::reference_wrapper<T>;
 
+    template <typename T>
+    using OptionalRef_t = Optional_t<RefWrapper_t<T>>;
 
     /**
     * @brief bind a member function of type T with a variable number of arguments and a specific instance of

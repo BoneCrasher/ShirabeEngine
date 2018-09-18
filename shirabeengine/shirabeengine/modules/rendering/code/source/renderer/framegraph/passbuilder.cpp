@@ -505,11 +505,17 @@ namespace engine
 
                 bool const arraySliceOverlap = view.arraySliceRange.overlapsWith(aArraySliceRange);
                 if(!arraySliceOverlap)
+                {
                     continue;
-
-                bool const mipSliceOverlap = view.mipSliceRange.overlapsWith(aMipSliceRange);
-                if(!mipSliceOverlap)
-                    continue;
+                }
+                else
+                {
+                    bool const mipSliceOverlap = view.mipSliceRange.overlapsWith(aMipSliceRange);
+                    if(!mipSliceOverlap)
+                    {
+                        continue;
+                    }
+                }
 
                 return true;
             }

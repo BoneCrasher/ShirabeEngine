@@ -132,7 +132,7 @@ namespace Test
             resourceProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(gfxApiResourceBackend));
 
             CStdSharedPtr_t<CResourceManagerBase>  proxyResourceManager = makeCStdSharedPtr<CResourceManager>(resourceProxyFactory);
-
+            proxyResourceManager->initialize();
             gfxApiResourceBackend->initialize();
 
             //

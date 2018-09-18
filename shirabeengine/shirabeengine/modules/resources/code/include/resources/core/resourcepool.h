@@ -62,7 +62,7 @@ namespace engine
              * @return       Returns a const reference to the stored resource.
              * @throw        std::runtime_error, if not registered.
              */
-            TValue const &getResource(const TIndex& index) const;
+            OptionalRef_t<TValue> const getResource(const TIndex& index) const;
 
             /**
              * Access the resource identified by aIndex.
@@ -71,7 +71,7 @@ namespace engine
              * @return       Returns a reference to the stored resource.
              * @throw        std::runtime_error, if not registered.
              */
-            TValue &getResource(const TIndex& index);
+            OptionalRef_t<TValue> getResource(const TIndex& index);
 
             /**
              * Begin iterating over the stored resources.
@@ -152,7 +152,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        TValue const&
+        OptionalRef_t<TValue> const
         IndexedResourcePool<TIndex, TValue>::getResource(
                 TIndex const&index) const
         {
@@ -167,7 +167,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        TValue&
+        OptionalRef_t<TValue>
         IndexedResourcePool<TIndex, TValue>::getResource(
                 TIndex const&index)
         {

@@ -38,9 +38,9 @@ namespace engine
         if(offset == aOther.offset)
           overlap = true;
         else if(offset < aOther.offset)
-          overlap = (((offset + length) - (aOther.offset)) > 0);
+          overlap = (( (static_cast<int32_t>(offset) + length) - static_cast<int32_t>(aOther.offset) ) > 0);
         else
-          overlap = (((aOther.offset + aOther.length) - offset) > 0);
+          overlap = (( (static_cast<int32_t>(aOther.offset) + aOther.length) - static_cast<int32_t>(offset) ) > 0);
 
         return overlap;
     }

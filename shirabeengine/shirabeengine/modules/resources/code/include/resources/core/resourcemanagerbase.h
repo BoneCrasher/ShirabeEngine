@@ -341,7 +341,16 @@ namespace engine
              */
             SHIRABE_INLINE AnyProxy getResourceProxy(std::string const &aResourceId)
             {
-                return mResources.getResource(aResourceId);
+
+                AnyProxy proxy = nullptr;
+
+                OptionalRef_t<AnyProxy> ref = mResources.getResource(aResourceId);
+                if(ref.has_value())
+                {
+                    proxy = ref.value().get();
+                }
+
+                return proxy;
             }
 
             /**
@@ -381,7 +390,7 @@ namespace engine
                 bool                                        aCreationDeferred)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mCreatorFunctions.find(typeIndex) != mCreatorFunctions.end())
+            if(mCreatorFunctions.find(typeIndex) == mCreatorFunctions.end())
                 return EEngineStatus::Error;
 
             CreatorFn_t<TResource> fn = std::any_cast<CreatorFn_t<TResource>>(mCreatorFunctions[typeIndex]);
@@ -398,7 +407,7 @@ namespace engine
         EEngineStatus CResourceManagerBase::loadResource(std::string const &aResourceId)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mLoadFunctions.find(typeIndex) != mLoadFunctions.end())
+            if(mLoadFunctions.find(typeIndex) == mLoadFunctions.end())
                 return EEngineStatus::Error;
 
             LoadFn_t<TResource> fn = std::any_cast<LoadFn_t<TResource>>(mLoadFunctions[typeIndex]);
@@ -417,7 +426,7 @@ namespace engine
                 typename TResource::CUpdateRequest const &aRequest)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mUpdateFunctions.find(typeIndex) != mUpdateFunctions.end())
+            if(mUpdateFunctions.find(typeIndex) == mUpdateFunctions.end())
                 return EEngineStatus::Error;
 
             UpdateFn_t<TResource> fn = std::any_cast<UpdateFn_t<TResource>>(mUpdateFunctions[typeIndex]);
@@ -434,7 +443,7 @@ namespace engine
         EEngineStatus CResourceManagerBase::unloadResource(std::string const &aResourceId)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mUnloadFunctions.find(typeIndex) != mUnloadFunctions.end())
+            if(mUnloadFunctions.find(typeIndex) == mUnloadFunctions.end())
                 return EEngineStatus::Error;
 
             UnloadFn_t<TResource> fn = std::any_cast<UnloadFn_t<TResource>>(mUnloadFunctions[typeIndex]);
@@ -451,7 +460,7 @@ namespace engine
         EEngineStatus CResourceManagerBase::destroyResource(std::string const &aResourceId)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mDestructorFunctions.find(typeIndex) != mDestructorFunctions.end())
+            if(mDestructorFunctions.find(typeIndex) == mDestructorFunctions.end())
                 return EEngineStatus::Error;
 
             DestroyFn_t<TResource> fn = std::any_cast<DestroyFn_t<TResource>>(mDestructorFunctions[typeIndex]);
