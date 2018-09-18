@@ -176,40 +176,18 @@ namespace engine
             VkQueue getGraphicsQueue();
 
             /**
+             * If the Vulkan-Environment should work upon a surface, provide it here.
+             *
+             * @param aSurface The surface to bind to the Vk-Environment.
+             */
+            void setSurface(VkSurfaceKHR const &aSurface);
+
+            /**
              * Return the current vulkan internal state mutably.
              *
              * @return See brief.
              */
             SVulkanState &getState();
-
-        private_methods:
-            /**
-             * Create and initialize the vulkan instance, including determinition of all
-             * vulkan capable devices and their capabilities as well as device selection
-             * and binding.
-             *
-             * @param aInstanceName The name of the instance to create.
-             */
-            void createVulkanInstance(std::string const &aInstanceName);
-
-            /**
-             * Create a vulkan surface and swapchain.
-             *
-             * @param aApplicationEnvironment The application environment to attach to.
-             */
-            void createVulkanSurface(os::SApplicationEnvironment const &aApplicationEnvironment);
-
-            /**
-             * Find all physical devices and required capabilities in the system.
-             */
-            void determinePhysicalDevices();
-
-            /**
-             * Select a specific physical device previously discovered by the vulkan API.
-             *
-             * @param aDeviceIndex Index of the device to select.
-             */
-            void selectPhysicalDevice(uint32_t const &aDeviceIndex);
 
             /**
              * Create and bind a vulkan swapchain.
@@ -222,6 +200,35 @@ namespace engine
                     math::CRect     const &aRequestedBackBufferSize,
                     VkFormat        const &aRequestedFormat,
                     VkColorSpaceKHR const &aColorSpace);
+
+        private_methods:
+            /**
+             * Create and initialize the vulkan instance, including determinition of all
+             * vulkan capable devices and their capabilities as well as device selection
+             * and binding.
+             *
+             * @param aInstanceName The name of the instance to create.
+             */
+            void createVulkanInstance(std::string const &aInstanceName);
+
+            // /**
+            //  * Create a vulkan surface and swapchain.
+            //  *
+            //  * @param aApplicationEnvironment The application environment to attach to.
+            //  */
+            // void createVulkanSurface(os::SApplicationEnvironment const &aApplicationEnvironment);
+
+            /**
+             * Find all physical devices and required capabilities in the system.
+             */
+            void determinePhysicalDevices();
+
+            /**
+             * Select a specific physical device previously discovered by the vulkan API.
+             *
+             * @param aDeviceIndex Index of the device to select.
+             */
+            void selectPhysicalDevice(uint32_t const &aDeviceIndex);
 
         private_members:
             SVulkanState mVkState;

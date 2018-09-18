@@ -33,15 +33,22 @@ namespace engine
             {
                 CStdSharedPtr_t<IWindow> window = nullptr;
 
-                Display *const display = reinterpret_cast<Display *const>(mX11Display->displayHandle());
-                uint64_t const x       = aInitialBounds.position.x();
-                uint64_t const y       = aInitialBounds.position.y();
-                uint64_t const w       = aInitialBounds.size.x();
-                uint64_t const h       = aInitialBounds.size.y();
+                Display *const  display = reinterpret_cast<Display *const>(mX11Display->displayHandle());
+                uint64_t const &screen  = mX11Display->primaryScreenIndex();
+
+                XSetWindowAttributes attributes{};
+                attributes.background_pixel = XWhitePixel(display, screen);
+
+                uint64_t const  x       = aInitialBounds.position.x();
+                uint64_t const  y       = aInitialBounds.position.y();
+                uint64_t const  w       = aInitialBounds.size.x();
+                uint64_t const  h       = aInitialBounds.size.y();
+                Visual  *const  visual  = DefaultVisual(display,screen);
+                uint64_t const  d       = DefaultDepth(display, screen);
 
                 try
                 {
-                    Window const x11Window = XCreateWindow(display, 0, x, y, w, h, 1, CopyFromParent, InputOutput, nullptr, 0, nullptr);
+                    Window const x11Window = XCreateWindow(display, XRootWindow(display, screen), x, y, w, h, 1, d, InputOutput, visual, CWBackPixel, &attributes);
 
                     window = makeCStdSharedPtr<CX11Window>(display, x11Window, aName, aInitialBounds);
                 }

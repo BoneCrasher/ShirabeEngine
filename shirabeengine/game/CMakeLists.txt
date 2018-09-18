@@ -18,4 +18,4 @@ set(
 
 include(project_setup)
 
-add_dependencies(enginetest INSTALL_shirabeengine)
+add_dependencies(game INSTALL_shirabeengine)

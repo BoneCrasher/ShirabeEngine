@@ -9,11 +9,13 @@
 #include <graphicsapi/resources/types/all.h>
 #include <vulkan/resources/vulkanresourcetaskbackend.h>
 #include <vulkan/rendering/vulkanrendercontext.h>
+#include <vulkan/vulkandevicecapabilities.h>
 
 #include <wsi/display.h>
 #if defined SHIRABE_PLATFORM_LINUX
 #include <wsi/x11/x11display.h>
 #include <wsi/x11/x11windowfactory.h>
+#include <vulkan/wsi/x11surface.h>
 #elif defined SHIRABE_PLATFORM_WINDOWS
 #include <wsi/windows/windowsdisplay.h>
 #include <wsi/windows/windowswindowfactory.h>
@@ -210,10 +212,21 @@ namespace engine
         std::function<void()> fnCreateDefaultGFXAPI
                 = [&, this] () -> void
         {
-            mVulkanEnvironment = makeCStdSharedPtr<CVulkanEnvironment>();
+            if(gfxApi == EGFXAPI::Vulkan)
+            {
+                mVulkanEnvironment = makeCStdSharedPtr<CVulkanEnvironment>();
+                EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
+                HandleEngineStatusError(status, "Vulkan initialization failed.");
 
-            EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
-            HandleEngineStatusError(status, "Vulkan initialization failed.");
+                VkSurfaceKHR surface = vulkan::CX11VulkanSurface::create(mVulkanEnvironment, x11Display, std::static_pointer_cast<x11::CX11Window>(mMainWindow));
+                mVulkanEnvironment->setSurface(surface);
+
+                VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
+                mVulkanEnvironment->createSwapChain(
+                             displayDesc.bounds,
+                             requiredFormat,
+                             VK_COLORSPACE_SRGB_NONLINEAR_KHR);
+            }
         };
 
         std::function<void()> fnCreatePlatformResourceSystem
@@ -286,8 +299,8 @@ namespace engine
         {
             fnCreatePlatformWindowSystem();
             fnCreateDefaultGFXAPI();
-            fnCreatePlatformResourceSystem();
-            fnCreatePlatformRenderer();
+            // fnCreatePlatformResourceSystem();
+            // fnCreatePlatformRenderer();
 
         }
         catch(CEngineException const e)
@@ -361,7 +374,10 @@ namespace engine
 
         mScene.update();
 
-        mRenderer->renderScene();
+        if(mRenderer)
+        {
+            mRenderer->renderScene();
+        }
 
         return EEngineStatus::Ok;
     }

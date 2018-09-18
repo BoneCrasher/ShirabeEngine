@@ -8,6 +8,7 @@
 #include "vulkan/vulkanenvironment.h"
 #include "vulkan/vulkandevicecapabilities.h"
 #include "vulkan/vulkanimport.h"
+#include "vulkan/wsi/x11surface.h"
 
 namespace engine
 {
@@ -157,7 +158,7 @@ namespace engine
     #ifdef SHIRABE_PLATFORM_WINDOWS
                 VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
     #elif defined SHIRABE_PLATFORM_LINUX
-                VK_KHR_XLIB_SURFACE_EXTENSION_NAME
+                VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
     #endif
     #ifdef SHIRABE_DEBUG
                 VK_EXT_DEBUG_REPORT_EXTENSION_NAME
@@ -270,35 +271,35 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CVulkanEnvironment::createVulkanSurface(
-                os::SApplicationEnvironment const &aApplicationEnvironment)
-        {
-            VkSurfaceKHR surface{};
-
-#if defined SHIRABE_PLATFORM_WINDOWS
-            VkWin32SurfaceCreateInfoKHR vkWin32SurfaceCreateInfo{};
-            vkWin32SurfaceCreateInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-            vkWin32SurfaceCreateInfo.hwnd      = reinterpret_cast<HWND>(appEnvironment.primaryWindowHandle);
-            vkWin32SurfaceCreateInfo.hinstance = reinterpret_cast<HINSTANCE>(appEnvironment.instanceHandle);
-            vkWin32SurfaceCreateInfo.flags     = 0;
-            vkWin32SurfaceCreateInfo.pNext     = nullptr;
-
-            auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(mVkState.instance, "vkCreateWin32SurfaceKHR");
-            if(!CreateWin32SurfaceKHR)
-            {
-                throw CVulkanError("Cannot find vulkan function 'vkCreateWin32SurfaceKHR'.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
-            }
-
-            VkResult result = CreateWin32SurfaceKHR(mVkState.instance, &vkWin32SurfaceCreateInfo, nullptr, &surface);
-            if(VkResult::VK_SUCCESS != result)
-            {
-                throw CVulkanError("Failed to create window surface!", result);
-            }
-#elif defined SHIRABE_PLATFORM_LINUX
-#endif
-
-            mVkState.surface = surface;
-        }
+//         void CVulkanEnvironment::createVulkanSurface(
+//                 os::SApplicationEnvironment const &aApplicationEnvironment)
+//         {
+//             VkSurfaceKHR surface{};
+//
+// #if defined SHIRABE_PLATFORM_WINDOWS
+//             VkWin32SurfaceCreateInfoKHR vkWin32SurfaceCreateInfo{};
+//             vkWin32SurfaceCreateInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+//             vkWin32SurfaceCreateInfo.hwnd      = reinterpret_cast<HWND>(appEnvironment.primaryWindowHandle);
+//             vkWin32SurfaceCreateInfo.hinstance = reinterpret_cast<HINSTANCE>(appEnvironment.instanceHandle);
+//             vkWin32SurfaceCreateInfo.flags     = 0;
+//             vkWin32SurfaceCreateInfo.pNext     = nullptr;
+//
+//             auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(mVkState.instance, "vkCreateWin32SurfaceKHR");
+//             if(!CreateWin32SurfaceKHR)
+//             {
+//                 throw CVulkanError("Cannot find vulkan function 'vkCreateWin32SurfaceKHR'.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+//             }
+//
+//             VkResult result = CreateWin32SurfaceKHR(mVkState.instance, &vkWin32SurfaceCreateInfo, nullptr, &surface);
+//             if(VkResult::VK_SUCCESS != result)
+//             {
+//                 throw CVulkanError("Failed to create window surface!", result);
+//             }
+// #elif defined SHIRABE_PLATFORM_LINUX
+// #endif
+//
+//             mVkState.surface = surface;
+//         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -765,11 +766,11 @@ namespace engine
                 createVulkanInstance("ShirabeEngine Demo");
                 determinePhysicalDevices();
                 selectPhysicalDevice(0);
-                createVulkanSurface(aApplicationEnvironment);
-                createSwapChain(
-                            aApplicationEnvironment.primaryDisplay().bounds,
-                            requiredFormat,
-                            VK_COLORSPACE_SRGB_NONLINEAR_KHR);
+                // createVulkanSurface(aApplicationEnvironment);
+                // createSwapChain(
+                //             aApplicationEnvironment.primaryDisplay().bounds,
+                //             requiredFormat,
+                //             VK_COLORSPACE_SRGB_NONLINEAR_KHR);
 
                 return status;
             }
@@ -838,6 +839,15 @@ namespace engine
             vkGetDeviceQueue(mVkState.selectedLogicalDevice, physicalDevice.queueFamilies.graphicsQueueFamilyIndices.at(0), 0, &queue);
 
             return queue;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::setSurface(VkSurfaceKHR const &aSurface)
+        {
+            getState().surface = aSurface;
         }
         //<-----------------------------------------------------------------------------
 
