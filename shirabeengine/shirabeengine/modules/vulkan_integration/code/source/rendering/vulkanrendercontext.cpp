@@ -35,19 +35,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindSwapChain()
+        EEngineStatus CVulkanRenderContext::bindSwapChain(PublicResourceId_t const &aSwapChainResourceId)
         {
             CVulkanEnvironment::SVulkanState     &vkState     = mVulkanEnvironment->getState();
             CVulkanEnvironment::SVulkanSwapChain &vkSwapChain = vkState.swapChain;
 
-            int64_t nextImageIndex = -1;
+            uint32_t nextImageIndex = 0;
+
+            VkDevice       device    = vkState.selectedLogicalDevice;
+            VkSwapchainKHR swapChain = vkState.swapChain.handle;
+            VkSemaphore    semaphore = vkState.swapChain.imageAvailableSemaphore;
+            uint64_t const timeout   =  std::numeric_limits<uint64_t>::max();
 
             VkResult result =
                     vkAcquireNextImageKHR(
-                        vkState.selectedLogicalDevice,
-                        vkSwapChain.handle,
-                        std::numeric_limits<uint64_t>::max(),
-                        vkSwapChain.swapChainSemaphore,
+                        device,
+                        swapChain,
+                        timeout,
+                        semaphore,
                         VK_NULL_HANDLE,
                         &nextImageIndex);
 
@@ -59,7 +64,11 @@ namespace engine
             VkImage               &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
             CStdSharedPtr_t<void>  resource = CStdSharedPtr_t<void>(static_cast<void*>(&image), [] (void*) {});
 
-            EEngineStatus const status   = mGraphicsAPIResourceBackend->registerResource("BackBuffer", resource);
+            EEngineStatus const status =
+                    mGraphicsAPIResourceBackend->registerResource(
+                        aSwapChainResourceId,
+                        resource,
+                        gfxapi::CGFXAPIResourceBackend::EImportStorageMode::Overwrite);
 
             return status;
         }

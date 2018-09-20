@@ -68,7 +68,7 @@ namespace engine
 
                 CLog::Verbose(logTag(), "SwapChainPass");
 
-                // aContext->bindSwapChain(aPassData.importData.backBufferInput);
+                aContext->bindSwapChain(aPassData.importData.backBufferInput);
 
                 return true;
             };

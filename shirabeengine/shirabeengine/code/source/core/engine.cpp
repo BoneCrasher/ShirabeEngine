@@ -142,6 +142,8 @@ namespace engine
     {
         EEngineStatus status = EEngineStatus::Ok;
 
+        CStdSharedPtr_t<CGFXAPIResourceBackend> resourceBackend = nullptr;
+
         CStdSharedPtr_t<CWSIDisplay> display = nullptr;
 #if defined SHIRABE_PLATFORM_LINUX
         CStdSharedPtr_t<x11::CX11Display> x11Display = makeCStdSharedPtr<x11::CX11Display>();
@@ -246,15 +248,7 @@ namespace engine
             mAssetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
-            CStdSharedPtr_t<CGFXAPIResourceBackend>     resourceBackend     = makeCStdSharedPtr<CGFXAPIResourceBackend>();
             CStdSharedPtr_t<CGFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
-
-            mProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
-            mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
-
-            CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
-            mResourceManager = manager;
 
             // The graphics API resource backend is static and does not have to be replaced.
             // On switching the graphics API the task backend (also containing the effective API handles),
@@ -270,8 +264,16 @@ namespace engine
                 resourceTaskBackend = vkResourceTaskBackend;
             }
 
+            resourceBackend = makeCStdSharedPtr<CGFXAPIResourceBackend>();
             resourceBackend->setResourceTaskBackend(resourceTaskBackend);
             resourceBackend->initialize();
+
+            mProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
+            mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
+
+            CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
+            mResourceManager = manager;            
             mResourceManager->initialize();
         };
 
@@ -284,7 +286,12 @@ namespace engine
             // How to decouple?
             CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;
             if(gfxApi == EGFXAPI::Vulkan)
-                gfxApiRenderContext = makeCStdSharedPtr<CVulkanRenderContext>();
+            {
+                CStdSharedPtr_t<CVulkanRenderContext> vulkanRenderContext = makeCStdSharedPtr<CVulkanRenderContext>();
+                vulkanRenderContext->initialize(mVulkanEnvironment, resourceBackend);
+
+                gfxApiRenderContext = vulkanRenderContext;
+            }
 
             CStdSharedPtr_t<IFrameGraphRenderContext> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
 

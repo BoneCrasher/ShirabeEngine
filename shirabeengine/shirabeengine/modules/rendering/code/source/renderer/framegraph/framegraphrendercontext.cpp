@@ -64,10 +64,25 @@ namespace engine
 
             return mResourceMap.at(aName);
         }
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         void CFrameGraphRenderContext::removeMappedInternalResourceIds(std::string const &aName)
         {
             mResourceMap.erase(aName);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::bindSwapChain(SFrameGraphResource const &aSwapChainResource)
+        {
+            EEngineStatus const status = mGraphicsAPIRenderContext->bindSwapChain(aSwapChainResource.readableName);
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 

@@ -33,6 +33,14 @@ namespace engine
 
         public_api:
             /**
+             * Bind a swapchain, if any, for further framegraph operations.
+             *
+             * @param  aSwapChainResource The resource handle created for the swapchain in the FG.
+             * @return                    EEngineStatus::Ok if successful. False otherwise.
+             */
+            virtual EEngineStatus bindSwapChain(SFrameGraphResource const &aSwapChainResource) = 0;
+
+            /**
              * Import a texture for use with framegraph render operations.
              *
              * @param aTexture The texture to import.
@@ -216,6 +224,14 @@ namespace engine
                     CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
                     CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                     CStdSharedPtr_t<IRenderContext>       aRenderer);
+
+            /**
+             * Bind a swapchain, if any, for further framegraph operations.
+             *
+             * @param  aSwapChainResource The resource handle created for the swapchain in the FG.
+             * @return                    EEngineStatus::Ok if successful. False otherwise.
+             */
+            EEngineStatus bindSwapChain(SFrameGraphResource const &aSwapChainResource);
 
             /**
              * Import a texture for use with framegraph render operations.

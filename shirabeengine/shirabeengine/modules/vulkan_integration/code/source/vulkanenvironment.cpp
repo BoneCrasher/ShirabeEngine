@@ -237,7 +237,7 @@ namespace engine
             // In Debug-mode, hook-in a validation layer report callback
             //
 #ifdef SHIRABE_DEBUG
-            int const reportFlags =
+            uint32_t const reportFlags =
                     VK_DEBUG_REPORT_ERROR_BIT_EXT       |
                     VK_DEBUG_REPORT_WARNING_BIT_EXT     |
                     VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
@@ -721,7 +721,7 @@ namespace engine
             }
 
             //
-            // Finally: Extract SwapChain images
+            // Extract SwapChain images
             //
             uint32_t             createdSwapChainImageCount = 0;
             std::vector<VkImage> swapChainImages;
@@ -736,17 +736,34 @@ namespace engine
             vkGetSwapchainImagesKHR(mVkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, swapChainImages.data());
 
             //
+            // Finally: Create an image availability semaphore to access the swapchain images for rendering operations.
+            //
+            VkSemaphore vkImageAvailableSemaphore = VK_NULL_HANDLE;
+
+            VkSemaphoreCreateInfo vkImageAvailableSemaphoreCreateInfo{};
+            vkImageAvailableSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkImageAvailableSemaphoreCreateInfo.pNext = nullptr;
+            vkImageAvailableSemaphoreCreateInfo.flags = 0;
+
+            result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkImageAvailableSemaphoreCreateInfo, nullptr, &vkImageAvailableSemaphore);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create image availability semaphore for the swapchain.", result);
+            }
+
+            //
             // Apply to state
             //
             SVulkanSwapChain swapChain = {};
-            swapChain.capabilities          = vkSurfaceCapabilities;
-            swapChain.supportedFormats      = vkSurfaceFormats;
-            swapChain.supportedPresentModes = vkSurfacePresentModes;
-            swapChain.selectedExtents       = vkBackBufferExtents;
-            swapChain.selectedFormat        = vkSelectedFormat;
-            swapChain.selectedPresentMode   = vkSelectedPresentMode;
-            swapChain.swapChainImages       = swapChainImages;
-            swapChain.handle                = vkSwapChain;
+            swapChain.capabilities            = vkSurfaceCapabilities;
+            swapChain.supportedFormats        = vkSurfaceFormats;
+            swapChain.supportedPresentModes   = vkSurfacePresentModes;
+            swapChain.selectedExtents         = vkBackBufferExtents;
+            swapChain.selectedFormat          = vkSelectedFormat;
+            swapChain.selectedPresentMode     = vkSelectedPresentMode;
+            swapChain.swapChainImages         = swapChainImages;
+            swapChain.handle                  = vkSwapChain;
+            swapChain.imageAvailableSemaphore = vkImageAvailableSemaphore;
 
             mVkState.swapChain = swapChain;
         }
@@ -796,6 +813,19 @@ namespace engine
         {
             // Wait for the logical device to finish up all work.
             vkDeviceWaitIdle(mVkState.selectedLogicalDevice);
+
+            if(mVkState.swapChain.handle)
+            {
+                mVkState.swapChain.swapChainImages.clear();
+
+                vkDestroySwapchainKHR(mVkState.selectedLogicalDevice, mVkState.swapChain.handle, nullptr);
+
+                if(mVkState.swapChain.imageAvailableSemaphore)
+                {
+                    vkDestroySemaphore(mVkState.selectedLogicalDevice, mVkState.swapChain.imageAvailableSemaphore, nullptr);
+                }
+            }
+
             // Kill it with fire...
             vkDestroyDevice(mVkState.selectedLogicalDevice, nullptr);
 

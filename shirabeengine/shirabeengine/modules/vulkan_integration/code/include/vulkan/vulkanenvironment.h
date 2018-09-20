@@ -112,6 +112,7 @@ namespace engine
                 VkSurfaceFormatKHR              selectedFormat;
                 VkPresentModeKHR                selectedPresentMode;
                 std::vector<VkImage>            swapChainImages;
+                VkSemaphore                     imageAvailableSemaphore;
             };
 
             /**

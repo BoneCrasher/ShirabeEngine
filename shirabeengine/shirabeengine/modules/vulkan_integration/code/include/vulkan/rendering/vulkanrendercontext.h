@@ -42,11 +42,12 @@ namespace engine
             bool deinitialize();
 
             /**
-             * Update and bind the swap chain to the pipeline (if any...)
+             * Bind the graphics API swapchain to the pipeline (if any...)
              *
-             * @return EEngineStatus::Ok, if successful. An error code otherwise.
+             * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
+             * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus bindSwapChain();
+            EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId);
 
             /**
              * Bind a resource to the pipeline.

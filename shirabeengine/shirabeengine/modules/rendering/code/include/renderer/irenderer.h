@@ -29,6 +29,14 @@ namespace engine
 
         public_api:
             /**
+             * Bind the graphics API swapchain to the pipeline (if any...)
+             *
+             * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
+             * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
+             */
+            virtual EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId) = 0;
+
+            /**
              * Bind a resource to the pipeline of the respective graphics API used.
              *
              * @param aResourceUID The UID of the resource to be bound.
