@@ -4,6 +4,8 @@
 #include <log/log.h>
 #include <renderer/irenderer.h>
 #include <renderer/renderertypes.h>
+#include <graphicsapi/resources/gfxapiresourcebackend.h>
+#include "vulkan/vulkanenvironment.h"
 
 namespace engine
 {
@@ -21,6 +23,31 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CVulkanRenderContext);
 
         public_methods:
+            /**
+             * Initialize this render context.
+             *
+             * @param aGraphicsAPIResourceBackend The resource backend to access and use for graphics resources.
+             * @param aVulkanEnvironment          The current vulkan environment initialized for this application.
+             * @return                            True, if successful. False otherwise.
+             */
+            bool initialize(
+                    CStdSharedPtr_t<CVulkanEnvironment>             const &aVulkanEnvironment,
+                    CStdSharedPtr_t<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend);
+
+            /**
+             * Destroy and run...
+             *
+             * @return See brief.
+             */
+            bool deinitialize();
+
+            /**
+             * Update and bind the swap chain to the pipeline (if any...)
+             *
+             * @return EEngineStatus::Ok, if successful. An error code otherwise.
+             */
+            EEngineStatus bindSwapChain();
+
             /**
              * Bind a resource to the pipeline.
              *
@@ -44,6 +71,10 @@ namespace engine
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
             EEngineStatus render(SRenderable const &aRenderable);
+
+        private_members:
+            CStdSharedPtr_t<CVulkanEnvironment>             mVulkanEnvironment;
+            CStdSharedPtr_t<gfxapi::CGFXAPIResourceBackend> mGraphicsAPIResourceBackend;
         };
     }
 }
