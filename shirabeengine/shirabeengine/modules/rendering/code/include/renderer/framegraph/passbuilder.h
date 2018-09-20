@@ -102,6 +102,18 @@ namespace engine
             // create~?
 
             /**
+             * Request the import of a texture resource in the framegraph.
+             *
+             * @param aName       Name of the texture to import.
+             * @param aDescriptor Descriptor of the texture to import.
+             * @return            Return a framegraph resource handle for the texture
+             *                    import.
+             */
+            SFrameGraphResource importTexture(
+                    std::string        const &aName,
+                    SFrameGraphTexture const &aDescriptor);
+
+            /**
              * Request a forward-op of a texture.
              *
              * @param aSubjacentTargetResource The resource id of the texture to forward.

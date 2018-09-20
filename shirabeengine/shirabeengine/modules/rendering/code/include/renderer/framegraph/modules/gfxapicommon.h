@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_FRAMEGRAPH_MODULE_PREPASS_H__
-#define __SHIRABE_FRAMEGRAPH_MODULE_PREPASS_H__
+#ifndef __SHIRABE_FRAMEGRAPH_MODULE_GFXAPICOMMON_H__
+#define __SHIRABE_FRAMEGRAPH_MODULE_GFXAPICOMMON_H__
 
 #include <platform/platform.h>
 #include <log/log.h>
@@ -16,23 +16,23 @@ namespace engine
         /**
          * Template specialization selector for the gbuffer module.
          */
-        struct SPrepassModuleTag_t {};
+        struct SGraphicsAPICommonModuleTag_t {};
 
         /**
          * The FrameGraphModule<SGBufferModuleTag_t> class implements all gbuffer generation
          * related data structs and passes.
          */
         template<>
-        class SHIRABE_TEST_EXPORT CFrameGraphModule<SPrepassModuleTag_t>
+        class SHIRABE_TEST_EXPORT CFrameGraphModule<SGraphicsAPICommonModuleTag_t>
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SPrepassModuleTag_t>);
+            SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SGraphicsAPICommonModuleTag_t>);
 
         public_structs:
             /**
              * The SGBufferGenerationImportData struct describes all imported data for the
              * GBufferGeneration pass.
              */
-            struct SPrepassImportData
+            struct SSwapChainPassImportData
             {
                 SFrameGraphResource backBufferInput;
             };
@@ -41,22 +41,27 @@ namespace engine
              * The SGBufferGenerationExportData struct describes all exported data for the
              * GBufferGeneration pass.
              */
-            struct SPrepassExportData
+            struct SSwapChainPassExportData
             {
                 SFrameGraphResource backbuffer;
             };
 
         public_methods:
             /**
-             * Add a gbuffer generation pass to the render graph.
+             * Add a swapchain pass to the framegraph, which will import a swapchain backbuffer image
+             * and bind it to the underlying graphics API.
              *
              * @param aGraphBuilder    The graph builder to source from.
-             * @param aRenderableInput The renderables for which gbuffer data should be generated.
+             * @param aWidth           The width of the backbuffer images.
+             * @param aHeight          The height of the backbuffer images.
+             * @param aFormat          The format of the backbuffer images.
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
-            SPrepassExportData addPrepass(
-                    CGraphBuilder             &aGraphBuilder,
-                    SFrameGraphResource const &aBackBuffer);
+            SSwapChainPassExportData addSwapChainPass(
+                    CGraphBuilder            &aGraphBuilder,
+                    uint32_t           const &aWidth,
+                    uint32_t           const &aHeight,
+                    FrameGraphFormat_t const &aFormat);
         };
 
     }

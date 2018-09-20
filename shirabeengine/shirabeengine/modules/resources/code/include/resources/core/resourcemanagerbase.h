@@ -632,18 +632,18 @@ namespace engine
             }
             catch(CEngineException ee)
             {
+                CLog::Error(logTag(), CString::format("Error while trying to destroy a resource in the resource manager. Error: %0, Code: %1", ee.message(), ee.status()));
                 eraseFn();
-                throw;
             }
             catch(std::exception e)
             {
+                CLog::Error(logTag(), CString::format("Error while trying to destroy a resource in the resource manager. Error: %0", e.what()));
                 eraseFn();
-                throw;
             }
             catch(...)
             {
+                CLog::Error(logTag(), CString::format("Unknown Error while trying to destroy a resource in the resource manager."));
                 eraseFn();
-                throw;
             }
 
             // Any further verification, e.g. with the backend to ensure proper deletion?

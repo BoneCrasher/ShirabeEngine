@@ -33,12 +33,35 @@ namespace engine
 
             // Basic abstract descriptor of resources being used.
             SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
+            resource.assignTextureParameters(aDescriptor);
             resource.assignedPassUID     = mPassUID;
             resource.parentResource      = 0;
             resource.subjacentResource   = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName        = aName;
             resource.type                = EFrameGraphResourceType::Texture;
+
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            accessor->registerResource(resource.resourceId);
+
+            return resource;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SFrameGraphResource CPassBuilder::importTexture(
+                std::string        const &aName,
+                SFrameGraphTexture const &aDescriptor)
+        {
+            SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
             resource.assignTextureParameters(aDescriptor);
+            resource.assignedPassUID     = mPassUID;
+            resource.parentResource      = 0;
+            resource.subjacentResource   = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
+            resource.readableName        = aName;
+            resource.type                = EFrameGraphResourceType::Texture;
+            resource.isExternalResource  = true;
 
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
             accessor->registerResource(resource.resourceId);

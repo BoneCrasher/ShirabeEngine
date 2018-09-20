@@ -251,10 +251,22 @@ namespace engine
 
                 HandleEngineStatusError(status, CString::format("Failed to create and/or enqueue resource creation task."));
             }
-            catch(std::future_error const&fe)
+            catch(std::future_error const &fe)
             {
                 CLog::Error(logTag(), CString::format("Failed to access future shared state. Error: %0", fe.what()));
             }
+#if defined SHIRABE_DEBUG // In Release-Mode, all other exceptions need to be reported.
+            catch(std::exception const &e)
+            {
+                CLog::Error(logTag(), CString::format("Error while trying to request a task result in the resource backend. Error: %0", e.what()));
+
+            }
+            catch(...)
+            {
+                CLog::Error(logTag(), CString::format("Unknown error while trying to request a task result in the resource backend."));
+
+            }
+#endif
 
             return status;
         }

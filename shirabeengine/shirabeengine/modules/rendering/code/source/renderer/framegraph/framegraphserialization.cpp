@@ -520,7 +520,7 @@ namespace engine
                             ? "68a357"
                             : (viewIsWriteMode
                                ? "c97064"
-                               : "c82d33" )),
+                               : "e0e0e0" )),
                         aView.resourceId,
                         aView.subjacentResource,
                         (viewIsReadMode

@@ -1,6 +1,6 @@
 #include "renderer/framegraph/graphbuilder.h"
 #include "renderer/framegraph/passbuilder.h"
-#include "renderer/framegraph/modules/prepass.h"
+#include "renderer/framegraph/modules/gfxapicommon.h"
 #include "renderer/framegraph/modules/gbuffergeneration.h"
 #include "renderer/framegraph/modules/lighting.h"
 #include "renderer/framegraph/modules/compositing.h"
@@ -149,19 +149,6 @@ namespace engine
             CGraphBuilder graphBuilder{ };
             graphBuilder.initialize(mAppEnvironment, mDisplay);
 
-            SFrameGraphTexture backBufferTextureDesc{ };
-            backBufferTextureDesc.width          = width;
-            backBufferTextureDesc.height         = height;
-            backBufferTextureDesc.depth          = 1;
-            backBufferTextureDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
-            backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
-            backBufferTextureDesc.arraySize      = 1;
-            backBufferTextureDesc.mipLevels      = 1;
-            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget | EFrameGraphResourceUsage::Unused;
-
-            SFrameGraphResource backBuffer{ };
-            backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
-
             RenderableList renderableCollection ={
                 { "Cube",    0, 0 },
                 { "Sphere",  0, 0 },
@@ -171,25 +158,28 @@ namespace engine
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
             // Prepass
-            CFrameGraphModule<SPrepassModuleTag_t>                     prepassModule    { };
-            CFrameGraphModule<SPrepassModuleTag_t>::SPrepassExportData prepassExportData{ };
-            prepassExportData = prepassModule.addPrepass(
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                           prepassModule    { };
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SSwapChainPassExportData prepassExportData{ };
+            prepassExportData =
+                    prepassModule.addSwapChainPass(
                         graphBuilder,
-                        backBuffer);
-
-            SFrameGraphTexture const &tex = *graphBuilder.getResources().get<SFrameGraphTexture>(backBuffer.resourceId);
+                        width,
+                        height,
+                        FrameGraphFormat_t::R8G8B8A8_UNORM);
 
             // GBuffer
             CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule    { };
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
-            gbufferExportData = gbufferModule.addGBufferGenerationPass(
+            gbufferExportData =
+                    gbufferModule.addGBufferGenerationPass(
                         graphBuilder,
                         renderables);
 
             // Lighting
             CFrameGraphModule<SLightingModuleTag_t>                      lightingModule    { };
             CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
-            lightingExportData = lightingModule.addLightingPass(
+            lightingExportData =
+                    lightingModule.addLightingPass(
                         graphBuilder,
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
@@ -199,7 +189,8 @@ namespace engine
             // Compositing
             CFrameGraphModule<SCompositingModuleTag_t>              compositingModule    { };
             CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
-            compositingExportData = compositingModule.addDefaultCompositingPass(
+            compositingExportData =
+                    compositingModule.addDefaultCompositingPass(
                         graphBuilder,
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
