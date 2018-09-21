@@ -102,11 +102,21 @@ namespace engine
             vkPresentInfo.pImageIndices      = &(vkState.swapChain.currentSwapChainImageIndex);
             vkPresentInfo.pResults           =  nullptr;
 
-            vkQueuePresentKHR(presentQueue, &vkPresentInfo);
+            VkResult result = vkQueuePresentKHR(presentQueue, &vkPresentInfo);
+            if(VK_SUCCESS != result)
+            {
+                throw CVulkanError("Failed to execute 'vkQueuePresentKHR'", result);
+            }
 
             // Temporary workaround to avoid memory depletion from GPU workloads using validation layers.
             // Implement better synchronization and throttling, once ready.
-            vkQueueWaitIdle(presentQueue);
+            result = vkQueueWaitIdle(presentQueue);
+            if(VK_SUCCESS != result)
+            {
+                throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
+            }
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
