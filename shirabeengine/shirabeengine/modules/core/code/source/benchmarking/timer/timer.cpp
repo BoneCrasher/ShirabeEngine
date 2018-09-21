@@ -115,7 +115,7 @@ namespace engine
 
 #ifdef _DEBUG
         if (mTimeInterface && (mConversionConstant.tv_sec || mConversionConstant.tv_nsec))
-#elif
+#else
         if (mTimeInterface)
 #endif
 		{

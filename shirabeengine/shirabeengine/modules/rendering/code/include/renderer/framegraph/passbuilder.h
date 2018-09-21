@@ -130,6 +130,15 @@ namespace engine
                     CRange                   const &aMipSliceRange   = CRange(0, 1));
 
             /**
+             * Accept a forwarded resource but do nothing further with it.
+             *
+             * @param aSubjacentTargetResource The resource id of the texture to accept.
+             * @return                         Return a framegraph resource handle for the texture acceptance.
+             */
+            SFrameGraphResource acceptTexture(
+                    SFrameGraphResource const &aSubjacentTargetResource);
+
+            /**
              * Request a write operation on a subjacent texture instance.
              *
              * @param aSubjacentTargetResource The resource id of the texture to write.

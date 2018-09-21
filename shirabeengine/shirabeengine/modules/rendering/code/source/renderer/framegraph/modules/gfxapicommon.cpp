@@ -15,7 +15,7 @@ namespace engine
                 FrameGraphFormat_t const &aFormat)
         {
             /**
-             * The SState struct is the internal state of the gbuffer generation pass.
+             * The SState struct is the internal state of the swapchain pass.
              */
             struct SState
             {
@@ -74,6 +74,61 @@ namespace engine
             };
 
             auto pass = aGraphBuilder.spawnPass<CallbackPass<SSwapChainPassData>>("SwapChainPass", setup, execute);
+            return pass->passData().exportData;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData
+        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addPresentPass(
+                CGraphBuilder             &aGraphBuilder,
+                SFrameGraphResource const &aRenderingResult)
+        {
+            /**
+             * The SState struct is the internal state of the present generation pass.
+             */
+            struct SState
+            {
+            };
+
+            /**
+             * The SPassData struct declares the externally managed pass data
+             * for the pass to be created.
+             */
+            struct SPresentPassData
+            {
+                SPresentPassImportData importData;
+                SPresentPassExportData exportData;
+
+                SState state;
+            };
+
+            auto const setup = [&] (
+                    CPassBuilder     &aBuilder,
+                    SPresentPassData &aOutPassData) -> bool
+            {
+                SFrameGraphResource const handle = aBuilder.acceptTexture(aRenderingResult);
+
+                return true;
+            };
+
+            auto const execute = [=] (
+                    SPresentPassData                          const&aPassData,
+                    CFrameGraphResources                      const&aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+            {
+                using namespace engine::rendering;
+
+                CLog::Verbose(logTag(), "SwapChainPass");
+
+                aContext->present();
+
+                return true;
+            };
+
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>("PresentPass", setup, execute);
             return pass->passData().exportData;
         }
         //<-----------------------------------------------------------------------------

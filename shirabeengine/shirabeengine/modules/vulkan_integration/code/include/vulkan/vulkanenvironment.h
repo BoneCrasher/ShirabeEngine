@@ -112,7 +112,9 @@ namespace engine
                 VkSurfaceFormatKHR              selectedFormat;
                 VkPresentModeKHR                selectedPresentMode;
                 std::vector<VkImage>            swapChainImages;
+                uint32_t                        currentSwapChainImageIndex;
                 VkSemaphore                     imageAvailableSemaphore;
+                VkSemaphore                     renderCompletedSemaphore;
             };
 
             /**
@@ -128,23 +130,23 @@ namespace engine
 
             public_members:
                 // Instance
-                std::vector<char const*>     instanceLayers;
-                std::vector<char const*>     instanceExtensions;
-                VkInstanceCreateInfo         instanceCreateInfo;
-                VkInstance                   instance;
+                std::vector<char const*>      instanceLayers;
+                std::vector<char const*>      instanceExtensions;
+                VkInstanceCreateInfo          instanceCreateInfo;
+                VkInstance                    instance;
                 // Debug
-                VkDebugReportCallbackEXT     debugReportCallback;
+                VkDebugReportCallbackEXT      debugReportCallback;
                 // Surface
-                VkSurfaceKHR                 surface;
+                VkSurfaceKHR                  surface;
                 // Physical Device
-                std::vector<char const*>     deviceLayers;
-                std::vector<char const*>     deviceExtensions;
+                std::vector<char const*>      deviceLayers;
+                std::vector<char const*>      deviceExtensions;
                 Vector<SVulkanPhysicalDevice> supportedPhysicalDevices;
-                uint32_t                     selectedPhysicalDevice;
+                uint32_t                      selectedPhysicalDevice;
                 // Logical Device
-                VkDevice                     selectedLogicalDevice;
+                VkDevice                      selectedLogicalDevice;
                 // Swap Chain
-                SVulkanSwapChain             swapChain;
+                SVulkanSwapChain              swapChain;
             };
 
         public_constructors:
@@ -175,6 +177,13 @@ namespace engine
              * @return A graphics queue, if available or VK_NULL_HANDLE.
              */
             VkQueue getGraphicsQueue();
+
+            /**
+             * Return the currently selected present queue, if any.
+             *
+             * @return A present queue, if available or VK_NULL_HANDLE.
+             */
+            VkQueue getPresentQueue();
 
             /**
              * If the Vulkan-Environment should work upon a surface, provide it here.

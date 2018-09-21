@@ -155,8 +155,9 @@ namespace engine
         {
             Undefined = 0,
             Forward   = 1,
-            Read      = 2,
-            Write     = 4
+            Accept    = 2,
+            Read      = 4,
+            Write     = 8
         };
 
         /**

@@ -310,6 +310,87 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        SFrameGraphResource CPassBuilder::acceptTexture(
+                SFrameGraphResource const &aSubjacentTargetResource)
+        {
+            FrameGraphResourceId_t const subjacentResourceId =
+                    (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
+                     ? aSubjacentTargetResource.resourceId
+                     : aSubjacentTargetResource.subjacentResource;
+
+            EFrameGraphViewAccessMode const mode = EFrameGraphViewAccessMode::Accept;
+
+            EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
+
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+
+            SFrameGraphTextureView const &textureView = *mResourceData.get<SFrameGraphTextureView>(aSubjacentTargetResource.resourceId);
+
+            CRange adjustedArraySliceRange = textureView.arraySliceRange;
+            CRange adjustedMipSliceRange   = textureView.mipSliceRange;
+
+            adjustArrayAndMipSliceRanges(
+                        mResourceData,
+                        aSubjacentTargetResource,
+                        textureView.arraySliceRange,
+                        textureView.mipSliceRange,
+                        adjustedArraySliceRange,
+                        adjustedMipSliceRange);
+
+            Optional_t<RefWrapper_t<SFrameGraphTextureView>> ref{};
+
+            // Can we cull?
+            bool duplicateFound = false;
+            if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
+            {
+                FrameGraphResourceId_t const duplicateViewId =
+                        findDuplicateTextureView(
+                            subjacentResourceId,
+                            textureView.format,
+                            source,
+                            adjustedArraySliceRange,
+                            adjustedMipSliceRange,
+                            mode);
+
+                duplicateFound = (duplicateViewId > 0);
+                if(duplicateFound)
+                {
+                    SFrameGraphTextureView &view = *mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+
+                    ref = view;
+                }
+            }
+
+            if(!duplicateFound)
+            {
+                SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
+                view.arraySliceRange    = adjustedArraySliceRange;
+                view.mipSliceRange      = adjustedMipSliceRange;
+                view.format             = textureView.format;
+                view.source             = source;
+                view.assignedPassUID    = mPassUID;
+                view.parentResource     = aSubjacentTargetResource.resourceId;
+                view.subjacentResource  = subjacentResourceId;
+                view.readableName       = CString::format("TextureView ID %0 - Forward #%1", view.resourceId, aSubjacentTargetResource.resourceId);
+                view.type               = EFrameGraphResourceType::TextureView;
+                view.mode.set(mode);
+
+                CStdSharedPtr_t<SFrameGraphResource> subjacent = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
+                ++subjacent->referenceCount;
+
+                ref = view;
+            }
+
+            accessor->registerResource(ref->get().resourceId);
+            ++(ref->get().referenceCount);
+
+            return *ref;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         SFrameGraphResource CPassBuilder::writeTexture(
                 SFrameGraphResource          const &aSubjacentTargetResource,
                 SFrameGraphWriteTextureFlags const &aFlags,

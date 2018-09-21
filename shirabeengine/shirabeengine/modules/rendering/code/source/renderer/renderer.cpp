@@ -158,17 +158,21 @@ namespace engine
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
             // Prepass
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                           prepassModule    { };
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SSwapChainPassExportData prepassExportData{ };
-            prepassExportData =
-                    prepassModule.addSwapChainPass(
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                           graphicsAPICommonModule{ };
+            CFrameGraphModule<SGBufferModuleTag_t>                                     gbufferModule          { };
+            CFrameGraphModule<SLightingModuleTag_t>                                    lightingModule         { };
+            CFrameGraphModule<SCompositingModuleTag_t>                                 compositingModule      { };
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SSwapChainPassExportData swapChainPassExportData{ };
+
+            // SwapChain binding
+            swapChainPassExportData =
+                    graphicsAPICommonModule.addSwapChainPass(
                         graphBuilder,
                         width,
                         height,
                         FrameGraphFormat_t::R8G8B8A8_UNORM);
 
             // GBuffer
-            CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule    { };
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
             gbufferExportData =
                     gbufferModule.addGBufferGenerationPass(
@@ -176,7 +180,6 @@ namespace engine
                         renderables);
 
             // Lighting
-            CFrameGraphModule<SLightingModuleTag_t>                      lightingModule    { };
             CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
             lightingExportData =
                     lightingModule.addLightingPass(
@@ -187,7 +190,6 @@ namespace engine
                         gbufferExportData.gbuffer3);
 
             // Compositing
-            CFrameGraphModule<SCompositingModuleTag_t>              compositingModule    { };
             CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData =
                     compositingModule.addDefaultCompositingPass(
@@ -197,7 +199,14 @@ namespace engine
                         gbufferExportData.gbuffer2,
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer,
-                        prepassExportData.backbuffer);
+                        swapChainPassExportData.backbuffer);
+
+            // Present
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
+            presentPassExportData =
+                    graphicsAPICommonModule.addPresentPass(
+                        graphBuilder,
+                        compositingExportData.output);
 
             CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
@@ -225,9 +234,10 @@ namespace engine
                 system("tools/makeFrameGraphPNG.sh");
             }
 
-            // CRenderer will call.
             if(frameGraph)
+            {
                 frameGraph->execute(mFrameGraphRenderContext);
+            }
 
             return EEngineStatus::Ok;
         }

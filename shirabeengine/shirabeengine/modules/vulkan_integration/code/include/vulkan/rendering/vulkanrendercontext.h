@@ -50,6 +50,13 @@ namespace engine
             EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId);
 
             /**
+             * Commit all changes and present the rendered content in the backbuffer to screen.
+             *
+             * @return EEngineStatus::Ok if successful. False otherwise.
+             */
+            EEngineStatus present();
+
+            /**
              * Bind a resource to the pipeline.
              *
              * @param aResourceId The id of the resourcer to bind.

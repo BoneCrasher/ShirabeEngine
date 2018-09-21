@@ -29,8 +29,8 @@ namespace engine
 
         public_structs:
             /**
-             * The SGBufferGenerationImportData struct describes all imported data for the
-             * GBufferGeneration pass.
+             * The SSwapChainPassImportData struct describes all imported data for the
+             * SwapChain pass.
              */
             struct SSwapChainPassImportData
             {
@@ -38,12 +38,28 @@ namespace engine
             };
 
             /**
-             * The SGBufferGenerationExportData struct describes all exported data for the
-             * GBufferGeneration pass.
+             * The SSwapChainPassExportData struct describes all exported data for the
+             * SwapChain pass.
              */
             struct SSwapChainPassExportData
             {
                 SFrameGraphResource backbuffer;
+            };
+
+            /**
+             * The SPresentPassImportData struct describes all imported data for the
+             * Present pass.
+             */
+            struct SPresentPassImportData
+            {
+            };
+
+            /**
+             * The SPresentPassExportData struct describes all exported data for the
+             * Present pass.
+             */
+            struct SPresentPassExportData
+            {
             };
 
         public_methods:
@@ -62,6 +78,18 @@ namespace engine
                     uint32_t           const &aWidth,
                     uint32_t           const &aHeight,
                     FrameGraphFormat_t const &aFormat);
+
+            /**
+             * Add a present pass to commit the rendering result to screen and free up the swap chain image acquired.
+             *
+             * @param aGraphBuilder    The graph builder to source from.
+             * @param aRenderingResult "No-Op" forwarded resource just to abuse the framegraph system to add this pass...
+             *                         TODO: Think of a clean solution...
+             * @return                 Export data of this pass. Will be empty as this pass is the end of execution.
+             */
+            SPresentPassExportData addPresentPass(
+                    CGraphBuilder             &aGraphBuilder,
+                    SFrameGraphResource const &aRenderingResult);
         };
 
     }

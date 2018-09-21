@@ -89,6 +89,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::present()
+        {
+            EEngineStatus const status = mGraphicsAPIRenderContext->present();
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
             PublicResourceId_t const pid = "";

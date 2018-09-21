@@ -41,6 +41,13 @@ namespace engine
             virtual EEngineStatus bindSwapChain(SFrameGraphResource const &aSwapChainResource) = 0;
 
             /**
+             * Commit all changes and present the rendered content in the backbuffer to screen.
+             *
+             * @return EEngineStatus::Ok if successful. False otherwise.
+             */
+            virtual EEngineStatus present() = 0;
+
+            /**
              * Import a texture for use with framegraph render operations.
              *
              * @param aTexture The texture to import.
@@ -232,6 +239,14 @@ namespace engine
              * @return                    EEngineStatus::Ok if successful. False otherwise.
              */
             EEngineStatus bindSwapChain(SFrameGraphResource const &aSwapChainResource);
+
+            /**
+             * Commit all changes and present the rendered content in the backbuffer to screen.
+             *
+             * @return EEngineStatus::Ok if successful. False otherwise.
+             */
+
+            EEngineStatus present();
 
             /**
              * Import a texture for use with framegraph render operations.

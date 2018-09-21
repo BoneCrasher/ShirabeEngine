@@ -438,7 +438,7 @@ namespace engine
         void CFrameGraphGraphVizSerializer::writeTextureResource(SFrameGraphTexture const &aTexture)
         {
             std::string mode = "create";
-            if(aTexture.assignedPassUID == 0)
+            if(aTexture.isExternalResource)
                 mode = "import";
 
             static constexpr char const *textureStyle = "shape=none";
@@ -501,6 +501,7 @@ namespace engine
             bool const viewIsReadMode  = aView.mode.check(EFrameGraphViewAccessMode::Read);
             bool const viewIsWriteMode = aView.mode.check(EFrameGraphViewAccessMode::Write);
             bool const viewIsFwdMode   = aView.mode.check(EFrameGraphViewAccessMode::Forward);
+            bool const viewIsAckMode   = aView.mode.check(EFrameGraphViewAccessMode::Accept);
 
             std::string viewId   = CString::format("TextureView%0", aView.resourceId);
 
@@ -520,14 +521,18 @@ namespace engine
                             ? "68a357"
                             : (viewIsWriteMode
                                ? "c97064"
-                               : "e0e0e0" )),
+                               : (viewIsFwdMode
+                                  ? "d0d0d0"
+                                  : "e0e0e0"))),
                         aView.resourceId,
                         aView.subjacentResource,
                         (viewIsReadMode
                             ? "Read"
                             : (viewIsWriteMode
                                ? "Write"
-                               : "Forward" )),
+                               : (viewIsFwdMode
+                                  ? "Forward"
+                                  : "Accept"))),
                         to_string(aView.format),
                         to_string(aView.arraySliceRange),
                         to_string(aView.mipSliceRange),
@@ -549,6 +554,8 @@ namespace engine
             bool parentResourceIsTextureView = (aParentResource.type == EFrameGraphResourceType::TextureView);
             bool viewIsReadMode              = aView.mode.check(EFrameGraphViewAccessMode::Read);
             bool viewIsWriteMode             = aView.mode.check(EFrameGraphViewAccessMode::Write);
+            bool viewIsFwdMode               = aView.mode.check(EFrameGraphViewAccessMode::Forward);
+            bool viewIsAckMode               = aView.mode.check(EFrameGraphViewAccessMode::Accept);
 
             std::string const passId   = CString::format("Pass%0", aPassUID);
             std::string const viewId   = CString::format("TextureView%0", aView.resourceId);
@@ -576,10 +583,15 @@ namespace engine
                 static constexpr char const*pass2ViewWriteEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
                 mStream << "    " << passId << " -> " << viewId  << " [" << pass2ViewWriteEdgeStyle << ",color=" << color << "];\n";
             }
-            else
+            else if(viewIsFwdMode)
             {
                 static constexpr char const*pass2ViewForwardEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
                 mStream << "    " << passId << " -> " << viewId  << " [" << pass2ViewForwardEdgeStyle << ",color=" << color << "];\n";
+            }
+            else
+            {
+                static constexpr char const*viewAccept2PassEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
+                mStream << "    " << viewId << " -> " << passId << " [" << viewAccept2PassEdgeStyle << ",color=" << color << "];\n";
             }
 
             if(parentResourceIsTextureView)

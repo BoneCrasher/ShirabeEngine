@@ -255,7 +255,7 @@ namespace engine
             {
                 CLog::Error(logTag(), CString::format("Failed to access future shared state. Error: %0", fe.what()));
             }
-#if defined SHIRABE_DEBUG // In Release-Mode, all other exceptions need to be reported.
+#if 1 // defined SHIRABE_DEBUG // In Release-Mode, all other exceptions need to be reported.
             catch(std::exception const &e)
             {
                 CLog::Error(logTag(), CString::format("Error while trying to request a task result in the resource backend. Error: %0", e.what()));

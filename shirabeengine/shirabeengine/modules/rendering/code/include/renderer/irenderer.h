@@ -37,6 +37,13 @@ namespace engine
             virtual EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId) = 0;
 
             /**
+             * Commit all changes and present the rendered content in the backbuffer to screen.
+             *
+             * @return EEngineStatus::Ok if successful. False otherwise.
+             */
+            virtual EEngineStatus present() = 0;
+
+            /**
              * Bind a resource to the pipeline of the respective graphics API used.
              *
              * @param aResourceUID The UID of the resource to be bound.

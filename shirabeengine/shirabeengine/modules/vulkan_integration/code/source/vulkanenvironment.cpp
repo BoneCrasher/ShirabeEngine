@@ -79,6 +79,10 @@ namespace engine
             , selectedExtents({ 0, 0 })
             , selectedFormat()
             , selectedPresentMode()
+            , swapChainImages()
+            , currentSwapChainImageIndex(0)
+            , imageAvailableSemaphore(VK_NULL_HANDLE)
+            , renderCompletedSemaphore(VK_NULL_HANDLE)
         {}
         //<-----------------------------------------------------------------------------
 
@@ -516,7 +520,7 @@ namespace engine
                 VkFormat        const &aRequestedFormat,
                 VkColorSpaceKHR const &aColorSpace)
         {
-            SVulkanPhysicalDevice const &vkPhysicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
+            SVulkanPhysicalDevice       &vkPhysicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
             VkSurfaceKHR          const &vkSurface        = mVkState.surface;
 
             //
@@ -736,7 +740,7 @@ namespace engine
             vkGetSwapchainImagesKHR(mVkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, swapChainImages.data());
 
             //
-            // Finally: Create an image availability semaphore to access the swapchain images for rendering operations.
+            // Finally: Create an image availability and render completed semaphore to access the swapchain images for rendering operations.
             //
             VkSemaphore vkImageAvailableSemaphore = VK_NULL_HANDLE;
 
@@ -751,19 +755,56 @@ namespace engine
                 throw CVulkanError("Cannot create image availability semaphore for the swapchain.", result);
             }
 
+            VkSemaphore vkRenderCompletedSemaphore = VK_NULL_HANDLE;
+
+            VkSemaphoreCreateInfo vkRenderCompletedSemaphoreCreateInfo{};
+            vkRenderCompletedSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkRenderCompletedSemaphoreCreateInfo.pNext = nullptr;
+            vkRenderCompletedSemaphoreCreateInfo.flags = 0;
+
+            result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkRenderCompletedSemaphoreCreateInfo, nullptr, &vkRenderCompletedSemaphore);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create image availability semaphore for the swapchain.", result);
+            }
+
+            //
+            // PRESENT QUEUES
+            //
+            std::vector<uint32_t> const &supportingQueueFamilyIndices = vkPhysicalDevice.queueFamilies.supportingQueueFamilyIndices;
+
+            for(uint32_t k=0; k<supportingQueueFamilyIndices.size(); ++k)
+            {
+                uint32_t const &familyIndex = supportingQueueFamilyIndices.at(k);
+
+                VkBool32 isPresentingSupported = VK_FALSE;
+
+                VkResult const result = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, familyIndex, vkSurface, &isPresentingSupported);
+                if(VK_SUCCESS != result)
+                {
+                    continue;
+                }
+
+                if(isPresentingSupported)
+                {
+                    vkPhysicalDevice.queueFamilies.presentQueueFamilyIndices.push_back(familyIndex);
+                }
+            }
+
             //
             // Apply to state
             //
             SVulkanSwapChain swapChain = {};
-            swapChain.capabilities            = vkSurfaceCapabilities;
-            swapChain.supportedFormats        = vkSurfaceFormats;
-            swapChain.supportedPresentModes   = vkSurfacePresentModes;
-            swapChain.selectedExtents         = vkBackBufferExtents;
-            swapChain.selectedFormat          = vkSelectedFormat;
-            swapChain.selectedPresentMode     = vkSelectedPresentMode;
-            swapChain.swapChainImages         = swapChainImages;
-            swapChain.handle                  = vkSwapChain;
-            swapChain.imageAvailableSemaphore = vkImageAvailableSemaphore;
+            swapChain.capabilities             = vkSurfaceCapabilities;
+            swapChain.supportedFormats         = vkSurfaceFormats;
+            swapChain.supportedPresentModes    = vkSurfacePresentModes;
+            swapChain.selectedExtents          = vkBackBufferExtents;
+            swapChain.selectedFormat           = vkSelectedFormat;
+            swapChain.selectedPresentMode      = vkSelectedPresentMode;
+            swapChain.swapChainImages          = swapChainImages;
+            swapChain.handle                   = vkSwapChain;
+            swapChain.imageAvailableSemaphore  = vkImageAvailableSemaphore;
+            swapChain.renderCompletedSemaphore = vkRenderCompletedSemaphore;
 
             mVkState.swapChain = swapChain;
         }
@@ -867,9 +908,32 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        VkQueue CVulkanEnvironment::getPresentQueue()
+        {
+            SVulkanPhysicalDevice const&physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
+
+            VkQueue queue = VK_NULL_HANDLE;
+            if(physicalDevice.queueFamilies.presentQueueFamilyIndices.empty())
+            {
+                CLog::Error(logTag(), "No present queues available.");
+            }
+            else
+            {
+                vkGetDeviceQueue(mVkState.selectedLogicalDevice, physicalDevice.queueFamilies.presentQueueFamilyIndices.at(0), 0, &queue);
+            }
+
+            return queue;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         void CVulkanEnvironment::setSurface(VkSurfaceKHR const &aSurface)
         {
-            getState().surface = aSurface;
+            SVulkanState &vkState = getState();
+
+            vkState.surface = aSurface;
         }
         //<-----------------------------------------------------------------------------
 
