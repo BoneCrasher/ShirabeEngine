@@ -52,6 +52,7 @@ namespace engine
              */
             struct SPresentPassImportData
             {
+                SFrameGraphResource finalOutputId;
             };
 
             /**
@@ -86,12 +87,13 @@ namespace engine
              *
              * @param aPassName        The unique name of the pass to add.
              * @param aGraphBuilder    The graph builder to source from.
-             *                         TODO: Think of a clean solution...
+             * @param aOutput          The final output of the framegraph to commit.
              * @return                 Export data of this pass. Will be empty as this pass is the end of execution.
              */
             SPresentPassExportData addPresentPass(
                     std::string         const &aPassName,
-                    CGraphBuilder             &aGraphBuilder);
+                    CGraphBuilder             &aGraphBuilder,
+                    SFrameGraphResource const &aOutput);
         };
 
     }

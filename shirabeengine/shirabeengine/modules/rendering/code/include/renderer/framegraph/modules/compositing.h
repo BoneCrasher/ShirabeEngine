@@ -61,7 +61,6 @@ namespace engine
              * @param aGbuffer2                GBuffer source containing relevant information for lighting.
              * @param aGbuffer3                GBuffer source containing relevant information for lighting.
              * @param aLightAccumulationBuffer Light Accumulation data for compositing.
-             * @param aBackBuffer              Target texture for the render graph final output.
              * @return                         Export data of this pass to chain it with other passes' inputs.
              */
             SExportData addDefaultCompositingPass(
@@ -71,8 +70,7 @@ namespace engine
                     SFrameGraphResource const &aGbuffer1,
                     SFrameGraphResource const &aGbuffer2,
                     SFrameGraphResource const &aGbuffer3,
-                    SFrameGraphResource const &aLightAccumulationBuffer,
-                    SFrameGraphResource const &aBackBuffer);
+                    SFrameGraphResource const &aLightAccumulationBuffer);
         };
 
     }

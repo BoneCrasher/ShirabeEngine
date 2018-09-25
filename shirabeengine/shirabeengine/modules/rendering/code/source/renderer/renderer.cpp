@@ -210,15 +210,15 @@ namespace engine
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
                         gbufferExportData.gbuffer3,
-                        lightingExportData.lightAccumulationBuffer,
-                        prePassExportData.backbuffer);
+                        lightingExportData.lightAccumulationBuffer);
 
             // Present
             CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
             presentPassExportData =
                     graphicsAPICommonModule.addPresentPass(
                         sPresentPassID,
-                        graphBuilder);
+                        graphBuilder,
+                        compositingExportData.output);
 
             // Link Compositing and Present
             graphBuilder.createPassDependency(sCompositingPassID, sPresentPassID);

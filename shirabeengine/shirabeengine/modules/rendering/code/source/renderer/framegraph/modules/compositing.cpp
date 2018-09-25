@@ -15,14 +15,14 @@ namespace engine
                 SFrameGraphResource const &aGbuffer1,
                 SFrameGraphResource const &aGbuffer2,
                 SFrameGraphResource const &aGbuffer3,
-                SFrameGraphResource const &aLightAccumulationBuffer,
-                SFrameGraphResource const &aBackBuffer)
+                SFrameGraphResource const &aLightAccumulationBuffer)
         {
             /**
              * The SState struct is the internal state of the compositing pass.
              */
             struct SState
             {
+                SFrameGraphResource compositingBufferId;
             };
 
             /**
@@ -41,6 +41,20 @@ namespace engine
                     CPassBuilder &aBuilder,
                     SPassData    &aOutPassData) -> bool
             {
+                SFrameGraphTexture gbufferTexture = *aGraphBuilder.getResources().get<SFrameGraphTexture>(aGbuffer0.subjacentResource);
+
+                SFrameGraphTexture compositingBufferDesc ={ };
+                compositingBufferDesc.width          = gbufferTexture.width;
+                compositingBufferDesc.height         = gbufferTexture.height;
+                compositingBufferDesc.depth          = 1;
+                compositingBufferDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
+                compositingBufferDesc.mipLevels      = 1;
+                compositingBufferDesc.arraySize      = 1;
+                compositingBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
+                compositingBufferDesc.permittedUsage = EFrameGraphResourceUsage::ImageResource | EFrameGraphResourceUsage::RenderTarget;
+
+                aOutPassData.state.compositingBufferId = aBuilder.createTexture("Compositing Buffer", compositingBufferDesc);
+
                 SFrameGraphReadTextureFlags readFlags{ };
                 readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
                 readFlags.source         = EFrameGraphReadSource::Color;
@@ -55,7 +69,7 @@ namespace engine
                 writeFlags.requiredFormat = FrameGraphFormat_t::Automatic;
                 writeFlags.writeTarget    = EFrameGraphWriteTarget::Color;
 
-                aOutPassData.exportData.output = aBuilder.writeTexture(aBackBuffer, writeFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.exportData.output = aBuilder.writeTexture(aOutPassData.state.compositingBufferId, writeFlags, CRange(0, 1), CRange(0, 1));
 
                 return true;
             };

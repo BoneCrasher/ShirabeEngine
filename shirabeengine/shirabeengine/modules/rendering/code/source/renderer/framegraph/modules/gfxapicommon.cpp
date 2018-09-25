@@ -84,8 +84,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData
         CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addPresentPass(
-                std::string        const &aPassName,
-                CGraphBuilder             &aGraphBuilder)
+                std::string         const &aPassName,
+                CGraphBuilder             &aGraphBuilder,
+                SFrameGraphResource const &aOutput)
         {
             /**
              * The SState struct is the internal state of the present generation pass.
@@ -110,6 +111,12 @@ namespace engine
                     CPassBuilder     &aBuilder,
                     SPresentPassData &aOutPassData) -> bool
             {
+                SFrameGraphReadTextureFlags readFlags{ };
+                readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
+                readFlags.source         = EFrameGraphReadSource::Color;
+
+                aOutPassData.importData.finalOutputId = aBuilder.readTexture(aOutput, readFlags, CRange(0, 1), CRange(0, 1));
+
                 return true;
             };
 

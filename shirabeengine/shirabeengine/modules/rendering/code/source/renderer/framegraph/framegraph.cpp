@@ -187,6 +187,9 @@ namespace engine
         {
             assert(aRendercontext != nullptr);
 
+            bool const initialized = initializeResources(aRendercontext, mResources);
+            bool const bound       = bindResources(aRendercontext, mResources);
+
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
             {
@@ -196,19 +199,22 @@ namespace engine
 
                 FrameGraphResourceIdList const &passResources = accessor->resourceReferences();
 
-                bool const initialized = initializeResources(aRendercontext, passResources);
-                bool const bound       = bindResources(aRendercontext, passResources);
+                // bool const initialized = initializeResources(aRendercontext, passResources);
+                // bool const bound       = bindResources(aRendercontext, passResources);
 
                 bool executed = pass->execute(mResourceData, aRendercontext);
                 if(!executed) {
                     CLog::Error(logTag(), CString::format("Failed to execute pass %0", pass->passUID()));
                 }
 
-                bool const unbound       = unbindResources(aRendercontext, passResources);
-                bool const deinitialized = deinitializeResources(aRendercontext, passResources);
+                // bool const unbound       = unbindResources(aRendercontext, passResources);
+                // bool const deinitialized = deinitializeResources(aRendercontext, passResources);
 
                 copy.pop();
             }
+
+            bool const unbound       = unbindResources(aRendercontext, mResources);
+            bool const deinitialized = deinitializeResources(aRendercontext, mResources);
 
             return true;
         }
@@ -251,11 +257,17 @@ namespace engine
                 case EFrameGraphResourceType::TextureView:
                     subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
                     texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
-                    textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
+                    textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);                    
 
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), textureView->resourceId);
                     if(it == mInstantiatedResources.end())
                     {
+                        bool const subjacentTextureCreated = (mInstantiatedResources.end() != std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId));
+                        if(!texture->isExternalResource && !subjacentTextureCreated)
+                        {
+                            initialized |= initializeResources(aRenderContext, {texture->resourceId});
+                        }
+
                         initialized |=
                                 initializeTextureView(
                                     aRenderContext,
@@ -359,10 +371,10 @@ namespace engine
                 case EFrameGraphResourceType::Texture:
                     if(aIncludeSubjacent)
                     {
-                        if(resource->referenceCount == 0)
-                        {
-                            texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
+                        texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
 
+                        if(!texture->isExternalResource && resource->referenceCount == 0)
+                        {
                             deinitialized |=
                                     deinitializeTexture(
                                         aRenderContext,
