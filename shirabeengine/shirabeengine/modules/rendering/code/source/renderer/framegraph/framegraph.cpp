@@ -457,6 +457,14 @@ namespace engine
                 CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
                 CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView)
         {
+            bool const isForwardedOrAccepted =
+                    ((aTextureView->mode.check(EFrameGraphViewAccessMode::Forward)) ||
+                     (aTextureView->mode.check(EFrameGraphViewAccessMode::Accept)));
+            if(isForwardedOrAccepted)
+            {
+                return true; // Nothing to be done and no error.
+            }
+
             FrameGraphResourceId_t id = aTextureView->resourceId;
 
             EEngineStatus status = aRenderContext->createTextureView(*aTexture, *aTextureView);
@@ -474,9 +482,16 @@ namespace engine
                 CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
                 CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView)
         {
+            bool const isForwardedOrAccepted =
+                    ((aTextureView->mode.check(EFrameGraphViewAccessMode::Forward)) ||
+                     (aTextureView->mode.check(EFrameGraphViewAccessMode::Accept)));
+            if(isForwardedOrAccepted)
+            {
+                return true; // Nothing to be done and no error.
+            }
+
             EEngineStatus status = aRenderContext->destroyTextureView(*aTextureView);
             HandleEngineStatusError(status, "Failed to unload texture view for FrameGraphExecution.");
-
 
             return true;
         }

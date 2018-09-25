@@ -115,6 +115,10 @@ namespace engine
                 uint32_t                        currentSwapChainImageIndex;
                 VkSemaphore                     imageAvailableSemaphore;
                 VkSemaphore                     renderCompletedSemaphore;
+                // Creation config
+                math::CRect                     requestedBackBufferSize;
+                VkFormat                        requestedFormat;
+                VkColorSpaceKHR                 colorSpace;
             };
 
             /**
@@ -211,6 +215,11 @@ namespace engine
                     VkFormat        const &aRequestedFormat,
                     VkColorSpaceKHR const &aColorSpace);
 
+            /**
+             * Try to recreate the swapchain with the last known configuration.
+             */
+            void recreateSwapChain();
+
         private_methods:
             /**
              * Create and initialize the vulkan instance, including determinition of all
@@ -239,6 +248,11 @@ namespace engine
              * @param aDeviceIndex Index of the device to select.
              */
             void selectPhysicalDevice(uint32_t const &aDeviceIndex);
+
+            /**
+             * Cleanup all swapchain resources.
+             */
+            void destroySwapChain();
 
         private_members:
             SVulkanState mVkState;

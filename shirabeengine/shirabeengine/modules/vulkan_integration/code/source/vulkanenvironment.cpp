@@ -82,7 +82,10 @@ namespace engine
             , swapChainImages()
             , currentSwapChainImageIndex(0)
             , imageAvailableSemaphore(VK_NULL_HANDLE)
-            , renderCompletedSemaphore(VK_NULL_HANDLE)
+            , renderCompletedSemaphore(VK_NULL_HANDLE)            
+            , requestedBackBufferSize()
+            , requestedFormat(VkFormat::VK_FORMAT_R8G8B8A8_UNORM)
+            , colorSpace(VkColorSpaceKHR::VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {}
         //<-----------------------------------------------------------------------------
 
@@ -523,6 +526,10 @@ namespace engine
             SVulkanPhysicalDevice       &vkPhysicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
             VkSurfaceKHR          const &vkSurface        = mVkState.surface;
 
+            mVkState.swapChain.requestedBackBufferSize = aRequestedBackBufferSize;
+            mVkState.swapChain.requestedFormat         = aRequestedFormat;
+            mVkState.swapChain.colorSpace              = aColorSpace;
+
             //
             // Extract capabilities
             //
@@ -530,7 +537,10 @@ namespace engine
 
             VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceCapabilities);
             if(VkResult::VK_SUCCESS != result)
+            {
                 throw CVulkanError("Failed to get surface capabilities for physical device and surface.", result);
+            }
+
             //
             // Determine backbuffer extents
             //
@@ -614,7 +624,7 @@ namespace engine
             //
             VkSurfaceFormatKHR vkSelectedFormat = {};
 
-            if(vkSurfaceFormats.size() == 1 && vkSurfaceFormats.at(0).format == VK_FORMAT_UNDEFINED)
+            if(vkSurfaceFormats.size() == 1 && VK_FORMAT_UNDEFINED == vkSurfaceFormats.at(0).format)
             {
                 // We can use any format desired.
                 vkSelectedFormat = { aRequestedFormat, VK_COLORSPACE_SRGB_NONLINEAR_KHR };
@@ -647,7 +657,7 @@ namespace engine
             for(VkPresentModeKHR const &presentMode : vkSurfacePresentModes)
             {
                 // Try to find a mailbox present mode, as it will allow us to implement triple buffering
-                if(presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+                if(VK_PRESENT_MODE_MAILBOX_KHR == presentMode)
                 {
                     vkSelectedPresentMode = presentMode;
                     break;
@@ -813,6 +823,52 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::recreateSwapChain()
+        {
+            SVulkanState &vkState = getState();
+
+            vkDeviceWaitIdle(vkState.selectedLogicalDevice);
+
+            destroySwapChain();
+
+            math::CRect     const &backBufferSize   = mVkState.swapChain.requestedBackBufferSize;
+            VkFormat        const &backBufferFormat = mVkState.swapChain.requestedFormat;
+            VkColorSpaceKHR const &colorSpace       = mVkState.swapChain.colorSpace;
+
+            createSwapChain(backBufferSize, backBufferFormat, colorSpace);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::destroySwapChain()
+        {
+            SVulkanState &vkState = getState();
+
+            VkDevice         &logicalDevice = vkState.selectedLogicalDevice;
+            SVulkanSwapChain &swapChain     = vkState.swapChain;
+
+            vkDestroySemaphore   (logicalDevice, swapChain.imageAvailableSemaphore,  nullptr);
+            vkDestroySemaphore   (logicalDevice, swapChain.renderCompletedSemaphore, nullptr);
+            vkDestroySwapchainKHR(logicalDevice, swapChain.handle,                   nullptr);
+
+            swapChain.capabilities             = {};
+            swapChain.supportedFormats         = {};
+            swapChain.supportedPresentModes    = {};
+            swapChain.selectedExtents          = {};
+            swapChain.selectedFormat           = {};
+            swapChain.selectedPresentMode      = {};
+            swapChain.swapChainImages          = {};
+            swapChain.handle                   = VK_NULL_HANDLE;
+            swapChain.imageAvailableSemaphore  = VK_NULL_HANDLE;
+            swapChain.renderCompletedSemaphore = VK_NULL_HANDLE;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanEnvironment::initialize(SApplicationEnvironment const &aApplicationEnvironment)
         {
             try {
@@ -855,17 +911,8 @@ namespace engine
             // Wait for the logical device to finish up all work.
             vkDeviceWaitIdle(mVkState.selectedLogicalDevice);
 
-            if(mVkState.swapChain.handle)
-            {
-                mVkState.swapChain.swapChainImages.clear();
-
-                vkDestroySwapchainKHR(mVkState.selectedLogicalDevice, mVkState.swapChain.handle, nullptr);
-
-                if(mVkState.swapChain.imageAvailableSemaphore)
-                {
-                    vkDestroySemaphore(mVkState.selectedLogicalDevice, mVkState.swapChain.imageAvailableSemaphore, nullptr);
-                }
-            }
+            // Swapchain
+            destroySwapChain();
 
             // Kill it with fire...
             vkDestroyDevice(mVkState.selectedLogicalDevice, nullptr);

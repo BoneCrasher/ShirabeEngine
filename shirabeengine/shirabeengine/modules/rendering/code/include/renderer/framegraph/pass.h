@@ -37,6 +37,8 @@ namespace engine
         class CPassBase
                 : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
         {
+            SHIRABE_DECLARE_LOG_TAG(CPassBase);
+
         public_classes:
             /**
              * This accessor provides guarded immutable access to the internals of a CPassBase.
@@ -233,6 +235,8 @@ namespace engine
         class CallbackPass
                 : public CPassBase
         {
+            SHIRABE_DECLARE_LOG_TAG(CallbackPass);
+
         public_typedefs:
             using SetupCallback_t = std::function<bool(CPassBuilder&, TPassData&)>;
             using ExecCallback_t  = std::function<bool(TPassData const&, CFrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&)>;
@@ -338,7 +342,16 @@ namespace engine
             {
                 return mExecCallback(mPassData, aFrameGraphResources, aContext);
             }
-            catch(...) {
+            catch(CEngineException const &ee)
+            {
+                CLog::Error(logTag(), ee.message());
+            }
+            catch(std::runtime_error const &e)
+            {
+                CLog::Error(logTag(), e.what());
+            }
+            catch(...)
+            {
                 return false;
             }
         }

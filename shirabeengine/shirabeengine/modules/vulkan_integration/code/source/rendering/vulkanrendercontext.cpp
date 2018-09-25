@@ -1,5 +1,6 @@
 #include "vulkan/rendering/vulkanrendercontext.h"
 
+#include <thread>
 #include <core/string.h>
 
 namespace engine
@@ -49,7 +50,11 @@ namespace engine
             VkSemaphore    semaphore = vkState.swapChain.imageAvailableSemaphore;
             uint64_t const timeout   =  std::numeric_limits<uint64_t>::max();
 
-            VkResult result =
+            VkResult result = VK_SUCCESS;
+
+            do
+            {
+                result =
                     vkAcquireNextImageKHR(
                         device,
                         swapChain,
@@ -57,6 +62,15 @@ namespace engine
                         semaphore,
                         VK_NULL_HANDLE,
                         &nextImageIndex);
+
+                if(VkResult::VK_ERROR_OUT_OF_DATE_KHR == result)
+                {
+                    mVulkanEnvironment->recreateSwapChain();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
+
+            }
+            while(VkResult::VK_SUCCESS != result);
 
             if(VkResult::VK_SUCCESS != result)
             {
@@ -110,11 +124,11 @@ namespace engine
 
             // Temporary workaround to avoid memory depletion from GPU workloads using validation layers.
             // Implement better synchronization and throttling, once ready.
-            result = vkQueueWaitIdle(presentQueue);
-            if(VK_SUCCESS != result)
-            {
-                throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
-            }
+            // result = vkQueueWaitIdle(presentQueue);
+            // if(VK_SUCCESS != result)
+            // {
+            //     throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
+            // }
 
             return EEngineStatus::Ok;
         }
