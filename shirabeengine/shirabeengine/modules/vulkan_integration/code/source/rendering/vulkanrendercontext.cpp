@@ -109,8 +109,8 @@ namespace engine
             VkPresentInfoKHR vkPresentInfo {};
             vkPresentInfo.sType              =  VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
             vkPresentInfo.pNext              =  nullptr;
-            vkPresentInfo.waitSemaphoreCount =  1;
-            vkPresentInfo.pWaitSemaphores    =  signalSemaphores;
+            vkPresentInfo.waitSemaphoreCount =  0;  // 1;
+            vkPresentInfo.pWaitSemaphores    =  {}; // signalSemaphores;
             vkPresentInfo.swapchainCount     =  1;
             vkPresentInfo.pSwapchains        =  swapChains;
             vkPresentInfo.pImageIndices      = &(vkState.swapChain.currentSwapChainImageIndex);
