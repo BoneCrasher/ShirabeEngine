@@ -166,6 +166,59 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        bool CGraphBuilder::createPassDependency(
+                std::string const &aPassSource,
+                std::string const &aPassTarget)
+        {
+            auto const sourcePredicate = [&] (PassMap::value_type const &aPair) -> bool
+            {
+                return (0 == aPassSource.compare(aPair.second->passName()));
+            };
+
+            auto const targetPredicate = [&] (PassMap::value_type const &aPair) -> bool
+            {
+                return (0 == aPassTarget.compare(aPair.second->passName()));
+            };
+
+            PassMap::const_iterator sourcePass = std::find_if(mPasses.begin(), mPasses.end(), sourcePredicate);
+            PassMap::const_iterator targetPass = std::find_if(mPasses.begin(), mPasses.end(), targetPredicate);
+
+            bool const containsSourcePass = (mPasses.end() != sourcePass);
+            bool const containsTargetPass = (mPasses.end() != targetPass);
+
+            if(!(containsSourcePass && containsTargetPass))
+            {
+                CLog::Error(logTag(), CString::format("Cannot create pass dependency from %0 to %1. At least one pass was not found.", aPassSource, aPassTarget));
+                return false;
+            }
+
+            PassUID_t const &sourcePassUID = sourcePass->second->passUID();
+            PassUID_t const &targetPassUID = targetPass->second->passUID();
+
+            createPassDependencyByUID(sourcePassUID, targetPassUID);
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CGraphBuilder::createPassDependencyByUID(
+                PassUID_t const &aPassSource,
+                PassUID_t const &aPassTarget)
+        {
+            bool const passAlreadyRegistered = alreadyRegisteredFn<PassUID_t>(mPassAdjacency[aPassSource], aPassTarget);
+            if(!passAlreadyRegistered)
+            {
+                mPassAdjacency[aPassSource].push_back(aPassTarget);
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         SFrameGraphResource CGraphBuilder::registerTexture(
                 std::string        const &aReadableName,
                 SFrameGraphTexture const &aTexture)
@@ -231,12 +284,17 @@ namespace engine
         {
             CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
+            // First (No-Op, automatically performed on call to 'setPassDependency(...)':
+            //   Evaluate explicit pass dependencies without resource flow.
+
+            // Second: Evaluate all pass resources and their implicit relations to passes and other resources.
             for(PassMap::value_type const &assignment : graph()->passes())
             {
                 bool const collected = collectPass(assignment.second);
                 assert(true == collected);
             }
 
+            // Third: Sort the passes by their relationships and dependencies.
             bool const topologicalPassSortSuccessful = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
             if(!topologicalPassSortSuccessful)
             {
@@ -244,6 +302,7 @@ namespace engine
                 return nullptr;
             }
 
+            // Fourth: Sort the resources by their relationships and dependencies.
             bool const topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(accessor->mutableResourceOrder());
             if(!topologicalResourceSortSuccessful)
             {
@@ -304,11 +363,7 @@ namespace engine
 
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
 
-            // Derive:
-            // - Resource creation requests.
-            // - Edges: pass->pass and resource[view]->resource[view] for graph generation!
-            // - ???
-            FrameGraphResourceIdList  resources = accessor->mutableResourceReferences();
+            FrameGraphResourceIdList const resources = accessor->mutableResourceReferences();
 
             for(FrameGraphResourceId_t const&resource : resources)
             {
@@ -344,11 +399,7 @@ namespace engine
 
                     if(parentResource.assignedPassUID != passUID)
                     {
-                        bool const passAlreadyRegistered = alreadyRegisteredFn<PassUID_t>(mPassAdjacency[parentResource.assignedPassUID], passUID);
-                        if(!passAlreadyRegistered)
-                        {
-                            mPassAdjacency[parentResource.assignedPassUID].push_back(passUID);
-                        }
+                        createPassDependencyByUID(parentResource.assignedPassUID, passUID);
                     }
 
                     // Do the same for the resources!

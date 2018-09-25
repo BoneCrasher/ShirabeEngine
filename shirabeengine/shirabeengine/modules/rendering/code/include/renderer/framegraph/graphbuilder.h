@@ -118,6 +118,16 @@ namespace engine
                     TPassCreationArgs  &&...aArgs);
 
             /**
+             * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
+             *
+             * @param aPassSource Name of pass to depend on.
+             * @param aPassTarget Dependent pass name.
+             */
+            bool createPassDependency(
+                     std::string const &aPassSource,
+                     std::string const &aPassTarget);
+
+            /**
              * Register an external texture for read/write inside the render graph.
              *
              * @param aReadableName The name of the texture to register
@@ -163,6 +173,16 @@ namespace engine
              * @return See brief.
              */
             CStdUniquePtr_t<CGraph> &graph();
+
+            /**
+             * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
+             *
+             * @param aPassSource UID of the Pass to depend on.
+             * @param aPassTarget Dependent pass UID.
+             */
+            void createPassDependencyByUID(
+                     PassUID_t const &aPassSource,
+                     PassUID_t const &aPassTarget);
 
             /**
              * Accepts an arbitrary resource and tries to traverse the resource-resourceview-path to find

@@ -9,6 +9,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
         CFrameGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
+                std::string         const &aPassName,
                 CGraphBuilder             &aGraphBuilder,
                 SFrameGraphResource const &aRenderableInput)
         {
@@ -115,7 +116,7 @@ namespace engine
                 return true;
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>("GBufferGeneration", setup, execute);
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
             return pass->passData().exportData;
         }
         //<-----------------------------------------------------------------------------

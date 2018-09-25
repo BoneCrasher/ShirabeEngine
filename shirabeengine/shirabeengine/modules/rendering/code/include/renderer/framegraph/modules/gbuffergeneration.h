@@ -53,11 +53,13 @@ namespace engine
             /**
              * Add a gbuffer generation pass to the render graph.
              *
+             * @param aPassName        The unique name of the pass to add.
              * @param aGraphBuilder    The graph builder to source from.
              * @param aRenderableInput The renderables for which gbuffer data should be generated.
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
             SGBufferGenerationExportData addGBufferGenerationPass(
+                    std::string         const &aPassName,
                     CGraphBuilder             &aGraphBuilder,
                     SFrameGraphResource const &aRenderableInput);
         };

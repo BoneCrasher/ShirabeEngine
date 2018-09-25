@@ -157,16 +157,22 @@ namespace engine
             SFrameGraphResource renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
-            // Prepass
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                           graphicsAPICommonModule{ };
-            CFrameGraphModule<SGBufferModuleTag_t>                                     gbufferModule          { };
-            CFrameGraphModule<SLightingModuleTag_t>                                    lightingModule         { };
-            CFrameGraphModule<SCompositingModuleTag_t>                                 compositingModule      { };
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SSwapChainPassExportData swapChainPassExportData{ };
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                     graphicsAPICommonModule{ };
+            CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule          { };
+            CFrameGraphModule<SLightingModuleTag_t>                              lightingModule         { };
+            CFrameGraphModule<SCompositingModuleTag_t>                           compositingModule      { };
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPrePassExportData prePassExportData{ };
 
-            // SwapChain binding
-            swapChainPassExportData =
-                    graphicsAPICommonModule.addSwapChainPass(
+            static std::string const sPrePassID               = "PrePass";
+            static std::string const sGBufferGenerationPassID = "GBufferGenerationPass";
+            static std::string const sLightingPassID          = "LightingPass";
+            static std::string const sCompositingPassID       = "CompositingPass";
+            static std::string const sPresentPassID           = "PresentPass";
+
+            // Prepass
+            prePassExportData =
+                    graphicsAPICommonModule.addPrePass(
+                        sPrePassID,
                         graphBuilder,
                         width,
                         height,
@@ -176,13 +182,18 @@ namespace engine
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
             gbufferExportData =
                     gbufferModule.addGBufferGenerationPass(
+                        sGBufferGenerationPassID,
                         graphBuilder,
                         renderables);
+
+            // Link SwapChain pass and GBuffer
+            graphBuilder.createPassDependency(sPrePassID, sGBufferGenerationPassID);
 
             // Lighting
             CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
             lightingExportData =
                     lightingModule.addLightingPass(
+                        sLightingPassID,
                         graphBuilder,
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
@@ -193,21 +204,27 @@ namespace engine
             CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData =
                     compositingModule.addDefaultCompositingPass(
+                        sCompositingPassID,
                         graphBuilder,
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer,
-                        swapChainPassExportData.backbuffer);
+                        prePassExportData.backbuffer);
 
             // Present
             CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
             presentPassExportData =
                     graphicsAPICommonModule.addPresentPass(
-                        graphBuilder,
-                        compositingExportData.output);
+                        sPresentPassID,
+                        graphBuilder);
 
+            // Link Compositing and Present
+            graphBuilder.createPassDependency(sCompositingPassID, sPresentPassID);
+
+
+            // Compile the whole thing :)
             CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
             static bool serializedOnce = false;

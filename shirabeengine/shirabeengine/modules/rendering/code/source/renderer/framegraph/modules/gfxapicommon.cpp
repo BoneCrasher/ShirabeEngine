@@ -7,15 +7,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SSwapChainPassExportData
-        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addSwapChainPass(
+        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPrePassExportData
+        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addPrePass(
+                std::string        const &aPassName,
                 CGraphBuilder            &aGraphBuilder,
                 uint32_t           const &aWidth,
                 uint32_t           const &aHeight,
                 FrameGraphFormat_t const &aFormat)
         {
             /**
-             * The SState struct is the internal state of the swapchain pass.
+             * The SState struct is the internal state of the Pre pass.
              */
             struct SState
             {
@@ -26,17 +27,17 @@ namespace engine
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SSwapChainPassData
+            struct SPrePassData
             {
-                SSwapChainPassImportData importData;
-                SSwapChainPassExportData exportData;
+                SPrePassImportData importData;
+                SPrePassExportData exportData;
 
                 SState state;
             };
 
             auto const setup = [&] (
                     CPassBuilder       &aBuilder,
-                    SSwapChainPassData &aOutPassData) -> bool
+                    SPrePassData &aOutPassData) -> bool
             {
                 SFrameGraphTexture backBufferTextureDesc{ };
                 backBufferTextureDesc.readableName   = "BackBuffer";
@@ -60,20 +61,20 @@ namespace engine
             };
 
             auto const execute = [=] (
-                    SSwapChainPassData                        const&aPassData,
+                    SPrePassData                        const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
                     CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
             {
                 using namespace engine::rendering;
 
-                CLog::Verbose(logTag(), "SwapChainPass");
+                CLog::Verbose(logTag(), "PrePass");
 
                 aContext->bindSwapChain(aPassData.importData.backBufferInput);
 
                 return true;
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SSwapChainPassData>>("SwapChainPass", setup, execute);
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPrePassData>>(aPassName, setup, execute);
             return pass->passData().exportData;
         }
         //<-----------------------------------------------------------------------------
@@ -83,8 +84,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData
         CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addPresentPass(
-                CGraphBuilder             &aGraphBuilder,
-                SFrameGraphResource const &aRenderingResult)
+                std::string        const &aPassName,
+                CGraphBuilder             &aGraphBuilder)
         {
             /**
              * The SState struct is the internal state of the present generation pass.
@@ -109,8 +110,6 @@ namespace engine
                     CPassBuilder     &aBuilder,
                     SPresentPassData &aOutPassData) -> bool
             {
-                SFrameGraphResource const handle = aBuilder.acceptTexture(aRenderingResult);
-
                 return true;
             };
 
@@ -128,7 +127,7 @@ namespace engine
                 return true;
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>("PresentPass", setup, execute);
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>(aPassName, setup, execute);
             return pass->passData().exportData;
         }
         //<-----------------------------------------------------------------------------

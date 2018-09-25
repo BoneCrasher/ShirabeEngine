@@ -29,19 +29,19 @@ namespace engine
 
         public_structs:
             /**
-             * The SSwapChainPassImportData struct describes all imported data for the
-             * SwapChain pass.
+             * The SPrePassImportData struct describes all imported data for the
+             * Pre pass.
              */
-            struct SSwapChainPassImportData
+            struct SPrePassImportData
             {
                 SFrameGraphResource backBufferInput;
             };
 
             /**
-             * The SSwapChainPassExportData struct describes all exported data for the
-             * SwapChain pass.
+             * The SPrePassExportData struct describes all exported data for the
+             * Pre pass.
              */
-            struct SSwapChainPassExportData
+            struct SPrePassExportData
             {
                 SFrameGraphResource backbuffer;
             };
@@ -64,16 +64,18 @@ namespace engine
 
         public_methods:
             /**
-             * Add a swapchain pass to the framegraph, which will import a swapchain backbuffer image
-             * and bind it to the underlying graphics API.
+             * Add a pre pass to the framegraph, which will perform all preparation steps to render into
+             * a graphics pipeline.
              *
+             * @param aPassName        The unique name of the pass to add.
              * @param aGraphBuilder    The graph builder to source from.
              * @param aWidth           The width of the backbuffer images.
              * @param aHeight          The height of the backbuffer images.
              * @param aFormat          The format of the backbuffer images.
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
-            SSwapChainPassExportData addSwapChainPass(
+            SPrePassExportData addPrePass(
+                    std::string        const &aPassName,
                     CGraphBuilder            &aGraphBuilder,
                     uint32_t           const &aWidth,
                     uint32_t           const &aHeight,
@@ -82,14 +84,14 @@ namespace engine
             /**
              * Add a present pass to commit the rendering result to screen and free up the swap chain image acquired.
              *
+             * @param aPassName        The unique name of the pass to add.
              * @param aGraphBuilder    The graph builder to source from.
-             * @param aRenderingResult "No-Op" forwarded resource just to abuse the framegraph system to add this pass...
              *                         TODO: Think of a clean solution...
              * @return                 Export data of this pass. Will be empty as this pass is the end of execution.
              */
             SPresentPassExportData addPresentPass(
-                    CGraphBuilder             &aGraphBuilder,
-                    SFrameGraphResource const &aRenderingResult);
+                    std::string         const &aPassName,
+                    CGraphBuilder             &aGraphBuilder);
         };
 
     }

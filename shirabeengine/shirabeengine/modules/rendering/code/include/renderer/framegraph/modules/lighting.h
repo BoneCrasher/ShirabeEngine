@@ -52,6 +52,7 @@ namespace engine
             /**
              * Add a lighting pass to the render graph.
              *
+             * @param aPassName     The unique name of the pass to add.
              * @param aGraphBuilder The graph builder to source from.
              * @param aGbuffer0     GBuffer source containing relevant information for lighting.
              * @param aGbuffer1     GBuffer source containing relevant information for lighting.
@@ -60,6 +61,7 @@ namespace engine
              * @return              Export data of this pass to chain it with other passes' inputs.
              */
             SLightingExportData addLightingPass(
+                    std::string         const &aPassName,
                     CGraphBuilder             &aGraphBuilder,
                     SFrameGraphResource const &aGbuffer0,
                     SFrameGraphResource const &aGbuffer1,

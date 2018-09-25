@@ -9,6 +9,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData
         CFrameGraphModule<SLightingModuleTag_t>::addLightingPass(
+                std::string         const &aPassName,
                 CGraphBuilder             &aGraphBuilder,
                 SFrameGraphResource const &aGbuffer0,
                 SFrameGraphResource const &aGbuffer1,
@@ -81,7 +82,7 @@ namespace engine
                 return true;
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>("LightAccumulation", setup, execute);
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
             return pass->passData().exportData;
         }
         //<-----------------------------------------------------------------------------

@@ -9,6 +9,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphModule<SCompositingModuleTag_t>::SExportData
         CFrameGraphModule<SCompositingModuleTag_t>::addDefaultCompositingPass(
+                std::string         const &aPassName,
                 CGraphBuilder             &aGraphBuilder,
                 SFrameGraphResource const &aGbuffer0,
                 SFrameGraphResource const &aGbuffer1,
@@ -69,7 +70,7 @@ namespace engine
                 return true;
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>("Compositing", setup, execute);
+            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
             return pass->passData().exportData;
         }
         //<-----------------------------------------------------------------------------
