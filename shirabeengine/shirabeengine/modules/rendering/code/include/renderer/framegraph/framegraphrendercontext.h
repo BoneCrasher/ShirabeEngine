@@ -32,6 +32,19 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IFrameGraphRenderContext);
 
         public_api:
+
+            /**
+             * @brief bindCommandBuffer
+             * @return
+             */
+            virtual EEngineStatus bindCommandBuffer() = 0;
+
+            /**
+             * @brief commitCommandBuffer
+             * @return
+             */
+            virtual EEngineStatus commitCommandBuffer() = 0;
+
             /**
              * Bind a swapchain, if any, for further framegraph operations.
              *
@@ -231,6 +244,10 @@ namespace engine
                     CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
                     CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                     CStdSharedPtr_t<IRenderContext>       aRenderer);
+
+            EEngineStatus bindCommandBuffer();
+
+            EEngineStatus commitCommandBuffer();
 
             /**
              * Bind a swapchain, if any, for further framegraph operations.

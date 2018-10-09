@@ -61,15 +61,17 @@ namespace engine
             };
 
             auto const execute = [=] (
-                    SPrePassData                        const&aPassData,
-                    CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+                    SPrePassData                              const &aPassData,
+                    CFrameGraphResources                      const &aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>
+                    &aContext) -> bool
             {
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "PrePass");
 
                 aContext->bindSwapChain(aPassData.importData.backBufferInput);
+                aContext->bindCommandBuffer();
 
                 return true;
             };
@@ -129,6 +131,7 @@ namespace engine
 
                 CLog::Verbose(logTag(), "SwapChainPass");
 
+                aContext->commitCommandBuffer();
                 aContext->present();
 
                 return true;

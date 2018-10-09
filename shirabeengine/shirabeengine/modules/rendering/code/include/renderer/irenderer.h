@@ -28,6 +28,11 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IRenderContext);
 
         public_api:
+
+            virtual EEngineStatus bindGraphicsCommandBuffer() = 0;
+
+            virtual EEngineStatus commitGraphicsCommandBuffer() = 0;
+
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
              *

@@ -151,6 +151,9 @@ namespace engine
                 VkDevice                      selectedLogicalDevice;
                 // Swap Chain
                 SVulkanSwapChain              swapChain;
+                // Command Pool & Buffer
+                VkCommandPool                 commandPool;
+                std::vector<VkCommandBuffer>  commandBuffers;
             };
 
         public_constructors:
@@ -248,6 +251,8 @@ namespace engine
              * @param aDeviceIndex Index of the device to select.
              */
             void selectPhysicalDevice(uint32_t const &aDeviceIndex);
+
+            void createCommandPool();
 
             /**
              * Cleanup all swapchain resources.

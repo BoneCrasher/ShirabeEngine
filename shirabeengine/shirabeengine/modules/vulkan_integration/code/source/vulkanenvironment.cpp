@@ -842,6 +842,47 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::createCommandPool()
+        {
+            SVulkanState          &vkState        = getState();
+            SVulkanPhysicalDevice &physicalDevice = vkState.supportedPhysicalDevices[vkState.selectedPhysicalDevice];
+
+            std::vector<uint32_t> graphicsQueueIndices = physicalDevice.queueFamilies.graphicsQueueFamilyIndices;
+
+            VkCommandPoolCreateInfo vkCommandPoolCreateInfo = {};
+            vkCommandPoolCreateInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+            vkCommandPoolCreateInfo.pNext            = nullptr;
+            vkCommandPoolCreateInfo.queueFamilyIndex = graphicsQueueIndices.at(0);
+            vkCommandPoolCreateInfo.flags            = 0;
+
+            VkCommandPool vkCommandPool = VK_NULL_HANDLE;
+
+            VkResult result = vkCreateCommandPool(vkState.selectedLogicalDevice, &vkCommandPoolCreateInfo, nullptr, &vkCommandPool);
+            if(VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create command pool.", result);
+            }
+
+            vkState.commandBuffers.resize(1);
+
+            VkCommandBufferAllocateInfo vkCommandBufferAllocateInfo = {};
+            vkCommandBufferAllocateInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            vkCommandBufferAllocateInfo.pNext              = nullptr;
+            vkCommandBufferAllocateInfo.commandPool        = vkCommandPool;
+            vkCommandBufferAllocateInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            vkCommandBufferAllocateInfo.commandBufferCount = static_cast<uint32_t>(vkState.commandBuffers.size());
+
+            result = vkAllocateCommandBuffers(vkState.selectedLogicalDevice, &vkCommandBufferAllocateInfo, vkState.commandBuffers.data());
+            if (VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create command buffer(s).", result);
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         void CVulkanEnvironment::destroySwapChain()
         {
             SVulkanState &vkState = getState();
@@ -877,6 +918,7 @@ namespace engine
                 createVulkanInstance("ShirabeEngine Demo");
                 determinePhysicalDevices();
                 selectPhysicalDevice(0);
+                createCommandPool();
 
                 return status;
             }
@@ -910,6 +952,9 @@ namespace engine
         {
             // Wait for the logical device to finish up all work.
             vkDeviceWaitIdle(mVkState.selectedLogicalDevice);
+
+            //
+            vkDestroyCommandPool(mVkState.selectedLogicalDevice, mVkState.commandPool, nullptr);
 
             // Swapchain
             destroySwapChain();

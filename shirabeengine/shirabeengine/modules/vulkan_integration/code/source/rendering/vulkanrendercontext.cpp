@@ -38,6 +38,47 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::bindGraphicsCommandBuffer()
+        {
+            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+
+            VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
+            vkCommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            vkCommandBufferBeginInfo.pNext = nullptr;
+            vkCommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+            VkCommandBuffer commandBuffer = state.commandBuffers.at(0); // just use the first one for now
+
+            VkResult const result = vkBeginCommandBuffer(commandBuffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw new CVulkanError("Failed to begin command buffer.", result);
+            }
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::commitGraphicsCommandBuffer()
+        {
+            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+
+            VkResult const result = vkEndCommandBuffer(state.commandBuffers.at(0));
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw new CVulkanError("Failed to record and commit command buffer.", result);
+            }
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::bindSwapChain(PublicResourceId_t const &aSwapChainResourceId)
         {
             CVulkanEnvironment::SVulkanState     &vkState     = mVulkanEnvironment->getState();

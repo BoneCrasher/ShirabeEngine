@@ -41,6 +41,11 @@ namespace engine
              */
             bool deinitialize();
 
+
+            EEngineStatus bindGraphicsCommandBuffer();
+
+            EEngineStatus commitGraphicsCommandBuffer();
+
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
              *

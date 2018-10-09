@@ -78,6 +78,28 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::bindCommandBuffer()
+        {
+            EEngineStatus const status = mGraphicsAPIRenderContext->bindGraphicsCommandBuffer();
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::commitCommandBuffer()
+        {
+            EEngineStatus const status = mGraphicsAPIRenderContext->commitGraphicsCommandBuffer();
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CFrameGraphRenderContext::bindSwapChain(SFrameGraphResource const &aSwapChainResource)
         {
             EEngineStatus const status = mGraphicsAPIRenderContext->bindSwapChain(aSwapChainResource.readableName);
