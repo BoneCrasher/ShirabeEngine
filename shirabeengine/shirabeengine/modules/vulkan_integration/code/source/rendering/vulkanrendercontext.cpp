@@ -47,7 +47,7 @@ namespace engine
             vkCommandBufferBeginInfo.pNext = nullptr;
             vkCommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-            VkCommandBuffer commandBuffer = state.commandBuffers.at(0); // just use the first one for now
+            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
             VkResult const result = vkBeginCommandBuffer(commandBuffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
             if(VkResult::VK_SUCCESS != result)
@@ -66,7 +66,7 @@ namespace engine
         {
             CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
 
-            VkResult const result = vkEndCommandBuffer(state.commandBuffers.at(0));
+            VkResult const result = vkEndCommandBuffer(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex)); // The commandbuffers and swapchain count currently match
             if(VkResult::VK_SUCCESS != result)
             {
                 throw new CVulkanError("Failed to record and commit command buffer.", result);
