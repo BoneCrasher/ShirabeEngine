@@ -254,6 +254,10 @@ namespace engine
 
             void createCommandPool();
 
+            void recreateCommandBuffers(uint32_t const &aBufferCount);
+
+            void destroyCommandBuffers();
+
             /**
              * Cleanup all swapchain resources.
              */

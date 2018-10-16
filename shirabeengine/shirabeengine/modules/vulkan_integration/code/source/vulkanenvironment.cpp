@@ -738,7 +738,7 @@ namespace engine
             // Extract SwapChain images
             //
             uint32_t             createdSwapChainImageCount = 0;
-            std::vector<VkImage> swapChainImages;
+            std::vector<VkImage> swapChainImages            = {};
 
             result = vkGetSwapchainImagesKHR(mVkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, nullptr);
             if(VkResult::VK_SUCCESS != result)
@@ -817,6 +817,9 @@ namespace engine
             swapChain.renderCompletedSemaphore = vkRenderCompletedSemaphore;
 
             mVkState.swapChain = swapChain;
+
+            // Now also recreate the command buffers, one foreach swap chain to ensure proper async rendering
+            recreateCommandBuffers(createdSwapChainImageCount); // TBDiscussed: How to permit compute and graphics pipelines in parallel.
         }
         //<-----------------------------------------------------------------------------
 
@@ -863,20 +866,55 @@ namespace engine
                 throw CVulkanError("Cannot create command pool.", result);
             }
 
-            vkState.commandBuffers.resize(1);
+            vkState.commandPool = vkCommandPool;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::recreateCommandBuffers(uint32_t const &aBufferCount)
+        {
+            SVulkanState &vkState = getState();
+
+            destroyCommandBuffers();
+
+            vkState.commandBuffers.resize(aBufferCount);
 
             VkCommandBufferAllocateInfo vkCommandBufferAllocateInfo = {};
             vkCommandBufferAllocateInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
             vkCommandBufferAllocateInfo.pNext              = nullptr;
-            vkCommandBufferAllocateInfo.commandPool        = vkCommandPool;
+            vkCommandBufferAllocateInfo.commandPool        = vkState.commandPool;
             vkCommandBufferAllocateInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             vkCommandBufferAllocateInfo.commandBufferCount = static_cast<uint32_t>(vkState.commandBuffers.size());
 
-            result = vkAllocateCommandBuffers(vkState.selectedLogicalDevice, &vkCommandBufferAllocateInfo, vkState.commandBuffers.data());
+            VkResult const result = vkAllocateCommandBuffers(vkState.selectedLogicalDevice, &vkCommandBufferAllocateInfo, vkState.commandBuffers.data());
             if (VkResult::VK_SUCCESS != result)
             {
                 throw CVulkanError("Cannot create command buffer(s).", result);
             }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void CVulkanEnvironment::destroyCommandBuffers()
+        {
+            SVulkanState &vkState = getState();
+
+            // Cleanup the old command buffers, if any.
+            bool const hasCommandBuffers = not vkState.commandBuffers.empty();
+            if(hasCommandBuffers)
+            {
+                vkFreeCommandBuffers(
+                            vkState.selectedLogicalDevice,
+                            vkState.commandPool,
+                            static_cast<uint32_t>(vkState.commandBuffers.size()),
+                            vkState.commandBuffers.data());
+            }
+
+            vkState.commandBuffers.clear();
         }
         //<-----------------------------------------------------------------------------
 
@@ -919,6 +957,7 @@ namespace engine
                 determinePhysicalDevices();
                 selectPhysicalDevice(0);
                 createCommandPool();
+                recreateCommandBuffers(1);
 
                 return status;
             }
@@ -953,8 +992,10 @@ namespace engine
             // Wait for the logical device to finish up all work.
             vkDeviceWaitIdle(mVkState.selectedLogicalDevice);
 
-            //
+            // Destroy command buffers and pool
+            destroyCommandBuffers();
             vkDestroyCommandPool(mVkState.selectedLogicalDevice, mVkState.commandPool, nullptr);
+            mVkState.commandPool = VK_NULL_HANDLE;
 
             // Swapchain
             destroySwapChain();
