@@ -285,16 +285,24 @@ namespace engine
         private_members:
             CStdSharedPtr_t<SApplicationEnvironment>               mApplicationEnvironment;
             CStdSharedPtr_t<wsi::CWSIDisplay>                      mDisplay;
+
             CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;
             CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
             Map<std::string, PublicResourceId_t>                   mImportedResources;
+
             PassMap                                                mPasses;
             FrameGraphResourceIdList                               mResources;
             CFrameGraphMutableResources                            mResourceData;
-            AdjacencyListMap_t<FrameGraphResourceId_t>             mResourceAdjacency;
+
             AdjacencyListMap_t<PassUID_t>                          mPassAdjacency;
-            AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t>  mPassToResourceAdjacency;
+
             CStdUniquePtr_t<CGraph>                                mFrameGraph;
+
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+            AdjacencyListMap_t<FrameGraphResourceId_t>             mResourceAdjacency;
+            AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t>  mPassToResourceAdjacency;
+#endif
+
         };
         //<-----------------------------------------------------------------------------
 
@@ -306,11 +314,12 @@ namespace engine
                 typename... TPassCreationArgs
                 >
         CStdSharedPtr_t<TPass> CGraphBuilder::spawnPass(
-                std::string                 const&aName,
-                TPassCreationArgs            &&...aArgs)
+                std::string                 const     &aName,
+                TPassCreationArgs                 &&...aArgs)
         {
             if(!graph())
             {
+                // TBD: Log
                 return nullptr;
             }
 
@@ -324,6 +333,7 @@ namespace engine
                         accessor->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
                 if(!pass)
                 {
+                    // TBD: Log
                     return nullptr;
                 }
 
@@ -344,27 +354,6 @@ namespace engine
                 }
 
                 mPasses[pass->passUID()] = pass;
-
-                //
-                // IMPORTANT: Perform implicit collection at this point in order to provide
-                //            any subsequent pass spawn and setup to access already available
-                //            resource descriptions!
-                /*if(!collectPass(passBuilder))
-                {
-                    Log::Error(logTag(), "Cannot collect pass after setup.");
-                    pass = nullptr;
-                    return nullptr;
-                }*/
-
-                // Passes are added to the graph on compilation!!! Move there once the environment is setup.
-                // if!(graph()->addPass(name, std::static_pointer_cast<PassBase>(pass))) {
-                //  // TODO: Log
-                //  pass = nullptr;
-                //  return nullptr;
-                // }
-
-                // Read out the PassLinker state filled in by "setup(...)" and properly merge it with
-                // the current graph builder state.
 
                 return pass;
             }

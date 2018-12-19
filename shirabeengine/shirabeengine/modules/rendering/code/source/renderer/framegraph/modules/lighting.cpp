@@ -50,7 +50,7 @@ namespace engine
                 lightAccBufferDesc.mipLevels      = 1;
                 lightAccBufferDesc.arraySize      = 1;
                 lightAccBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
-                lightAccBufferDesc.permittedUsage = EFrameGraphResourceUsage::ImageResource | EFrameGraphResourceUsage::RenderTarget;
+                lightAccBufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
 
                 aOutPassData.state.lightAccumulationBufferTextureId = aBuilder.createTexture("Light Accumulation Buffer", lightAccBufferDesc);
 

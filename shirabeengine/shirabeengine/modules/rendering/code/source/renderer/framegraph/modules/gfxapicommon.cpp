@@ -48,7 +48,7 @@ namespace engine
                 backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
                 backBufferTextureDesc.arraySize      = 1;
                 backBufferTextureDesc.mipLevels      = 1;
-                backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget | EFrameGraphResourceUsage::Unused;
+                backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::ColorAttachment | EFrameGraphResourceUsage::Unused;
 
                 aOutPassData.importData.backBufferInput = aBuilder.importTexture(backBufferTextureDesc.readableName, backBufferTextureDesc);
 

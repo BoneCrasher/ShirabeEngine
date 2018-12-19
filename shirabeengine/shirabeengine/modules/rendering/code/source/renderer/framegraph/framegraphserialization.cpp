@@ -1,3 +1,5 @@
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+
 #include "renderer/framegraph/framegraphdata.h"
 #include "renderer/framegraph/framegraph.h"
 #include "renderer/framegraph/pass.h"
@@ -96,6 +98,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool CFrameGraphGraphVizSerializer::serializeGraph(CGraph const &aGraph)
         {
+
+
             CStdUniquePtr_t<CGraph::CAccessor> accessor = aGraph.getAccessor(CPassKey<CFrameGraphGraphVizSerializer>());
 
             CFrameGraphResources const &resources = accessor->resourceData();
@@ -608,3 +612,5 @@ namespace engine
         //<-----------------------------------------------------------------------------
     }
 }
+
+#endif

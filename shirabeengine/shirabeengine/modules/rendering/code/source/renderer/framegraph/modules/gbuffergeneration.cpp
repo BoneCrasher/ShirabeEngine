@@ -58,7 +58,7 @@ namespace engine
                 gbufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
                 gbufferDesc.arraySize      = 4;
                 gbufferDesc.mipLevels      = 1;
-                gbufferDesc.permittedUsage = EFrameGraphResourceUsage::ImageResource | EFrameGraphResourceUsage::RenderTarget;
+                gbufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
 
                 // Basic underlying output buffer to be linked
                 aOutPassData.state.gbufferTextureArrayId = aBuilder.createTexture("GBuffer Array Texture", gbufferDesc);

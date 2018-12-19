@@ -18,14 +18,18 @@ namespace engine
 {
     namespace framegraph
     {
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         using namespace serialization;
+#endif
 
         /**
          * A CGraph describes the hierarchical structure of the framegraph,
          * i.e. its inputs, outputs, passes, resources and all operations performed.
          */
         class SHIRABE_TEST_EXPORT CGraph
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
                 : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
+#endif
         {
             SHIRABE_DECLARE_LOG_TAG(CGraph);
 
@@ -48,12 +52,14 @@ namespace engine
                 std::stack<PassUID_t>                                 const &passExecutionOrder()      const;
                 FrameGraphResourceIdList                              const &resources()               const;
                 CFrameGraphMutableResources                           const &resourceData()            const;
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
                 AdjacencyListMap_t<FrameGraphResourceId_t>            const &resourceAdjacency()       const;
                 std::stack<FrameGraphResourceId_t>                    const &resourceOrder()           const;
                 AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &passToResourceAdjacency() const;
+#endif
 
             private_members:
-                CGraph const*m_graph;
+                CGraph const *m_graph;
             };
 
             /**
@@ -75,9 +81,11 @@ namespace engine
                 std::stack<PassUID_t>                                 &mutablePassExecutionOrder();
                 FrameGraphResourceIdList                              &mutableResources();
                 CFrameGraphMutableResources                           &mutableResourceData();
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
                 AdjacencyListMap_t<FrameGraphResourceId_t>            &mutableResourceAdjacency();
                 std::stack<FrameGraphResourceId_t>                    &mutableResourceOrder();
                 AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> &mutablePassToResourceAdjacency();
+#endif
 
                 /**
                  * Create a new pass of type TPass given a uid and name.
@@ -122,6 +130,7 @@ namespace engine
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
 
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
              * Getter method for the graphvizserializer class to fetch an immutable accessor class.
              *
@@ -143,6 +152,7 @@ namespace engine
             {
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
+#endif
 
             /**
              * Execute the framegraph, causing it create the respective command buffers.
@@ -151,6 +161,7 @@ namespace engine
              */
             bool execute(CStdSharedPtr_t<IFrameGraphRenderContext>&);
 
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
              * Double-Dispatch accept for the graph to accept any kind of frame graph serializer instance.
              *
@@ -166,6 +177,7 @@ namespace engine
              * @return            True, if successful. False otherwise.
              */
             virtual bool acceptDeserializer(IFrameGraphDeserializer &aDeserializer);
+#endif
 
             /**
              * Assign another graph to this instance.
@@ -193,6 +205,14 @@ namespace engine
             bool initializeResources(
                     CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
                     FrameGraphResourceIdList                  const &aResourceIds);
+
+            /**
+             * Initialize all subpasses, the render pass and the framebuffer.
+             *
+             * @param aRenderContext The render context interface to the graphics API.
+             * @return               True, if successful. False, otherwise.
+             */
+            bool initializeRenderPassAndFrameBuffer(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext);
 
             /**
              * Bind all automatic resources required for execution.
@@ -341,10 +361,14 @@ namespace engine
             std::stack<PassUID_t>                                 mPassExecutionOrder;
             FrameGraphResourceIdList                              mResources;
             CFrameGraphMutableResources                           mResourceData;
+            FrameGraphResourceIdList                              mInstantiatedResources;
+
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             AdjacencyListMap_t<FrameGraphResourceId_t>            mResourceAdjacency;
             std::stack<FrameGraphResourceId_t>                    mResourceOrder;
             AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> mPassToResourceAdjacency;
-            FrameGraphResourceIdList                              mInstantiatedResources;
+#endif
+
         };
         //<-----------------------------------------------------------------------------
 

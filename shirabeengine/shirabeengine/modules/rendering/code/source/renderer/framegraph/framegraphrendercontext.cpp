@@ -1,5 +1,7 @@
 #include <assert.h>
 
+#include <graphicsapi/resources/types/renderpass.h>
+
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
 
@@ -122,6 +124,52 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::createFrameBufferAndRenderPass(
+                SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                CFrameGraphMutableResources     const &aFrameGraphResources)
+        {
+            CRenderPass::SDescriptor renderPassDesc = {};
+
+            for(FrameGraphResourceId_t const &id : aAttachmentInfo.getAttachementResourceIds())
+            {
+                CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(id);
+
+                SAttachmentDescription attachmentDesc = {};
+                attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
+                attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
+                attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
+                attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
+                attachmentDesc.format         = textureView->format;
+                attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;       // For now we don't care about the initial layout...
+                attachmentDesc.finalLayout    = EImageLayout::PRESENT_SRC_KHR; // For now we just assume everything to be presentable...
+
+                renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
+            }
+
+            CRenderPass::CCreationRequest const renderPassCreationRequest(renderPassDesc);
+
+            EEngineStatus status = mResourceManager->createResource<CRenderPass>(renderPassCreationRequest, "DefaultRenderPass", false);
+            if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
+                return EEngineStatus::Ok;
+            else
+                HandleEngineStatusError(status, "Failed to create render pass.");
+
+            CFrameBuffer::SDescriptor frameBufferDesc = {};
+            CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc);
+
+            status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, "DefaultFrameBuffer", false);
+            if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
+                return EEngineStatus::Ok;
+            else
+                HandleEngineStatusError(status, "Failed to create frame buffer.");
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
             PublicResourceId_t const pid = "";
@@ -141,12 +189,12 @@ namespace engine
             desc.name        = aTexture.readableName;
             desc.textureInfo = aTexture;
 
-            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::RenderTarget))
-                desc.gpuBinding.set(EBufferBinding::ColorAttachement);
-            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::DepthTarget))
-                desc.gpuBinding.set(EBufferBinding::DepthAttachement);
-            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::ImageResource))
-                desc.gpuBinding.set(EBufferBinding::InputAttachement);
+            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment))
+                desc.gpuBinding.set(EBufferBinding::ColorAttachment);
+            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment))
+                desc.gpuBinding.set(EBufferBinding::DepthAttachment);
+            if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment))
+                desc.gpuBinding.set(EBufferBinding::InputAttachment);
 
             desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 

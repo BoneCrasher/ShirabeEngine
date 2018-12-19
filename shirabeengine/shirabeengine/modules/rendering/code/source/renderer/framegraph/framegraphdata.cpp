@@ -83,12 +83,15 @@ namespace engine
     {
         switch(aUsage)
         {
-        case EFrameGraphResourceUsage::Undefined:      return "Undefined";
-        case EFrameGraphResourceUsage::BufferResource: return "BufferResource";
-        case EFrameGraphResourceUsage::BufferTarget:   return "BufferTarget";
-        case EFrameGraphResourceUsage::ImageResource:  return "ImageResource";
-        case EFrameGraphResourceUsage::RenderTarget:   return "RenderTarget";
-        case EFrameGraphResourceUsage::DepthTarget:    return "DepthTarget";
+            case EFrameGraphResourceUsage::Undefined      : return "Undefined";
+            case EFrameGraphResourceUsage::InputAttachment: return "InputAttachment";
+            case EFrameGraphResourceUsage::ColorAttachment: return "ColorAttachment";
+            case EFrameGraphResourceUsage::DepthAttachment: return "DepthAttachment";
+            case EFrameGraphResourceUsage::SampledImage   : return "SampledImage";
+            case EFrameGraphResourceUsage::StorageImage   : return "StorageImage";
+            case EFrameGraphResourceUsage::BufferResource : return "BufferResource";
+            case EFrameGraphResourceUsage::BufferTarget   : return "BufferTarget";
+            case EFrameGraphResourceUsage::Unused         : return "Unused";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -262,6 +265,51 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        void SFrameGraphAttachmentCollection::addInputAttachment(
+                PassUID_t              const &aPassUID,
+                FrameGraphResourceId_t const &aResourceID)
+        {
+            mAttachmentResourceIds.push_back(aResourceID);
+
+            uint64_t const index = (mAttachmentResourceIds.size() - 1);
+            mInputAttachments.push_back(index);
+            mAttachmentPassAssignment[aPassUID].push_back(index);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void SFrameGraphAttachmentCollection::addColorAttachment(
+                PassUID_t              const &aPassUID,
+                FrameGraphResourceId_t const &aResourceID)
+        {
+            mAttachmentResourceIds.push_back(aResourceID);
+
+            uint64_t const index = (mAttachmentResourceIds.size() - 1);
+            mColorAttachments.push_back(index);
+            mAttachmentPassAssignment[aPassUID].push_back(index);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        void SFrameGraphAttachmentCollection::addDepthAttachment(
+                PassUID_t              const &aPassUID,
+                FrameGraphResourceId_t const &aResourceID)
+        {
+            mAttachmentResourceIds.push_back(aResourceID);
+
+            uint64_t const index = (mAttachmentResourceIds.size() - 1);
+            mDepthAttachments.push_back(index);
+            mAttachmentPassAssignment[aPassUID].push_back(index);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         SFrameGraphResourceFlags::SFrameGraphResourceFlags()
             : requiredFormat(FrameGraphFormat_t::Undefined)
         {}
@@ -294,7 +342,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphResources::CFrameGraphResources()
         {
-            m_resources.push_back(std::make_shared<SFrameGraphResource>());
+            mResources.push_back(std::make_shared<SFrameGraphResource>());
         }
         //<-----------------------------------------------------------------------------
 
@@ -321,7 +369,7 @@ namespace engine
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
             try {
 #endif
-                m_resources = aOther.resources();
+                mResources = aOther.resources();
 
                 for(RefIndex_t::value_type const&id : aOther.textures())
                     CFrameGraphResourcesRef<SFrameGraphTexture>::insert(id);

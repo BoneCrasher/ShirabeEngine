@@ -12,17 +12,18 @@ namespace engine
         using AlreadyRegisteredFn_t = std::function<bool(std::vector<TUID> const&, TUID const&)>;
 
         /**
-         *
+         * Functor usable as a predicate to determine, whether adjacency info was already stored for a
+         * node UID.
          */
         template <typename TUID>
         static AlreadyRegisteredFn_t<TUID> alreadyRegisteredFn =
-                [] (std::vector<TUID> const&adjacency, TUID const&possiblyAdjacent)
+                [] (std::vector<TUID> const &aAdjacency, TUID const& aPossiblyAdjacent)
         {
-            return std::find(adjacency.begin(), adjacency.end(), possiblyAdjacent) != adjacency.end();
+            return (aAdjacency.end() != std::find(aAdjacency.begin(), aAdjacency.end(), aPossiblyAdjacent));
         };
 
         /**
-         * The SequenceUIDGenerator class implements IUIDGenerator so that it
+         * The SequenceUIDGene rator class implements IUIDGenerator so that it
          * increments a FrameGraphResourceId_t linearly on each call to 'generate',
          * starting at 'aInitialID' provided to the constructor.
          */
@@ -57,18 +58,20 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CGraphBuilder::CGraphBuilder()
-            : mApplicationEnvironment(nullptr)
-            , mDisplay(nullptr)
-            , mPassUIDGenerator(std::make_shared<CSequenceUIDGenerator>(0))
-            , mResourceUIDGenerator(std::make_shared<CSequenceUIDGenerator>(1))
-            , mImportedResources()
-            , mPasses()
-            , mResources()
-            , mResourceData()
-            , mResourceAdjacency()
-            , mPassAdjacency()
-            , mPassToResourceAdjacency()
-            , mFrameGraph(nullptr)
+            : mApplicationEnvironment (nullptr                                   )
+            , mDisplay                (nullptr                                   )
+            , mPassUIDGenerator       (std::make_shared<CSequenceUIDGenerator>(0))
+            , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator>(1))
+            , mImportedResources      (                                          )
+            , mPasses                 (                                          )
+            , mResources              (                                          )
+            , mResourceData           (                                          )
+            , mPassAdjacency          (                                          )
+            , mFrameGraph             (nullptr                                   )
+    #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+            , mResourceAdjacency      (                                          )
+            , mPassToResourceAdjacency(                                          )
+    #endif
         {}
         //<-----------------------------------------------------------------------------
 
@@ -136,7 +139,7 @@ namespace engine
                 return true;
             };
 
-            auto const pseudoExec = [] (
+            auto const pseudoExec  = [] (
                     bool                                      const&,
                     CFrameGraphResources                      const&,
                     CStdSharedPtr_t<IFrameGraphRenderContext>      &) -> bool
@@ -302,6 +305,8 @@ namespace engine
                 return nullptr;
             }
 
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+
             // Fourth: Sort the resources by their relationships and dependencies.
             bool const topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(accessor->mutableResourceOrder());
             if(!topologicalResourceSortSuccessful)
@@ -309,6 +314,7 @@ namespace engine
                 CLog::Error(logTag(), "Failed to perform topologicalSort(...) for resources on graph compilation.");
                 return nullptr;
             }
+#endif
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
 
@@ -322,11 +328,14 @@ namespace engine
 
             // Move out the current adjacency state to the frame graph, so that it can be used for further processing.
             // It is no more needed at this point within the GraphBuilder.
-            accessor->mutablePassAdjacency()           = std::move(this->mPassAdjacency);
+            accessor->mutablePassAdjacency() = std::move(this->mPassAdjacency);
+            accessor->mutableResources()     = std::move(this->mResources);
+            accessor->mutableResourceData().mergeIn(this->mResourceData);
+
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             accessor->mutableResourceAdjacency()       = std::move(this->mResourceAdjacency);
             accessor->mutablePassToResourceAdjacency() = std::move(this->mPassToResourceAdjacency);
-            accessor->mutableResources()               = std::move(this->mResources);
-            accessor->mutableResourceData().mergeIn(this->mResourceData);
+#endif
 
             return std::move(graph());
         }
@@ -357,6 +366,53 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        bool deriveAttachements(
+                CStdUniquePtr_t<CPassBase::CMutableAccessor>       &aAccessor,
+                SFrameGraphResource                          const &aTextureViewHandle,
+                SFrameGraphTextureView                       const &aTextureView)
+        {
+            SFrameGraphTexture const &t = *static_cast<SFrameGraphTexture const *const>(&aTextureViewHandle);
+
+            // The "requestedUsage"-flags are set while evaluating the texture views!
+            // Consequently, evaluate all texture views first and then care for the textures itself
+            // to have all state reflected appropriately.
+            bool const isColorAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment);
+            bool const isDepthAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment);
+            bool const isInputAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment);
+
+            bool const textureViewIsForWrite  = aTextureView.mode.check(EFrameGraphViewAccessMode::Write);
+            if(textureViewIsForWrite)
+            {
+                bool const textureViewWritesColor = (EFrameGraphViewSource::Color == aTextureView.source);
+                bool const textureViewWritesDepth = (EFrameGraphViewSource::Depth == aTextureView.source);
+
+                if(textureViewWritesColor)
+                {
+                    // Color Attachement                
+
+                }
+                else if(textureViewWritesDepth)
+                {
+                    // Depth Attachement
+                }
+                else
+                {
+                    // Unsupported
+                    // TBD: Error?
+                }
+            }
+            else
+            {
+                // Input Attachment
+            }
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         bool CGraphBuilder::collectPass(CStdSharedPtr_t<CPassBase> aPass)
         {
             assert(nullptr != aPass);
@@ -364,27 +420,23 @@ namespace engine
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             FrameGraphResourceIdList const resources = accessor->mutableResourceReferences();
-
-            for(FrameGraphResourceId_t const&resource : resources)
+            for(FrameGraphResourceId_t const &resourceId : resources)
             {
-                SFrameGraphResource &r = *mResourceData.getMutable<SFrameGraphResource>(resource);
+                SFrameGraphResource &resource = *mResourceData.getMutable<SFrameGraphResource>(resourceId);
 
                 // For each underlying OR imported resource (textures/buffers or whatever importable)
-                if(r.parentResource == 0)
+                if(0 == resource.parentResource)
                 {
-                    switch(r.type)
+                    if(EFrameGraphResourceType::Texture == resource.type)
                     {
-                    case EFrameGraphResourceType::Imported:
-                        break;
-                    case EFrameGraphResourceType::RenderableList:
-                    case EFrameGraphResourceType::Buffer:
-                    case EFrameGraphResourceType::Texture:
-                        // And map the resources to it's pass appropriately
-                        bool const alreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[aPass->passUID()], r.resourceId);
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+                        // Map the resources to it's pass appropriately
+                        bool const alreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[aPass->passUID()], resource.resourceId);
                         if(!alreadyRegistered)
                         {
-                            mPassToResourceAdjacency[aPass->passUID()].push_back(r.resourceId);
+                            mPassToResourceAdjacency[aPass->passUID()].push_back(resource.resourceId);
                         }
+#endif
                         break;
                     }
                 }
@@ -394,59 +446,79 @@ namespace engine
                     // Avoid internal references for passes!
                     // If the edge from pass k to pass k+1 was not added yet.
                     // Create edge: Parent-->Source
-                    SFrameGraphResource const &parentResource = *mResourceData.get<SFrameGraphResource>(r.parentResource);
+                    SFrameGraphResource const &parentResource = *mResourceData.get<SFrameGraphResource>(resource.parentResource);
                     PassUID_t           const &passUID        = aPass->passUID();
 
+                    // Create a pass dependency used for topologically sorting the graph
+                    // to derive the pass execution order.
                     if(parentResource.assignedPassUID != passUID)
                     {
                         createPassDependencyByUID(parentResource.assignedPassUID, passUID);
                     }
 
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+
                     // Do the same for the resources!
-                    bool const resourceAdjacencyAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mResourceAdjacency[parentResource.resourceId], r.resourceId);
+                    bool const resourceAdjacencyAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mResourceAdjacency[parentResource.resourceId], resource.resourceId);
                     if(!resourceAdjacencyAlreadyRegistered)
                     {
-                        mResourceAdjacency[parentResource.resourceId].push_back(r.resourceId);
+                        mResourceAdjacency[parentResource.resourceId].push_back(resource.resourceId);
                     }
 
                     // And map the resources to it's pass appropriately
-                    bool const resourceEdgeAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[passUID], r.resourceId);
+                    bool const resourceEdgeAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[passUID], resource.resourceId);
                     if(!resourceEdgeAlreadyRegistered)
                     {
-                        mPassToResourceAdjacency[passUID].push_back(r.resourceId);
+                        mPassToResourceAdjacency[passUID].push_back(resource.resourceId);
                     }
 
-                    if(r.type == EFrameGraphResourceType::TextureView)
-                    {
-                        SFrameGraphTexture     &texture     = *mResourceData.getMutable<SFrameGraphTexture>    (r.subjacentResource);
-                        SFrameGraphTextureView &textureView = *mResourceData.getMutable<SFrameGraphTextureView>(r.resourceId);
+#endif
 
+                    if(EFrameGraphResourceType::TextureView == resource.type)
+                    {
+                        SFrameGraphTexture     &texture     = *mResourceData.getMutable<SFrameGraphTexture>    (resource.subjacentResource);
+                        SFrameGraphTextureView &textureView = *mResourceData.getMutable<SFrameGraphTextureView>(resource.resourceId);
 
                         // Auto adjust format if requested
-                        if(textureView.format == FrameGraphFormat_t::Automatic)
+                        if(FrameGraphFormat_t::Automatic == textureView.format)
                         {
                             textureView.format = texture.format;
                         }
 
-                        // Flag required usage flags, so that the subjacent texture is properly created.
+                        SFrameGraphAttachmentCollection &attachments = mResourceData.getAttachments();
+
+                        // Set required usage flags, so that the subjacent texture is properly created.
+                        // This will also derive all attachements of the to be created render pass.
+                        // Since we avoided simultaneous R/W, setting just one of the attachment flags
+                        // per texture view will work out.
                         if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
                         {
-                            texture.requestedUsage.set(EFrameGraphResourceUsage::ImageResource);
+                            texture.requestedUsage.set(EFrameGraphResourceUsage::InputAttachment);
+                            attachments.addInputAttachment(passUID, resource.resourceId);
                         }
                         else if(textureView.mode.check(EFrameGraphViewAccessMode::Write))
                         {
-                            texture.requestedUsage.set(EFrameGraphResourceUsage::RenderTarget);
+                            if(EFrameGraphViewSource::Color == textureView.source)
+                            {
+                                texture.requestedUsage.set(EFrameGraphResourceUsage::ColorAttachment);
+                                attachments.addColorAttachment(passUID, resource.resourceId);
+                            }
+                            else if(EFrameGraphViewSource::Depth == textureView.source)
+                            {
+                                texture.requestedUsage.set(EFrameGraphResourceUsage::DepthAttachment);
+                                attachments.addDepthAttachment(passUID, resource.resourceId);
+                            }
                         }
                         else
                         {
                             texture.requestedUsage.set(EFrameGraphResourceUsage::Unused);
                         }
                     }
-                    else if(r.type == EFrameGraphResourceType::BufferView)
+                    else if(resource.type == EFrameGraphResourceType::BufferView)
                     {
                         // TODO
                     }
-                    else if(r.type == EFrameGraphResourceType::RenderableListView)
+                    else if(resource.type == EFrameGraphResourceType::RenderableListView)
                     {
                         // TODO
                     }
@@ -454,7 +526,7 @@ namespace engine
             }
 
             // Now that the internal resource references were adjusted and duplicates removed, confirm the index in the graph builder
-            for(FrameGraphResourceId_t const&id : accessor->resourceReferences())
+            for(FrameGraphResourceId_t const &id : accessor->resourceReferences())
             {
                 mResources.push_back(id);
             }

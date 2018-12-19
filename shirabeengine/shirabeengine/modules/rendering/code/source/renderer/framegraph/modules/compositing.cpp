@@ -51,7 +51,7 @@ namespace engine
                 compositingBufferDesc.mipLevels      = 1;
                 compositingBufferDesc.arraySize      = 1;
                 compositingBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
-                compositingBufferDesc.permittedUsage = EFrameGraphResourceUsage::ImageResource | EFrameGraphResourceUsage::RenderTarget;
+                compositingBufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
 
                 aOutPassData.state.compositingBufferId = aBuilder.createTexture("Compositing Buffer", compositingBufferDesc);
 

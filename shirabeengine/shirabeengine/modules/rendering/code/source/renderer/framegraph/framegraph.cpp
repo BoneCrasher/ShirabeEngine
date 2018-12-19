@@ -54,6 +54,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+
         AdjacencyListMap_t<FrameGraphResourceId_t> const &CGraph::CAccessor::resourceAdjacency() const
         {
             return m_graph->mResourceAdjacency;
@@ -76,6 +79,9 @@ namespace engine
         {
             return m_graph->mPassToResourceAdjacency;
         }
+
+#endif
+
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -122,6 +128,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+
         AdjacencyListMap_t<FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutableResourceAdjacency()
         {
             return mGraph->mResourceAdjacency;
@@ -144,11 +152,14 @@ namespace engine
         {
             return mGraph->mPassToResourceAdjacency;
         }
+
+#endif
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         bool CGraph::acceptSerializer(IFrameGraphSerializer &aSerializer) const
         {
             aSerializer.serializeGraph(*this);
@@ -162,6 +173,7 @@ namespace engine
         {
             aDeserializer.deserializeGraph(*this);
         }
+#endif
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -172,9 +184,11 @@ namespace engine
             mPasses                  = aOther.mPasses;
             mPassAdjacency           = aOther.mPassAdjacency;
             mPassExecutionOrder      = aOther.mPassExecutionOrder;
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             mResourceAdjacency       = aOther.mResourceAdjacency;
             mResourceOrder           = aOther.mResourceOrder;
             mPassToResourceAdjacency = aOther.mPassToResourceAdjacency;
+#endif
 
             return (*this);
         }
@@ -183,12 +197,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraph::execute(CStdSharedPtr_t<IFrameGraphRenderContext> &aRendercontext)
+        bool CGraph::execute(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext)
         {
             assert(aRendercontext != nullptr);
 
-            bool const initialized = initializeResources(aRendercontext, mResources);
-            bool const bound       = bindResources(aRendercontext, mResources);
+            bool const successfullySetUp = initializeRenderPassAndFrameBuffer(aRenderContext);
+
+            // bool const initialized = initializeResources(aRendercontext, mResources);
+            // bool const bound       = bindResources(aRendercontext, mResources);
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
@@ -202,8 +218,9 @@ namespace engine
                 // bool const initialized = initializeResources(aRendercontext, passResources);
                 // bool const bound       = bindResources(aRendercontext, passResources);
 
-                bool executed = pass->execute(mResourceData, aRendercontext);
-                if(!executed) {
+                bool executed = pass->execute(mResourceData, aRenderContext);
+                if(!executed)
+                {
                     CLog::Error(logTag(), CString::format("Failed to execute pass %0", pass->passUID()));
                 }
 
@@ -213,8 +230,8 @@ namespace engine
                 copy.pop();
             }
 
-            bool const unbound       = unbindResources(aRendercontext, mResources);
-            bool const deinitialized = deinitializeResources(aRendercontext, mResources);
+            bool const unbound       = unbindResources(aRenderContext, mResources);
+            bool const deinitialized = deinitializeResources(aRenderContext, mResources);
 
             return true;
         }
@@ -278,6 +295,71 @@ namespace engine
                     break;
                 }
             }
+
+            return initialized;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::initializeRenderPassAndFrameBuffer(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext)
+        {
+            bool initialized = true;
+
+            std::vector<CStdSharedPtr_t<SFrameGraphTexture>>     textureReferences{};
+            std::vector<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewReferences{};
+
+            SFrameGraphAttachmentCollection const &attachments = mResourceData.getAttachments();
+            for(FrameGraphResourceId_t const &id : attachments.getAttachementResourceIds())
+            {
+                CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
+                CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
+                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
+
+                FrameGraphResourceIdList::const_iterator it = mInstantiatedResources.end();
+
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
+
+                subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
+                textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
+
+                // Make sure the subjacent resource was created.
+                it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
+                if(it == mInstantiatedResources.end())
+                {
+                    initialized |=
+                            initializeTexture(
+                                aRenderContext,
+                                texture);
+                    mInstantiatedResources.push_back(texture->resourceId);
+
+                    textureReferences.push_back(texture);
+                }
+
+                // No go for the texture view.
+                it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), textureView->resourceId);
+                if(it == mInstantiatedResources.end())
+                {
+                    bool const subjacentTextureCreated = (mInstantiatedResources.end() != std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId));
+                    if(!texture->isExternalResource && !subjacentTextureCreated)
+                    {
+                        initialized |= initializeResources(aRenderContext, {texture->resourceId});
+                    }
+
+                    initialized |=
+                            initializeTextureView(
+                                aRenderContext,
+                                texture,
+                                textureView);
+                    mInstantiatedResources.push_back(textureView->resourceId);
+
+                    textureViewReferences.push_back(textureView);
+                }
+            }
+
+            EEngineStatus const status = aRenderContext->createFrameBufferAndRenderPass(attachments, mResourceData);
 
             return initialized;
         }

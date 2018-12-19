@@ -189,7 +189,7 @@ namespace Test
             backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
             backBufferTextureDesc.arraySize      = 1;
             backBufferTextureDesc.mipLevels      = 1;
-            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::RenderTarget;
+            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::ColorAttachment;
 
             SFrameGraphResource backBuffer{ };
             backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);

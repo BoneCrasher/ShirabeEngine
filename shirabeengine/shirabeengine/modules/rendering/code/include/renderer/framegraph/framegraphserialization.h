@@ -1,6 +1,8 @@
 #ifndef __SR_SHIRABE_FRAMEGRAPH_SERIALIZATION_H__
 #define __SR_SHIRABE_FRAMEGRAPH_SERIALIZATION_H__
 
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+
 #include <sstream>
 #include <optional>
 
@@ -273,4 +275,5 @@ namespace engine
     }
 }
 
+#endif
 #endif

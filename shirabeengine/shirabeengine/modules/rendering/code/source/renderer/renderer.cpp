@@ -227,6 +227,7 @@ namespace engine
             // Compile the whole thing :)
             CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             static bool serializedOnce = false;
             if(!serializedOnce)
             {
@@ -250,6 +251,7 @@ namespace engine
 
                 system("tools/makeFrameGraphPNG.sh");
             }
+#endif
 
             if(frameGraph)
             {

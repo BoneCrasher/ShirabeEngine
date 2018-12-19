@@ -23,6 +23,8 @@ namespace engine
 {
     namespace framegraph
     {
+
+
         using core::CBitField;
         using engine::CRange;
         using namespace engine::rendering;
@@ -39,8 +41,7 @@ namespace engine
                 : uint8_t
         {
             Undefined = 0,
-            Imported  = 1,
-            Texture,
+            Texture   = 1,
             Buffer,
             TextureView,
             BufferView,
@@ -71,13 +72,15 @@ namespace engine
         enum class EFrameGraphResourceUsage
                 : uint8_t
         {
-            Undefined      =   0,
-            ImageResource  =   1,
-            BufferResource =   2,
-            RenderTarget   =   4,
-            DepthTarget    =   8,
-            BufferTarget   =  16,
-            Unused         = 128
+            Undefined        =   0,
+            InputAttachment  =   1,
+            ColorAttachment  =   2,
+            DepthAttachment  =   4,
+            SampledImage     =   8,
+            StorageImage     =  16,
+            BufferResource   =  32,
+            BufferTarget     =  64,
+            Unused           = 128
         };
 
         /**
@@ -177,6 +180,9 @@ namespace engine
          */
         SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, EFrameGraphResourceType const&e);
 
+        /**
+         * @brief The SFrameGraphResource struct
+         */
         struct SHIRABE_TEST_EXPORT SFrameGraphResource
         {
         public_constructors:
@@ -272,6 +278,9 @@ namespace engine
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphBufferView, SFrameGraphBufferView);
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphBufferView, SFrameGraphBufferView);
 
+        /**
+         * @brief The SFrameGraphTexture struct
+         */
         struct SHIRABE_TEST_EXPORT SFrameGraphTexture
                 : public SFrameGraphResource
                 , public gfxapi::STextureInfo
@@ -328,6 +337,72 @@ namespace engine
 
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTextureView, SFrameGraphTextureView);
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphTextureView, SFrameGraphTextureView);
+
+
+        /**
+         * @brief The SFrameGraphAttachmentCollection struct
+         */
+        class SFrameGraphAttachmentCollection
+        {
+        public_methods:
+            /**
+             * Add an input attachment to the collection and register it
+             * for the given pass.
+             *
+             * @param aPassUID    The pass UID of the pass, which will access the attachment.
+             * @param aResourceID The resourceUID of the texture view, which will serve as an
+             *                    attachment.
+             */
+            void addInputAttachment(
+                    PassUID_t              const &aPassUID,
+                    FrameGraphResourceId_t const &aResourceID);
+
+            /**
+             * Add a color attachment to the collection and register it
+             * for the given pass.
+             *
+             * @param aPassUID    The pass UID of the pass, which will access the attachment.
+             * @param aResourceID The resourceUID of the texture view, which will serve as an
+             *                    attachment.
+             */
+            void addColorAttachment(
+                    PassUID_t              const &aPassUID,
+                    FrameGraphResourceId_t const &aResourceID);
+
+            /**
+             * Add a depth attachment to the collection and register it
+             * for the given pass.
+             *
+             * @param aPassUID    The pass UID of the pass, which will access the attachment.
+             * @param aResourceID The resourceUID of the texture view, which will serve as an
+             *                    attachment.
+             */
+            void addDepthAttachment(
+                    PassUID_t              const &aPassUID,
+                    FrameGraphResourceId_t const &aResourceID);
+
+            /**
+             * Return the list of attachment resource ids.
+             *
+             * @return See brief.
+             */
+            Vector<FrameGraphResourceId_t>   const &getAttachementResourceIds()   const { return mAttachmentResourceIds;    }
+            Vector<uint64_t>                 const &getColorAttachments()         const { return mColorAttachments;         }
+            Vector<uint64_t>                 const &getDepthAttachments()         const { return mDepthAttachments;         }
+            Vector<uint64_t>                 const &getInputAttachments()         const { return mInputAttachments;         }
+            Map<PassUID_t, Vector<uint64_t>> const &getAttachmentPassAssignment() const { return mAttachmentPassAssignment; }
+
+        private_members:
+            Vector<FrameGraphResourceId_t>
+                mAttachmentResourceIds;
+            Vector<uint64_t>
+                mColorAttachments,
+                mDepthAttachments,
+                mInputAttachments;
+            Map<PassUID_t, Vector<uint64_t>>
+                mAttachmentPassAssignment;
+        };
+
 
         /**
          * Describes common resource flags for read/write operations.
@@ -495,11 +570,11 @@ namespace engine
             get(FrameGraphResourceId_t const &aResourceId) const
             {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(m_resources.size() <= aResourceId)
+                if(mResources.size() <= aResourceId)
                     throw std::runtime_error("Resource handle not found.");
 #endif
 
-                CStdSharedPtr_t<SFrameGraphResource> resource = m_resources.at(aResourceId);
+                CStdSharedPtr_t<SFrameGraphResource> resource = mResources.at(aResourceId);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(nullptr == resource)
                     throw std::runtime_error("Resource handle is empty.");
@@ -509,16 +584,18 @@ namespace engine
                 return ptr;
             }
 
-            SHIRABE_INLINE Index_t    const &resources()           const { return m_resources; }
-            SHIRABE_INLINE RefIndex_t const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get(); }
-            SHIRABE_INLINE RefIndex_t const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get(); }
-            SHIRABE_INLINE RefIndex_t const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get(); }
-            SHIRABE_INLINE RefIndex_t const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get(); }
-            SHIRABE_INLINE RefIndex_t const &renderablesLists()    const { return CFrameGraphResourcesRef<SFrameGraphRenderableList>::get(); }
-            SHIRABE_INLINE RefIndex_t const &renderableListViews() const { return CFrameGraphResourcesRef<SFrameGraphRenderableListView>::get(); }
+            SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                   }
+            SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachements()        const { return mAttachements;                                                }
+            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get();            }
+            SHIRABE_INLINE RefIndex_t                      const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get();        }
+            SHIRABE_INLINE RefIndex_t                      const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get();             }
+            SHIRABE_INLINE RefIndex_t                      const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get();         }
+            SHIRABE_INLINE RefIndex_t                      const &renderablesLists()    const { return CFrameGraphResourcesRef<SFrameGraphRenderableList>::get();     }
+            SHIRABE_INLINE RefIndex_t                      const &renderableListViews() const { return CFrameGraphResourcesRef<SFrameGraphRenderableListView>::get(); }
 
         protected_members:
-            Index_t m_resources;
+            Index_t                         mResources;
+            SFrameGraphAttachmentCollection mAttachements;
         };
         
         /**
@@ -539,9 +616,9 @@ namespace engine
             spawnResource()
             {
                 CStdSharedPtr_t<T> ptr = std::make_shared<T>();
-                ptr->resourceId = m_resources.size();
+                ptr->resourceId = mResources.size();
 
-                m_resources.push_back(ptr);
+                mResources.push_back(ptr);
 
                 CFrameGraphResourcesRef<T>::insert(ptr->resourceId);
 
@@ -563,6 +640,12 @@ namespace engine
                 CStdSharedPtr_t<T> ptr = *const_cast<CStdSharedPtr_t<T>*>(&static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId));
                 return ptr;
             }
+
+            SHIRABE_INLINE SFrameGraphAttachmentCollection &getAttachments()
+            {
+                return mAttachements;
+            }
+
 
             /**
              * Merge two sets of framegraph resources together.

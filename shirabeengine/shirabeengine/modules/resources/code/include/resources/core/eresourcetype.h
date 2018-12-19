@@ -63,7 +63,9 @@ namespace engine
             TEXTURE_VIEW          = 605,
             DEPTH_STENCIL_STATE   = 701,
             RASTERIZER_STATE      = 702,
-            BLEND_STATE           = 703
+            BLEND_STATE           = 703,
+            RENDER_PASS           = 704,
+            FRAME_BUFFER          = 705
         };
 
         /**

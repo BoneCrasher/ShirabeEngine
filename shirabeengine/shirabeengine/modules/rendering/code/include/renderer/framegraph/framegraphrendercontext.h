@@ -61,6 +61,17 @@ namespace engine
             virtual EEngineStatus present() = 0;
 
             /**
+             * Create a framebuffer and render pass including subpasses for the provided attachment info.
+             *
+             * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
+             * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
+             * @return EEngineStatus::Ok, if successful. An errorcode otherwise.
+             */
+            virtual EEngineStatus createFrameBufferAndRenderPass(
+                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                    CFrameGraphMutableResources     const &aFrameGraphResources) = 0;
+
+            /**
              * Import a texture for use with framegraph render operations.
              *
              * @param aTexture The texture to import.
@@ -264,6 +275,17 @@ namespace engine
              */
 
             EEngineStatus present();
+
+            /**
+             * Create a framebuffer and render pass including subpasses for the provided attachment info.
+             *
+             * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
+             * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
+             * @return EEngineStatus::Ok, if successful. An errorcode otherwise.
+             */
+            EEngineStatus createFrameBufferAndRenderPass(
+                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                    CFrameGraphMutableResources     const &aFrameGraphResources);
 
             /**
              * Import a texture for use with framegraph render operations.

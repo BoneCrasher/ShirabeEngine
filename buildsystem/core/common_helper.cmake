@@ -339,10 +339,10 @@ macro(setupTargetAndConfig MODULE_NAME)
 
         set(SHIRABE_PROJECT_ARCHITECTURE ${SHIRABE_ARCH})
     else()
-        if(NOT SHIRABE_ADDRESSMODEL_64BIT)
-            set(SHIRABE_PROJECT_ARCHITECTURE x86)
-        else()
+        if(SHIRABE_ADDRESSMODEL_64BIT)
             set(SHIRABE_PROJECT_ARCHITECTURE x86_64)
+        else()
+            set(SHIRABE_PROJECT_ARCHITECTURE x86)
         endif()
     endif()
 

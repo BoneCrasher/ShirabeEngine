@@ -125,6 +125,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         bool CPassBase::acceptSerializer(IFrameGraphSerializer &aSerializer) const
         {
             bool const serialized = aSerializer.serializePass(*this);
@@ -140,6 +141,7 @@ namespace engine
             bool const deserialized = aDeserializer.deserializePass(*this);
             return deserialized;
         }
+#endif
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

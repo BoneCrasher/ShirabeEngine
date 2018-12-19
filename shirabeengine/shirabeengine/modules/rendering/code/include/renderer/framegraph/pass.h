@@ -22,7 +22,10 @@ namespace engine
     namespace framegraph
     {
         using namespace rendering;
+
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         using namespace serialization;
+#endif
 
         class CGraphBuilder;
         class CGraph;
@@ -35,7 +38,9 @@ namespace engine
          * As such, this pass implementation can not be instantiate, set-up or executed.
          */
         class CPassBase
+        #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
                 : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
+        #endif
         {
             SHIRABE_DECLARE_LOG_TAG(CPassBase);
 
@@ -169,6 +174,8 @@ namespace engine
              */
             std::string const &passName() const;
 
+
+#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
              * Double-Dispatch serialization integration to serialize this pass.
              *
@@ -182,6 +189,7 @@ namespace engine
              * @param aDeserializer Deserializer to accept for pass serialization.
              */
             virtual bool acceptDeserializer(IFrameGraphDeserializer &aDeserializer);
+#endif
 
             /**
              * Interface method for all passes' setup.

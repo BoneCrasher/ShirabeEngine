@@ -44,9 +44,9 @@ namespace engine
             UniformBuffer                = 4,   //< The buffer resource can be used as a uniform data
                                                 //   source bound against the pipeline registers.
             TextureInput                 = 8,   //< The buffer resource can be used as a sampled input texture.
-            InputAttachement             = 16,  //< The buffer resource can be used as a frame buffer input attachement (Read).
-            ColorAttachement             = 32,  //< The buffer resource can be used as a frame buffer color attachement (Write).
-            DepthAttachement             = 64,  //< The buffer resource can be used as a frame buffer depth attachement (Write).
+            InputAttachment              = 16,  //< The buffer resource can be used as a frame buffer input attachement (Read).
+            ColorAttachment              = 32,  //< The buffer resource can be used as a frame buffer color attachement (Write).
+            DepthAttachment              = 64,  //< The buffer resource can be used as a frame buffer depth attachement (Write).
             ShaderOutput_StreamOutput    = 128, //< The buffer resource can be used as a compute/shader data output target.
             UnorderedMultithreadedAccess = 256, //< The buffer resource can be accessed from multiple GPU threads in unordered fashion.
             CopySource                   = 512, //< The buffer will be used as a copy source buffer for copy operations.

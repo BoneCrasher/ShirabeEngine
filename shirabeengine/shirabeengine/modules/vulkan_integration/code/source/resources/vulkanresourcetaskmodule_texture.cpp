@@ -34,15 +34,15 @@ namespace engine
             VkImageUsageFlags imageUsage{};
             if(desc.gpuBinding.check(EBufferBinding::TextureInput))
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT;
-            if(desc.gpuBinding.check(EBufferBinding::InputAttachement))
+            if(desc.gpuBinding.check(EBufferBinding::InputAttachment))
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
             if(desc.gpuBinding.check(EBufferBinding::CopySource))
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
             if(desc.gpuBinding.check(EBufferBinding::CopyTarget))
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-            if(desc.gpuBinding.check(EBufferBinding::ColorAttachement))
+            if(desc.gpuBinding.check(EBufferBinding::ColorAttachment))
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-            if(desc.gpuBinding.check(EBufferBinding::DepthAttachement))
+            if(desc.gpuBinding.check(EBufferBinding::DepthAttachment))
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
