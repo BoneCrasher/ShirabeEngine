@@ -58,6 +58,7 @@ namespace engine
         {
             SHIRABE_IMPLEMENT_TASKS_FOR(Texture)
             SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
+            SHIRABE_IMPLEMENT_TASKS_FOR(RenderPass);
 
             return EEngineStatus::Ok;
         }
@@ -68,8 +69,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanResourceTaskBackend::deinitialize()
         {
-            SHIRABE_IMPLEMENT_TASKS_FOR(Texture);
-            SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
+            // SHIRABE_IMPLEMENT_TASKS_FOR(Texture);
+            // SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
+            // SHIRABE_IMPLEMENT_TASKS_FOR(RenderPass);
 
             return EEngineStatus::Ok;
         }

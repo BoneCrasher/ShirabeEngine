@@ -6,6 +6,7 @@
 #include <graphicsapi/resources/gfxapiresourcetaskbackend.h>
 #include <graphicsapi/resources/types/texture.h>
 #include <graphicsapi/resources/types/textureview.h>
+#include <graphicsapi/resources/types/renderpass.h>
 #include "vulkan/vulkanimport.h"
 #include "vulkan/vulkanenvironment.h"
 
@@ -78,6 +79,7 @@ namespace engine
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(TextureView);
             //DeclareTaskBuilderModule(Buffer);
             //DeclareTaskBuilderModule(BufferView);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(RenderPass);
 
         private_members:
             CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;

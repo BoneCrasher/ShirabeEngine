@@ -366,48 +366,48 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool deriveAttachements(
-                CStdUniquePtr_t<CPassBase::CMutableAccessor>       &aAccessor,
-                SFrameGraphResource                          const &aTextureViewHandle,
-                SFrameGraphTextureView                       const &aTextureView)
-        {
-            SFrameGraphTexture const &t = *static_cast<SFrameGraphTexture const *const>(&aTextureViewHandle);
-
-            // The "requestedUsage"-flags are set while evaluating the texture views!
-            // Consequently, evaluate all texture views first and then care for the textures itself
-            // to have all state reflected appropriately.
-            bool const isColorAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment);
-            bool const isDepthAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment);
-            bool const isInputAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment);
-
-            bool const textureViewIsForWrite  = aTextureView.mode.check(EFrameGraphViewAccessMode::Write);
-            if(textureViewIsForWrite)
-            {
-                bool const textureViewWritesColor = (EFrameGraphViewSource::Color == aTextureView.source);
-                bool const textureViewWritesDepth = (EFrameGraphViewSource::Depth == aTextureView.source);
-
-                if(textureViewWritesColor)
-                {
-                    // Color Attachement                
-
-                }
-                else if(textureViewWritesDepth)
-                {
-                    // Depth Attachement
-                }
-                else
-                {
-                    // Unsupported
-                    // TBD: Error?
-                }
-            }
-            else
-            {
-                // Input Attachment
-            }
-
-            return true;
-        }
+        // bool deriveAttachements(
+        //         CStdUniquePtr_t<CPassBase::CMutableAccessor>       &aAccessor,
+        //         SFrameGraphResource                          const &aTextureViewHandle,
+        //         SFrameGraphTextureView                       const &aTextureView)
+        // {
+        //     SFrameGraphTexture const &t = *static_cast<SFrameGraphTexture const *const>(&aTextureViewHandle);
+        //
+        //     // The "requestedUsage"-flags are set while evaluating the texture views!
+        //     // Consequently, evaluate all texture views first and then care for the textures itself
+        //     // to have all state reflected appropriately.
+        //     bool const isColorAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment);
+        //     bool const isDepthAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment);
+        //     bool const isInputAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment);
+        //
+        //     bool const textureViewIsForWrite  = aTextureView.mode.check(EFrameGraphViewAccessMode::Write);
+        //     if(textureViewIsForWrite)
+        //     {
+        //         bool const textureViewWritesColor = (EFrameGraphViewSource::Color == aTextureView.source);
+        //         bool const textureViewWritesDepth = (EFrameGraphViewSource::Depth == aTextureView.source);
+        //
+        //         if(textureViewWritesColor)
+        //         {
+        //             // Color Attachement
+        //
+        //         }
+        //         else if(textureViewWritesDepth)
+        //         {
+        //             // Depth Attachement
+        //         }
+        //         else
+        //         {
+        //             // Unsupported
+        //             // TBD: Error?
+        //         }
+        //     }
+        //     else
+        //     {
+        //         // Input Attachment
+        //     }
+        //
+        //     return true;
+        // }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

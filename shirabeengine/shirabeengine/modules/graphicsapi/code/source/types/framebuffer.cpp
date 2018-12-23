@@ -1,4 +1,4 @@
-#include "graphicsapi/resources/types/textureview.h"
+#include "graphicsapi/resources/types/framebuffer.h"
 
 namespace engine
 {
@@ -7,22 +7,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CTextureViewDeclaration::SDescriptor::SDescriptor()
+        CFrameBufferDeclaration::SDescriptor::SDescriptor()
             : name("")
-            , subjacentTexture()
-            , textureFormat(EFormat::Undefined)
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        std::string CTextureViewDeclaration::SDescriptor::toString() const
+        std::string CFrameBufferDeclaration::SDescriptor::toString() const
         {
             std::stringstream ss;
             ss
-                    << "RenderTargetSDescriptor ('" << name << "'): "
-                    << " Format: " << (uint8_t)textureFormat << ";";
+                    << "RenderTargetSDescriptor ('" << name << "'): ";
 
             return ss.str();
         }
@@ -31,34 +28,42 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CTextureViewDeclaration::CCreationRequest::CCreationRequest(
-                SDescriptor        const &aDescriptor,
-                PublicResourceId_t const &aUnderlyingTextureHandle)
+        CFrameBufferDeclaration::CCreationRequest::CCreationRequest(
+                SDescriptor            const &aDescriptor,
+                PublicResourceId_t     const &aRenderPassHandle,
+                PublicResourceIdList_t const &aTextureViewHandles)
             : CBaseDeclaration::CCreationRequestBase<SDescriptor>(aDescriptor)
-            , mUnderlyingTextureHandle(aUnderlyingTextureHandle)
+            , mRenderPassHandle(aRenderPassHandle)
+            , mTextureViewHandles(aTextureViewHandles)
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        PublicResourceId_t const &CTextureViewDeclaration::CCreationRequest::underlyingTextureHandle() const
+        PublicResourceId_t const &CFrameBufferDeclaration::CCreationRequest::renderPassHandle() const
         {
-            return mUnderlyingTextureHandle;
+            return mRenderPassHandle;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        std::string CTextureViewDeclaration::CCreationRequest::toString() const
+        PublicResourceIdList_t const &CFrameBufferDeclaration::CCreationRequest::textureViewHandles() const
+        {
+            return mTextureViewHandles;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::string CFrameBufferDeclaration::CCreationRequest::toString() const
         {
             std::stringstream ss;
             ss
                     << "RenderTargetViewCreationRequest: \n"
-                    << "[\n"
-                    << resourceDescriptor().toString() << "\n"
-                    << "]"
                     << std::endl;
 
             return ss.str();
@@ -68,10 +73,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CTextureView::CTextureView(
-                const CTextureView::SDescriptor &aDescriptor)
-            : CTextureViewDeclaration()
-            , CResourceDescriptorAdapter<CTextureViewDeclaration::SDescriptor>(aDescriptor)
+        CFrameBuffer::CFrameBuffer(
+                const CFrameBuffer::SDescriptor &aDescriptor)
+            : CFrameBufferDeclaration()
+            , CResourceDescriptorAdapter<CFrameBufferDeclaration::SDescriptor>(aDescriptor)
         {}
         //<-----------------------------------------------------------------------------
     }

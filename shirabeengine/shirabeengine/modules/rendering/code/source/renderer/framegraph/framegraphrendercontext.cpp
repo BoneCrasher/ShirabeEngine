@@ -1,6 +1,7 @@
 #include <assert.h>
 
 #include <graphicsapi/resources/types/renderpass.h>
+#include <graphicsapi/resources/types/framebuffer.h>
 
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
@@ -128,36 +129,79 @@ namespace engine
                 SFrameGraphAttachmentCollection const &aAttachmentInfo,
                 CFrameGraphMutableResources     const &aFrameGraphResources)
         {
-            CRenderPass::SDescriptor renderPassDesc = {};
-
-            for(FrameGraphResourceId_t const &id : aAttachmentInfo.getAttachementResourceIds())
+            //<-----------------------------------------------------------------------------
+            // Helper function to find attachment indices in index lists.
+            //<-----------------------------------------------------------------------------
+            auto const &findAttachmentRelationFn = [] (Vector<uint64_t> const &aRelationIndices, uint64_t const &aIndex) -> bool
             {
-                CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(id);
+                auto const &predicate = [aIndex] (uint64_t const &aTestIndex) -> bool
+                {
+                    return (aIndex == aTestIndex);
+                };
 
-                SAttachmentDescription attachmentDesc = {};
-                attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
-                attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
-                attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
-                attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
-                attachmentDesc.format         = textureView->format;
-                attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;       // For now we don't care about the initial layout...
-                attachmentDesc.finalLayout    = EImageLayout::PRESENT_SRC_KHR; // For now we just assume everything to be presentable...
+                auto const &iterator = std::find(aRelationIndices.begin(), aRelationIndices.end(), predicate);
 
-                renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
+                return (aRelationIndices.end() != iterator);
+            };
+            //<-----------------------------------------------------------------------------
+
+            CRenderPass::SDescriptor renderPassDesc = {};
+            renderPassDesc.name = "DefaultRenderPass";
+
+            for(auto const &[passUID, attachmentResourceIdList] : aAttachmentInfo.getAttachmentPassAssignment())
+            {
+                SSubpassDescription subpassDesc = {};
+
+                for(auto const &id : attachmentResourceIdList)
+                {
+                    CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(id);
+
+                    uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
+
+                    SAttachmentDescription attachmentDesc = {};
+                    attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
+                    attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
+                    attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
+                    attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
+                    attachmentDesc.format         = textureView->format;
+                    attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;       // For now we don't care about the initial layout...
+                    attachmentDesc.finalLayout    = EImageLayout::PRESENT_SRC_KHR; // For now we just assume everything to be presentable...
+
+                    renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
+
+                    SAttachmentReference attachmentReference {};
+                    attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);
+                    // attachmentReference.layout     = ...;
+
+                    bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getColorAttachments(), attachmentIndex);
+                    bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getDepthAttachments(), attachmentIndex);
+                    bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getInputAttachments(), attachmentIndex);
+
+                    if     (isColorAttachment) { subpassDesc.colorAttachments       .push_back(attachmentReference); }
+                    else if(isDepthAttachment) { subpassDesc.depthStencilAttachments.push_back(attachmentReference); }
+                    else if(isInputAttachment) { subpassDesc.inputAttachments       .push_back(attachmentReference); }
+                }
+
+                renderPassDesc.subpassDescriptions.push_back(subpassDesc);
             }
+
+            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
 
             CRenderPass::CCreationRequest const renderPassCreationRequest(renderPassDesc);
 
-            EEngineStatus status = mResourceManager->createResource<CRenderPass>(renderPassCreationRequest, "DefaultRenderPass", false);
+            EEngineStatus status = mResourceManager->createResource<CRenderPass>(renderPassCreationRequest, sRenderPassResourceId, false);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
                 return EEngineStatus::Ok;
             else
                 HandleEngineStatusError(status, "Failed to create render pass.");
 
-            CFrameBuffer::SDescriptor frameBufferDesc = {};
-            CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc);
+            // Next: Create FrameBuffer Resource Types and VK Backend
 
-            status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, "DefaultFrameBuffer", false);
+            CFrameBuffer::SDescriptor frameBufferDesc = {};
+            CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc, sRenderPassResourceId, ...);
+
+            status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, sFrameBufferResourceId, false);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
                 return EEngineStatus::Ok;
             else

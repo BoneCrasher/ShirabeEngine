@@ -67,11 +67,11 @@ namespace engine
 
         struct SSubpassDescription
         {
-            std::vector<SAttachmentReference> const inputAttachments;
-            std::vector<SAttachmentReference> const colorAttachments;
-            std::vector<SAttachmentReference> const resolveAttachments;
-            std::vector<SAttachmentReference> const depthStencilAttachments;
-            std::vector<uint32_t>             const preserveStencilAttachments;
+            std::vector<SAttachmentReference> inputAttachments;
+            std::vector<SAttachmentReference> colorAttachments;
+            std::vector<SAttachmentReference> resolveAttachments;
+            std::vector<SAttachmentReference> depthStencilAttachments;
+            std::vector<uint32_t>             preserveStencilAttachments;
         };
 
         /**
