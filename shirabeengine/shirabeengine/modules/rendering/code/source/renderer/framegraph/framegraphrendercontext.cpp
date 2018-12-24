@@ -132,21 +132,31 @@ namespace engine
             //<-----------------------------------------------------------------------------
             // Helper function to find attachment indices in index lists.
             //<-----------------------------------------------------------------------------
-            auto const &findAttachmentRelationFn = [] (Vector<uint64_t> const &aRelationIndices, uint64_t const &aIndex) -> bool
+            auto const findAttachmentRelationFn = [] (Vector<uint64_t> const &aRelationIndices, uint64_t const &aIndex) -> bool
             {
-                auto const &predicate = [aIndex] (uint64_t const &aTestIndex) -> bool
+                auto const predicate = [&] (uint64_t const &aTestIndex) -> bool
                 {
                     return (aIndex == aTestIndex);
                 };
 
-                auto const &iterator = std::find(aRelationIndices.begin(), aRelationIndices.end(), predicate);
+                auto const &iterator = std::find_if(aRelationIndices.begin(), aRelationIndices.end(), predicate);
 
                 return (aRelationIndices.end() != iterator);
             };
             //<-----------------------------------------------------------------------------
 
+            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+
+            // This list will store the readable names of the texture views created upfront, so that the
+            // framebuffer can bind to it.
+            PublicResourceIdList_t textureViewIds = {};
+
+            //<-----------------------------------------------------------------------------
+            // Begin the render pass derivation
+            //<-----------------------------------------------------------------------------
             CRenderPass::SDescriptor renderPassDesc = {};
-            renderPassDesc.name = "DefaultRenderPass";
+            renderPassDesc.name = sRenderPassResourceId;
 
             for(auto const &[passUID, attachmentResourceIdList] : aAttachmentInfo.getAttachmentPassAssignment())
             {
@@ -155,6 +165,15 @@ namespace engine
                 for(auto const &id : attachmentResourceIdList)
                 {
                     CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(id);
+                    CStdSharedPtr_t<SFrameGraphTexture>     const &texture     = aFrameGraphResources.get<SFrameGraphTexture>(textureView->subjacentResource);
+
+                    // Create the underlying resources upfront, so that the renderpass and framebuffer creation can take place properly.
+                    // Performing the creation and registration here will also cause the index of texture view public resource ids to
+                    // match up with the index of attachment descriptions, which is also a requirement of the FrameBuffer <-> RenderPass
+                    // system.
+                    createTexture(*texture);
+                    createTextureView(*texture, *textureView);
+                    textureViewIds.push_back(textureView->readableName);
 
                     uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
 
@@ -185,21 +204,18 @@ namespace engine
                 renderPassDesc.subpassDescriptions.push_back(subpassDesc);
             }
 
-            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
-            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
-
             CRenderPass::CCreationRequest const renderPassCreationRequest(renderPassDesc);
 
-            EEngineStatus status = mResourceManager->createResource<CRenderPass>(renderPassCreationRequest, sRenderPassResourceId, false);
+            EEngineStatus status = mResourceManager->createResource<CRenderPass>(renderPassCreationRequest, renderPassDesc.name, false);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
                 return EEngineStatus::Ok;
             else
                 HandleEngineStatusError(status, "Failed to create render pass.");
 
-            // Next: Create FrameBuffer Resource Types and VK Backend
+            // Next: Create FrameBuffer Resource Types in VK Backend
 
             CFrameBuffer::SDescriptor frameBufferDesc = {};
-            CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc, sRenderPassResourceId, ...);
+            CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc, renderPassDesc.name, textureViewIds);
 
             status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, sFrameBufferResourceId, false);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)

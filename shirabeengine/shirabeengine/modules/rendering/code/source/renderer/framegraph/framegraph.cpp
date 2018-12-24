@@ -199,7 +199,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool CGraph::execute(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext)
         {
-            assert(aRendercontext != nullptr);
+            assert(aRenderContext != nullptr);
 
             bool const successfullySetUp = initializeRenderPassAndFrameBuffer(aRenderContext);
 
