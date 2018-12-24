@@ -437,7 +437,7 @@ namespace engine
                             mPassToResourceAdjacency[aPass->passUID()].push_back(resource.resourceId);
                         }
 #endif
-                        break;
+                        continue;
                     }
                 }
                 // For each derived resource (views)

@@ -207,9 +207,6 @@ namespace engine
             bool const successfullySetUp = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
             assert(successfullySetUp);
 
-            // bool const initialized = initializeResources(aRendercontext, mResources);
-            // bool const bound       = bindResources(aRendercontext, mResources);
-
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
             {
@@ -217,10 +214,7 @@ namespace engine
                 CStdSharedPtr_t<CPassBase>            const pass     = mPasses.at(passUID);
                 CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
 
-                FrameGraphResourceIdList const &passResources = accessor->resourceReferences();
-
-                // bool const initialized = initializeResources(aRendercontext, passResources);
-                // bool const bound       = bindResources(aRendercontext, passResources);
+                // FrameGraphResourceIdList const &passResources = accessor->resourceReferences();
 
                 bool executed = pass->execute(mResourceData, aRenderContext);
                 if(!executed)
@@ -228,17 +222,11 @@ namespace engine
                     CLog::Error(logTag(), CString::format("Failed to execute pass %0", pass->passUID()));
                 }
 
-                // bool const unbound       = unbindResources(aRendercontext, passResources);
-                // bool const deinitialized = deinitializeResources(aRendercontext, passResources);
-
                 copy.pop();
             }
 
             bool const successfullyCleanedUp = deinitializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
             assert(successfullyCleanedUp);
-
-            // bool const unbound       = unbindResources(aRenderContext, mResources);
-            // bool const deinitialized = deinitializeResources(aRenderContext, mResources);
 
             return true;
         }

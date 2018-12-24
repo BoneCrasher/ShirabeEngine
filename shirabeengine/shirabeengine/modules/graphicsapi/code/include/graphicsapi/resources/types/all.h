@@ -15,6 +15,8 @@
 #include "structuredbuffer.h"
 #include "shader.h"
 #include "swapchain.h"
+#include "renderpass.h"
+#include "framebuffer.h"
 
 namespace engine
 {
@@ -29,7 +31,9 @@ namespace engine
             DepthStencilState,                    \
             RasterizerState,                      \
             SwapChain,                            \
-            SwapChainBuffer
+            SwapChainBuffer,                      \
+            FrameBuffer,                          \
+            RenderPass
                 // ConstantBuffer,     \
                 // ObjectBuffer,       \
                 // StructuredBuffer,   \

@@ -5,6 +5,8 @@ namespace engine
 {
     using engine::gfxapi::CTexture;
     using engine::gfxapi::CTextureView;
+    using engine::gfxapi::CRenderPass;
+    using engine::gfxapi::CFrameBuffer;
 
     //<-----------------------------------------------------------------------------
     //
@@ -38,6 +40,22 @@ namespace engine
         success = success &&
                 addCreator<CTextureView>(std::bind(
                                  &CResourceManager::createResourceImpl<CTextureView>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1,
+                                 std::placeholders::_2,
+                                 std::placeholders::_3));        
+
+        success = success &&
+                addCreator<CRenderPass>(std::bind(
+                                 &CResourceManager::createResourceImpl<CRenderPass>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1,
+                                 std::placeholders::_2,
+                                 std::placeholders::_3));
+
+        success = success &&
+                addCreator<CFrameBuffer>(std::bind(
+                                 &CResourceManager::createResourceImpl<CFrameBuffer>,
                                  static_cast<CResourceManagerBase *>(this),
                                  std::placeholders::_1,
                                  std::placeholders::_2,
@@ -90,6 +108,18 @@ namespace engine
         success = success &&
                 addDestructor<CTextureView>(std::bind(
                                  &CResourceManager::destroyResourceImpl<CTextureView>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1));
+
+        success = success &&
+                addDestructor<CRenderPass>(std::bind(
+                                 &CResourceManager::destroyResourceImpl<CRenderPass>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1));
+
+        success = success &&
+                addDestructor<CFrameBuffer>(std::bind(
+                                 &CResourceManager::destroyResourceImpl<CFrameBuffer>,
                                  static_cast<CResourceManagerBase *>(this),
                                  std::placeholders::_1));
 
