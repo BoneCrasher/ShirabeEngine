@@ -210,9 +210,14 @@ namespace engine
              * Initialize all subpasses, the render pass and the framebuffer.
              *
              * @param aRenderContext The render context interface to the graphics API.
+             * @param aRenderPassId  Unique Id of the render pass to initialize.
+             * @param aFrameBufferId Unique Id of the frame buffer to initialize.
              * @return               True, if successful. False, otherwise.
              */
-            bool initializeRenderPassAndFrameBuffer(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext);
+            bool initializeRenderPassAndFrameBuffer(
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    std::string                               const &aRenderPassId,
+                    std::string                               const &aFrameBufferId);
 
             /**
              * Bind all automatic resources required for execution.
@@ -235,6 +240,19 @@ namespace engine
             bool unbindResources(
                     CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
                     FrameGraphResourceIdList                  const &aResourceIds);
+
+            /**
+             * Initialize all subpasses, the render pass and the framebuffer.
+             *
+             * @param aRenderContext The render context interface to the graphics API.
+             * @param aRenderPassId  Unique Id of the render pass to deinitialize.
+             * @param aFrameBufferId Unique Id of the frame buffer to deinitialize.
+             * @return               True, if successful. False, otherwise.
+             */
+            bool deinitializeRenderPassAndFrameBuffer(
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    std::string                               const &aRenderPassId,
+                    std::string                               const &aFrameBufferId);
 
             /**
              * Deinitialize all resources required for execution.

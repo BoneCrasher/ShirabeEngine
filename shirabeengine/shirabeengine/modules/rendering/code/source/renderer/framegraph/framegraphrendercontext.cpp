@@ -126,6 +126,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         EEngineStatus CFrameGraphRenderContext::createFrameBufferAndRenderPass(
+                std::string                     const &aFrameBufferId,
+                std::string                     const &aRenderPassId,
                 SFrameGraphAttachmentCollection const &aAttachmentInfo,
                 CFrameGraphMutableResources     const &aFrameGraphResources)
         {
@@ -145,8 +147,13 @@ namespace engine
             };
             //<-----------------------------------------------------------------------------
 
-            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
-            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+            // Each element in the frame buffer is required to have the same dimensions.
+            // These variables will store the first sizes encountered and will validate
+            // against them for any subsequent size, to make sure that the attachments
+            // to be bound are valid.
+            int32_t width  = -1,
+                    height = -1,
+                    layers = -1;
 
             // This list will store the readable names of the texture views created upfront, so that the
             // framebuffer can bind to it.
@@ -156,7 +163,7 @@ namespace engine
             // Begin the render pass derivation
             //<-----------------------------------------------------------------------------
             CRenderPass::SDescriptor renderPassDesc = {};
-            renderPassDesc.name = sRenderPassResourceId;
+            renderPassDesc.name = aRenderPassId;
 
             for(auto const &[passUID, attachmentResourceIdList] : aAttachmentInfo.getAttachmentPassAssignment())
             {
@@ -165,7 +172,33 @@ namespace engine
                 for(auto const &id : attachmentResourceIdList)
                 {
                     CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(id);
+                    assert(nullptr != textureView);
                     CStdSharedPtr_t<SFrameGraphTexture>     const &texture     = aFrameGraphResources.get<SFrameGraphTexture>(textureView->subjacentResource);
+                    assert(nullptr != texture);
+
+                    // Validation first!
+                    bool dimensionsValid = true;
+                    if(0 > width)
+                    {
+                        width  = static_cast<int32_t>(texture->width);
+                        height = static_cast<int32_t>(texture->height);
+                        layers = textureView->arraySliceRange.length;
+
+                        dimensionsValid = (0 < width and 0 < height and 0 < layers);
+                    }
+                    else
+                    {
+                        bool const validWidth  = (width  == static_cast<int32_t>(texture->width));
+                        bool const validHeight = (height == static_cast<int32_t>(texture->height));
+                        bool const validLayers = (layers == static_cast<int32_t>(textureView->arraySliceRange.length));
+
+                        dimensionsValid = (validWidth and validHeight and validLayers);
+                    }
+
+                    if(not dimensionsValid)
+                    {
+                        HandleEngineStatusError(EEngineStatus::Error, "Invalid image view dimensions for frame buffer creation.");
+                    }
 
                     // Create the underlying resources upfront, so that the renderpass and framebuffer creation can take place properly.
                     // Performing the creation and registration here will also cause the index of texture view public resource ids to
@@ -188,17 +221,28 @@ namespace engine
 
                     renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
 
-                    SAttachmentReference attachmentReference {};
-                    attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);
-                    // attachmentReference.layout     = ...;
-
                     bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getColorAttachments(), attachmentIndex);
                     bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getDepthAttachments(), attachmentIndex);
                     bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getInputAttachments(), attachmentIndex);
 
-                    if     (isColorAttachment) { subpassDesc.colorAttachments       .push_back(attachmentReference); }
-                    else if(isDepthAttachment) { subpassDesc.depthStencilAttachments.push_back(attachmentReference); }
-                    else if(isInputAttachment) { subpassDesc.inputAttachments       .push_back(attachmentReference); }
+                    SAttachmentReference attachmentReference {};
+                    attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);
+
+                    if(isColorAttachment)
+                    {
+                        attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
+                        subpassDesc.colorAttachments.push_back(attachmentReference);
+                    }
+                    else if(isDepthAttachment)
+                    {
+                        attachmentReference.layout = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        subpassDesc.depthStencilAttachments.push_back(attachmentReference);
+                    }
+                    else if(isInputAttachment)
+                    {
+                        attachmentReference.layout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
+                        subpassDesc.inputAttachments.push_back(attachmentReference);
+                    }
                 }
 
                 renderPassDesc.subpassDescriptions.push_back(subpassDesc);
@@ -215,9 +259,16 @@ namespace engine
             // Next: Create FrameBuffer Resource Types in VK Backend
 
             CFrameBuffer::SDescriptor frameBufferDesc = {};
+            frameBufferDesc.name   = aFrameBufferId;
+            frameBufferDesc.width  = static_cast<uint32_t>(width);
+            frameBufferDesc.height = static_cast<uint32_t>(height);
+            frameBufferDesc.layers = static_cast<uint32_t>(layers);
+            frameBufferDesc.dependencies.push_back(renderPassDesc.name);
+            frameBufferDesc.dependencies.insert(frameBufferDesc.dependencies.end(), textureViewIds.begin(), textureViewIds.end());
+
             CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc, renderPassDesc.name, textureViewIds);
 
-            status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, sFrameBufferResourceId, false);
+            status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, frameBufferDesc.name, false);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status)
                 return EEngineStatus::Ok;
             else
@@ -490,6 +541,56 @@ namespace engine
         EEngineStatus CFrameGraphRenderContext::destroyBufferView(FrameGraphResourceId_t const &aResourceId)
         {
             return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CFrameGraphRenderContext::destroyFrameBufferAndRenderPass(
+                std::string                     const &aFrameBufferId,
+                std::string                     const &aRenderPassId,
+                SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                CFrameGraphMutableResources     const &aFrameGraphResources)
+        {
+            EEngineStatus status = mResourceManager->destroyResource<CFrameBuffer>(aFrameBufferId);
+            HandleEngineStatusError(status, "Failed to destroy frame buffer.");
+
+            FrameGraphResourceIdList texturesToFree;
+
+            for(FrameGraphResourceId_t const &attachmentResourceId : aAttachmentInfo.getAttachementResourceIds())
+            {
+                CStdSharedPtr_t<SFrameGraphTextureView> textureView = aFrameGraphResources.get<SFrameGraphTextureView>(attachmentResourceId);
+                assert(nullptr != textureView);
+
+                status = mResourceManager->destroyResource<CTextureView>(textureView->readableName);
+                HandleEngineStatusError(status, "Failed to free texture view.");
+
+                // Make sure to uniquely register the subjacent resource for later release.
+                auto const &iterator = std::find(texturesToFree.begin(), texturesToFree.end(), textureView->subjacentResource);
+                if(texturesToFree.end() != iterator)
+                {
+                    texturesToFree.push_back(textureView->subjacentResource);
+                }
+            }
+
+            // Free the subjacent textures UNLESS the resource is external/persistent...
+            for(FrameGraphResourceId_t const &textureId : texturesToFree)
+            {
+                CStdSharedPtr_t<SFrameGraphTexture> texture = aFrameGraphResources.get<SFrameGraphTexture>(textureId);
+                assert(nullptr != texture);
+
+                if(not texture->isExternalResource)
+                {
+                    status = mResourceManager->destroyResource<CTexture>(texture->readableName);
+                    HandleEngineStatusError(status, "Failed to free texture.");
+                }
+            }
+
+            status = mResourceManager->destroyResource<CRenderPass>(aRenderPassId);
+            HandleEngineStatusError(status, "Failed to destroy render pass.");
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 

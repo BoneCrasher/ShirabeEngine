@@ -201,7 +201,11 @@ namespace engine
         {
             assert(aRenderContext != nullptr);
 
-            bool const successfullySetUp = initializeRenderPassAndFrameBuffer(aRenderContext);
+            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+
+            bool const successfullySetUp = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+            assert(successfullySetUp);
 
             // bool const initialized = initializeResources(aRendercontext, mResources);
             // bool const bound       = bindResources(aRendercontext, mResources);
@@ -230,8 +234,11 @@ namespace engine
                 copy.pop();
             }
 
-            bool const unbound       = unbindResources(aRenderContext, mResources);
-            bool const deinitialized = deinitializeResources(aRenderContext, mResources);
+            bool const successfullyCleanedUp = deinitializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+            assert(successfullyCleanedUp);
+
+            // bool const unbound       = unbindResources(aRenderContext, mResources);
+            // bool const deinitialized = deinitializeResources(aRenderContext, mResources);
 
             return true;
         }
@@ -303,7 +310,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraph::initializeRenderPassAndFrameBuffer(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext)
+        bool CGraph::initializeRenderPassAndFrameBuffer(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                std::string                               const &aFrameBufferId,
+                std::string                               const &aRenderPassId)
         {
             bool initialized = true;
 
@@ -359,8 +369,24 @@ namespace engine
                 }
             }
 
-            EEngineStatus const status = aRenderContext->createFrameBufferAndRenderPass(attachments, mResourceData);
+            EEngineStatus const status = aRenderContext->createFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId, attachments, mResourceData);
 
+            initialized = (CheckEngineError(status));
+            return initialized;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::deinitializeRenderPassAndFrameBuffer(
+                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                std::string                               const &aFrameBufferId,
+                std::string                               const &aRenderPassId)
+        {
+            EEngineStatus const status = aRenderContext->destroyFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId, mResourceData.getAttachments(), mResourceData);
+
+            bool const initialized = (CheckEngineError(status));
             return initialized;
         }
         //<-----------------------------------------------------------------------------

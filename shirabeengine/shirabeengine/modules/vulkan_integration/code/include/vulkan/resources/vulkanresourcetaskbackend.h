@@ -7,6 +7,7 @@
 #include <graphicsapi/resources/types/texture.h>
 #include <graphicsapi/resources/types/textureview.h>
 #include <graphicsapi/resources/types/renderpass.h>
+#include <graphicsapi/resources/types/framebuffer.h>
 #include "vulkan/vulkanimport.h"
 #include "vulkan/vulkanenvironment.h"
 
@@ -19,6 +20,8 @@ namespace engine
 
         #define VkTypes 	\
             VkSwapchainKHR, \
+            VkRenderPass,   \
+            VkFrameBuffer,  \
             VkImage,        \
             VkBuffer,       \
             VkImageView,    \
@@ -80,6 +83,7 @@ namespace engine
             //DeclareTaskBuilderModule(Buffer);
             //DeclareTaskBuilderModule(BufferView);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(RenderPass);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(FrameBuffer);
 
         private_members:
             CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;

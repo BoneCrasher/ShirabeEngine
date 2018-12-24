@@ -63,11 +63,15 @@ namespace engine
             /**
              * Create a framebuffer and render pass including subpasses for the provided attachment info.
              *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to create.
+             * @param aRenderPassId        Unique Id of the render pass instance to create.
              * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
              * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
              * @return EEngineStatus::Ok, if successful. An errorcode otherwise.
              */
             virtual EEngineStatus createFrameBufferAndRenderPass(
+                    std::string                     const &aFrameBufferId,
+                    std::string                     const &aRenderPassId,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
                     CFrameGraphMutableResources     const &aFrameGraphResources) = 0;
 
@@ -226,6 +230,21 @@ namespace engine
             virtual EEngineStatus destroyBufferView(FrameGraphResourceId_t const &aResourceId) = 0;
 
             /**
+             * Destroy the frame buffer and render pass identified by the arguments' UIDs.
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer to destroy
+             * @param aRenderPassId        Unique Id of the render pass to destroy
+             * @param aAttachmentInfo      Attachment information of the current pass.
+             * @param aFrameGraphResources List of resources referred to by attachment resource ids.
+             * @return EEngineStatus::Ok, if successful. An error code otherwise.
+             */
+            virtual EEngineStatus destroyFrameBufferAndRenderPass(
+                    std::string                     const &aFrameBufferId,
+                    std::string                     const &aRenderPassId,
+                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                    CFrameGraphMutableResources     const &aFrameGraphResources) = 0;
+
+            /**
              * Render a renderable entity using the graphicsAPI.
              *
              * @param aRenderable The renderable to process.
@@ -279,11 +298,15 @@ namespace engine
             /**
              * Create a framebuffer and render pass including subpasses for the provided attachment info.
              *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to create.
+             * @param aRenderPassId        Unique Id of the render pass instance to create.
              * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
              * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
              * @return EEngineStatus::Ok, if successful. An errorcode otherwise.
              */
             EEngineStatus createFrameBufferAndRenderPass(
+                    std::string                     const &aFrameBufferId,
+                    std::string                     const &aRenderPassId,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
                     CFrameGraphMutableResources     const &aFrameGraphResources);
 
@@ -439,6 +462,21 @@ namespace engine
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
             EEngineStatus destroyBufferView(FrameGraphResourceId_t const &aResourceId);
+
+            /**
+             * Destroy the frame buffer and render pass identified by the arguments' UIDs.
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer to destroy
+             * @param aRenderPassId        Unique Id of the render pass to destroy
+             * @param aAttachmentInfo      Attachment information of the current pass.
+             * @param aFrameGraphResources List of resources referred to by attachment resource ids.
+             * @return EEngineStatus::Ok, if successful. An error code otherwise.
+             */
+            EEngineStatus destroyFrameBufferAndRenderPass(
+                    std::string                     const &aFrameBufferId,
+                    std::string                     const &aRenderPassId,
+                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                    CFrameGraphMutableResources     const &aFrameGraphResources);
 
             /**
              * Render a renderable entity using the graphicsAPI.
