@@ -344,6 +344,17 @@ namespace engine
          */
         class SFrameGraphAttachmentCollection
         {
+        public_constructors:
+            SFrameGraphAttachmentCollection() = default;
+
+            SHIRABE_INLINE SFrameGraphAttachmentCollection(SFrameGraphAttachmentCollection const &aOther)
+                : mAttachmentResourceIds(aOther.mAttachmentResourceIds)
+                , mColorAttachments(aOther.mColorAttachments)
+                , mDepthAttachments(aOther.mDepthAttachments)
+                , mInputAttachments(aOther.mInputAttachments)
+                , mAttachmentPassAssignment(aOther.mAttachmentPassAssignment)
+            { }
+
         public_methods:
             /**
              * Add an input attachment to the collection and register it

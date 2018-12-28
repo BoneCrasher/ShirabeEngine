@@ -147,6 +147,9 @@ namespace engine
             };
             //<-----------------------------------------------------------------------------
 
+            // List of resource ids of the attachments.
+            FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementResourceIds();
+
             // Each element in the frame buffer is required to have the same dimensions.
             // These variables will store the first sizes encountered and will validate
             // against them for any subsequent size, to make sure that the attachments
@@ -165,13 +168,15 @@ namespace engine
             CRenderPass::SDescriptor renderPassDesc = {};
             renderPassDesc.name = aRenderPassId;
 
-            for(auto const &[passUID, attachmentResourceIdList] : aAttachmentInfo.getAttachmentPassAssignment())
+            for(auto const &[passUID, attachmentResourceIndexList] : aAttachmentInfo.getAttachmentPassAssignment())
             {
                 SSubpassDescription subpassDesc = {};
 
-                for(auto const &id : attachmentResourceIdList)
+                for(auto const &index : attachmentResourceIndexList)
                 {
-                    CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(id);
+                    FrameGraphResourceId_t const &resourceId = attachmentResources[index];
+
+                    CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
                     assert(nullptr != textureView);
                     CStdSharedPtr_t<SFrameGraphTexture>     const &texture     = aFrameGraphResources.get<SFrameGraphTexture>(textureView->subjacentResource);
                     assert(nullptr != texture);
@@ -200,12 +205,7 @@ namespace engine
                         HandleEngineStatusError(EEngineStatus::Error, "Invalid image view dimensions for frame buffer creation.");
                     }
 
-                    // Create the underlying resources upfront, so that the renderpass and framebuffer creation can take place properly.
-                    // Performing the creation and registration here will also cause the index of texture view public resource ids to
-                    // match up with the index of attachment descriptions, which is also a requirement of the FrameBuffer <-> RenderPass
-                    // system.
-                    createTexture(*texture);
-                    createTextureView(*texture, *textureView);
+                    // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
                     textureViewIds.push_back(textureView->readableName);
 
                     uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
@@ -549,43 +549,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CFrameGraphRenderContext::destroyFrameBufferAndRenderPass(
                 std::string                     const &aFrameBufferId,
-                std::string                     const &aRenderPassId,
-                SFrameGraphAttachmentCollection const &aAttachmentInfo,
-                CFrameGraphMutableResources     const &aFrameGraphResources)
+                std::string                     const &aRenderPassId)
         {
             EEngineStatus status = mResourceManager->destroyResource<CFrameBuffer>(aFrameBufferId);
             HandleEngineStatusError(status, "Failed to destroy frame buffer.");
-
-            FrameGraphResourceIdList texturesToFree;
-
-            for(FrameGraphResourceId_t const &attachmentResourceId : aAttachmentInfo.getAttachementResourceIds())
-            {
-                CStdSharedPtr_t<SFrameGraphTextureView> textureView = aFrameGraphResources.get<SFrameGraphTextureView>(attachmentResourceId);
-                assert(nullptr != textureView);
-
-                status = mResourceManager->destroyResource<CTextureView>(textureView->readableName);
-                HandleEngineStatusError(status, "Failed to free texture view.");
-
-                // Make sure to uniquely register the subjacent resource for later release.
-                auto const &iterator = std::find(texturesToFree.begin(), texturesToFree.end(), textureView->subjacentResource);
-                if(texturesToFree.end() != iterator)
-                {
-                    texturesToFree.push_back(textureView->subjacentResource);
-                }
-            }
-
-            // Free the subjacent textures UNLESS the resource is external/persistent...
-            for(FrameGraphResourceId_t const &textureId : texturesToFree)
-            {
-                CStdSharedPtr_t<SFrameGraphTexture> texture = aFrameGraphResources.get<SFrameGraphTexture>(textureId);
-                assert(nullptr != texture);
-
-                if(not texture->isExternalResource)
-                {
-                    status = mResourceManager->destroyResource<CTexture>(texture->readableName);
-                    HandleEngineStatusError(status, "Failed to free texture.");
-                }
-            }
 
             status = mResourceManager->destroyResource<CRenderPass>(aRenderPassId);
             HandleEngineStatusError(status, "Failed to destroy render pass.");

@@ -242,7 +242,7 @@ namespace engine
                     FrameGraphResourceIdList                  const &aResourceIds);
 
             /**
-             * Initialize all subpasses, the render pass and the framebuffer.
+             * Deinitialize all subpasses, the render pass and the framebuffer.
              *
              * @param aRenderContext The render context interface to the graphics API.
              * @param aRenderPassId  Unique Id of the render pass to deinitialize.

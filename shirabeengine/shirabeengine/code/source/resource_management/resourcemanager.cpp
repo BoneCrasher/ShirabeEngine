@@ -74,6 +74,18 @@ namespace engine
                                  std::placeholders::_1));
 
         success = success &&
+                addLoader<CRenderPass>(std::bind(
+                                 &CResourceManager::loadResourceImpl<CRenderPass>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1));
+
+        success = success &&
+                addLoader<CFrameBuffer>(std::bind(
+                                 &CResourceManager::loadResourceImpl<CFrameBuffer>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1));
+
+        success = success &&
                 addUpdater<CTexture>(std::bind(
                                  &CResourceManager::updateResourceImpl<CTexture>,
                                  static_cast<CResourceManagerBase *>(this),
@@ -96,6 +108,18 @@ namespace engine
         success = success &&
                 addUnloader<CTextureView>(std::bind(
                                  &CResourceManager::unloadResourceImpl<CTextureView>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1));
+
+        success = success &&
+                addUnloader<CRenderPass>(std::bind(
+                                 &CResourceManager::loadResourceImpl<CRenderPass>,
+                                 static_cast<CResourceManagerBase *>(this),
+                                 std::placeholders::_1));
+
+        success = success &&
+                addUnloader<CFrameBuffer>(std::bind(
+                                 &CResourceManager::loadResourceImpl<CFrameBuffer>,
                                  static_cast<CResourceManagerBase *>(this),
                                  std::placeholders::_1));
 

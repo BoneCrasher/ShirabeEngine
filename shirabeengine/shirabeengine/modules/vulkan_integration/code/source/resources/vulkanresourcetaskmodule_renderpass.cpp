@@ -43,6 +43,10 @@ namespace engine
                     vkAttachmentDescriptions.push_back(vkAttachmentDesc);
                 }
 
+                std::vector<std::vector<VkAttachmentReference>> inputAttachmentReferenceList(0);
+                std::vector<std::vector<VkAttachmentReference>> colorAttachmentReferenceList(0);
+                std::vector<std::vector<VkAttachmentReference>> depthAttachmentReferenceList(0);
+
                 for(auto const &subpassDesc : desc.subpassDescriptions)
                 {
                     std::vector<VkAttachmentReference> inputAttachmentReferences(0);
@@ -76,13 +80,17 @@ namespace engine
                         depthAttachmentReferences.push_back(vkAttachmentReference);
                     }
 
+                    inputAttachmentReferenceList.push_back(inputAttachmentReferences);
+                    colorAttachmentReferenceList.push_back(colorAttachmentReferences);
+                    depthAttachmentReferenceList.push_back(depthAttachmentReferences);
+
                     VkSubpassDescription vkSubpassDesc{};
                     vkSubpassDesc.pipelineBindPoint       = VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
-                    vkSubpassDesc.pInputAttachments       = inputAttachmentReferences.data();
-                    vkSubpassDesc.inputAttachmentCount    = inputAttachmentReferences.size();
-                    vkSubpassDesc.pColorAttachments       = colorAttachmentReferences.data();
-                    vkSubpassDesc.colorAttachmentCount    = colorAttachmentReferences.size();
-                    vkSubpassDesc.pDepthStencilAttachment = depthAttachmentReferences.data();
+                    vkSubpassDesc.pInputAttachments       = inputAttachmentReferenceList.back().data();
+                    vkSubpassDesc.inputAttachmentCount    = inputAttachmentReferenceList.back().size();
+                    vkSubpassDesc.pColorAttachments       = colorAttachmentReferenceList.back().data();
+                    vkSubpassDesc.colorAttachmentCount    = colorAttachmentReferenceList.back().size();
+                    vkSubpassDesc.pDepthStencilAttachment = depthAttachmentReferenceList.back().data();
                     vkSubpassDesc.flags = 0;
 
                     vkSubpassDescriptions.push_back(vkSubpassDesc);

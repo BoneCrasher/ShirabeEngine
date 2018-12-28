@@ -234,15 +234,11 @@ namespace engine
              *
              * @param aFrameBufferId       Unique Id of the frame buffer to destroy
              * @param aRenderPassId        Unique Id of the render pass to destroy
-             * @param aAttachmentInfo      Attachment information of the current pass.
-             * @param aFrameGraphResources List of resources referred to by attachment resource ids.
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
             virtual EEngineStatus destroyFrameBufferAndRenderPass(
                     std::string                     const &aFrameBufferId,
-                    std::string                     const &aRenderPassId,
-                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
-                    CFrameGraphMutableResources     const &aFrameGraphResources) = 0;
+                    std::string                     const &aRenderPassId) = 0;
 
             /**
              * Render a renderable entity using the graphicsAPI.
@@ -468,15 +464,11 @@ namespace engine
              *
              * @param aFrameBufferId       Unique Id of the frame buffer to destroy
              * @param aRenderPassId        Unique Id of the render pass to destroy
-             * @param aAttachmentInfo      Attachment information of the current pass.
-             * @param aFrameGraphResources List of resources referred to by attachment resource ids.
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
             EEngineStatus destroyFrameBufferAndRenderPass(
                     std::string                     const &aFrameBufferId,
-                    std::string                     const &aRenderPassId,
-                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
-                    CFrameGraphMutableResources     const &aFrameGraphResources);
+                    std::string                     const &aRenderPassId);
 
             /**
              * Render a renderable entity using the graphicsAPI.

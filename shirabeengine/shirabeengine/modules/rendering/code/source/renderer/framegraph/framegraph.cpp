@@ -204,8 +204,8 @@ namespace engine
             static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
             static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
 
-            bool const successfullySetUp = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
-            assert(successfullySetUp);
+            bool const successfullySetUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+            assert(successfullySetUpRenderPassAndFrameBuffer);
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
@@ -225,8 +225,8 @@ namespace engine
                 copy.pop();
             }
 
-            bool const successfullyCleanedUp = deinitializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
-            assert(successfullyCleanedUp);
+            bool const successfullyCleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+            assert(successfullyCleanedUpRenderPassAndFrameBuffer);
 
             return true;
         }
@@ -303,63 +303,20 @@ namespace engine
                 std::string                               const &aFrameBufferId,
                 std::string                               const &aRenderPassId)
         {
-            bool initialized = true;
-
             std::vector<CStdSharedPtr_t<SFrameGraphTexture>>     textureReferences{};
             std::vector<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewReferences{};
 
-            SFrameGraphAttachmentCollection const &attachments = mResourceData.getAttachments();
-            for(FrameGraphResourceId_t const &id : attachments.getAttachementResourceIds())
-            {
-                CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
-                CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
-                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
+            SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
+            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementResourceIds();
 
-                FrameGraphResourceIdList::const_iterator it = mInstantiatedResources.end();
-
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
-
-                subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
-                texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
-                textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
-
-                // Make sure the subjacent resource was created.
-                it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
-                if(it == mInstantiatedResources.end())
-                {
-                    initialized |=
-                            initializeTexture(
-                                aRenderContext,
-                                texture);
-                    mInstantiatedResources.push_back(texture->resourceId);
-
-                    textureReferences.push_back(texture);
-                }
-
-                // No go for the texture view.
-                it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), textureView->resourceId);
-                if(it == mInstantiatedResources.end())
-                {
-                    bool const subjacentTextureCreated = (mInstantiatedResources.end() != std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId));
-                    if(!texture->isExternalResource && !subjacentTextureCreated)
-                    {
-                        initialized |= initializeResources(aRenderContext, {texture->resourceId});
-                    }
-
-                    initialized |=
-                            initializeTextureView(
-                                aRenderContext,
-                                texture,
-                                textureView);
-                    mInstantiatedResources.push_back(textureView->resourceId);
-
-                    textureViewReferences.push_back(textureView);
-                }
-            }
+            // Make sure that all texture views and their subjacent textures are created upfront!
+            bool const subjacentResourcesCreated = initializeResources(aRenderContext, attachmentResourceIds);
+            assert(subjacentResourcesCreated);
 
             EEngineStatus const status = aRenderContext->createFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId, attachments, mResourceData);
+            HandleEngineStatusError(status, "Failed to create frame buffer and/or render pass.");
 
-            initialized = (CheckEngineError(status));
+            bool const initialized = (not CheckEngineError(status));
             return initialized;
         }
         //<-----------------------------------------------------------------------------
@@ -372,10 +329,17 @@ namespace engine
                 std::string                               const &aFrameBufferId,
                 std::string                               const &aRenderPassId)
         {
-            EEngineStatus const status = aRenderContext->destroyFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId, mResourceData.getAttachments(), mResourceData);
+            SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
+            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementResourceIds();
 
-            bool const initialized = (CheckEngineError(status));
-            return initialized;
+            EEngineStatus const status = aRenderContext->destroyFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+            HandleEngineStatusError(status, "Failed to destroy frame buffer and/or render pass.");
+
+            bool const subjacentResourcesDestroyed = deinitializeResources(aRenderContext, attachmentResourceIds);
+            assert(subjacentResourcesDestroyed);
+
+            bool const deinitialized = (not CheckEngineError(status));
+            return deinitialized;
         }
         //<-----------------------------------------------------------------------------
 

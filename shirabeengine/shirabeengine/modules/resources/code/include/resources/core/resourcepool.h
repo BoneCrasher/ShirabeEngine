@@ -128,8 +128,10 @@ namespace engine
         IndexedResourcePool<TIndex, TValue>::removeResource(
                 TIndex const&index)
         {
-            if(!hasResource(index))
+            if(not hasResource(index))
+            {
                 return false;
+            }
 
             mResources.erase(mResources.find(index));
             return true;
@@ -144,7 +146,8 @@ namespace engine
         IndexedResourcePool<TIndex, TValue>::hasResource(
                 TIndex const&index) const
         {
-            return (mResources.find(index) != mResources.end());
+            bool const hasResource = (mResources.end() != mResources.find(index));
+            return hasResource;
         }
         //<-----------------------------------------------------------------------------
 

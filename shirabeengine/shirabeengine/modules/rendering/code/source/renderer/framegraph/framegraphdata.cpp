@@ -384,6 +384,8 @@ namespace engine
                 for(RefIndex_t::value_type const&id : aOther.renderableListViews())
                     CFrameGraphResourcesRef<SFrameGraphRenderableListView>::insert(id);
 
+                mAttachements = aOther.attachements();
+
                 return true;
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
