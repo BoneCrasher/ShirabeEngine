@@ -225,7 +225,7 @@ namespace engine
                 copy.pop();
             }
 
-            bool const successfullyCleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+            bool const successfullyCleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
             assert(successfullyCleanedUpRenderPassAndFrameBuffer);
 
             return true;
@@ -435,17 +435,17 @@ namespace engine
 
                         if(!texture->isExternalResource && resource->referenceCount == 0)
                         {
-                            deinitialized |=
-                                    deinitializeTexture(
-                                        aRenderContext,
-                                        texture);
+                            deinitialized |= deinitializeTexture(aRenderContext, texture);
+
+                            auto const condition = [&] (FrameGraphResourceId_t const &aId) -> bool
+                            {
+                                return (aId == texture->resourceId);
+                            };
+
                             std::remove_if(
                                         mInstantiatedResources.begin(),
                                         mInstantiatedResources.end(),
-                                        [&] (FrameGraphResourceId_t const &aId) -> bool
-                            {
-                                return (aId == texture->resourceId);
-                            });
+                                        condition);
                         }
                     }
                     break;
@@ -461,18 +461,17 @@ namespace engine
                         texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
                         textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 
-                        deinitialized |=
-                                deinitializeTextureView(
-                                    aRenderContext,
-                                    texture,
-                                    textureView);
+                        deinitialized |= deinitializeTextureView(aRenderContext, texture, textureView);
+
+                        auto const condition = [&] (FrameGraphResourceId_t const &aId) -> bool
+                        {
+                            return (aId == textureView->resourceId);
+                        };
+
                         std::remove_if(
                                     mInstantiatedResources.begin(),
                                     mInstantiatedResources.end(),
-                                    [&] (FrameGraphResourceId_t const &aId) -> bool
-                        {
-                            return (aId == textureView->resourceId);
-                        });
+                                    condition);
 
                         --(texture->referenceCount);
 

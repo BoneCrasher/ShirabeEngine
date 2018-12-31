@@ -113,13 +113,13 @@ namespace engine
 
         success = success &&
                 addUnloader<CRenderPass>(std::bind(
-                                 &CResourceManager::loadResourceImpl<CRenderPass>,
+                                 &CResourceManager::unloadResourceImpl<CRenderPass>,
                                  static_cast<CResourceManagerBase *>(this),
                                  std::placeholders::_1));
 
         success = success &&
                 addUnloader<CFrameBuffer>(std::bind(
-                                 &CResourceManager::loadResourceImpl<CFrameBuffer>,
+                                 &CResourceManager::unloadResourceImpl<CFrameBuffer>,
                                  static_cast<CResourceManagerBase *>(this),
                                  std::placeholders::_1));
 

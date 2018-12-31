@@ -275,6 +275,8 @@ namespace engine
                 HandleEngineStatusError(status, "Failed to create frame buffer.");
 
             return status;
+
+            // return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -558,6 +560,8 @@ namespace engine
             HandleEngineStatusError(status, "Failed to destroy render pass.");
 
             return status;
+
+            // return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 

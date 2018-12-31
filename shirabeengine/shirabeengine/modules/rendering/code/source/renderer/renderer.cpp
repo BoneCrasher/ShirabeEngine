@@ -223,7 +223,6 @@ namespace engine
             // Link Compositing and Present
             graphBuilder.createPassDependency(sCompositingPassID, sPresentPassID);
 
-
             // Compile the whole thing :)
             CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
 
@@ -252,7 +251,6 @@ namespace engine
                 system("tools/makeFrameGraphPNG.sh");
             }
 #endif
-
             if(frameGraph)
             {
                 frameGraph->execute(mFrameGraphRenderContext);
