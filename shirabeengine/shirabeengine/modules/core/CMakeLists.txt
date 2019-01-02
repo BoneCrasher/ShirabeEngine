@@ -13,6 +13,7 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEMATH    
         SHIRABEMODULELOG     
+        SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
         JSON                 
         #XML2
@@ -22,4 +23,5 @@ include(project_setup)
 
 add_dependencies(core INSTALL_math)
 add_dependencies(core INSTALL_log)
+add_dependencies(core INSTALL_base)
 add_dependencies(core INSTALL_platform)

@@ -1,24 +1,26 @@
 function(linkLibrary)
     
-	LogStatus(MESSAGES 	
+    LogStatus(MESSAGES
         ${SHIRABE_ADDRESSMODEL_64BIT}
         ${SHIRABE_PLATFORM_CONFIG})
 
     set(BINARY_NAME wsi)
-	set(LINK_STATIC OFF)
+    set(LINK_STATIC OFF)
 
-	formatPlatformConfigName(
-            ${BINARY_NAME}
-            SHIRABE_ADDRESSMODEL_64BIT
-            SHIRABE_PLATFORM_CONFIG
-            ON
-            BINARY_NAME
-        )
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/wsi)
+
+    formatPlatformConfigName(
+        ${BINARY_NAME}
+        SHIRABE_ADDRESSMODEL_64BIT
+        SHIRABE_PLATFORM_CONFIG
+        ON
+        BINARY_NAME
+    )
 
     # -I
     append_parentscope(
         SHIRABE_PROJECT_INCLUDEPATH
-        ${SHIRABE_PROJECT_DEPLOY_DIR}/include
+        ${MODULE_DIR}/code/include
         )
 		
 	# -L

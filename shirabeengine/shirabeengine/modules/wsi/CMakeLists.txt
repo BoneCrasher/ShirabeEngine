@@ -18,6 +18,7 @@ set(
         SHIRABEMODULECORE       
         SHIRABEMODULEMATH       
         SHIRABEMODULELOG        
+        SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
         XLIB
         JSON
@@ -25,8 +26,9 @@ set(
 
 include(project_setup)
 
-add_dependencies(wsi INSTALL_platform)
+add_dependencies(wsi INSTALL_core)
 add_dependencies(wsi INSTALL_os)
 add_dependencies(wsi INSTALL_math)
 add_dependencies(wsi INSTALL_log)
-add_dependencies(wsi INSTALL_core)
+add_dependencies(wsi INSTALL_base)
+add_dependencies(wsi INSTALL_platform)

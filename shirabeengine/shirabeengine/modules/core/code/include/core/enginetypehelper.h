@@ -15,7 +15,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "base/declaration.h"
+#include <base/declaration.h>
 
 #define SHIRABE_STR(m) #m
 #define SHIRABE_LOG_FUNCTION(...) SHIRABE_STR( __VA_ARGS__)

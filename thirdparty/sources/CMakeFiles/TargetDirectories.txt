@@ -1,0 +1,15 @@
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/rebuild_cache.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/edit_cache.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/list_install_components.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/install/strip.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-glsl.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-hlsl.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/install.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-cpp.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-util.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-core.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-reflect.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/install/local.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/test.dir
+/home/dotti/workspaces/shirabeengine/thirdparty/sources/CMakeFiles/spirv-cross-msl.dir

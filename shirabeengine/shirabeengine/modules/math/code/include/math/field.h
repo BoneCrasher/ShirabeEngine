@@ -15,8 +15,8 @@
 #include <cstring>
 #include <cassert>
 
-#include "platform/platform.h"
-#include "base/declaration.h"
+#include <platform/platform.h>
+#include <base/declaration.h>
 
 namespace engine
 {

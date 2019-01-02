@@ -13,7 +13,8 @@ set(
         SHIRABEMODULECORE       
         SHIRABEMODULEMATH       
         SHIRABEMODULELOG        
-        SHIRABEMODULEPLATFORM   
+        SHIRABEMODULEBASE
+        SHIRABEMODULEPLATFORM
         STBI                    
         FXGLTF                  
         JSON                    
@@ -22,6 +23,7 @@ set(
 include(project_setup)
 
 add_dependencies(asset INSTALL_platform)
+add_dependencies(asset INSTALL_base)
 add_dependencies(asset INSTALL_core)
 add_dependencies(asset INSTALL_utility)
 add_dependencies(asset INSTALL_graphicsapi)

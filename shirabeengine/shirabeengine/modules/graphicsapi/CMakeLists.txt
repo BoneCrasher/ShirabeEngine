@@ -11,6 +11,7 @@ set(
         SHIRABEMODULECORE     
         SHIRABEMODULEMATH     
         SHIRABEMODULELOG      
+        SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM 
         JSON                  
         XML2)
@@ -18,6 +19,7 @@ set(
 include(project_setup)
 
 add_dependencies(graphicsapi INSTALL_resources)
+add_dependencies(graphicsapi INSTALL_base)
 add_dependencies(graphicsapi INSTALL_platform)
 add_dependencies(graphicsapi INSTALL_math)
 add_dependencies(graphicsapi INSTALL_log)

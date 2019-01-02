@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_PROXYBASEDCResourceManager_H__
-#define __SHIRABE_PROXYBASEDCResourceManager_H__
+#ifndef __SHIRABE_RESOURCEMANAGER_H__
+#define __SHIRABE_RESOURCEMANAGER_H__
 
 #include <thread>
 #include <typeindex>

@@ -1,13 +1,15 @@
 function(linkLibrary)
     
-	LogStatus(MESSAGES 	
-            ${SHIRABE_ADDRESSMODEL_64BIT}
-            ${SHIRABE_PLATFORM_CONFIG})
+    LogStatus(MESSAGES
+        ${SHIRABE_ADDRESSMODEL_64BIT}
+        ${SHIRABE_PLATFORM_CONFIG})
 
     set(BINARY_NAME rendering)
-	set(LINK_STATIC OFF)
+    set(LINK_STATIC OFF)
 
-	formatPlatformConfigName(
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/rendering)
+
+    formatPlatformConfigName(
         ${BINARY_NAME}
         SHIRABE_ADDRESSMODEL_64BIT
         SHIRABE_PLATFORM_CONFIG
@@ -18,7 +20,7 @@ function(linkLibrary)
     # -I
     append_parentscope(
         SHIRABE_PROJECT_INCLUDEPATH
-        ${SHIRABE_PROJECT_DEPLOY_DIR}/include
+        ${MODULE_DIR}/code/include
         )
 		
 	# -L

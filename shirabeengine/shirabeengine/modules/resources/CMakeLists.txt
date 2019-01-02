@@ -10,6 +10,7 @@ set(
         SHIRABEMODULECORE     
         SHIRABEMODULEMATH     
         SHIRABEMODULELOG      
+        SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM 
         JSON                  
         XML2)
@@ -19,4 +20,5 @@ include(project_setup)
 add_dependencies(resources INSTALL_math)
 add_dependencies(resources INSTALL_log)
 add_dependencies(resources INSTALL_core)
+add_dependencies(resources INSTALL_base)
 add_dependencies(resources INSTALL_platform)

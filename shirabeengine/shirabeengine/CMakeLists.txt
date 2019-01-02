@@ -17,6 +17,7 @@ add_subdirectory(modules/graphicsapi)
 add_subdirectory(modules/rendering)
 add_subdirectory(modules/vulkan_integration)
 add_subdirectory(modules/asset)
+add_subdirectory(modules/material)
 
 include($ENV{SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
 include(project_default_template)
@@ -45,17 +46,19 @@ set(
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEVULKAN     
+        SHIRABEMODULEVULKAN
         SHIRABEMODULERENDERING  
+        SHIRABEMODULEMATERIAL
         SHIRABEMODULEGRAPHICSAPI
         SHIRABEMODULERESOURCES  
         SHIRABEMODULEASSET      
         SHIRABEMODULEWSI        
         SHIRABEMODULECORE       
-        SHIRABEMODULEUTILITY    
+        SHIRABEMODULEUTILITY
+        SHIRABEMODULEOS
         SHIRABEMODULELOG        
-        SHIRABEMODULEMATH       
-        SHIRABEMODULEOS         
+        SHIRABEMODULEMATH
+        SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM   
         VULKANSDK
         XLIB
@@ -67,17 +70,18 @@ set(
 
 include(project_setup)
 
-add_dependencies(shirabeengine INSTALL_platform)
-add_dependencies(shirabeengine INSTALL_base)
-add_dependencies(shirabeengine INSTALL_os)
-add_dependencies(shirabeengine INSTALL_log)
-add_dependencies(shirabeengine INSTALL_math)
-add_dependencies(shirabeengine INSTALL_core)
-add_dependencies(shirabeengine INSTALL_utility)
 add_dependencies(shirabeengine INSTALL_wsi)
 add_dependencies(shirabeengine INSTALL_resources)
 add_dependencies(shirabeengine INSTALL_graphicsapi)
 add_dependencies(shirabeengine INSTALL_rendering)
 add_dependencies(shirabeengine INSTALL_vulkan_integration)
 add_dependencies(shirabeengine INSTALL_asset)
+add_dependencies(shirabeengine INSTALL_material)
+add_dependencies(shirabeengine INSTALL_utility)
+add_dependencies(shirabeengine INSTALL_core)
+add_dependencies(shirabeengine INSTALL_os)
+add_dependencies(shirabeengine INSTALL_log)
+add_dependencies(shirabeengine INSTALL_math)
+add_dependencies(shirabeengine INSTALL_base)
+add_dependencies(shirabeengine INSTALL_platform)
 
