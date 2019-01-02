@@ -11,6 +11,7 @@
 #include <ostream>
 
 #include "core/enginetypehelper.h"
+#include "core/result.h"
 #include "log/log.h"
 
 namespace engine
@@ -95,6 +96,43 @@ namespace engine
      * @return
      */
     bool CheckEngineError(EEngineStatus const &aStatus);
+
+    /**
+     * The CEngineResult class is a SResult implementation to return result tuples of
+     * result type EEngineStatus.
+     */
+    template <typename TData = void*>
+    class CEngineResult
+        : public AResult<EEngineStatus, TData>
+    {
+    public_constructors:
+        /**
+         * Create an empty result from a result code.
+         *
+         * @param aResult
+         */
+        CEngineResult(EEngineStatus const &aResult)
+            : AResult<EEngineStatus, TData>(aResult)
+        {}
+
+        /**
+         * Create a result from result code and data.
+         *
+         * @param aResult
+         * @param aData
+         */
+        CEngineResult(
+                EEngineStatus const &aResult,
+                TData         const &aData)
+            : AResult<EEngineStatus, TData>(aResult, aData)
+        {}
+
+    public_methods:
+        bool successful() const {
+            bool const success = not CheckEngineError(AResult<EEngineStatus, TData>::result());
+            return success;
+        }
+    };
 
     /**
      * @brief The EngineException class

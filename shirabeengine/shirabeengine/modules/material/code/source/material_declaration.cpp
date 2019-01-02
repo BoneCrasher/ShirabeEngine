@@ -1,8 +1,8 @@
 #include "material/material_declaration.h"
 
-namespace Shirabe
+namespace engine
 {
-    namespace Material
+    namespace material
     {
 
     }
