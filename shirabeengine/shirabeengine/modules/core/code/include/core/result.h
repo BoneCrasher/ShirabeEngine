@@ -24,8 +24,8 @@ namespace engine
          * @param aData
          */
         SHIRABE_INLINE AResult(
-                TResult              const &aResult,
-                std::optional<TData> const &aData = std::optional<TData>())
+                TResult const &aResult,
+                TData   const &aData = TData())
             : mResult(aResult)
             , mData(aData)
         {}
@@ -52,7 +52,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE std::optional<TData> const &data() const
+        SHIRABE_INLINE TData const &data() const
         {
             return mData;
         }
@@ -62,7 +62,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE std::optional<TData> &data()
+        SHIRABE_INLINE TData &data()
         {
             return mData;
         }
@@ -75,8 +75,8 @@ namespace engine
         virtual bool successful() const = 0;
 
     private_members:
-        TResult              mResult;
-        std::optional<TData> mData;
+        TResult mResult;
+        TData   mData;
     };
 
 

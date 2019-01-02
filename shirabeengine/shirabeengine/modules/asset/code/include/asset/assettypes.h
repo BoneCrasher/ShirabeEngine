@@ -104,7 +104,7 @@ namespace engine
              * @param aAssetId UID of the asset to fetch.
              * @return         A filled optional of requested asset type T, or an empty optional.
              */
-            Optional_t<T> getAsset(AssetId_t const &aAssetId);
+            CEngineResult<T> getAsset(AssetId_t const &aAssetId);
 
             // Iterator compatibility
             typename Index_t::iterator       begin()       { return mIndex.begin(); }
@@ -125,8 +125,10 @@ namespace engine
                 AssetId_t const &aAssetId,
                 T         const &aAsset)
         {
-            if(mIndex.find(aAssetId) != mIndex.end())
+            if(mIndex.end() != mIndex.find(aAssetId))
+            {
                 return EAssetErrorCode::AssetAlreadyAdded;
+            }
 
             mIndex[aAssetId] = aAsset;
 
@@ -138,12 +140,16 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        Optional_t<T> CAssetRegistry<T>::getAsset(AssetId_t const &aAssetId)
+        CEngineResult<T> CAssetRegistry<T>::getAsset(AssetId_t const &aAssetId)
         {
-            Optional_t<T> result{ };
+            CEngineResult<T> result = CEngineResult<T>(EEngineStatus::Error);
 
-            if(mIndex.find(aAssetId) != mIndex.end())
-                result = mIndex.at(aAssetId);
+            if(mIndex.end() != mIndex.find(aAssetId))
+            {
+                T const &asset = mIndex.at(aAssetId);
+
+                result = CEngineResult<T>(EEngineStatus::Ok, asset);
+            }
 
             return result;
         }

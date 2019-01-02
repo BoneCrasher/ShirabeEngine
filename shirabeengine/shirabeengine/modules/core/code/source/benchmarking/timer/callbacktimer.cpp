@@ -27,11 +27,13 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool CCallbackTimer::run()
+    CEngineResult<> CCallbackTimer::run()
     {
         // Do not re-run a running timer.
         if(mRunning.load())
-            return false;
+        {
+            return CEngineResult<>(EEngineStatus::Error);
+        }
 
         mRunning.store(true);
         mPause.store(false);
@@ -54,14 +56,14 @@ namespace engine
                 mTimerThread->detach();
         }
 
-        return true;
+        return CEngineResult<>(EEngineStatus::Ok);
     }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool CCallbackTimer::pause()
+    CEngineResult<> CCallbackTimer::pause()
     {
         // Do not allow multithreaded execution corruption by
         // having one thread unblock another.
@@ -70,17 +72,19 @@ namespace engine
         if(mBlockWhileRunning
                 || !mRunning.load()
                 || mInterrupt.load())
-            return false;
+        {
+            return CEngineResult<>(EEngineStatus::Error);
+        }
 
         mPause.store(true); // Will halt next frame!
-        return true;
+        return CEngineResult<>(EEngineStatus::Ok);
     }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool CCallbackTimer::resume()
+    CEngineResult<> CCallbackTimer::resume()
     {
         if(!mRunning.load()) // Implicit run feature.
             run();
@@ -89,23 +93,27 @@ namespace engine
             // Do not allow multithreaded execution corruption by
             // having one thread unblock another.
             if(mBlockWhileRunning)
-                return false;
+            {
+                return CEngineResult<>(EEngineStatus::Ok);
+            }
 
             mPause.store(false); // Will continue after Sleep!
         }
 
-        return true;
+        return CEngineResult<>(EEngineStatus::Ok);
     }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool CCallbackTimer::stop()
+    CEngineResult<> CCallbackTimer::stop()
     {
         // Do not pause a not running timer.
         if(!mRunning.load())
-            return false;
+        {
+            return CEngineResult<>(EEngineStatus::Ok);
+        }
 
         mInterrupt.store(true); // Will stop next frame!
 
@@ -115,14 +123,14 @@ namespace engine
         //    UhOh... Manage this in existing custom deleter?
         mTimerThread = nullptr;
 
-        return true;
+        return CEngineResult<>(EEngineStatus::Ok);
     }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    void CCallbackTimer::exec()
+    CEngineResult<> CCallbackTimer::exec()
     {
         std::clock_t
                 curr = 0,
@@ -160,6 +168,8 @@ namespace engine
 
         mRunning.store(false);
         mInterrupt.store(false); // Will stop next frame!
+
+        return CEngineResult<>(EEngineStatus::Ok);
     }
     //<-----------------------------------------------------------------------------
 

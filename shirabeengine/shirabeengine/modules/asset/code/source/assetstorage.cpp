@@ -61,24 +61,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SAsset CAssetStorage::loadAsset(AssetId_t const &aAssetUID)
+        CEngineResult<SAsset> CAssetStorage::loadAsset(AssetId_t const &aAssetUID)
         {
-            Optional_t<SAsset> asset = mAssetIndex.getAsset(aAssetUID);
-            if(!asset.has_value())
-            {
-                throw std::runtime_error("Asset not found.");
-            }
-
-            return *asset;
+            return mAssetIndex.getAsset(aAssetUID);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        ByteBuffer CAssetStorage::loadAssetData(SAsset const &aAsset)
+        CEngineResult<ByteBuffer> CAssetStorage::loadAssetData(SAsset const &aAsset)
         {
-            ByteBuffer data{};
+            CEngineResult<ByteBuffer> data = CEngineResult<ByteBuffer>(EEngineStatus::Error);
 
             switch(aAsset.type)
             {
@@ -92,14 +86,14 @@ namespace engine
                 break;
             }
 
-            return std::move(data);
+            return data;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        ByteBuffer CAssetStorage::loadBufferAsset(SAsset const &aAsset)
+        CEngineResult<ByteBuffer> CAssetStorage::loadBufferAsset(SAsset const &aAsset)
         {
             ByteBuffer data;
 
@@ -114,44 +108,42 @@ namespace engine
                   EEngineStatus status = m_resourceManager->createTexture(request, pid);
                   HandleEngineStatusError(status, "Failed to create asset resource instance in resource manager.");
             */
-            return data;
+            return CEngineResult(EEngineStatus::Ok, data);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void loadImageFromFile(
-                std::string const&aFilename,
-                SImage           &aImage)
+        CEngineResult<SImage> loadImageFromFile(std::string const &aFilename)
         {
+            SImage image{};
+
             int w = 0, h = 0, c = 0;
             unsigned char* stbuc = stbi_load(aFilename.c_str(), &w, &h, &c, 4);
 
             uint64_t const size = (w * h * 4 * sizeof(int8_t));
-            aImage.data         = std::move(ByteBuffer::DataArrayFromSize(size));
-            aImage.width        = w;
-            aImage.height       = h;
-            aImage.channels     = c;
-
-            memcpy(aImage.data.mutableData(), stbuc, aImage.data.size());
+            image.data         = ByteBuffer::DataArrayFromSize(size);
+            image.width        = w;
+            image.height       = h;
+            image.channels     = c;
 
             stbi_image_free(stbuc);
+
+            return CEngineResult(EEngineStatus::Ok, image);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        ByteBuffer CAssetStorage::loadTextureAsset(SAsset const &aAsset)
+        CEngineResult<ByteBuffer> CAssetStorage::loadTextureAsset(SAsset const &aAsset)
         {
-            SImage image ={};
-
             // Default for now...
             // Will check cache and download from server if necessary
-            loadImageFromFile(aAsset.URI, image);
+            CEngineResult<SImage> image = loadImageFromFile(aAsset.URI);
 
-            return std::move(image.data);
+            return CEngineResult(EEngineStatus::Ok, image.data().data);
         }
         //<-----------------------------------------------------------------------------
 

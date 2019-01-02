@@ -10,6 +10,7 @@
 #include <atomic>
 
 #include "core/enginetypehelper.h"
+#include "core/enginestatus.h"
 
 namespace engine
 {
@@ -71,7 +72,7 @@ namespace engine
          *              a) Calling stop to terminate the thread
          *              b) Having Callbacks be fired, on which the system can react.
          */
-        bool run();
+        CEngineResult<> run();
 
         /**
          * Pauses the thread execution without altering any of the
@@ -79,7 +80,7 @@ namespace engine
          *
          * @return True, if the thread was in a pausable state. False otherwise.
          */
-        bool pause();
+        CEngineResult<> pause();
 
         /**
          * Resumes the thread, if created, running and paused.
@@ -87,20 +88,20 @@ namespace engine
          *
          * @return True if the thread could be resumed or run. False, otherwise.
          */
-        bool resume();
+        CEngineResult<> resume();
 
         /**
          * Stops & destroys the internal pointer instance.
          *
          * @return True, if the thread could be stopped. False, otherwise.
          */
-        bool stop();
+        CEngineResult<> stop();
 
     private:
         /**
          * Internal execution function implementing the timing logic.
          */
-        void exec();
+        CEngineResult<> exec();
 
         uint32_t                     mTickMs;
         bool                         mOnce;

@@ -36,7 +36,7 @@ namespace engine
              * @param aAssetUID The UID of the asset to load.
              * @return          A valid asset if successful. Empty otherwise.
              */
-            virtual SAsset loadAsset(AssetId_t const &aAssetUID) = 0;
+            virtual CEngineResult<SAsset> loadAsset(AssetId_t const &aAssetUID) = 0;
 
             /**
              * Load the byte data for a provided asset descriptor.
@@ -44,7 +44,7 @@ namespace engine
              * @param aAsset The asset descriptor for which byte data should be loaded.
              * @return       A filled byte buffer if successful. False otherwise.
              */
-            virtual ByteBuffer loadAssetData(SAsset const &aAsset) = 0;
+            virtual CEngineResult<ByteBuffer> loadAssetData(SAsset const &aAsset) = 0;
         };
 
         /**
@@ -83,7 +83,7 @@ namespace engine
              * @param aAssetUID The UID of the asset to load.
              * @return          A valid asset if successful. Empty otherwise.
              */
-            SAsset loadAsset(AssetId_t const &aAssetUID);
+            CEngineResult<SAsset> loadAsset(AssetId_t const &aAssetUID);
 
             /**
              * Load the byte data for a provided asset descriptor.
@@ -91,7 +91,7 @@ namespace engine
              * @param aAsset The asset descriptor for which byte data should be loaded.
              * @return       A filled byte buffer if successful. False otherwise.
              */
-            ByteBuffer loadAssetData(SAsset const &aAsset);
+            CEngineResult<ByteBuffer> loadAssetData(SAsset const &aAsset);
 
         private_methods:
             /**
@@ -100,7 +100,7 @@ namespace engine
              * @param aAsset Asset descriptor of the buffer resource.
              * @return       A filled bytebuffer if successful. An empty buffer othwerise.
              */
-            ByteBuffer loadBufferAsset(SAsset const &aAsset);
+            CEngineResult<ByteBuffer> loadBufferAsset(SAsset const &aAsset);
 
             /**
              * Implementation of loading texture assets from disc.
@@ -108,7 +108,7 @@ namespace engine
              * @param aAsset Asset descriptor of the buffer resource.
              * @return       A filled bytebuffer if successful. An empty buffer othwerise.
              */
-            ByteBuffer loadTextureAsset(SAsset const &aAsset);
+            CEngineResult<ByteBuffer> loadTextureAsset(SAsset const &aAsset);
 
         private_members:
             AssetIndex_t     mAssetIndex;
