@@ -8,6 +8,7 @@
 #include <base/declaration.h>
 #include <log/log.h>
 #include "core/enginetypehelper.h"
+#include "core/enginestatus.h"
 
 namespace engine
 {
@@ -78,7 +79,7 @@ namespace engine
                 CTask& operator=(CTask&& aOther)
                 {
                     mPriority = aOther.mPriority;
-                    mTask     = std::move(aOther.v);
+                    mTask     = std::move(aOther.mTask);
 
                     return *this;
                 }
@@ -334,7 +335,7 @@ namespace engine
              *
              * @return
              */
-            TaskType nextRunnable();
+            CEngineResult<> nextRunnable(TaskType &aOutTask);
 
             /**
              * Thread func to be executed on the worker thread.
@@ -560,13 +561,13 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        typename CLooper<TTaskResult>::TaskType CLooper<TTaskResult>::nextRunnable()
+        CEngineResult<> CLooper<TTaskResult>::nextRunnable(TaskType &aOutTask)
         {
             std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
 
             if(mRunnables.empty())
             {
-                throw std::runtime_error("Empty queue...");
+                return CEngineResult<>(EEngineStatus::Error);
             }
 
             // Implement dequeueing by priority with proper
@@ -574,7 +575,8 @@ namespace engine
             typename CLooper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
             mRunnables.pop_back();
 
-            return std::move(runnable);
+            aOutTask = std::move(runnable);
+            return CEngineResult<>(EEngineStatus::Ok);
         }
         //<-----------------------------------------------------------------------------
 
@@ -588,11 +590,17 @@ namespace engine
 
             while(!mAbortRequested.load())
             {
-                try {
-                    TaskType task = nextRunnable();
-                    if(!loop(std::move(task)))
+                try
+                {
+                    TaskType task;
+                    CEngineResult<> fetch = nextRunnable(task);
+                    if(fetch.successful())
                     {
-                        throw std::runtime_error("Failed to execute loop function.");
+                        bool const loopSuccessful = loop(std::move(task));
+                        if(not loopSuccessful)
+                        {
+                            // throw std::runtime_error("Failed to execute loop function.");
+                        }
                     }
                 }
                 catch(std::runtime_error& e) {
