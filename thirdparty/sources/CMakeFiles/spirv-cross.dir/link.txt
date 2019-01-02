@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/spirv-cross.dir/main.cpp.o  -o spirv-cross libspirv-cross-glsl.a libspirv-cross-hlsl.a libspirv-cross-cpp.a libspirv-cross-reflect.a libspirv-cross-msl.a libspirv-cross-util.a libspirv-cross-core.a libspirv-cross-glsl.a libspirv-cross-core.a 
