@@ -3,7 +3,8 @@
 
 #include <map>
 
-#include "core/enginetypehelper.h"
+#include <core/enginetypehelper.h>
+#include <core/enginestatus.h>
 
 namespace engine
 {
@@ -38,14 +39,14 @@ namespace engine
              * @param aResource The resource to be stored.
              * @return          True, if successful. False, otherwise.
              */
-            bool addResource(TIndex const &aIndex, TValue const &aResource);
+            CEngineResult<> addResource(TIndex const &aIndex, TValue const &aResource);
             /**
              * Remove a resource from this pool.
              *
              * @param aIndex The index by which to address the resource.
              * @return       True, if successful. False otherwise.
              */
-            bool removeResource(TIndex const &aIndex);
+            CEngineResult<> removeResource(TIndex const &aIndex);
 
             /**
              * Check, whether a resource identified by aIndex is registered.
@@ -53,7 +54,7 @@ namespace engine
              * @param aIndex The index by which to address the resource.
              * @return       True, if successful. False otherwise.
              */
-            bool hasResource(TIndex const &aIndex) const;
+            CEngineResult<bool> hasResource(TIndex const &aIndex) const;
 
             /**
              * Access the resource identified by aIndex immutably.
@@ -62,7 +63,7 @@ namespace engine
              * @return       Returns a const reference to the stored resource.
              * @throw        std::runtime_error, if not registered.
              */
-            OptionalRef_t<TValue> const getResource(const TIndex& index) const;
+            CEngineResult<TValue> const getResource(const TIndex& index) const;
 
             /**
              * Access the resource identified by aIndex.
@@ -71,7 +72,7 @@ namespace engine
              * @return       Returns a reference to the stored resource.
              * @throw        std::runtime_error, if not registered.
              */
-            OptionalRef_t<TValue> getResource(const TIndex& index);
+            CEngineResult<TValue> getResource(const TIndex& index);
 
             /**
              * Begin iterating over the stored resources.
@@ -108,15 +109,18 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        bool IndexedResourcePool<TIndex, TValue>::addResource(
+        CEngineResult<> IndexedResourcePool<TIndex, TValue>::addResource(
                 TIndex const&index,
                 TValue const&resource)
         {
-            if(hasResource(index))
-                return false;
+            CEngineResult<bool> const has = hasResource(index);
+            if(not has.data())
+            {
+                return { EEngineStatus::Error };
+            }
 
             mResources[index] = resource;
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
@@ -124,17 +128,17 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        bool
-        IndexedResourcePool<TIndex, TValue>::removeResource(
+        CEngineResult<> IndexedResourcePool<TIndex, TValue>::removeResource(
                 TIndex const&index)
         {
-            if(not hasResource(index))
+            CEngineResult<bool> const has = hasResource(index);
+            if(not has.data())
             {
-                return false;
+                return { EEngineStatus::Error };
             }
 
             mResources.erase(mResources.find(index));
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
@@ -142,12 +146,12 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        bool
-        IndexedResourcePool<TIndex, TValue>::hasResource(
+        CEngineResult<bool> IndexedResourcePool<TIndex, TValue>::hasResource(
                 TIndex const&index) const
         {
             bool const hasResource = (mResources.end() != mResources.find(index));
-            return hasResource;
+
+            return { EEngineStatus::Ok, hasResource };
         }
         //<-----------------------------------------------------------------------------
 
@@ -155,16 +159,15 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        OptionalRef_t<TValue> const
-        IndexedResourcePool<TIndex, TValue>::getResource(
-                TIndex const&index) const
+        CEngineResult<TValue> const IndexedResourcePool<TIndex, TValue>::getResource(TIndex const&index) const
         {
-            if(!hasResource(index))
+            CEngineResult<bool> const has = hasResource(index);
+            if(not has.data())
             {
-                return {};
+                return { EEngineStatus::Error };
             }
 
-            return mResources.at(index);
+            return { EEngineStatus::Ok, mResources.at(index) };
         }
         //<-----------------------------------------------------------------------------
 
@@ -172,16 +175,15 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TIndex, typename TValue>
-        OptionalRef_t<TValue>
-        IndexedResourcePool<TIndex, TValue>::getResource(
-                TIndex const&index)
+        CEngineResult<TValue> IndexedResourcePool<TIndex, TValue>::getResource(TIndex const&index)
         {
-            if(!hasResource(index))
+            CEngineResult<bool> const has = hasResource(index);
+            if(not has.data())
             {
-                return {};
+                return { EEngineStatus::Error };
             }
 
-            return mResources.at(index);
+            return { EEngineStatus::Ok, mResources.at(index) };
         }
         //<-----------------------------------------------------------------------------
     }

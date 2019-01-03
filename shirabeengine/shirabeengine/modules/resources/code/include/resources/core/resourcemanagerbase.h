@@ -80,21 +80,21 @@ namespace engine
              *
              * @return EEngineStatus::Ok on success. An error code otherwise.
              */
-            virtual EEngineStatus initialize();
+            virtual CEngineResult<> initialize();
 
             /**
              * Deinitialize the resource manager and free..
              *
              * @return EEngineStatus::Ok on success. An error code otherwise.
              */
-            virtual EEngineStatus deinitialize();
+            virtual CEngineResult<> deinitialize();
 
             /**
              * Unload, destroy and remove all stored resources.
              *
              * @return
              */
-            bool clear();
+            CEngineResult<> clear();
 
             /**
              * Create a new resource from a creation request and a human readable
@@ -108,7 +108,7 @@ namespace engine
              * @return                 EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus createResource(
+            CEngineResult<> createResource(
                     typename TResource::CCreationRequest const &aRequest,
                     std::string                          const &aResourceId,
                     bool                                        aCreationDeferred = false);
@@ -121,7 +121,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus loadResource(std::string const &aResourceId);
+            CEngineResult<> loadResource(std::string const &aResourceId);
 
             /**
              * Update a resource based on the update request provided.
@@ -132,7 +132,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus updateResource(
+            CEngineResult<> updateResource(
                     std::string                        const &aResourceId,
                     typename TResource::CUpdateRequest const &aRequest);
 
@@ -144,7 +144,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus unloadResource(std::string const &aResourceId);
+            CEngineResult<> unloadResource(std::string const &aResourceId);
 
             /**
              * Destroy a resource, which will also remove it from the resource manager.
@@ -154,14 +154,14 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus destroyResource(std::string const &aResourceId);
+            CEngineResult<> destroyResource(std::string const &aResourceId);
 
         protected_typedefs:
             /**
              * Function-signature alias to make addition of creators for resources simple.
              */
             template <typename TResource>
-            using CreatorFn_t = std::function<EEngineStatus(
+            using CreatorFn_t = std::function<CEngineResult<>(
                     typename TResource::CCreationRequest const &,
                     std::string                          const &,
                     bool)>;
@@ -170,13 +170,13 @@ namespace engine
              * Function-signature alias to make addition of loaders for resources simple.
              */
             template <typename TResource>
-            using LoadFn_t = std::function<EEngineStatus(std::string const &)>;
+            using LoadFn_t = std::function<CEngineResult<>(std::string const &)>;
 
             /**
              * Function-signature alias to make addition of updaters for resources simple.
              */
             template <typename TResource>
-            using UpdateFn_t = std::function<EEngineStatus(
+            using UpdateFn_t = std::function<CEngineResult<>(
                     std::string                        const &,
                     typename TResource::CUpdateRequest const &)>;
 
@@ -184,13 +184,13 @@ namespace engine
              * Function-signature alias to make addition of unloaders for resources simple.
              */
             template <typename TResource>
-            using UnloadFn_t = std::function<EEngineStatus(std::string const &)>;
+            using UnloadFn_t = std::function<CEngineResult<>(std::string const &)>;
 
             /**
              * Function-signature alias to make addition of destroyers for resources simple.
              */
             template <typename TResource>
-            using DestroyFn_t = std::function<EEngineStatus(std::string const &)>;
+            using DestroyFn_t = std::function<CEngineResult<>(std::string const &)>;
 
         protected_constructors:
             /**
@@ -210,7 +210,7 @@ namespace engine
              * @return           True, if successful. False on error.
              */
             template <typename TResource>
-            bool addCreator(CreatorFn_t<TResource> const &aCreator);
+            CEngineResult<> addCreator(CreatorFn_t<TResource> const &aCreator);
 
             /**
              * Set/Overwrite the loader for the resource type TResource.
@@ -220,7 +220,7 @@ namespace engine
              * @return           True, if successful. False on error.
              */
             template <typename TResource>
-            bool addLoader(LoadFn_t<TResource> const &aLoader);
+            CEngineResult<> addLoader(LoadFn_t<TResource> const &aLoader);
 
             /**
              * Set/Overwrite the updater for the resource type TResource.
@@ -230,7 +230,7 @@ namespace engine
              * @return           True, if successful. False on error.
              */
             template <typename TResource>
-            bool addUpdater(UpdateFn_t<TResource> const &aUpdater);
+            CEngineResult<> addUpdater(UpdateFn_t<TResource> const &aUpdater);
 
             /**
              * Set/Overwrite the unloader for the resource type TResource.
@@ -240,7 +240,7 @@ namespace engine
              * @return           True, if successful. False on error.
              */
             template <typename TResource>
-            bool addUnloader(UnloadFn_t<TResource> const &aUnloader);
+            CEngineResult<> addUnloader(UnloadFn_t<TResource> const &aUnloader);
 
             /**
              * Set/Overwrite the destructor for the resource type TResource.
@@ -250,7 +250,7 @@ namespace engine
              * @return            True, if successful. False on error.
              */
             template <typename TResource>
-            bool addDestructor(DestroyFn_t<TResource> const &aDestructor);
+            CEngineResult<> addDestructor(DestroyFn_t<TResource> const &aDestructor);
 
             /**
              * Create a new resource from a creation request and a human readable
@@ -264,7 +264,7 @@ namespace engine
              * @return                 EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus createResourceImpl(
+            CEngineResult<> createResourceImpl(
                     typename TResource::CCreationRequest const &aRequest,
                     std::string                          const &aResourceId,
                     bool                                        aCreationDeferred = false);
@@ -277,7 +277,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus loadResourceImpl(std::string const &aResourceId);
+            CEngineResult<> loadResourceImpl(std::string const &aResourceId);
 
             /**
              * Update a resource based on the update request provided.
@@ -288,7 +288,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus updateResourceImpl(
+            CEngineResult<> updateResourceImpl(
                     std::string                        const &aResourceId,
                     typename TResource::CUpdateRequest const &aRequest);
 
@@ -300,7 +300,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus unloadResourceImpl(std::string const &aResourceId);
+            CEngineResult<> unloadResourceImpl(std::string const &aResourceId);
 
             /**
              * Destroy a resource, which will also remove it from the resource manager.
@@ -310,7 +310,7 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             template <typename TResource>
-            EEngineStatus destroyResourceImpl(std::string const &aResourceId);
+            CEngineResult<> destroyResourceImpl(std::string const &aResourceId);
 
         private_methods:
             /**
@@ -321,7 +321,7 @@ namespace engine
              * @param aDependencies A list of dependencies of the proxy.
              * @return              EEngineStatus::Ok, if successful. Any error code otherwise.
              */
-            EEngineStatus proxyLoad(
+            CEngineResult<> proxyLoad(
                     CStdSharedPtr_t<IResourceProxyBase>        aProxy,
                     PublicResourceIdList_t              const &aDependencies);
 
@@ -331,7 +331,7 @@ namespace engine
              * @param aProxy The resource tree root proxy object.
              * @return       EEngineStatus::Ok, if successful. Any error code otherwise.
              */
-            EEngineStatus proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy);
+            CEngineResult<> proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy);
 
             /**
              * Return the resource proxy for a provided resource id.
@@ -339,18 +339,17 @@ namespace engine
              * @param aResourceId The resource id of the resource to access.
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
-            SHIRABE_INLINE AnyProxy getResourceProxy(std::string const &aResourceId)
+            SHIRABE_INLINE CEngineResult<AnyProxy> getResourceProxy(std::string const &aResourceId)
             {
-
-                AnyProxy proxy = nullptr;
-
-                OptionalRef_t<AnyProxy> ref = mResources.getResource(aResourceId);
-                if(ref.has_value())
+                CEngineResult<AnyProxy> ref = mResources.getResource(aResourceId);
+                if(ref.successful())
                 {
-                    proxy = ref.value().get();
+                    return { EEngineStatus::Ok, ref.data() };
                 }
-
-                return proxy;
+                else
+                {
+                    return { EEngineStatus::Error };
+                }
             }
 
             /**
@@ -360,7 +359,7 @@ namespace engine
              * @param aProxy      The proxy object of the resource proxied.
              * @return            EEngineStatus::Ok, if successful. Any error code otherwise.
              */
-            SHIRABE_INLINE bool storeResourceProxy(
+            SHIRABE_INLINE CEngineResult<> storeResourceProxy(
                     std::string const &aResourceId,
                     AnyProxy    const &aProxy)
             {
@@ -384,18 +383,20 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::createResource(
+        CEngineResult<> CResourceManagerBase::createResource(
                 typename TResource::CCreationRequest const &aRequest,
                 std::string                          const &aResourceId,
                 bool                                        aCreationDeferred)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mCreatorFunctions.find(typeIndex) == mCreatorFunctions.end())
+            if(mCreatorFunctions.end() == mCreatorFunctions.find(typeIndex))
+            {
                 return EEngineStatus::Error;
+            }
 
             CreatorFn_t<TResource> fn = std::any_cast<CreatorFn_t<TResource>>(mCreatorFunctions[typeIndex]);
 
-            EEngineStatus const status = fn(aRequest, aResourceId, aCreationDeferred);
+            CEngineResult<> const status = fn(aRequest, aResourceId, aCreationDeferred);
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -404,15 +405,17 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::loadResource(std::string const &aResourceId)
+        CEngineResult<> CResourceManagerBase::loadResource(std::string const &aResourceId)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mLoadFunctions.find(typeIndex) == mLoadFunctions.end())
+            if(mLoadFunctions.end() == mLoadFunctions.find(typeIndex))
+            {
                 return EEngineStatus::Error;
+            }
 
             LoadFn_t<TResource> fn = std::any_cast<LoadFn_t<TResource>>(mLoadFunctions[typeIndex]);
 
-            EEngineStatus const status = fn(aResourceId);
+            CEngineResult<> const status = fn(aResourceId);
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -421,17 +424,19 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::updateResource(
+        CEngineResult<> CResourceManagerBase::updateResource(
                 std::string                        const &aResourceId,
                 typename TResource::CUpdateRequest const &aRequest)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mUpdateFunctions.find(typeIndex) == mUpdateFunctions.end())
+            if(mUpdateFunctions.end() == mUpdateFunctions.find(typeIndex))
+            {
                 return EEngineStatus::Error;
+            }
 
             UpdateFn_t<TResource> fn = std::any_cast<UpdateFn_t<TResource>>(mUpdateFunctions[typeIndex]);
 
-            EEngineStatus const status = fn(aResourceId, aRequest);
+            CEngineResult<> const status = fn(aResourceId, aRequest);
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -440,15 +445,17 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::unloadResource(std::string const &aResourceId)
+        CEngineResult<> CResourceManagerBase::unloadResource(std::string const &aResourceId)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mUnloadFunctions.find(typeIndex) == mUnloadFunctions.end())
+            if(mUnloadFunctions.end() == mUnloadFunctions.find(typeIndex))
+            {
                 return EEngineStatus::Error;
+            }
 
             UnloadFn_t<TResource> fn = std::any_cast<UnloadFn_t<TResource>>(mUnloadFunctions[typeIndex]);
 
-            EEngineStatus const status = fn(aResourceId);
+            CEngineResult<> const status = fn(aResourceId);
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -457,15 +464,17 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::destroyResource(std::string const &aResourceId)
+        CEngineResult<> CResourceManagerBase::destroyResource(std::string const &aResourceId)
         {
             std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mDestructorFunctions.find(typeIndex) == mDestructorFunctions.end())
+            if(mDestructorFunctions.end() == mDestructorFunctions.find(typeIndex))
+            {
                 return EEngineStatus::Error;
+            }
 
             DestroyFn_t<TResource> fn = std::any_cast<DestroyFn_t<TResource>>(mDestructorFunctions[typeIndex]);
 
-            EEngineStatus const status = fn(aResourceId);
+            CEngineResult<> const status = fn(aResourceId);
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -474,36 +483,43 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::createResourceImpl(
+        CEngineResult<> CResourceManagerBase::createResourceImpl(
                 typename TResource::CCreationRequest const &aRequest,
                 std::string                          const &aResourceId,
                 bool                                        aCreationDeferred)
         {
             typename TResource::SDescriptor const& desc = aRequest.resourceDescriptor();
 
-            AnyProxy resourceProxy = getResourceProxy(aResourceId);
-            if(!resourceProxy)
+            CEngineResult<AnyProxy> resourceProxyFetch = getResourceProxy(aResourceId);
+            if(not resourceProxyFetch.successful())
             {
-                CStdSharedPtr_t<IResourceProxy<TResource>> proxy
-                        = mProxyFactory->create<TResource>(EProxyType::Dynamic, aRequest);
-                if(!proxy)
-                    HandleEngineStatusError(
+                CStdSharedPtr_t<IResourceProxy<TResource>> proxy = mProxyFactory->create<TResource>(EProxyType::Dynamic, aRequest);
+                if(not proxy)
+                {
+                    EngineStatusPrintOnError(
                                 EEngineStatus::Error,
+                                logTag(),
                                 "Failed to create proxy for resource.");
+                }
 
-                bool const storageSuccessful = storeResourceProxy(aResourceId, AnyProxy(proxy));
-                if(!storageSuccessful)
-                    HandleEngineStatusError(
+                CEngineResult<> storage = storeResourceProxy(aResourceId, AnyProxy(proxy));
+                if(not storage.successful())
+                {
+                    EngineStatusPrintOnError(
                                 EEngineStatus::ResourceManager_ProxyCreationFailed,
+                                logTag(),
                                 "Failed to store resource proxy.");
+                }
             }
 
             // If creation is not deferred, immediately load the resources using the proxy.
-            EEngineStatus const status = loadResource<TResource>(aResourceId);
-            if(!aCreationDeferred)
-                HandleEngineStatusError(status, "Failed to load resource");
+            CEngineResult<> const status = loadResource<TResource>(aResourceId);
+            if(not aCreationDeferred)
+            {
+                EngineStatusPrintOnError(status.result(), logTag(), "Failed to load resource");
+            }
 
-            return EEngineStatus::Ok;
+            return status;
         }
         //<-----------------------------------------------------------------------------
 
@@ -511,16 +527,20 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::loadResourceImpl(std::string const &aResourceId)
+        CEngineResult<> CResourceManagerBase::loadResourceImpl(std::string const &aResourceId)
         {
-            AnyProxy resourceProxy = getResourceProxy(aResourceId);
-            if(!resourceProxy)
-                HandleEngineStatusError(EEngineStatus::Error, "Cannot find resource proxy.");
+            CEngineResult<AnyProxy> resourceProxyFetch = getResourceProxy(aResourceId);
+            if(not resourceProxyFetch.successful())
+            {
+                EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Cannot find resource proxy.");
+            }
 
-            CStdSharedPtr_t<IResourceProxyBase>           baseProxy    = baseProxyCast(resourceProxy);
-            CStdSharedPtr_t<CGenericProxyBase<TResource>> genericProxy = genericProxyBaseCast<TResource>(resourceProxy);
-            if(!genericProxy)
-                HandleEngineStatusError(EEngineStatus::Error, "Proxy is not a GenericResourceProxy");
+            CStdSharedPtr_t<IResourceProxyBase>           baseProxy    = baseProxyCast(resourceProxyFetch.data());
+            CStdSharedPtr_t<CGenericProxyBase<TResource>> genericProxy = genericProxyBaseCast<TResource>(resourceProxyFetch.data());
+            if(not genericProxy)
+            {
+                EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Proxy is not a GenericResourceProxy");
+            }
 
             typename TResource::CCreationRequest const &creator = genericProxy->creationRequest();
             typename TResource::SDescriptor      const &desc    = creator.resourceDescriptor();
@@ -530,25 +550,29 @@ namespace engine
             {
                 for(PublicResourceId_t const &dependencyId : dependencies)
                 {
-                    AnyProxy dependencyProxy = this->getResourceProxy(dependencyId);
-                    if(!dependencyProxy)
-                        // throw EngineException(EEngineStatus::Error, "Dependency not registered.");
+                    CEngineResult<AnyProxy> dependencyProxyFetch = this->getResourceProxy(dependencyId);
+                    if(not dependencyProxyFetch.successful())
+                    {
+                        EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Dependency not registered.");
                         continue;
+                    }
 
-                    CStdSharedPtr_t<IResourceProxyBase> base = baseProxyCast(dependencyProxy);
-                    if(!(ELoadState::LOADED == base->loadState()))
+                    CStdSharedPtr_t<IResourceProxyBase> base = baseProxyCast(dependencyProxyFetch.data());
+                    if(not (ELoadState::LOADED == base->loadState()))
                     {
                         while(ELoadState::LOADING == base->loadState())
+                        {
                             std::this_thread::sleep_for(std::chrono::microseconds(100));
+                        }
 
                         // TODO:
                         //   Even more state handling is required here.. what if the resource is currently being unloaded?
                         //   Or unavailable?
 
-                        PublicResourceIdList_t placeholder={};
-                        EEngineStatus const status = proxyLoad(base, placeholder);
-                        HandleEngineStatusError(
-                                    status,
+                        CEngineResult<> const load = proxyLoad(base, {});
+                        EngineStatusPrintOnError(
+                                    load.result(),
+                                    logTag(),
                                     "Failed to load dependency proxy underlying resource.");
 
                         // Recheck for availability?
@@ -558,15 +582,17 @@ namespace engine
                 }
             }
 
-            if(!(ELoadState::LOADED == baseProxy->loadState()))
+            if(not (ELoadState::LOADED == baseProxy->loadState()))
             {
                 while(ELoadState::LOADING == baseProxy->loadState())
+                {
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
+                }
 
                 if(ELoadState::LOADED != baseProxy->loadState())
                 {
-                    EEngineStatus const status = proxyLoad(baseProxy, dependencies);
-                    HandleEngineStatusError(status, "Failed to load resource proxy ");
+                    CEngineResult<> const load = proxyLoad(baseProxy, dependencies);
+                    EngineStatusPrintOnError(load.result(), logTag(), "Failed to load resource proxy ");
                 }
             }
 
@@ -578,7 +604,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::updateResourceImpl(
+        CEngineResult<> CResourceManagerBase::updateResourceImpl(
                 std::string                        const &aResourceId,
                 typename TResource::CUpdateRequest const &aRequest)
         {
@@ -590,19 +616,23 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::unloadResourceImpl(std::string const &aResourceId)
+        CEngineResult<> CResourceManagerBase::unloadResourceImpl(std::string const &aResourceId)
         {
-            AnyProxy resourceProxy = getResourceProxy(aResourceId);
-            if(!resourceProxy)
-                HandleEngineStatusError(EEngineStatus::Error, "Cannot find resource proxy.");
+            CEngineResult<AnyProxy> resourceProxyFetch = getResourceProxy(aResourceId);
+            if(not resourceProxyFetch.successful())
+            {
+                EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Cannot find resource proxy.");
+            }
 
-            CStdSharedPtr_t<IResourceProxyBase> &base = baseProxyCast(resourceProxy);
+            CStdSharedPtr_t<IResourceProxyBase> &base = baseProxyCast(resourceProxyFetch.data());
 
             // TODO: Unload all dependers if available...
-            EEngineStatus const status = proxyUnload(base);
-            HandleEngineStatusError(
-                        status,
+            CEngineResult<> const status = proxyUnload(base);
+            EngineStatusPrintOnError(
+                        status.result(),
+                        logTag(),
                         CString::format("Failed to unload proxy resource in backend (Id: %0).", aResourceId));
+
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -611,43 +641,71 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CResourceManagerBase::destroyResourceImpl(std::string const &aResourceId)
+        CEngineResult<> CResourceManagerBase::destroyResourceImpl(std::string const &aResourceId)
         {
-            EEngineStatus status = EEngineStatus::Ok;
+            CEngineResult<> unload = EEngineStatus::Ok;
 
             auto const eraseFn
-                    = [&, this] () -> EEngineStatus
+                    = [&, this] () -> CEngineResult<>
             {
-                bool const resourceRemoved = mResources.removeResource(aResourceId);
-                if(!resourceRemoved)
-                    return HandleEngineStatusError(EEngineStatus::Error, "Failed to remove resource from internal registry.");
+                CEngineResult<> const removal = mResources.removeResource(aResourceId);
+                if(not removal.successful())
+                {
+                    EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Failed to remove resource from internal registry.");
 
-                return EEngineStatus::Ok;
+                    return { EEngineStatus::Error };
+
+                }
+
+                return { EEngineStatus::Ok };
             };
 
             try
             {
-                status = unloadResource<TResource>(aResourceId);
-                status = eraseFn();
-            }
-            catch(CEngineException ee)
-            {
-                CLog::Error(logTag(), CString::format("Error while trying to destroy a resource in the resource manager. Error: %0, Code: %1", ee.message(), ee.status()));
-                eraseFn();
+                unload = unloadResource<TResource>(aResourceId);
+                unload = eraseFn();
             }
             catch(std::exception e)
             {
-                CLog::Error(logTag(), CString::format("Error while trying to destroy a resource in the resource manager. Error: %0", e.what()));
-                eraseFn();
+                CLog::Error(logTag(), CString::format("Error while trying to destroy a resource in the resource manager. Error: %0", e.what()));                
+                unload = eraseFn();
             }
             catch(...)
             {
-                CLog::Error(logTag(), CString::format("Unknown Error while trying to destroy a resource in the resource manager."));
-                eraseFn();
+                CLog::Error(logTag(), CString::format("Unknown Error while trying to destroy a resource in the resource manager."));                
+                unload = eraseFn();
             }
 
             // Any further verification, e.g. with the backend to ensure proper deletion?
-            return status;
+            return unload;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TResource, typename TFunction>
+        CEngineResult<> addFunctor(TFunction const &aFunction, Map<std::type_index, Any_t> &aRegistry)
+        {
+            std::type_index const typeIndex = std::type_index(typeid(TResource));
+            if(aRegistry.end() != aRegistry.find(typeIndex))
+            {
+                return { EEngineStatus::Error };
+            }
+
+            aRegistry[typeIndex] = aFunction;
+            return { EEngineStatus::Ok };
+        }
+
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TResource>
+        CEngineResult<> CResourceManagerBase::addCreator(CreatorFn_t<TResource> const &aFunction)
+        {
+            return addFunctor<TResource, CreatorFn_t<TResource>>(aFunction, mCreatorFunctions);
         }
         //<-----------------------------------------------------------------------------
 
@@ -655,14 +713,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        bool CResourceManagerBase::addCreator(CreatorFn_t<TResource> const &aFunction)
+        CEngineResult<> CResourceManagerBase::addLoader(LoadFn_t<TResource> const &aFunction)
         {
-            std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mCreatorFunctions.find(typeIndex) != mCreatorFunctions.end())
-                return false;
-
-            mCreatorFunctions[typeIndex] = aFunction;
-            return true;
+            return addFunctor<TResource, LoadFn_t<TResource>>(aFunction, mLoadFunctions);
         }
         //<-----------------------------------------------------------------------------
 
@@ -670,14 +723,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        bool CResourceManagerBase::addLoader(LoadFn_t<TResource> const &aFunction)
+        CEngineResult<> CResourceManagerBase::addUpdater(UpdateFn_t<TResource> const &aFunction)
         {
-            std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mLoadFunctions.find(typeIndex) != mLoadFunctions.end())
-                return false;
-
-            mLoadFunctions[typeIndex] = aFunction;
-            return true;
+            return addFunctor<TResource, UpdateFn_t<TResource>>(aFunction, mUpdateFunctions);
         }
         //<-----------------------------------------------------------------------------
 
@@ -685,14 +733,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        bool CResourceManagerBase::addUpdater(UpdateFn_t<TResource> const &aFunction)
-        {
-            std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mUpdateFunctions.find(typeIndex) != mUpdateFunctions.end())
-                return false;
-
-            mUpdateFunctions[typeIndex] = aFunction;
-            return true;
+        CEngineResult<> CResourceManagerBase::addUnloader(LoadFn_t<TResource> const &aFunction)
+        {            
+            return addFunctor<TResource, LoadFn_t<TResource>>(aFunction, mUnloadFunctions);
         }
         //<-----------------------------------------------------------------------------
 
@@ -700,29 +743,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        bool CResourceManagerBase::addUnloader(LoadFn_t<TResource> const &aFunction)
+        CEngineResult<> CResourceManagerBase::addDestructor(DestroyFn_t<TResource> const &aFunction)
         {
-            std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mUnloadFunctions.find(typeIndex) != mUnloadFunctions.end())
-                return false;
-
-            mUnloadFunctions[typeIndex] = aFunction;
-            return true;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename TResource>
-        bool CResourceManagerBase::addDestructor(DestroyFn_t<TResource> const &aFunction)
-        {
-            std::type_index const typeIndex = std::type_index(typeid(TResource));
-            if(mDestructorFunctions.find(typeIndex) != mDestructorFunctions.end())
-                return false;
-
-            mDestructorFunctions[typeIndex] = aFunction;
-            return true;
+            return addFunctor<TResource, DestroyFn_t<TResource>>(aFunction, mDestructorFunctions);
         }
         //<-----------------------------------------------------------------------------
     }

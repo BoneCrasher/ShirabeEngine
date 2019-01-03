@@ -108,7 +108,7 @@ namespace engine
                   EEngineStatus status = m_resourceManager->createTexture(request, pid);
                   HandleEngineStatusError(status, "Failed to create asset resource instance in resource manager.");
             */
-            return CEngineResult(EEngineStatus::Ok, data);
+            return CEngineResult<ByteBuffer>(EEngineStatus::Ok, data);
         }
         //<-----------------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ namespace engine
 
             stbi_image_free(stbuc);
 
-            return CEngineResult(EEngineStatus::Ok, image);
+            return CEngineResult<SImage>(EEngineStatus::Ok, image);
         }
         //<-----------------------------------------------------------------------------
 
@@ -143,7 +143,7 @@ namespace engine
             // Will check cache and download from server if necessary
             CEngineResult<SImage> image = loadImageFromFile(aAsset.URI);
 
-            return CEngineResult(EEngineStatus::Ok, image.data().data);
+            return CEngineResult<ByteBuffer>(EEngineStatus::Ok, image.data().data);
         }
         //<-----------------------------------------------------------------------------
 

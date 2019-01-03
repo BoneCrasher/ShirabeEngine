@@ -55,14 +55,14 @@ namespace engine
              * @param aResolvedDependencies A collection of dependencies of the resource to be loaded.
              * @return                      EEngineStatus::Ok, if successful. An error flag otherwise.
              */
-            EEngineStatus loadSync(PublicResourceIdList_t const &aResolvedDependencies);
+            CEngineResult<> loadSync(PublicResourceIdList_t const &aResolvedDependencies);
 
             /**
              * Unload the proxied resource from the graphics API backend.
              *
              * @return EEngineStatus::Ok, if successful. An error flag otherwise.
              */
-            EEngineStatus unloadSync();
+            CEngineResult<> unloadSync();
 
             /**
              * Return the attached destruction request, if any.
@@ -110,29 +110,28 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CGFXAPIResourceProxy<TResource>::loadSync(PublicResourceIdList_t const &aResolvedDependencies)
+        CEngineResult<> CGFXAPIResourceProxy<TResource>::loadSync(PublicResourceIdList_t const &aResolvedDependencies)
         {
             this->setLoadState(ELoadState::LOADING);
-
-            EEngineStatus status = EEngineStatus::Ok;
 
             typename TResource::CCreationRequest const &creationRequest = static_cast<CGenericProxyBase<TResource>*>(this)->creationRequest();
             typename TResource::SDescriptor      const &rd              = creationRequest.resourceDescriptor();
 
-            status = this->resourceBackend()->template load<TResource>(creationRequest, aResolvedDependencies, ETaskSynchronization::Sync, nullptr);
-            if(CheckEngineError(status))
+            CEngineResult<> load = this->resourceBackend()->template load<TResource>(creationRequest, aResolvedDependencies, ETaskSynchronization::Sync, nullptr);
+            if(not load.successful())
             {
                 // MBT TODO: Consider distinguishing the above returned status a little more in
                 //           order to reflect UNLOADED or UNAVAILABLE state.
                 this->setLoadState(ELoadState::UNLOADED);
 
-                HandleEngineStatusError(EEngineStatus::GFXAPI_LoadResourceFailed, CString::format("Failed to load GFXAPI resource '%0'", rd.name));
+                load = { EEngineStatus::GFXAPI_LoadResourceFailed };
+                EngineStatusPrintOnError(load.result(), logTag(), CString::format("Failed to load GFXAPI resource '%0'", rd.name));
             }
 
             this->setDestructionRequest(typename TResource::CDestructionRequest(rd.name));
             this->setLoadState(ELoadState::LOADED);
 
-            return EEngineStatus::Ok;
+            return load;
         }
         //<-----------------------------------------------------------------------------
 
@@ -140,20 +139,21 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CGFXAPIResourceProxy<TResource>::unloadSync()
+        CEngineResult<> CGFXAPIResourceProxy<TResource>::unloadSync()
         {
-            EEngineStatus status = EEngineStatus::Ok;
-            status = this->resourceBackend()->template unload<TResource>(typename TResource::CDestructionRequest(this->destructionRequest()));
+            CEngineResult<> unload = this->resourceBackend()->template unload<TResource>(typename TResource::CDestructionRequest(this->destructionRequest()));
 
-            if(CheckEngineError(status)) {
+            if(not unload.successful())
+            {
                 this->setLoadState(ELoadState::UNKNOWN);
 
-                HandleEngineStatusError(EEngineStatus::GFXAPI_UnloadResourceFailed, CString::format("Failed to unload GFXAPI resource '%0'", ""));
+                unload = { EEngineStatus::GFXAPI_UnloadResourceFailed };
+                EngineStatusPrintOnError(unload.result(), logTag(), CString::format("Failed to unload GFXAPI resource '%0'", ""));
             }
 
             this->setLoadState(ELoadState::UNLOADED);
 
-            return EEngineStatus::Ok;
+            return unload;
         }
         //<-----------------------------------------------------------------------------
     }

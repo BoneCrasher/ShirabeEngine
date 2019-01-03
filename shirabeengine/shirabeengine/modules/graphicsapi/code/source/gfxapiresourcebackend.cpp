@@ -7,8 +7,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CGFXAPIResourceBackend
-        ::CGFXAPIResourceBackend()
+        CGFXAPIResourceBackend::CGFXAPIResourceBackend()
             : mResourceThread()
             , mResourceThreadHandler(mResourceThread.getHandler())
         {}
@@ -17,30 +16,31 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGFXAPIResourceBackend
-        ::initialize()
+        CEngineResult<> CGFXAPIResourceBackend::initialize()
         {
             // Do not catch those as it will prevent all iteration.
             bool const initialized = mResourceThread.initialize();
-            if(!initialized)
+            if(not initialized)
             {
-                throw CEngineException(EEngineStatus::Error, "Cannot initialize resource backend thread.");
+                EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Cannot initialize resource backend thread.");
+                return { EEngineStatus::Error };
             }
 
             bool const ran = mResourceThread.run();
-            if(!ran)
+            if(not ran)
             {
-                throw CEngineException(EEngineStatus::Error, "Cannot run resource backend thread.");
+                EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Cannot run resource backend thread.");
+                return { EEngineStatus::Error };
             }
 
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGFXAPIResourceBackend::deinitialize()
+        CEngineResult<> CGFXAPIResourceBackend::deinitialize()
         {
             if(mResourceThread.running())
             {
@@ -48,33 +48,33 @@ namespace engine
             }
 
             bool const deinitialized = mResourceThread.deinitialize();
-            return deinitialized;
+            return ( deinitialized ? EEngineStatus::Ok : EEngineStatus::Error );
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CGFXAPIResourceBackend::registerResource(
+        CEngineResult<> CGFXAPIResourceBackend::registerResource(
                 PublicResourceId_t    const &aId,
                 CStdSharedPtr_t<void> const &aResource,
                 EImportStorageMode    const &aImportStorageMode)
         {
-            bool const alreadyRegistered = (mStorage.find(aId) != mStorage.end());
+            bool const alreadyRegistered = (mStorage.end() != mStorage.find(aId));
             if(alreadyRegistered && (EImportStorageMode::NoOverwrite == aImportStorageMode))
             {
-                return EEngineStatus::Error;
+                return { EEngineStatus::Error };
             }
 
             mStorage[aId] = aResource;
-            return EEngineStatus::Ok;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CGFXAPIResourceBackend::enqueue(
+        CEngineResult<> CGFXAPIResourceBackend::enqueue(
                 ResourceTaskFn_t                           &aTask,
                 std::future<ResourceTaskFn_t::result_type> &aOutSharedFuture)
         {
@@ -85,10 +85,11 @@ namespace engine
             looperTask.setPriority(ETaskPriority::Normal);
 
             looperTaskFuture = looperTask.bind(aTask);
-            aOutSharedFuture  = std::move(looperTaskFuture);
+            aOutSharedFuture = std::move(looperTaskFuture);
 
             bool          const enqueued = mResourceThreadHandler.post(std::move(looperTask));
             EEngineStatus const status   = (enqueued ? EEngineStatus::Ok : EEngineStatus::GFXAPI_SubsystemThreadEnqueueFailed);
+
             return status;
         }
         //<-----------------------------------------------------------------------------
@@ -96,11 +97,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CGFXAPIResourceBackend::setResourceTaskBackend(CStdSharedPtr_t<ResourceTaskBackend_t> const &aBackend)
+        CEngineResult<> CGFXAPIResourceBackend::setResourceTaskBackend(CStdSharedPtr_t<ResourceTaskBackend_t> const &aBackend)
         {
-            assert(aBackend != nullptr);
-
-            mResourceTaskBackend = aBackend;
+            if(nullptr == aBackend)
+            {
+                return EEngineStatus::Error;
+            }
+            else
+            {
+                mResourceTaskBackend = aBackend;
+                return EEngineStatus::Ok;
+            }
         }
         //<-----------------------------------------------------------------------------
     }

@@ -90,17 +90,19 @@ namespace engine
              * Initialize the resource task backend, which will create and start
              * a separate resource operation thread.
              *
-             * @return True, if initialized successfully. False otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
-            bool initialize();
+            CEngineResult<> initialize();
             /**
              * Deinitialize the resource task backend, stopping the resource
              * operation thread and joining it.
              * All resource will be removed beforehand.
              *
-             * @return True, if successful. False, otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
-            bool deinitialize();
+            CEngineResult<> deinitialize();
 
             /**
              * Create/Load a specific resource specified by its creation request
@@ -110,10 +112,11 @@ namespace engine
              * @param aDependencies Dependency UIDs of the resource required for resource creation.
              * @param aSyncMode     Async/Sync creation?
              * @param aCallback     Callback to be invoked on successful resource creation.
-             * @return              EEngineStatus::Ok, if successful. An error code otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
             template <typename TResource>
-            EEngineStatus load(
+            CEngineResult<> load(
                     typename TResource::CCreationRequest const &aRequest,
                     PublicResourceIdList_t               const &aDependencies,
                     ETaskSynchronization                 const &aSyncMode,
@@ -123,10 +126,11 @@ namespace engine
              * Unload a specific resource specified by its destruction request.
              *
              * @param aRequest The destruction request used to destroy the resource.
-             * @return         EEngineStatus::Ok, if successful. An error code otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
             template <typename TResource>
-            EEngineStatus unload(
+            CEngineResult<> unload(
                     typename TResource::CDestructionRequest const &aRequest);
 
             /**
@@ -134,9 +138,10 @@ namespace engine
              *
              * @param aId       The resource id of the resource.
              * @param aResource The resource to be registered.
-             * @return          EEngineStatus::Ok, if successful. An error code otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
-            EEngineStatus registerResource(
+            CEngineResult<> registerResource(
                     PublicResourceId_t    const &aId,
                     CStdSharedPtr_t<void> const &aResource,
                     EImportStorageMode    const &aImportStorageMode = EImportStorageMode::NoOverwrite);
@@ -147,7 +152,7 @@ namespace engine
              *
              * @param aBackend The backend pointer. Musn't be nullptr.
              */
-            void setResourceTaskBackend(CStdSharedPtr_t<ResourceTaskBackend_t> const &aBackend);
+            CEngineResult<> setResourceTaskBackend(CStdSharedPtr_t<ResourceTaskBackend_t> const &aBackend);
 
         private_methods:
             /**
@@ -156,10 +161,11 @@ namespace engine
              * @param aRequest              Creation request used to create the resource.
              * @param aResolvedDependencies Dependency UIDs required to create the resource/
              * @param aOutHandle            The result of an async/sync resource operation.
-             * @return                      EEngineStatus::Ok if successful. An error code otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
             template <typename TResource>
-            EEngineStatus loadImpl(
+            CEngineResult<> loadImpl(
                     typename TResource::CCreationRequest const &aRequest,
                     ResolvedDependencyCollection_t       const &aResolvedDependencies,
                     SDeferredResourceOperationHandle           &aOutHandle);
@@ -172,10 +178,11 @@ namespace engine
              *                              unload operation.
              * @param aResolvedDependencies Dependency UIDs required to create the resource/
              * @param aOutHandle            The result of an async/sync resource operation.
-             * @return                      EEngineStatus::Ok if successful. An error code otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
             template <typename TResource>
-            EEngineStatus unloadImpl(
+            CEngineResult<> unloadImpl(
                     typename TResource::CDestructionRequest const &aRequest,
                     SGFXAPIResourceHandleAssignment         const &aAssignment,
                     ResolvedDependencyCollection_t          const &aResolvedDependencies,
@@ -186,9 +193,10 @@ namespace engine
              *
              * @param aTask            The task to be enqueued.
              * @param aOutSharedFuture The future handle for the tasks to fetch the results.
-             * @return                 EEngineStatus::Ok, if successful. An error code otherwise.
+             * @return A result containing EEngineStatus::Ok, if successful.
+             * @return A result containing an EEngineStatus error value on error.
              */
-            EEngineStatus enqueue(
+            CEngineResult<> enqueue(
                     ResourceTaskFn_t                           &aTask,
                     std::future<ResourceTaskFn_t::result_type> &aOutSharedFuture);
 
@@ -204,7 +212,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CGFXAPIResourceBackend::load(
+        CEngineResult<> CGFXAPIResourceBackend::load(
                 typename TResource::CCreationRequest const &aRequest,
                 PublicResourceIdList_t               const &aDependencies,
                 ETaskSynchronization                 const &aSyncMode,
@@ -225,7 +233,7 @@ namespace engine
             try
             {
                 status = loadImpl<TResource>(aRequest, resolvedDependencies, handle);
-                if(!CheckEngineError(status))
+                if(not CheckEngineError(status))
                 {
                     switch(aSyncMode)
                     {
@@ -249,24 +257,24 @@ namespace engine
                     }
                 }
 
-                HandleEngineStatusError(status, CString::format("Failed to create and/or enqueue resource creation task."));
+                return CEngineResult<>(status);
             }
             catch(std::future_error const &fe)
             {
                 CLog::Error(logTag(), CString::format("Failed to access future shared state. Error: %0", fe.what()));
+                return CEngineResult<>(EEngineStatus::Error);
             }
-#if 1 // defined SHIRABE_DEBUG // In Release-Mode, all other exceptions need to be reported.
             catch(std::exception const &e)
             {
                 CLog::Error(logTag(), CString::format("Error while trying to request a task result in the resource backend. Error: %0", e.what()));
+                return CEngineResult<>(EEngineStatus::Error);
 
             }
             catch(...)
             {
                 CLog::Error(logTag(), CString::format("Unknown error while trying to request a task result in the resource backend."));
-
+                return CEngineResult<>(EEngineStatus::Error);
             }
-#endif
 
             return status;
         }
@@ -276,7 +284,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CGFXAPIResourceBackend::unload(
+        CEngineResult<> CGFXAPIResourceBackend::unload(
                 typename TResource::CDestructionRequest const &aRequest)
         {
             ResourceTaskFn_t::result_type    resourceHandle       ={};
@@ -296,7 +304,7 @@ namespace engine
                             resolvedDependencies,
                             handle);
 
-                if(!CheckEngineError(status))
+                if(not CheckEngineError(status))
                 {
                     resourceHandle = handle.futureHandle.get(); // Wait for it ALWAYS!
                     mStorage.erase(resourceHandle.publicResourceHandle);
@@ -308,8 +316,8 @@ namespace engine
                 CLog::Error(logTag(), CString::format("Failed to access future shared state. Error: %0", fe.what()));
             }
 
-            HandleEngineStatusError(status, CString::format("Failed to create and/or enqueue resource destruction task."));
-            return status;
+            EngineStatusPrintOnError(status, logTag(), CString::format("Failed to create and/or enqueue resource destruction task."));
+            return CEngineResult<>(status);
         }
         //<-----------------------------------------------------------------------------
 
@@ -317,7 +325,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CGFXAPIResourceBackend::loadImpl(
+        CEngineResult<> CGFXAPIResourceBackend::loadImpl(
                 typename TResource::CCreationRequest const &aRequest,
                 ResolvedDependencyCollection_t       const &aResolvedDependencies,
                 SDeferredResourceOperationHandle           &aOutHandle)
@@ -328,20 +336,20 @@ namespace engine
             if(CheckEngineError(status))
             {
                 CLog::Error(logTag(), CString::format("Failed to create build task for resource '%0'", "..."));
-                return status;
+                return { status };
             }
 
             std::future<ResourceTaskFn_t::result_type> future{};
-            status = enqueue(task, future);
-            if(CheckEngineError(status))
+            CEngineResult<> enqueueing = enqueue(task, future);
+            if(not enqueueing.successful())
             {
                 CLog::Error(logTag(), CString::format("Failed to enqueue resource creation task for resource '%0'", "..."));
-                return status;
+                return enqueueing;
             }
 
             aOutHandle.futureHandle = std::move(future);
 
-            return status;
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -349,7 +357,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        EEngineStatus CGFXAPIResourceBackend::unloadImpl(
+        CEngineResult<> CGFXAPIResourceBackend::unloadImpl(
                 typename TResource::CDestructionRequest const &aRequest,
                 SGFXAPIResourceHandleAssignment         const &aAssignment,
                 ResolvedDependencyCollection_t          const &aResolvedDependencies,
@@ -365,16 +373,16 @@ namespace engine
             }
 
             std::future<ResourceTaskFn_t::result_type> future;
-            status = enqueue(task, future);
-            if(CheckEngineError(status))
+            CEngineResult<> enqueueing = enqueue(task, future);
+            if(not enqueueing.successful())
             {
                 CLog::Error(logTag(), CString::format("Failed to enqueue resource creation task for resource '%0'", "..."));
-                return status;
+                return enqueueing;
             }
 
             aOutHandle.futureHandle = std::move(future);
 
-            return status;
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
     }

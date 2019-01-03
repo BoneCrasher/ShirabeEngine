@@ -25,7 +25,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CResourceManagerBase::initialize()
+        CEngineResult<> CResourceManagerBase::initialize()
         {
             return EEngineStatus::Ok;
         }
@@ -34,7 +34,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CResourceManagerBase::deinitialize()
+        CEngineResult<> CResourceManagerBase::deinitialize()
         {
             return EEngineStatus::Ok;
         }
@@ -43,7 +43,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CResourceManagerBase::clear()
+        CEngineResult<> CResourceManagerBase::clear()
         {
             mCreatorFunctions.clear();
             mLoadFunctions.clear();
@@ -51,36 +51,34 @@ namespace engine
             mUnloadFunctions.clear();
             mDestructorFunctions.clear();
 
-
-
-            return true;
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CResourceManagerBase::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> proxy, PublicResourceIdList_t const&dependencies)
+        CEngineResult<> CResourceManagerBase::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> aProxy, PublicResourceIdList_t const &aDependencies)
         {
-            EEngineStatus const status = proxy->loadSync(dependencies);
+            EEngineStatus const status = aProxy->loadSync(aDependencies);
             std::string   const msg    = "Failed to load underlying resource of resource proxy.";
-            HandleEngineStatusError(status, msg);
 
-            return status;
+            EngineStatusPrintOnError(status, logTag(), msg);
+
+            return { status };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CResourceManagerBase
-        ::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy)
+        CEngineResult<> CResourceManagerBase::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy)
         {
             EEngineStatus const status = aProxy->unloadSync();
 
-            HandleEngineStatusError(status, "Failed to unload underlying resource of resource proxy.");
+            EngineStatusPrintOnError(status, logTag(), "Failed to unload underlying resource of resource proxy.");
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
     }

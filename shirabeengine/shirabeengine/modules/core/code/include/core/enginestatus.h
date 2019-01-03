@@ -97,37 +97,33 @@ namespace engine
      */
     bool CheckEngineError(EEngineStatus const &aStatus);
 
+    SHIRABE_INLINE static void EngineStatusPrintOnError(EEngineStatus const &aStatus, std::string const &aLogTag, std::string const &aMessage)
+    {
+        bool const error = CheckEngineError(aStatus);
+        if(error)
+        {
+            CLog::Error(aLogTag, aMessage);
+        }
+    }
+
     /**
      * The CEngineResult class is a SResult implementation to return result tuples of
      * result type EEngineStatus.
      */
-    template <typename TData = void*>
+    template <typename TData = void>
     class CEngineResult
         : public AResult<EEngineStatus, TData>
     {
     public_constructors:
-        /**
-         * Create an empty result from a result code.
-         *
-         * @param aResult
-         */
-        CEngineResult(EEngineStatus const &aResult)
-            : AResult<EEngineStatus, TData>(aResult)
-        {}
-
-        /**
-         * Create a result from result code and data.
-         *
-         * @param aResult
-         * @param aData
-         */
-        CEngineResult(
-                EEngineStatus const &aResult,
-                TData         const &aData)
-            : AResult<EEngineStatus, TData>(aResult, aData)
-        {}
+        // Reuse the base class constructors.
+        using AResult<EEngineStatus, TData>::AResult;
 
     public_methods:
+        /**
+         * Evaluate, whether the result contains a successful result code.
+         *
+         * @return See brief.
+         */
         bool successful() const {
             bool const success = not CheckEngineError(AResult<EEngineStatus, TData>::result());
             return success;
@@ -135,41 +131,12 @@ namespace engine
     };
 
     /**
-     * @brief The EngineException class
+     * Print out an EEngineStatus value to an ostream.
+     *
+     * @param aStream
+     * @param aStatus
+     * @return
      */
-    class SHIRABE_LIBRARY_EXPORT CEngineException
-            : public std::runtime_error
-    {
-    public:
-        /**
-         * @brief CEngineException
-         * @param aStatus
-         * @param aMessage
-         */
-        CEngineException(
-                EEngineStatus const &aStatus,
-                std::string   const &aMessage);
-
-        /**
-         * @brief status
-         * @return
-         */
-        EEngineStatus const &status() const;
-
-        /**
-         * @brief message
-         * @return
-         */
-        std::string const message() const;
-
-    private_members:
-        EEngineStatus mStatus;
-    };
-
-    SHIRABE_LIBRARY_EXPORT EEngineStatus HandleEngineStatusError(
-            EEngineStatus const &aStatus,
-            std::string   const &aMessage);
-
     std::ostream& operator<<(std::ostream &aStream, EEngineStatus const &aStatus);
 }
 

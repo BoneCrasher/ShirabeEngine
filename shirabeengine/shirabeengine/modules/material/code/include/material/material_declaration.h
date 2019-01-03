@@ -208,7 +208,7 @@ namespace engine
             uint8_t   const *const data       = (mData.data() + location.offset);
             TDataType const *const bufferData = reinterpret_cast<TDataType const *>(data);
 
-            return CEngineResult(EEngineStatus::Error, bufferData);
+            return CEngineResult<TDataType const *>(EEngineStatus::Error, bufferData);
         }
         //<-----------------------------------------------------------------------------
 
@@ -237,7 +237,7 @@ namespace engine
             bool const has = hasBuffer(aBufferName);
             if(not has)
             {
-                return CEngineResult(EEngineStatus::Error, nullptr);
+                return CEngineResult<TBufferType const*>(EEngineStatus::Error, nullptr);
             }
 
             SBufferData     const &buffer = mBufferIndex.at(aBufferName);

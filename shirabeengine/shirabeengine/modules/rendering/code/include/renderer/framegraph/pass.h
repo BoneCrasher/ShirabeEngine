@@ -210,8 +210,8 @@ namespace engine
              * @return                     True, if successful. False otherwise.
              */
             virtual bool execute(
-                    CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) = 0;
+                    CFrameGraphResources                      const &aFrameGraphResources,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aContext) = 0;
 
         private_methods:
             /**
@@ -350,16 +350,14 @@ namespace engine
             {
                 return mExecCallback(mPassData, aFrameGraphResources, aContext);
             }
-            catch(CEngineException const &ee)
-            {
-                CLog::Error(logTag(), ee.message());
-            }
             catch(std::runtime_error const &e)
             {
                 CLog::Error(logTag(), e.what());
+                return false;
             }
             catch(...)
             {
+                CLog::Error(logTag(), "Unknown error while executing pass.");
                 return false;
             }
         }
