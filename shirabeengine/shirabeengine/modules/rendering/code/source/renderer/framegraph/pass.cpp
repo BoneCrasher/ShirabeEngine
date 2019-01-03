@@ -42,7 +42,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CPassBase::CMutableAccessor::registerResource(FrameGraphResourceId_t const &aResourceUID)
+        CEngineResult<> CPassBase::CMutableAccessor::registerResource(FrameGraphResourceId_t const &aResourceUID)
         {
             return mPass->registerResource(aResourceUID);
         }
@@ -53,7 +53,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const
         {
-            return std::move(CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this)));
+            SHIRABE_UNUSED(aPassKey);
+
+            return CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
@@ -62,7 +64,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CStdUniquePtr_t<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey)
         {
-            return std::move(CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this)));
+            SHIRABE_UNUSED(aPassKey);
+
+            return CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
@@ -71,7 +75,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CPassBuilder> &&aPassKey) const
         {
-            return std::move(CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this)));
+            SHIRABE_UNUSED(aPassKey);
+
+            return CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
@@ -80,7 +86,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CStdUniquePtr_t<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey)
         {
-            return std::move(CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this)));
+            SHIRABE_UNUSED(aPassKey);
+
+            return CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
@@ -89,7 +97,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraph> &&aPassKey) const
         {
-            return std::move(CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this)));
+            SHIRABE_UNUSED(aPassKey);
+
+            return CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
@@ -147,10 +157,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CPassBase::registerResource(FrameGraphResourceId_t const &aResourceUID)
+        CEngineResult<> CPassBase::registerResource(FrameGraphResourceId_t const &aResourceUID)
         {
             mResourceReferences.push_back(aResourceUID);
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
     }
