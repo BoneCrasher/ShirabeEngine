@@ -24,22 +24,33 @@ namespace engine
     {
         Ok                                                              =       0,
         Error                                                           =      -1,  // Non-specific issues
-        NullPointer                                                     =     -50,  // General parameter issues
-        OutOfBounds                                                     =     -51,
+        NullPointer                                                     =     -26,  // General parameter issues
+        OutOfBounds                                                     =     -51,  // Array/Vector
         CollectionOperationException                                    =     -70,  // Collection issues
         CollectionInsertException                                       =     -71,
         CollectionEraseException                                        =     -72,
         ObjectAlreadyAddedToCollection                                  =     -80,
         ObjectNotAddedToCollection                                      =     -81,
-        FileNotFound                                                    =    -100, // Filesystem and handles
-        EngineComponentInitializationError                              =    -200, // Engine component issues
-        EngineComponentUpdateError                                      =    -201,
-        EngineComponentDeinitializationError                            =    -202,
-        WindowCreationError                                             =    -250, // Window issues
-        WindowMessageHandlerError                                       =    -251,
-        WindowEventError                                                =    -252,
+        FileNotFound                                                    =    -101, // Filesystem and handles
+        CreationError                                                   =    -201,
+        InitializationError                                             =    -202, // Lifecycle
+        UpdateError                                                     =    -203,
+        DeinitializationError                                           =    -204,
+        DestructionError                                                =    -205,
+        ResourceError_CreationFailed                                    =    -251,
+        ResourceError_AlreadyCreated                                    =    -252,
+        ResourceError_NotFound                                          =    -253,
+        ResourceError_LoadFailed                                        =    -254,
+        ResourceError_UnloadFailed                                      =    -255,
+        ResourceError_DestructionFailed                                 =    -256,
+        ResourceError_ResourceInvalid                                   =    -257,
+        WindowCreationError                                             =    -351, // Window issues
+        WindowMessageHandlerError                                       =    -352,
+        WindowEventError                                                =    -353,
         ResourceManager_Generic                                         =   -1000, // ResourceManager
         ResourceManager_ResourceAlreadyCreated                          =   -1001,
+        ResourceManager_ResourceNotFound                                =   -1002,
+        ResourceManager_ProxyNotFound                                   =   -1003,
         ResourceManager_ProxyCreationFailed                             =   -1010,
         ResourceManager_RootProxyFetchFailed                            =   -1050,
         ResourceManager_BaseProxyCastFailed                             =   -1051, // ResourceManager::Proxy
@@ -86,8 +97,15 @@ namespace engine
         Timer_PlatformTimeConversionConstantFetchFailed                 = -300052,
         Timer_PlatformTimestampFetchFailed                              = -300053,
         Time_Win32__QueryPerformanceFrequencyFailed                     = -300101,
-        Time_Win32__QueryPerformanceCounterFailed                       = -300102
-
+        Time_Win32__QueryPerformanceCounterFailed                       = -300102,
+        FrameGraph_Generic                                              = -500001,
+        FrameGraph_PassBuilder_TextureIsBeingRead                       = -500101,
+        FrameGraph_PassBuilder_TextureIsBeingWritten                    = -500102,
+        FrameGraph_PassBuilder_DuplicateTextureViewId                   = -500103,
+        FrameGraph_PassBuilder_ForwardResourceFailed                    = -500104,
+        FrameGraph_PassBuilder_AcceptResourceFailed                     = -500105,
+        FrameGraph_PassBuilder_ReadResourceFailed                       = -500106,
+        FrameGraph_PassBuilder_WriteResourceFailed                      = -500107,
     };
 
     /**
@@ -124,9 +142,22 @@ namespace engine
          *
          * @return See brief.
          */
-        bool successful() const {
+        SHIRABE_INLINE bool successful() const
+        {
             bool const success = not CheckEngineError(AResult<EEngineStatus, TData>::result());
             return success;
+        }
+
+        /**
+         * Check, whether the stored result equals the result being provided as the argument.
+         *
+         * @param aOtherStatus
+         * @return
+         */
+        SHIRABE_INLINE bool resultEquals(EEngineStatus const &aOtherStatus) const
+        {
+            bool const equal = (AResult<EEngineStatus, TData>::result() == aOtherStatus);
+            return equal;
         }
     };
 

@@ -17,7 +17,8 @@ namespace engine
          */
         template <typename TUID>
         static AlreadyRegisteredFn_t<TUID> alreadyRegisteredFn =
-                [] (std::vector<TUID> const &aAdjacency, TUID const& aPossiblyAdjacent)
+                [] (std::vector<TUID> const &aAdjacency,
+                    TUID              const &aPossiblyAdjacent)
         {
             return (aAdjacency.end() != std::find(aAdjacency.begin(), aAdjacency.end(), aPossiblyAdjacent));
         };
@@ -123,26 +124,31 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::initialize(
+        CEngineResult<> CGraphBuilder::initialize(
                 CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
                 CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay)
         {
-            assert(nullptr != aApplicationEnvironment);
-            assert(nullptr != aDisplay               );
+            bool const inputInvalid =
+                    nullptr == aApplicationEnvironment or
+                    nullptr == aDisplay;
+            if(inputInvalid)
+            {
+                return { EEngineStatus::Error };
+            }
 
             applicationEnvironment() = aApplicationEnvironment;
             mDisplay                 = aDisplay;
             graph()                  = makeCStdUniquePtr<CGraph>();
 
-            auto const pseudoSetup = [] (CPassBuilder const&, bool&) -> bool
+            auto const pseudoSetup = [] (CPassBuilder const &, bool &) -> bool
             {
                 return true;
             };
 
             auto const pseudoExec  = [] (
-                    bool                                      const&,
-                    CFrameGraphResources                      const&,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &) -> bool
+                    bool                                      const &,
+                    CFrameGraphResources                      const &,
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &) -> bool
             {
                 return true;
             };
@@ -150,26 +156,26 @@ namespace engine
             // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
             spawnPass<CallbackPass<bool>>("Pseudo-Pass", pseudoSetup, pseudoExec);
 
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::deinitialize()
+        CEngineResult<> CGraphBuilder::deinitialize()
         {
             graph()                  = nullptr;
             applicationEnvironment() = nullptr;
 
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::createPassDependency(
+        CEngineResult<> CGraphBuilder::createPassDependency(
                 std::string const &aPassSource,
                 std::string const &aPassTarget)
         {
@@ -192,7 +198,7 @@ namespace engine
             if(!(containsSourcePass && containsTargetPass))
             {
                 CLog::Error(logTag(), CString::format("Cannot create pass dependency from %0 to %1. At least one pass was not found.", aPassSource, aPassTarget));
-                return false;
+                return { EEngineStatus::Error };
             }
 
             PassUID_t const &sourcePassUID = sourcePass->second->passUID();
@@ -200,14 +206,14 @@ namespace engine
 
             createPassDependencyByUID(sourcePassUID, targetPassUID);
 
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CGraphBuilder::createPassDependencyByUID(
+        CEngineResult<> CGraphBuilder::createPassDependencyByUID(
                 PassUID_t const &aPassSource,
                 PassUID_t const &aPassTarget)
         {
@@ -216,6 +222,8 @@ namespace engine
             {
                 mPassAdjacency[aPassSource].push_back(aPassTarget);
             }
+
+            return { passAlreadyRegistered ? EEngineStatus::Error : EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
@@ -283,7 +291,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CGraph> CGraphBuilder::compile()
+        CEngineResult<CStdUniquePtr_t<CGraph>> CGraphBuilder::compile()
         {
             CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
@@ -293,16 +301,20 @@ namespace engine
             // Second: Evaluate all pass resources and their implicit relations to passes and other resources.
             for(PassMap::value_type const &assignment : graph()->passes())
             {
-                bool const collected = collectPass(assignment.second);
-                assert(true == collected);
+                CEngineResult<> const collection = collectPass(assignment.second);
+                if(not collection.successful())
+                {
+                    CLog::Error(logTag(), "Failed to perform pass collection.");
+                    return { EEngineStatus::Error };
+                }
             }
 
             // Third: Sort the passes by their relationships and dependencies.
-            bool const topologicalPassSortSuccessful = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
-            if(!topologicalPassSortSuccessful)
+            CEngineResult<> const topologicalPassSort = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
+            if(not topologicalPassSort.successful())
             {
                 CLog::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
-                return nullptr;
+                return { EEngineStatus::Error };
             }
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
@@ -318,10 +330,11 @@ namespace engine
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
 
-            bool const validationSuccessful = validate(accessor->passExecutionOrder());
-            if(!validationSuccessful) {
+            CEngineResult<> const validation = validate(accessor->passExecutionOrder());
+            if(not validation.successful())
+            {
                 CLog::Error(logTag(), "Failed to perform validation(...) on graph compilation.");
-                return nullptr;
+                return { EEngineStatus::Error };
             }
 
 #endif
@@ -337,85 +350,44 @@ namespace engine
             accessor->mutablePassToResourceAdjacency() = std::move(this->mPassToResourceAdjacency);
 #endif
 
-            return std::move(graph());
+            return { EEngineStatus::Ok, std::move(graph()) };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        FrameGraphResourceId_t CGraphBuilder::findSubjacentResource(
+        CEngineResult<FrameGraphResourceId_t> CGraphBuilder::findSubjacentResource(
                SFrameGraphResourceMap const &aResources,
                SFrameGraphResource    const &aStart)
         {
             if(aStart.parentResource == 0)
             {
-                return aStart.resourceId;
+                return { EEngineStatus::Ok, aStart.resourceId };
             }
-            else {
+            else
+            {
                 if(aResources.find(aStart.parentResource) != aResources.end())
                 {
                     return findSubjacentResource(aResources, aResources.at(aStart.parentResource));
                 }
                 else
-                    throw std::runtime_error("Resource not found...");
+                {
+                    return { EEngineStatus::Error };
+                }
             }
-        }
+        }        
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        // bool deriveAttachements(
-        //         CStdUniquePtr_t<CPassBase::CMutableAccessor>       &aAccessor,
-        //         SFrameGraphResource                          const &aTextureViewHandle,
-        //         SFrameGraphTextureView                       const &aTextureView)
-        // {
-        //     SFrameGraphTexture const &t = *static_cast<SFrameGraphTexture const *const>(&aTextureViewHandle);
-        //
-        //     // The "requestedUsage"-flags are set while evaluating the texture views!
-        //     // Consequently, evaluate all texture views first and then care for the textures itself
-        //     // to have all state reflected appropriately.
-        //     bool const isColorAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment);
-        //     bool const isDepthAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment);
-        //     bool const isInputAttachment = t.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment);
-        //
-        //     bool const textureViewIsForWrite  = aTextureView.mode.check(EFrameGraphViewAccessMode::Write);
-        //     if(textureViewIsForWrite)
-        //     {
-        //         bool const textureViewWritesColor = (EFrameGraphViewSource::Color == aTextureView.source);
-        //         bool const textureViewWritesDepth = (EFrameGraphViewSource::Depth == aTextureView.source);
-        //
-        //         if(textureViewWritesColor)
-        //         {
-        //             // Color Attachement
-        //
-        //         }
-        //         else if(textureViewWritesDepth)
-        //         {
-        //             // Depth Attachement
-        //         }
-        //         else
-        //         {
-        //             // Unsupported
-        //             // TBD: Error?
-        //         }
-        //     }
-        //     else
-        //     {
-        //         // Input Attachment
-        //     }
-        //
-        //     return true;
-        // }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::collectPass(CStdSharedPtr_t<CPassBase> aPass)
+        CEngineResult<> CGraphBuilder::collectPass(CStdSharedPtr_t<CPassBase> aPass)
         {
-            assert(nullptr != aPass);
+            if(nullptr == aPass)
+            {
+                return { EEngineStatus::Error };
+            }
 
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
 
@@ -544,14 +516,14 @@ namespace engine
             }
 #endif
 
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::validate(std::stack<PassUID_t> const &aPassOrder)
+        CEngineResult<> CGraphBuilder::validate(std::stack<PassUID_t> const &aPassOrder)
         {
             bool allBindingsValid = true;
 
@@ -569,7 +541,7 @@ namespace engine
 
             } // foreach TextureView
 
-            return (allBindingsValid);
+            return { allBindingsValid ? EEngineStatus::Ok : EEngineStatus::Error };
         }
         //<-----------------------------------------------------------------------------
 
@@ -591,8 +563,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool
-        CGraphBuilder::validateTextureUsage(SFrameGraphTexture const &aTexture)
+        bool CGraphBuilder::validateTextureUsage(SFrameGraphTexture const &aTexture)
         {
             // Cross both bitsets... permittedUsage should fully contain requestedUsage
             return aTexture.permittedUsage.check(aTexture.requestedUsage);

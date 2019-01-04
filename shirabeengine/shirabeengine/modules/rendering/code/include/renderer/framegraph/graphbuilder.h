@@ -1,4 +1,4 @@
-#ifndef __SHIRABE_RENDERER_GRAPHBUILDER_H__
+﻿#ifndef __SHIRABE_RENDERER_GRAPHBUILDER_H__
 #define __SHIRABE_RENDERER_GRAPHBUILDER_H__
 
 #include <string>
@@ -55,7 +55,7 @@ namespace engine
              * @param aDisplay                WSI display to bind against the current hardware monitor config.
              * @return                        True, if successful. False otherwise.
              */
-            bool initialize(
+            CEngineResult<> initialize(
                     CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
                     CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay);
 
@@ -64,7 +64,7 @@ namespace engine
              *
              * @return True, if successful. False otherwise.
              */
-            bool deinitialize();
+            CEngineResult<> deinitialize();
 
             /**
              * Fetch the internal resource UID generator to request a new UID.
@@ -113,9 +113,9 @@ namespace engine
                     typename    TPass,
                     typename... TPassCreationArgs
                     >
-            CStdSharedPtr_t<TPass> spawnPass(
-                    std::string       const&aName,
-                    TPassCreationArgs  &&...aArgs);
+            CEngineResult<CStdSharedPtr_t<TPass>> spawnPass(
+                    std::string       const &aName,
+                    TPassCreationArgs  &&... aArgs);
 
             /**
              * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
@@ -123,7 +123,7 @@ namespace engine
              * @param aPassSource Name of pass to depend on.
              * @param aPassTarget Dependent pass name.
              */
-            bool createPassDependency(
+            CEngineResult<> createPassDependency(
                      std::string const &aPassSource,
                      std::string const &aPassTarget);
 
@@ -157,7 +157,7 @@ namespace engine
              *
              * @return A pointer to a compiled and executable CGraph instance.
              */
-            CStdUniquePtr_t<CGraph> compile();
+            CEngineResult<CStdUniquePtr_t<CGraph>> compile();
 
         private_methods:
             /**
@@ -180,7 +180,7 @@ namespace engine
              * @param aPassSource UID of the Pass to depend on.
              * @param aPassTarget Dependent pass UID.
              */
-            void createPassDependencyByUID(
+            CEngineResult<> createPassDependencyByUID(
                      PassUID_t const &aPassSource,
                      PassUID_t const &aPassTarget);
 
@@ -193,7 +193,7 @@ namespace engine
              * @param aResourceToSearchFrom Starting point of the path towards the subjacent resource.
              * @return                      The FrameGraphResourceId_t of the subjacent resource or 0 if not found.
              */
-            FrameGraphResourceId_t findSubjacentResource(
+            CEngineResult<FrameGraphResourceId_t> findSubjacentResource(
                     SFrameGraphResourceMap const &aResourceMap,
                     SFrameGraphResource    const &aResourceToSearchFrom);
 
@@ -203,7 +203,7 @@ namespace engine
              * @param aPass The pass to collect.
              * @return      True, if successful. False, otherwise.
              */
-            bool collectPass(CStdSharedPtr_t<CPassBase> aPass);
+            CEngineResult<> collectPass(CStdSharedPtr_t<CPassBase> aPass);
 
             /**
              * Perform a topological depth first sort of the graph,
@@ -213,7 +213,7 @@ namespace engine
              * @return              True, if successful. False otherwise.
              */
             template <typename TUID>
-            bool topologicalSort(std::stack<TUID> &aOutPassOrder);
+            CEngineResult<> topologicalSort(std::stack<TUID> &aOutPassOrder);
 
             /**
              * Validate the pass order and data flow dependencies of a sorted
@@ -222,7 +222,7 @@ namespace engine
              * @param aPassOrder The stack containing the pass order to be validated.
              * @return           True, if valid. False otherwise.
              */
-            bool validate(std::stack<PassUID_t> const &aPassOrder);
+            CEngineResult<> validate(std::stack<PassUID_t> const &aPassOrder);
 
             /**
              * Validate, whether the textureview tries to access the subjacent texture in
@@ -313,14 +313,14 @@ namespace engine
                 typename    TPass,
                 typename... TPassCreationArgs
                 >
-        CStdSharedPtr_t<TPass> CGraphBuilder::spawnPass(
-                std::string                 const     &aName,
-                TPassCreationArgs                 &&...aArgs)
+        CEngineResult<CStdSharedPtr_t<TPass>> CGraphBuilder::spawnPass(
+                std::string       const &aName,
+                TPassCreationArgs &&...  aArgs)
         {
-            if(!graph())
+            if(nullptr == graph())
             {
-                // TBD: Log
-                return nullptr;
+                CLog::Error(logTag(), "No graph instance available.");
+                return { EEngineStatus::Error };
             }
 
             try
@@ -329,38 +329,33 @@ namespace engine
 
                 PassUID_t const uid = generatePassUID();
 
-                CStdSharedPtr_t<TPass> pass =
-                        accessor->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
-                if(!pass)
+                CEngineResult<CStdSharedPtr_t<TPass>> passCreation = accessor->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
+                if(not passCreation.successful())
                 {
-                    // TBD: Log
-                    return nullptr;
+                    CLog::Error(logTag(), "No pass instance created.");
+                    return { EEngineStatus::Error };
                 }
 
+                CStdSharedPtr_t<TPass> &pass = passCreation.data();
+
                 // Link the pass providing the import and export resources for the passes from the variadic argument list.
-                // This will declare all required resources:
-                //   - Create
-                //   - Read
-                //   - Write
-                //   - Import
                 CPassBuilder passBuilder(uid, pass, mResourceData);
 
-                bool const passSetupSuccessful = pass->setup(passBuilder);
-                if(!passSetupSuccessful)
+                CEngineResult<> const passSetup = pass->setup(passBuilder);
+                if(not passSetup.successful())
                 {
                     CLog::Error(logTag(), "Cannot setup pass instance.");
-                    pass = nullptr;
-                    return nullptr;
+                    return { EEngineStatus::Error };
                 }
 
                 mPasses[pass->passUID()] = pass;
 
-                return pass;
+                return { EEngineStatus::Ok, pass };
             }
             catch(std::exception e)
             {
                 CLog::Error(logTag(), e.what());
-                throw;
+                return { EEngineStatus::Error };
             }
         }
         //<-----------------------------------------------------------------------------
@@ -369,7 +364,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TUID>
-        bool CGraphBuilder::topologicalSort(std::stack<TUID> &aOutPassOrder)
+        CEngineResult<> CGraphBuilder::topologicalSort(std::stack<TUID> &aOutPassOrder)
         {
             std::function<
                     void(
@@ -380,10 +375,10 @@ namespace engine
 
             // Define the recursive sort function
             DSFi_fn = [&](
-                    AdjacencyListMap_t<TUID> const&aEdges,
-                    TUID const                    &aVertex,
-                    std::map<TUID, bool>          &aVisitedEdges,
-                    std::stack<TUID>              &aPassOrder) -> void
+                    AdjacencyListMap_t<TUID> const &aEdges,
+                    TUID const                     &aVertex,
+                    std::map<TUID, bool>           &aVisitedEdges,
+                    std::stack<TUID>               &aPassOrder) -> void
             {
                 bool const edgeVisited = aVisitedEdges[aVertex];
                 if(edgeVisited)
@@ -423,15 +418,15 @@ namespace engine
             catch(std::runtime_error const &aRTE)
             {
                 CLog::Error(logTag(), CString::format("Failed to perform topological sort: %0 ", aRTE.what()));
-                return false;
+                return { EEngineStatus::Error };
             }
             catch(...)
             {
                 CLog::Error(logTag(), "Failed to perform topological sort. Unknown error.");
-                return false;
+                return { EEngineStatus::Error };
             }
 
-            return true;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 

@@ -94,7 +94,7 @@ namespace engine
              * @return            Return a framegraph resource handle for the texture
              *                    creation.
              */
-            SFrameGraphResource createTexture(
+            CEngineResult<SFrameGraphResource> createTexture(
                     std::string        const &aName,
                     SFrameGraphTexture const &aDescriptor);
 
@@ -109,7 +109,7 @@ namespace engine
              * @return            Return a framegraph resource handle for the texture
              *                    import.
              */
-            SFrameGraphResource importTexture(
+            CEngineResult<SFrameGraphResource> importTexture(
                     std::string        const &aName,
                     SFrameGraphTexture const &aDescriptor);
 
@@ -123,7 +123,7 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 forwarding.
              */
-            SFrameGraphResource forwardTexture(
+            CEngineResult<SFrameGraphResource> forwardTexture(
                     SFrameGraphResource      const &aSubjacentTargetResource,
                     SFrameGraphResourceFlags const &aFlags,
                     CRange                   const &aArraySliceRange = CRange(0, 1),
@@ -135,7 +135,7 @@ namespace engine
              * @param aSubjacentTargetResource The resource id of the texture to accept.
              * @return                         Return a framegraph resource handle for the texture acceptance.
              */
-            SFrameGraphResource acceptTexture(
+            CEngineResult<SFrameGraphResource> acceptTexture(
                     SFrameGraphResource const &aSubjacentTargetResource);
 
             /**
@@ -148,7 +148,7 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            SFrameGraphResource writeTexture(
+            CEngineResult<SFrameGraphResource> writeTexture(
                     SFrameGraphResource          const &aSubjacentTargetResource,
                     SFrameGraphWriteTextureFlags const &aFlags,
                     CRange                       const &aArraySliceRange = CRange(0, 1),
@@ -164,7 +164,7 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            SFrameGraphResource readTexture(
+            CEngineResult<SFrameGraphResource> readTexture(
                     SFrameGraphResource         const &aSubjacentTargetResource,
                     SFrameGraphReadTextureFlags const &aFlags,
                     CRange                      const &aArraySliceRange = CRange(0, 1),
@@ -179,7 +179,7 @@ namespace engine
              * @return                        Return a frame graph resource handle for the
              *                                list view created.
              */
-            SFrameGraphResource importRenderables(
+            CEngineResult<SFrameGraphResource> importRenderables(
                     std::string         const &aCollectionName,
                     SFrameGraphResource const &aRenderableListResource);
 
@@ -197,7 +197,7 @@ namespace engine
              * @return                     Returns the resource UID of a possibly duplicate
              *                             view or 0, if no duplication was found.
              */
-            FrameGraphResourceId_t findDuplicateTextureView(
+            CEngineResult<FrameGraphResourceId_t> findDuplicateTextureView(
                     FrameGraphResourceId_t               const &aSubjacentResourceId,
                     FrameGraphFormat_t                   const &aFormat,
                     EFrameGraphViewSource                const &aViewSource,
@@ -228,7 +228,7 @@ namespace engine
              * @param aAdjustedArraySliceRange Output handle for the corrected array range.
              * @param aAdjustedMipSliceRange   Output handle for the corrected mip range.
              */
-            void adjustArrayAndMipSliceRanges(
+            CEngineResult<> adjustArrayAndMipSliceRanges(
                     CFrameGraphResources const &aResourceData,
                     SFrameGraphResource  const &aSourceResource,
                     CRange               const &aArraySliceRange,
@@ -248,7 +248,7 @@ namespace engine
              * @param aValidateReads   Flag indicating, whether read operations should be validated.
              * @param aValidateWrites  Flag indicating, wheter write operations should be validated.
              */
-            void validateArrayAndMipSliceRanges(
+            CEngineResult<> validateArrayAndMipSliceRanges(
                     CFrameGraphResources const &aResourceData,
                     SFrameGraphResource  const &aSourceResource,
                     CRange               const &aArraySliceRange,
@@ -268,7 +268,7 @@ namespace engine
              * @param aMipSliceRange   The resource mip range to validate.
              * @return                 True, if no simultaneous overlapping reads are performed.
              */
-            bool isTextureBeingReadInSubresourceRange(
+            CEngineResult<bool> isTextureBeingReadInSubresourceRange(
                     RefIndex_t           const &aResourceViews,
                     CFrameGraphResources const &aResources,
                     SFrameGraphResource  const &aSourceResource,
@@ -287,7 +287,7 @@ namespace engine
              * @param aMipSliceRange   The resource mip range to validate.
              * @return                 True, if no simultaneous overlapping writes are performed.
              */
-            bool isTextureBeingWrittenInSubresourceRange(
+            CEngineResult<bool> isTextureBeingWrittenInSubresourceRange(
                     RefIndex_t           const &aResourceViews,
                     CFrameGraphResources const &aResources,
                     SFrameGraphResource  const &aSourceResource,

@@ -564,6 +564,8 @@ namespace engine
         class CFrameGraphResources
                 : public CFrameGraphResourcesRefContainer<SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES>
         {
+            SHIRABE_DECLARE_LOG_TAG(CFrameGraphResources);
+
         public_constructors:
             CFrameGraphResources();
 
@@ -577,22 +579,30 @@ namespace engine
              * @throw             Throws std::runtime_error on error.
              */
             template <typename T>
-            CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>> const
+            CEngineResult<
+                CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>> const
+            >
             get(FrameGraphResourceId_t const &aResourceId) const
             {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(mResources.size() <= aResourceId)
-                    throw std::runtime_error("Resource handle not found.");
+                {
+                    CLog::Error(logTag(), CString::format("Resource w/ resource id %0 not found."));
+                    return { EEngineStatus::ResourceError_NotFound };
+                }
 #endif
 
                 CStdSharedPtr_t<SFrameGraphResource> resource = mResources.at(aResourceId);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(nullptr == resource)
-                    throw std::runtime_error("Resource handle is empty.");
+                {
+                    CLog::Error(logTag(), CString::format("Resource w/ resource id %0: Handle is empty. Invalid resource."));
+                    return { EEngineStatus::ResourceError_ResourceInvalid };
+                }
 #endif
 
                 CStdSharedPtr_t<T> ptr = std::static_pointer_cast<T>(resource);
-                return ptr;
+                return { EEngineStatus::Ok, ptr };
             }
 
             SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                   }
@@ -645,11 +655,19 @@ namespace engine
              * @throw             Throws std::runtime_error on error.
              */
             template <typename T> // with T : FrameGraphResource
-            CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>>
+            CEngineResult<
+                CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>>
+            >
             getMutable(FrameGraphResourceId_t const &aResourceId)
             {
-                CStdSharedPtr_t<T> ptr = *const_cast<CStdSharedPtr_t<T>*>(&static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId));
-                return ptr;
+                CEngineResult<CStdSharedPtr_t<T> const> fetch = static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId);
+                if(not fetch.resultEquals(EEngineStatus::ResourceError_NotFound))
+                {
+                   CStdSharedPtr_t<T> ptr = std::const_pointer_cast<T>(fetch.data());
+                   fetch = { EEngineStatus::Ok, ptr };
+                }
+
+                return fetch;
             }
 
             SHIRABE_INLINE SFrameGraphAttachmentCollection &getAttachments()
