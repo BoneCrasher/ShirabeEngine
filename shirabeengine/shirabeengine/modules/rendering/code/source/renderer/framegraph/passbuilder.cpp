@@ -434,7 +434,7 @@ namespace engine
                 }
             }
 
-            if(!duplicateFound)
+            if(not duplicateFound)
             {
                 SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
                 view.arraySliceRange    = adjustedArraySliceRange;
@@ -470,25 +470,27 @@ namespace engine
                 return { EEngineStatus::Ok, *resource };
             }
 
-            return { EEngineStatus::FrameGraph_PassBuilder_ForwardResourceFailed, *resource };
+            return { EEngineStatus::FrameGraph_PassBuilder_AcceptResourceFailed, *resource };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphResource CPassBuilder::writeTexture(
+        CEngineResult<SFrameGraphResource> CPassBuilder::writeTexture(
                 SFrameGraphResource          const &aSubjacentTargetResource,
                 SFrameGraphWriteTextureFlags const &aFlags,
                 CRange                       const &aArraySliceRange,
                 CRange                       const &aMipSliceRange)
         {
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+
             FrameGraphResourceId_t const subjacentResourceId =
                     (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
                      ? aSubjacentTargetResource.resourceId
                      : aSubjacentTargetResource.subjacentResource;
 
-            EFrameGraphViewAccessMode const mode = EFrameGraphViewAccessMode::Write;
+            EFrameGraphViewAccessMode const mode   = EFrameGraphViewAccessMode::Write;
 
             EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
             if(aFlags.writeTarget == EFrameGraphWriteTarget::Color)
@@ -499,8 +501,6 @@ namespace engine
             {
                 source = EFrameGraphViewSource::Depth;
             }
-
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
             CRange adjustedArraySliceRange = aArraySliceRange;
             CRange adjustedMipSliceRange   = aMipSliceRange;
@@ -521,13 +521,13 @@ namespace engine
                         true,
                         true);
 
-            Optional_t<RefWrapper_t<SFrameGraphTextureView>> ref{};
+            Optional_t<RefWrapper_t<SFrameGraphTextureView>> resource{};
 
             // Can we cull?
             bool duplicateFound = false;
             if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
             {
-                FrameGraphResourceId_t const duplicateViewId =
+                CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery =
                         findDuplicateTextureView(
                             subjacentResourceId,
                             aFlags.requiredFormat,
@@ -535,17 +535,27 @@ namespace engine
                             adjustedArraySliceRange,
                             adjustedMipSliceRange,
                             mode);
+                if(not duplicateViewIdQuery.successful())
+                {
+                    return { duplicateViewIdQuery.result() };
+                }
 
-                duplicateFound = (duplicateViewId > 0);
+                duplicateFound = duplicateViewIdQuery.resultEquals(EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId);
                 if(duplicateFound)
                 {
-                    SFrameGraphTextureView &view = *mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
 
-                    ref = view;
+                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    if(not viewFetch.successful())
+                    {
+                        return { viewFetch.result() };
+                    }
+
+                    resource = *(viewFetch.data());
                 }
             }
 
-            if(!duplicateFound)
+            if(not duplicateFound)
             {
                 SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
                 view.arraySliceRange    = adjustedArraySliceRange;
@@ -559,28 +569,43 @@ namespace engine
                 view.type               = EFrameGraphResourceType::TextureView;
                 view.mode.set(mode);
 
-                CStdSharedPtr_t<SFrameGraphResource> subjacent = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
-                ++subjacent->referenceCount;
+                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
+                if(not subjacentFetch.successful())
+                {
+                    return { subjacentFetch.result() };
+                }
 
-                ref = view;
+                SFrameGraphResource &subjacent = *(subjacentFetch.data());
+                ++(subjacent.referenceCount);
+
+                resource = view;
             }
 
-            accessor->registerResource(ref->get().resourceId);
-            ++(ref->get().referenceCount);
+            if(resource.has_value())
+            {
+                SFrameGraphResource &ref = resource->get();
 
-            return *ref;
+                accessor->registerResource(ref.resourceId);
+                ++(ref.referenceCount);
+
+                return { EEngineStatus::Ok, *resource };
+            }
+
+            return { EEngineStatus::FrameGraph_PassBuilder_WriteResourceFailed, *resource };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphResource CPassBuilder::readTexture(
+        CEngineResult<SFrameGraphResource> CPassBuilder::readTexture(
                 SFrameGraphResource         const &aSubjacentTargetResource,
                 SFrameGraphReadTextureFlags const &aFlags,
                 CRange                      const &aArraySliceRange,
                 CRange                      const &aMipSliceRange)
         {
+            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+
             FrameGraphResourceId_t const subjacentResourceId =
                     (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
                      ? aSubjacentTargetResource.resourceId
@@ -597,8 +622,6 @@ namespace engine
             {
                 source = EFrameGraphViewSource::Depth;
             }
-
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
             CRange adjustedArraySliceRange = aArraySliceRange;
             CRange adjustedMipSliceRange   = aMipSliceRange;
@@ -619,13 +642,13 @@ namespace engine
                         false,
                         true);
 
-            Optional_t<RefWrapper_t<SFrameGraphTextureView>> ref{};
+            Optional_t<RefWrapper_t<SFrameGraphTextureView>> resource{};
 
             // Can we cull?
             bool duplicateFound = false;
             if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
             {
-                FrameGraphResourceId_t const duplicateViewId =
+                CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery =
                         findDuplicateTextureView(
                             subjacentResourceId,
                             aFlags.requiredFormat,
@@ -633,17 +656,27 @@ namespace engine
                             adjustedArraySliceRange,
                             adjustedMipSliceRange,
                             mode);
+                if(not duplicateViewIdQuery.successful())
+                {
+                    return { duplicateViewIdQuery.result() };
+                }
 
-                duplicateFound = (duplicateViewId > 0);
+                duplicateFound = duplicateViewIdQuery.resultEquals(EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId);
                 if(duplicateFound)
                 {
-                    SFrameGraphTextureView &view = *mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
 
-                    ref = view;
+                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    if(not viewFetch.successful())
+                    {
+                        return { viewFetch.result() };
+                    }
+
+                    resource = *(viewFetch.data());
                 }
             }
 
-            if(!duplicateFound)
+            if(not duplicateFound)
             {
                 SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
                 view.arraySliceRange    = adjustedArraySliceRange;
@@ -657,16 +690,29 @@ namespace engine
                 view.type               = EFrameGraphResourceType::TextureView;
                 view.mode.set(mode);
 
-                CStdSharedPtr_t<SFrameGraphResource> subjacent = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
-                ++subjacent->referenceCount;
+                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
+                if(not subjacentFetch.successful())
+                {
+                    return { subjacentFetch.result() };
+                }
 
-                ref = view;
+                SFrameGraphResource &subjacent = *(subjacentFetch.data());
+                ++(subjacent.referenceCount);
+
+                resource = view;
             }
 
-            accessor->registerResource(ref->get().resourceId);
-            ++(ref->get().referenceCount);
+            if(resource.has_value())
+            {
+                SFrameGraphResource &ref = resource->get();
 
-            return *ref;
+                accessor->registerResource(ref.resourceId);
+                ++(ref.referenceCount);
+
+                return { EEngineStatus::Ok, *resource };
+            }
+
+            return { EEngineStatus::FrameGraph_PassBuilder_ReadResourceFailed, *resource };
         }
         //<-----------------------------------------------------------------------------
 
