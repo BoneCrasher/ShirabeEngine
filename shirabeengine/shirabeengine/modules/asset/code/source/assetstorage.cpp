@@ -72,7 +72,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<ByteBuffer> CAssetStorage::loadAssetData(SAsset const &aAsset)
         {
-            CEngineResult<ByteBuffer> data = CEngineResult<ByteBuffer>(EEngineStatus::Error);
+            CEngineResult<ByteBuffer> data = { EEngineStatus::Error };
 
             switch(aAsset.type)
             {

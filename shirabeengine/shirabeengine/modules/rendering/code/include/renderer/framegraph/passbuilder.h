@@ -294,6 +294,16 @@ namespace engine
                     CRange               const &aArraySliceRange,
                     CRange               const &aMipSliceRange);
 
+        private_methods:
+            CEngineResult<SFrameGraphResource> useTexture(
+                    SFrameGraphResource          const &aSubjacentTargetResource,
+                    EFrameGraphViewSource        const &aSourceOrTarget,
+                    EFormat                      const &aRequiredFormat,
+                    CRange                       const &aArraySliceRange,
+                    CRange                       const &aMipSliceRange,
+                    EFrameGraphViewAccessMode    const &aMode,
+                    EEngineStatus                const &aFailCode);
+
         private_members:
             PassUID_t                    mPassUID;
             CStdSharedPtr_t<CPassBase>   mPass;

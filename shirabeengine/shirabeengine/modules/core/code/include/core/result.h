@@ -18,6 +18,34 @@ namespace engine
     {
     public_constructors:
         /**
+         * Create an empty result.
+         */
+        SHIRABE_INLINE AResult()
+            : mResult(TResult())
+            , mData(TData())
+        {}
+
+        /**
+         * Copy-Construct a result from another.
+         *
+         * @param aOther
+         */
+        explicit SHIRABE_INLINE AResult(AResult<TResult, TData> const &aOther)
+            : mResult(aOther.mResult)
+            , mData(aOther.mData)
+        {}
+
+        /**
+         * Move-Construct a result from another.
+         *
+         * @param aOther
+         */
+        explicit SHIRABE_INLINE AResult(AResult<TResult, TData> &&aOther)
+            : mResult(aOther.mResult)
+            , mData(std::move(aOther.mData))
+        {}
+
+        /**
          * Create a result from a result code.
          *
          * @param aResult
@@ -55,6 +83,35 @@ namespace engine
          * Destroy and run...
          */
         virtual ~AResult() = default;
+
+    public_operators:
+        /**
+         * Copy-Assign another result to this instance.
+         *
+         * @param aOther
+         * @return
+         */
+        SHIRABE_INLINE AResult<TResult, TData> &operator=(AResult<TResult, TData> const &aOther)
+        {
+            mResult = aOther.mResult;
+            mData   = aOther.mData;
+
+            return (*this);
+        }
+
+        /**
+         * Move-Assign another result to this instance.
+         *
+         * @param aOther
+         * @return
+         */
+        SHIRABE_INLINE AResult<TResult, TData> &operator=(AResult<TResult, TData> &&aOther)
+        {
+            mResult = aOther.mResult;
+            mData   = std::move(aOther.mData);
+
+            return (*this);
+        }
 
     public_methods:
         /**

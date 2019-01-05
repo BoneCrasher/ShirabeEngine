@@ -106,6 +106,7 @@ namespace engine
         FrameGraph_PassBuilder_AcceptResourceFailed                     = -500105,
         FrameGraph_PassBuilder_ReadResourceFailed                       = -500106,
         FrameGraph_PassBuilder_WriteResourceFailed                      = -500107,
+        FrameGraph_PassBuilder_ImportRenderablesFailed                  = -500151,
     };
 
     /**
@@ -135,6 +136,7 @@ namespace engine
     public_constructors:
         // Reuse the base class constructors.
         using AResult<EEngineStatus, TData>::AResult;
+        using AResult<EEngineStatus, TData>::operator=;
 
     public_methods:
         /**

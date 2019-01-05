@@ -633,8 +633,7 @@ namespace engine
              * @return   Returns a mutable reference to the newly created instance.
              */
             template <typename T> // with T : FrameGraphResource
-            typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>&
-            spawnResource()
+            typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T> &spawnResource()
             {
                 CStdSharedPtr_t<T> ptr = std::make_shared<T>();
                 ptr->resourceId = mResources.size();
@@ -660,14 +659,15 @@ namespace engine
             >
             getMutable(FrameGraphResourceId_t const &aResourceId)
             {
-                CEngineResult<CStdSharedPtr_t<T> const> fetch = static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId);
+                CEngineResult<CStdSharedPtr_t<T> const> fetch  = static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId);
+                CEngineResult<CStdSharedPtr_t<T>>       result = { EEngineStatus::Ok };
                 if(not fetch.resultEquals(EEngineStatus::ResourceError_NotFound))
                 {
                    CStdSharedPtr_t<T> ptr = std::const_pointer_cast<T>(fetch.data());
-                   fetch = { EEngineStatus::Ok, ptr };
+                   result = CEngineResult<CStdSharedPtr_t<T>>(EEngineStatus::Ok, ptr);
                 }
 
-                return fetch;
+                return result;
             }
 
             SHIRABE_INLINE SFrameGraphAttachmentCollection &getAttachments()
