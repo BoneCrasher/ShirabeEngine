@@ -54,27 +54,27 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::initialize()
+        CEngineResult<> CVulkanResourceTaskBackend::initialize()
         {
             SHIRABE_IMPLEMENT_TASKS_FOR(Texture)
             SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
             SHIRABE_IMPLEMENT_TASKS_FOR(RenderPass);
             SHIRABE_IMPLEMENT_TASKS_FOR(FrameBuffer);
 
-            return EEngineStatus::Ok;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::deinitialize()
+        CEngineResult<> CVulkanResourceTaskBackend::deinitialize()
         {
             // SHIRABE_IMPLEMENT_TASKS_FOR(Texture);
             // SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
             // SHIRABE_IMPLEMENT_TASKS_FOR(RenderPass);
 
-            return EEngineStatus::Ok;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
     }

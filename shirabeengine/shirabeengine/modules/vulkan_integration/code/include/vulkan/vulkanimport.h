@@ -11,12 +11,4 @@
 
 #include <vulkan/vulkan.h>
 
-namespace engine
-{
-    namespace vulkan
-    {
-
-    }
-}
-
 #endif

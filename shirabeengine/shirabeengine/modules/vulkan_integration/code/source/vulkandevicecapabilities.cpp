@@ -47,9 +47,9 @@ namespace engine
             case EFormat::BC6H_UF16:                return VkFormat::VK_FORMAT_BC6H_UFLOAT_BLOCK;
             case EFormat::BC7_UNORM:                return VkFormat::VK_FORMAT_BC7_UNORM_BLOCK;
             case EFormat::BC7_UNORM_SRGB:           return VkFormat::VK_FORMAT_BC7_SRGB_BLOCK;
+            default:                                return VkFormat::VK_FORMAT_UNDEFINED;
             }
 
-            return VkFormat::VK_FORMAT_UNDEFINED;
         }
         //<-----------------------------------------------------------------------------
 
@@ -93,9 +93,9 @@ namespace engine
             case VkFormat::VK_FORMAT_BC6H_UFLOAT_BLOCK:    return EFormat::BC6H_UF16;
             case VkFormat::VK_FORMAT_BC7_UNORM_BLOCK:      return EFormat::BC7_UNORM;
             case VkFormat::VK_FORMAT_BC7_SRGB_BLOCK:       return EFormat::BC7_UNORM_SRGB;
+            default:                                       return EFormat::Undefined;
             }
 
-            return EFormat::Undefined;
         }
         //<-----------------------------------------------------------------------------
 

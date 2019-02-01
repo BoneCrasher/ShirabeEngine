@@ -20,6 +20,8 @@ namespace engine
          */
         class CX11VulkanSurface
         {
+            SHIRABE_DECLARE_LOG_TAG(CX11VulkanSurface);
+
         public_static_functions:
             /**
              * Create an X11 based VkSurfaceKHR.
@@ -30,7 +32,7 @@ namespace engine
              * @return                   A VkSurfaceKHR handle, successful. Throws otherwise.
              * @throw CVulkanError       An instance of CVulkanError containing an error message and VkResult code.
              */
-            static VkSurfaceKHR create(
+            static CEngineResult<VkSurfaceKHR> create(
                     CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment,
                     CStdSharedPtr_t<CX11Display>        const &aDisplay,
                     CStdSharedPtr_t<CX11Window>         const &aWindow);
@@ -39,6 +41,7 @@ namespace engine
             CX11VulkanSurface() = delete;
             CX11VulkanSurface(CX11VulkanSurface const&) = delete;
             CX11VulkanSurface(CX11VulkanSurface &&)     = delete;
+
         private_destructors:
             ~CX11VulkanSurface() = delete;
 

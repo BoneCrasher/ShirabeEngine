@@ -124,13 +124,13 @@ namespace engine
             VkImage               &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
             CStdSharedPtr_t<void>  resource = CStdSharedPtr_t<void>(static_cast<void*>(&image), [] (void*) {});
 
-            EEngineStatus const status =
+            CEngineResult<> registration =
                     mGraphicsAPIResourceBackend->registerResource(
                         aSwapChainResourceId,
                         resource,
                         gfxapi::CGFXAPIResourceBackend::EImportStorageMode::Overwrite);
 
-            return status;
+            return (registration.result());
         }
         //<-----------------------------------------------------------------------------
 

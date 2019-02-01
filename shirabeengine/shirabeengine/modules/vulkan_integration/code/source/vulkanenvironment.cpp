@@ -966,11 +966,6 @@ namespace engine
                 CLog::Error(logTag(), CString::format("CVulkanError (VkResult: %0):\n%1", ve.vulkanResult(), ve.what()));
                 return EEngineStatus::Error;
             }
-            catch(CEngineException const e)
-            {
-                CLog::Error(logTag(), e.message());
-                return e.status();
-            }
             catch(std::exception const stde)
             {
                 CLog::Error(logTag(), stde.what());

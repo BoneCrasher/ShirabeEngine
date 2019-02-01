@@ -7,7 +7,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        VkSurfaceKHR CX11VulkanSurface::create(
+        CEngineResult<VkSurfaceKHR> CX11VulkanSurface::create(
                 CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment,
                 CStdSharedPtr_t<CX11Display>        const &aDisplay,
                 CStdSharedPtr_t<CX11Window>         const &aWindow)
@@ -29,16 +29,18 @@ namespace engine
             auto CreateXLibSurfaceKHR = (PFN_vkCreateXlibSurfaceKHR)vkGetInstanceProcAddr(state.instance, "vkCreateXlibSurfaceKHR");
             if(!CreateXLibSurfaceKHR)
             {
-                throw CVulkanError("Cannot find vulkan function 'vkCreateXlibSurfaceKHR'.", VkResult::VK_ERROR_INITIALIZATION_FAILED);
+                CLog::Error(logTag(), "Cannot find vulkan function 'vkCreateXlibSurfaceKHR'.");
+                return { EEngineStatus::InitializationError };
             }
 
             VkResult result = CreateXLibSurfaceKHR(state.instance, &vkXlibSurfaceCreateInfo, nullptr, &surface);
             if(VkResult::VK_SUCCESS != result)
             {
-                throw CVulkanError("Failed to create window surface!", result);
+                CLog::Error(logTag(), "Failed to create window surface!");
+                return { EEngineStatus::InitializationError };
             }
 
-            return surface;
+            return { EEngineStatus::Ok, surface };
         }
         //<-----------------------------------------------------------------------------
 

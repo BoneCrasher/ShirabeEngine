@@ -58,6 +58,8 @@ namespace engine
         class CVulkanResourceTaskBackend
                 : public CGFXAPIResourceTaskBackend
         {
+            SHIRABE_DECLARE_LOG_TAG(CVulkanResourceTaskBackend);
+
         public_constructors:
             /**
              * Construct a vulkan resource task backend from a vulkan environment.
@@ -70,12 +72,12 @@ namespace engine
             /**
              * Initialize the backend.
              */
-            EEngineStatus initialize();
+            CEngineResult<> initialize();
 
             /**
              * Deinitialize the backend.
              */
-            EEngineStatus deinitialize();
+            CEngineResult<> deinitialize();
 
         private_methods:
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(Texture);

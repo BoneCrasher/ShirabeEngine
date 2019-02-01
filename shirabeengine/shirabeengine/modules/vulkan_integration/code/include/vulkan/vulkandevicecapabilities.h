@@ -50,26 +50,26 @@ namespace engine
              * @param aProperties     Additional property type flags to be matched by the lookup.
              * @return
              */
-            static uint32_t determineMemoryType(
+            static CEngineResult<uint32_t> determineMemoryType(
                     VkPhysicalDevice      const &aPhysicalDevice,
                     uint32_t              const &aRequiredType,
                     VkMemoryPropertyFlags const &aProperties)
             {
-                VkPhysicalDeviceMemoryProperties memProperties;
+                VkPhysicalDeviceMemoryProperties memProperties{};
                 vkGetPhysicalDeviceMemoryProperties(aPhysicalDevice, &memProperties);
 
-                for(uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+                for(uint32_t k = 0; k < memProperties.memoryTypeCount; ++k)
                 {
-                    uint32_t const typeFlag = (aRequiredType & (1 << i));
-                    bool     const propFlag = ((memProperties.memoryTypes[i].propertyFlags & aProperties) == aProperties);
+                    uint32_t const typeFlag = (aRequiredType & (1 << k));
+                    bool     const propFlag = ((memProperties.memoryTypes[k].propertyFlags & aProperties) == aProperties);
 
                     if(typeFlag && propFlag)
                     {
-                        return i;
+                        return { EEngineStatus::Ok, k };
                     }
                 }
 
-                throw std::runtime_error("failed to find suitable memory type!");
+                return { EEngineStatus::Error };
             }
         };
 

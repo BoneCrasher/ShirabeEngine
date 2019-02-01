@@ -81,12 +81,19 @@ namespace engine
                 VkMemoryAllocateInfo vkMemoryAllocateInfo ={ };
                 vkMemoryAllocateInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
                 vkMemoryAllocateInfo.allocationSize  = vkMemoryRequirements.size;
-                vkMemoryAllocateInfo.memoryTypeIndex =
+
+                CEngineResult<uint32_t> memoryTypeFetch =
                         CVulkanDeviceCapsHelper::determineMemoryType(
                             vkPhysicalDevice,
                             vkMemoryRequirements.memoryTypeBits,
                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+                if(not memoryTypeFetch.successful())
+                {
+                    CLog::Error(logTag(), "Could not determine memory type index.");
+                    return SGFXAPIResourceHandleAssignment();
+                }
 
+                vkMemoryAllocateInfo.memoryTypeIndex = memoryTypeFetch.data();
 
                 VkDeviceMemory vkImageMemory = VK_NULL_HANDLE;
 
