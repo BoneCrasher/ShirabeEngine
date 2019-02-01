@@ -75,7 +75,7 @@ namespace engine
              * @param aFormat          The format of the backbuffer images.
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
-            SPrePassExportData addPrePass(
+            CEngineResult<SPrePassExportData> addPrePass(
                     std::string        const &aPassName,
                     CGraphBuilder            &aGraphBuilder,
                     uint32_t           const &aWidth,
@@ -90,7 +90,7 @@ namespace engine
              * @param aOutput          The final output of the framegraph to commit.
              * @return                 Export data of this pass. Will be empty as this pass is the end of execution.
              */
-            SPresentPassExportData addPresentPass(
+            CEngineResult<SPresentPassExportData> addPresentPass(
                     std::string         const &aPassName,
                     CGraphBuilder             &aGraphBuilder,
                     SFrameGraphResource const &aOutput);

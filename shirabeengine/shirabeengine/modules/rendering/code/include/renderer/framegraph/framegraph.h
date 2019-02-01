@@ -31,7 +31,7 @@ namespace engine
                 : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
 #endif
         {
-            SHIRABE_DECLARE_LOG_TAG(CGraph);
+            SHIRABE_DECLARE_LOG_TAG(CGraph)
 
         public_classes:
             /**
@@ -99,8 +99,8 @@ namespace engine
                         typename... TPassCreationArgs
                         >
                 CEngineResult<CStdSharedPtr_t<TPass>> createPass(
-                        PassUID_t         const &uid,
-                        std::string       const &name,
+                        PassUID_t         const      &uid,
+                        std::string       const      &name,
                         TPassCreationArgs       &&...args);
 
             private_members:
@@ -116,7 +116,9 @@ namespace engine
              */
             CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<class CGraphBuilder> &&aKey) const
             {
-                return std::move(std::make_unique<CAccessor>(this));
+                SHIRABE_UNUSED(aKey);
+
+                return std::make_unique<CAccessor>(this);
             }
 
             /**
@@ -127,7 +129,9 @@ namespace engine
              */
             CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<class CGraphBuilder> &&aKey)
             {
-                return std::move(std::make_unique<CMutableAccessor>(this));
+                SHIRABE_UNUSED(aKey);
+
+                return std::make_unique<CMutableAccessor>(this);
             }
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION

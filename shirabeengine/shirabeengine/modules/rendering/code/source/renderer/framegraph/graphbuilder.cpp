@@ -131,6 +131,7 @@ namespace engine
             bool const inputInvalid =
                     nullptr == aApplicationEnvironment or
                     nullptr == aDisplay;
+
             if(inputInvalid)
             {
                 return { EEngineStatus::Error };
@@ -140,17 +141,18 @@ namespace engine
             mDisplay                 = aDisplay;
             graph()                  = makeCStdUniquePtr<CGraph>();
 
-            auto const pseudoSetup = [] (CPassBuilder const &, bool &) -> bool
+            // TODO: We add a dummy pass for the algorithm to work... Need to fix that up
+            auto const pseudoSetup = [] (CPassBuilder const &, bool &) -> CEngineResult<>
             {
-                return true;
+                return { EEngineStatus::Ok };
             };
 
             auto const pseudoExec  = [] (
                     bool                                      const &,
                     CFrameGraphResources                      const &,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &) -> bool
+                    CStdSharedPtr_t<IFrameGraphRenderContext>       &) -> CEngineResult<>
             {
-                return true;
+                return { EEngineStatus::Ok };
             };
 
             // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
@@ -181,12 +183,14 @@ namespace engine
         {
             auto const sourcePredicate = [&] (PassMap::value_type const &aPair) -> bool
             {
-                return (0 == aPassSource.compare(aPair.second->passName()));
+                std::string const &name = aPair.second->passName();
+                return (0 == aPassSource.compare(name));
             };
 
             auto const targetPredicate = [&] (PassMap::value_type const &aPair) -> bool
             {
-                return (0 == aPassTarget.compare(aPair.second->passName()));
+                std::string const &name = aPair.second->passName();
+                return (0 == aPassTarget.compare(name));
             };
 
             PassMap::const_iterator sourcePass = std::find_if(mPasses.begin(), mPasses.end(), sourcePredicate);
@@ -195,7 +199,7 @@ namespace engine
             bool const containsSourcePass = (mPasses.end() != sourcePass);
             bool const containsTargetPass = (mPasses.end() != targetPass);
 
-            if(!(containsSourcePass && containsTargetPass))
+            if(not (containsSourcePass && containsTargetPass))
             {
                 CLog::Error(logTag(), CString::format("Cannot create pass dependency from %0 to %1. At least one pass was not found.", aPassSource, aPassTarget));
                 return { EEngineStatus::Error };
@@ -218,7 +222,7 @@ namespace engine
                 PassUID_t const &aPassTarget)
         {
             bool const passAlreadyRegistered = alreadyRegisteredFn<PassUID_t>(mPassAdjacency[aPassSource], aPassTarget);
-            if(!passAlreadyRegistered)
+            if(not passAlreadyRegistered)
             {
                 mPassAdjacency[aPassSource].push_back(aPassTarget);
             }
@@ -361,13 +365,13 @@ namespace engine
                SFrameGraphResourceMap const &aResources,
                SFrameGraphResource    const &aStart)
         {
-            if(aStart.parentResource == 0)
+            if(SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE == aStart.parentResource)
             {
                 return { EEngineStatus::Ok, aStart.resourceId };
             }
             else
             {
-                if(aResources.find(aStart.parentResource) != aResources.end())
+                if(aResources.end() != aResources.find(aStart.parentResource))
                 {
                     return findSubjacentResource(aResources, aResources.at(aStart.parentResource));
                 }
@@ -392,12 +396,21 @@ namespace engine
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             FrameGraphResourceIdList const resources = accessor->mutableResourceReferences();
+
             for(FrameGraphResourceId_t const &resourceId : resources)
             {
-                SFrameGraphResource &resource = *mResourceData.getMutable<SFrameGraphResource>(resourceId);
+                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> resourceFetch = mResourceData.getMutable<SFrameGraphResource>(resourceId);
+                if(not resourceFetch.successful())
+                {
+                    CLog::Error(logTag(), "Could not fetch pass data.");
+
+                    return { resourceFetch.result() };
+                }
+
+                SFrameGraphResource &resource = *(resourceFetch.data());
 
                 // For each underlying OR imported resource (textures/buffers or whatever importable)
-                if(0 == resource.parentResource)
+                if(SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE == resource.parentResource)
                 {
                     if(EFrameGraphResourceType::Texture == resource.type)
                     {
@@ -418,7 +431,15 @@ namespace engine
                     // Avoid internal references for passes!
                     // If the edge from pass k to pass k+1 was not added yet.
                     // Create edge: Parent-->Source
-                    SFrameGraphResource const &parentResource = *mResourceData.get<SFrameGraphResource>(resource.parentResource);
+                    CEngineResult<CStdSharedPtr_t<SFrameGraphResource> const> parentResourceFetch = mResourceData.get<SFrameGraphResource>(resource.parentResource);
+                    if(not parentResourceFetch.successful())
+                    {
+                        CLog::Error(logTag(), "Could not fetch pass data.");
+
+                        return { resourceFetch.result() };
+                    }
+
+                    SFrameGraphResource const &parentResource = *(parentResourceFetch.data());
                     PassUID_t           const &passUID        = aPass->passUID();
 
                     // Create a pass dependency used for topologically sorting the graph
@@ -448,8 +469,18 @@ namespace engine
 
                     if(EFrameGraphResourceType::TextureView == resource.type)
                     {
-                        SFrameGraphTexture     &texture     = *mResourceData.getMutable<SFrameGraphTexture>    (resource.subjacentResource);
-                        SFrameGraphTextureView &textureView = *mResourceData.getMutable<SFrameGraphTextureView>(resource.resourceId);
+                        CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>>     textureFetch     = mResourceData.getMutable<SFrameGraphTexture>    (resource.subjacentResource);
+                        CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewFetch = mResourceData.getMutable<SFrameGraphTextureView>(resource.resourceId);
+
+                        if(not (textureFetch.successful() and textureViewFetch.successful()))
+                        {
+                            CLog::Error(logTag(), "Could not fetch texture and/or texture view from resource registry.");
+                            return { resourceFetch.result() };
+                        }
+
+                        SFrameGraphTexture     &texture     = *(textureFetch.data());
+                        SFrameGraphTextureView &textureView = *(textureViewFetch.data());
+
 
                         // Auto adjust format if requested
                         if(FrameGraphFormat_t::Automatic == textureView.format)
@@ -486,11 +517,11 @@ namespace engine
                             texture.requestedUsage.set(EFrameGraphResourceUsage::Unused);
                         }
                     }
-                    else if(resource.type == EFrameGraphResourceType::BufferView)
+                    else if(EFrameGraphResourceType::BufferView == resource.type)
                     {
                         // TODO
                     }
-                    else if(resource.type == EFrameGraphResourceType::RenderableListView)
+                    else if(EFrameGraphResourceType::RenderableListView == resource.type)
                     {
                         // TODO
                     }
@@ -525,23 +556,44 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraphBuilder::validate(std::stack<PassUID_t> const &aPassOrder)
         {
+            SHIRABE_UNUSED(aPassOrder);
+
             bool allBindingsValid = true;
 
             for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())
             {
-                SFrameGraphTextureView const &textureView = *mResourceData.get<SFrameGraphTextureView>(textureViewRef);
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> textureViewFetch = mResourceData.get<SFrameGraphTextureView>(textureViewRef);
+                if(not textureViewFetch.successful())
+                {
+                    CLog::Error(logTag(), "Failed to get texture view to validate.");
+                    return { textureViewFetch.result() };
+                }
+
+                SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
 
                 // Adjust resource access flags in the subjacent resource to have the texture creation configure
                 // everything appropriately.
-                FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
-                SFrameGraphTexture     const &texture             = *mResourceData.get<SFrameGraphTexture>(subjacentResourceId);
 
-                bool viewBindingValid = validateTextureView(texture, textureView);
+                FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
+
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> subjacentFetch = mResourceData.get<SFrameGraphTexture>(subjacentResourceId);
+                if(not textureViewFetch.successful())
+                {
+                    CLog::Error(logTag(), "Failed to get subjacent texture to validate.");
+                    return { textureViewFetch.result() };
+                }
+
+                SFrameGraphTexture const &texture = *(subjacentFetch.data());
+
+                bool viewBindingValid = true;
+                viewBindingValid  = validateTextureView(texture, textureView);
                 allBindingsValid &= viewBindingValid;
 
             } // foreach TextureView
 
-            return { allBindingsValid ? EEngineStatus::Ok : EEngineStatus::Error };
+            return { allBindingsValid
+                        ? EEngineStatus::Ok
+                        : EEngineStatus::Error };
         }
         //<-----------------------------------------------------------------------------
 
@@ -549,8 +601,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureView(
-                SFrameGraphTexture     const& aTexture,
-                SFrameGraphTextureView const& atextureView)
+                SFrameGraphTexture     const &aTexture,
+                SFrameGraphTextureView const &atextureView)
         {
             bool const usageValid             = validateTextureUsage(aTexture);
             bool const formatValid            = validateTextureFormat(aTexture, atextureView);
@@ -583,7 +635,9 @@ namespace engine
             {
                 uint64_t power = 2;
                 while(value >>= 1)
+                {
                     power <<= 1;
+                }
                 return power;
             };
 
@@ -592,7 +646,8 @@ namespace engine
 
             bool formatsCompatible = false;
 
-            switch(target) {
+            switch(target)
+            {
             case FrameGraphFormat_t::Undefined:
             case FrameGraphFormat_t::Structured:
                 // Invalid!
@@ -625,11 +680,11 @@ namespace engine
 
             bool arraySliceRangeValid = true;
             arraySliceRangeValid &= (arraySliceRange.offset < aTexture.arraySize);
-            arraySliceRangeValid &= ((arraySliceRange.offset + arraySliceRange.length) <= aTexture.arraySize);
+            arraySliceRangeValid &= ((arraySliceRange.offset + static_cast<uint32_t>(arraySliceRange.length)) <= aTexture.arraySize);
 
             bool mipSliceRangeValid = true;
             mipSliceRangeValid &= (mipSliceRange.offset < aTexture.mipLevels);
-            mipSliceRangeValid &= ((mipSliceRange.offset + mipSliceRange.length) <= aTexture.mipLevels);
+            mipSliceRangeValid &= ((mipSliceRange.offset + static_cast<uint32_t>(mipSliceRange.length)) <= aTexture.mipLevels);
 
             bool const valid = (arraySliceRangeValid && mipSliceRangeValid);
             return valid;

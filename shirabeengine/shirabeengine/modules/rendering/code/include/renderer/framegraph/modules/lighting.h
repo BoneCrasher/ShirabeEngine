@@ -60,7 +60,7 @@ namespace engine
              * @param aGbuffer3     GBuffer source containing relevant information for lighting.
              * @return              Export data of this pass to chain it with other passes' inputs.
              */
-            SLightingExportData addLightingPass(
+            CEngineResult<SLightingExportData> addLightingPass(
                     std::string         const &aPassName,
                     CGraphBuilder             &aGraphBuilder,
                     SFrameGraphResource const &aGbuffer0,

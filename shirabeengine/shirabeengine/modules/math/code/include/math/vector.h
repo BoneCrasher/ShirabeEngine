@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <initializer_list>
+#include <cmath>
 
 #include "math/field.h"
 

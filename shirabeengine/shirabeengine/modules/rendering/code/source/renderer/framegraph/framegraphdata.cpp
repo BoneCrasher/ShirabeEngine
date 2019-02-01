@@ -10,7 +10,8 @@ namespace engine
     template <>
     std::string to_string<EFrameGraphResourceType>(EFrameGraphResourceType const&type)
     {
-        switch(type) {
+        switch(type)
+        {
         default:
         case EFrameGraphResourceType::Undefined:   return "Undefined";
         case EFrameGraphResourceType::Texture:     return "Texture";
@@ -102,6 +103,8 @@ namespace engine
     template <>
     std::string to_string<framegraph::EFrameGraphWriteTarget>(framegraph::EFrameGraphWriteTarget const &aTarget)
     {
+        SHIRABE_UNUSED(aTarget);
+
         return "";
     }
     //<-----------------------------------------------------------------------------
@@ -112,6 +115,8 @@ namespace engine
     template <>
     std::string to_string<framegraph::EFrameGraphResourceAccessibility>(framegraph::EFrameGraphResourceAccessibility const &aAccessibility)
     {
+        SHIRABE_UNUSED(aAccessibility);
+
         return "";
     }
     //<-----------------------------------------------------------------------------
@@ -136,6 +141,8 @@ namespace engine
     template <>
     std::string to_string<framegraph::EFrameGraphViewAccessMode>(framegraph::EFrameGraphViewAccessMode const &aAccessMode)
     {
+        SHIRABE_UNUSED(aAccessMode);
+
         return "";
     }
     //<-----------------------------------------------------------------------------
@@ -172,6 +179,9 @@ namespace engine
                 FrameGraphFormat_t const &aBase,
                 FrameGraphFormat_t const &aDerived)
         {
+            SHIRABE_UNUSED(aBase);
+            SHIRABE_UNUSED(aDerived);
+
             return true;
         }
         //<-----------------------------------------------------------------------------
@@ -242,9 +252,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool SFrameGraphTexture::validate() const
         {
-            bool const dimensionsValid = (width == 0 || !(width == 0 || height == 0 || depth == 0));
-            bool const mipLevelsValid  = (mipLevels >= 1);
-            bool const arraySizeValid  = (arraySize >= 1);
+            bool const dimensionsValid = (0 == width || not (0 == width || 0 == height || 0 == depth));
+            bool const mipLevelsValid  = (1 <= mipLevels);
+            bool const arraySizeValid  = (1 <= arraySize);
 
             return (dimensionsValid && mipLevelsValid && arraySizeValid);
         }
@@ -357,7 +367,9 @@ namespace engine
             aSource.resize(aOutTarget.size() + aSource.size());
 
             for(T const &s : aSource)
+            {
                 aOutTarget.push_back(s);
+            }
         }
         //<-----------------------------------------------------------------------------
 
@@ -372,17 +384,34 @@ namespace engine
                 mResources = aOther.resources();
 
                 for(RefIndex_t::value_type const&id : aOther.textures())
+                {
                     CFrameGraphResourcesRef<SFrameGraphTexture>::insert(id);
+                }
+
                 for(RefIndex_t::value_type const&id : aOther.textureViews())
+                {
                     CFrameGraphResourcesRef<SFrameGraphTextureView>::insert(id);
+                }
+
                 for(RefIndex_t::value_type const&id : aOther.buffers())
+                {
                     CFrameGraphResourcesRef<SFrameGraphBuffer>::insert(id);
+                }
+
                 for(RefIndex_t::value_type const&id : aOther.bufferViews())
+                {
                     CFrameGraphResourcesRef<SFrameGraphBufferView>::insert(id);
+                }
+
                 for(RefIndex_t::value_type const&id : aOther.renderablesLists())
+                {
                     CFrameGraphResourcesRef<SFrameGraphRenderableList>::insert(id);
+                }
+
                 for(RefIndex_t::value_type const&id : aOther.renderableListViews())
+                {
                     CFrameGraphResourcesRef<SFrameGraphRenderableListView>::insert(id);
+                }
 
                 mAttachements = aOther.attachements();
 
@@ -392,6 +421,7 @@ namespace engine
             }
             catch(std::runtime_error const &aRTE)
             {
+                SHIRABE_UNUSED(aRTE);
                 return false;
             }
             catch(...)

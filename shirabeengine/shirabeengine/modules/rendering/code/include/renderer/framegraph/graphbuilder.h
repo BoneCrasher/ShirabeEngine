@@ -31,7 +31,7 @@ namespace engine
          */
         class SHIRABE_TEST_EXPORT CGraphBuilder
         {
-            SHIRABE_DECLARE_LOG_TAG(CGraphBuilder);
+            SHIRABE_DECLARE_LOG_TAG(CGraphBuilder)
 
         public_constructors:
             /**
@@ -389,7 +389,7 @@ namespace engine
                 aVisitedEdges[aVertex] = true;
 
                 // For each outgoing edge...
-                bool const doesNotContainEdge = (aEdges.find(aVertex) == aEdges.end());
+                bool const doesNotContainEdge = (aEdges.end() == aEdges.find(aVertex));
                 if(!doesNotContainEdge)
                 {
                     for(TUID const &adjacent : aEdges.at(aVertex))
@@ -411,7 +411,7 @@ namespace engine
                 }
 
                 for(typename AdjacencyListMap_t<TUID>::value_type &passAdjacency : mPassAdjacency)
-                {
+                {                    
                     DSFi_fn(mPassAdjacency, passAdjacency.first, visitedEdges, aOutPassOrder);
                 }
             }

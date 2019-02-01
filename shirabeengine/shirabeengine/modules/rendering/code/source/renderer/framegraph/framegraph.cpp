@@ -100,7 +100,11 @@ namespace engine
         {
             return mGraph->mPassAdjacency;
         }
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         std::stack<PassUID_t> &CGraph::CMutableAccessor::mutablePassExecutionOrder()
         {
             return mGraph->mPassExecutionOrder;
@@ -251,20 +255,22 @@ namespace engine
 
             for(FrameGraphResourceId_t const&id : aResourceIds)
             {
+                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> subjacentFetch;
+
                 CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
                 CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
                 CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
                 FrameGraphResourceIdList::const_iterator it = mInstantiatedResources.end();
 
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
                     texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
 
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
-                    if(it == mInstantiatedResources.end())
+                    if(mInstantiatedResources.end() == it)
                     {
                         initialization = initializeTexture(aRenderContext, texture);
                         if(not initialization.successful())
@@ -280,15 +286,22 @@ namespace engine
 
                     break;
                 case EFrameGraphResourceType::TextureView:
-                    subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                    subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(resource->subjacentResource);
+                    if(not subjacentFetch.successful())
+                    {
+                        EngineStatusPrintOnError(subjacentFetch.result(), logTag(), "Failed to fetch subjacent resource.");
+                        result = CEngineResult<>(subjacentFetch.result());
+                    }
+
+                    subjacent   = subjacentFetch.data();
                     texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
                     textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);                    
 
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), textureView->resourceId);
-                    if(it == mInstantiatedResources.end())
+                    if(mInstantiatedResources.end() == it)
                     {
                         bool const subjacentTextureCreated = (mInstantiatedResources.end() != std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId));
-                        if(!texture->isExternalResource && !subjacentTextureCreated)
+                        if(not texture->isExternalResource && not subjacentTextureCreated)
                         {
                             initialization = initializeResources(aRenderContext, {texture->resourceId});
                             if(not initialization.successful())
@@ -375,7 +388,7 @@ namespace engine
             {
                 CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
@@ -412,7 +425,7 @@ namespace engine
             {
                 CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id);
+                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
@@ -442,13 +455,17 @@ namespace engine
                 CStdSharedPtr_t<IFrameGraphRenderContext>      &aRenderContext,
                 FrameGraphResourceIdList                  const&aResourceIds)
         {
+            SHIRABE_UNUSED(aRenderContext);
+
             std::function<CEngineResult<>(FrameGraphResourceId_t const&, bool)> recurse = nullptr;
 
             recurse = [&, this] (FrameGraphResourceId_t const &aId, bool aIncludeSubjacent) -> CEngineResult<>
             {
+                SHIRABE_UNUSED(aIncludeSubjacent);
+
                 CEngineResult<> deinitialized = { EEngineStatus::Ok };
 
-                CStdSharedPtr_t<SFrameGraphResource>    resource    = mResourceData.getMutable<SFrameGraphResource>(aId);
+                CStdSharedPtr_t<SFrameGraphResource>    resource    = mResourceData.getMutable<SFrameGraphResource>(aId).data();
                 CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
                 CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
                 CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
@@ -484,7 +501,14 @@ namespace engine
 
                     if(resource->referenceCount == 0)
                     {
-                        subjacent   = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                        CEngineResult<CStdSharedPtr_t<SFrameGraphResource> const> subjacentFetch = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                        if(not subjacentFetch.successful())
+                        {
+                            EngineStatusPrintOnError(subjacentFetch.result(), logTag(), "Failed to fetch subjacent resource.");
+                            return CEngineResult<>(subjacentFetch.result());
+                        }
+
+                        subjacent   = subjacentFetch.data();
                         texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
                         textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 

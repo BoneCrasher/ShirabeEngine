@@ -188,40 +188,53 @@ namespace engine
 
                 for(auto const &index : attachmentResourceIndexList)
                 {
-                    FrameGraphResourceId_t const &resourceId = attachmentResources[index];
+                    FrameGraphResourceId_t const &resourceId = attachmentResources.at(index);
 
-                    CStdSharedPtr_t<SFrameGraphTextureView> const &textureView = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
-                    assert(nullptr != textureView);
-                    CStdSharedPtr_t<SFrameGraphTexture>     const &texture     = aFrameGraphResources.get<SFrameGraphTexture>(textureView->subjacentResource);
-                    assert(nullptr != texture);
+                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                    if(not textureViewFetch.successful())
+                    {
+                        CLog::Error(logTag(), CString::format("Fetching texture view w/ id %1 failed.", resourceId));
+                        return { EEngineStatus::ResourceError_NotFound };
+                    }
+
+                    SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+
+                    CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(textureView.subjacentResource);
+                    if(not textureFetch.successful())
+                    {
+                        CLog::Error(logTag(), CString::format("Fetching texture w/ id %1 failed.", textureView.subjacentResource));
+                        return { EEngineStatus::ResourceError_NotFound };
+                    }
+
+                    SFrameGraphTexture const &texture = *(textureFetch.data());
 
                     // Validation first!
                     bool dimensionsValid = true;
                     if(0 > width)
                     {
-                        width  = static_cast<int32_t>(texture->width);
-                        height = static_cast<int32_t>(texture->height);
-                        layers = textureView->arraySliceRange.length;
+                        width  = static_cast<int32_t>(texture.width);
+                        height = static_cast<int32_t>(texture.height);
+                        layers = textureView.arraySliceRange.length;
 
                         dimensionsValid = (0 < width and 0 < height and 0 < layers);
                     }
                     else
                     {
-                        bool const validWidth  = (width  == static_cast<int32_t>(texture->width));
-                        bool const validHeight = (height == static_cast<int32_t>(texture->height));
-                        bool const validLayers = (layers == static_cast<int32_t>(textureView->arraySliceRange.length));
+                        bool const validWidth  = (width  == static_cast<int32_t>(texture.width));
+                        bool const validHeight = (height == static_cast<int32_t>(texture.height));
+                        bool const validLayers = (layers == static_cast<int32_t>(textureView.arraySliceRange.length));
 
                         dimensionsValid = (validWidth and validHeight and validLayers);
                     }
 
                     if(not dimensionsValid)
                     {
-                        EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Invalid image view dimensions for frame buffer creation.");
+                        EngineStatusPrintOnError(EEngineStatus::FrameGraph_RenderContext_AttachmentDimensionsInvalid, logTag(), "Invalid image view dimensions for frame buffer creation.");
                         return { EEngineStatus::Error };
                     }
 
                     // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
-                    textureViewIds.push_back(textureView->readableName);
+                    textureViewIds.push_back(textureView.readableName);
 
                     uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
 
@@ -230,7 +243,7 @@ namespace engine
                     attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
                     attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
                     attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
-                    attachmentDesc.format         = textureView->format;
+                    attachmentDesc.format         = textureView.format;
                     attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;       // For now we don't care about the initial layout...
                     attachmentDesc.finalLayout    = EImageLayout::PRESENT_SRC_KHR; // For now we just assume everything to be presentable...
 
@@ -270,7 +283,7 @@ namespace engine
             {
                 return { EEngineStatus::Ok };
             }
-            else
+            else if(not (EEngineStatus::Ok == status.result()))
             {
                 EngineStatusPrintOnError(status.result(), logTag(), "Failed to create render pass.");
                 return { status };
@@ -327,11 +340,19 @@ namespace engine
             desc.textureInfo = aTexture;
 
             if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment))
+            {
                 desc.gpuBinding.set(EBufferBinding::ColorAttachment);
+            }
+
             if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment))
+            {
                 desc.gpuBinding.set(EBufferBinding::DepthAttachment);
+            }
+
             if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment))
+            {
                 desc.gpuBinding.set(EBufferBinding::InputAttachment);
+            }
 
             desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 
@@ -387,6 +408,10 @@ namespace engine
                 SFrameGraphResource    const &aResource,
                 SFrameGraphBuffer      const &aBuffer)
         {
+            SHIRABE_UNUSED(aResourceId);
+            SHIRABE_UNUSED(aResource);
+            SHIRABE_UNUSED(aBuffer);
+
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -399,6 +424,10 @@ namespace engine
                 SFrameGraphResource    const &aResource,
                 SFrameGraphBufferView  const &aBufferView)
         {
+            SHIRABE_UNUSED(aResourceId);
+            SHIRABE_UNUSED(aResource);
+            SHIRABE_UNUSED(aBufferView);
+
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -408,6 +437,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::loadTextureAsset(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -417,6 +447,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::loadBufferAsset(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -426,6 +457,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -455,6 +487,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t  const &aResourceId)
         {
+            SHIRABE_UNUSED(aResourceId);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -464,6 +497,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindMesh(AssetId_t const&aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -494,6 +528,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId)
         {
+            SHIRABE_UNUSED(aResourceId);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -503,6 +538,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unbindMesh(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -512,6 +548,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unloadTextureAsset(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -521,6 +558,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unloadBufferAsset(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -530,6 +568,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetUID)
         {
+            SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -566,6 +605,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::destroyBuffer(FrameGraphResourceId_t const &aResourceId)
         {
+            SHIRABE_UNUSED(aResourceId);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -575,6 +615,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::destroyBufferView(FrameGraphResourceId_t const &aResourceId)
         {
+            SHIRABE_UNUSED(aResourceId);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -603,6 +644,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::render(SRenderable const &aRenderable)
         {
+            SHIRABE_UNUSED(aRenderable);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------

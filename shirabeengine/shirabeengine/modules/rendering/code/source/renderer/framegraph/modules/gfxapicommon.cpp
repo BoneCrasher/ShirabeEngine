@@ -7,7 +7,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPrePassExportData
+        CEngineResult
+        <
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPrePassExportData
+        >
         CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addPrePass(
                 std::string        const &aPassName,
                 CGraphBuilder            &aGraphBuilder,
@@ -36,8 +39,9 @@ namespace engine
             };
 
             auto const setup = [&] (
-                    CPassBuilder       &aBuilder,
-                    SPrePassData &aOutPassData) -> bool
+                    CPassBuilder &aBuilder,
+                    SPrePassData &aOutPassData)
+                    -> CEngineResult<>
             {
                 SFrameGraphTexture backBufferTextureDesc{ };
                 backBufferTextureDesc.readableName   = "BackBuffer";
@@ -50,22 +54,42 @@ namespace engine
                 backBufferTextureDesc.mipLevels      = 1;
                 backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::ColorAttachment | EFrameGraphResourceUsage::Unused;
 
-                aOutPassData.importData.backBufferInput = aBuilder.importTexture(backBufferTextureDesc.readableName, backBufferTextureDesc);
+                CEngineResult<SFrameGraphResource> backBufferImport = aBuilder.importTexture(backBufferTextureDesc.readableName, backBufferTextureDesc);
+#ifdef SHIRABE_DEBUG
+                if(not backBufferImport.successful())
+                {
+                    CLog::Error(logTag(), CString::format("Failed to import back buffer texture '%1'", backBufferTextureDesc.readableName));
+                    return { backBufferImport.result() };
+                }
+#endif
+                aOutPassData.importData.backBufferInput = backBufferImport.data();
 
                 SFrameGraphResourceFlags flags{};
                 flags.requiredFormat = FrameGraphFormat_t::Automatic;
 
-                aOutPassData.exportData.backbuffer = aBuilder.forwardTexture(aOutPassData.importData.backBufferInput, flags);
+                CEngineResult<SFrameGraphResource> backBufferForward = aBuilder.forwardTexture(aOutPassData.importData.backBufferInput, flags);
+#ifdef SHIRABE_DEBUG
+                if(not backBufferForward.successful())
+                {
+                    CLog::Error(logTag(), CString::format("Failed to forward back buffer texture w/ id '%1'", aOutPassData.importData.backBufferInput));
+                    return { backBufferForward.result() };
+                }
+#endif
 
-                return true;
+                aOutPassData.exportData.backbuffer = backBufferForward.data();
+
+                return { EEngineStatus::Ok };
             };
 
             auto const execute = [=] (
                     SPrePassData                              const &aPassData,
                     CFrameGraphResources                      const &aFrameGraphResources,
                     CStdSharedPtr_t<IFrameGraphRenderContext>
-                    &aContext) -> bool
+                    &aContext)
+                    -> CEngineResult<>
             {
+                SHIRABE_UNUSED(aFrameGraphResources);
+
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "PrePass");
@@ -73,18 +97,28 @@ namespace engine
                 aContext->bindSwapChain(aPassData.importData.backBufferInput);
                 aContext->bindCommandBuffer();
 
-                return true;
+                return { EEngineStatus::Ok };
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPrePassData>>(aPassName, setup, execute);
-            return pass->passData().exportData;
+            CEngineResult<CStdSharedPtr_t<CallbackPass<SPrePassData>>> passFetch = aGraphBuilder.spawnPass<CallbackPass<SPrePassData>>(aPassName, setup, execute);
+            if(not passFetch.successful())
+            {
+                return { EEngineStatus::Error };
+            }
+            else
+            {
+                return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
+            }
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData
+        CEngineResult
+        <
+            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData
+        >
         CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::addPresentPass(
                 std::string         const &aPassName,
                 CGraphBuilder             &aGraphBuilder,
@@ -111,22 +145,27 @@ namespace engine
 
             auto const setup = [&] (
                     CPassBuilder     &aBuilder,
-                    SPresentPassData &aOutPassData) -> bool
+                    SPresentPassData &aOutPassData)
+                    -> CEngineResult<>
             {
                 SFrameGraphReadTextureFlags readFlags{ };
                 readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
                 readFlags.source         = EFrameGraphReadSource::Color;
 
-                aOutPassData.importData.finalOutputId = aBuilder.readTexture(aOutput, readFlags, CRange(0, 1), CRange(0, 1));
+                aOutPassData.importData.finalOutputId = aBuilder.readTexture(aOutput, readFlags, CRange(0, 1), CRange(0, 1)).data();
 
-                return true;
+                return { EEngineStatus::Ok };
             };
 
             auto const execute = [=] (
                     SPresentPassData                          const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext)
+                    -> CEngineResult<>
             {
+                SHIRABE_UNUSED(aPassData);
+                SHIRABE_UNUSED(aFrameGraphResources);
+
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "SwapChainPass");
@@ -134,11 +173,26 @@ namespace engine
                 aContext->commitCommandBuffer();
                 aContext->present();
 
-                return true;
+                return { EEngineStatus::Ok };
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>(aPassName, setup, execute);
-            return pass->passData().exportData;
+            CEngineResult<CStdSharedPtr_t<CallbackPass<SPresentPassData>>> spawn = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>(aPassName, setup, execute);
+            if(not spawn.successful())
+            {
+                return { EEngineStatus::Error };
+            }
+            else
+            {
+                CStdSharedPtr_t<CallbackPass<SPresentPassData>> pass = spawn.data();
+                if(nullptr == pass)
+                {
+                    return { EEngineStatus::NullPointer };
+                }
+                else
+                {
+                    return { EEngineStatus::Ok, pass->passData().exportData };
+                }
+            }
         }
         //<-----------------------------------------------------------------------------
     }

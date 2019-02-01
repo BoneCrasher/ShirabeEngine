@@ -18,11 +18,10 @@ set(SHIRABE_GCC_LD_CXXFLAGS)
 #
 set(
         SHIRABE_GCC_CL_COMMON_FLAGS
-            "-v"            # Print to the max
-            "-std=c++17"    # C++11 required
-            "-fpermissive"  # Actually bad... Try to remove!
-            "-fexceptions"  # Enable std exceptions
-            "-pthread"      # Enforce to use of pthread, as all ext. libs do
+            "-v"              # Print to the max
+            "-std=c++17"      # C++17 required
+            "-fexceptions"    # Enable std exceptions
+            "-pthread"        # Enforce to use of pthread, as all ext. libs do
 )
 
 if(SHIRABE_BUILD_SHAREDLIB OR SHIRABE_BUILD_STATICLIB)
@@ -112,21 +111,26 @@ endif()
 #
 if(SHIRABE_CC__WARNING_LEVEL)
         if(${SHIRABE_CC__WARNING_LEVEL} GREATER 2) # Activate even more complaints
-        append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wextra")
+            append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wextra")
         elseif(${SHIRABE_CC__WARNING_LEVEL} GREATER 1) # Activate "all" warnings
-         append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wall")
+            append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wall")
 	else()
 	     # Default, nothing to add.
 	endif()
 
 	 # Additionally, enforce ISO-violation warnings and even more?
         if(${SHIRABE_CC__WARNING_LEVEL} GREATER 3)
-        append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wpedantic")
+            # append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wpedantic")
 	endif()
 else() # 0# Default. Don't change anything
         append(SHIRABE_GCC_CL_COMMON_FLAGS "-w")
 endif()
 	
+# In any case, ignore excessive ;
+append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-extra-semi")
+append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-reserved-id-macro")
+
+
 #
 # Convert SHIRABE_CC__OPTIMIZATION_LEVEL
 #

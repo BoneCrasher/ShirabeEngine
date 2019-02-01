@@ -172,9 +172,24 @@ namespace engine
          *
          * @param aResult
          */
-        inline AResult(TResult const &aResult)
+        SHIRABE_INLINE AResult(TResult const &aResult)
             : mResult(aResult)
         {}
+
+        SHIRABE_INLINE AResult(AResult<TResult, void> const &aOther)
+            : mResult(aOther.mResult)
+        {}
+
+        AResult(AResult<TResult, void> &&) = delete;
+
+        SHIRABE_INLINE AResult<TResult, void> &operator=(AResult<TResult, void> const &aOther)
+        {
+            mResult = aOther.mResult;
+
+            return (*this);
+        }
+
+        AResult<TResult, void> &operator=(AResult<TResult, void> &&) = delete;
 
     public_destructors:
         /**

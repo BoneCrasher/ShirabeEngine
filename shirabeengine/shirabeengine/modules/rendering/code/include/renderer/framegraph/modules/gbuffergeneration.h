@@ -58,7 +58,7 @@ namespace engine
              * @param aRenderableInput The renderables for which gbuffer data should be generated.
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
-            SGBufferGenerationExportData addGBufferGenerationPass(
+            CEngineResult<SGBufferGenerationExportData> addGBufferGenerationPass(
                     std::string         const &aPassName,
                     CGraphBuilder             &aGraphBuilder,
                     SFrameGraphResource const &aRenderableInput);

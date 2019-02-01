@@ -69,6 +69,7 @@ namespace engine
                 CAccessor(CPassBase const *aPass);
 
             private_members:
+                // Pointer to the pass this accessor is attached to.
                 CPassBase const *mPass;
             };
 
@@ -307,10 +308,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
         CallbackPass<TPassData>::CallbackPass(
-                PassUID_t       const&passUID,
-                std::string     const&passName,
-                SetupCallback_t     &&setupCb,
-                ExecCallback_t      &&execCb)
+                PassUID_t       const  &passUID,
+                std::string     const  &passName,
+                SetupCallback_t       &&setupCb,
+                ExecCallback_t        &&execCb)
             : CPassBase(passUID, passName)
             , mSetupCallback(setupCb)
             , mExecCallback(execCb)
@@ -328,6 +329,7 @@ namespace engine
         CEngineResult<> CallbackPass<TPassData>::setup(CPassBuilder &aBuilder)
         {
             TPassData passData{ };
+
             CEngineResult<> setup = mSetupCallback(aBuilder, passData);
             if(setup.successful())
             {

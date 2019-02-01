@@ -63,7 +63,7 @@ namespace engine
              * @param aLightAccumulationBuffer Light Accumulation data for compositing.
              * @return                         Export data of this pass to chain it with other passes' inputs.
              */
-            SExportData addDefaultCompositingPass(
+            CEngineResult<SExportData> addDefaultCompositingPass(
                     std::string         const &aPassName,
                     CGraphBuilder             &aGraphBuilder,
                     SFrameGraphResource const &aGbuffer0,

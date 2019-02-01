@@ -7,7 +7,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
+        CEngineResult
+        <
+            CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
+        >
         CFrameGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
                 std::string         const &aPassName,
                 CGraphBuilder             &aGraphBuilder,
@@ -35,7 +38,8 @@ namespace engine
 
             auto const setup = [&] (
                     CPassBuilder &aBuilder,
-                    SPassData    &aOutPassData) -> bool
+                    SPassData    &aOutPassData)
+                    -> CEngineResult<>
             {
                 uint32_t width  = 1920;
                 uint32_t height = 1080;
@@ -45,7 +49,7 @@ namespace engine
                 {
                     CStdSharedPtr_t<wsi::CWSIDisplay> const &display = aGraphBuilder.display();
 
-                    SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
+                    SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
                     width  = displayDesc.bounds.size.x();
                     height = displayDesc.bounds.size.y();
                 }
@@ -61,7 +65,7 @@ namespace engine
                 gbufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
 
                 // Basic underlying output buffer to be linked
-                aOutPassData.state.gbufferTextureArrayId = aBuilder.createTexture("GBuffer Array Texture", gbufferDesc);
+                aOutPassData.state.gbufferTextureArrayId = aBuilder.createTexture("GBuffer Array Texture", gbufferDesc).data();
 
                 // This will create a list of render targets for the texutre array to render to.
                 // They'll be internally created and managed.
@@ -69,55 +73,92 @@ namespace engine
                 flags.requiredFormat = gbufferDesc.format;
                 flags.writeTarget    = EFrameGraphWriteTarget::Color;
 
-                aOutPassData.exportData.gbuffer0 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(0, 1), CRange(0, 1));
-                aOutPassData.exportData.gbuffer1 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(1, 1), CRange(0, 1));
-                aOutPassData.exportData.gbuffer2 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(2, 1), CRange(0, 1));
-                aOutPassData.exportData.gbuffer3 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(3, 1), CRange(0, 1));
+                aOutPassData.exportData.gbuffer0 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(0, 1), CRange(0, 1)).data();
+                aOutPassData.exportData.gbuffer1 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(1, 1), CRange(0, 1)).data();
+                aOutPassData.exportData.gbuffer2 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(2, 1), CRange(0, 1)).data();
+                aOutPassData.exportData.gbuffer3 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(3, 1), CRange(0, 1)).data();
 
                 // Import renderable objects based on selector, flags, or whatever should be supported...
-                aOutPassData.importData.renderableListView = aBuilder.importRenderables("SceneRenderables", aRenderableInput);
+                aOutPassData.importData.renderableListView = aBuilder.importRenderables("SceneRenderables", aRenderableInput).data();
 
-                return true;
+                return { EEngineStatus::Ok };
             };
 
             auto const execute = [=] (
                     SPassData                                 const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext) -> bool
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext)
+                    -> CEngineResult<>
             {
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
-                CStdSharedPtr_t<SFrameGraphRenderableListView> const &renderableView =
-                        aFrameGraphResources.get<SFrameGraphRenderableListView>(aPassData.importData.renderableListView.resourceId);
+                CEngineResult<CStdSharedPtr_t<SFrameGraphRenderableListView> const> renderableViewFetch = aFrameGraphResources.get<SFrameGraphRenderableListView>(aPassData.importData.renderableListView.resourceId);
+                if(not renderableViewFetch.successful())
+                {
+                    CLog::Error(logTag(), "Failed to fetch renderable view.");
+                    return { renderableViewFetch.result() };
+                }
 
+                CStdSharedPtr_t<SFrameGraphRenderableListView> const &renderableView = renderableViewFetch.data();
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(!renderableView)
-                    throw std::runtime_error(CString::format("Renderable view with id %0 not found.", aPassData.importData.renderableListView.resourceId));
+                if(nullptr == renderableView)
+                {
+                    CLog::Error(logTag(), CString::format("Renderable view with id %0 not found.", aPassData.importData.renderableListView.resourceId));
+                    return { renderableViewFetch.result() };
+                }
 #endif
+                CEngineResult<CStdSharedPtr_t<SFrameGraphRenderableList> const> renderableListFetch =
+                    aFrameGraphResources.get<SFrameGraphRenderableList>(aPassData.importData.renderableListView.subjacentResource);
 
-                CStdSharedPtr_t<SFrameGraphRenderableList> const&renderableList =
-                        aFrameGraphResources.get<SFrameGraphRenderableList>(aPassData.importData.renderableListView.subjacentResource);
+                if(not renderableListFetch.successful())
+                {
+                    CLog::Error(logTag(), "Failed to fetch renderable list.");
+                    return { EEngineStatus::NullPointer };
+                }
 
+                CStdSharedPtr_t<SFrameGraphRenderableList> const &renderableList = renderableListFetch.data();
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(!renderableList)
-                    throw std::runtime_error(CString::format("Renderable list with id %0 not found.", aPassData.importData.renderableListView.subjacentResource));
+                if(nullptr == renderableList)
+                {
+                    CLog::Error(logTag(), CString::format("Renderable list with id %0 not found.", aPassData.importData.renderableListView.subjacentResource));
+                    return { EEngineStatus::NullPointer };
+                }
 #endif
 
                 for(FrameGraphResourceId_t const &renderableId : renderableView->renderableRefIndices)
                 {
                     FrameGraphRenderable_t const &renderable = renderableList->renderableList.at(renderableId);
 
-                    EEngineStatus status = aContext->render(renderable);
-                    HandleEngineStatusError(status, "Failed to render renderable.");
+                    CEngineResult<> renderCall = aContext->render(renderable);
+                    if(not renderCall.successful())
+                    {
+                        CLog::Error(logTag(), "Failed to render renderable.");
+                        return { renderCall.result() };
+                    }
                 }
 
-                return true;
+                return { EEngineStatus::Ok };
             };
 
-            auto pass = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
-            return pass->passData().exportData;
+            auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
+            if(not passFetch.successful())
+            {
+                return { EEngineStatus::Error };
+            }
+            else
+            {
+                CStdSharedPtr_t<CallbackPass<SPassData>> pass = passFetch.data();
+                if(nullptr == pass)
+                {
+                    return { EEngineStatus::NullPointer };
+                }
+                else
+                {
+                    return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
+                }
+            }
         }
         //<-----------------------------------------------------------------------------
     }

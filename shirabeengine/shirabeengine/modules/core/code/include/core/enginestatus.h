@@ -107,6 +107,7 @@ namespace engine
         FrameGraph_PassBuilder_ReadResourceFailed                       = -500106,
         FrameGraph_PassBuilder_WriteResourceFailed                      = -500107,
         FrameGraph_PassBuilder_ImportRenderablesFailed                  = -500151,
+        FrameGraph_RenderContext_AttachmentDimensionsInvalid            = -500501,
     };
 
     /**

@@ -23,14 +23,14 @@ namespace engine
 {
     namespace framegraph
     {
-
-
         using core::CBitField;
         using engine::CRange;
         using namespace engine::rendering;
 
         using FrameGraphResourceId_t = uint64_t;
         using PassUID_t              = uint64_t;
+
+#define SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE 0
 
         SHIRABE_DECLARE_LIST_OF_TYPE(FrameGraphResourceId_t, FrameGraphResourceId);
 
@@ -200,6 +200,14 @@ namespace engine
                 return resourceId;
             }
 
+            /**
+             * Extract the resource id via implicit conversion in const context.
+             */
+            SHIRABE_INLINE operator FrameGraphResourceId_t const() const
+            {
+                return resourceId;
+            }
+
         public_members:
             uint32_t                referenceCount;
             PassUID_t               assignedPassUID;
@@ -290,6 +298,9 @@ namespace engine
              * Default-Construt a frame graph texture
              */
             SFrameGraphTexture();
+
+        public_destructors:
+            virtual ~SFrameGraphTexture() = default;
 
         public_methods:
             /**
@@ -533,14 +544,20 @@ namespace engine
              *
              * @return See brief.
              */
-            RefIndex_t const &get() const { return m_index; }
+            RefIndex_t const &get() const
+            {
+                return m_index;
+            }
 
             /**
              * Return the current index state mutably.
              *
              * @return See brief.
              */
-            RefIndex_t &getMutable() { return m_index; }
+            RefIndex_t &getMutable()
+            {
+                return m_index;
+            }
 
         private:
             RefIndex_t m_index;
@@ -564,7 +581,7 @@ namespace engine
         class CFrameGraphResources
                 : public CFrameGraphResourcesRefContainer<SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES>
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphResources);
+            SHIRABE_DECLARE_LOG_TAG(CFrameGraphResources)
 
         public_constructors:
             CFrameGraphResources();
@@ -579,7 +596,8 @@ namespace engine
              * @throw             Throws std::runtime_error on error.
              */
             template <typename T>
-            CEngineResult<
+            CEngineResult
+            <
                 CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>> const
             >
             get(FrameGraphResourceId_t const &aResourceId) const

@@ -32,7 +32,7 @@ namespace engine
             SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
             resource.assignTextureParameters(aDescriptor);
             resource.assignedPassUID     = mPassUID;
-            resource.parentResource      = 0;
+            resource.parentResource      = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
             resource.subjacentResource   = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName        = aName;
             resource.type                = EFrameGraphResourceType::Texture;
@@ -54,7 +54,7 @@ namespace engine
             SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
             resource.assignTextureParameters(aDescriptor);
             resource.assignedPassUID     = mPassUID;
-            resource.parentResource      = 0;
+            resource.parentResource      = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
             resource.subjacentResource   = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName        = aName;
             resource.type                = EFrameGraphResourceType::Texture;
@@ -90,7 +90,7 @@ namespace engine
                 bool const equal =
                         (compareView.arraySliceRange == aArrayRange)
                         and (compareView.mipSliceRange == aMipRange)
-                        and ((aFormat == FrameGraphFormat_t::Automatic) or (compareView.format == aFormat))
+                        and ((FrameGraphFormat_t::Automatic == aFormat) or (compareView.format == aFormat))
                         and (compareView.source == aViewSource)
                         and (compareView.mode.check(aMode))
                         and (compareView.subjacentResource == aSubjacentResourceId);
@@ -118,7 +118,8 @@ namespace engine
         {
             aAdjustedArraySliceRange = aArraySliceRange;
             aAdjustedMipSliceRange   = aMipSliceRange;
-            if(aSourceResource.type == EFrameGraphResourceType::TextureView)
+
+            if(EFrameGraphResourceType::TextureView == aSourceResource.type)
             {
                 CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.subjacentResource);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
@@ -489,7 +490,7 @@ namespace engine
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
             FrameGraphResourceId_t const subjacentResourceId =
-                    (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
+                    (EFrameGraphResourceType::Texture == aSubjacentTargetResource.type)
                      ? aSubjacentTargetResource.resourceId
                      : aSubjacentTargetResource.subjacentResource;
 
@@ -519,7 +520,7 @@ namespace engine
 
             // Can we cull?
             bool duplicateFound = false;
-            if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
+            if(EFrameGraphResourceType::TextureView == aSubjacentTargetResource.type)
             {
                 CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery =
                         findDuplicateTextureView(
@@ -529,6 +530,7 @@ namespace engine
                             adjustedArraySliceRange,
                             adjustedMipSliceRange,
                             mode);
+
                 if(not duplicateViewIdQuery.successful())
                 {
                     return { duplicateViewIdQuery.result() };
@@ -602,11 +604,11 @@ namespace engine
         {
             EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
 
-            if(aFlags.writeTarget == EFrameGraphWriteTarget::Color)
+            if(EFrameGraphWriteTarget::Color == aFlags.writeTarget)
             {
                 source = EFrameGraphViewSource::Color;
             }
-            else if(aFlags.writeTarget == EFrameGraphWriteTarget::Depth)
+            else if(EFrameGraphWriteTarget::Depth == aFlags.writeTarget)
             {
                 source = EFrameGraphViewSource::Depth;
             }
@@ -632,11 +634,11 @@ namespace engine
         {                        
             EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
 
-            if(aFlags.source == EFrameGraphReadSource::Color)
+            if(EFrameGraphReadSource::Color == aFlags.source)
             {
                 source = EFrameGraphViewSource::Color;
             }
-            else if(aFlags.source == EFrameGraphReadSource::Depth)
+            else if(EFrameGraphReadSource::Depth == aFlags.source)
             {
                 source = EFrameGraphViewSource::Depth;
             }
