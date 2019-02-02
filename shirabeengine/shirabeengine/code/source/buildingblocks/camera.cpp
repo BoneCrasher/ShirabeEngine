@@ -77,7 +77,9 @@ namespace engine
             CVector3D_t       const &aUp,
             CVector3D_t       const &aForward,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::LH)
-    {
+    {      
+        SHIRABE_UNUSED(aCoordinateSystem);
+
         CVector3D_t const n_up      = math::normalize(aUp);
         CVector3D_t const n_forward = math::normalize(aForward);
         CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
@@ -119,6 +121,8 @@ namespace engine
             CVector3D_t       const &aTarget,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
+        SHIRABE_UNUSED(aCoordinateSystem);
+
         CVector3D_t const n_up      = math::normalize(aUp);
         CVector3D_t const n_forward = math::normalize((aTarget - aEye));
         CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
@@ -161,8 +165,8 @@ namespace engine
         float const t = aBounds.y();
         float const r = aBounds.z();
         float const b = aBounds.w();
-        float const f = aFar;
-        float const n = aNear;
+        float const f = static_cast<float const>(aFar);
+        float const n = static_cast<float const>(aNear);
 
         float const width  = (r - l);
         float const height = (t - b);
