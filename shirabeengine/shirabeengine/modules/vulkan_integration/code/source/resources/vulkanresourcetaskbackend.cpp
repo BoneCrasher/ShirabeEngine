@@ -11,7 +11,7 @@ namespace engine
             : CGFXAPIResourceTaskBackend()
             , mVulkanEnvironment(aVulkanEnvironment)
         {
-            assert(mVulkanEnvironment != nullptr);
+            assert(nullptr != mVulkanEnvironment);
         }
         //<-----------------------------------------------------------------------------
 

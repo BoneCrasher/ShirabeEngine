@@ -14,7 +14,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureViewCreationTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureViewCreationTask(
                 CTextureView::CCreationRequest const &aRequest,
                 ResolvedDependencyCollection_t const &aDepencies,
                 ResourceTaskFn_t                     &aOutTask)
@@ -32,48 +32,58 @@ namespace engine
             switch(dimensionCount)
             {
             case 1:
-                if(desc.subjacentTexture.arraySize > 1)
+                if(1 < desc.subjacentTexture.arraySize)
+                {
                     imageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
+                }
                 else
+                {
                     imageViewType = VK_IMAGE_VIEW_TYPE_1D;
+                }
                 break;
             case 2:
-                if(desc.subjacentTexture.arraySize > 1)
+                if(1 < desc.subjacentTexture.arraySize)
+                {
                     imageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+                }
                 else
+                {
                     imageViewType = VK_IMAGE_VIEW_TYPE_2D;
+                }
                 break;
             case 3:
                 imageViewType = VK_IMAGE_VIEW_TYPE_3D;
                 break;
             }
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 PublicResourceId_t const &underlyingTextureHandle = aRequest.underlyingTextureHandle();
-                CStdSharedPtr_t<void> privateDependencyHandle = aDepencies.at(underlyingTextureHandle);
-                if(!privateDependencyHandle)
+                CStdSharedPtr_t<void>     privateDependencyHandle = aDepencies.at(underlyingTextureHandle);
+                if(not privateDependencyHandle)
                 {
-                    HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create TextureView due to missing dependency.");
+                    CLog::Error(logTag(), "Failed to create TextureView due to missing dependency.");
+                    return { EEngineStatus::DXDevice_CreateRTV_Failed };
                 }
 
                 CStdSharedPtr_t<SVulkanTextureResource> texture = std::static_pointer_cast<SVulkanTextureResource>(privateDependencyHandle);
-                if(!texture)
+                if(not texture)
                 {
-                    throw CVulkanError("Invalid internal data provided for texture destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for texture destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
                 }
 
                 VkImage        const vkImage        = texture->handle;
-                VkDeviceMemory const vkDeviceMemory = texture->attachedMemory;
+                // VkDeviceMemory const vkDeviceMemory = texture->attachedMemory; // TODO: Required?
 
                 VkImageViewCreateInfo vkImageViewCreateInfo ={ };
                 vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
                 vkImageViewCreateInfo.format                          = CVulkanDeviceCapsHelper::convertFormatToVk(desc.textureFormat);
                 vkImageViewCreateInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT; // TODO: Care about the specific aspect bits here in more detail.
                 vkImageViewCreateInfo.subresourceRange.baseArrayLayer = desc.arraySlices.offset;
-                vkImageViewCreateInfo.subresourceRange.layerCount     = desc.arraySlices.length;
+                vkImageViewCreateInfo.subresourceRange.layerCount     = static_cast<uint32_t>(desc.arraySlices.length);
                 vkImageViewCreateInfo.subresourceRange.baseMipLevel   = desc.mipMapSlices.offset;
-                vkImageViewCreateInfo.subresourceRange.levelCount     = desc.mipMapSlices.length;
+                vkImageViewCreateInfo.subresourceRange.levelCount     = static_cast<uint32_t>(desc.mipMapSlices.length);
                 vkImageViewCreateInfo.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
                 vkImageViewCreateInfo.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
                 vkImageViewCreateInfo.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -88,7 +98,8 @@ namespace engine
                 VkResult result = vkCreateImageView(mVulkanEnvironment->getState().selectedLogicalDevice, &vkImageViewCreateInfo, nullptr, &vkImageView);
                 if(VkResult::VK_SUCCESS != result)
                 {
-                    throw CVulkanError("Failed to create render target view.", result);
+                    CLog::Error(logTag(), CString::format("Failed to create render target view. Vulkan error: %0", result));
+                    return { EEngineStatus::Error };
                 }
 
                 SVulkanTextureViewResource *textureViewResource = new SVulkanTextureViewResource();
@@ -107,7 +118,7 @@ namespace engine
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
                 assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanTextureViewResource>(textureViewResource, textureViewDeleter);
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -117,35 +128,44 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureViewUpdateTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureViewUpdateTask(
                 CTextureView::CUpdateRequest    const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
-                ResolvedDependencyCollection_t  const &aDepencies,
+                ResolvedDependencyCollection_t  const &aDependencies,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aDependencies);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureViewDestructionTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureViewDestructionTask(
                 CTextureView::CDestructionRequest const &aRequest,
                 SGFXAPIResourceHandleAssignment   const &aAssignment,
-                ResolvedDependencyCollection_t    const &aDepencies,
+                ResolvedDependencyCollection_t    const &aDependencies,
                 ResourceTaskFn_t                        &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aDependencies);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 CStdSharedPtr_t<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(aAssignment.internalResourceHandle);
-                if(!textureView)
+                if(nullptr == textureView)
                 {
-                    throw CVulkanError("Invalid internal data provided for texture view destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for texture view destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
                 }
 
                 VkImageView vkImageView     = textureView->handle;
@@ -156,26 +176,28 @@ namespace engine
                 SGFXAPIResourceHandleAssignment assignment = aAssignment;
                 assignment.internalResourceHandle = nullptr;
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus
-        CVulkanResourceTaskBackend::
-        fnTextureViewQueryTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureViewQueryTask(
                 CTextureView::CQuery            const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
     }

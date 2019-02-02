@@ -30,21 +30,21 @@ namespace engine
     }
 
     #define SHIRABE_DECLARE_TASK_BUILDER_MODULE(type)                          \
-        EEngineStatus fn##type##CreationTask(                                  \
+        CEngineResult<> fn##type##CreationTask(                                \
                             C##type::CCreationRequest      const &aRequest,    \
                             ResolvedDependencyCollection_t const &aDepencies,  \
                             ResourceTaskFn_t                     &aOutTask);   \
-        EEngineStatus fn##type##UpdateTask(                                    \
+        CEngineResult<> fn##type##UpdateTask(                                  \
                             C##type::CUpdateRequest         const &aRequest,   \
                             SGFXAPIResourceHandleAssignment const &aAssignment,\
                             ResolvedDependencyCollection_t  const &aDepencies, \
                             ResourceTaskFn_t                      &aOutTask);  \
-        EEngineStatus fn##type##DestructionTask(                               \
+        CEngineResult<> fn##type##DestructionTask(                             \
                             C##type::CDestructionRequest    const &aRequest,   \
                             SGFXAPIResourceHandleAssignment const &aAssignment,\
                             ResolvedDependencyCollection_t  const &aDepencies, \
                             ResourceTaskFn_t                      &aOutTask);  \
-        EEngineStatus fn##type##QueryTask(                                     \
+        CEngineResult<> fn##type##QueryTask(                                   \
                             C##type::CQuery                 const &aRequest,   \
                             SGFXAPIResourceHandleAssignment const &aAssignment,\
                             ResourceTaskFn_t                      &aOutTask);

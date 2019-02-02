@@ -54,7 +54,7 @@ namespace engine
         /**
          * Describes the structure of a resource task function.
          */
-        using ResourceTaskFn_t = std::function<SGFXAPIResourceHandleAssignment()>;
+        using ResourceTaskFn_t = std::function<CEngineResult<SGFXAPIResourceHandleAssignment>()>;
 
         /**
          * Describes the structure of a collection of resolved resource dependencies.

@@ -13,16 +13,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnRenderPassCreationTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnRenderPassCreationTask(
                 CRenderPass::CCreationRequest  const &aRequest,
-                ResolvedDependencyCollection_t const &aDepencies,
+                ResolvedDependencyCollection_t const &aDependencies,
                 ResourceTaskFn_t                     &aOutTask)
         {
+            SHIRABE_UNUSED(aDependencies);
+
             EEngineStatus status = EEngineStatus::Ok;
 
             CRenderPass::SDescriptor const &desc = aRequest.resourceDescriptor();
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 std::vector<VkSubpassDescription>    vkSubpassDescriptions{};
                 std::vector<VkAttachmentDescription> vkAttachmentDescriptions{};
@@ -87,9 +89,9 @@ namespace engine
                     VkSubpassDescription vkSubpassDesc{};
                     vkSubpassDesc.pipelineBindPoint       = VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
                     vkSubpassDesc.pInputAttachments       = inputAttachmentReferenceList.back().data();
-                    vkSubpassDesc.inputAttachmentCount    = inputAttachmentReferenceList.back().size();
+                    vkSubpassDesc.inputAttachmentCount    = static_cast<uint32_t>(inputAttachmentReferenceList.back().size());
                     vkSubpassDesc.pColorAttachments       = colorAttachmentReferenceList.back().data();
-                    vkSubpassDesc.colorAttachmentCount    = colorAttachmentReferenceList.back().size();
+                    vkSubpassDesc.colorAttachmentCount    = static_cast<uint32_t>(colorAttachmentReferenceList.back().size());
                     vkSubpassDesc.pDepthStencilAttachment = depthAttachmentReferenceList.back().data();
                     vkSubpassDesc.flags = 0;
 
@@ -100,9 +102,9 @@ namespace engine
                 vkRenderPassCreateInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
                 vkRenderPassCreateInfo.pNext           = nullptr;
                 vkRenderPassCreateInfo.pSubpasses      = vkSubpassDescriptions.data();
-                vkRenderPassCreateInfo.subpassCount    = vkSubpassDescriptions.size();
+                vkRenderPassCreateInfo.subpassCount    = static_cast<uint32_t>(vkSubpassDescriptions.size());
                 vkRenderPassCreateInfo.pAttachments    = vkAttachmentDescriptions.data();
-                vkRenderPassCreateInfo.attachmentCount = vkAttachmentDescriptions.size();
+                vkRenderPassCreateInfo.attachmentCount = static_cast<uint32_t>(vkAttachmentDescriptions.size());
                 vkRenderPassCreateInfo.pDependencies   = nullptr;
                 vkRenderPassCreateInfo.dependencyCount = 0;
                 vkRenderPassCreateInfo.flags           = 0;
@@ -112,7 +114,8 @@ namespace engine
                 VkResult result = vkCreateRenderPass(mVulkanEnvironment->getState().selectedLogicalDevice, &vkRenderPassCreateInfo, nullptr, &vkRenderPass);
                 if(VkResult::VK_SUCCESS != result)
                 {
-                    throw CVulkanError("Failed to create render target view.", result);
+                    CLog::Error(logTag(), CString::format("Failed to create render target view. Vulkan error: %0", result));
+                    return { EEngineStatus::Error };
                 }
 
                 SVulkanRenderPassResource *renderPassResource = new SVulkanRenderPassResource();
@@ -131,7 +134,7 @@ namespace engine
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
                 assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanRenderPassResource>(renderPassResource, renderPassDeleter);
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -141,35 +144,44 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnRenderPassUpdateTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnRenderPassUpdateTask(
                 CRenderPass::CUpdateRequest     const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
-                ResolvedDependencyCollection_t  const &aDepencies,
+                ResolvedDependencyCollection_t  const &aDependencies,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aDependencies);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnRenderPassDestructionTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnRenderPassDestructionTask(
                 CRenderPass::CDestructionRequest const &aRequest,
                 SGFXAPIResourceHandleAssignment  const &aAssignment,
-                ResolvedDependencyCollection_t   const &aDepencies,
+                ResolvedDependencyCollection_t   const &aDependencies,
                 ResourceTaskFn_t                       &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aDependencies);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 CStdSharedPtr_t<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(aAssignment.internalResourceHandle);
-                if(!renderPass)
+                if(nullptr == renderPass)
                 {
-                    throw CVulkanError("Invalid internal data provided for render pass destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for render pass destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
                 }
 
                 VkRenderPass vkRenderPass    = renderPass->handle;
@@ -180,7 +192,7 @@ namespace engine
                 SGFXAPIResourceHandleAssignment assignment = aAssignment;
                 assignment.internalResourceHandle = nullptr;
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -190,14 +202,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnRenderPassQueryTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnRenderPassQueryTask(
                 CRenderPass::CQuery             const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
     }

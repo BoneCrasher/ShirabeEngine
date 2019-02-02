@@ -15,7 +15,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnFrameBufferCreationTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnFrameBufferCreationTask(
                 CFrameBuffer::CCreationRequest const &aRequest,
                 ResolvedDependencyCollection_t const &aDepencies,
                 ResourceTaskFn_t                     &aOutTask)

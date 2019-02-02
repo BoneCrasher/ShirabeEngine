@@ -11,41 +11,58 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureCreationTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureCreationTask(
                 CTexture::CCreationRequest     const &aRequest,
-                ResolvedDependencyCollection_t const &aDepencies,
+                ResolvedDependencyCollection_t const &aDependencies,
                 ResourceTaskFn_t                     &aOutTask)
         {
+            SHIRABE_UNUSED(aDependencies);
+
             EEngineStatus status = EEngineStatus::Ok;
 
             CTexture::SDescriptor const &desc = aRequest.resourceDescriptor();
 
             VkImageType imageType = VkImageType::VK_IMAGE_TYPE_2D;
-            if(desc.textureInfo.depth > 1) {
+            if(1 < desc.textureInfo.depth)
+            {
                 imageType = VkImageType::VK_IMAGE_TYPE_3D;
             }
-            else if(desc.textureInfo.height > 1) {
+            else if(1 < desc.textureInfo.height)
+            {
                 imageType = VkImageType::VK_IMAGE_TYPE_2D;
             }
-            else {
+            else
+            {
                 imageType = VkImageType::VK_IMAGE_TYPE_1D;
             }
 
-            VkImageUsageFlags imageUsage{};
+            VkImageUsageFlags imageUsage {};
             if(desc.gpuBinding.check(EBufferBinding::TextureInput))
+            {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT;
+            }
             if(desc.gpuBinding.check(EBufferBinding::InputAttachment))
+            {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
+            }
             if(desc.gpuBinding.check(EBufferBinding::CopySource))
+            {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+            }
             if(desc.gpuBinding.check(EBufferBinding::CopyTarget))
+            {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+            }
             if(desc.gpuBinding.check(EBufferBinding::ColorAttachment))
+            {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+            }
             if(desc.gpuBinding.check(EBufferBinding::DepthAttachment))
+            {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+            }
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 VkImageCreateInfo vkImageCreateInfo ={ };
                 vkImageCreateInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -66,13 +83,14 @@ namespace engine
 
                 VkImage vkImage = VK_NULL_HANDLE;
 
-                VkDevice         const&vkLogicalDevice  = mVulkanEnvironment->getState().selectedLogicalDevice;
-                VkPhysicalDevice const&vkPhysicalDevice = mVulkanEnvironment->getState().supportedPhysicalDevices.at(mVulkanEnvironment->getState().selectedPhysicalDevice).handle;
+                VkDevice         const &vkLogicalDevice  = mVulkanEnvironment->getState().selectedLogicalDevice;
+                VkPhysicalDevice const &vkPhysicalDevice = mVulkanEnvironment->getState().supportedPhysicalDevices.at(mVulkanEnvironment->getState().selectedPhysicalDevice).handle;
 
                 VkResult result = vkCreateImage(vkLogicalDevice, &vkImageCreateInfo, nullptr, &vkImage);
                 if(VkResult::VK_SUCCESS != result)
                 {
-                    throw CVulkanError("Failed to create texture.", result);
+                    CLog::Error(logTag(), CString::format("Failed to create texture. Vulkan result: %0", result));
+                    return { EEngineStatus::Error };
                 }
 
                 VkMemoryRequirements vkMemoryRequirements ={ };
@@ -87,10 +105,11 @@ namespace engine
                             vkPhysicalDevice,
                             vkMemoryRequirements.memoryTypeBits,
                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
                 if(not memoryTypeFetch.successful())
                 {
                     CLog::Error(logTag(), "Could not determine memory type index.");
-                    return SGFXAPIResourceHandleAssignment();
+                    return { EEngineStatus::Error };
                 }
 
                 vkMemoryAllocateInfo.memoryTypeIndex = memoryTypeFetch.data();
@@ -100,25 +119,34 @@ namespace engine
                 result = vkAllocateMemory(vkLogicalDevice, &vkMemoryAllocateInfo, nullptr, &vkImageMemory);
                 if(VkResult::VK_SUCCESS != result)
                 {
-                    throw CVulkanError("Failed to allocate image memory on GPU.", result);
+                    CLog::Error(logTag(), CString::format("Failed to allocate image memory on GPU. Vulkan error: %0", result));
+                    return { EEngineStatus::Error };
                 }
 
                 result = vkBindImageMemory(vkLogicalDevice, vkImage, vkImageMemory, 0);
                 if(VkResult::VK_SUCCESS != result)
                 {
-                    throw CVulkanError("Failed to bind image memory on GPU.", result);
+                    CLog::Error(logTag(), CString::format("Failed to bind image memory on GPU. Vulkan error: %0", result));
+                    return { EEngineStatus::Error };
                 }
 
                 SVulkanTextureResource *textureResource = new SVulkanTextureResource();
                 textureResource->handle         = vkImage;
                 textureResource->attachedMemory = vkImageMemory;
 
+                auto const deleter = [] (SVulkanTextureResource const*p)
+                {
+                    if(p)
+                    {
+                        delete p;
+                    }
+                };
+
                 SGFXAPIResourceHandleAssignment assignment ={ };
-
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanTextureResource>(textureResource, [] (SVulkanTextureResource const*p) { if(p) delete p; });
+                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanTextureResource>(textureResource, deleter);
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -128,12 +156,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureUpdateTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureUpdateTask(
                 CTexture::CUpdateRequest        const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
-                ResolvedDependencyCollection_t  const &aDepencies,
+                ResolvedDependencyCollection_t  const &aDependencies,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aDependencies);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
             return status;
@@ -143,20 +176,25 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureDestructionTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureDestructionTask(
                 CTexture::CDestructionRequest   const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
-                ResolvedDependencyCollection_t  const &aDepencies,
+                ResolvedDependencyCollection_t  const &aDependencies,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aDependencies);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanTextureResource> texture =
-                        std::static_pointer_cast<SVulkanTextureResource>(aAssignment.internalResourceHandle);
-                if(!texture)
-                    throw CVulkanError("Invalid internal data provided for texture destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                CStdSharedPtr_t<SVulkanTextureResource> texture = std::static_pointer_cast<SVulkanTextureResource>(aAssignment.internalResourceHandle);
+                if(nullptr == texture)
+                {
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for texture destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
+                }
 
                 VkImage        vkImage         = texture->handle;
                 VkDeviceMemory vkDeviceMemory  = texture->attachedMemory;
@@ -168,7 +206,7 @@ namespace engine
                 SGFXAPIResourceHandleAssignment assignment = aAssignment;
                 assignment.internalResourceHandle = nullptr;
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -178,14 +216,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnTextureQueryTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnTextureQueryTask(
                 CTexture::CQuery                const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
     }
