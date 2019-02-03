@@ -129,6 +129,7 @@ endif()
 # In any case, ignore excessive ;
 append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-extra-semi")
 append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-reserved-id-macro")
+append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-ignored-qualifiers")
 
 
 #

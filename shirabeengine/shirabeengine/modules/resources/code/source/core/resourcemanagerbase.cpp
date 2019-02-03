@@ -60,12 +60,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CResourceManagerBase::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> aProxy, PublicResourceIdList_t const &aDependencies)
         {
-            EEngineStatus const status = aProxy->loadSync(aDependencies);
-            std::string   const msg    = "Failed to load underlying resource of resource proxy.";
+            CEngineResult<> const loadOp = aProxy->loadSync(aDependencies);
+            std::string     const msg    = "Failed to load underlying resource of resource proxy.";
 
-            EngineStatusPrintOnError(status, logTag(), msg);
+            EngineStatusPrintOnError(loadOp.result(), logTag(), msg);
 
-            return { status };
+            return loadOp;
         }
         //<-----------------------------------------------------------------------------
 
@@ -74,11 +74,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CResourceManagerBase::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy)
         {
-            EEngineStatus const status = aProxy->unloadSync();
+            CEngineResult<> const unloadOp = aProxy->unloadSync();
 
-            EngineStatusPrintOnError(status, logTag(), "Failed to unload underlying resource of resource proxy.");
+            EngineStatusPrintOnError(unloadOp.result(), logTag(), "Failed to unload underlying resource of resource proxy.");
 
-            return { status };
+            return unloadOp;
         }
         //<-----------------------------------------------------------------------------
     }

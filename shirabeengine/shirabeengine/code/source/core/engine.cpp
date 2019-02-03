@@ -313,10 +313,10 @@ namespace engine
                 gfxApiRenderContext = vulkanRenderContext;
             }
 
-            CStdSharedPtr_t<IFrameGraphRenderContext> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
+            CEngineResult<CStdSharedPtr_t<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeCStdSharedPtr<CRenderer>();
-            status = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext);
+            status = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
             if(!CheckEngineError(status))
             {
                 status = mScene.initialize();
@@ -392,7 +392,7 @@ namespace engine
         if(CheckWindowManagerError(mWindowManager->update()))
         {
                 CLog::Error(logTag(), "Failed to update window manager.");
-                return EEngineStatus::EngineComponentUpdateError;
+                return EEngineStatus::UpdateError;
         }
 
         mScene.update();

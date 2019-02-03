@@ -89,6 +89,7 @@ namespace engine
             case CLog::ELogLevel::Error:   return "ERROR";
             case CLog::ELogLevel::WTF:     return "WTF";
             }
+            return "UNKNOWN";
         }
 
         /**

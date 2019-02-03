@@ -163,6 +163,8 @@ namespace engine
                 case '7':
                 case '8':
                 case '9':
+                    // Desired behaviour to enable reading numbers in text w/o preceding %
+                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     if(readNumber)
                     {
                         number *= 10;
@@ -179,6 +181,7 @@ namespace engine
 
                     stream << aFormat[k];
                     break;
+                    #pragma GCC diagnostic warning "-Wimplicit-fallthrough"
                 }
             }
 

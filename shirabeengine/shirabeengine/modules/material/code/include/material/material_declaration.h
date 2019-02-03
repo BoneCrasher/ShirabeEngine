@@ -276,6 +276,8 @@ namespace engine
             {
                 *(result.data()) = aFieldValue;
             }
+
+            return result;
         }
         //<-----------------------------------------------------------------------------
 

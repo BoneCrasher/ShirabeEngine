@@ -138,6 +138,29 @@ namespace engine
         // Reuse the base class constructors.
         using AResult<EEngineStatus, TData>::AResult;
         using AResult<EEngineStatus, TData>::operator=;
+        ///**
+        // * Convert-Copy-Construct this result from another containing any kind of assignable data.
+        // *
+        // * @param aOther Another result instance of datatype assignable to TData.
+        // */
+        //template <typename TOtherResult, typename = std::enable_if_t<std::is_assignable_v<TData, typename TOtherResult::value_type>, TOtherResult>>
+        //explicit SHIRABE_INLINE CEngineResult(TOtherResult const &aOther)
+        //    : AResult<EEngineStatus, TData>(aOther)
+        //{
+        //    static_assert (std::is_assignable_v<TData, typename TOtherResult::value_type>);
+        //}
+        //
+        ///**
+        // * Convert-Move-Construct this result from another containing any kind of assignable data.
+        // *
+        // * @param aOther Another result instance of datatype assignable to TData.
+        // */
+        //template <typename TOtherResult, typename = std::enable_if_t<std::is_assignable_v<TData, typename TOtherResult::value_type>, TOtherResult>>
+        //explicit SHIRABE_INLINE CEngineResult(TOtherResult &&aOther)
+        //    : AResult<EEngineStatus, TData>(aOther)
+        //{
+        //    static_assert (std::is_assignable_v<TData, typename TOtherResult::value_type>);
+        //}
 
     public_methods:
         /**
@@ -162,6 +185,9 @@ namespace engine
             bool const equal = (AResult<EEngineStatus, TData>::result() == aOtherStatus);
             return equal;
         }
+
+    private_members:
+        template <typename TOtherData> friend class CEngineResult;
     };
 
     /**

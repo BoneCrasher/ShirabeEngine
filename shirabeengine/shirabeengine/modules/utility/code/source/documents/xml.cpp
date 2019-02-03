@@ -34,7 +34,7 @@ namespace engine
             };
 
             // https://regexr.com/3j62r
-            static const std::string xpathMatchRegex = "((?:[/][\\d\\w]+)+)((?:[[]@([\\d\\w]+)=\'([\\d\\w]+)\'[\]])|(?:(?:=\'([\\d\\w]+)\')))";
+            static const std::string xpathMatchRegex = "((?:[/][\\d\\w]+)+)((?:[[]@([\\d\\w]+)=\'([\\d\\w]+)\'[\\]])|(?:(?:=\'([\\d\\w]+)\')))";
 
             // Matches
             //   /This
@@ -200,7 +200,7 @@ namespace engine
                     return nullptr;
                 }
 
-                if(aExpect > 0 && xpathResult->nodesetval->nodeNr != aExpect)
+                if(aExpect > 0 && static_cast<uint32_t>(xpathResult->nodesetval->nodeNr) != aExpect)
                 {
                     // Error, too many results
                     std::stringstream ss;

@@ -16,6 +16,9 @@ namespace engine
     template <typename TResult, typename TData>
     class AResult
     {
+    public_typedefs:
+        typedef TData value_type;
+
     public_constructors:
         /**
          * Create an empty result.
@@ -44,6 +47,32 @@ namespace engine
             : mResult(aOther.mResult)
             , mData(std::move(aOther.mData))
         {}
+
+        /**
+         * Convert-Copy-Construct this result from another containing any kind of assignable data.
+         *
+         * @param aOther Another result instance of datatype assignable to TData.
+         */
+        template <typename TOtherData>
+        SHIRABE_INLINE AResult(AResult<TResult, TOtherData> const &aOther)
+            : mResult(aOther.mResult)
+            , mData(aOther.mData)
+        {
+            static_assert (std::is_assignable_v<TData, TOtherData>, "Can't assign TOtherData to TData.");
+        }
+
+        /**
+         * Convert-Move-Construct this result from another containing any kind of assignable data.
+         *
+         * @param aOther Another result instance of datatype assignable to TData.
+         */
+        template <typename TOtherData>
+        SHIRABE_INLINE AResult(AResult<TResult, TOtherData> && aOther)
+            : mResult(aOther.mResult)
+            , mData(std::move(aOther.mData))
+        {
+            static_assert(std::is_assignable_v<TData, TOtherData>, "Can't assign TOtherData to TData.");
+        }
 
         /**
          * Create a result from a result code.
@@ -113,6 +142,28 @@ namespace engine
             return (*this);
         }
 
+        template <typename TOtherData>
+        SHIRABE_INLINE AResult<TResult, TData> &operator=(AResult<TResult, TOtherData> const &aOther)
+        {
+            static_assert (std::is_assignable_v<TData, TOtherData>);
+
+            mResult = aOther.mResult;
+            mData   = aOther.mData;
+
+            return (*this);
+        }
+
+        template <typename TOtherData>
+        SHIRABE_INLINE AResult<TResult, TData> &operator=(AResult<TResult, TOtherData> &&aOther)
+        {
+            static_assert (std::is_assignable_v<TData, TOtherData>);
+
+            mResult = aOther.mResult;
+            mData   = std::move(aOther.mData);
+
+            return (*this);
+        }
+
     public_methods:
         /**
          * Return the associated result information of this result struct.
@@ -152,6 +203,9 @@ namespace engine
         virtual bool successful() const = 0;
 
     private_members:
+
+        template <typename TSameResult, typename TOtherData> friend class AResult;
+
         TResult mResult;
         TData   mData;
     };
@@ -185,6 +239,13 @@ namespace engine
             mResult = aOther.result();
         }
 
+    public_destructors:
+        /**
+         * Destroy and run...
+         */
+        virtual ~AResult() = default;
+
+    public_operators:
         SHIRABE_INLINE AResult<TResult, void> &operator=(AResult<TResult, void> const &aOther)
         {
             mResult = aOther.mResult;
@@ -198,12 +259,6 @@ namespace engine
 
             return (*this);
         }
-
-    public_destructors:
-        /**
-         * Destroy and run...
-         */
-        virtual ~AResult() = default;
 
     public_methods:
         /**

@@ -53,8 +53,8 @@ namespace engine
             virtual EProxyType proxyType() const = 0;
             virtual ELoadState loadState() const = 0;
 
-            virtual EEngineStatus loadSync(PublicResourceIdList_t const &inResolvedDependencies) = 0;
-            virtual EEngineStatus unloadSync() = 0;
+            virtual CEngineResult<> loadSync(PublicResourceIdList_t const &inResolvedDependencies) = 0;
+            virtual CEngineResult<> unloadSync() = 0;
         };
 
         /**
@@ -196,9 +196,9 @@ namespace engine
              */
             bool destroy()
             {
-                bool const error = CheckEngineError(this->unloadSync());
+                bool const error = (not this->unloadSync().successful());
 
-                return (!error);
+                return (not error);
             }
 
         protected_methods:
