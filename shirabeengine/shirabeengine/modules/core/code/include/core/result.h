@@ -180,7 +180,10 @@ namespace engine
             : mResult(aOther.mResult)
         {}
 
-        AResult(AResult<TResult, void> &&) = delete;
+        SHIRABE_INLINE AResult(AResult<TResult, void> &&aOther)
+        {
+            mResult = aOther.result();
+        }
 
         SHIRABE_INLINE AResult<TResult, void> &operator=(AResult<TResult, void> const &aOther)
         {
@@ -189,7 +192,12 @@ namespace engine
             return (*this);
         }
 
-        AResult<TResult, void> &operator=(AResult<TResult, void> &&) = delete;
+        SHIRABE_INLINE AResult<TResult, void> &operator=(AResult<TResult, void> &&aOther)
+        {
+            mResult = aOther.mResult;
+
+            return (*this);
+        }
 
     public_destructors:
         /**

@@ -17,44 +17,48 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CVulkanResourceTaskBackend::fnFrameBufferCreationTask(
                 CFrameBuffer::CCreationRequest const &aRequest,
-                ResolvedDependencyCollection_t const &aDepencies,
+                ResolvedDependencyCollection_t const &aDependencies,
                 ResourceTaskFn_t                     &aOutTask)
         {
             EEngineStatus status = EEngineStatus::Ok;
 
             CFrameBuffer::SDescriptor const &desc = aRequest.resourceDescriptor();
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 PublicResourceId_t     const &renderPassHandle   = aRequest.renderPassHandle();
                 PublicResourceIdList_t const &textureViewHandles = aRequest.textureViewHandles();
 
-                CStdSharedPtr_t<void> renderPassPrivateHandle = aDepencies.at(renderPassHandle);
-                if(!renderPassPrivateHandle)
+                CStdSharedPtr_t<void> renderPassPrivateHandle = aDependencies.at(renderPassHandle);
+                if(not renderPassPrivateHandle)
                 {
-                    HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create frame buffer due to missing dependency.");
+                    CLog::Error(logTag(), "Failed to create frame buffer due to missing dependency.");
+                    return { EEngineStatus::DXDevice_CreateRTV_Failed };
                 }
 
                 CStdSharedPtr_t<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(renderPassPrivateHandle);
-                if(!renderPass)
+                if(not renderPass)
                 {
-                    throw CVulkanError("Invalid internal data provided for frame buffer creation.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
                 }
 
                 std::vector<VkImageView> textureViews {};
 
                 for(PublicResourceId_t const &id : textureViewHandles)
                 {
-                    CStdSharedPtr_t<void> textureViewPrivateHandle = aDepencies.at(id);
-                    if(!textureViewPrivateHandle)
+                    CStdSharedPtr_t<void> textureViewPrivateHandle = aDependencies.at(id);
+                    if(not textureViewPrivateHandle)
                     {
-                        HandleEngineStatusError(EEngineStatus::DXDevice_CreateRTV_Failed, "Failed to create frame buffer due to missing dependency.");
+                        CLog::Error(logTag(), "Failed to create frame buffer due to missing dependency.");
+                        return { EEngineStatus::DXDevice_CreateRTV_Failed };
                     }
 
                     CStdSharedPtr_t<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(textureViewPrivateHandle);
-                    if(!renderPass)
+                    if(not textureView)
                     {
-                        throw CVulkanError("Invalid internal data provided for frame buffer creation.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                        CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                        return { EEngineStatus::Error };
                     }
 
                     textureViews.push_back(textureView->handle);
@@ -76,7 +80,8 @@ namespace engine
                 VkResult result = vkCreateFramebuffer(mVulkanEnvironment->getState().selectedLogicalDevice, &vkFrameBufferCreateInfo, nullptr, &vkFrameBuffer);
                 if(VkResult::VK_SUCCESS != result)
                 {
-                    throw CVulkanError("Failed to create frame buffer instance.", result);
+                    CLog::Error(logTag(), CString::format("Failed to create frame buffer instance. Vulkan result: %0", result));
+                    return { EEngineStatus::Error };
                 }
 
                 SVulkanFrameBufferResource *frameBufferResource = new SVulkanFrameBufferResource();
@@ -95,7 +100,7 @@ namespace engine
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
                 assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanFrameBufferResource>(frameBufferResource, frameBufferDeleter);
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -105,38 +110,47 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnFrameBufferUpdateTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnFrameBufferUpdateTask(
                 CFrameBuffer::CUpdateRequest    const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
-                ResolvedDependencyCollection_t  const &aDepencies,
+                ResolvedDependencyCollection_t  const &aDependencies,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aDependencies);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnFrameBufferDestructionTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnFrameBufferDestructionTask(
                 CFrameBuffer::CDestructionRequest const &aRequest,
                 SGFXAPIResourceHandleAssignment   const &aAssignment,
-                ResolvedDependencyCollection_t    const &aDepencies,
+                ResolvedDependencyCollection_t    const &aDependencies,
                 ResourceTaskFn_t                        &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aDependencies);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
+            aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanFrameBufferResource> FrameBuffer = std::static_pointer_cast<SVulkanFrameBufferResource>(aAssignment.internalResourceHandle);
-                if(!FrameBuffer)
+                CStdSharedPtr_t<SVulkanFrameBufferResource> frameBuffer = std::static_pointer_cast<SVulkanFrameBufferResource>(aAssignment.internalResourceHandle);
+                if(not frameBuffer)
                 {
-                    throw CVulkanError("Invalid internal data provided for frame buffer destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
                 }
 
-                VkFramebuffer vkFrameBuffer   = FrameBuffer->handle;
+                VkFramebuffer vkFrameBuffer   = frameBuffer->handle;
                 VkDevice      vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
 
                 vkDestroyFramebuffer(vkLogicalDevice, vkFrameBuffer, nullptr);
@@ -144,7 +158,7 @@ namespace engine
                 SGFXAPIResourceHandleAssignment assignment = aAssignment;
                 assignment.internalResourceHandle = nullptr;
 
-                return assignment;
+                return { EEngineStatus::Ok, assignment };
             };
 
             return status;
@@ -154,14 +168,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanResourceTaskBackend::fnFrameBufferQueryTask(
+        CEngineResult<> CVulkanResourceTaskBackend::fnFrameBufferQueryTask(
                 CFrameBuffer::CQuery            const &aRequest,
                 SGFXAPIResourceHandleAssignment const &aAssignment,
                 ResourceTaskFn_t                      &aOutTask)
         {
+            SHIRABE_UNUSED(aRequest);
+            SHIRABE_UNUSED(aAssignment);
+            SHIRABE_UNUSED(aOutTask);
+
             EEngineStatus status = EEngineStatus::Ok;
 
-            return status;
+            return { status };
         }
         //<-----------------------------------------------------------------------------
     }

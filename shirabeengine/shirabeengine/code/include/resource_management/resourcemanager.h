@@ -39,14 +39,14 @@ namespace engine
          *
          * @return EEngineStatus::Ok on success. An error code otherwise.
          */
-        EEngineStatus initialize();
+        CEngineResult<> initialize();
 
         /**
          * Deinitialize the resource manager and free..
          *
          * @return EEngineStatus::Ok on success. An error code otherwise.
          */
-        EEngineStatus deinitialize();
+        CEngineResult<> deinitialize();
     };
 }
 

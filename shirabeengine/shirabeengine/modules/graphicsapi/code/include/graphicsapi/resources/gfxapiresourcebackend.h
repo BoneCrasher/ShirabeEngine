@@ -218,10 +218,12 @@ namespace engine
                 ETaskSynchronization                 const &aSyncMode,
                 CStdSharedPtr_t<IAsyncLoadCallback>  const &aCallback)
         {
-            ResourceTaskFn_t::result_type    resourceHandle = {};
-            SDeferredResourceOperationHandle handle         = {};
+            SHIRABE_UNUSED(aCallback);
 
-            EEngineStatus status = EEngineStatus::Ok;
+            ResourceTaskFn_t::result_type    resourceHandleFetch = {};
+            SDeferredResourceOperationHandle handle             = {};
+
+            CEngineResult<> loadOp = { EEngineStatus::Ok };
 
             // Resolve dependencies...
             ResolvedDependencyCollection_t resolvedDependencies = {};
@@ -232,23 +234,25 @@ namespace engine
 
             try
             {
-                status = loadImpl<TResource>(aRequest, resolvedDependencies, handle);
-                if(not CheckEngineError(status))
+                loadOp = loadImpl<TResource>(aRequest, resolvedDependencies, handle);
+                if(loadOp.successful())
                 {
                     switch(aSyncMode)
                     {
                     case ETaskSynchronization::Sync:
-                        resourceHandle = handle.futureHandle.get(); // Wait for it...
-                        if(!resourceHandle.valid())
+                        resourceHandleFetch = handle.futureHandle.get(); // Wait for it...
+                        if(not resourceHandleFetch.successful() && not resourceHandleFetch.data().valid())
                         {
-                            status = EEngineStatus::GFXAPI_SubsystemResourceCreationFailed;
+                            loadOp = CEngineResult<>(EEngineStatus::GFXAPI_SubsystemResourceCreationFailed);
                         }
                         else
                         {
-                            // Store the internal handle and return the public handle
-                            registerResource(resourceHandle.publicResourceHandle, resourceHandle.internalResourceHandle);
+                            SGFXAPIResourceHandleAssignment const &assignment = resourceHandleFetch.data();
 
-                            status = EEngineStatus::Ok;
+                            // Store the internal handle and return the public handle
+                            registerResource(assignment.publicResourceHandle, assignment.internalResourceHandle);
+
+                            loadOp = CEngineResult<>(EEngineStatus::Ok);
                         }
                         break;
                     case ETaskSynchronization::Async:
@@ -257,7 +261,7 @@ namespace engine
                     }
                 }
 
-                return CEngineResult<>(status);
+                return CEngineResult<>(loadOp);
             }
             catch(std::future_error const &fe)
             {
@@ -276,7 +280,7 @@ namespace engine
                 return CEngineResult<>(EEngineStatus::Error);
             }
 
-            return status;
+            return loadOp;
         }
         //<-----------------------------------------------------------------------------
 
@@ -287,15 +291,15 @@ namespace engine
         CEngineResult<> CGFXAPIResourceBackend::unload(
                 typename TResource::CDestructionRequest const &aRequest)
         {
-            ResourceTaskFn_t::result_type    resourceHandle       ={};
+            ResourceTaskFn_t::result_type    resourceHandleFetch  ={};
             ResolvedDependencyCollection_t   resolvedDependencies ={}; // Guarding the public API by passing in this empty map.
             SDeferredResourceOperationHandle handle               ={};
 
-            EEngineStatus status = EEngineStatus::Ok;
+            CEngineResult<> unloadOp = EEngineStatus::Ok;
             try
             {
                 CStdSharedPtr_t<void> resource = mStorage[aRequest.publicResourceId()];
-                status = unloadImpl<TResource>(
+                unloadOp = unloadImpl<TResource>(
                             aRequest,
                             {
                                 aRequest.publicResourceId(),
@@ -304,11 +308,14 @@ namespace engine
                             resolvedDependencies,
                             handle);
 
-                if(not CheckEngineError(status))
+                if(unloadOp.successful())
                 {
-                    resourceHandle = handle.futureHandle.get(); // Wait for it ALWAYS!
-                    mStorage.erase(resourceHandle.publicResourceHandle);
-                    status = EEngineStatus::Ok;
+                    resourceHandleFetch = handle.futureHandle.get(); // Wait for it ALWAYS!
+                    if(resourceHandleFetch.successful())
+                    {
+                        mStorage.erase(resourceHandleFetch.data().publicResourceHandle);
+                        unloadOp = CEngineResult<>(EEngineStatus::Ok);
+                    }
                 }
             }
             catch(std::future_error const&fe)
@@ -316,8 +323,8 @@ namespace engine
                 CLog::Error(logTag(), CString::format("Failed to access future shared state. Error: %0", fe.what()));
             }
 
-            EngineStatusPrintOnError(status, logTag(), CString::format("Failed to create and/or enqueue resource destruction task."));
-            return CEngineResult<>(status);
+            EngineStatusPrintOnError(unloadOp.result(), logTag(), CString::format("Failed to create and/or enqueue resource destruction task."));
+            return unloadOp;
         }
         //<-----------------------------------------------------------------------------
 
@@ -332,11 +339,11 @@ namespace engine
         {
             ResourceTaskFn_t task = nullptr;
 
-            EEngineStatus status = mResourceTaskBackend->creationTask<TResource>(aRequest, aResolvedDependencies, task);
-            if(CheckEngineError(status))
+            CEngineResult<> creationOp = mResourceTaskBackend->creationTask<TResource>(aRequest, aResolvedDependencies, task);
+            if(not creationOp.successful())
             {
                 CLog::Error(logTag(), CString::format("Failed to create build task for resource '%0'", "..."));
-                return { status };
+                return creationOp;
             }
 
             std::future<ResourceTaskFn_t::result_type> future{};
@@ -365,11 +372,11 @@ namespace engine
         {
             ResourceTaskFn_t task = nullptr;
 
-            EEngineStatus status = mResourceTaskBackend->destructionTask<TResource>(aRequest, aAssignment, aResolvedDependencies, task);
-            if(CheckEngineError(status))
+            CEngineResult<> destructionOp = mResourceTaskBackend->destructionTask<TResource>(aRequest, aAssignment, aResolvedDependencies, task);
+            if(not destructionOp.successful())
             {
                 CLog::Error(logTag(), CString::format("Failed to create destruction task for resource '%0'", "..."));
-                return status;
+                return destructionOp;
             }
 
             std::future<ResourceTaskFn_t::result_type> future;

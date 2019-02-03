@@ -163,7 +163,7 @@ namespace engine
 
         auto const fnCreatePlatformWindowSystem = [&, this] () -> void
         {
-            EEngineStatus status = EEngineStatus::Ok;
+            CEngineResult<> result = { EEngineStatus::Ok };
 
             CStdSharedPtr_t<IWindowFactory> factory = nullptr;
 
@@ -176,28 +176,33 @@ namespace engine
             mWindowManager = makeCStdSharedPtr<CWindowManager>();
 
             CWindowManager::EWindowManagerError windowManagerError = mWindowManager->initialize(*mApplicationEnvironment, factory);
-            if(!(mWindowManager && !CheckWindowManagerError(windowManagerError)))
+            if(nullptr == mWindowManager && not CheckWindowManagerError(windowManagerError))
             {
-                status = EEngineStatus::EngineComponentInitializationError;
-                HandleEngineStatusError(status, "Failed to create WindowManager.");
+                CLog::Error(logTag(), "Failed to create WindowManager.");
+                result = CEngineResult<>(EEngineStatus::InitializationError);
+                return;
             }
 
             mMainWindow = mWindowManager->createWindow("MainWindow", CRect(0, 0, windowWidth, windowHeight));
-            if(!mMainWindow)
+            if(nullptr == mMainWindow)
             {
-                status = EEngineStatus::WindowCreationError;
-                HandleEngineStatusError(status, "Failed to create main window in WindowManager.");
+                CLog::Error(logTag(), "Failed to create main window in WindowManager.");
+                result = CEngineResult<>(EEngineStatus::WindowCreationError);
+                return;
             }
-            else
-            {
-                status = mMainWindow->resume();
-                HandleEngineStatusError(status, "Failed to resume operation in main window.");
 
-                if(!CheckEngineError(status))
-                {
-                    status = mMainWindow->show();
-                    HandleEngineStatusError(status, "Failed to show main window.");
-                }
+            EEngineStatus status = mMainWindow->resume();
+            if(CheckEngineError(status))
+            {
+                CLog::Error(logTag(), "Failed to resume operation in main window.");
+                return;
+            }
+
+            status = mMainWindow->show();
+            if(CheckEngineError(status))
+            {
+                CLog::Error(logTag(), "Failed to show main window.");
+                return;
             }
 
             CStdSharedPtr_t<IWindow::IEventCallback> dummy = makeCStdSharedPtr<CTestDummy>();
@@ -218,10 +223,23 @@ namespace engine
             {
                 mVulkanEnvironment = makeCStdSharedPtr<CVulkanEnvironment>();
                 EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
-                HandleEngineStatusError(status, "Vulkan initialization failed.");
 
-                VkSurfaceKHR surface = vulkan::CX11VulkanSurface::create(mVulkanEnvironment, x11Display, std::static_pointer_cast<x11::CX11Window>(mMainWindow));
-                mVulkanEnvironment->setSurface(surface);
+                if(CheckEngineError(status))
+                {
+                    EngineStatusPrintOnError(status, logTag(), "Vulkan initialization failed.");
+                    return;
+                }
+
+
+                CEngineResult<VkSurfaceKHR> surfaceCreation = vulkan::CX11VulkanSurface::create(mVulkanEnvironment, x11Display, std::static_pointer_cast<x11::CX11Window>(mMainWindow));
+                if(not surfaceCreation.successful())
+                {
+                    CLog::Error(logTag(), "Failed to create vk surface.");
+                    mVulkanEnvironment->deinitialize();
+                    return;
+                }
+
+                mVulkanEnvironment->setSurface(surfaceCreation.data());
 
                 VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
                 mVulkanEnvironment->createSwapChain(
@@ -312,11 +330,6 @@ namespace engine
             fnCreatePlatformResourceSystem();
             fnCreatePlatformRenderer();
 
-        }
-        catch(CEngineException const e)
-        {
-            CLog::Error(logTag(), e.message());
-            return e.status();
         }
         catch(std::exception const stde)
         {

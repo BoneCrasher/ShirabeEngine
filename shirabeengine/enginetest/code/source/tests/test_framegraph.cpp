@@ -170,9 +170,9 @@ namespace Test
             CStdSharedPtr_t<IRenderContext> renderer = makeCStdSharedPtr<CMockRenderContext>();
             // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
             //
-            CStdSharedPtr_t<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer);
+            CStdSharedPtr_t<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer).data();
 
-            SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
+            SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
 
             uint32_t
                     width  = displayDesc.bounds.size.x(),
@@ -206,55 +206,57 @@ namespace Test
             CFrameGraphModule<SGBufferModuleTag_t> gbufferModule{};
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{};
             gbufferExportData = gbufferModule.addGBufferGenerationPass(
+                        "GBufferGeneration",
                         graphBuilder,
-                        renderables);
+                        renderables).data();
 
             // Lighting
             CFrameGraphModule<SLightingModuleTag_t> lightingModule{};
             CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{};
             lightingExportData = lightingModule.addLightingPass(
+                        "Lighting",
                         graphBuilder,
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
-                        gbufferExportData.gbuffer3);
+                        gbufferExportData.gbuffer3).data();
 
             // Compositing
             CFrameGraphModule<SCompositingModuleTag_t> compositingModule{ };
             CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData = compositingModule.addDefaultCompositingPass(
+                        "Compositing",
                         graphBuilder,
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
                         gbufferExportData.gbuffer3,
-                        lightingExportData.lightAccumulationBuffer,
-                        backBuffer);
+                        lightingExportData.lightAccumulationBuffer).data();
 
-            CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = graphBuilder.compile();
+            CEngineResult<CStdUniquePtr_t<engine::framegraph::CGraph>> frameGraph = graphBuilder.compile();
 
-            CStdSharedPtr_t<IFrameGraphSerializer> serializer = makeCStdSharedPtr<CFrameGraphGraphVizSerializer>();
-            serializer->initialize();
+            // CStdSharedPtr_t<IFrameGraphSerializer> serializer = makeCStdSharedPtr<CFrameGraphGraphVizSerializer>();
+            // serializer->initialize();
 
-            CStdSharedPtr_t<ISerializer<CGraph>::IResult> result = nullptr;
-
-            bool const serialized = serializer->serialize(*frameGraph, result);
-
-            CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
-                    std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
-
-            std::string serializedData {};
-            bool const dataFetched = typedResult->asString(serializedData);
-            writeFile("FrameGraphTest.gv", serializedData);
-
-            serializer->deinitialize();
-            serializer = nullptr;
-
-            system("tools/makeFrameGraphPNG.sh");
-
-            // Renderer will call.
-            if(frameGraph)
-                frameGraph->execute(renderContext);
+            // CStdSharedPtr_t<ISerializer<CGraph>::IResult> result = nullptr;
+            //
+            // bool const serialized = serializer->serialize(*frameGraph, result);
+            //
+            // CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
+            //         std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
+            //
+            // std::string serializedData {};
+            // bool const dataFetched = typedResult->asString(serializedData);
+            // writeFile("FrameGraphTest.gv", serializedData);
+            //
+            // serializer->deinitialize();
+            // serializer = nullptr;
+            //
+            // system("tools/makeFrameGraphPNG.sh");
+            //
+            // // Renderer will call.
+            // if(frameGraph)
+            //     frameGraph->execute(renderContext);
 
             gfxApiResourceTaskBackend->deinitialize();
             proxyResourceManager->deinitialize();

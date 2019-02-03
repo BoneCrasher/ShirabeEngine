@@ -124,7 +124,7 @@ namespace engine
                 //           order to reflect UNLOADED or UNAVAILABLE state.
                 this->setLoadState(ELoadState::UNLOADED);
 
-                load = { EEngineStatus::GFXAPI_LoadResourceFailed };
+                load = CEngineResult<>(EEngineStatus::GFXAPI_LoadResourceFailed);
                 EngineStatusPrintOnError(load.result(), logTag(), CString::format("Failed to load GFXAPI resource '%0'", rd.name));
             }
 
@@ -147,7 +147,7 @@ namespace engine
             {
                 this->setLoadState(ELoadState::UNKNOWN);
 
-                unload = { EEngineStatus::GFXAPI_UnloadResourceFailed };
+                unload = CEngineResult<>(EEngineStatus::GFXAPI_UnloadResourceFailed);
                 EngineStatusPrintOnError(unload.result(), logTag(), CString::format("Failed to unload GFXAPI resource '%0'", ""));
             }
 
