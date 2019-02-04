@@ -24,7 +24,7 @@ int main(int aArgc, char **aArgv)
     CConsole::InitializeConsole();
   #endif
 
-    CLog::Status(Main::logTag(), "SAE5300 - Application");
+    CLog::Status(Main::logTag(), "Shirabe Engine Game");
 
     CStdSharedPtr_t<os::SApplicationEnvironment> appEnvironment = makeCStdSharedPtr<os::SApplicationEnvironment>();
 #if defined SHIRABE_PLATFORM_WINDOWS
