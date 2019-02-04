@@ -21,7 +21,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CScene::initialize()
+    CEngineResult<> CScene::initialize()
     {
         return EEngineStatus::Ok;
     }
@@ -30,7 +30,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CScene::deinitialize()
+    CEngineResult<> CScene::deinitialize()
     {
         return EEngineStatus::Ok;
     }
@@ -39,7 +39,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CScene::update()
+    CEngineResult<> CScene::update()
     {
         return EEngineStatus::Ok;
     }

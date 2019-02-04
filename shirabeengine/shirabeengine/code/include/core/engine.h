@@ -13,9 +13,9 @@
 #include <vulkan/vulkanenvironment.h>
 
 #if   defined SHIRABE_PLATFORM_WINDOWS
-#include <wsi/windows/windowserror.h>
+    #include <wsi/windows/windowserror.h>
 #elif defined SHIRABE_PLATFORM_LINUX
-#include <wsi/x11/x11error.h>
+    #include <wsi/x11/x11error.h>
 #endif
 
 #include "buildingblocks/scene.h"
@@ -56,27 +56,27 @@ namespace engine
          * @brief initialize
          * @return
          */
-        EEngineStatus initialize();
+        CEngineResult<> initialize();
 
         /**
          * @brief deinitialize
          * @return
          */
-        EEngineStatus deinitialize();
+        CEngineResult<> deinitialize();
 
         /**
          * @brief update
          * @return
          */
-        EEngineStatus update();
+        CEngineResult<> update();
 
     private_members:
         // Application
         CStdSharedPtr_t<os::SApplicationEnvironment> mApplicationEnvironment;
 
         // WSI
-        CStdSharedPtr_t<CWindowManager> mWindowManager;
-        CStdSharedPtr_t<IWindow>        mMainWindow;
+        CStdSharedPtr_t<CWindowManager>        mWindowManager;
+        CStdSharedPtr_t<IWindow>               mMainWindow;
 
         // Assets & Resources
         CStdSharedPtr_t<CAssetStorage>         mAssetStorage;
@@ -84,8 +84,8 @@ namespace engine
         CStdSharedPtr_t<CResourceManagerBase>  mResourceManager;
 
         // Rendering
-        CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;
-        CStdSharedPtr_t<IRenderer>          mRenderer;
+        CStdSharedPtr_t<CVulkanEnvironment>    mVulkanEnvironment;
+        CStdSharedPtr_t<IRenderer>             mRenderer;
 
         // Internals
         CScene mScene;

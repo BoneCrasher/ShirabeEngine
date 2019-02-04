@@ -32,21 +32,21 @@ namespace engine
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus initialize();
+        CEngineResult<> initialize();
 
         /**
          * Shutdown and deiniitalize the scene instance.
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus deinitialize();
+        CEngineResult<> deinitialize();
 
         /**
          * Update this scene instance.
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus update();
+        CEngineResult<> update();
 
     private_members:
         CStdSharedPtr_t<IComponentFactory> mComponentFactory;

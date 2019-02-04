@@ -1,58 +1,63 @@
 #ifndef __SHIRABE_GAPI_DEVICECAPABILITIES_H__
 #define __SHIRABE_GAPI_DEVICECAPABILITIES_H__
 
-#include "Core/BasicTypes.h"
-#include "core/enginestatus.h"
-#include "core/enginetypehelper.h"
+#include <core/basictypes.h>
+#include <core/enginestatus.h>
+#include <core/enginetypehelper.h>
+#include <log/log.h>
+#include <graphicsapi/definitions.h>
 
-#include "Log/Log.h"
+namespace engine
+{
+    namespace gfxapi
+    {
+        using namespace engine::resources;
 
-#include "GFXAPI/Definitions.h"
+        struct SGAPIOutputMode
+        {
+            uint32_t            modeIndex;
+            Format              format;
+            CVector2D<uint32_t> size;
+            CVector2D<uint32_t> refreshRate;
+        };
+        SHIRABE_DECLARE_LIST_OF_TYPE(SGAPIOutputMode, SGAPIOutputMode);
 
-namespace engine {
-	namespace gfxapi {
-		using namespace engine::Resources;
+        struct SGAPIOutput
+        {
+            uint32_t            outputIndex;
+            SGAPIOutputModeList outputModes;
+        };
+        SHIRABE_DECLARE_LIST_OF_TYPE(SGAPIOutput, SGAPIOutput);
 
-		struct GAPIOutputMode {
-      uint32_t modeIndex;
-			Format   format;
-			TVector2D<uint32_t> 
-        size,
-        refreshRate;
-		};
-		DeclareListType(GAPIOutputMode, GAPIOutputMode);
+        struct SAPIAdapterDescription
+        {
+            std::string   name;
+            unsigned long dedicatedGPUMemory;
+            unsigned long dedicatedSysMemory;
 
-		struct GAPIOutput {
-			uint32_t           outputIndex;
-			GAPIOutputModeList outputModes;
-		};
-		DeclareListType(GAPIOutput, GAPIOutput);
+        };
 
-		struct GAPIAdapterDescription {
-			std::string   name;
-			unsigned long dedicatedGPUMemory;
-			unsigned long dedicatedSysMemory;
+        struct SGAPIAdapter
+        {
+            uint32_t               adapterIndex;
+            SAPIAdapterDescription description;
+            SGAPIOutputList        outputs;
+        };
+        SHIRABE_DECLARE_LIST_OF_TYPE(SGAPIAdapter, SGAPIAdapter);
 
-		};
+        struct SGAPIAdapterOutputConfig
+        {
+            int32_t adapterIndex;
+            int32_t outputIndex;
+            int32_t modeIndex;
+        };
 
-		struct GAPIAdapter {
-      uint32_t               adapterIndex;
-			GAPIAdapterDescription description;
-			GAPIOutputList         outputs;
-		};
-		DeclareListType(GAPIAdapter, GAPIAdapter);
+        struct SGAPIDeviceCapabilities
+        {
+            SGAPIAdapterList         adapters;
+            SGAPIAdapterOutputConfig selectedConfig;
+        };
 
-    struct GAPIAdapterOutputConfig {
-      int32_t adapterIndex;
-      int32_t outputIndex;
-      int32_t modeIndex;
-    };
-
-		struct GAPIDeviceCapabilities {
-			GAPIAdapterList         adapters;
-      GAPIAdapterOutputConfig selectedConfig;
-		};
-
-	}
+    }
 }
 #endif 

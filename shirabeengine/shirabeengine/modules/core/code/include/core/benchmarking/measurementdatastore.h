@@ -6,7 +6,6 @@
 #include <vector>
 #include <algorithm>
 
-#include "core/enginestatus.h"
 #include "core/benchmarking/measurementchunk.h"
 #include "core/benchmarking/measurementchunktraits.h"
 

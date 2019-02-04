@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_GAPICONFIG_H__
 #define __SHIRABE_GAPICONFIG_H__
 
-#include "Platform/Platform.h"
+#include <platform/platform.h>
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
     #define GAPI_USE_DX 

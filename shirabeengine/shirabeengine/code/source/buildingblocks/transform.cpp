@@ -27,6 +27,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::rotate(CVector3D_t const &aEulerRotation)
     {
+        SHIRABE_UNUSED(aEulerRotation);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -37,6 +39,9 @@ namespace engine
     CTransform &CTransform::rotate(CVector3D_t const &aAxis,
                                    float       const &aPhi)
     {
+        SHIRABE_UNUSED(aAxis);
+        SHIRABE_UNUSED(aPhi);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -46,6 +51,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::rotate(CQuaternion const &aQuaternionRotation)
     {
+        SHIRABE_UNUSED(aQuaternionRotation);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -55,6 +62,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetRotation(CVector3D_t const &aEulerRotation)
     {
+        SHIRABE_UNUSED(aEulerRotation);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -65,6 +74,9 @@ namespace engine
     CTransform &CTransform::resetRotation(CVector3D_t const &aAxis,
                                           float       const &aPhi)
     {
+        SHIRABE_UNUSED(aAxis);
+        SHIRABE_UNUSED(aPhi);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -74,6 +86,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetRotation(CQuaternion const &aQuaternionRotation)
     {
+        SHIRABE_UNUSED(aQuaternionRotation);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -83,6 +97,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::translate(CVector3D_t const &aTranslation)
     {
+        SHIRABE_UNUSED(aTranslation);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -92,6 +108,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetTranslation(CVector3D_t const &aTranslation)
     {
+        SHIRABE_UNUSED(aTranslation);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -101,6 +119,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::scale(float const &aFactor)
     {
+        SHIRABE_UNUSED(aFactor);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -110,6 +130,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::scale(CVector3D_t const &aFactors)
     {
+        SHIRABE_UNUSED(aFactors);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -119,6 +141,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetScale(float const &aFactor)
     {
+        SHIRABE_UNUSED(aFactor);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -128,6 +152,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetScale(CVector3D_t const &aFactors)
     {
+        SHIRABE_UNUSED(aFactors);
+
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -164,6 +190,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CMatrix4x4 const &CTransform::updateWorldTransform(CMatrix4x4 const &aParent)
     {
+        SHIRABE_UNUSED(aParent);
+
         return mCurrentWorldTransform;
     }
     //<-----------------------------------------------------------------------------

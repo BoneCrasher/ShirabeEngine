@@ -63,7 +63,7 @@ namespace engine
             static SHIRABE_INLINE SFrustumParameters Default()
             {
                 SFrustumParameters p = {};
-                p.fovY               = (float)M_PI / 4.0f;
+                p.fovY               = static_cast<float>(M_PI) / 4.0f;
                 p.width              = 1;
                 p.height             = 1;
                 p.nearPlaneDistance  = 0.0f;
@@ -139,49 +139,70 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE ECameraViewType const &viewType() const { return mViewType; }
+        SHIRABE_INLINE ECameraViewType const &viewType() const
+        {
+            return mViewType;
+        }
 
         /**
          * Return the assigned frustum parameters.
          *
          * @return See brief.
          */
-        SHIRABE_INLINE SFrustumParameters const &frustumParameters() const { return mFrustumParameters; }
+        SHIRABE_INLINE SFrustumParameters const &frustumParameters() const
+        {
+            return mFrustumParameters;
+        }
 
         /**
          * Return the assigned projection parameters.
          *
          * @return See brief.
          */
-        SHIRABE_INLINE SProjectionParameters const &projectionParameters() const { return mProjectionParameters; }
+        SHIRABE_INLINE SProjectionParameters const &projectionParameters() const
+        {
+            return mProjectionParameters;
+        }
 
         /**
          * Return the assigned look at target.
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CVector3D_t const &lookAtTarget() const { return mLookAtTarget; }
+        SHIRABE_INLINE CVector3D_t const &lookAtTarget() const
+        {
+            return mLookAtTarget;
+        }
 
         /**
          * Return the current world matrix representation of the underlying transform.
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CMatrix4x4 const&world() const { return mTransform.world(); }
+        SHIRABE_INLINE CMatrix4x4 const&world() const
+        {
+            return mTransform.world();
+        }
 
         /**
          * Return the current view matrix representation of the camera.
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CMatrix4x4 const&view() const { return mViewMatrix; }
+        SHIRABE_INLINE CMatrix4x4 const&view() const
+        {
+            return mViewMatrix;
+        }
 
         /**
          * Return the current projection matrix representation of the camera.
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CMatrix4x4 const&projection() const { return mProjectionMatrix; }
+        SHIRABE_INLINE CMatrix4x4 const&projection() const
+        {
+            return mProjectionMatrix;
+        }
 
     private_methods:
         /**
@@ -204,7 +225,7 @@ namespace engine
         SProjectionParameters mProjectionParameters;
         CVector3D_t           mLookAtTarget;
 
-        CTransform             mTransform;
+        CTransform            mTransform;
         CMatrix4x4            mViewMatrix;
         CMatrix4x4            mProjectionMatrix;
     };

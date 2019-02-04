@@ -15,6 +15,11 @@ namespace engine
     using resources::CResourceManagerBase;
     using resources::CResourceProxyFactory;
 
+    /**
+     * Engine default implementation of the resource manager, which will register all
+     * necessary type creators, destructors, updaters and queries.
+     *
+     */
     class CResourceManager
             : public CResourceManagerBase
     {

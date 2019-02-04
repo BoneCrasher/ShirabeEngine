@@ -147,7 +147,7 @@ namespace engine
                                  static_cast<CResourceManagerBase *>(this),
                                  std::placeholders::_1)).successful();
 
-        if(!success)
+        if(not success)
         {
             return EEngineStatus::Error;
         }

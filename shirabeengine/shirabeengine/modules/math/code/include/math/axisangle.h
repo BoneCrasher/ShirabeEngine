@@ -1,6 +1,7 @@
 #ifndef __SHIRABE_CAxisAngle_H__
 #define __SHIRABE_CAxisAngle_H__
 
+#include <base/declaration.h>
 #include "math/vector.h"
 
 namespace engine

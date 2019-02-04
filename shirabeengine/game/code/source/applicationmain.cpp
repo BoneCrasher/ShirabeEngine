@@ -36,20 +36,25 @@ int main(int aArgc, char **aArgv)
     // TODO: Configuation
     // EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);
 
-    CStdSharedPtr_t<CEngineInstance> engine = makeCStdSharedPtr<CEngineInstance>(appEnvironment/*, engineConfiguration*/);
-    if (CheckEngineError(engine->initialize()))
+    CStdSharedPtr_t<CEngineInstance> engine     = makeCStdSharedPtr<CEngineInstance>(appEnvironment/*, engineConfiguration*/);
+    CEngineResult<>                  engineInit = engine->initialize();
+    if(not engineInit.successful())
     {
         CLog::Error(Main::logTag(), "Failed to initialize engine instance.");
     }
 
-    while (!CheckEngineError(engine->update()))
+    CEngineResult<> engineUpdate = { EEngineStatus::Ok };
+
+    while (not (engineUpdate = engine->update()).successful())
     {
         // Just run the shit out of the engine...
         // If it returns we had an error or something had it close.
         // Drop out automatically in this case and perform cleanup.
     }
 
-    if (CheckEngineError(engine->deinitialize()))
+    CEngineResult<> engineDeinit = engine->deinitialize();
+
+    if (not engineDeinit.successful())
     {
         CLog::Error(Main::logTag(), "Failed to deinitialize engine instance.");
     }

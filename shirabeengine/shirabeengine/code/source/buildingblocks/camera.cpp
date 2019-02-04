@@ -202,9 +202,9 @@ namespace engine
             double            const &aFovY,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
-        float const aspect       =  ((float)aBounds.size.x() / (float)aBounds.size.y());
-        float const fovFactorRad =  ((aFovY/2.0f) * (M_PI/180.0f));
-        float const t            =  tan(fovFactorRad) * aNear;
+        float const aspect       =  static_cast<float>(aBounds.size.x()) / static_cast<float>(aBounds.size.y());
+        float const fovFactorRad =  ( (static_cast<float>(aFovY) / 2.0f) * static_cast<float>(M_PI / 180.0) );
+        float const t            =  tan(fovFactorRad) * static_cast<float>(aNear);
         float const b            = -t;
         float const r            =  t * aspect;
         float const l            = -r;
@@ -235,8 +235,8 @@ namespace engine
         float const t = aBounds.y();
         float const r = aBounds.z();
         float const b = aBounds.w();
-        float const f = aFar;
-        float const n = aNear;
+        float const f = static_cast<float>(aFar);
+        float const n = static_cast<float>(aNear);
 
         CMatrix4x4 const projection = CMatrix4x4({
             (2.0f / (r - l)), 0.0f,             0.0f,           -((r + l) / (r - l)),
@@ -276,7 +276,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    void CCamera::createProjectionMatrix(ECoordinateSystem const&aCoordinateSystem)
+    void CCamera::createProjectionMatrix(ECoordinateSystem const &aCoordinateSystem)
     {
         CMatrix4x4 mat = {};
 
@@ -285,9 +285,9 @@ namespace engine
         case ECameraProjectionType::Perspective:
             mat = projectionPerspectiveFOV(
                         { 0, 0, mFrustumParameters.width, mFrustumParameters.height },
-                        mFrustumParameters.nearPlaneDistance,
-                        mFrustumParameters.farPlaneDistance,
-                        mFrustumParameters.fovY,
+                        static_cast<double>(mFrustumParameters.nearPlaneDistance),
+                        static_cast<double>(mFrustumParameters.farPlaneDistance),
+                        static_cast<double>(mFrustumParameters.fovY),
                         aCoordinateSystem);
             break;
         case ECameraProjectionType::Orthographic:
@@ -298,8 +298,8 @@ namespace engine
                             (0.5f * mFrustumParameters.width),
                             (0.5f * mFrustumParameters.height)
                         }),
-                        mFrustumParameters.nearPlaneDistance,
-                        mFrustumParameters.farPlaneDistance,
+                        static_cast<double>(mFrustumParameters.nearPlaneDistance),
+                        static_cast<double>(mFrustumParameters.farPlaneDistance),
                         aCoordinateSystem);
             break;
         }

@@ -12,13 +12,14 @@
 #include <vulkan/vulkandevicecapabilities.h>
 
 #include <wsi/display.h>
+
 #if defined SHIRABE_PLATFORM_LINUX
-#include <wsi/x11/x11display.h>
-#include <wsi/x11/x11windowfactory.h>
-#include <vulkan/wsi/x11surface.h>
+    #include <wsi/x11/x11display.h>
+    #include <wsi/x11/x11windowfactory.h>
+    #include <vulkan/wsi/x11surface.h>
 #elif defined SHIRABE_PLATFORM_WINDOWS
-#include <wsi/windows/windowsdisplay.h>
-#include <wsi/windows/windowswindowfactory.h>
+    #include <wsi/windows/windowsdisplay.h>
+    #include <wsi/windows/windowswindowfactory.h>
 #endif
 
 #include "resource_management/resourcemanager.h"
@@ -87,6 +88,7 @@ namespace engine
         , mResourceManager  (nullptr)
         , mVulkanEnvironment(nullptr)
         , mRenderer         (nullptr)
+        , mScene            ({})
     { }
     //<-----------------------------------------------------------------------------
 
@@ -138,18 +140,19 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CEngineInstance::initialize()
+    CEngineResult<> CEngineInstance::initialize()
     {
         EEngineStatus status = EEngineStatus::Ok;
 
         CStdSharedPtr_t<CGFXAPIResourceBackend> resourceBackend = nullptr;
+        CStdSharedPtr_t<CWSIDisplay>            display         = nullptr;
 
-        CStdSharedPtr_t<CWSIDisplay> display = nullptr;
 #if defined SHIRABE_PLATFORM_LINUX
         CStdSharedPtr_t<x11::CX11Display> x11Display = makeCStdSharedPtr<x11::CX11Display>();
         display = x11Display;
 #elif defined SHIRABE_PLATFORM_WINDOWS
 #endif
+
         status = display->initialize();
 
         SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
@@ -161,7 +164,7 @@ namespace engine
         EGFXAPI        const gfxApi        = EGFXAPI::Vulkan;
         EGFXAPIVersion const gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
 
-        auto const fnCreatePlatformWindowSystem = [&, this] () -> void
+        auto const fnCreatePlatformWindowSystem = [&, this] () -> CEngineResult<>
         {
             CEngineResult<> result = { EEngineStatus::Ok };
 
@@ -180,7 +183,8 @@ namespace engine
             {
                 CLog::Error(logTag(), "Failed to create WindowManager.");
                 result = CEngineResult<>(EEngineStatus::InitializationError);
-                return;
+
+                return result;
             }
 
             mMainWindow = mWindowManager->createWindow("MainWindow", CRect(0, 0, windowWidth, windowHeight));
@@ -188,25 +192,28 @@ namespace engine
             {
                 CLog::Error(logTag(), "Failed to create main window in WindowManager.");
                 result = CEngineResult<>(EEngineStatus::WindowCreationError);
-                return;
+
+                return result;
             }
 
             EEngineStatus status = mMainWindow->resume();
             if(CheckEngineError(status))
             {
                 CLog::Error(logTag(), "Failed to resume operation in main window.");
-                return;
+                return { status };
             }
 
             status = mMainWindow->show();
             if(CheckEngineError(status))
             {
                 CLog::Error(logTag(), "Failed to show main window.");
-                return;
+                return { status };
             }
 
             CStdSharedPtr_t<IWindow::IEventCallback> dummy = makeCStdSharedPtr<CTestDummy>();
             mMainWindow->registerCallback(dummy);
+
+            return { EEngineStatus::Ok };
         };
 
         SRendererConfiguration rendererConfiguration = {};
@@ -216,10 +223,9 @@ namespace engine
         rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
         rendererConfiguration.requestFullscreen       = false;
 
-        std::function<void()> fnCreateDefaultGFXAPI
-                = [&, this] () -> void
+        auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
         {
-            if(gfxApi == EGFXAPI::Vulkan)
+            if(EGFXAPI::Vulkan == gfxApi)
             {
                 mVulkanEnvironment = makeCStdSharedPtr<CVulkanEnvironment>();
                 EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
@@ -227,7 +233,8 @@ namespace engine
                 if(CheckEngineError(status))
                 {
                     EngineStatusPrintOnError(status, logTag(), "Vulkan initialization failed.");
-                    return;
+
+                    return { status };
                 }
 
 
@@ -236,7 +243,8 @@ namespace engine
                 {
                     CLog::Error(logTag(), "Failed to create vk surface.");
                     mVulkanEnvironment->deinitialize();
-                    return;
+
+                    return { surfaceCreation.result() };
                 }
 
                 mVulkanEnvironment->setSurface(surfaceCreation.data());
@@ -247,10 +255,11 @@ namespace engine
                              requiredFormat,
                              VK_COLORSPACE_SRGB_NONLINEAR_KHR);
             }
+
+            return { EEngineStatus::Ok };
         };
 
-        std::function<void()> fnCreatePlatformResourceSystem
-                = [&, this] () -> void
+        auto const fnCreatePlatformResourceSystem = [&, this] () -> CEngineResult<>
         {
             // Instantiate the appropriate gfx api from engine config, BUT match it against
             // the platform capabilities!
@@ -262,6 +271,7 @@ namespace engine
             //
 
             CAssetStorage::AssetIndex_t assetIndex ={}; // AssetIndex::loadIndexById("");
+
             CStdSharedPtr_t<CAssetStorage> assetStorage = makeCStdSharedPtr<CAssetStorage>();
             mAssetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
@@ -274,7 +284,7 @@ namespace engine
             // This way, the resources can simply be reloaded on demand.
             // Nonetheless, a regular backend reset has to take place in order to have the proxies remain in a valid state!
             // The reset of the taskbackend should thus occur through the resource backend.
-            if(gfxApi == EGFXAPI::Vulkan)
+            if(EGFXAPI::Vulkan == gfxApi)
             {
                 CStdSharedPtr_t<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<CVulkanResourceTaskBackend>(mVulkanEnvironment);
                 vkResourceTaskBackend->initialize();
@@ -295,17 +305,18 @@ namespace engine
             CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
             mResourceManager = manager;            
             mResourceManager->initialize();
+
+            return { EEngineStatus::Ok };
         };
 
-        auto const fnCreatePlatformRenderer
-                = [&, this] () -> void
+        auto const fnCreatePlatformRenderer = [&, this] () -> CEngineResult<>
         {
             using engine::framegraph::IFrameGraphRenderContext;
             using engine::framegraph::CFrameGraphRenderContext;
 
             // How to decouple?
             CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;
-            if(gfxApi == EGFXAPI::Vulkan)
+            if(EGFXAPI::Vulkan == gfxApi)
             {
                 CStdSharedPtr_t<CVulkanRenderContext> vulkanRenderContext = makeCStdSharedPtr<CVulkanRenderContext>();
                 vulkanRenderContext->initialize(mVulkanEnvironment, resourceBackend);
@@ -316,19 +327,24 @@ namespace engine
             CEngineResult<CStdSharedPtr_t<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeCStdSharedPtr<CRenderer>();
-            status = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
-            if(!CheckEngineError(status))
+            status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
+            if(false == CheckEngineError(status))
             {
-                status = mScene.initialize();
+                CEngineResult<> initialization = mScene.initialize();
+                status = initialization.result();
             }
+
+            return { status };
         };
 
         try
         {
-            fnCreatePlatformWindowSystem();
-            fnCreateDefaultGFXAPI();
-            fnCreatePlatformResourceSystem();
-            fnCreatePlatformRenderer();
+            CEngineResult<> creation = { EEngineStatus::Ok };
+
+            creation = fnCreatePlatformWindowSystem();
+            creation = fnCreateDefaultGFXAPI();
+            creation = fnCreatePlatformResourceSystem();
+            creation = fnCreatePlatformRenderer();
 
         }
         catch(std::exception const stde)
@@ -349,27 +365,27 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CEngineInstance::deinitialize()
+    CEngineResult<> CEngineInstance::deinitialize()
     {
         EEngineStatus status = EEngineStatus::Ok;
 
-        if(mResourceManager)
+        if(nullptr != mResourceManager)
         {
             mResourceManager->clear(); // Will implicitely clear all subsystems!
             mResourceManager = nullptr;
         }
 
-        if(mProxyFactory)
+        if(nullptr != mProxyFactory)
         {
             mProxyFactory = nullptr;
         }
 
-        if(mRenderer)
+        if(nullptr != mRenderer)
         {
                 status = mRenderer->deinitialize();
         }
 
-        if(mMainWindow)
+        if(nullptr != mMainWindow)
         {
                 mMainWindow->hide();
                 mMainWindow->pause();
@@ -387,12 +403,12 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CEngineInstance::update()
+    CEngineResult<> CEngineInstance::update()
     {
         if(CheckWindowManagerError(mWindowManager->update()))
         {
                 CLog::Error(logTag(), "Failed to update window manager.");
-                return EEngineStatus::UpdateError;
+                return { EEngineStatus::UpdateError };
         }
 
         mScene.update();
@@ -402,7 +418,7 @@ namespace engine
             mRenderer->renderScene();
         }
 
-        return EEngineStatus::Ok;
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 }
