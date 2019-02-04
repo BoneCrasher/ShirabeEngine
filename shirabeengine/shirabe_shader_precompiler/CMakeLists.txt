@@ -13,6 +13,7 @@ set(
         SHIRABEMODULELOG
         SHIRABEMODULEPLATFORM
         SHIRABEMODULEBASE
+        GLSLANG
         SPIRVCROSS)
 
 include(project_setup)
