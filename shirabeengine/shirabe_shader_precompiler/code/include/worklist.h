@@ -73,10 +73,28 @@ namespace glslang_wrapper
         }
 
         /**
+         * @brief name
+         * @return
+         */
+        std::string &name()
+        {
+            return mItemName;
+        }
+
+        /**
          * @brief results
          * @return
          */
         std::string const &results() const
+        {
+            return mResults;
+        }
+
+        /**
+         * @brief results
+         * @return
+         */
+        std::string &results()
         {
             return mResults;
         }
