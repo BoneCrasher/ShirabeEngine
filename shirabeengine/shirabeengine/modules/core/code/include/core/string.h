@@ -67,7 +67,6 @@ namespace engine
          */
         static std::string  narrow(std::wstring const &aInput);
 
-        private_static_functions:
         /**
          * Accept an arbitrarily typed argument and convert it to it's proper
          * string representation.
@@ -96,6 +95,31 @@ namespace engine
                 >
         static std::string toString(const float& arg);
 
+
+        /**
+         * Convert a string into an arbitrarily typed representation.
+         *
+         * @param aString
+         * @return
+         */
+        template <
+                typename TData,
+                typename TEnable = void
+                >
+        static TData const fromString(std::string const &aString);
+
+
+        template <
+                typename TData,
+                typename std::enable_if
+                         <
+                            std::is_integral<TData>::value || std::is_floating_point<TData>::value,
+                            TData
+                         >::type
+                >
+        static TData fromString(std::string const &aString);
+
+    private_static_functions:
         /**
          * Format a list of arguments. In this case zero arguments as the abort-condition
          * of the recursive expansion of the parameter pack.
@@ -247,6 +271,28 @@ namespace engine
         outFormatted[index] = toString(inArg);
 
         formatArguments(outFormatted, std::forward<TArgs>(inArgs)...);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <
+            typename TData,
+            typename std::enable_if
+                     <
+                        std::is_integral<TData>::value || std::is_floating_point<TData>::value,
+                        TData
+                     >::type
+            >
+    TData CString::fromString(std::string const &aString)
+    {
+        TData const result{};
+
+        std::stringstream ss(aString);
+        ss >> result;
+
+        return result;
     }
     //<-----------------------------------------------------------------------------
 }

@@ -222,6 +222,7 @@ static std::string ReadFileData(std::string const &aFileName)
 /**
  * Print the proper usage of this tool.
  */
+[[noreturn]]
 void usage()
 {
     using namespace engine;
@@ -535,9 +536,6 @@ private_classes:
 
             fixLine(aDefinition);
 
-            mProcesses.push_back("D");
-            mProcesses.back().append(aDefinition);
-
             // The first "=" needs to turn into a space
             size_t const equalCharacterPos = aDefinition.find_first_of("=");
 
@@ -560,9 +558,6 @@ private_classes:
             mText.append("#undef ");
 
             fixLine(aUndefinition);
-
-            mProcesses.push_back("U");
-            mProcesses.back().append(aUndefinition);
 
             mText.append(aUndefinition);
             mText.append("\n");
@@ -593,7 +588,7 @@ public_methods:
 
     EFailCode initialize()
     {
-
+        return EFailCode::Success;
     }
 
     EFailCode run()
@@ -697,7 +692,7 @@ public_methods:
 
                 for (unsigned int k = 0; k < threads.size(); ++k)
                 {
-                    threads[k] = std::thread(compileShaders, std::ref(workList));
+                    threads[k] = std::thread(&CPrecompiler::compileShaders, this, std::ref(workList));
 
                     if (std::thread::id() == threads[k].get_id())
                     {
@@ -706,7 +701,14 @@ public_methods:
                     }
                 }
 
-                std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
+                auto const joiner = [] (std::thread &t)
+                {
+                    if(t.joinable())
+                    {
+                        t.join();
+                    }
+                };
+                std::for_each(threads.begin(), threads.end(), joiner);
             }
             else
             {
@@ -880,6 +882,52 @@ private_methods:
     //<-----------------------------------------------------------------------------
 
     /**
+     * Create the default name for saving a binary if -o is not provided.
+     *
+     * @param aStage The stage to determine a binary name for.
+     * @return See brief
+     */
+    std::string const GetBinaryName(EShLanguage const aStage) const
+    {
+        std::string name{};
+
+        if (mBinaryFileName.empty())
+        {
+            switch (aStage)
+            {
+            case EShLangVertex:         name = "vert.spv";  break;
+            case EShLangTessControl:    name = "tesc.spv";  break;
+            case EShLangTessEvaluation: name = "tese.spv";  break;
+            case EShLangGeometry:       name = "geom.spv";  break;
+            case EShLangFragment:       name = "frag.spv";  break;
+            case EShLangCompute:        name = "comp.spv";  break;
+    #ifdef NV_EXTENSIONS
+            case EShLangRayGenNV:       name = "rgen.spv";  break;
+            case EShLangIntersectNV:    name = "rint.spv";  break;
+            case EShLangAnyHitNV:       name = "rahit.spv"; break;
+            case EShLangClosestHitNV:   name = "rchit.spv"; break;
+            case EShLangMissNV:         name = "rmiss.spv"; break;
+            case EShLangCallableNV:     name = "rcall.spv"; break;
+            case EShLangMeshNV:         name = "mesh.spv";  break;
+            case EShLangTaskNV:         name = "task.spv";  break;
+    #endif
+            default:                     name = "unknown";  break;
+            }
+        }
+        else
+        {
+            name = mBinaryFileName;
+        }
+
+        return name;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+
+    /**
      * @brief compile
      * @param aFilename
      * @param aCompiler
@@ -899,6 +947,7 @@ private_methods:
 
         // move to length-based strings, rather than null-terminated strings
         uint64_t const length = shaderString.size();
+        SHIRABE_UNUSED(length);
 
         EShMessages messages = EShMsgDefault;
         messages = static_cast<EShMessages>(messages | EShMsgDebugInfo);
@@ -991,6 +1040,7 @@ private_methods:
             if (aWorklist.remove(workItem))
             {
                 bool const success = compileFn(workItem, "stdin");
+                SHIRABE_UNUSED(success);
             }
         }
         else
@@ -998,6 +1048,7 @@ private_methods:
             while (aWorklist.remove(workItem))
             {
                 bool const success = compileFn(workItem, workItem->name());
+                SHIRABE_UNUSED(success);
             }
         }
     }
@@ -1123,20 +1174,20 @@ private_methods:
             //
             // ENTRY POINT
             //
-            if (mEntryPointName)
+            if (not mEntryPointName.empty())
             {
-                shader->setEntryPoint(mEntryPointName);
+                shader->setEntryPoint(mEntryPointName.c_str());
             }
 
-            if (mSourceEntryPointName)
+            if (not mSourceEntryPointName.empty())
             {
-                if (nullptr == mEntryPointName)
+                if (mEntryPointName.empty())
                 {
                     printf("Warning: Changing source entry point name without setting an entry-point name.\n"
                            "Use '-e <name>'.\n");
                 }
 
-                shader->setSourceEntryPoint(mSourceEntryPointName);
+                shader->setSourceEntryPoint(mSourceEntryPointName.c_str());
             }
 
             //
@@ -1352,13 +1403,15 @@ private_methods:
                         {
                             printf("%s", logger.getAllMessages().c_str());
 
+                            std::string const binaryName = GetBinaryName(static_cast<EShLanguage>(stage));
+
                             if (mOptions.check(EOptions::OutputHexadecimal))
                             {
-                                glslang::OutputSpvHex(spirv, GetBinaryName((EShLanguage)stage), mVariableName);
+                                glslang::OutputSpvHex(spirv, binaryName.c_str(), mVariableName.c_str());
                             }
                             else
                             {
-                                glslang::OutputSpvBin(spirv, GetBinaryName((EShLanguage)stage));
+                                glslang::OutputSpvBin(spirv, binaryName.c_str());
                             }
 
                             if (not mSpvToolsDisassembler && mOptions.check(EOptions::HumanReadableSpv))
@@ -1382,6 +1435,69 @@ private_methods:
             delete shaders.back();
             shaders.pop_back();
         }
+    }    
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+
+    /**
+     * Parse either a .conf file provided by the user or the default from glslang::DefaultTBuiltInResource
+     */
+    void processConfigFile()
+    {
+        if(0 == mConfigFile.size())
+        {
+            mResources = DefaultBuiltInResource();
+        }
+        else
+        {
+            std::string configString  = ReadFileData(mConfigFile);
+            char       *configCString = configString.data();
+
+            DecodeResourceLimits(&mResources, configCString);
+        }
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+
+    /**
+     * Process a list of files.
+     *
+     * @param aInputFilenames See brief.
+     */
+    void process(std::vector<std::string> const &aInputFilenames)
+    {
+        using namespace engine;
+
+        ShInitialize();
+
+        for(std::string const &filename : aInputFilenames)
+        {
+            EShLanguage const lang = determineTargetLanguage(filename, true, mOptions);
+
+            ShHandle compiler = ShConstructCompiler(lang, static_cast<int>(mOptions.value()));
+            if (nullptr == compiler)
+            {
+                return;
+            }
+
+            compile("stdin", compiler, mOptions);
+
+            if (false == (mOptions.check(EOptions::SuppressInfolog)))
+            {
+                std::string const log = ShGetInfoLog(compiler);
+                CLog::Error(Main::logTag(), log);
+            }
+
+            ShDestruct(compiler);
+        }
+
+        ShFinalize();
     }
     //<-----------------------------------------------------------------------------
 
@@ -1472,23 +1588,105 @@ private_methods:
     //<
     //<-----------------------------------------------------------------------------
 
-    //
-    // Parse either a .conf file provided by the user or the default from glslang::DefaultTBuiltInResource
-    //
-    void processConfigFile()
+    /**
+     * Process an optional binding base of one the forms:
+     *   --argname [stage] base            // base for stage (if given) or all stages (if not)
+     *   --argname [stage] [base set]...   // set/base pairs: set the base for given binding set.
+     *
+     * Where stage is one of the forms accepted by FindLanguage, and base is an integer
+     *
+     *  @param aArgC
+     * @param aArgV
+     * @param aResource
+     */
+    void ProcessBindingBase(int &aArgC, char**& aArgV, glslang::TResourceType aResource)
     {
-        if(0 == mConfigFile.size())
-        {
-            mResources = DefaultBuiltInResource();
-        }
-        else
-        {
-            std::string configString  = ReadFileData(mConfigFile);
-            char       *configCString = configString.data();
+        if (argc < 2)
+            usage();
 
-            DecodeResourceLimits(&mResources, configCString);
+        EShLanguage lang = EShLangCount;
+        int singleBase = 0;
+        TPerSetBaseBinding perSetBase;
+        int arg = 1;
+
+        // Parse stage, if given
+        if (!isdigit(argv[arg][0])) {
+            if (argc < 3) // this form needs one more argument
+                usage();
+
+            lang = FindLanguage(argv[arg++], false);
+        }
+
+        if ((argc - arg) > 2 && isdigit(argv[arg+0][0]) && isdigit(argv[arg+1][0])) {
+            // Parse a per-set binding base
+            while ((argc - arg) > 2 && isdigit(argv[arg+0][0]) && isdigit(argv[arg+1][0])) {
+                const int baseNum = atoi(argv[arg++]);
+                const int setNum = atoi(argv[arg++]);
+                perSetBase[setNum] = baseNum;
+            }
+        } else {
+            // Parse single binding base
+            singleBase = atoi(argv[arg++]);
+        }
+
+        argc -= (arg-1);
+        argv += (arg-1);
+
+        // Set one or all languages
+        const int langMin = (lang < EShLangCount) ? lang+0 : 0;
+        const int langMax = (lang < EShLangCount) ? lang+1 : EShLangCount;
+
+        for (int lang = langMin; lang < langMax; ++lang) {
+            if (!perSetBase.empty())
+                baseBindingForSet[res][lang].insert(perSetBase.begin(), perSetBase.end());
+            else
+                baseBinding[res][lang] = singleBase;
         }
     }
+
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+
+    void ProcessResourceSetBindingBase(int& argc, char**& argv, std::array<std::vector<std::string>, EShLangCount>& base)
+    {
+        if (argc < 2)
+            usage();
+
+        if (!isdigit(argv[1][0])) {
+            if (argc < 3) // this form needs one more argument
+                usage();
+
+            // Parse form: --argname stage [regname set base...], or:
+            //             --argname stage set
+            const EShLanguage lang = FindLanguage(argv[1], false);
+
+            argc--;
+            argv++;
+
+            while (argc > 1 && argv[1] != nullptr && argv[1][0] != '-') {
+                base[lang].push_back(argv[1]);
+
+                argc--;
+                argv++;
+            }
+
+            // Must have one arg, or a multiple of three (for [regname set binding] triples)
+            if (base[lang].size() != 1 && (base[lang].size() % 3) != 0)
+                usage();
+
+        } else {
+            // Parse form: --argname set
+            for (int lang=0; lang<EShLangCount; ++lang)
+                base[lang].push_back(argv[1]);
+
+            argc--;
+            argv++;
+        }
+    }
+
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
@@ -1505,401 +1703,614 @@ private_methods:
      * @param argc
      * @param argv
      */
-    void ProcessArguments(int argc, char* argv[], std::vector<std::unique_ptr<CWorkItem>>& aOutWorkItems)
+    void ProcessArguments(int aArgC, char *aArgV[], std::vector<std::unique_ptr<CWorkItem>>& aOutWorkItems)
     {
-        for (int res = 0; res < glslang::EResCount; ++res)
-            baseBinding[res].fill(0);
+        for (uint64_t k = 0; k < glslang::EResCount; ++k)
+        {
+            mBaseBinding[k].fill(0);
+        }
 
-        ExecutableName = argv[0];
-        workItems.reserve(argc);
+        mExecutableName = aArgV[0];
 
-        const auto bumpArg = [&]() {
-            if (argc > 0) {
-                argc--;
-                argv++;
+        mWorkItems.reserve(static_cast<size_t>(aArgC));
+
+        const auto bumpArg = [&]()
+        {
+            if (0 < aArgC)
+            {
+                --aArgC;
+                ++aArgV;
             }
         };
 
         // read a string directly attached to a single-letter option
-        const auto getStringOperand = [&](const char* desc) {
-            if (argv[0][2] == 0) {
-                printf("%s must immediately follow option (no spaces)\n", desc);
-                exit(EFailUsage);
+        const auto getStringOperand = [&] (char const *aDesc)
+        {
+            if (0 == aArgV[0][2])
+            {
+                printf("%s must immediately follow option (no spaces)\n", aDesc);
+                std::exit(EnumValueOf(EFailCode::FailUsage));
             }
-            return argv[0] + 2;
+
+            return (aArgV[0] + 2);
         };
 
         // read a number attached to a single-letter option
-        const auto getAttachedNumber = [&](const char* desc) {
-            int num = atoi(argv[0] + 2);
-            if (num == 0) {
-                printf("%s: expected attached non-0 number\n", desc);
-                exit(EFailUsage);
+        const auto getAttachedNumber = [&] (char const *aDesc)
+        {
+            int num = atoi(aArgV[0] + 2);
+            if (0 == num)
+            {
+                printf("%s: expected attached non-0 number\n", aDesc);
+                std::exit(EnumValueOf(EFailCode::FailUsage));
             }
+
             return num;
         };
 
         // minimum needed (without overriding something else) to target Vulkan SPIR-V
-        const auto setVulkanSpv = []() {
-            if (Client == glslang::EShClientNone)
-                ClientVersion = glslang::EShTargetVulkan_1_0;
-            Client = glslang::EShClientVulkan;
-            Options |= EOptionSpv;
-            Options |= EOptionVulkanRules;
-            Options |= EOptionLinkProgram;
+        const auto setVulkanSpv = [this] ()
+        {
+            if (glslang::EShClientNone == mClient)
+            {
+                mClientVersion = glslang::EShTargetVulkan_1_0;
+            }
+
+            mClient = glslang::EShClientVulkan;
+
+            mOptions.set(EOptions::Spv);
+            mOptions.set(EOptions::VulkanRules);
+            mOptions.set(EOptions::LinkProgram);
         };
 
         // minimum needed (without overriding something else) to target OpenGL SPIR-V
-        const auto setOpenGlSpv = []() {
-            if (Client == glslang::EShClientNone)
-                ClientVersion = glslang::EShTargetOpenGL_450;
-            Client = glslang::EShClientOpenGL;
-            Options |= EOptionSpv;
-            Options |= EOptionLinkProgram;
-            // undo a -H default to Vulkan
-            Options &= ~EOptionVulkanRules;
+        const auto setOpenGlSpv = [this] ()
+        {
+            if (glslang::EShClientNone == mClient)
+            {
+                mClientVersion = glslang::EShTargetOpenGL_450;
+            }
+
+            mClient = glslang::EShClientOpenGL;
+
+            mOptions.set  (EOptions::Spv);
+            mOptions.set  (EOptions::LinkProgram);
+            mOptions.unset(EOptions::VulkanRules);
         };
 
-        const auto getUniformOverride = [getStringOperand]() {
-            const char *arg = getStringOperand("-u<name>:<location>");
-            const char *split = strchr(arg, ':');
-            if (split == NULL) {
-                printf("%s: missing location\n", arg);
-                exit(EFailUsage);
+        const auto getUniformOverride = [getStringOperand] () -> std::pair<std::string, uint64_t>
+        {
+            std::string            const arg           = getStringOperand("-u<name>:<location>");
+            std::string::size_type const splitPosition = arg.find_first_of(':');
+
+            if (std::string::npos == splitPosition)
+            {
+                printf("%s: missing location\n", arg.c_str());
+                std::exit(EnumValueOf(EFailCode::FailUsage));
             }
-            errno = 0;
-            int location = ::strtol(split + 1, NULL, 10);
-            if (errno) {
-                printf("%s: invalid location\n", arg);
-                exit(EFailUsage);
-            }
-            return std::make_pair(std::string(arg, split - arg), location);
+
+            std::string const nameString     = arg.substr(0,                 splitPosition);
+            std::string const locationString = arg.substr(splitPosition + 1, std::string::npos);
+            uint64_t    const location       = CString::fromString<uint64_t>(locationString);
+
+            auto const pair = std::make_pair(nameString, location);
+            return pair;
         };
 
-        for (bumpArg(); argc >= 1; bumpArg()) {
-            if (argv[0][0] == '-') {
-                switch (argv[0][1]) {
-                case '-':
+        for (bumpArg(); aArgC >= 1; bumpArg())
+        {
+            if ('-' == aArgV[0][0])
+            {
+                switch (aArgV[0][1])
+                {
+                case '-': // --<flag>
                     {
-                        std::string lowerword(argv[0]+2);
-                        std::transform(lowerword.begin(), lowerword.end(), lowerword.begin(), ::tolower);
+                        std::string flag(aArgV[0] + 2);
+
+                        std::transform(flag.begin(), flag.end(), flag.begin(), ::tolower);
 
                         // handle --word style options
-                        if (lowerword == "auto-map-bindings" ||  // synonyms
-                            lowerword == "auto-map-binding"  ||
-                            lowerword == "amb") {
-                            Options |= EOptionAutoMapBindings;
-                        } else if (lowerword == "auto-map-locations" || // synonyms
-                                   lowerword == "aml") {
-                            Options |= EOptionAutoMapLocations;
-                        } else if (lowerword == "uniform-base") {
-                            if (argc <= 1)
-                                Error("no <base> provided for --uniform-base");
-                            uniformBase = ::strtol(argv[1], NULL, 10);
+                        if ("auto-map-bindings" == flag ||  // synonyms
+                            "auto-map-binding"  == flag ||
+                            "amb"               == flag)
+                        {
+                            mOptions.set(EOptions::AutoMapBindings);
+                        }
+                        else if ("auto-map-locations" == flag || // synonyms
+                                 "aml"                == flag)
+                        {
+                            mOptions.set(EOptions::AutoMapLocations);
+                        }
+                        else if ("uniform-base" == flag)
+                        {
+                            if (1 >= aArgC)
+                            {
+                                Error(logTag(), "no <base> provided for --uniform-base");
+                            }
+
+                            mUniformBase = CString::fromString<uint32_t>(std::string(aArgV[1]));
+
                             bumpArg();
                             break;
-                        } else if (lowerword == "client") {
-                            if (argc > 1) {
-                                if (strcmp(argv[1], "vulkan100") == 0)
+                        }
+                        else if ("client" == flag)
+                        {
+                            if (1 < aArgC)
+                            {
+                                std::string clientString = aArgV[1];
+                                if("vulkan100" == clientString)
+                                {
                                     setVulkanSpv();
-                                else if (strcmp(argv[1], "opengl100") == 0)
+                                }
+                                else if("opengl100" == clientString)
+                                {
                                     setOpenGlSpv();
+                                }
                                 else
-                                    Error("--client expects vulkan100 or opengl100");
+                                {
+                                    Error(logTag(), "--client expects vulkan100 or opengl100");
+                                }
                             }
+
                             bumpArg();
-                        } else if (lowerword == "entry-point") {
-                            entryPointName = argv[1];
-                            if (argc <= 1)
-                                Error("no <name> provided for --entry-point");
+                        }
+                        else if ("entry-point" == flag)
+                        {
+                            mEntryPointName = std::string(aArgV[1]);
+
+                            if(1 >= aArgC)
+                            {
+                                Error(logTag(), "no <name> provided for --entry-point");
+                            }
+
                             bumpArg();
-                        } else if (lowerword == "flatten-uniform-arrays" || // synonyms
-                                   lowerword == "flatten-uniform-array"  ||
-                                   lowerword == "fua") {
-                            Options |= EOptionFlattenUniformArrays;
-                        } else if (lowerword == "hlsl-offsets") {
-                            Options |= EOptionHlslOffsets;
-                        } else if (lowerword == "hlsl-iomap" ||
-                                   lowerword == "hlsl-iomapper" ||
-                                   lowerword == "hlsl-iomapping") {
-                            Options |= EOptionHlslIoMapping;
-                        } else if (lowerword == "hlsl-enable-16bit-types") {
-                            HlslEnable16BitTypes = true;
-                        } else if (lowerword == "hlsl-dx9-compatible") {
-                            HlslDX9compatible = true;
-                        } else if (lowerword == "invert-y" ||  // synonyms
-                                   lowerword == "iy") {
-                            Options |= EOptionInvertY;
-                        } else if (lowerword == "keep-uncalled" || // synonyms
-                                   lowerword == "ku") {
-                            Options |= EOptionKeepUncalled;
-                        } else if (lowerword == "no-storage-format" || // synonyms
-                                   lowerword == "nsf") {
-                            Options |= EOptionNoStorageFormat;
-                        } else if (lowerword == "relaxed-errors") {
-                            Options |= EOptionRelaxedErrors;
-                        } else if (lowerword == "resource-set-bindings" ||  // synonyms
-                                   lowerword == "resource-set-binding"  ||
-                                   lowerword == "rsb") {
-                            ProcessResourceSetBindingBase(argc, argv, baseResourceSetBinding);
-                        } else if (lowerword == "shift-image-bindings" ||  // synonyms
-                                   lowerword == "shift-image-binding"  ||
-                                   lowerword == "sib") {
-                            ProcessBindingBase(argc, argv, glslang::EResImage);
-                        } else if (lowerword == "shift-sampler-bindings" || // synonyms
-                                   lowerword == "shift-sampler-binding"  ||
-                                   lowerword == "ssb") {
-                            ProcessBindingBase(argc, argv, glslang::EResSampler);
-                        } else if (lowerword == "shift-uav-bindings" ||  // synonyms
-                                   lowerword == "shift-uav-binding"  ||
-                                   lowerword == "suavb") {
-                            ProcessBindingBase(argc, argv, glslang::EResUav);
-                        } else if (lowerword == "shift-texture-bindings" ||  // synonyms
-                                   lowerword == "shift-texture-binding"  ||
-                                   lowerword == "stb") {
-                            ProcessBindingBase(argc, argv, glslang::EResTexture);
-                        } else if (lowerword == "shift-ubo-bindings" ||  // synonyms
-                                   lowerword == "shift-ubo-binding"  ||
-                                   lowerword == "shift-cbuffer-bindings" ||
-                                   lowerword == "shift-cbuffer-binding"  ||
-                                   lowerword == "sub" ||
-                                   lowerword == "scb") {
-                            ProcessBindingBase(argc, argv, glslang::EResUbo);
-                        } else if (lowerword == "shift-ssbo-bindings" ||  // synonyms
-                                   lowerword == "shift-ssbo-binding"  ||
-                                   lowerword == "sbb") {
-                            ProcessBindingBase(argc, argv, glslang::EResSsbo);
-                        } else if (lowerword == "source-entrypoint" || // synonyms
-                                   lowerword == "sep") {
-                            if (argc <= 1)
-                                Error("no <entry-point> provided for --source-entrypoint");
-                            sourceEntryPointName = argv[1];
+                        }
+                        else if ("flatten-uniform-arrays" == flag || // synonyms
+                                 "flatten-uniform-array"  == flag ||
+                                 "fua"                    == flag )
+                        {
+                            mOptions.set(EOptions::FlattenUniformArrays);
+                        }
+                        else if ("hlsl-offsets" == flag)
+                        {
+                            mOptions.set(EOptions::HlslOffsets);
+                        }
+                        else if ("hlsl-iomap"     == flag ||
+                                 "hlsl-iomapper"  == flag ||
+                                 "hlsl-iomapping" == flag )
+                        {
+                            mOptions.set(EOptions::HlslIoMapping);
+                        }
+                        else if ("hlsl-enable-16bit-types" == flag)
+                        {
+                            mHlslEnable16BitTypes = true;
+                        }
+                        else if ("hlsl-dx9-compatible" == flag)
+                        {
+                            mHlslDX9compatible = true;
+                        }
+                        else if ("invert-y" == flag ||  // synonyms
+                                 "iy"       == flag )
+                        {
+                            mOptions.set(EOptions::InvertY);
+                        }
+                        else if ("keep-uncalled" == flag || // synonyms
+                                 "ku"            == flag )
+                        {
+                            mOptions.set(EOptions::KeepUncalled);
+                        }
+                        else if ("no-storage-format" == flag || // synonyms
+                                 "nsf"               == flag )
+                        {
+                            mOptions.set(EOptions::NoStorageFormat);
+                        }
+                        else if ("relaxed-errors" == flag)
+                        {
+                            mOptions.set(EOptions::RelaxedErrors);
+                        }
+                        else if ("resource-set-bindings" == flag ||  // synonyms
+                                 "resource-set-binding"  == flag ||
+                                 "rsb"                   == flag )
+                        {
+                            ProcessResourceSetBindingBase(aArgC, aArgV, mBaseResourceSetBinding);
+                        }
+                        else if ("shift-image-bindings" == flag ||  // synonyms
+                                 "shift-image-binding"  == flag ||
+                                 "sib"                  == flag )
+                        {
+                            ProcessBindingBase(aArgC, aArgV, glslang::EResImage);
+                        }
+                        else if ("shift-sampler-bindings" == flag || // synonyms
+                                 "shift-sampler-binding"  == flag ||
+                                 "ssb"                    == flag )
+                        {
+                            ProcessBindingBase(aArgC, aArgV, glslang::EResSampler);
+                        }
+                        else if ("shift-uav-bindings" == flag ||  // synonyms
+                                 "shift-uav-binding"  == flag ||
+                                 "suavb"              == flag )
+                        {
+                            ProcessBindingBase(aArgC, aArgV, glslang::EResUav);
+                        }
+                        else if ("shift-texture-bindings" == flag ||  // synonyms
+                                 "shift-texture-binding"  == flag ||
+                                 "stb"                    == flag )
+                        {
+                            ProcessBindingBase(aArgC, aArgV, glslang::EResTexture);
+                        }
+                        else if ("shift-ubo-bindings"     == flag ||  // synonyms
+                                 "shift-ubo-binding"      == flag ||
+                                 "shift-cbuffer-bindings" == flag ||
+                                 "shift-cbuffer-binding"  == flag ||
+                                 "sub"                    == flag ||
+                                 "scb"                    == flag )
+                        {
+                            ProcessBindingBase(aArgC, aArgV, glslang::EResUbo);
+                        }
+                        else if ("shift-ssbo-bindings" == flag ||  // synonyms
+                                 "shift-ssbo-binding"  == flag ||
+                                 "sbb"                 == flag )
+                        {
+                            ProcessBindingBase(aArgC, aArgV, glslang::EResSsbo);
+                        }
+                        else if ("source-entrypoint" == flag || // synonyms
+                                 "sep"               == flag )
+                        {
+                            if (1 >= aArgC)
+                            {
+                                Error(logTag(), "no <entry-point> provided for --source-entrypoint");
+                            }
+
+                            mSourceEntryPointName = std::string(aArgV[1]);
+
                             bumpArg();
                             break;
-                        } else if (lowerword == "spirv-dis") {
-                            SpvToolsDisassembler = true;
-                        } else if (lowerword == "spirv-val") {
-                            SpvToolsValidate = true;
-                        } else if (lowerword == "stdin") {
-                            Options |= EOptionStdin;
-                            shaderStageName = argv[1];
-                        } else if (lowerword == "suppress-warnings") {
-                            Options |= EOptionSuppressWarnings;
-                        } else if (lowerword == "target-env") {
-                            if (argc > 1) {
-                                if (strcmp(argv[1], "vulkan1.0") == 0) {
+                        }
+                        else if ("spirv-dis" == flag)
+                        {
+                            mSpvToolsDisassembler = true;
+                        }
+                        else if ("spirv-val" == flag)
+                        {
+                            mSpvToolsValidate = true;
+                        }
+                        else if ("stdin" == flag)
+                        {
+                            mOptions.set(EOptions::Stdin);
+                            mShaderStageName = std::string(aArgV[1]);
+                        }
+                        else if ("suppress-warnings" == flag)
+                        {
+                            mOptions.set(EOptions::SuppressWarnings);
+                        }
+                        else if ("target-env" == flag)
+                        {
+                            if (1 < aArgC)
+                            {
+                                std::string targetEnvironmentString = std::string(aArgV[1]);
+
+                                if ("vulkan1.0" == targetEnvironmentString)
+                                {
                                     setVulkanSpv();
-                                    ClientVersion = glslang::EShTargetVulkan_1_0;
-                                } else if (strcmp(argv[1], "vulkan1.1") == 0) {
+                                    mClientVersion = glslang::EShTargetVulkan_1_0;
+                                }
+                                else if ("vulkan1.1" == targetEnvironmentString)
+                                {
                                     setVulkanSpv();
-                                    ClientVersion = glslang::EShTargetVulkan_1_1;
-                                } else if (strcmp(argv[1], "opengl") == 0) {
+                                    mClientVersion = glslang::EShTargetVulkan_1_1;
+                                }
+                                else if ("opengl" == targetEnvironmentString)
+                                {
                                     setOpenGlSpv();
-                                    ClientVersion = glslang::EShTargetOpenGL_450;
-                                } else if (strcmp(argv[1], "spirv1.0") == 0) {
-                                    TargetLanguage = glslang::EShTargetSpv;
-                                    TargetVersion = glslang::EShTargetSpv_1_0;
-                                } else if (strcmp(argv[1], "spirv1.1") == 0) {
-                                    TargetLanguage = glslang::EShTargetSpv;
-                                    TargetVersion = glslang::EShTargetSpv_1_1;
-                                } else if (strcmp(argv[1], "spirv1.2") == 0) {
-                                    TargetLanguage = glslang::EShTargetSpv;
-                                    TargetVersion = glslang::EShTargetSpv_1_2;
-                                } else if (strcmp(argv[1], "spirv1.3") == 0) {
-                                    TargetLanguage = glslang::EShTargetSpv;
-                                    TargetVersion = glslang::EShTargetSpv_1_3;
-                                } else if (strcmp(argv[1], "spirv1.4") == 0) {
-                                    TargetLanguage = glslang::EShTargetSpv;
-                                    TargetVersion = glslang::EShTargetSpv_1_4;
-                                } else
-                                    Error("--target-env expected one of: vulkan1.0, vulkan1.1, opengl, spirv1.0, spirv1.1, spirv1.2, or spirv1.3");
+                                    mClientVersion = glslang::EShTargetOpenGL_450;
+                                }
+                                else if ("spirv1.0" == targetEnvironmentString)
+                                {
+                                    mTargetLanguage = glslang::EShTargetSpv;
+                                    mTargetVersion  = glslang::EShTargetSpv_1_0;
+                                }
+                                else if ("spirv1.1" == targetEnvironmentString)
+                                {
+                                    mTargetLanguage = glslang::EShTargetSpv;
+                                    mTargetVersion  = glslang::EShTargetSpv_1_1;
+                                }
+                                else if ("spirv1.2" == targetEnvironmentString)
+                                {
+                                    mTargetLanguage = glslang::EShTargetSpv;
+                                    mTargetVersion  = glslang::EShTargetSpv_1_2;
+                                }
+                                else if ("spirv1.3" == targetEnvironmentString)
+                                {
+                                    mTargetLanguage = glslang::EShTargetSpv;
+                                    mTargetVersion  = glslang::EShTargetSpv_1_3;
+                                }
+                                else if ("spirv1.4" == targetEnvironmentString)
+                                {
+                                    mTargetLanguage = glslang::EShTargetSpv;
+                                    mTargetVersion  = glslang::EShTargetSpv_1_4;
+                                }
+                                else
+                                {
+                                    Error(logTag(), "--target-env expected one of: vulkan1.0, vulkan1.1, opengl, spirv1.0, spirv1.1, spirv1.2, or spirv1.3");
+                                }
                             }
+
                             bumpArg();
-                        } else if (lowerword == "variable-name" || // synonyms
-                                   lowerword == "vn") {
-                            Options |= EOptionOutputHexadecimal;
-                            if (argc <= 1)
-                                Error("no <C-variable-name> provided for --variable-name");
-                            variableName = argv[1];
+                        }
+                        else if ("variable-name" == flag || // synonyms
+                                 "vn"            == flag )
+                        {
+                            mOptions.set(EOptions::OutputHexadecimal);
+
+                            if (1 >= aArgC)
+                            {
+                                Error(logTag(), "no <C-variable-name> provided for --variable-name");
+                            }
+
+                            mVariableName = std::string(aArgV[1]);
+
                             bumpArg();
                             break;
-                        } else if (lowerword == "version") {
-                            Options |= EOptionDumpVersions;
-                        } else {
+                        }
+                        else if ("version" == flag)
+                        {
+                            mOptions.set(EOptions::DumpVersions);
+                        }
+                        else
+                        {
                             usage();
                         }
                     }
                     break;
                 case 'C':
-                    Options |= EOptionCascadingErrors;
+                    mOptions.set(EOptions::CascadingErrors);
                     break;
                 case 'D':
-                    if (argv[0][2] == 0)
-                        Options |= EOptionReadHlsl;
+                    if (0 == aArgV[0][2])
+                    {
+                        mOptions.set(EOptions::ReadHlsl);
+                    }
                     else
-                        UserPreamble.addDef(getStringOperand("-D<macro> macro name"));
+                    {
+                        std::string const definition = getStringOperand("-D<macro> macro name");
+
+                        mProcesses.push_back("D");
+                        mProcesses.back().append(definition);
+
+                        mUserPreamble.addDefinition(definition);
+                    }
                     break;
                 case 'u':
-                    uniformLocationOverrides.push_back(getUniformOverride());
+                    {
+                        std::pair<std::string, uint64_t> uniformOverride = getUniformOverride();
+                        mUniformLocationOverrides.push_back(uniformOverride);
+                    }
                     break;
                 case 'E':
-                    Options |= EOptionOutputPreprocessed;
+                    mOptions.set(EOptions::OutputPreprocessed);
                     break;
                 case 'G':
                     // OpenGL client
                     setOpenGlSpv();
-                    if (argv[0][2] != 0)
-                        ClientInputSemanticsVersion = getAttachedNumber("-G<num> client input semantics");
+
+                    if (0 != aArgV[0][2])
+                    {
+                        mClientInputSemanticsVersion = getAttachedNumber("-G<num> client input semantics");
+                    }
                     break;
                 case 'H':
-                    Options |= EOptionHumanReadableSpv;
-                    if ((Options & EOptionSpv) == 0) {
+                    mOptions.set(EOptions::HumanReadableSpv);
+                    if (not mOptions.check(EOptions::Spv))
+                    {
                         // default to Vulkan
                         setVulkanSpv();
                     }
                     break;
                 case 'I':
-                    IncludeDirectoryList.push_back(getStringOperand("-I<dir> include path"));
+                    {
+                        std::string const operand = getStringOperand("-I<dir> include path");
+                        mIncludeDirectoryList.push_back(operand);
+                    }
                     break;
                 case 'O':
-                    if (argv[0][2] == 'd')
-                        Options |= EOptionOptimizeDisable;
-                    else if (argv[0][2] == 's')
-    #if ENABLE_OPT
-                        Options |= EOptionOptimizeSize;
-    #else
-                        Error("-Os not available; optimizer not linked");
-    #endif
-                    else
-                        Error("unknown -O option");
+                    {
+                        if ('d' == aArgV[0][2])
+                        {
+                            mOptions.set(EOptions::OptimizeDisable);
+                        }
+                        else if ('s' == aArgV[0][2])
+                        {
+        #if ENABLE_OPT
+                            mOptions.set(EOptions::OptimizeSize);
+        #else
+                            Error(logTag(), "-Os not available; optimizer not linked");
+        #endif
+                        }
+                        else
+                        {
+                            Error(logTag(), "unknown -O option");
+                        }
+                    }
                     break;
                 case 'S':
-                    if (argc <= 1)
-                        Error("no <stage> specified for -S");
-                    shaderStageName = argv[1];
+                    if (1 >= aArgC)
+                    {
+                        Error(logTag(), "no <stage> specified for -S");
+                    }
+
+                    mShaderStageName = std::string(aArgV[1]);
+
                     bumpArg();
                     break;
                 case 'U':
-                    UserPreamble.addUndef(getStringOperand("-U<macro>: macro name"));
+                    {
+                        std::string const undefinition = getStringOperand("-U<macro>: macro name");
+
+                        mProcesses.push_back("U");
+                        mProcesses.back().append(undefinition);
+
+                        mUserPreamble.addUndefinition(undefinition);
+                    }
                     break;
                 case 'V':
                     setVulkanSpv();
-                    if (argv[0][2] != 0)
-                        ClientInputSemanticsVersion = getAttachedNumber("-V<num> client input semantics");
+                    if (0 != aArgV[0][2])
+                    {
+                        mClientInputSemanticsVersion = getAttachedNumber("-V<num> client input semantics");
+                    }
                     break;
                 case 'c':
-                    Options |= EOptionDumpConfig;
+                    mOptions.set(EOptions::DumpConfig);
                     break;
                 case 'd':
-                    if (strncmp(&argv[0][1], "dumpversion", strlen(&argv[0][1]) + 1) == 0 ||
-                        strncmp(&argv[0][1], "dumpfullversion", strlen(&argv[0][1]) + 1) == 0)
-                        Options |= EOptionDumpBareVersion;
-                    else
-                        Options |= EOptionDefaultDesktop;
+                    {
+                        std::string const mode = std::string(aArgV[0]);
+                        if("dumpversion"     == mode ||
+                           "dumpfullversion" == mode )
+                        {
+                            mOptions.set(EOptions::DumpBareVersion);
+                        }
+                        else
+                        {
+                            mOptions.set(EOptions::DefaultDesktop);
+                        }
+                    }
                     break;
                 case 'e':
-                    entryPointName = argv[1];
-                    if (argc <= 1)
-                        Error("no <name> provided for -e");
+                    mEntryPointName = std::string(aArgV[1]);
+
+                    if (1 >= aArgC)
+                    {
+                        Error(logTag(), "no <name> provided for -e");
+                    }
+
                     bumpArg();
                     break;
                 case 'f':
-                    if (strcmp(&argv[0][2], "hlsl_functionality1") == 0)
-                        targetHlslFunctionality1 = true;
-                    else
-                        Error("-f: expected hlsl_functionality1");
+                    {
+                        std::string const functionality = std::string(&aArgV[0][2]);
+
+                        if("hlsl_functionality1" == functionality)
+                        {
+                            mTargetHlslFunctionality1 = true;
+                        }
+                        else
+                        {
+                            Error(logTag(), "-f: expected hlsl_functionality1");
+                        }
+                    }
                     break;
                 case 'g':
-                    Options |= EOptionDebug;
+                    mOptions.set(EOptions::Debug);
                     break;
                 case 'h':
                     usage();
                     break;
                 case 'i':
-                    Options |= EOptionIntermediate;
+                    mOptions.set(EOptions::Intermediate);
                     break;
                 case 'l':
-                    Options |= EOptionLinkProgram;
+                    mOptions.set(EOptions::LinkProgram);
                     break;
                 case 'm':
-                    Options |= EOptionMemoryLeakMode;
+                    mOptions.set(EOptions::MemoryLeakMode);
                     break;
                 case 'o':
-                    if (argc <= 1)
-                        Error("no <file> provided for -o");
-                    binaryFileName = argv[1];
+                    if (1 >= aArgC)
+                    {
+                        Error(logTag(), "no <file> provided for -o");
+                    }
+
+                    mBinaryFileName = std::string(aArgV[1]);
+
                     bumpArg();
                     break;
                 case 'q':
-                    Options |= EOptionDumpReflection;
+                    mOptions.set(EOptions::DumpReflection);
                     break;
                 case 'r':
-                    Options |= EOptionRelaxedErrors;
+                    mOptions.set(EOptions::RelaxedErrors);
                     break;
                 case 's':
-                    Options |= EOptionSuppressInfolog;
+                    mOptions.set(EOptions::SuppressInfolog);
                     break;
                 case 't':
-                    Options |= EOptionMultiThreaded;
+                    mOptions.set(EOptions::MultiThreaded);
                     break;
                 case 'v':
-                    Options |= EOptionDumpVersions;
+                    mOptions.set(EOptions::DumpVersions);
                     break;
                 case 'w':
-                    Options |= EOptionSuppressWarnings;
+                    mOptions.set(EOptions::SuppressWarnings);
                     break;
                 case 'x':
-                    Options |= EOptionOutputHexadecimal;
+                    mOptions.set(EOptions::OutputHexadecimal);
                     break;
                 default:
                     usage();
                     break;
                 }
-            } else {
-                std::string name(argv[0]);
-                if (! SetConfigFile(name)) {
-                    workItems.push_back(std::unique_ptr<glslang::TWorkItem>(new glslang::TWorkItem(name)));
+            }
+            else
+            {
+                std::string const name(aArgV[0]);
+
+                if (not SetConfigFile(name))
+                {
+                    aOutWorkItems.push_back(std::unique_ptr<CWorkItem>(new CWorkItem(name)));
                 }
             }
         }
 
         // Make sure that -S is always specified if --stdin is specified
-        if ((Options & EOptionStdin) && shaderStageName == nullptr)
-            Error("must provide -S when --stdin is given");
+        if (mOptions.check(EOptions::Stdin) && mShaderStageName.empty())
+        {
+            Error(logTag(), "must provide -S when --stdin is given");
+        }
 
         // Make sure that -E is not specified alongside linking (which includes SPV generation)
-        if ((Options & EOptionOutputPreprocessed) && (Options & EOptionLinkProgram))
-            Error("can't use -E when linking is selected");
+        if (mOptions.check(EOptions::OutputPreprocessed) && mOptions.check(EOptions::LinkProgram))
+        {
+            Error(logTag(), "can't use -E when linking is selected");
+        }
 
         // -o or -x makes no sense if there is no target binary
-        if (binaryFileName && (Options & EOptionSpv) == 0)
-            Error("no binary generation requested (e.g., -V)");
+        if (not mBinaryFileName.empty() && not mOptions.check(EOptions::Spv))
+        {
+            Error(logTag(), "no binary generation requested (e.g., -V)");
+        }
 
-        if ((Options & EOptionFlattenUniformArrays) != 0 &&
-            (Options & EOptionReadHlsl) == 0)
-            Error("uniform array flattening only valid when compiling HLSL source.");
+        if (    mOptions.check(EOptions::FlattenUniformArrays) &&
+            not mOptions.check(EOptions::ReadHlsl))
+        {
+            Error(logTag(), "uniform array flattening only valid when compiling HLSL source.");
+        }
 
         // rationalize client and target language
-        if (TargetLanguage == glslang::EShTargetNone) {
-            switch (ClientVersion) {
+        if (glslang::EShTargetNone == mTargetLanguage)
+        {
+            switch (mClientVersion)
+            {
             case glslang::EShTargetVulkan_1_0:
-                TargetLanguage = glslang::EShTargetSpv;
-                TargetVersion = glslang::EShTargetSpv_1_0;
+                mTargetLanguage = glslang::EShTargetSpv;
+                mTargetVersion  = glslang::EShTargetSpv_1_0;
                 break;
             case glslang::EShTargetVulkan_1_1:
-                TargetLanguage = glslang::EShTargetSpv;
-                TargetVersion = glslang::EShTargetSpv_1_3;
+                mTargetLanguage = glslang::EShTargetSpv;
+                mTargetVersion  = glslang::EShTargetSpv_1_3;
                 break;
             case glslang::EShTargetOpenGL_450:
-                TargetLanguage = glslang::EShTargetSpv;
-                TargetVersion = glslang::EShTargetSpv_1_0;
+                mTargetLanguage = glslang::EShTargetSpv;
+                mTargetVersion  = glslang::EShTargetSpv_1_0;
                 break;
             default:
                 break;
             }
         }
-        if (TargetLanguage != glslang::EShTargetNone && Client == glslang::EShClientNone)
-            Error("To generate SPIR-V, also specify client semantics. See -G and -V.");
+        if (glslang::EShTargetNone != mTargetLanguage && glslang::EShClientNone == mClient)
+        {
+            Error(logTag(), "To generate SPIR-V, also specify client semantics. See -G and -V.");
+        }
     }
     //<-----------------------------------------------------------------------------
 
@@ -1908,38 +2319,33 @@ private_methods:
     //<-----------------------------------------------------------------------------
 
     /**
-     * @brief process
-     * @param aInputFilenames
+     * *.conf => this is a config file that can set limits/resources
+     *
+     * @param aConfigFilename
+     * @return
      */
-    void process(std::vector<std::string> const &aInputFilenames)
+    bool SetConfigFile(std::string const &aConfigFilename)
     {
-        using namespace engine;
-
-        ShInitialize();
-
-        for(std::string const &filename : aInputFilenames)
+        bool const hasValidSize = (5 > aConfigFilename.size());
+        if(hasValidSize)
         {
-            EShLanguage const lang = determineTargetLanguage(filename, true, mOptions);
-
-            ShHandle compiler = ShConstructCompiler(lang, static_cast<int>(mOptions.value()));
-            if (nullptr == compiler)
-            {
-                return;
-            }
-
-            compile("stdin", compiler, mOptions);
-
-            if (false == (mOptions.check(EOptions::SuppressInfolog)))
-            {
-                std::string const log = ShGetInfoLog(compiler);
-                CLog::Error(Main::logTag(), log);
-            }
-
-            ShDestruct(compiler);
+            return false;
         }
 
-        ShFinalize();
+        bool const hasValidSuffix = (0 == aConfigFilename.compare(aConfigFilename.size() - 5, 5, ".conf"));
+        if (hasValidSuffix)
+        {
+            mConfigFile = aConfigFilename;
+            return true;
+        }
+
+        return false;
     }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
 
 private_members:
     // array of unique places to leave the shader names and infologs for the asynchronous compiles
@@ -1960,12 +2366,12 @@ private_members:
     bool mHlslEnable16BitTypes     = false;
     bool mHlslDX9compatible        = false;
 
-    const char* mExecutableName       = nullptr;
-    const char* mBinaryFileName       = nullptr;
-    const char* mEntryPointName       = nullptr;
-    const char* mSourceEntryPointName = nullptr;
-    const char* mShaderStageName      = nullptr;
-    const char* mVariableName         = nullptr;
+    std::string mExecutableName       = nullptr;
+    std::string mBinaryFileName       = nullptr;
+    std::string mEntryPointName       = nullptr;
+    std::string mSourceEntryPointName = nullptr;
+    std::string mShaderStageName      = nullptr;
+    std::string mVariableName         = nullptr;
 
     bool mCompileFailed = false;
     bool mLinkFailed    = false;
@@ -1986,8 +2392,8 @@ private_members:
     // Per descriptor-set binding base data
     typedef std::map<unsigned int, unsigned int> PerSetBaseBinding_t;
 
-    std::vector<std::pair<std::string, int>> mUniformLocationOverrides;
-    uint32_t                                 mUniformBase;
+    std::vector<std::pair<std::string, int32_t>> mUniformLocationOverrides;
+    uint32_t                                     mUniformBase;
 
     std::array<std::array<unsigned int,        EShLangCount>, glslang::EResCount> mBaseBinding;
     std::array<std::array<PerSetBaseBinding_t, EShLangCount>, glslang::EResCount> mBaseBindingForSet;
