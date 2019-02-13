@@ -26,12 +26,7 @@
 #include <core/bitfield.h>
 #include <core/enginetypehelper.h>
 
-#include "resourcelimits.h"
-#include "worklist.h"
-#include "directorystackfileincluder.h"
-
 using namespace engine;
-using namespace glslang_wrapper;
 
 #if ENABLE_OPT
 static constexpr bool const OPTIMIZATION_ENABLED = true;
@@ -44,58 +39,20 @@ namespace Main
     SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
 }
 
+/**
+ * Describes error codes of the tool.
+ */
+enum class EResult
+{
+    Success      =       0,
+    WrongUsage   = -100000,
+    NoInput,
+    FileError,
+    InputInvalid,
+};
+
 //<-----------------------------------------------------------------------------
 //
-//<-----------------------------------------------------------------------------
-
-// Replacement implementation of safe fopen on non-MSVC or non-secure MINGW
-// enviroments
-#if not defined _MSC_VER && not defined MINGW_HAS_SECURE_API
-
-#include <errno.h>
-
-/**
- * Safely open a file named 'aFilename' and return the file handle to it.
- *
- * @param aFilename
- * @param aMode
- * @param aOutFile
- * @return
- */
-int fopen_s(
-   char const *aFilename,
-   char const *aMode,
-   FILE      **aOutFile)
-{
-   if (nullptr == aOutFile || nullptr == aFilename || nullptr == aMode)
-   {
-      return EINVAL;
-   }
-
-   FILE *f = fopen(aFilename, aMode);
-   if (nullptr == f)
-   {
-      if (0 != errno)
-      {
-         return errno;
-      }
-      else
-      {
-         return ENOENT;
-      }
-   }
-
-   *aOutFile = f;
-
-   return 0;
-}
-
-#endif // not defined _MSC_VER && not defined MINGW_HAS_SECURE_API
-
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
 //<-----------------------------------------------------------------------------
 
 /**
@@ -117,89 +74,12 @@ std::underlying_type_t<TEnum> EnumValueOf(TEnum const &aEnumFlag)
 //<-----------------------------------------------------------------------------
 
 /**
- * Enum class describing suitable precompiler error states.
- */
-enum class EFailCode
-        : uint8_t
-{
-    Success = 0,
-    FailUsage,
-    FailCompile,
-    FailLink,
-    FailCompilerCreate,
-    FailThreadCreate,
-    FailLinkerCreate
-};
-
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Print a formatted error message.
- *
- * @param aMessage The message to print.
- */
-[[noreturn]]
-void Error(std::string const &aTag, std::string const &aMessage)
-{
-    CLog::Error(aTag, CString::format("%0 (use -h for usage)\n", aMessage));
-
-    exit(EnumValueOf(EFailCode::FailUsage));
-}
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Outputs the given string, but only if it is non-null and non-empty.
- * This prevents erroneous newlines from appearing.
- *
- * @param str
- */
-void putsIfNonEmpty(const char* str)
-{
-    if (nullptr != str && str[0])
-    {
-        puts(str);
-    }
-}
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Outputs the given string to stderr, but only if it is non-null and non-empty.
- * This prevents erroneous newlines from appearing.
- *
- * @param str
- */
-void stderrIfNonEmpty(const char* str)
-{
-    if (nullptr != str && str[0])
-    {
-        fprintf(stderr, "%s\n", str);
-    }
-}
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
  * Read a file into a string.
  *
  * @param aFileName Filename of the file to read.
  * @return          See brief.
  */
-static std::string ReadFileData(std::string const &aFileName)
+static std::string readFile(std::string const &aFileName)
 {
     bool const fileExists = std::filesystem::exists(aFileName);
     if(not fileExists)
@@ -233,159 +113,7 @@ void usage()
 {
     using namespace engine;
 
-    printf("Usage: glslangValidator [option]... [file]...\n"
-           "\n"
-           "'file' can end in .<stage> for auto-stage classification, where <stage> is:\n"
-           "    .conf   to provide a config file that replaces the default configuration\n"
-           "            (see -c option below for generating a template)\n"
-           "    .vert   for a vertex shader\n"
-           "    .tesc   for a tessellation control shader\n"
-           "    .tese   for a tessellation evaluation shader\n"
-           "    .geom   for a geometry shader\n"
-           "    .frag   for a fragment shader\n"
-           "    .comp   for a compute shader\n"
-#ifdef NV_EXTENSIONS
-           "    .mesh   for a mesh shader\n"
-           "    .task   for a task shader\n"
-           "    .rgen    for a ray generation shader\n"
-           "    .rint    for a ray intersection shader\n"
-           "    .rahit   for a ray any hit shader\n"
-           "    .rchit   for a ray closest hit shader\n"
-           "    .rmiss   for a ray miss shader\n"
-           "    .rcall   for a ray callable shader\n"
-#endif
-           "    .glsl   for .vert.glsl, .tesc.glsl, ..., .comp.glsl compound suffixes\n"
-           "    .hlsl   for .vert.hlsl, .tesc.hlsl, ..., .comp.hlsl compound suffixes\n"
-           "\n"
-           "Options:\n"
-           "  -C          cascading errors; risk crash from accumulation of error recoveries\n"
-           "  -D          input is HLSL (this is the default when any suffix is .hlsl)\n"
-           "  -D<macro=def>\n"
-           "  -D<macro>   define a pre-processor macro\n"
-           "  -E          print pre-processed GLSL; cannot be used with -l;\n"
-           "              errors will appear on stderr\n"
-           "  -G[ver]     create SPIR-V binary, under OpenGL semantics; turns on -l;\n"
-           "              default file name is <stage>.spv (-o overrides this);\n"
-           "              'ver', when present, is the version of the input semantics,\n"
-           "              which will appear in #define GL_SPIRV ver;\n"
-           "              '--client opengl100' is the same as -G100;\n"
-           "              a '--target-env' for OpenGL will also imply '-G'\n"
-           "  -H          print human readable form of SPIR-V; turns on -V\n"
-           "  -I<dir>     add dir to the include search path; includer's directory\n"
-           "              is searched first, followed by left-to-right order of -I\n"
-           "  -Od         disables optimization; may cause illegal SPIR-V for HLSL\n"
-           "  -Os         optimizes SPIR-V to minimize size\n"
-           "  -S <stage>  uses specified stage rather than parsing the file extension\n"
-           "              choices for <stage> are vert, tesc, tese, geom, frag, or comp\n"
-           "  -U<macro>   undefine a pre-processor macro\n"
-           "  -V[ver]     create SPIR-V binary, under Vulkan semantics; turns on -l;\n"
-           "              default file name is <stage>.spv (-o overrides this)\n"
-           "              'ver', when present, is the version of the input semantics,\n"
-           "              which will appear in #define VULKAN ver\n"
-           "              '--client vulkan100' is the same as -V100\n"
-           "              a '--target-env' for Vulkan will also imply '-V'\n"
-           "  -c          configuration dump;\n"
-           "              creates the default configuration file (redirect to a .conf file)\n"
-           "  -d          default to desktop (#version 110) when there is no shader #version\n"
-           "              (default is ES version 100)\n"
-           "  -e <name> | --entry-point <name>\n"
-           "              specify <name> as the entry-point function name\n"
-           "  -f{hlsl_functionality1}\n"
-           "              'hlsl_functionality1' enables use of the\n"
-           "              SPV_GOOGLE_hlsl_functionality1 extension\n"
-           "  -g          generate debug information\n"
-           "  -h          print this usage message\n"
-           "  -i          intermediate tree (glslang AST) is printed out\n"
-           "  -l          link all input files together to form a single module\n"
-           "  -m          memory leak mode\n"
-           "  -o <file>   save binary to <file>, requires a binary option (e.g., -V)\n"
-           "  -q          dump reflection query database\n"
-           "  -r | --relaxed-errors"
-           "              relaxed GLSL semantic error-checking mode\n"
-           "  -s          silence syntax and semantic error reporting\n"
-           "  -t          multi-threaded mode\n"
-           "  -v | --version\n"
-           "              print version strings\n"
-           "  -w | --suppress-warnings\n"
-           "              suppress GLSL warnings, except as required by \"#extension : warn\"\n"
-           "  -x          save binary output as text-based 32-bit hexadecimal numbers\n"
-           "  -u<name>:<loc> specify a uniform location override for --aml\n"
-           "  --uniform-base <base> set a base to use for generated uniform locations\n"
-           "  --auto-map-bindings | --amb       automatically bind uniform variables\n"
-           "                                    without explicit bindings\n"
-           "  --auto-map-locations | --aml      automatically locate input/output lacking\n"
-           "                                    'location' (fragile, not cross stage)\n"
-           "  --client {vulkan<ver>|opengl<ver>} see -V and -G\n"
-           "  -dumpfullversion | -dumpversion   print bare major.minor.patchlevel\n"
-           "  --flatten-uniform-arrays | --fua  flatten uniform texture/sampler arrays to\n"
-           "                                    scalars\n"
-           "  --hlsl-offsets                    allow block offsets to follow HLSL rules\n"
-           "                                    works independently of source language\n"
-           "  --hlsl-iomap                      perform IO mapping in HLSL register space\n"
-           "  --hlsl-enable-16bit-types         allow 16-bit types in SPIR-V for HLSL\n"
-           "  --hlsl-dx9-compatible             interprets sampler declarations as a texture/sampler combo like DirectX9 would."
-           "  --invert-y | --iy                 invert position.Y output in vertex shader\n"
-           "  --keep-uncalled | --ku            don't eliminate uncalled functions\n"
-           "  --no-storage-format | --nsf       use Unknown image format\n"
-           "  --resource-set-binding [stage] name set binding\n"
-           "                                    set descriptor set and binding for\n"
-           "                                    individual resources\n"
-           "  --resource-set-binding [stage] set\n"
-           "                                    set descriptor set for all resources\n"
-           "  --rsb                             synonym for --resource-set-binding\n"
-           "  --shift-image-binding [stage] num\n"
-           "                                    base binding number for images (uav)\n"
-           "  --shift-image-binding [stage] [num set]...\n"
-           "                                    per-descriptor-set shift values\n"
-           "  --sib                             synonym for --shift-image-binding\n"
-           "  --shift-sampler-binding [stage] num\n"
-           "                                    base binding number for samplers\n"
-           "  --shift-sampler-binding [stage] [num set]...\n"
-           "                                    per-descriptor-set shift values\n"
-           "  --ssb                             synonym for --shift-sampler-binding\n"
-           "  --shift-ssbo-binding [stage] num  base binding number for SSBOs\n"
-           "  --shift-ssbo-binding [stage] [num set]...\n"
-           "                                    per-descriptor-set shift values\n"
-           "  --sbb                             synonym for --shift-ssbo-binding\n"
-           "  --shift-texture-binding [stage] num\n"
-           "                                    base binding number for textures\n"
-           "  --shift-texture-binding [stage] [num set]...\n"
-           "                                    per-descriptor-set shift values\n"
-           "  --stb                             synonym for --shift-texture-binding\n"
-           "  --shift-uav-binding [stage] num   base binding number for UAVs\n"
-           "  --shift-uav-binding [stage] [num set]...\n"
-           "                                    per-descriptor-set shift values\n"
-           "  --suavb                           synonym for --shift-uav-binding\n"
-           "  --shift-UBO-binding [stage] num   base binding number for UBOs\n"
-           "  --shift-UBO-binding [stage] [num set]...\n"
-           "                                    per-descriptor-set shift values\n"
-           "  --sub                             synonym for --shift-UBO-binding\n"
-           "  --shift-cbuffer-binding | --scb   synonyms for --shift-UBO-binding\n"
-           "  --spirv-dis                       output standard-form disassembly; works only\n"
-           "                                    when a SPIR-V generation option is also used\n"
-           "  --spirv-val                       execute the SPIRV-Tools validator\n"
-           "  --source-entrypoint <name>        the given shader source function is\n"
-           "                                    renamed to be the <name> given in -e\n"
-           "  --sep                             synonym for --source-entrypoint\n"
-           "  --stdin                           read from stdin instead of from a file;\n"
-           "                                    requires providing the shader stage using -S\n"
-           "  --target-env {vulkan1.0 | vulkan1.1 | opengl | \n"
-           "                spirv1.0 | spirv1.1 | spirv1.2 | spirv1.3}\n"
-           "                                    set execution environment that emitted code\n"
-           "                                    will execute in (versus source language\n"
-           "                                    semantics selected by --client) defaults:\n"
-           "                                     * 'vulkan1.0' under '--client vulkan<ver>'\n"
-           "                                     * 'opengl' under '--client opengl<ver>'\n"
-           "                                     * 'spirv1.0' under --target-env vulkan1.0\n"
-           "                                     * 'spirv1.3' under --target-env vulkan1.1\n"
-           "                                    multiple --targen-env can be specified.\n"
-           "  --variable-name <name>\n"
-           "  --vn <name>                       creates a C header file that contains a\n"
-           "                                    uint32_t array named <name>\n"
-           "                                    initialized with the shader binary code\n"
-           );
-
-    ::exit(EnumValueOf(EFailCode::FailUsage));
+    ::exit(EnumValueOf(EResult::WrongUsage));
 }
 //<-----------------------------------------------------------------------------
 
@@ -408,41 +136,76 @@ public_enums:
             : uint64_t
     {
         None                 = 0,
-        Intermediate         = (1u <<  0),
-        SuppressInfolog      = (1u <<  1),
-        MemoryLeakMode       = (1u <<  2),
-        RelaxedErrors        = (1u <<  3),
-        GiveWarnings         = (1u <<  4),
-        LinkProgram          = (1u <<  5),
-        MultiThreaded        = (1u <<  6),
-        DumpConfig           = (1u <<  7),
-        DumpReflection       = (1u <<  8),
-        SuppressWarnings     = (1u <<  9),
-        DumpVersions         = (1u << 10),
-        Spv                  = (1u << 11),
-        HumanReadableSpv     = (1u << 12),
-        VulkanRules          = (1u << 13),
-        DefaultDesktop       = (1u << 14),
-        OutputPreprocessed   = (1u << 15),
-        OutputHexadecimal    = (1u << 16),
-        ReadHlsl             = (1u << 17),
-        CascadingErrors      = (1u << 18),
-        AutoMapBindings      = (1u << 19),
-        FlattenUniformArrays = (1u << 20),
-        NoStorageFormat      = (1u << 21),
-        KeepUncalled         = (1u << 22),
-        HlslOffsets          = (1u << 23),
-        HlslIoMapping        = (1u << 24),
-        AutoMapLocations     = (1u << 25),
-        Debug                = (1u << 26),
-        Stdin                = (1u << 27),
-        OptimizeDisable      = (1u << 28),
-        OptimizeSize         = (1u << 29),
-        InvertY              = (1u << 30),
-        DumpBareVersion      = (1u << 31),
+        MultiThreaded        = (1u << 1),
+        DumpConfig           = (1u << 2),
+        DumpReflection       = (1u << 3),
+        DumpBareVersion      = (1u << 4),
+    };
+
+    /**
+     * Flags describing the selected shading language
+     */
+    enum class EShadingLanguage
+    {
+        Unknown    = 0,
+        CGLanguage,
+        GLSL,
+        HLSL,
+        XShade
+    };
+
+    /**
+     * Describes the stage of the shader to compile.
+     */
+    enum class EShaderStage
+    {
+        NotApplicable = 0,
+        Vertex,
+        TesselationControlPoint,
+        TesselationEvaluation,
+        Geometry,
+        Fragment,
+        Compute
+    };
+
+    /**
+     * Identifies the respective compiler to use to compile a shader file.
+     */
+    enum class EShaderCompiler
+    {
+        Unknown                  = 0,
+        CGLanguage,
+        GlslangReferenceCompiler,
+        DxHlslCompiler,
+        XShadeCompiler,
     };
 
 private_structs:
+
+    /**
+     * @brief The SShaderCompilationElement struct
+     */
+    struct SShaderCompilationElement
+    {
+        std::string  fileName;
+        std::string  contents;
+        EShaderStage stage;
+
+    public_constructors:
+        /**
+         * @brief SShaderCompilationElement
+         * @param aFileName
+         * @param aContents
+         * @param aStage
+         */
+        SShaderCompilationElement(std::string  const &aFileName,
+                                  std::string  const &aContents,
+                                  EShaderStage const aStage)
+            : fileName(aFileName)
+            , contents(aContents)
+            , stage(aStage)
+        {}
+    };
 
     /**
      * Simple bundling of what makes a compilation unit for ease in passing around,
@@ -450,436 +213,207 @@ private_structs:
      */
     struct SShaderCompilationUnit
     {
-        EShLanguage               stage;
-        uint64_t                  count;        // live number of strings/names
-        std::vector<char const *> text;         // memory owned/managed externally
-        std::vector<std::string>  fileName;     // hold's the memory, but...
-        std::vector<char const *> fileNameList; // downstream interface wants pointers
+        EShaderCompiler           compiler;
+        EShadingLanguage          language;
 
-        /**
-         * @brief SShaderCompilationUnit
-         * @param stage
-         */
-        SShaderCompilationUnit(EShLanguage stage)
-            : stage(stage)
-            , count(0)
-        { }
+        std::vector<SShaderCompilationElement> elements;
 
-        /**
-         * @brief SShaderCompilationUnit
-         * @param aOther
-         */
-        SShaderCompilationUnit(SShaderCompilationUnit const &aOther)
-            : stage       (aOther.stage)
-            , count       (aOther.count)
-            , text        (aOther.text )
-            , fileName    (aOther.fileName)
-            , fileNameList(aOther.fileNameList)
-        { }
-
-        /**
-         * @brief addString
-         * @param ifileName
-         * @param itext
-         */
-        [[noreturn]]
-        void addString(std::string const &aFileName, std::string const &aText)
-        {
-            static constexpr uint64_t const MAX_COUNT = 1;
-            assert(1 > MAX_COUNT);
-
-            text        .push_back(aText.c_str());
-            fileName    .push_back(aFileName);
-            fileNameList.push_back(aFileName.c_str());
-
-            ++count;
-        }
-    };
-
-private_classes:
-
-    /**
-     * Add things like "#define ..." to a preamble to use in the beginning of the shader.
-     */
-    class CPreamble
-    {
     public_constructors:
+
         /**
-         * Default constructor
+         * @brief SShaderCompilationUnit
+         * @param aCompiler
+         * @param aLanguage
          */
-        CPreamble()
+        SShaderCompilationUnit(EShaderCompiler  const aCompiler,
+                               EShadingLanguage const aLanguage)
+            : compiler(aCompiler)
+            , language(aLanguage)
         { }
 
     public_methods:
-        /**
-         * Check, if there's a preamble text currently set.
-         *
-         * @return True, if set.
-         */
-        bool isSet() const
-        {
-            return (not mText.empty());
-        }
 
         /**
-         * Return the current preamble text.
-         *
-         * @return See brief
+         * @brief addElement
+         * @param aFileName
+         * @param aContents
+         * @param aStage
+         * @return
          */
-        std::string get() const
+        EResult addElement(std::string  const &aFileName,
+                           std::string  const &aContents,
+                           EShaderStage const  aStage)
         {
-            return mText.c_str();
-        }
-
-        /**
-         * Add a definition to the preamble.
-         *
-         * @param aDefinition The #define to add.
-         */
-        void addDefinition(std::string aDefinition)
-        {
-            mText.append("#define ");
-
-            fixLine(aDefinition);
-
-            // The first "=" needs to turn into a space
-            size_t const equalCharacterPos = aDefinition.find_first_of("=");
-
-            if (aDefinition.npos != equalCharacterPos)
+            if(aFileName.empty() || aContents.empty())
             {
-                aDefinition[equalCharacterPos] = ' ';
+                CLog::Error(logTag(), CString::format("Invalid input for file %0:\n%1", aFileName, aContents));
+                return EResult::InputInvalid;
             }
 
-            mText.append(aDefinition);
-            mText.append("\n");
+            elements.push_back({ aFileName, aContents, aStage });
         }
-
-        /**
-         * Add an "undefinition" to the preamble
-         *
-         * @param aUndefinition The #undef to add.
-         */
-        void addUndefinition(std::string aUndefinition)
-        {
-            mText.append("#undef ");
-
-            fixLine(aUndefinition);
-
-            mText.append(aUndefinition);
-            mText.append("\n");
-        }
-
-    protected_methods:
-        /**
-         * Remove \n from the un/definition string.
-         *
-         * @param aInOutLine The line to fix.
-         */
-        void fixLine(std::string &aInOutLine)
-        {
-            // Can't go past a newline in the line
-            size_t const endOfLinePos = aInOutLine.find_first_of("\n");
-            if(aInOutLine.npos != endOfLinePos)
-            {
-                aInOutLine = aInOutLine.substr(0, endOfLinePos);
-            }
-        }
-
-    private_members:
-        std::string mText;  // Contents of preamble
     };
 
 public_methods:
 
 
-    EFailCode initialize()
+    EResult initialize()
     {
-        return EFailCode::Success;
+        return EResult::Success;
     }
 
-    EFailCode run()
+    EResult run()
     {
-        CWorklist workList{};
-
-        auto const handler = [&workList] (std::unique_ptr<CWorkItem> &item)
-        {
-            assert(item);
-            workList.add(item.get());
-        };
-
-        std::for_each(mWorkItems.begin(), mWorkItems.end(), handler);
-
-        if (mOptions.check(EOptions::DumpConfig))
-        {
-            printf("%s", GetDefaultBuiltInResourceString().c_str());
-            if (workList.empty())
-            {
-                return EFailCode::Success;
-            }
-        }
-
-        if (mOptions.check(EOptions::DumpBareVersion))
-        {
-            printf("%d.%d.%d\n", glslang::GetSpirvGeneratorVersion(), GLSLANG_MINOR_VERSION, GLSLANG_PATCH_LEVEL);
-
-            if (workList.empty())
-            {
-                return EFailCode::Success;
-            }
-        }
-        else if (mOptions.check(EOptions::DumpVersions))
-        {
-            printf("Glslang Version: %d.%d.%d\n", glslang::GetSpirvGeneratorVersion(), GLSLANG_MINOR_VERSION, GLSLANG_PATCH_LEVEL);
-            printf("ESSL Version: %s\n",          glslang::GetEsslVersionString());
-            printf("GLSL Version: %s\n",          glslang::GetGlslVersionString());
-
-            std::string spirvVersion;
-            glslang::GetSpirvVersion(spirvVersion);
-
-            printf("SPIR-V Version %s\n",                    spirvVersion.c_str());
-            printf("GLSL.std.450 Version %d, Revision %d\n", GLSLstd450Version, GLSLstd450Revision);
-            printf("Khronos Tool ID %d\n",                   glslang::GetKhronosToolId());
-            printf("SPIR-V Generator Version %d\n",          glslang::GetSpirvGeneratorVersion());
-            printf("GL_KHR_vulkan_glsl version %d\n",        100);
-            printf("ARB_GL_gl_spirv version %d\n",           100);
-
-            if (workList.empty())
-            {
-                return EFailCode::Success;
-            }
-        }
-
-        if (workList.empty() && not mOptions.check(EOptions::Stdin))
-        {
-            usage();
-        }
-
-        if (mOptions.check(EOptions::Stdin))
-        {
-            mWorkItems.push_back(std::unique_ptr<CWorkItem> {new CWorkItem("stdin")} );
-            workList.add(mWorkItems.back().get());
-        }
-
-        processConfigFile();
-
-        if(mOptions.check(EOptions::ReadHlsl) && not (mOptions.check(EOptions::OutputPreprocessed) || mOptions.check(EOptions::Spv)))
-        {
-            Error(logTag(), "ERROR: HLSL requires SPIR-V code generation (or preprocessing only)");
-        }
-
-        //
-        // Two modes:
-        // 1) linking all arguments together, single-threaded, new C++ interface
-        // 2) independent arguments, can be tackled by multiple asynchronous threads, for testing thread safety, using the old handle interface
-        //
-        if (mOptions.check(core::CBitField<EOptions>(EOptions::LinkProgram) | EOptions::OutputPreprocessed))
-        {
-            glslang::InitializeProcess();
-            glslang::InitializeProcess();  // also test reference counting of users
-            glslang::InitializeProcess();  // also test reference counting of users
-            glslang::FinalizeProcess();    // also test reference counting of users
-            glslang::FinalizeProcess();    // also test reference counting of users
-
-            compileAndLinkShaderFiles(workList);
-
-            glslang::FinalizeProcess();
-        }
-        else
-        {
-            ShInitialize();
-            ShInitialize();  // also test reference counting of users
-            ShFinalize();    // also test reference counting of users
-
-            bool printShaderNames = (1 < workList.size());
-
-            if (mOptions.check(EOptions::MultiThreaded))
-            {
-                std::array<std::thread, 16> threads;
-
-                for (unsigned int k = 0; k < threads.size(); ++k)
-                {
-                    threads[k] = std::thread(&CPrecompiler::compileShaders, this, std::ref(workList));
-
-                    if (std::thread::id() == threads[k].get_id())
-                    {
-                        fprintf(stderr, "Failed to create thread\n");
-                        return EFailCode::FailThreadCreate;
-                    }
-                }
-
-                auto const joiner = [] (std::thread &t)
-                {
-                    if(t.joinable())
-                    {
-                        t.join();
-                    }
-                };
-                std::for_each(threads.begin(), threads.end(), joiner);
-            }
-            else
-            {
-                compileShaders(workList);
-            }
-
-            // Print out all the resulting infologs
-            for (size_t w = 0; w < mWorkItems.size(); ++w)
-            {
-                if(mWorkItems[w])
-                {
-                    if (printShaderNames || 0 < mWorkItems[w]->results().size())
-                    {
-                        putsIfNonEmpty(mWorkItems[w]->name().c_str());
-                    }
-
-                    putsIfNonEmpty(mWorkItems[w]->results().c_str());
-                }
-            }
-
-            ShFinalize();
-        }
-
-        if (mCompileFailed)
-        {
-            return EFailCode::FailCompile;
-        }
-
-        if (mLinkFailed)
-        {
-            return EFailCode::FailLink;
-        }
-
-        return EFailCode::Success;
+        return EResult::Success;
     }
 
-    void deinitialize()
+    EResult deinitialize()
     {
-
+        return EResult::Success;
     }
 
 private_methods:
 
-    //
-    //   Deduce the language from the filename.  Files must end in one of the
-    //   following extensions:
-    //
-    //   .vert = vertex
-    //   .tesc = tessellation control
-    //   .tese = tessellation evaluation
-    //   .geom = geometry
-    //   .frag = fragment
-    //   .comp = compute
-    //   .rgen = ray generation
-    //   .rint = ray intersection
-    //   .rahit = ray any hit
-    //   .rchit = ray closest hit
-    //   .rmiss = ray miss
-    //   .rcall = ray callable
-    //   .mesh  = mesh
-    //   .task  = task
-    //   Additionally, the file names may end in .<stage>.glsl and .<stage>.hlsl
-    //   where <stage> is one of the stages listed above.
-    //
-    EShLanguage determineTargetLanguage(std::string const &aFilename, bool aParseStageName, core::CBitField<EOptions> &aInOutOptions)
+    /**
+     * Accept an inline list of options and check if a specific value is contained in this list.
+     *
+     * @param aOptions
+     * @param aCompare
+     * @return
+     */
+    template <typename TValue>
+    bool anyOf(std::vector<TValue> const &&aOptions, TValue const &aCompare)
     {
-        std::string stageName {};
+        return (aOptions.end() != std::find(aOptions.begin(), aOptions.end(), aCompare));
+    }
 
-        static std::string shaderStageName = "";
-
-        if (not shaderStageName.empty())
+    /**
+     * Accept an inline assignment and check, whether an assignment for a specific key exists.
+     * Return it's value.
+     *
+     * @param aExtension
+     * @param aOptions
+     * @return
+     */
+    template <typename TKey, typename TValue>
+    std::enable_if_t<std::is_default_constructible_v<TValue>, TValue> const mapValue(TKey const &aExtension, std::unordered_map<TKey, TValue> const &&aOptions)
+    {
+        bool const contained = (aOptions.end() != std::find(aOptions.begin(), aOptions.end(), aExtension));
+        if(not contained)
         {
-            stageName = shaderStageName;
-        }
-        else if (aParseStageName)
-        {
-            // Note: "first" extension means "first from the end", i.e.
-            // if the file is named foo.vert.glsl, then "glsl" is first,
-            // "vert" is second.
-            size_t      firstExtStart  = aFilename.find_last_of(".");
-            bool        hasFirstExt    = (std::string::npos != firstExtStart);
-            size_t      secondExtStart = hasFirstExt
-                                            ? aFilename.find_last_of(".", firstExtStart - 1)
-                                            : std::string::npos;
-            bool        hasSecondExt   = (std::string::npos != secondExtStart);
-
-            std::string firstExt       = aFilename.substr(firstExtStart + 1, std::string::npos);
-            bool        usesUnifiedExt = hasFirstExt && ("glsl" == firstExt || "hlsl" == firstExt);
-
-            if (usesUnifiedExt && "hlsl" == firstExt)
-            {
-                // We need to enable HLSL processing
-                aInOutOptions.set(EOptions::ReadHlsl);
-            }
-
-            if (hasFirstExt && not usesUnifiedExt)
-            {
-                // No .glsl or .hlsl in the end so the first extension will
-                // provide the proper stage name file extension.
-                stageName = firstExt;
-            }
-            else if (usesUnifiedExt && hasSecondExt)
-            {
-                // Extract the proper stage name file extension, i.e. the second extension
-                stageName = aFilename.substr(secondExtStart + 1, firstExtStart - secondExtStart - 1);
-            }
-            else
-            {
-                // Undefined, assume vertex shader.
-                usage();
-                return EShLangVertex;
-            }
+            return TValue();
         }
         else
         {
-            // Just set the filename...
-            stageName = aFilename;
+            return aOptions.at(aExtension);
+        }
+    }
+
+    /**
+     * Derive the shading language used and the stage to compile from the full shader file name.
+     *
+     * @param aFileName See brief.
+     * @return          A tuple containing the language and stage information.
+     */
+    std::tuple<EShadingLanguage, EShaderStage> const compileTargetFromShaderFilename(std::string const &aFileName)
+    {
+        EShaderStage     stage    = {};
+        EShadingLanguage language = EShadingLanguage::Unknown;
+
+        // Possible filename variants:
+        // 1. <basename>.<stage>.<language_unified_ext> ; e.g. awesomeShader.vert.glsl
+        // 2. <basename>.<language_unified_ext>         ; e.g. awesomeShader.hlsl, awesomeShader.cg
+        // 3. <basename>.<stage>                        ; e.g. awesomeShader.vert, awesomeShader.vs
+
+        std::string primaryExtension   = std::string();
+        std::string secondaryExtension = std::string();
+
+        size_t const primaryExtensionPosition   = aFileName.find_last_of(".");
+        size_t const secondaryExtensionPosition = aFileName.find_last_of(".", primaryExtensionPosition - 1);
+
+        bool const hasPrimaryExtension   = (std::string::npos != primaryExtensionPosition);
+        bool const hasSecondaryExtension = (std::string::npos != secondaryExtensionPosition);
+
+        if(hasPrimaryExtension)
+        {
+            primaryExtension = aFileName.substr(primaryExtensionPosition + 1, std::string::npos);
         }
 
-        if ("vert" == stageName)
+        if(hasSecondaryExtension)
         {
-            return EShLangVertex;
+            secondaryExtension = aFileName.substr(secondaryExtensionPosition + 1, (primaryExtensionPosition - secondaryExtensionPosition - 1));
         }
-        else if ("tesc" == stageName)
-        {
-            return EShLangTessControl;
-        }
-        else if ("tese" == stageName)
-        {
-            return EShLangTessEvaluation;
-        }
-        else if ("geom" == stageName)
-        {
-            return EShLangGeometry;
-        }
-        else if ("frag" == stageName)
-        {
-            return EShLangFragment;
-        }
-        else if ("comp" == stageName)
-        {
-            return EShLangCompute;
-        }
-    #ifdef NV_EXTENSIONS
-        else if (stageName == "rgen")
-            return EShLangRayGenNV;
-        else if (stageName == "rint")
-            return EShLangIntersectNV;
-        else if (stageName == "rahit")
-            return EShLangAnyHitNV;
-        else if (stageName == "rchit")
-            return EShLangClosestHitNV;
-        else if (stageName == "rmiss")
-            return EShLangMissNV;
-        else if (stageName == "rcall")
-            return EShLangCallableNV;
-        else if (stageName == "mesh")
-            return EShLangMeshNV;
-        else if (stageName == "task")
-            return EShLangTaskNV;
-    #endif
 
-        usage();
+        bool const usesUnifiedExtension = anyOf({ "cg", "hlsl", "glsl", "xs" }, primaryExtension);
 
-        return EShLangVertex;
+        std::string stageName = std::string();
+        if(hasPrimaryExtension and not usesUnifiedExtension)
+        {
+            stageName = primaryExtension;
+        }
+        else if(usesUnifiedExtension)
+        {
+            stageName = hasSecondaryExtension
+                            ? secondaryExtension
+                            : primaryExtension;
+        }
+        else
+        {
+            // Invalid
+            usage();
+            return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
+        }
+
+        // Determine language
+        language  = mapValue<std::string, EShadingLanguage>(primaryExtension, {{ "cg",   EShadingLanguage::CGLanguage },
+                                                                               { "glsl", EShadingLanguage::GLSL       },
+                                                                               { "vert", EShadingLanguage::GLSL       },
+                                                                               { "tesc", EShadingLanguage::GLSL       },
+                                                                               { "tese", EShadingLanguage::GLSL       },
+                                                                               { "geom", EShadingLanguage::GLSL       },
+                                                                               { "frag", EShadingLanguage::GLSL       },
+                                                                               { "comp", EShadingLanguage::GLSL       },
+                                                                               { "hlsl", EShadingLanguage::HLSL       },
+                                                                               { "vs",   EShadingLanguage::HLSL       },
+                                                                               { "hs",   EShadingLanguage::HLSL       },
+                                                                               { "ds",   EShadingLanguage::HLSL       },
+                                                                               { "gs",   EShadingLanguage::HLSL       },
+                                                                               { "ps",   EShadingLanguage::HLSL       },
+                                                                               { "cs",   EShadingLanguage::HLSL       },
+                                                                               { "xs",   EShadingLanguage::XShade     }});
+
+        if(EShadingLanguage::Unknown == language)
+        {
+            usage();
+            return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
+        }
+
+        // Determine stage
+        stage = mapValue<std::string, EShaderStage>(stageName, {{ "vert", EShaderStage::Vertex                  },
+                                                                { "tesc", EShaderStage::TesselationControlPoint },
+                                                                { "tese", EShaderStage::TesselationEvaluation   },
+                                                                { "geom", EShaderStage::Geometry                },
+                                                                { "frag", EShaderStage::Fragment                },
+                                                                { "comp", EShaderStage::Compute                 },
+                                                        #ifdef NV_EXTENSIONS
+                                                                { "rgen",  EShaderStage::NVRayGen                },
+                                                                { "rint",  EShaderStage::NVIntersect             },
+                                                                { "rahit", EShaderStage::NVAnyHit                },
+                                                                { "rchit", EShaderStage::NVClosestHit            },
+                                                                { "rmiss", EShaderStage::NVMiss                  },
+                                                                { "rcall", EShaderStage::NVCallable              },
+                                                                { "mesh",  EShaderStage::NVMesh                  },
+                                                                { "task",  EShaderStage::NVTask                  },
+                                                        #endif
+                                                                                                                  });
+
+        if(EShaderStage::NotApplicable == stage)
+        {
+            usage();
+            return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
+        }
+
+        return { language, stage };
     }
     //<-----------------------------------------------------------------------------
 
@@ -888,44 +422,52 @@ private_methods:
     //<-----------------------------------------------------------------------------
 
     /**
-     * Create the default name for saving a binary if -o is not provided.
+     * Determine the output name of the compiled shader based on language, stage and file base name.
      *
-     * @param aStage The stage to determine a binary name for.
-     * @return See brief
+     * @param aFileBaseName
+     * @param aLanguage
+     * @param aStage
+     * @return              See brief.
      */
-    std::string const GetBinaryName(EShLanguage const aStage) const
+    std::string const getOutputFilename(std::string      const &aFileBaseName,
+                                        EShadingLanguage const &aLanguage,
+                                        EShaderStage     const &aStage) const
     {
-        std::string name{};
+        std::string extension{};
 
-        if (mBinaryFileName.empty())
+        if(EShadingLanguage::CGLanguage == aLanguage)
         {
-            switch (aStage)
-            {
-            case EShLangVertex:         name = "vert.spv";  break;
-            case EShLangTessControl:    name = "tesc.spv";  break;
-            case EShLangTessEvaluation: name = "tese.spv";  break;
-            case EShLangGeometry:       name = "geom.spv";  break;
-            case EShLangFragment:       name = "frag.spv";  break;
-            case EShLangCompute:        name = "comp.spv";  break;
-    #ifdef NV_EXTENSIONS
-            case EShLangRayGenNV:       name = "rgen.spv";  break;
-            case EShLangIntersectNV:    name = "rint.spv";  break;
-            case EShLangAnyHitNV:       name = "rahit.spv"; break;
-            case EShLangClosestHitNV:   name = "rchit.spv"; break;
-            case EShLangMissNV:         name = "rmiss.spv"; break;
-            case EShLangCallableNV:     name = "rcall.spv"; break;
-            case EShLangMeshNV:         name = "mesh.spv";  break;
-            case EShLangTaskNV:         name = "task.spv";  break;
-    #endif
-            default:                     name = "unknown";  break;
-            }
+            extension = ".cg.spv";
+        }
+        else if(EShadingLanguage::XShade == aLanguage)
+        {
+            extension = "spv";
         }
         else
         {
-            name = mBinaryFileName;
+            switch (aStage)
+            {
+            case EShaderStage::Vertex:                  extension = (EShadingLanguage::HLSL == aLanguage) ? "vs.hlsl.spv" : "vert.glsl.spv";  break;
+            case EShaderStage::TesselationControlPoint: extension = (EShadingLanguage::HLSL == aLanguage) ? "hs.hlsl.spv" : "tesc.glsl.spv";  break;
+            case EShaderStage::TesselationEvaluation:   extension = (EShadingLanguage::HLSL == aLanguage) ? "ds.hlsl.spv" : "tese.glsl.spv";  break;
+            case EShaderStage::Geometry:                extension = (EShadingLanguage::HLSL == aLanguage) ? "gs.hlsl.spv" : "geom.glsl.spv";  break;
+            case EShaderStage::Fragment:                extension = (EShadingLanguage::HLSL == aLanguage) ? "ps.hlsl.spv" : "frag.glsl.spv";  break;
+            case EShaderStage::Compute:                 extension = (EShadingLanguage::HLSL == aLanguage) ? "cs.hlsl.spv" : "comp.glsl.spv";  break;
+    #ifdef NV_EXTENSIONS
+            case EShaderStage::NVRayGen:                extension = "rgen.spv";  break;
+            case EShaderStage::NVIntersect:             extension = "rint.spv";  break;
+            case EShaderStage::NVAnyHit:                extension = "rahit.spv"; break;
+            case EShaderStage::NVClosestHit:            extension = "rchit.spv"; break;
+            case EShaderStage::NVMiss:                  extension = "rmiss.spv"; break;
+            case EShaderStage::NVCallable:              extension = "rcall.spv"; break;
+            case EShaderStage::NVMesh:                  extension = "mesh.spv";  break;
+            case EShaderStage::NVTask:                  extension = "task.spv";  break;
+    #endif
+            default:                                    extension = "unknown";   break;
+            }
         }
 
-        return name;
+        return CString::format("%0.%1", aFileBaseName, aStage);
     }
     //<-----------------------------------------------------------------------------
 
@@ -939,15 +481,14 @@ private_methods:
      * @param aCompiler
      */
     void compile(std::string                       const &aFilename,
-                 ShHandle                          const &aCompiler,
                  engine::core::CBitField<EOptions> const &aOptions)
     {
         int result = 0;
 
-        std::string shaderString = ReadFileData(aFilename);
+        std::string shaderString = readFile(aFilename);
         if(shaderString.empty())
         {
-            Error(logTag(), "Shader file is empty.");
+            CLog::Error(logTag(), CString::format("Shader file %0 is empty.", aFilename));
             return;
         }
 
@@ -955,44 +496,9 @@ private_methods:
         uint64_t const length = shaderString.size();
         SHIRABE_UNUSED(length);
 
-        EShMessages messages = EShMsgDefault;
-        messages = static_cast<EShMessages>(messages | EShMsgDebugInfo);
-        messages = static_cast<EShMessages>(messages | EShMsgAST);
+        // Invoke specific compiler.
 
-        // SetMessageOptions(messages);
 
-        //if (UserPreamble.isSet())
-        //    Error("-D and -U options require -l (linking)\n");
-
-        int32_t const limit = aOptions.check(EOptions::MemoryLeakMode) ? 100 : 1;
-
-        for (int32_t i = 0; i < limit; ++i)
-        {
-            for (int32_t j = 0; j < limit; ++j)
-            {
-                char const *data = shaderString.data();
-                result = ShCompile(/* ShHandle          = */ aCompiler,
-                                   /* shaderStrings     = */ &data,
-                                   /* numStrings        = */ 1,
-                                   /* lengths           = */ nullptr,
-                                   /* optimizationLevel = */ EShOptNone,
-                                   /* resources         = */ &mResources,
-                                   /* debugOptions      = */ static_cast<int>(aOptions.value()),
-                                   /* defaultVersion    = */ (aOptions.check(EOptions::DefaultDesktop)) ? 110 : 100,
-                                   /* forwardCompatible = */ false,
-                                   /* messages          = */ messages);
-            }
-
-            if (aOptions.check(EOptions::MemoryLeakMode))
-            {
-                // glslang::OS_DumpMemoryCounters();
-            }
-        }
-
-        if(0 == result)
-        {
-            mCompileFailed = true;
-        }
     }
     //<-----------------------------------------------------------------------------
 
