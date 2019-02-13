@@ -282,7 +282,7 @@ private_methods:
      * @return
      */
     template <typename TValue>
-    bool anyOf(std::vector<TValue> const &&aOptions, TValue const &aCompare)
+    static bool anyOf(std::vector<TValue> const &&aOptions, TValue const &aCompare)
     {
         return (aOptions.end() != std::find(aOptions.begin(), aOptions.end(), aCompare));
     }
@@ -296,7 +296,7 @@ private_methods:
      * @return
      */
     template <typename TKey, typename TValue>
-    std::enable_if_t<std::is_default_constructible_v<TValue>, TValue> const mapValue(TKey const &aExtension, std::unordered_map<TKey, TValue> const &&aOptions)
+    static std::enable_if_t<std::is_default_constructible_v<TValue>, TValue> const mapValue(TKey const &aExtension, std::unordered_map<TKey, TValue> const &&aOptions)
     {
         bool const contained = (aOptions.end() != std::find(aOptions.begin(), aOptions.end(), aExtension));
         if(not contained)
@@ -435,37 +435,48 @@ private_methods:
     {
         std::string extension{};
 
-        if(EShadingLanguage::CGLanguage == aLanguage)
+        static std::unordered_map<EShaderStage, std::string> glslStageAssignment =
         {
-            extension = ".cg.spv";
-        }
-        else if(EShadingLanguage::XShade == aLanguage)
-        {
-            extension = "spv";
-        }
-        else
-        {
-            switch (aStage)
-            {
-            case EShaderStage::Vertex:                  extension = (EShadingLanguage::HLSL == aLanguage) ? "vs.hlsl.spv" : "vert.glsl.spv";  break;
-            case EShaderStage::TesselationControlPoint: extension = (EShadingLanguage::HLSL == aLanguage) ? "hs.hlsl.spv" : "tesc.glsl.spv";  break;
-            case EShaderStage::TesselationEvaluation:   extension = (EShadingLanguage::HLSL == aLanguage) ? "ds.hlsl.spv" : "tese.glsl.spv";  break;
-            case EShaderStage::Geometry:                extension = (EShadingLanguage::HLSL == aLanguage) ? "gs.hlsl.spv" : "geom.glsl.spv";  break;
-            case EShaderStage::Fragment:                extension = (EShadingLanguage::HLSL == aLanguage) ? "ps.hlsl.spv" : "frag.glsl.spv";  break;
-            case EShaderStage::Compute:                 extension = (EShadingLanguage::HLSL == aLanguage) ? "cs.hlsl.spv" : "comp.glsl.spv";  break;
+            { EShaderStage::Vertex                  , "vert.glsl.spv" },
+            { EShaderStage::TesselationControlPoint , "tesc.glsl.spv" },
+            { EShaderStage::TesselationEvaluation   , "tese.glsl.spv" },
+            { EShaderStage::Geometry                , "geom.glsl.spv" },
+            { EShaderStage::Fragment                , "frag.glsl.spv" },
+            { EShaderStage::Compute                 , "comp.glsl.spv" },
     #ifdef NV_EXTENSIONS
-            case EShaderStage::NVRayGen:                extension = "rgen.spv";  break;
-            case EShaderStage::NVIntersect:             extension = "rint.spv";  break;
-            case EShaderStage::NVAnyHit:                extension = "rahit.spv"; break;
-            case EShaderStage::NVClosestHit:            extension = "rchit.spv"; break;
-            case EShaderStage::NVMiss:                  extension = "rmiss.spv"; break;
-            case EShaderStage::NVCallable:              extension = "rcall.spv"; break;
-            case EShaderStage::NVMesh:                  extension = "mesh.spv";  break;
-            case EShaderStage::NVTask:                  extension = "task.spv";  break;
+            { EShaderStage::NVRayGen                , "rgen.spv"      },
+            { EShaderStage::NVIntersect             , "rint.spv"      },
+            { EShaderStage::NVAnyHit                , "rahit.spv"     },
+            { EShaderStage::NVClosestHit            , "rchit.spv"     },
+            { EShaderStage::NVMiss                  , "rmiss.spv"     },
+            { EShaderStage::NVCallable              , "rcall.spv"     },
+            { EShaderStage::NVMesh                  , "mesh.spv"      },
+            { EShaderStage::NVTask                  , "task.spv"      },
     #endif
-            default:                                    extension = "unknown";   break;
-            }
-        }
+            { EShaderStage::NotApplicable           , "unknown"       },
+        };
+
+        static std::unordered_map<EShaderStage, std::string> hlslStageAssignment =
+        {
+            { EShaderStage::Vertex                  , "vs.hlsl.spv" },
+            { EShaderStage::TesselationControlPoint , "hs.hlsl.spv" },
+            { EShaderStage::TesselationEvaluation   , "ds.hlsl.spv" },
+            { EShaderStage::Geometry                , "gs.hlsl.spv" },
+            { EShaderStage::Fragment                , "ps.hlsl.spv" },
+            { EShaderStage::Compute                 , "cs.hlsl.spv" },
+            { EShaderStage::NotApplicable           , "unknown"     },
+        };
+
+        static std::unordered_map<EShadingLanguage, std::string> languageAssignment  =
+        {
+            { EShadingLanguage::CGLanguage, "cg.spv"  },
+            { EShadingLanguage::XShade,     "xs.spv"  },
+            { EShadingLanguage::GLSL,       mapValue<EShaderStage, std::string>(aStage, std::move(glslStageAssignment)) },
+            { EShadingLanguage::HLSL,       mapValue<EShaderStage, std::string>(aStage, std::move(hlslStageAssignment)) },
+            { EShadingLanguage::Unknown,    "unknown" }
+        };
+
+        extension = mapValue<EShadingLanguage, std::string>(aLanguage, std::move(languageAssignment));
 
         return CString::format("%0.%1", aFileBaseName, aStage);
     }
@@ -476,15 +487,15 @@ private_methods:
     //<-----------------------------------------------------------------------------
 
     /**
-     * @brief compile
+     * Compile a single shader file.
+     *
      * @param aFilename
-     * @param aCompiler
+     * @param aOptions
+     * @return
      */
-    void compile(std::string                       const &aFilename,
-                 engine::core::CBitField<EOptions> const &aOptions)
+    EResult compile(std::string                       const &aFilename,
+                    engine::core::CBitField<EOptions> const &aOptions)
     {
-        int result = 0;
-
         std::string shaderString = readFile(aFilename);
         if(shaderString.empty())
         {
@@ -496,9 +507,22 @@ private_methods:
         uint64_t const length = shaderString.size();
         SHIRABE_UNUSED(length);
 
+        // Determine compiler
+        auto const [language, stage] = compileTargetFromShaderFilename(aFilename);
+
+        std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
+
+
         // Invoke specific compiler.
-
-
+        switch(language)
+        {
+            case EShadingLanguage::CGLanguage:
+            case EShadingLanguage::HLSL:
+            case EShadingLanguage::GLSL:
+            case EShadingLanguage::XShade:
+            case EShadingLanguage::Unknown:
+                break;
+        }
     }
     //<-----------------------------------------------------------------------------
 
