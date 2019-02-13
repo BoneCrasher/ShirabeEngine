@@ -33,6 +33,12 @@
 using namespace engine;
 using namespace glslang_wrapper;
 
+#if ENABLE_OPT
+static constexpr bool const OPTIMIZATION_ENABLED = true;
+#else
+static constexpr bool const OPTIMIZATION_ENABLED = false;
+#endif
+
 namespace Main
 {
     SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
@@ -1449,7 +1455,7 @@ private_methods:
     {
         if(0 == mConfigFile.size())
         {
-            mResources = DefaultBuiltInResource();
+            mResources = glslang_wrapper::DefaultBuiltInResource();
         }
         else
         {
@@ -1572,7 +1578,7 @@ private_methods:
             aOutMessages = static_cast<EShMessages>(aOutMessages | EShMsgHlslEnable16BitTypes);
         }
 
-        if (mOptions.check(EOptions::OptimizeDisable) || not ENABLE_OPT)
+        if (mOptions.check(EOptions::OptimizeDisable) || not OPTIMIZATION_ENABLED)
         {
             aOutMessages = static_cast<EShMessages>(aOutMessages | EShMsgHlslLegalization);
         }
@@ -1599,48 +1605,63 @@ private_methods:
      * @param aArgV
      * @param aResource
      */
-    void ProcessBindingBase(int &aArgC, char**& aArgV, glslang::TResourceType aResource)
+    void ProcessBindingBase(uint32_t &aArgC, char**& aArgV, glslang::TResourceType aResource)
     {
-        if (argc < 2)
+        if(2 > aArgC)
+        {
             usage();
+        }
 
-        EShLanguage lang = EShLangCount;
-        int singleBase = 0;
-        TPerSetBaseBinding perSetBase;
-        int arg = 1;
+        EShLanguage language = EShLangCount;
+
+        uint32_t            singleBase = 0;
+        PerSetBaseBinding_t perSetBase = {};
+
+        uint32_t arg = 1;
 
         // Parse stage, if given
-        if (!isdigit(argv[arg][0])) {
-            if (argc < 3) // this form needs one more argument
+        if(not std::isdigit(aArgV[arg][0]))
+        {
+            if(3 > aArgC)
+            {
                 usage();
-
-            lang = FindLanguage(argv[arg++], false);
-        }
-
-        if ((argc - arg) > 2 && isdigit(argv[arg+0][0]) && isdigit(argv[arg+1][0])) {
-            // Parse a per-set binding base
-            while ((argc - arg) > 2 && isdigit(argv[arg+0][0]) && isdigit(argv[arg+1][0])) {
-                const int baseNum = atoi(argv[arg++]);
-                const int setNum = atoi(argv[arg++]);
-                perSetBase[setNum] = baseNum;
             }
-        } else {
-            // Parse single binding base
-            singleBase = atoi(argv[arg++]);
+
+            language = determineTargetLanguage(aArgV[arg++], false, mOptions);
         }
 
-        argc -= (arg-1);
-        argv += (arg-1);
+        if( 2 < (aArgC - arg) && std::isdigit(aArgV[arg + 0][0]) && std::isdigit(aArgV[arg + 1][0]) )
+        {
+            while(2 < (aArgC - arg) && std::isdigit(aArgV[arg + 0][0]) && std::isdigit(aArgV[arg + 1][0]) )
+            {
+                uint32_t const baseNumber = CString::fromString<uint32_t>(aArgV[arg++]);
+                uint32_t const setNumber  = CString::fromString<uint32_t>(aArgV[arg++]);
+
+                perSetBase[setNumber] = baseNumber;
+            }
+        }
+        else
+        {
+            singleBase = CString::fromString<uint32_t>(aArgV[arg++]);
+        }
+
+        aArgC -= (arg - 1);
+        aArgV += (arg - 1);
 
         // Set one or all languages
-        const int langMin = (lang < EShLangCount) ? lang+0 : 0;
-        const int langMax = (lang < EShLangCount) ? lang+1 : EShLangCount;
+        uint32_t const languageMin = (EShLangCount > language) ? (language + 0) : 0;
+        uint32_t const languageMax = (EShLangCount > language) ? (language + 1) : EShLangCount;
 
-        for (int lang = langMin; lang < langMax; ++lang) {
-            if (!perSetBase.empty())
-                baseBindingForSet[res][lang].insert(perSetBase.begin(), perSetBase.end());
+        for(uint32_t languageIndex = languageMin; languageIndex < languageMax; ++languageIndex)
+        {
+            if(not perSetBase.empty())
+            {
+                mBaseBindingForSet[aResource][languageIndex].insert(perSetBase.begin(), perSetBase.end());
+            }
             else
-                baseBinding[res][lang] = singleBase;
+            {
+                mBaseBinding[aResource][languageIndex] = singleBase;
+            }
         }
     }
 
@@ -1650,40 +1671,49 @@ private_methods:
     //<
     //<-----------------------------------------------------------------------------
 
-    void ProcessResourceSetBindingBase(int& argc, char**& argv, std::array<std::vector<std::string>, EShLangCount>& base)
+    void ProcessResourceSetBindingBase(uint32_t &aArgC, char **&aArgV, std::array<std::vector<std::string>, EShLangCount> &aBase)
     {
-        if (argc < 2)
+        if(2 > aArgC)
+        {
             usage();
+        }
 
-        if (!isdigit(argv[1][0])) {
-            if (argc < 3) // this form needs one more argument
+        if(not std::isdigit(aArgV[1][0]))
+        {
+            if(3 > aArgC)
+            {
                 usage();
+            }
 
             // Parse form: --argname stage [regname set base...], or:
             //             --argname stage set
-            const EShLanguage lang = FindLanguage(argv[1], false);
+            EShLanguage const language = determineTargetLanguage(aArgV[1], false, mOptions);
 
-            argc--;
-            argv++;
+            --aArgC;
+            ++aArgV;
 
-            while (argc > 1 && argv[1] != nullptr && argv[1][0] != '-') {
-                base[lang].push_back(argv[1]);
+            while(1 < aArgC && nullptr != aArgV[1] && '-' != aArgV[1][0])
+            {
+                aBase[language].push_back(aArgV[1]);
 
-                argc--;
-                argv++;
+                --aArgC;
+                ++aArgV;
             }
 
-            // Must have one arg, or a multiple of three (for [regname set binding] triples)
-            if (base[lang].size() != 1 && (base[lang].size() % 3) != 0)
+            if(1 != aBase[language].size() && 0 != (aBase[language].size() % 3))
+            {
                 usage();
+            }
+        }
+        else
+        {
+            for(uint32_t language = 0; language < EShLangCount; ++language)
+            {
+                aBase[language].push_back(aArgV[1]);
+            }
 
-        } else {
-            // Parse form: --argname set
-            for (int lang=0; lang<EShLangCount; ++lang)
-                base[lang].push_back(argv[1]);
-
-            argc--;
-            argv++;
+            --aArgC;
+            ++aArgV;
         }
     }
 
@@ -1703,7 +1733,7 @@ private_methods:
      * @param argc
      * @param argv
      */
-    void ProcessArguments(int aArgC, char *aArgV[], std::vector<std::unique_ptr<CWorkItem>>& aOutWorkItems)
+    void ProcessArguments(uint32_t aArgC, char *aArgV[], std::vector<std::unique_ptr<CWorkItem>>& aOutWorkItems)
     {
         for (uint64_t k = 0; k < glslang::EResCount; ++k)
         {
@@ -2120,11 +2150,14 @@ private_methods:
                         }
                         else if ('s' == aArgV[0][2])
                         {
-        #if ENABLE_OPT
-                            mOptions.set(EOptions::OptimizeSize);
-        #else
-                            Error(logTag(), "-Os not available; optimizer not linked");
-        #endif
+                            if(OPTIMIZATION_ENABLED)
+                            {
+                                mOptions.set(EOptions::OptimizeSize);
+                            }
+                            else
+                            {
+                                Error(logTag(), "-Os not available; optimizer not linked");
+                            }
                         }
                         else
                         {

@@ -36,7 +36,7 @@ endif()
 
 set(
     SHIRABE_GCC_LD_COMMON_FLAGS
-            )
+)
 
 # Make sure the compiler uses the correct address model
 if(SHIRABE_PROJECT_CROSS_BUILD_ARMHF)

@@ -46,7 +46,7 @@ namespace glslang_wrapper
     // These are the default resources for TBuiltInResources, used for both
     //  - parsing this string for the case where the user didn't supply one,
     //  - dumping out a template for user construction of a config file.
-    static CBuiltInResource_t const &DefaultBuiltInResource();
+    CBuiltInResource_t const &DefaultBuiltInResource();
 
     // Returns the DefaultTBuiltInResource as a human-readable string.
     std::string GetDefaultBuiltInResourceString();

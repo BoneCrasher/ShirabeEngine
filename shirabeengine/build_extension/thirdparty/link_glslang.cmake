@@ -19,10 +19,10 @@ function(linkLibrary)
     # -l
     append_parentscope(
         SHIRABE_PROJECT_LIBRARY_TARGETS
-        OGLCompiler
-        OSDependent
         glslang
+        OGLCompiler
         HLSL
         SPIRV
-        SPRRemapper)
+        SPVRemapper
+        OSDependent)
 endfunction(linkLibrary)

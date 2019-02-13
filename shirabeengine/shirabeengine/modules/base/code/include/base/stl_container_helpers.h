@@ -26,12 +26,12 @@ namespace engine
             return mContainer.rend();
         }
 
-        typename T::reverse_const_iterator begin() const
+        typename T::const_reverse_iterator begin() const
         {
             return mContainer.rbegin();
         }
 
-        typename T::reverse_const_iterator end() const
+        typename T::const_reverse_iterator end() const
         {
             return mContainer.rend();
         }

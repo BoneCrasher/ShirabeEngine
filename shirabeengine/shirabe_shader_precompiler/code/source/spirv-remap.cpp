@@ -37,10 +37,12 @@
 #include <fstream>
 #include <cstring>
 #include <stdexcept>
+#include <filesystem>
 
-#include "../SPIRV/SPVRemapper.h"
+#include <SPIRV/SPVRemapper.h>
 
-namespace {
+namespace
+{
 
     typedef unsigned int SpvWord;
 
@@ -53,54 +55,81 @@ namespace {
 
     // OS dependent path separator (avoiding boost::filesystem dependency)
 #if defined(_WIN32)
-    char path_sep_char() { return '\\'; }
+    static char path_sep_char() { return '\\'; }
 #else
-    char path_sep_char() { return '/';  }
+    static char path_sep_char() { return '/';  }
 #endif
 
-    std::string basename(const std::string filename)
+    /**
+     * Extract the base name of a filename
+     *
+     * @param aFilename
+     * @return
+     */
+    std::string basename(std::string const aFilename)
     {
-        const size_t sepLoc = filename.find_last_of(path_sep_char());
-
-        return (sepLoc == filename.npos) ? filename : filename.substr(sepLoc+1);
+        return std::filesystem::path(aFilename).filename();
     }
 
-    void errHandler(const std::string& str) {
-        std::cout << str << std::endl;
+    /**
+     * Print an error message and exit the application.
+     *
+     * @param aMessage
+     */
+    [[noreturn]]
+    void errHandler(std::string const &aMessage)
+    {
+        std::cout << aMessage << std::endl;
         exit(5);
     }
 
-    void logHandler(const std::string& str) {
-        std::cout << str << std::endl;
+    /**
+     * Print a log message.
+     *
+     * @param aMessage
+     */
+    void logHandler(std::string const &aMessage)
+    {
+        std::cout << aMessage << std::endl;
     }
 
     // Read word stream from disk
-    void read(std::vector<SpvWord>& spv, const std::string& inFilename, int verbosity)
+    void read(std::vector<SpvWord> &aSpvWords, std::string const &aFilename, uint32_t const aVerbosity)
     {
-        std::ifstream fp;
+        std::ifstream fileStream;
 
-        if (verbosity > 0)
-            logHandler(std::string("  reading: ") + inFilename);
+        if(0 < aVerbosity)
+        {
+            logHandler(std::string("  reading: ") + aFilename);
+        }
 
-        spv.clear();
-        fp.open(inFilename, std::fstream::in | std::fstream::binary);
+        aSpvWords.clear();
 
-        if (fp.fail())
-            errHandler("error opening file for read: ");
+        fileStream.open(aFilename, std::fstream::in | std::fstream::binary);
+        if(fileStream.fail())
+        {
+            errHandler(std::string("Error opening file for read: ") + aFilename);
+        }
 
         // Reserve space (for efficiency, not for correctness)
-        fp.seekg(0, fp.end);
-        spv.reserve(size_t(fp.tellg()) / sizeof(SpvWord));
-        fp.seekg(0, fp.beg);
+        fileStream.seekg(0, fileStream.end);
+        aSpvWords.reserve(std::size_t(fileStream.tellg()) / sizeof(SpvWord));
+        fileStream.seekg(0, fileStream.beg);
 
-        while (!fp.eof()) {
-            SpvWord inWord;
-            fp.read((char *)&inWord, sizeof(inWord));
+        while(not fileStream.eof())
+        {
+            SpvWord word{};
 
-            if (!fp.eof()) {
-                spv.push_back(inWord);
-                if (fp.fail())
-                    errHandler(std::string("error reading file: ") + inFilename);
+            char *wordCh = (char *) &word;
+            fileStream.read(wordCh, sizeof(SpvWord));
+
+            if(not fileStream.eof())
+            {
+                aSpvWords.push_back(word);
+                if(fileStream.fail())
+                {
+                    errHandler(std::string("error reading file: ") + aFilename);
+                }
             }
         }
     }
@@ -311,33 +340,33 @@ namespace {
 
 } // namespace
 
-int main(int argc, char** argv)
-{
-    std::vector<std::string> inputFile;
-    std::string              outputDir;
-    int                      opts;
-    int                      verbosity;
-
-#ifdef use_cpp11
-    // handle errors by exiting
-    spv::spirvbin_t::registerErrorHandler(errHandler);
-
-    // Log messages to std::cout
-    spv::spirvbin_t::registerLogHandler(logHandler);
-#endif
-
-    if (argc < 2)
-        usage(argv[0]);
-
-    parseCmdLine(argc, argv, inputFile, outputDir, opts, verbosity);
-
-    if (outputDir.empty())
-        usage(argv[0], "Output directory required");
-
-    std::string errmsg;
-
-    // Main operations: read, remap, and write.
-    execute(inputFile, outputDir, opts, verbosity);
-
-    // If we get here, everything went OK!  Nothing more to be done.
-}
+// int main(int argc, char** argv)
+// {
+//     std::vector<std::string> inputFile;
+//     std::string              outputDir;
+//     int                      opts;
+//     int                      verbosity;
+//
+// #ifdef use_cpp11
+//     // handle errors by exiting
+//     spv::spirvbin_t::registerErrorHandler(errHandler);
+//
+//     // Log messages to std::cout
+//     spv::spirvbin_t::registerLogHandler(logHandler);
+// #endif
+//
+//     if (argc < 2)
+//         usage(argv[0]);
+//
+//     parseCmdLine(argc, argv, inputFile, outputDir, opts, verbosity);
+//
+//     if (outputDir.empty())
+//         usage(argv[0], "Output directory required");
+//
+//     std::string errmsg;
+//
+//     // Main operations: read, remap, and write.
+//     execute(inputFile, outputDir, opts, verbosity);
+//
+//     // If we get here, everything went OK!  Nothing more to be done.
+// }
