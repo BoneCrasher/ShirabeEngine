@@ -179,9 +179,10 @@ public_enums:
         DebugMode            = (1u << 2),
         OptimizationEnabled  = (1u << 3),
         MultiThreaded        = (1u << 4),
-        DumpConfig           = (1u << 5),
-        DumpReflection       = (1u << 6),
-        DumpBareVersion      = (1u << 7),
+        RecursiveScan        = (1u << 5),
+        DumpConfig           = (1u << 6),
+        DumpReflection       = (1u << 7),
+        DumpBareVersion      = (1u << 8),
     };
 
     /**
@@ -225,6 +226,18 @@ public_enums:
 private_structs:
 
     /**
+     * @brief The SConfiguration struct
+     */
+    struct SConfiguration
+    {
+        std::vector<std::string>                inputPaths;
+        std::string                             outputPath;
+        std::vector<std::string>                outputFilenames;
+        core::CBitField<CPrecompiler::EOptions> options;
+    };
+
+
+    /**
      * @brief The SShaderCompilationElement struct
      */
     struct SShaderCompilationElement
@@ -236,6 +249,16 @@ private_structs:
     public_constructors:
         /**
          * @brief SShaderCompilationElement
+         */
+        SShaderCompilationElement()
+            : fileName({})
+            , contents({})
+            , stage(EShaderStage::NotApplicable)
+        {}
+
+        /**
+         * @brief SShaderCompilationElement
+         *
          * @param aFileName
          * @param aContents
          * @param aStage
@@ -261,6 +284,14 @@ private_structs:
         std::vector<SShaderCompilationElement> elements;
 
     public_constructors:
+
+        /**
+         * @brief SShaderCompilationUnit
+         */
+        SShaderCompilationUnit()
+            : compiler(EShaderCompiler::Unknown)
+            , language(EShadingLanguage::Unknown)
+        {}
 
         /**
          * @brief SShaderCompilationUnit
@@ -292,7 +323,17 @@ private_structs:
                 return EResult::InputInvalid;
             }
 
-            elements.push_back({ aFileName, aContents, aStage });
+            addElement({ aFileName, aContents, aStage });
+        }
+
+        /**
+         * @brief addElement
+         * @param aOther
+         * @return
+         */
+        EResult addElement(SShaderCompilationElement const &aOther)
+        {
+            elements.push_back(aOther);
         }
     };
 
@@ -304,8 +345,155 @@ public_methods:
         return EResult::Success;
     }
 
+
+    /**
+     * @brief ProcessArguments
+     * @param aArgC
+     * @param aArgV
+     * @return
+     */
+    EResult processArguments(uint32_t const aArgC, char **aArgV)
+    {
+        std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
+
+        core::CBitField<EOptions> options    = {};
+        std::string               outputPath = {};
+        std::vector<std::string>  inputPaths = {};
+
+        //
+        // Process all options provided to the application.
+        //
+        auto const processor = [&, this] (std::string const &aArgument) -> bool
+        {
+            //
+            // All options do have the format: <option>[=|:]<value>
+            //
+
+            auto const extract = [&aArgument] () -> std::tuple<bool, std::string, std::string>
+            {
+                std::string::size_type const separatorPosition = aArgument.find_first_of("=:");
+                if(std::string::npos == separatorPosition)
+                {
+                    return { false, std::string(), std::string() };
+                }
+                else
+                {
+                    std::string const option = aArgument.substr(0, separatorPosition);
+                    std::string const value  = aArgument.substr(separatorPosition + 1, std::string::npos);
+
+                    return { true, option, value };
+                }
+            };
+
+            auto const [valid, option, value] = extract();
+            if(not valid)
+            {
+                return false;
+            }
+
+            std::string const referencableValue = value;
+
+            std::unordered_map<std::string, std::function<bool()>> handlers =
+            {
+                { "--verbose",        [&] () { options.set(CPrecompiler::EOptions::VerboseOutput);         return true; }},
+                { "--debug",          [&] () { options.set(CPrecompiler::EOptions::DebugMode);             return true; }},
+                { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
+                { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
+                { "-o",               [&] () { outputPath = referencableValue;                             return true; }},
+                { "-i",               [&] () { inputPaths = readInputPaths(referencableValue).data();      return true; }},
+            };
+
+            auto const fn = mapValue<std::string, std::function<bool()>>(option, std::move(handlers));
+            if(fn)
+            {
+                return fn();
+            }
+            else
+            {
+                return false;
+            }
+        };
+        std::for_each(usableArguments.begin(), usableArguments.end(), processor);
+
+        //
+        // Derive filenames from the list of input paths.
+        //
+        std::vector<std::vector<std::string>> derivedFilenames{};
+
+        auto const deriveInputFilenames = [&] (std::string const &aInputPath) -> std::vector<std::string>
+        {
+            std::vector<std::string> inputFilenames{};
+            std::vector<std::string> outputFilenames{};
+
+            //
+            // Determine a list of filenames.
+            // IF the input path itself is a filename, it is just used.
+            // Otherwise, if it's a directory, scan it for input files.
+            // A directory can be scanned recursively, if configured to do so.
+            //
+            auto const inputFilename = std::filesystem::path(aInputPath);
+
+            bool const isDirectory = std::filesystem::is_directory(inputFilename);
+            if(isDirectory)
+            {
+                if(options.check(CPrecompiler::EOptions::RecursiveScan))
+                {
+                    auto const fileIterator = std::filesystem::recursive_directory_iterator(inputFilename);
+                    for(std::filesystem::directory_entry const &file : fileIterator)
+                    {
+                        if(not file.is_regular_file())
+                        {
+                            continue;
+                        }
+
+                        inputFilenames.push_back(file.path().string());
+                    }
+                }
+                else
+                {
+                    auto const fileIterator = std::filesystem::directory_iterator(inputFilename);
+                    for(std::filesystem::directory_entry const &file : fileIterator)
+                    {
+                        if(not file.is_regular_file())
+                        {
+                            continue;
+                        }
+
+                        inputFilenames.push_back(file.path().string());
+                    }
+                }
+            }
+            else
+            {
+                inputFilenames.push_back(aInputPath);
+            }
+
+            return inputFilenames;
+        };
+        std::transform(inputPaths.begin(), inputPaths.end(), std::back_inserter(derivedFilenames), deriveInputFilenames);
+
+        SConfiguration config {};
+        config.options    = options;
+        config.outputPath = outputPath;
+
+        //
+        //  Reduce the list of per-path derived filenames to a single filename list.
+        //
+        auto const reducer = [&config] (std::vector<std::string> const &fileNames)
+        {
+            config.inputPaths.insert(config.inputPaths.end(), fileNames.begin(), fileNames.end());
+        };
+        std::for_each(derivedFilenames.begin(), derivedFilenames.end(), reducer);
+
+        mConfig = config;
+
+        return EResult::Success;
+    }
+
     EResult run()
     {
+
+
         return EResult::Success;
     }
 
@@ -364,7 +552,7 @@ private_methods:
                             ? secondaryExtension
                             : primaryExtension;
         }
-        else
+        else(compiler, language);
         {
             // Invalid
             usage();
@@ -494,42 +682,92 @@ private_methods:
     //<-----------------------------------------------------------------------------
 
     /**
+     * @brief ReadInputPaths
+     * @param aPathsString
+     * @return
+     */
+    CResult<std::vector<std::string>> readInputPaths(std::string const &aPathsString)
+    {
+        if(aPathsString.empty())
+        {
+            return { false };
+        }
+
+        std::vector<std::string> paths = CString::split(aPathsString, ',');
+        if(paths.empty())
+        {
+            return { false };
+        }
+
+        return { paths };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+
+    /**
      * Compile a single shader file.
      *
      * @param aFilename
      * @param aOptions
      * @return
      */
-    EResult compile(std::string                       const &aFilename,
-                    engine::core::CBitField<EOptions> const &aOptions)
+    CResult<SShaderCompilationUnit> generateCompilationUnit(std::vector<std::string> const &aFilenames)
     {
-        std::string shaderString = readFile(aFilename);
-        if(shaderString.empty())
+        EShaderCompiler  compiler = EShaderCompiler::Unknown;
+        EShadingLanguage language = EShadingLanguage::Unknown;
+
+        auto const deriveElement = [&compiler, this] (std::string const &aFilename) -> SShaderCompilationElement
         {
-            CLog::Error(logTag(), CString::format("Shader file %0 is empty.", aFilename));
-            return EResult::InputInvalid;
-        }
+            std::string shaderString = readFile(aFilename);
+            if(shaderString.empty())
+            {
+                CLog::Error(logTag(), CString::format("Shader file %0 is empty.", aFilename));
+                return {};
+            }
 
-        // move to length-based strings, rather than null-terminated strings
-        uint64_t const length = shaderString.size();
-        SHIRABE_UNUSED(length);
+            // move to length-based strings, rather than null-terminated strings
+            uint64_t const length = shaderString.size();
+            SHIRABE_UNUSED(length);
 
-        // Determine compiler
-        auto const [language, stage] = compileTargetFromShaderFilename(aFilename);
+            // Determine compiler
+            auto const [language, stage] = compileTargetFromShaderFilename(aFilename);
 
-        std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
+            EShaderCompiler fileCompiler = mapValue<EShadingLanguage, EShaderCompiler>(language, {{ EShadingLanguage::CGLanguage, EShaderCompiler::CGLanguage               },
+                                                                                                  { EShadingLanguage::GLSL,       EShaderCompiler::GlslangReferenceCompiler },
+                                                                                                  { EShadingLanguage::HLSL,       EShaderCompiler::DxHlslCompiler           },
+                                                                                                  { EShadingLanguage::XShade,     EShaderCompiler::XShadeCompiler           }});
 
+            if(EShaderCompiler::Unknown != compiler && fileCompiler != compiler )
+            {
+                // Different compilers detected. This implies different languages...
+                CLog::Error(logTag(), CString::format("Different compilers detected for a pair of files. C1: %0, C2: %1", EnumValueOf(compiler), EnumValueOf(fileCompiler)));
+                return {};
+            }
 
-        // Invoke specific compiler.
-        switch(language)
-        {
-            case EShadingLanguage::CGLanguage:
-            case EShadingLanguage::HLSL:
-            case EShadingLanguage::GLSL:
-            case EShadingLanguage::XShade:
-            case EShadingLanguage::Unknown:
-                break;
-        }
+            std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).filename(), language, stage);
+            std::string const outputPath = std::filesystem::path(mConfig.outputPath) / outputName;
+
+            // TODO store output filename in element.
+            SShaderCompilationElement element {};
+            element.fileName = aFilename;
+            element.contents = shaderString;
+            element.stage    = stage;
+
+            return element;
+        };
+
+        std::vector<SShaderCompilationElement> elements = {};
+        std::transform(aFilenames.begin(), aFilenames.end(), std::back_inserter(elements), deriveElement);
+
+        SShaderCompilationUnit unit{};
+        unit.compiler = compiler;
+        unit.language = language;
+        unit.elements = std::move(elements);
+
+        return { unit };
     }
     //<-----------------------------------------------------------------------------
 
@@ -545,122 +783,8 @@ private_methods:
 
 private_members:
 
+    SConfiguration mConfig;
 };
-
-/**
- * @brief The SConfiguration struct
- */
-struct SConfiguration
-{
-    std::vector<std::string>                inputPaths;
-    std::string                             outputPath;
-    std::vector<std::string>                outputFilenames;
-    core::CBitField<CPrecompiler::EOptions> options;
-};
-
-/**
- * @brief ReadInputPaths
- * @param aPathsString
- * @return
- */
-CResult<std::vector<std::string>> ReadInputPaths(std::string const &aPathsString)
-{
-    if(aPathsString.empty())
-    {
-        return { false };
-    }
-
-    std::vector<std::string> paths = CString::split(aPathsString, ',');
-    if(paths.empty())
-    {
-        return { false };
-    }
-
-    return { paths };
-}
-
-/**
- * @brief ProcessArguments
- * @param aArgC
- * @param aArgV
- * @return
- */
-CResult<SConfiguration> const ProcessArguments(uint32_t const aArgC, char **aArgV)
-{
-    std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
-
-    SConfiguration config{};
-
-    auto const processor = [&config] (std::string const &aArgument) -> bool
-    {
-        //
-        // All options do have the format: <option>[=|:]<value>
-        //
-
-        auto const extract = [&aArgument] () -> std::tuple<bool, std::string, std::string>
-        {
-            std::string::size_type const separatorPosition = aArgument.find_first_of("=:");
-            if(std::string::npos == separatorPosition)
-            {
-                return { false, std::string(), std::string() };
-            }
-            else
-            {
-                std::string const option = aArgument.substr(0, separatorPosition);
-                std::string const value  = aArgument.substr(separatorPosition + 1, std::string::npos);
-
-                return { true, option, value };
-            }
-        };
-
-        auto const [valid, option, value] = extract();
-        if(not valid)
-        {
-            return false;
-        }
-
-        std::string const referencableValue = value;
-
-        std::unordered_map<std::string, std::function<bool()>> handlers =
-        {
-            { "--verbose",  [&] () { config.options.set(CPrecompiler::EOptions::VerboseOutput);         return true; }},
-            { "--debug",    [&] () { config.options.set(CPrecompiler::EOptions::DebugMode);             return true; }},
-            { "--optimize", [&] () { config.options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
-            { "-o",         [&] () { config.outputPath      = referencableValue;                        return true; }},
-            { "-i",         [&] () { config.inputPaths      = ReadInputPaths(referencableValue).data(); return true; }},
-        };
-
-        auto const fn = mapValue<std::string, std::function<bool()>>(option, std::move(handlers));
-        if(fn)
-        {
-            return fn();
-        }
-        else
-        {
-            return false;
-        }
-    };
-    std::for_each(usableArguments.begin(), usableArguments.end(), processor);
-
-    std::vector<std::vector<std::string>> derivedFilenames{};
-
-    auto const deriveOutputFilenames = [&config] (std::string const &aInputPath) -> std::vector<std::string>
-    {
-        std::vector<std::string> inputFilenames{};
-        std::vector<std::string> outputFilenames{};
-
-        bool const pathHasTrailingBackslash = ('/' == aInputPath.back());
-        if(pathHasTrailingBackslash)
-        {
-            // Trailing backslash detected.
-        }
-
-        return outputFilenames;
-    };
-    std::transform(config.inputPaths.begin(), config.inputPaths.end(), std::back_inserter(derivedFilenames), deriveOutputFilenames);
-
-    return { config };
-}
 
 #if defined SHIRABE_PLATFORM_WINDOWS
 int WINAPI WinMain(
@@ -684,7 +808,6 @@ int main(int aArgC, char **aArgV)
         return -1;
     }
 
-    ProcessArguments(aArgC, aArgV);
 
 
     std::string const inputPath  = aArgV[1];
@@ -717,6 +840,7 @@ int main(int aArgC, char **aArgV)
         // Then go for SPIRV-cross, perform reflection and generate headers
         // for all shaders.
         precompiler->initialize();
+        precompiler->processArguments(static_cast<uint32_t>(aArgC), aArgV);
         precompiler->run();
         precompiler->deinitialize();
         precompiler.reset();
