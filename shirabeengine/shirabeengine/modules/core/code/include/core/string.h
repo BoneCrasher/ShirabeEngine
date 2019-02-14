@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <sstream>
 #include <array>
+#include <vector>
 
 #include <base/declaration.h>
 
@@ -118,6 +119,15 @@ namespace engine
                          >::type
                 >
         static TData fromString(std::string const &aString);
+
+        /**
+         * @brief split
+         *
+         * @param aInput
+         * @param aDelimiter
+         * @return
+         */
+        static std::vector<std::string> split(std::string const &aInput, char const aDelimiter);
 
     private_static_functions:
         /**

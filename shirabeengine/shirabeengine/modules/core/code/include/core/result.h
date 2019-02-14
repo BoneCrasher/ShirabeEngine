@@ -281,6 +281,36 @@ namespace engine
     private_members:
         TResult mResult;
     };
+
+    /**
+     * Default Result implementation for bool data types.
+     */
+    template <typename TData>
+    class CResult
+            : public AResult<bool, TData>
+    {
+    public_constructors:
+        using AResult<bool, TData>::AResult;
+
+        /**
+         * Create a result from a data value.
+         *
+         * @param aData
+         */
+        SHIRABE_INLINE CResult(TData const &aData)
+            : AResult<bool, TData>(true, aData)
+        {}
+
+    public_operators:
+        using AResult<bool, TData>::operator=;
+
+    public_methods:
+        SHIRABE_INLINE bool successful() const
+        {
+            return (AResult<bool, TData>::result());
+        }
+    };
+
 }
 
 #endif // RESULT_H

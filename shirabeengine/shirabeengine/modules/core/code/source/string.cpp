@@ -1,4 +1,4 @@
-#include "core/string.h"
+﻿#include "core/string.h"
 
 namespace engine
 {
@@ -50,6 +50,24 @@ namespace engine
 
         std::string const narrowed = converter.to_bytes(aInput);
         return narrowed;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    std::vector<std::string> CString::split(std::string const &aInput, char const aDelimiter)
+    {
+        std::vector<std::string> tokens;
+        std::string              token;
+
+        std::istringstream tokenStream(aInput);
+        while (std::getline(tokenStream, token, aDelimiter))
+        {
+           tokens.push_back(token);
+        }
+
+        return tokens;
     }
     //<-----------------------------------------------------------------------------
 }
