@@ -492,7 +492,16 @@ public_methods:
 
     EResult run()
     {
+        // Determine config.
+        CResult<SShaderCompilationUnit> const unitGeneration = generateCompilationUnit(mConfig.inputPaths);
+        if(not unitGeneration.successful())
+        {
 
+        }
+
+        SShaderCompilationUnit const unit = unitGeneration.data();
+
+        // Invoke compiler.
 
         return EResult::Success;
     }
@@ -552,7 +561,7 @@ private_methods:
                             ? secondaryExtension
                             : primaryExtension;
         }
-        else(compiler, language);
+        else
         {
             // Invalid
             usage();
