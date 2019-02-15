@@ -23,7 +23,7 @@ namespace engine
      * strings to each other or format a string with a variadic number
      * of arguments.
      */
-    class CString
+    SHIRABE_LIBRARY_EXPORT class CString
     {
         public_static_functions:
         /**

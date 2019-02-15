@@ -152,6 +152,32 @@ void usage()
 {
     using namespace engine;
 
+    std::string const usageMessage =
+            "Usage:                                                                           \n"
+            "  ./shirabe_shader_precompiler <options>                                         \n"
+            "                                                                                 \n"
+            "Options:                                                                         \n"
+            "  --verbose                                                                      \n"
+            "      Values: true or false                                                      \n"
+            "      Effect: Enables verbose output while doing the job.                        \n"
+            "  --debug                                                                        \n"
+            "      Effect: Enable debug output.                                               \n"
+            "  --optimize                                                                     \n"
+            "      Effect: Optimize the shader.                                               \n"
+            "  --recursive_scan                                                               \n"
+            "      Effect: If any of the paths in the -i option is a directory, include       \n"
+            "              all subdirectories in the input file search.                       \n"
+            "  -o=<path>                                                                      \n"
+            "      Effect: Specifies the directory to save the compilation result to.         \n"
+            "  -i=<comma-separated list of file- and directory-paths>                         \n"
+            "      Effect: Specifies the list of files and directories to source from.        \n"
+            "                                                                                 \n"
+            " Example:                                                                        \n"
+            "   ./shirabe_shader_precompiler --verbose --debug -o=./spv_output -i=./spv_input \n"
+            "                                                                                 \n";
+
+    std::cout << usageMessage;
+
     ::exit(EnumValueOf(EResult::WrongUsage));
 }
 //<-----------------------------------------------------------------------------
@@ -371,18 +397,18 @@ public_methods:
 
             auto const extract = [&aArgument] () -> std::tuple<bool, std::string, std::string>
             {
-                std::string::size_type const separatorPosition = aArgument.find_first_of("=:");
-                if(std::string::npos == separatorPosition)
-                {
-                    return { false, std::string(), std::string() };
-                }
-                else
-                {
-                    std::string const option = aArgument.substr(0, separatorPosition);
-                    std::string const value  = aArgument.substr(separatorPosition + 1, std::string::npos);
+                std::string option = std::string();
+                std::string value  = std::string();
 
-                    return { true, option, value };
+                std::string::size_type const separatorPosition = aArgument.find_first_of("=:");
+                if(not (std::string::npos == separatorPosition))
+                {
+                    value = aArgument.substr(separatorPosition + 1, std::string::npos);
                 }
+
+                option = aArgument.substr(0, separatorPosition);
+
+                return { true, option, value };
             };
 
             auto const [valid, option, value] = extract();
@@ -433,6 +459,13 @@ public_methods:
             //
             auto const inputFilename = std::filesystem::path(aInputPath);
 
+            bool const exists = std::filesystem::exists(aInputPath);
+            if(not exists)
+            {
+                CLog::Debug(logTag(), CString::format("Path '%0' does not exist. Skipping.", aInputPath));
+                return {};
+            }
+
             bool const isDirectory = std::filesystem::is_directory(inputFilename);
             if(isDirectory)
             {
@@ -465,12 +498,20 @@ public_methods:
             }
             else
             {
+                CLog::Debug(logTag(), CString::format("Output path '%0' does not exist. Creating.", outputPath));
                 inputFilenames.push_back(aInputPath);
             }
 
             return inputFilenames;
         };
         std::transform(inputPaths.begin(), inputPaths.end(), std::back_inserter(derivedFilenames), deriveInputFilenames);
+
+        // Make sure the output config is correct.
+        bool const outputPathExists = std::filesystem::exists(outputPath);
+        if(not outputPathExists)
+        {
+            std::filesystem::create_directory(outputPath);
+        }
 
         SConfiguration config {};
         config.options    = options;
@@ -492,16 +533,20 @@ public_methods:
 
     EResult run()
     {
-        // Determine config.
+        // Determine compilation items and config.
         CResult<SShaderCompilationUnit> const unitGeneration = generateCompilationUnit(mConfig.inputPaths);
         if(not unitGeneration.successful())
         {
-
+            CLog::Error(logTag(), "Failed to derive shader compilation units and configuration");
+            return EResult::InputInvalid;
         }
 
         SShaderCompilationUnit const unit = unitGeneration.data();
 
-        // Invoke compiler.
+        // Invoke compiler
+
+
+        // Perform reflection and generate output file
 
         return EResult::Success;
     }
@@ -815,30 +860,6 @@ int main(int aArgC, char **aArgV)
     {
         usage();
         return -1;
-    }
-
-
-
-    std::string const inputPath  = aArgV[1];
-    std::string const outputPath = aArgV[2];
-
-    bool const inputPathExists  = std::filesystem::exists(inputPath);
-    bool const outputPathExists = std::filesystem::exists(outputPath);
-
-    if(not inputPathExists)
-    {
-        CLog::Error(Main::logTag(), "Input path not valid.");
-        return -2;
-    }
-
-    if(not outputPathExists)
-    {
-        bool const successfullyCreated = std::filesystem::create_directories(outputPath);
-        if(not successfullyCreated)
-        {
-            CLog::Error(Main::logTag(), "Cannot create output path.");
-            return -3;
-        }
     }
 
     try
