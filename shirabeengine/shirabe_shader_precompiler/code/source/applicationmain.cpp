@@ -296,6 +296,7 @@ private_structs:
     struct SShaderCompilationElement
     {
         std::string  fileName;
+        std::string  outputPath;
         std::string  contents;
         EShaderStage stage;
         char         padding[4]; // Explicit alignment padding.
@@ -573,7 +574,21 @@ public_methods:
         SShaderCompilationUnit const unit = unitGeneration.data();
 
         // Invoke compiler
-        std::string command = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
+        std::string application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
+        std::string options     = CString::format("-v -g -l -Od -C --target-env vulkan1.1 -V -o %0", unit.elements.at(0).outputPath);
+
+        std::string files       = {};
+
+        auto const append = [&] (SShaderCompilationElement const &aElement)
+        {
+            files.append(" ");
+            files.append(aElement.fileName);
+        };
+        std::for_each(unit.elements.begin(), unit.elements.end(), append);
+
+        std::string const command = CString::format("%0 %1 %2", application, options, files);
+
+        CLog::Debug(logTag(), CString::format("Command to be executed: %0", command));
 
         CResult<std::string> commandResult = executeCmd(command);
         if(not commandResult.successful())
@@ -846,11 +861,11 @@ private_methods:
             std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
             std::string const outputPath = std::filesystem::path(mConfig.outputPath) / outputName;
 
-            // TODO store output filename in element.
             SShaderCompilationElement element {};
-            element.fileName = aFilename;
-            element.contents = shaderString;
-            element.stage    = stage;
+            element.fileName   = aFilename;
+            element.contents   = shaderString;
+            element.stage      = stage;
+            element.outputPath = outputPath;
 
             return element;
         };

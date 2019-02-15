@@ -25,4 +25,7 @@ function(linkLibrary)
         spirv-cross-msl
         spirv-cross-reflect
         spirv-cross-util)
+
+    install(DIRECTORY ${DIR}/bin DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/tools/spirv-cross USE_SOURCE_PERMISSIONS)
+
 endfunction(linkLibrary)
