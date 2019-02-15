@@ -32,6 +32,31 @@ namespace Main
     SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
 }
 
+CResult<std::string> executeCmd(std::string const &aCommand)
+{
+    std::array<char, 128> buffer {};
+    std::string           result {};
+
+    std::string const cmd = aCommand + " 2>&1";
+
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+    if (nullptr == pipe)
+    {
+        CLog::Error(Main::logTag(), CString::format("Failed to open command pipe for command '%0'", cmd));
+        return { false };
+    }
+
+    while(not feof(pipe.get()))
+    {
+        if(nullptr != fgets(buffer.data(), buffer.size(), pipe.get()))
+        {
+            result.append(buffer.data());
+        }
+    }
+
+    return result;
+}
+
 /**
  * Describes error codes of the tool.
  */
@@ -42,6 +67,8 @@ enum class EResult
     NoInput,
     FileError,
     InputInvalid,
+    CompilationFailed,
+    LinkFailed
 };
 
 //<-----------------------------------------------------------------------------
@@ -271,6 +298,7 @@ private_structs:
         std::string  fileName;
         std::string  contents;
         EShaderStage stage;
+        char         padding[4]; // Explicit alignment padding.
 
     public_constructors:
         /**
@@ -545,7 +573,18 @@ public_methods:
         SShaderCompilationUnit const unit = unitGeneration.data();
 
         // Invoke compiler
+        std::string command = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
 
+        CResult<std::string> commandResult = executeCmd(command);
+        if(not commandResult.successful())
+        {
+            CLog::Error(logTag(), commandResult.data());
+            return EResult::CompilationFailed;
+        }
+        else
+        {
+            CLog::Debug(logTag(), commandResult.data());
+        }
 
         // Perform reflection and generate output file
 

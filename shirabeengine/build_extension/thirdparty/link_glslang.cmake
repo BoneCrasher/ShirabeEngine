@@ -25,4 +25,6 @@ function(linkLibrary)
         SPIRV
         SPVRemapper
         OSDependent)
+
+    install(DIRECTORY ${DIR}/bin DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/tools/glslang USE_SOURCE_PERMISSIONS)
 endfunction(linkLibrary)
