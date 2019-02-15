@@ -176,7 +176,7 @@ void usage()
             "   ./shirabe_shader_precompiler --verbose --debug -o=./spv_output -i=./spv_input \n"
             "                                                                                 \n";
 
-    std::cout << usageMessage;
+    CLog::Warning(Main::logTag(), usageMessage);
 
     ::exit(EnumValueOf(EResult::WrongUsage));
 }
@@ -510,7 +510,8 @@ public_methods:
         bool const outputPathExists = std::filesystem::exists(outputPath);
         if(not outputPathExists)
         {
-            std::filesystem::create_directory(outputPath);
+            std::filesystem::path const outputPathAbsolute = std::filesystem::current_path() / outputPath;
+            std::filesystem::create_directory(outputPathAbsolute);
         }
 
         SConfiguration config {};
@@ -577,20 +578,22 @@ private_methods:
         std::string primaryExtension   = std::string();
         std::string secondaryExtension = std::string();
 
-        size_t const primaryExtensionPosition   = aFileName.find_last_of(".");
-        size_t const secondaryExtensionPosition = aFileName.find_last_of(".", primaryExtensionPosition - 1);
+        std::string const filename = std::filesystem::path(aFileName).filename();
+
+        size_t const primaryExtensionPosition   = filename.find_last_of(".");
+        size_t const secondaryExtensionPosition = filename.find_last_of(".", primaryExtensionPosition - 1);
 
         bool const hasPrimaryExtension   = (std::string::npos != primaryExtensionPosition);
         bool const hasSecondaryExtension = (std::string::npos != secondaryExtensionPosition);
 
         if(hasPrimaryExtension)
         {
-            primaryExtension = aFileName.substr(primaryExtensionPosition + 1, std::string::npos);
+            primaryExtension = filename.substr(primaryExtensionPosition + 1, std::string::npos);
         }
 
         if(hasSecondaryExtension)
         {
-            secondaryExtension = aFileName.substr(secondaryExtensionPosition + 1, (primaryExtensionPosition - secondaryExtensionPosition - 1));
+            secondaryExtension = filename.substr(secondaryExtensionPosition + 1, (primaryExtensionPosition - secondaryExtensionPosition - 1));
         }
 
         bool const usesUnifiedExtension = anyOf({ "cg", "hlsl", "glsl", "xs" }, primaryExtension);
@@ -633,7 +636,7 @@ private_methods:
 
         if(EShadingLanguage::Unknown == language)
         {
-            usage();
+            CLog::Error(logTag(), CString::format("Invalid extension '%0'. Cannot derive language.", stageName));
             return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
         }
 
@@ -658,7 +661,7 @@ private_methods:
 
         if(EShaderStage::NotApplicable == stage)
         {
-            usage();
+            CLog::Error(logTag(), CString::format("Invalid file extension '%0'. Cannot map to stage.", stageName));
             return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
         }
 
@@ -727,7 +730,7 @@ private_methods:
 
         extension = mapValue<EShadingLanguage, std::string>(aLanguage, std::move(languageAssignment));
 
-        return CString::format("%0.%1", aFileBaseName, EnumValueOf(aStage));
+        return CString::format("%0.%1", aFileBaseName, extension);
     }
     //<-----------------------------------------------------------------------------
 
@@ -801,7 +804,7 @@ private_methods:
                 return {};
             }
 
-            std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).filename(), language, stage);
+            std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
             std::string const outputPath = std::filesystem::path(mConfig.outputPath) / outputName;
 
             // TODO store output filename in element.
