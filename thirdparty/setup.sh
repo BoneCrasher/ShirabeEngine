@@ -120,9 +120,9 @@ function setup_vulkan
 }
 
 #test_env
-#setup_base
-#setup_spirv_tools
-#setup_spirv_cross
-#setup_glslang
-#setup_tools
+setup_base
+setup_spirv_tools
+setup_spirv_cross
+setup_glslang
+setup_tools
 setup_vulkan
