@@ -107,12 +107,15 @@ function setup_tools
 
 function setup_vulkan
 {
-    mkdir vulkan_sdk
-
     local vulkan_sdk_tar_name="vulkan-sdk.tar.gz"
 
+    # Make sure 'tar' can extract
+    mkdir vulkan_sdk
+    # Download latest VK-SDK
     wget https://sdk.lunarg.com/sdk/download/latest/linux/${vulkan_sdk_tar_name}
+    # Extract
     tar -C vulkan_sdk -xvzf ${vulkan_sdk_tar_name}
+    # Rename to vulkan_sdk/version
     find vulkan_sdk/ -mindepth 1 -maxdepth 1 -type d | xargs -I {} mv {} vulkan_sdk/version
 }
 
