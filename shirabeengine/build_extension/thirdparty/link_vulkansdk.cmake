@@ -1,6 +1,6 @@
 function(linkLibrary)
     
-    set(DIR $ENV{VULKAN_SDK})
+    set(DIR ${THIRD_PARTY_DIR}/vulkan_sdk/version/x86_64)
     file(TO_CMAKE_PATH ${DIR} DIR)
 
     LogStatus(MESSAGES "Vulkan-Dir: ${DIR}")

@@ -19,4 +19,4 @@ buildOne ()
     cd ${THIS}
 }
 
-buildOne
+buildOne linux ${addressmode} ${configuration}

@@ -193,43 +193,60 @@ function build
 {
     local library 
     for library in "${LIBRARIES[@]}";
-    do
-        local buildscript="${BUILD_SCRIPTS_DIR}/build_${library}.sh"
+    do    
+        local dependency_name="DEPENDENCIES_${library}[@]"
+        local dependencies=${!dependency_name} #Indirect expansion
+        local librariesToBuild=( ${dependencies[@]} ${library} )
 
-        # Test for build script
-        if [ ! -f ${buildscript} ]; then
-            printf "Buildscript ${buildscript} for library '${library}' does not exist. Skipping.\n"
-            
-            continue
-        fi
-        
-        # Run build for each address mode and configuration
-        local addressmode 
-        for addressmode in "${ADDRESS_MODES[@]}"
+        for libraryToBuild in "${librariesToBuild[@]}";
         do
-        
-            local configuration 
-            for configuration in "${CONFIGURATIONS[@]}";
+
+            local buildscript="${BUILD_SCRIPTS_DIR}/build_${libraryToBuild}.sh"
+
+            # Test for build script
+            if [ ! -f ${buildscript} ]; then
+                printf "Buildscript ${buildscript} for library '${libraryToBuild}' does not exist. Skipping.\n"
+
+                continue
+            fi
+
+            # Run build for each address mode and configuration
+            local addressmode
+            for addressmode in "${ADDRESS_MODES[@]}"
             do
 
-                printf "Building ${library} as ${addressmode}/${configuration}"
+                local configuration
+                for configuration in "${CONFIGURATIONS[@]}";
+                do
 
-                local source_directory=${LIBRARY_SOURCE_DIR}/${library}
-                local build_directory=${BUILD_BASE_DIR}/${library}
-                local deploy_directory=${DEPLOY_BASE_DIR}/${library}/linux${addressmode}/${configuration}
+                    printf "/*--------------------------------------------------------------------*/\n"
+                    printf "/* Building ${libraryToBuild} as ${addressmode}/${configuration}      */\n"
+                    printf "/*--------------------------------------------------------------------*/\n"
+                    printf "                                                                        \n"
 
-                rm -rf ${build_directory}
-                mkdir -p ${build_directory}
+                    local source_directory=${LIBRARY_SOURCE_DIR}/${libraryToBuild}
+                    local build_directory=${BUILD_BASE_DIR}/${libraryToBuild}
+                    local deploy_directory=${DEPLOY_BASE_DIR}/${libraryToBuild}/linux${addressmode}/${configuration}
 
-                rm -rf ${deploy_directory}
-                mkdir -p ${deploy_directory}
+                    rm -rf ${build_directory}
+                    mkdir -p ${build_directory}
 
-                # Will inherit the current enclosing scopes and variables
-                source ${buildscript}
-                
-            done # foreach configuration
-        
-        done # foreach address mode
+                    rm -rf ${deploy_directory}
+                    mkdir -p ${deploy_directory}
+
+                    # Will inherit the current enclosing scopes and variables
+                    source ${buildscript}
+
+                    printf "/*--------------------------------------------------------------------*/\n"
+                    printf "/* Done building ${libraryToBuild} as ${addressmode}/${configuration} */\n"
+                    printf "/*--------------------------------------------------------------------*/\n"
+                    printf "                                                                        \n"
+
+                done # foreach configuration
+
+            done # foreach addressmode
+
+        done # foreach libraryToBuild
         
     done # foreach library
 }
@@ -241,8 +258,12 @@ function build
 
 test_env ${LIBRARY_SOURCE_DIR}
 
-printf "Autodetecting available libraries in ${LIBRARY_SOURCE_DIR}\n"
-LIBRARIES=( $( cd ${LIBRARY_SOURCE_DIR} && ls -d */ | sed 's/\/$//' ) )
+if [ -f define_libraries.sh ]; then
+    source define_libraries.sh
+else
+    printf "Autodetecting available libraries in ${LIBRARY_SOURCE_DIR}\n"
+    # LIBRARIES=( $( cd ${LIBRARY_SOURCE_DIR} && ls -d */ | sed 's/\/$//' ) )
+fi
 
 read_arguments $@
 
