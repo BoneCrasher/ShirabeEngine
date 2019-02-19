@@ -12,7 +12,9 @@ REPOSITORIES[glslang]="git@github.com:KhronosGroup/glslang.git"
 REPOSITORIES[spirv_cross]="git@github.com:KhronosGroup/SPIRV-Cross.git"
 REPOSITORIES[spirv_tools]="git@github.com:KhronosGroup/SPIRV-Tools.git"
 REPOSITORIES[spirv_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
-REPOSITORIES[vulkan]="git@github.com:KhronosGroup/Vulkan-LoaderAndValidationLayers.git"
+REPOSITORIES[vulkan]="git@github.com:KhronosGroup/Vulkan-Loader.git"
+REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
+REPOSITORIES[vulkan_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
 REPOSITORIES[spirv_effcee]="git@github.com:google/effcee.git"
 REPOSITORIES[spirv_re2]="git@github.com:google/re2.git"
 REPOSITORIES[spirv_gtest]="git@github.com:google/googletest.git"
@@ -28,13 +30,15 @@ declare -A TARGET_DIRECTORIES
 TARGET_DIRECTORIES[zlib]="${SOURCES_DIR}/zlib"
 TARGET_DIRECTORIES[gtest]="${SOURCES_DIR}/googletest"
 TARGET_DIRECTORIES[glslang]="${SOURCES_DIR}/glslang"
-TARGET_DIRECTORIES[spirv_cross]="${SOURCES_DIR}/SPIRV-Cross"
-TARGET_DIRECTORIES[spirv_tools]="${SOURCES_DIR}/SPIRV-Tools"
-TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/SPIRV-Tools/external/spirv-headers"
+TARGET_DIRECTORIES[spirv_cross]="${SOURCES_DIR}/spirv_cross"
+TARGET_DIRECTORIES[spirv_tools]="${SOURCES_DIR}/spirv_tools"
+TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/spirv_tools/external/spirv-headers"
+TARGET_DIRECTORIES[spirv_effcee]="${SOURCES_DIR}/spirv_tools/external/effcee"
+TARGET_DIRECTORIES[spirv_re2]="${SOURCES_DIR}/spirv_tools/external/re2"
+TARGET_DIRECTORIES[spirv_gtest]="${SOURCES_DIR}/spirv_tools/external/googletest"
 TARGET_DIRECTORIES[vulkan]="${SOURCES_DIR}/vulkan_sdk"
-TARGET_DIRECTORIES[spirv_effcee]="${SOURCES_DIR}/SPIRV-Tools/external/effcee"
-TARGET_DIRECTORIES[spirv_re2]="${SOURCES_DIR}/SPIRV-Tools/external/re2"
-TARGET_DIRECTORIES[spirv_gtest]="${SOURCES_DIR}/SPIRV-Tools/external/googletest"
+TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
+TARGET_DIRECTORIES[vulkan_validation_layers]="${SOURCES_DIR}/vulkan_sdk_validation_layers"
 
 TARGET_DIRECTORIES[libxml2]="${SOURCES_DIR}/libxml2"
 TARGET_DIRECTORIES[libxslt]="${SOURCES_DIR}/libxslt"
@@ -45,10 +49,10 @@ TARGET_DIRECTORIES[assimp]="${SOURCES_DIR}/assimp"
 
 CAN_FETCH_BUILD_TOOLS=0
 
-function clean_env
+function clean
 {
-    if [ -d ${SOURCES_DIR} ]; then
-        rm -rf ${SOURCES_DIR}
+    if [ -d ${1} ]; then
+        rm -rf ${1}
     fi
 }
 
@@ -81,12 +85,30 @@ function setup_one
     printf "Setting up repository ${1}\n"
 
     local key=${1}
+
+    clean ${key}
+
     local repo="${REPOSITORIES[${key}]}"
     local directory="${TARGET_DIRECTORIES[${key}]}"
 
     printf "Command: git clone ${repo} ${directory}\n"
 
     git clone ${repo} ${directory}
+}
+
+function update_one
+{
+    printf "Updating repository ${1}\n"
+
+    local key=${1}
+
+    if [ ! -d ${key} ]; then
+        printf "Directory ${key} does not exist.\n"
+    else
+        cd ${key}
+        git pull ${key}
+        cd ..
+    fi
 }
 
 function setup_base
@@ -144,14 +166,33 @@ function setup_vulkan
     # # Move to deploy, as it will be expected to be there linking
     # mv vulkan_sdk _deploy
 
+    setup_one vulkan_headers
     setup_one vulkan
+    setup_one vulkan_validation_layers
 }
 
+# Check, whether we should update.
+if [ ! -z ${1} ]; then
+    if [ "${1}" = "--update" ]; then
+        source ${THIS}/define_libraries.sh
+
+        local library
+        for library in "${LIBRARIES[@]}";
+        do
+
+            update_one ${library}
+
+        done
+
+        exit 1
+    fi
+fi
+
 test_env
-# clean_env
-# setup_base
-# setup_spirv_tools
-# setup_spirv_cross
-# setup_glslang
-# setup_tools
+clean_env
+setup_base
+setup_spirv_tools
+setup_spirv_cross
+setup_glslang
+setup_tools
 setup_vulkan

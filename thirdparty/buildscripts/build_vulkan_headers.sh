@@ -7,15 +7,16 @@ buildOne ()
     export CFLAGS="-m${addressmode}"
     export CXXFLAGS="-m${addressmode}"
 
+    export ASFLAGS=--${addressmode}
+
     cd ${build_directory}
 
-    echo "${CFLAGS} ${CXXFLAGS}"
-
-    cmake                                            \
-        -DCMAKE_INSTALL_PREFIX="${deploy_directory}" \
-        -DCMAKE_BUILD_TYPE=${configuration}          \
-        -DASSIMP_ANDROID_JNIIOSYSTEM=OFF             \
+    cmake                                                  \
+        -DCMAKE_INSTALL_PREFIX="${deploy_directory}"       \
+        -DCMAKE_BUILD_TYPE=${configuration}                \
         ${source_directory}
+
+    # cmake -LA | awk '{if(f)print} /-- Cache values/{f=1}'
 
     cmake --build . -- -j12
     cmake --build . --target install

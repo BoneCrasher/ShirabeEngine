@@ -31,6 +31,10 @@ buildOne ()
     make -j12
     make install
 
+    # Make sure to reset exported variables
+    export CFLAGS=
+    export CXXFLAGS=
+
     cd ${THIS}
 }
 

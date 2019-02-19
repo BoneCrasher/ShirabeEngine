@@ -21,6 +21,8 @@ LIBRARIES=()
 ADDRESS_MODES=( 32 64 )
 CONFIGURATIONS=( debug release )
 
+ALREADY_BUILT_LIBS=()
+
 #---------------------------------------------------------------------
 # Print usage
 #---------------------------------------------------------------------
@@ -73,15 +75,21 @@ function test_env
 #---------------------------------------------------------------------
 function has_element
 {
+    local search=${1}; shift
+    local array=( "${@}" )
+
     local element_test
-    for element_test in "${1}"; 
+    for element_test in "${array[@]}";
     do
-        if [ "${element_test}" = "${2}" ]; then
-            return 1
+        printf "Testing against ${element_test} \n"
+
+        if [ "${element_test}" = "${search}" ]; then
+            printf "${search} contained in ${array[*]}.\n"
+            return 0
         fi
     done
     
-    return 0
+    return 1
 }
 #---------------------------------------------------------------------
 
@@ -136,7 +144,7 @@ function read_arguments
                 local library
                 for library in "${libraries_requested[@]}";
                 do
-                    if ! has_element ${LIBRARIES[@]} ${library}; then
+                    if ! has_element ${library} ${LIBRARIES[@]}; then
                         printf "Error: Libary ${library} not available in sources directory.\n"
                     fi
                 done
@@ -151,8 +159,8 @@ function read_arguments
                 local mode
                 for mode in "${modes_requested[@]}";
                 do
-                    if ! has_element ${ADDRESS_MODES[@]} ${modes_requested}; then                
-                            printf "Error: Address mode ${modes_requested} not supported.\n"
+                    if ! has_element ${mode} ${ADDRESS_MODES[@]}; then
+                            printf "Error: Address mode ${mode} not supported.\n"
                     fi
                 done
                 
@@ -166,8 +174,8 @@ function read_arguments
                 local config
                 for config in "${configs_requested[@]}";
                 do
-                    if ! has_element ${CONFIGURATIONS[@]} ${configs_requested}; then                
-                            printf "Error: Configuration ${configs_requested} not supported.\n"
+                    if ! has_element ${config} ${CONFIGURATIONS[@]}; then
+                            printf "Error: Configuration ${config} not supported.\n"
                     fi
                 done
                 
@@ -197,11 +205,11 @@ function build
         local dependency_name="DEPENDENCIES_${library}[@]"
         local librariesToBuild=
 
-        if [[ -z "${dependency_name}" ]]; then
+        if [ ! -z ${!dependency_name-} ]; then
             local dependencies=${!dependency_name} #Indirect expansion
-            librariesToBuild=(  ${library} )
-        else
             librariesToBuild=( ${dependencies[@]} ${library} )
+        else
+            librariesToBuild=( ${library} )
         fi
 
         for libraryToBuild in "${librariesToBuild[@]}";
@@ -224,6 +232,15 @@ function build
                 local configuration
                 for configuration in "${CONFIGURATIONS[@]}";
                 do
+                    if [ ${#ALREADY_BUILT_LIBS[@]} -ne 0 ]; then
+
+                        printf "Checking whether library ${libraryToBuild}_${addressmode}_${configuration} was compiled already.\n"
+
+                        if has_element ${libraryToBuild}_${addressmode}_${configuration} ${ALREADY_BUILT_LIBS[@]}; then
+                            printf "Library ${libraryToBuild}_${addressmode}_${configuration} already compiled. Skipping\n"
+                            continue
+                        fi
+                    fi
 
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "/* Building ${libraryToBuild} as ${addressmode}/${configuration}      */\n"
@@ -242,6 +259,8 @@ function build
 
                     # Will inherit the current enclosing scopes and variables
                     source ${buildscript}
+
+                    ALREADY_BUILT_LIBS=( ${ALREADY_BUILT_LIBS[@]} ${libraryToBuild}_${addressmode}_${configuration} )
 
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "/* Done building ${libraryToBuild} as ${addressmode}/${configuration} */\n"
