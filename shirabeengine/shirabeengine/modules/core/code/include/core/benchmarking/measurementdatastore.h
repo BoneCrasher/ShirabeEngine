@@ -214,7 +214,7 @@ namespace engine
             /* At least two chunks required to calc averageerage */
             if (mChunks.size() >= 2)
             {
-                off = std::max(0ul,                   off);
+                off = std::max(StorageSizeType_t(0),  off);
                 off = std::min((mChunks.size() - 1u), off);
                 len = std::min((mChunks.size() - off - 1), len);
 

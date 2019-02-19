@@ -70,57 +70,57 @@ namespace Test
         public:
             static CStdSharedPtr_t<IFrameGraphRenderContext> fromRenderer(CStdSharedPtr_t<IRenderContext> renderer);
 
-            EEngineStatus importTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> importTexture(SFrameGraphTexture const &aTexture);
 
-            EEngineStatus createTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> createTexture(SFrameGraphTexture const &aTexture);
 
-            EEngineStatus createTextureView(
+            CEngineResult<> createTextureView(
                     SFrameGraphTexture      const &aTexture,
                     SFrameGraphTextureView  const &aView);
 
-            EEngineStatus createBuffer(
+            CEngineResult<> createBuffer(
                     FrameGraphResourceId_t const &aResourceId,
                     SFrameGraphResource    const &aResource,
                     SFrameGraphBuffer      const &aBuffer);
 
-            EEngineStatus createBufferView(
+            CEngineResult<> createBufferView(
                     FrameGraphResourceId_t const &aResourceId,
                     SFrameGraphResource    const &aResource,
                     SFrameGraphBufferView  const &aView);
 
-            EEngineStatus loadTextureAsset(AssetId_t const &aAssetId);
+            CEngineResult<> loadTextureAsset(AssetId_t const &aAssetId);
 
-            EEngineStatus loadBufferAsset(AssetId_t const &aAssetId);
+            CEngineResult<> loadBufferAsset(AssetId_t const &aAssetId);
 
-            EEngineStatus loadMeshAsset(AssetId_t const &aAssetId);
+            CEngineResult<> loadMeshAsset(AssetId_t const &aAssetId);
 
-            EEngineStatus bindTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> bindTextureView(SFrameGraphTextureView const &aView);
 
-            EEngineStatus bindBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> bindBufferView(FrameGraphResourceId_t const &aResourceId);
 
-            EEngineStatus bindMesh(AssetId_t const &aMesh);
+            CEngineResult<> bindMesh(AssetId_t const &aMesh);
 
-            EEngineStatus unbindTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> unbindTextureView(SFrameGraphTextureView const &aView);
 
-            EEngineStatus unbindBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> unbindBufferView(FrameGraphResourceId_t const &aResourceId);
 
-            EEngineStatus unbindMesh(AssetId_t const &aAssetId);
+            CEngineResult<> unbindMesh(AssetId_t const &aAssetId);
 
-            EEngineStatus unloadTextureAsset(AssetId_t const &aAssetId);
+            CEngineResult<> unloadTextureAsset(AssetId_t const &aAssetId);
 
-            EEngineStatus unloadBufferAsset(AssetId_t const &aAssetId);
+            CEngineResult<> unloadBufferAsset(AssetId_t const &aAssetId);
 
-            EEngineStatus unloadMeshAsset(AssetId_t  const &aAssetId);
+            CEngineResult<> unloadMeshAsset(AssetId_t  const &aAssetId);
 
-            EEngineStatus destroyTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> destroyTexture(SFrameGraphTexture const &aTexture);
 
-            EEngineStatus destroyTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> destroyTextureView(SFrameGraphTextureView const &aView);
 
-            EEngineStatus destroyBuffer(FrameGraphResourceId_t      const &aResourceId);
+            CEngineResult<> destroyBuffer(FrameGraphResourceId_t      const &aResourceId);
 
-            EEngineStatus destroyBufferView(FrameGraphResourceId_t  const &aResourceId);
+            CEngineResult<> destroyBufferView(FrameGraphResourceId_t  const &aResourceId);
 
-            EEngineStatus render(SRenderable const&renderable);
+            CEngineResult<> render(SRenderable const&renderable);
 
         private:
             CMockFrameGraphRenderContext(CStdSharedPtr_t<IRenderContext> aRenderer);
@@ -158,9 +158,9 @@ namespace Test
             SHIRABE_DECLARE_LOG_TAG(CMockGFXAPIResourceTaskBackend)
 
         public_methods:
-            EEngineStatus initialize();
+            CEngineResult<> initialize();
 
-            EEngineStatus deinitialize();
+            CEngineResult<> deinitialize();
 
             SHIRABE_DECLARE_MOCK_TASK_BUILDER_MODULE(Texture)
             SHIRABE_DECLARE_MOCK_TASK_BUILDER_MODULE(TextureView)

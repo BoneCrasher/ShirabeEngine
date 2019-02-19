@@ -17,8 +17,9 @@ set(
         SHIRABEMODULEPLATFORM
         STBI                    
         FXGLTF                  
-        JSON                    
-        XML2)
+        JSON
+        XML2
+        ZLIB)
 
 include(project_setup)
 

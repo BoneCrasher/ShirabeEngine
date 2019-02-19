@@ -1,20 +1,8 @@
 function(linkLibrary)
     
-    set(DIR ${THIRD_PARTY_DIR}/vulkan_sdk/version/x86_64)
+    set(DIR ${THIRD_PARTY_DIR}/_deploy/vulkan_sdk/${SHIRABE_PLATFORM_PREFIX}${SHIRABE_PLATFORM_ADDRESS_SIZE}/${SHIRABE_PLATFORM_CONFIG})
     file(TO_CMAKE_PATH ${DIR} DIR)
 
-    LogStatus(MESSAGES "Vulkan-Dir: ${DIR}")
-
-    set(LIB_SUFFIX)
-    if(SHIRABE_DEBUG)
-            set(LIB_SUFFIX)
-    endif()
-
-    set(ADDRESS_SUFFIX)
-    if(NOT SHIRABE_ADDRESSMODEL_64BIT)
-            set(ADDRESS_SUFFIX 32)
-    endif()
-	
     # -I
     append_parentscope(
         SHIRABE_PROJECT_INCLUDEPATH

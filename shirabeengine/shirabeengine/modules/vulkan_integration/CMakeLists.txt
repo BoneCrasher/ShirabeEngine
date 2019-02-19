@@ -21,7 +21,8 @@ set(
         VULKANSDK
         XLIB
         JSON
-        XML2)
+        XML2
+        ZLIB)
 
 include(project_setup)
 

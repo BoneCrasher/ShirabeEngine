@@ -23,7 +23,7 @@ function(linkLibrary)
 			)
 	else()
 		append_parentscope(
-			SHIRABE_PROJECT_LIBRARY_TARGETS
+                        SHIRABE_PROJECT_LIBRARY_TARGETS
 			xml2
 			)
 	endif()

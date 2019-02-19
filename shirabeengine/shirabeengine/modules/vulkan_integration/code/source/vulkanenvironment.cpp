@@ -263,7 +263,7 @@ namespace engine
                 throw CVulkanError("Cannot load vulkan extension function 'vkCreateDebugReportCallbackEXT'", VkResult::VK_ERROR_INITIALIZATION_FAILED);
             }
 
-            VkDebugReportCallbackEXT vkDebugReportCallback = nullptr;
+            VkDebugReportCallbackEXT vkDebugReportCallback = 0;
             result = vkCreateDebugReportCallbackEXT(instance, &vkDebugReportCallbackCreateInfo, nullptr, &vkDebugReportCallback);
             if(VkResult::VK_SUCCESS != result)
             {

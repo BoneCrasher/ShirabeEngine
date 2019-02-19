@@ -31,17 +31,17 @@ set(
         Serialization/XMLObjectSerializer.cpp)
 
 set(
-	SHIRABE_EMBED_MODULE_NAMES
-		os
-		core
-		log
-		math 
-		utility
-		wsi
-		resources
-		rendering
-		graphicsapi
-		vulkan
+    SHIRABE_EMBED_MODULE_NAMES
+        os
+        core
+        log
+        math
+        utility
+        wsi
+        resources
+        rendering
+        graphicsapi
+        vulkan
         asset)
 
 set(

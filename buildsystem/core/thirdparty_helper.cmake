@@ -215,6 +215,8 @@ function(link)
                 version)
     elseif(UNIX AND NOT APPLE)
         linkLinuxOSEnvironment(
+            OS_LIBRARY_DIRECTORIES
+                /usr/lib
             OS_LIBRARY_LINK_TARGETS
                 stdc++_pic
                 dl)

@@ -1,8 +1,4 @@
 function(linkLibrary)
-    
-    LogStatus(MESSAGES
-        ${SHIRABE_ADDRESSMODEL_64BIT}
-        ${SHIRABE_PLATFORM_CONFIG})
 
     set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine)
 

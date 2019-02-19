@@ -1,8 +1,4 @@
 function(linkLibrary)
-    
-    LogStatus(MESSAGES
-        ${SHIRABE_ADDRESSMODEL_64BIT}
-        ${SHIRABE_PLATFORM_CONFIG})
 
     set(BINARY_NAME wsi)
     set(LINK_STATIC OFF)

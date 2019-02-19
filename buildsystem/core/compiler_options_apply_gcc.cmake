@@ -40,7 +40,7 @@ set(
 
 # Make sure the compiler uses the correct address model
 if(SHIRABE_PROJECT_CROSS_BUILD_ARMHF)
-    append(SHIRABE_GCC_CL_COMMON_FLAGS "-marm")
+    #append(SHIRABE_GCC_CL_COMMON_FLAGS "-marm")
 elseif(SHIRABE_ADDRESSMODEL_64BIT)
     append(SHIRABE_GCC_CL_COMMON_FLAGS "-m64")
 else()

@@ -12,7 +12,8 @@ set(
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
         JSON                 
-        XML2)
+        XML2
+        ZLIB)
 
 include(project_setup)
 

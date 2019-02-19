@@ -9,7 +9,8 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEPLATFORM
         JSON                 
-        XML2)
+        XML2
+        ZLIB)
         
 include(project_setup)
 
