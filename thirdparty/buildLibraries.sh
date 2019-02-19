@@ -195,8 +195,14 @@ function build
     for library in "${LIBRARIES[@]}";
     do    
         local dependency_name="DEPENDENCIES_${library}[@]"
-        local dependencies=${!dependency_name} #Indirect expansion
-        local librariesToBuild=( ${dependencies[@]} ${library} )
+        local librariesToBuild=
+
+        if [[ -z "${dependency_name}" ]]; then
+            local dependencies=${!dependency_name} #Indirect expansion
+            librariesToBuild=(  ${library} )
+        else
+            librariesToBuild=( ${dependencies[@]} ${library} )
+        fi
 
         for libraryToBuild in "${librariesToBuild[@]}";
         do

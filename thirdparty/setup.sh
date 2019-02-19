@@ -12,6 +12,7 @@ REPOSITORIES[glslang]="git@github.com:KhronosGroup/glslang.git"
 REPOSITORIES[spirv_cross]="git@github.com:KhronosGroup/SPIRV-Cross.git"
 REPOSITORIES[spirv_tools]="git@github.com:KhronosGroup/SPIRV-Tools.git"
 REPOSITORIES[spirv_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
+REPOSITORIES[vulkan]="git@github.com:KhronosGroup/Vulkan-LoaderAndValidationLayers.git"
 REPOSITORIES[spirv_effcee]="git@github.com:google/effcee.git"
 REPOSITORIES[spirv_re2]="git@github.com:google/re2.git"
 REPOSITORIES[spirv_gtest]="git@github.com:google/googletest.git"
@@ -30,6 +31,7 @@ TARGET_DIRECTORIES[glslang]="${SOURCES_DIR}/glslang"
 TARGET_DIRECTORIES[spirv_cross]="${SOURCES_DIR}/SPIRV-Cross"
 TARGET_DIRECTORIES[spirv_tools]="${SOURCES_DIR}/SPIRV-Tools"
 TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/SPIRV-Tools/external/spirv-headers"
+TARGET_DIRECTORIES[vulkan]="${SOURCES_DIR}/vulkan_sdk"
 TARGET_DIRECTORIES[spirv_effcee]="${SOURCES_DIR}/SPIRV-Tools/external/effcee"
 TARGET_DIRECTORIES[spirv_re2]="${SOURCES_DIR}/SPIRV-Tools/external/re2"
 TARGET_DIRECTORIES[spirv_gtest]="${SOURCES_DIR}/SPIRV-Tools/external/googletest"
@@ -127,27 +129,29 @@ function setup_tools
 
 function setup_vulkan
 {
-    local vulkan_sdk_tar_name="vulkan-sdk.tar.gz"
+    # local vulkan_sdk_tar_name="vulkan-sdk.tar.gz"
+    #
+    # # Make sure 'tar' can extract
+    # mkdir vulkan_sdk
+    # mkdir _deploy
+    #
+    # # Download latest VK-SDK
+    # wget https://sdk.lunarg.com/sdk/download/latest/linux/${vulkan_sdk_tar_name}
+    # # Extract
+    # tar -C vulkan_sdk -xvzf ${vulkan_sdk_tar_name}
+    # # Rename to vulkan_sdk/version
+    # find vulkan_sdk/ -mindepth 1 -maxdepth 1 -type d | xargs -I {} mv {} vulkan_sdk/version
+    # # Move to deploy, as it will be expected to be there linking
+    # mv vulkan_sdk _deploy
 
-    # Make sure 'tar' can extract
-    mkdir vulkan_sdk
-    mkdir _deploy
-
-    # Download latest VK-SDK
-    wget https://sdk.lunarg.com/sdk/download/latest/linux/${vulkan_sdk_tar_name}
-    # Extract
-    tar -C vulkan_sdk -xvzf ${vulkan_sdk_tar_name}
-    # Rename to vulkan_sdk/version
-    find vulkan_sdk/ -mindepth 1 -maxdepth 1 -type d | xargs -I {} mv {} vulkan_sdk/version
-    # Move to deploy, as it will be expected to be there linking
-    mv vulkan_sdk _deploy/vulkan_sdk
+    setup_one vulkan
 }
 
 test_env
-clean_env
-setup_base
-setup_spirv_tools
-setup_spirv_cross
-setup_glslang
-setup_tools
+# clean_env
+# setup_base
+# setup_spirv_tools
+# setup_spirv_cross
+# setup_glslang
+# setup_tools
 setup_vulkan

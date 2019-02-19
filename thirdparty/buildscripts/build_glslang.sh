@@ -5,6 +5,7 @@ THIS=`pwd -P`
 buildOne ()
 {
     export CFLAGS="-m${addressmode}"
+    export CXXFLAGS="-m${addressmode}"
 
     cd ${build_directory}
 

@@ -4,9 +4,9 @@ THIS=`pwd -P`
 
 buildOne ()
 {
-    mkdir ${deploy_directory}/include
+    mkdir -p ${deploy_directory}/include/stb
 
-    cp -v ${source_directory}/*.h ${deploy_directory}/include/
+    cp -v ${source_directory}/*.h ${deploy_directory}/include/stb
 }
 
 buildOne linux ${addressmode} ${configuration}
