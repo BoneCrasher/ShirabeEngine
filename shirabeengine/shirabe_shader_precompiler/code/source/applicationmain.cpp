@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <iterator>
 #include <filesystem>
 #include <cstring>
 #include <cstdlib>
@@ -12,6 +13,8 @@
 #include <memory>
 #include <thread>
 #include <functional>
+
+#include <spirv_cross/spirv_cross.hpp>
 
 #include <log/log.h>
 #include <core/string.h>
@@ -162,6 +165,39 @@ static std::string readFile(std::string const &aFileName)
 
     std::string inputData((std::istreambuf_iterator<char>(inputFileStream)),
                            std::istreambuf_iterator<char>());
+
+    return inputData;
+}
+
+//<-----------------------------------------------------------------------------
+
+//<-----------------------------------------------------------------------------
+//<
+//<-----------------------------------------------------------------------------
+
+/**
+ * Read a file into a string.
+ *
+ * @param aFileName Filename of the file to read.
+ * @return          See brief.
+ */
+static std::vector<uint32_t> const readSpirVFile(std::string const &aFileName)
+{
+    bool const fileExists = std::filesystem::exists(aFileName);
+    if(not fileExists)
+    {
+        return {};
+    }
+
+    std::ifstream inputFileStream(aFileName);
+    bool const inputStreamOk = inputFileStream.operator bool();
+    if(not inputStreamOk)
+    {
+        return {};
+    }
+
+    std::vector<uint32_t> const inputData((std::istream_iterator<uint32_t>(inputFileStream)),
+                                           std::istream_iterator<uint32_t>());
 
     return inputData;
 }
@@ -561,6 +597,133 @@ public_methods:
         return EResult::Success;
     }
 
+    /**
+     * Format a valid glslangValidator command line and invoke the command to create a .spv module reading its stdout/stderr output.
+     *
+     * @param aUnit Source data information for the glslangValidator command.
+     * @return      EResult::Success           if successful.
+     * @return      EResult::CompilationFailed on error.
+     */
+    EResult runGlslang(SShaderCompilationUnit const &aUnit)
+    {
+        std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
+        std::string const options     = "-v -g -l -Od -C --target-env vulkan1.1 -V ";
+
+        std::underlying_type_t<EResult> result = 0;
+
+        auto const compile = [&] (SShaderCompilationElement const &aElement) -> void
+        {
+            std::string const outputFiles = aElement.outputPath;
+            std::string const inputFiles  = aElement.fileName;
+
+            std::string          const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFiles, inputFiles);
+            CResult<std::string> const commandResult = executeCmd(command);
+            if(not commandResult.successful())
+            {
+                CLog::Error(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::CompilationFailed);
+            }
+            else
+            {
+                CLog::Debug(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::Success);
+            }
+        };
+        std::for_each(aUnit.elements.begin(), aUnit.elements.end(), compile);
+
+        return static_cast<EResult>(result);
+    }
+
+    /**
+     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
+     *
+     * @param aUnit Source data information for the glslangValidator command.
+     * @return      EResult::Success      if successful.
+     * @return      EResult::InputInvalid on error.
+     */
+    EResult runSpirVDisassembler(SShaderCompilationUnit const &aUnit)
+    {
+        std::string const application = CString::format("%0/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path());
+        std::string const options     = "";
+
+        std::underlying_type_t<EResult> result = 0;
+
+        auto const disassemble = [&] (SShaderCompilationElement const &aElement) -> void
+        {
+            std::string const outputFiles = aElement.outputPath;
+            std::string const inputFiles  = aElement.outputPath;
+
+            std::string          const command       = CString::format("%0 %1 -o %2.dis %3", application, options, outputFiles, inputFiles);
+            CResult<std::string> const commandResult = executeCmd(command);
+            if(not commandResult.successful())
+            {
+                CLog::Error(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::InputInvalid);
+            }
+            else
+            {
+                CLog::Debug(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::Success);
+            }
+        };
+        std::for_each(aUnit.elements.begin(), aUnit.elements.end(), disassemble);
+
+        return static_cast<EResult>(result);
+    }
+
+    /**
+     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
+     *
+     * @param aUnit Source data information for the glslangValidator command.
+     * @return      EResult::Success      if successful.
+     * @return      EResult::InputInvalid on error.
+     */
+    EResult invokeSpirVCross(SShaderCompilationUnit const &aUnit)
+    {
+        // std::string           const inputFilename = aUnit.elements.at(0).outputPath;
+        // std::vector<uint32_t> const spirvSource   = readSpirVFile(inputFilename);
+        //
+        // spirv_cross::Compiler compiler(std::move(spirvSource));
+        //
+        // spirv_cross::ShaderResources const resources = compiler.get_shader_resources();
+
+        // Read Stage Inputs
+//         for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
+//         {
+//             spv::Decor
+//         }
+// separate_samplers
+// separate_images
+// subpass_inputs
+
+       // // Read UBO
+       // for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
+       // {
+       //     uint32_t set     = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
+       //     uint32_t binding = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
+       // }
+       //
+       // // Read Textures
+       // for (spirv_cross::Resource const &sampledImage : resources.sampled_images)
+       // {
+       //     uint32_t set     = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
+       //     uint32_t binding = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
+       // }
+       //
+       // for (const Resource &resource : res.subpass_inputs)
+       // {
+       //     unsigned attachment_index = comp.get_decoration(resource.id, spv::DecorationInputAttachmentIndex);
+       // }
+       //
+       // return EResult::Success;
+    }
+
+    /**
+     * Run the shader precompiler on the identified input items.
+     *
+     * @return EResult::Success      if successful.
+     * @return EResult::InputInvalid on error.
+     */
     EResult run()
     {
         // Determine compilation items and config.
@@ -573,35 +736,9 @@ public_methods:
 
         SShaderCompilationUnit const unit = unitGeneration.data();
 
-        // Invoke compiler
-        std::string application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
-        std::string options     = CString::format("-v -g -l -Od -C --target-env vulkan1.1 -V -o %0", unit.elements.at(0).outputPath);
-
-        std::string files       = {};
-
-        auto const append = [&] (SShaderCompilationElement const &aElement)
-        {
-            files.append(" ");
-            files.append(aElement.fileName);
-        };
-        std::for_each(unit.elements.begin(), unit.elements.end(), append);
-
-        std::string const command = CString::format("%0 %1 %2", application, options, files);
-
-        CLog::Debug(logTag(), CString::format("Command to be executed: %0", command));
-
-        CResult<std::string> commandResult = executeCmd(command);
-        if(not commandResult.successful())
-        {
-            CLog::Error(logTag(), commandResult.data());
-            return EResult::CompilationFailed;
-        }
-        else
-        {
-            CLog::Debug(logTag(), commandResult.data());
-        }
-
-        // Perform reflection and generate output file
+        EResult const glslangResult    = runGlslang(unit);
+        EResult const spirvDisResult   = runSpirVDisassembler(unit);
+        EResult const spirvCrossResult = invokeSpirVCross(unit);
 
         return EResult::Success;
     }
@@ -773,12 +910,15 @@ private_methods:
             { EShaderStage::NotApplicable           , "unknown"     },
         };
 
-        static std::unordered_map<EShadingLanguage, std::string> languageAssignment  =
+        std::string const hlslStage = mapValue<EShaderStage, std::string>(aStage, std::move(hlslStageAssignment));
+        std::string const glslStage = mapValue<EShaderStage, std::string>(aStage, std::move(glslStageAssignment));
+
+        std::unordered_map<EShadingLanguage, std::string> languageAssignment  =
         {
             { EShadingLanguage::CGLanguage, "cg.spv"  },
             { EShadingLanguage::XShade,     "xs.spv"  },
-            { EShadingLanguage::GLSL,       mapValue<EShaderStage, std::string>(aStage, std::move(glslStageAssignment)) },
-            { EShadingLanguage::HLSL,       mapValue<EShaderStage, std::string>(aStage, std::move(hlslStageAssignment)) },
+            { EShadingLanguage::GLSL,       glslStage },
+            { EShadingLanguage::HLSL,       hlslStage },
             { EShadingLanguage::Unknown,    "unknown" }
         };
 
