@@ -10,8 +10,12 @@ LIBRARIES=(                             \
            stb                          \
            assimp                       \
            glslang                      \
-           spirv_tools                  \
            spirv_cross                  \
+           spirv_tools                  \
+           spirv_headers                \
+           spirv_effcee                 \
+           spirv_re2                    \
+           spirv_gtest                  \
            vulkan_headers               \
            vulkan_sdk                   \
            vulkan_sdk_validation_layers \

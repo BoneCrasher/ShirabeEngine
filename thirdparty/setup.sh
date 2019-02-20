@@ -7,28 +7,33 @@ DEPLOY_DIR=${THIS}/_deploy
 
 declare -A REPOSITORIES
 REPOSITORIES[zlib]="git@github.com:madler/zlib.git"
-REPOSITORIES[gtest]="git@github.com:google/googletest.git"
+REPOSITORIES[libxml2]="git@github.com:GNOME/libxml2.git"
+REPOSITORIES[libxslt]="git@github.com:GNOME/libxslt.git"
+REPOSITORIES[nlohmann_json]="git@github.com:nlohmann/json.git"
+REPOSITORIES[googletest]="git@github.com:google/googletest.git"
+REPOSITORIES[asio]="git@github.com:chriskohlhoff/asio.git"
+REPOSITORIES[stb]="git@github.com:nothings/stb.git"
+REPOSITORIES[assimp]="git@github.com:assimp/assimp.git"
 REPOSITORIES[glslang]="git@github.com:KhronosGroup/glslang.git"
 REPOSITORIES[spirv_cross]="git@github.com:KhronosGroup/SPIRV-Cross.git"
 REPOSITORIES[spirv_tools]="git@github.com:KhronosGroup/SPIRV-Tools.git"
 REPOSITORIES[spirv_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
-REPOSITORIES[vulkan]="git@github.com:KhronosGroup/Vulkan-Loader.git"
-REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
-REPOSITORIES[vulkan_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
 REPOSITORIES[spirv_effcee]="git@github.com:google/effcee.git"
 REPOSITORIES[spirv_re2]="git@github.com:google/re2.git"
 REPOSITORIES[spirv_gtest]="git@github.com:google/googletest.git"
-
-REPOSITORIES[libxml2]="git@github.com:GNOME/libxml2.git"
-REPOSITORIES[libxslt]="git@github.com:GNOME/libxslt.git"
-REPOSITORIES[json]="git@github.com:nlohmann/json.git"
-REPOSITORIES[asio]="git@github.com:chriskohlhoff/asio.git"
-REPOSITORIES[stb]="git@github.com:nothings/stb.git"
-REPOSITORIES[assimp]="git@github.com:assimp/assimp.git"
+REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
+REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
+REPOSITORIES[vulkan_sdk_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
 
 declare -A TARGET_DIRECTORIES
 TARGET_DIRECTORIES[zlib]="${SOURCES_DIR}/zlib"
-TARGET_DIRECTORIES[gtest]="${SOURCES_DIR}/googletest"
+TARGET_DIRECTORIES[libxml2]="${SOURCES_DIR}/libxml2"
+TARGET_DIRECTORIES[libxslt]="${SOURCES_DIR}/libxslt"
+TARGET_DIRECTORIES[googletest]="${SOURCES_DIR}/googletest"
+TARGET_DIRECTORIES[nlohmann_json]="${SOURCES_DIR}/nlohmann_json"
+TARGET_DIRECTORIES[asio]="${SOURCES_DIR}/asio"
+TARGET_DIRECTORIES[stb]="${SOURCES_DIR}/stb"
+TARGET_DIRECTORIES[assimp]="${SOURCES_DIR}/assimp"
 TARGET_DIRECTORIES[glslang]="${SOURCES_DIR}/glslang"
 TARGET_DIRECTORIES[spirv_cross]="${SOURCES_DIR}/spirv_cross"
 TARGET_DIRECTORIES[spirv_tools]="${SOURCES_DIR}/spirv_tools"
@@ -36,16 +41,10 @@ TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/spirv_tools/external/spirv-hea
 TARGET_DIRECTORIES[spirv_effcee]="${SOURCES_DIR}/spirv_tools/external/effcee"
 TARGET_DIRECTORIES[spirv_re2]="${SOURCES_DIR}/spirv_tools/external/re2"
 TARGET_DIRECTORIES[spirv_gtest]="${SOURCES_DIR}/spirv_tools/external/googletest"
-TARGET_DIRECTORIES[vulkan]="${SOURCES_DIR}/vulkan_sdk"
 TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
-TARGET_DIRECTORIES[vulkan_validation_layers]="${SOURCES_DIR}/vulkan_sdk_validation_layers"
+TARGET_DIRECTORIES[vulkan_sdk]="${SOURCES_DIR}/vulkan_sdk"
+TARGET_DIRECTORIES[vulkan_sdk_validation_layers]="${SOURCES_DIR}/vulkan_sdk_validation_layers"
 
-TARGET_DIRECTORIES[libxml2]="${SOURCES_DIR}/libxml2"
-TARGET_DIRECTORIES[libxslt]="${SOURCES_DIR}/libxslt"
-TARGET_DIRECTORIES[json]="${SOURCES_DIR}/nlohmann_json"
-TARGET_DIRECTORIES[asio]="${SOURCES_DIR}/asio"
-TARGET_DIRECTORIES[stb]="${SOURCES_DIR}/stb"
-TARGET_DIRECTORIES[assimp]="${SOURCES_DIR}/assimp"
 
 CAN_FETCH_BUILD_TOOLS=0
 
@@ -101,19 +100,20 @@ function update_one
     printf "Updating repository ${1}\n"
 
     local key=${1}
+    local dir=${TARGET_DIRECTORIES[${key}]}
 
-    if [ ! -d ${key} ]; then
+    if [ ! -d ${dir} ]; then
         printf "Directory ${key} does not exist.\n"
     else
-        cd ${key}
-        git pull ${key}
+        cd ${dir}
+        git pull
         cd ..
     fi
 }
 
 function setup_base
 {
-    setup_one gtest
+    setup_one googletest
 }
 
 function setup_spirv_tools
@@ -143,7 +143,7 @@ function setup_tools
     setup_one zlib
     setup_one libxml2
     setup_one libxslt
-    setup_one json
+    setup_one nlohmann_json
     setup_one asio
     setup_one stb
     setup_one assimp
@@ -168,7 +168,7 @@ function setup_vulkan
 
     setup_one vulkan_headers
     setup_one vulkan
-    setup_one vulkan_validation_layers
+    setup_one vulkan_sdk_validation_layers
 }
 
 # Check, whether we should update.
@@ -176,7 +176,6 @@ if [ ! -z ${1} ]; then
     if [ "${1}" = "--update" ]; then
         source ${THIS}/define_libraries.sh
 
-        local library
         for library in "${LIBRARIES[@]}";
         do
 
