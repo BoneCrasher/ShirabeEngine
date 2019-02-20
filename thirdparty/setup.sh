@@ -173,6 +173,7 @@ function setup_vulkan
 
 # Check, whether we should update.
 if [ ! -z ${1} ]; then
+
     if [ "${1}" = "--update" ]; then
         source ${THIS}/define_libraries.sh
 
@@ -185,6 +186,7 @@ if [ ! -z ${1} ]; then
 
         exit 1
     fi
+
 fi
 
 test_env

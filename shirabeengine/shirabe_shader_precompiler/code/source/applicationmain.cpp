@@ -175,6 +175,30 @@ static std::string readFile(std::string const &aFileName)
 //<
 //<-----------------------------------------------------------------------------
 
+struct uint32_helper_t {};
+
+// istream extension!
+namespace std
+{
+    template<class traits>
+    class basic_istream<uint32_helper_t, traits>
+            : public basic_ifstream<uint32_t>
+    {
+    public:
+        explicit basic_istream<uint32_helper_t, traits>(
+                char               const* aFilename,
+                ios_base::openmode const  aMode)
+            : basic_ifstream<uint32_t>( aFilename, aMode )
+        {}
+
+        basic_istream<uint32_helper_t, traits> &operator>>(uint32_t &aData)
+        {
+            read(&aData, 1);
+            return *this;
+        }
+    };
+} // namespace std {}
+
 /**
  * Read a file into a string.
  *
@@ -189,15 +213,24 @@ static std::vector<uint32_t> const readSpirVFile(std::string const &aFileName)
         return {};
     }
 
-    std::ifstream inputFileStream(aFileName);
-    bool const inputStreamOk = inputFileStream.operator bool();
-    if(not inputStreamOk)
+
+    std::ifstream inputFileStream(aFileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
+    uint64_t size = inputFileStream.tellg();
+    inputFileStream.seekg(0, std::ios::beg);
+
+    bool const inputFileStreamOk = inputFileStream.operator bool();
+    if(not inputFileStreamOk)
     {
         return {};
     }
 
-    std::vector<uint32_t> const inputData((std::istream_iterator<uint32_t>(inputFileStream)),
-                                           std::istream_iterator<uint32_t>());
+    std::vector<uint32_t> inputData;
+    inputData.resize(size / 4);
+
+    for(uint64_t k=0; k<(size / 4); ++k)
+    {
+        inputFileStream.read(reinterpret_cast<char *>(inputData.data() + k), 4);
+    }
 
     return inputData;
 }
@@ -680,42 +713,47 @@ public_methods:
      */
     EResult invokeSpirVCross(SShaderCompilationUnit const &aUnit)
     {
-        // std::string           const inputFilename = aUnit.elements.at(0).outputPath;
-        // std::vector<uint32_t> const spirvSource   = readSpirVFile(inputFilename);
-        //
-        // spirv_cross::Compiler compiler(std::move(spirvSource));
-        //
-        // spirv_cross::ShaderResources const resources = compiler.get_shader_resources();
+        std::underlying_type_t<EResult> result = 0;
 
-        // Read Stage Inputs
-//         for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
-//         {
-//             spv::Decor
-//         }
-// separate_samplers
-// separate_images
-// subpass_inputs
+        auto const reflect = [&] (SShaderCompilationElement const &aElement) -> void
+        {
+            std::string           const outputFiles = aElement.outputPath;
+            std::string           const inputFiles  = aElement.outputPath;
+            std::vector<uint32_t> const spirvSource = readSpirVFile(inputFiles);
 
-       // // Read UBO
-       // for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
-       // {
-       //     uint32_t set     = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
-       //     uint32_t binding = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
-       // }
-       //
-       // // Read Textures
-       // for (spirv_cross::Resource const &sampledImage : resources.sampled_images)
-       // {
-       //     uint32_t set     = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
-       //     uint32_t binding = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
-       // }
-       //
-       // for (const Resource &resource : res.subpass_inputs)
-       // {
-       //     unsigned attachment_index = comp.get_decoration(resource.id, spv::DecorationInputAttachmentIndex);
-       // }
-       //
-       // return EResult::Success;
+            spirv_cross::Compiler compiler(std::move(spirvSource));
+
+            spirv_cross::ShaderResources const resources = compiler.get_shader_resources();
+            // Read Stage Inputs
+            for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
+            {
+            }
+
+            for (spirv_cross::Resource const &subPassInput : resources.subpass_inputs)
+            {
+                uint32_t const attachmentIndex = compiler.get_decoration(subPassInput.id, spv::DecorationInputAttachmentIndex);
+            }
+
+            // separate_samplers
+            // separate_images
+
+            // Read UBO
+            for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
+            {
+                uint32_t set     = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
+                uint32_t binding = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
+            }
+
+            // Read Textures
+            for (spirv_cross::Resource const &sampledImage : resources.sampled_images)
+            {
+                uint32_t set     = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
+                uint32_t binding = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
+            }
+        };
+        std::for_each(aUnit.elements.begin(), aUnit.elements.end(), reflect);
+
+        return static_cast<EResult>(result);
     }
 
     /**
