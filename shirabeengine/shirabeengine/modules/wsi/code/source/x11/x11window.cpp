@@ -1,5 +1,5 @@
 ﻿#include <log/log.h>
-#include <core/string.h>
+#include <base/string.h>
 
 #include "wsi/x11/x11window.h"
 

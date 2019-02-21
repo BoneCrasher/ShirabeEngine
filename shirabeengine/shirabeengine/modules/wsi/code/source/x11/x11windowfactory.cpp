@@ -1,4 +1,4 @@
-#include <core/string.h>
+#include <base/string.h>
 #include "wsi/x11/x11window.h"
 #include "wsi/x11/x11windowfactory.h"
 

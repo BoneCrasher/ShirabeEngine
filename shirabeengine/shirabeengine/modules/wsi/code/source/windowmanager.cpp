@@ -2,7 +2,7 @@
 #include <functional>
 
 #include <platform/platform.h>
-#include <core/string.h>
+#include <base/string.h>
 
 #include "wsi/windowmanager.h"
 

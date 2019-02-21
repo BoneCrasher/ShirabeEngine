@@ -32,6 +32,7 @@ set(
 
 set(
     SHIRABE_EMBED_MODULE_NAMES
+        base
         os
         core
         log

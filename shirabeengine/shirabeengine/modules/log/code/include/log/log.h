@@ -10,6 +10,7 @@
 
 #include <platform/platform.h>
 #include <base/declaration.h>
+#include <base/string.h>
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
 #include <Windows.h>
@@ -99,11 +100,13 @@ namespace engine
          * @param aLogTag  The tag of the source of the log call to associate with.
          * @param aMessage -
          */
+        template <typename... TArguments>
         static void Verbose(
                 std::string const &aLogTag,
-                std::string const &aMessage)
+                std::string const &aFormat,
+                TArguments    &&...aArguments)
         {
-            LogImpl(ELogLevel::Verbose, aLogTag, aMessage);
+            LogImpl(ELogLevel::Verbose, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
 
         /**
@@ -112,12 +115,15 @@ namespace engine
          * @param aLogTag  The tag of the source of the log call to associate with.
          * @param aMessage -
          */
+        template <typename... TArguments>
         static void Status(
                 std::string const &aLogTag,
-                std::string const &aMessage)
+                std::string const &aFormat,
+                TArguments    &&...aArguments)
         {
-            LogImpl(ELogLevel::Status, aLogTag, aMessage);
+            LogImpl(ELogLevel::Status, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
+
         /**
          * Log-call for debug output, usally printing state and
          * values or intermediate positional output.
@@ -125,12 +131,15 @@ namespace engine
          * @param aLogTag  The tag of the source of the log call to associate with.
          * @param aMessage -
          */
+        template <typename... TArguments>
         static void Debug(
                 std::string const &aLogTag,
-                std::string const &aMessage)
+                std::string const &aFormat,
+                TArguments    &&...aArguments)
         {
-            LogImpl(ELogLevel::Debug, aLogTag, aMessage);
+            LogImpl(ELogLevel::Debug, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
+
         /**
          * Log-call for abnormal state or behaviour, which can be
          * caught or recovered but require attention.
@@ -138,12 +147,15 @@ namespace engine
          * @param aLogTag  The tag of the source of the log call to associate with.
          * @param aMessage -
          */
+        template <typename... TArguments>
         static void Warning(
                 std::string const &aLogTag,
-                std::string const &aMessage)
+                std::string const &aFormat,
+                TArguments    &&...aArguments)
         {
-            LogImpl(ELogLevel::Warning, aLogTag, aMessage);
+            LogImpl(ELogLevel::Warning, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
+
         /**
          * Log-call for abnormal state or behaviour, which requires
          * handling or cleanup and abort.
@@ -151,26 +163,42 @@ namespace engine
          * @param aLogTag  The tag of the source of the log call to associate with.
          * @param aMessage -
          */
+        template <typename... TArguments>
         static void Error(
                 std::string const &aLogTag,
-                std::string const &aMessage)
+                std::string const &aFormat,
+                TArguments    &&...aArguments)
         {
-            LogImpl(ELogLevel::Error, aLogTag, aMessage);
+            LogImpl(ELogLevel::Error, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
+
         /**
          * Log-call for errors that should never have happened.
          *
          * @param aLogTag  The tag of the source of the log call to associate with.
          * @param aMessage -
          */
+        template <typename... TArguments>
         static void WTF(
                 std::string const &aLogTag,
-                std::string const &aMessage)
+                std::string const &aFormat,
+                TArguments    &&...aArguments)
         {
-            LogImpl(ELogLevel::WTF, aLogTag, aMessage);
+            LogImpl(ELogLevel::WTF, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
 
     private_static_functions:
+        template <typename... TArguments>
+        static void LogImpl(
+                ELogLevel       const &aLevel,
+                std::string     const &aLogTag,
+                std::string     const &aFormat,
+                TArguments       &&...aArguments)
+        {
+            std::string const message = CString::format(aFormat, std::forward<TArguments>(aArguments)...);
+            LogImpl(aLevel, aLogTag, message);
+        }
+
         /**
          * Common implementation of log output generation.
          * Forwarded to by all other log-calls.
@@ -190,8 +218,9 @@ namespace engine
 
             std::stringstream ss;
             ss
-                << std::setw(7)  << ELogLevelToString(aLevel) << "): "
-                << std::setw(20) << "[" << aLogTag << "]"     << " --> "
+                << std::setw(7)
+                << ELogLevelToString(aLevel) << ": "
+                << "[" << aLogTag << "]"     << " --> \n"
                 << aMessage      << "\n";
 
             std::string const formatted = ss.str();

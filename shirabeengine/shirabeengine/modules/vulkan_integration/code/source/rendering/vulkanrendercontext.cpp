@@ -1,7 +1,7 @@
 #include "vulkan/rendering/vulkanrendercontext.h"
 
 #include <thread>
-#include <core/string.h>
+#include <base/string.h>
 
 namespace engine
 {

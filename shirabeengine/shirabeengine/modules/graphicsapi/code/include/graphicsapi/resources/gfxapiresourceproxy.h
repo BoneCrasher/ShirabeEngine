@@ -8,7 +8,7 @@
 
 #include <core/enginetypehelper.h>
 #include <core/enginestatus.h>
-#include <core/string.h>
+#include <base/string.h>
 #include <resources/core/resourcebackendproxy.h>
 
 #include "graphicsapi/resources/gfxapi.h"

@@ -6,7 +6,7 @@
 
 #include <core/basictypes.h>
 #include <core/enginetypehelper.h>
-#include <core/string.h>
+#include <base/string.h>
 
 namespace engine
 {

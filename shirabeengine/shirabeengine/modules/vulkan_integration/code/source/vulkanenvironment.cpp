@@ -3,7 +3,7 @@
 
 #include <platform/platform.h>
 #include <os/applicationenvironment.h>
-#include <core/string.h>
+#include <base/string.h>
 #include <graphicsapi/resources/types/swapchain.h>
 #include "vulkan/vulkanenvironment.h"
 #include "vulkan/vulkandevicecapabilities.h"

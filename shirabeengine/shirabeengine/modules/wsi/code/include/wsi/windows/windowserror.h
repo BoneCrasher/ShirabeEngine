@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <Windows.h>
 
-#include "Core/String.h"
+#include <base/string.h>
 #include "core/enginestatus.h"
 
 namespace engine {

@@ -3,7 +3,7 @@
 #include <base/declaration.h>
 #include <log/log.h>
 #include "core/benchmarking/timer/timer.h"
-#include "core/string.h"
+#include <base/string.h>
 
 namespace engine
 {

@@ -11,7 +11,7 @@
 #endif
 
 #include <core/enginestatus.h>
-#include <core/string.h>
+#include <base/string.h>
 
 namespace engine
 {

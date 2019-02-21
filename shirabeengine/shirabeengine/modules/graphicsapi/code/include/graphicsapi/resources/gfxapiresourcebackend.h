@@ -2,7 +2,7 @@
 #define __SHIRABE_GFXAPIRESOURCEBACKEND_H__
 
 #include <core/threading/looper.h>
-#include <core/string.h>
+#include <base/string.h>
 
 #include "graphicsapi/resources/gfxapiresourcetaskbackend.h"
 

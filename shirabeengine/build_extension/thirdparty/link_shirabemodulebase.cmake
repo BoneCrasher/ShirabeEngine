@@ -19,16 +19,16 @@ function(linkLibrary)
         ${MODULE_DIR}/code/include
         )
 		
-	## -L
-    #append_parentscope(
-    #    SHIRABE_PROJECT_LIBRARY_DIRECTORIES
-    #    ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib
-    #    )
-	#
-	## -l
-	#append_parentscope(
-	#	SHIRABE_PROJECT_LIBRARY_TARGETS
-	#	${BINARY_NAME}
-	#	)
+    if(SHIRABE_BUILD_STATICLIB)
+        append_parentscope(
+                SHIRABE_PROJECT_LIBRARY_TARGETS
+                ${BINARY_NAME}
+                )
+    else()
+        append_parentscope(
+                SHIRABE_PROJECT_LIBRARY_MODULES
+                ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a
+                )
+    endif()
 
 endfunction(linkLibrary)

@@ -9,7 +9,7 @@
 
 #include <core/enginetypehelper.h>
 #include <core/random.h>
-#include <core/string.h>
+#include <base/string.h>
 
 #include "resources/core/iresourceproxy.h"
 #include "resources/core/resourcepool.h"
