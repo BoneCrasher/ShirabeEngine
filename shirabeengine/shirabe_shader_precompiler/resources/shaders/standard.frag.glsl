@@ -1,18 +1,30 @@
 #version 440 core
+#extension GL_GOOGLE_include_directive : require
+#include "include/base.glsl"
 
-layout (location=0)
+// Attachment binding
+layout(input_attachment_index = 0, set = 0, binding = 0)
+uniform subpassInput gbuffer0;
+layout(input_attachment_index = 1, set = 0, binding = 1)
+uniform subpassInput gbuffer1;
+layout(input_attachment_index = 2, set = 0, binding = 2)
+uniform subpassInput gbuffer2;
+layout(input_attachment_index = 3, set = 0, binding = 3)
+uniform subpassInput gbuffer3;
+
+// Input
+layout (location = 0)
 in struct_Input
 {
     vec3 vertex_position;
     vec3 vertex_normal;
     vec3 vertex_tangent;
     vec2 vertex_texcoord;
-} Input;
+} shader_input;
 
-layout (input_attachment_index = 0, set = 0, binding = 0) uniform subpassInput inputColor;
-layout (input_attachment_index = 1, set = 1, binding = 1) uniform subpassInput inputDepth;
-
-layout (location=0) out vec4 fragment_color_0;
+// Output
+layout (location = 0)
+out vec4 fragment_color_0;
 
 void main()
 {

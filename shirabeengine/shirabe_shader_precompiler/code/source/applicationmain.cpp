@@ -17,23 +17,15 @@
 #include <spirv_cross/spirv_cross.hpp>
 
 #include <log/log.h>
-#include <core/string.h>
+#include <base/string.h>
 #include <core/bitfield.h>
 #include <core/enginetypehelper.h>
 #include <core/result.h>
 
+#include "definition.h"
+
 using namespace engine;
-
-#if ENABLE_OPT
-static constexpr bool const OPTIMIZATION_ENABLED = true;
-#else
-static constexpr bool const OPTIMIZATION_ENABLED = false;
-#endif
-
-namespace Main
-{
-    SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
-}
+using namespace shader_precompiler;
 
 CResult<std::string> executeCmd(std::string const &aCommand)
 {
@@ -45,7 +37,7 @@ CResult<std::string> executeCmd(std::string const &aCommand)
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
     if (nullptr == pipe)
     {
-        CLog::Error(Main::logTag(), CString::format("Failed to open command pipe for command '%0'", cmd));
+        CLog::Error(shader_precompiler::logTag(), CString::format("Failed to open command pipe for command '%0'", cmd));
         return { false };
     }
 
@@ -59,20 +51,6 @@ CResult<std::string> executeCmd(std::string const &aCommand)
 
     return result;
 }
-
-/**
- * Describes error codes of the tool.
- */
-enum class EResult
-{
-    Success      =       0,
-    WrongUsage   = -100000,
-    NoInput,
-    FileError,
-    InputInvalid,
-    CompilationFailed,
-    LinkFailed
-};
 
 //<-----------------------------------------------------------------------------
 //
@@ -175,30 +153,6 @@ static std::string readFile(std::string const &aFileName)
 //<
 //<-----------------------------------------------------------------------------
 
-struct uint32_helper_t {};
-
-// istream extension!
-namespace std
-{
-    template<class traits>
-    class basic_istream<uint32_helper_t, traits>
-            : public basic_ifstream<uint32_t>
-    {
-    public:
-        explicit basic_istream<uint32_helper_t, traits>(
-                char               const* aFilename,
-                ios_base::openmode const  aMode)
-            : basic_ifstream<uint32_t>( aFilename, aMode )
-        {}
-
-        basic_istream<uint32_helper_t, traits> &operator>>(uint32_t &aData)
-        {
-            read(&aData, 1);
-            return *this;
-        }
-    };
-} // namespace std {}
-
 /**
  * Read a file into a string.
  *
@@ -213,9 +167,11 @@ static std::vector<uint32_t> const readSpirVFile(std::string const &aFileName)
         return {};
     }
 
-
     std::ifstream inputFileStream(aFileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-    uint64_t size = inputFileStream.tellg();
+
+    std::streamoff filesize = inputFileStream.tellg();
+    uint64_t       datasize = static_cast<uint64_t>(filesize) / 4;
+
     inputFileStream.seekg(0, std::ios::beg);
 
     bool const inputFileStreamOk = inputFileStream.operator bool();
@@ -225,11 +181,13 @@ static std::vector<uint32_t> const readSpirVFile(std::string const &aFileName)
     }
 
     std::vector<uint32_t> inputData;
-    inputData.resize(size / 4);
+    inputData.resize(datasize);
 
-    for(uint64_t k=0; k<(size / 4); ++k)
+    for(uint64_t k=0; k<datasize; ++k)
     {
-        inputFileStream.read(reinterpret_cast<char *>(inputData.data() + k), 4);
+        uint32_t *const data = (inputData.data() + k);
+        char     *const ch   = reinterpret_cast<char *const>(data);
+        inputFileStream.read(ch, 4);
     }
 
     return inputData;
@@ -272,7 +230,7 @@ void usage()
             "   ./shirabe_shader_precompiler --verbose --debug -o=./spv_output -i=./spv_input \n"
             "                                                                                 \n";
 
-    CLog::Warning(Main::logTag(), usageMessage);
+    CLog::Warning(shader_precompiler::logTag(), usageMessage);
 
     ::exit(EnumValueOf(EResult::WrongUsage));
 }
@@ -307,44 +265,6 @@ public_enums:
         DumpBareVersion      = (1u << 8),
     };
 
-    /**
-     * Flags describing the selected shading language
-     */
-    enum class EShadingLanguage
-    {
-        Unknown    = 0,
-        CGLanguage,
-        GLSL,
-        HLSL,
-        XShade
-    };
-
-    /**
-     * Describes the stage of the shader to compile.
-     */
-    enum class EShaderStage
-    {
-        NotApplicable = 0,
-        Vertex,
-        TesselationControlPoint,
-        TesselationEvaluation,
-        Geometry,
-        Fragment,
-        Compute
-    };
-
-    /**
-     * Identifies the respective compiler to use to compile a shader file.
-     */
-    enum class EShaderCompiler
-    {
-        Unknown                  = 0,
-        CGLanguage,
-        GlslangReferenceCompiler,
-        DxHlslCompiler,
-        XShadeCompiler,
-    };
-
 private_structs:
 
     /**
@@ -356,109 +276,6 @@ private_structs:
         std::string                             outputPath;
         std::vector<std::string>                outputFilenames;
         core::CBitField<CPrecompiler::EOptions> options;
-    };
-
-
-    /**
-     * @brief The SShaderCompilationElement struct
-     */
-    struct SShaderCompilationElement
-    {
-        std::string  fileName;
-        std::string  outputPath;
-        std::string  contents;
-        EShaderStage stage;
-        char         padding[4]; // Explicit alignment padding.
-
-    public_constructors:
-        /**
-         * @brief SShaderCompilationElement
-         */
-        SShaderCompilationElement()
-            : fileName({})
-            , contents({})
-            , stage(EShaderStage::NotApplicable)
-        {}
-
-        /**
-         * @brief SShaderCompilationElement
-         *
-         * @param aFileName
-         * @param aContents
-         * @param aStage
-         */
-        SShaderCompilationElement(std::string  const &aFileName,
-                                  std::string  const &aContents,
-                                  EShaderStage const aStage)
-            : fileName(aFileName)
-            , contents(aContents)
-            , stage(aStage)
-        {}
-    };
-
-    /**
-     * Simple bundling of what makes a compilation unit for ease in passing around,
-     * and separation of handling file IO versus API (programmatic) compilation.
-     */
-    struct SShaderCompilationUnit
-    {
-        EShaderCompiler           compiler;
-        EShadingLanguage          language;
-
-        std::vector<SShaderCompilationElement> elements;
-
-    public_constructors:
-
-        /**
-         * @brief SShaderCompilationUnit
-         */
-        SShaderCompilationUnit()
-            : compiler(EShaderCompiler::Unknown)
-            , language(EShadingLanguage::Unknown)
-        {}
-
-        /**
-         * @brief SShaderCompilationUnit
-         * @param aCompiler
-         * @param aLanguage
-         */
-        SShaderCompilationUnit(EShaderCompiler  const aCompiler,
-                               EShadingLanguage const aLanguage)
-            : compiler(aCompiler)
-            , language(aLanguage)
-        { }
-
-    public_methods:
-
-        /**
-         * @brief addElement
-         * @param aFileName
-         * @param aContents
-         * @param aStage
-         * @return
-         */
-        EResult addElement(std::string  const &aFileName,
-                           std::string  const &aContents,
-                           EShaderStage const  aStage)
-        {
-            if(aFileName.empty() || aContents.empty())
-            {
-                CLog::Error(logTag(), CString::format("Invalid input for file %0:\n%1", aFileName, aContents));
-                return EResult::InputInvalid;
-            }
-
-            addElement({ aFileName, aContents, aStage });
-        }
-
-        /**
-         * @brief addElement
-         * @param aOther
-         * @return
-         */
-        EResult addElement(SShaderCompilationElement const &aOther)
-        {
-            elements.push_back(aOther);
-        }
     };
 
 public_methods:
@@ -637,19 +454,16 @@ public_methods:
      * @return      EResult::Success           if successful.
      * @return      EResult::CompilationFailed on error.
      */
-    EResult runGlslang(SShaderCompilationUnit const &aUnit)
+    EResult runGlslang(SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
     {
         std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
-        std::string const options     = "-v -g -l -Od -C --target-env vulkan1.1 -V ";
+        std::string const options     = "-v -d -g -Od -V --target-env vulkan1.1";
 
         std::underlying_type_t<EResult> result = 0;
 
-        auto const compile = [&] (SShaderCompilationElement const &aElement) -> void
+        auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
         {
-            std::string const outputFiles = aElement.outputPath;
-            std::string const inputFiles  = aElement.fileName;
-
-            std::string          const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFiles, inputFiles);
+            std::string          const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
             CResult<std::string> const commandResult = executeCmd(command);
             if(not commandResult.successful())
             {
@@ -661,8 +475,37 @@ public_methods:
                 CLog::Debug(logTag(), commandResult.data());
                 result |= EnumValueOf(EResult::Success);
             }
+
+            CLog::Debug(logTag(), command);
         };
-        std::for_each(aUnit.elements.begin(), aUnit.elements.end(), compile);
+
+        if(aCompileStagesIndividually)
+        {
+            auto const compile = [&] (SShaderCompilationElement const &aElement) -> void
+            {
+                std::string const outputFile = aElement.outputPath;
+                std::string const inputFile  = aElement.fileName;
+
+                once(inputFile, outputFile);
+
+                aUnit.outputFiles.push_back(outputFile);
+            };
+            std::for_each(aUnit.elements.begin(), aUnit.elements.end(), compile);
+        }
+        else
+        {
+            std::string const outputFiles = aUnit.elements.at(0).outputPath;
+            std::string       inputFiles  = "";
+
+            auto const append = [&inputFiles] (SShaderCompilationElement const &aElement)
+            {
+                inputFiles.append(" " + aElement.fileName);
+            };
+            std::for_each(aUnit.elements.begin(), aUnit.elements.end(), append);
+
+            once(inputFiles, outputFiles);
+            aUnit.outputFiles.push_back(aUnit.elements.at(0).outputPath);
+        }
 
         return static_cast<EResult>(result);
     }
@@ -674,19 +517,19 @@ public_methods:
      * @return      EResult::Success      if successful.
      * @return      EResult::InputInvalid on error.
      */
-    EResult runSpirVDisassembler(SShaderCompilationUnit const &aUnit)
+    EResult runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
     {
         std::string const application = CString::format("%0/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path());
         std::string const options     = "";
 
         std::underlying_type_t<EResult> result = 0;
 
-        auto const disassemble = [&] (SShaderCompilationElement const &aElement) -> void
+        auto const disassemble = [&] (std::string const &aElement) -> void
         {
-            std::string const outputFiles = aElement.outputPath;
-            std::string const inputFiles  = aElement.outputPath;
+            std::string const inputFile  = aElement;
+            std::string const outputFile = aElement + ".dis";
 
-            std::string          const command       = CString::format("%0 %1 -o %2.dis %3", application, options, outputFiles, inputFiles);
+            std::string          const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFile, inputFile);
             CResult<std::string> const commandResult = executeCmd(command);
             if(not commandResult.successful())
             {
@@ -699,7 +542,7 @@ public_methods:
                 result |= EnumValueOf(EResult::Success);
             }
         };
-        std::for_each(aUnit.elements.begin(), aUnit.elements.end(), disassemble);
+        std::for_each(aInputFilenames.begin(), aInputFilenames.end(), disassemble);
 
         return static_cast<EResult>(result);
     }
@@ -717,21 +560,78 @@ public_methods:
 
         auto const reflect = [&] (SShaderCompilationElement const &aElement) -> void
         {
-            std::string           const outputFiles = aElement.outputPath;
-            std::string           const inputFiles  = aElement.outputPath;
-            std::vector<uint32_t> const spirvSource = readSpirVFile(inputFiles);
+            std::string           const inputFile   = aElement.outputPath;
+            // std::string           const outputFile  = aElement.outputPath;
+            std::vector<uint32_t> const spirvSource = readSpirVFile(inputFile);
 
             spirv_cross::Compiler compiler(std::move(spirvSource));
 
             spirv_cross::ShaderResources const resources = compiler.get_shader_resources();
+
+            CLog::Debug(logTag(), "Reflecting %0", inputFile);
+
             // Read Stage Inputs
             for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
             {
+                uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
+                uint32_t const set      = compiler.get_decoration(stageInput.id, spv::DecorationDescriptorSet);
+                uint32_t const binding  = compiler.get_decoration(stageInput.id, spv::DecorationBinding);
+                CLog::Debug(logTag(),
+                            "\nStageInput: "
+                            "\n  ID:       %0"
+                            "\n  Name:     %1"
+                            "\n  Location: %2"
+                            "\n  Set:      %3"
+                            "\n  Binding:  %4",
+                            stageInput.id,
+                            stageInput.name,
+                            location,
+                            set,
+                            binding);
             }
 
+            // Stage Outputs
+            for (spirv_cross::Resource const &stageInput : resources.stage_outputs)
+            {
+                uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
+                uint32_t const set      = compiler.get_decoration(stageInput.id, spv::DecorationDescriptorSet);
+                uint32_t const binding  = compiler.get_decoration(stageInput.id, spv::DecorationBinding);
+                CLog::Debug(logTag(),
+                            "\nStageOutput: "
+                            "\n  ID:       %0"
+                            "\n  Name:     %1"
+                            "\n  Location: %2"
+                            "\n  Set:      %3"
+                            "\n  Binding:  %4",
+                            stageInput.id,
+                            stageInput.name,
+                            location,
+                            set,
+                            binding);
+            }
+
+            // Subpass Input
             for (spirv_cross::Resource const &subPassInput : resources.subpass_inputs)
             {
                 uint32_t const attachmentIndex = compiler.get_decoration(subPassInput.id, spv::DecorationInputAttachmentIndex);
+                uint32_t const location        = compiler.get_decoration(subPassInput.id, spv::DecorationLocation);
+                uint32_t const set             = compiler.get_decoration(subPassInput.id, spv::DecorationDescriptorSet);
+                uint32_t const binding         = compiler.get_decoration(subPassInput.id, spv::DecorationBinding);
+
+                CLog::Debug(logTag(),
+                            "\nSubpassInput: "
+                            "\n  ID:              %0"
+                            "\n  Name:            %1"
+                            "\n  AttachmentIndex: %2"
+                            "\n  Location:        %3"
+                            "\n  Set:             %4"
+                            "\n  Binding:         %5",
+                            subPassInput.id,
+                            subPassInput.name,
+                            attachmentIndex,
+                            location,
+                            set,
+                            binding);
             }
 
             // separate_samplers
@@ -740,15 +640,43 @@ public_methods:
             // Read UBO
             for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
             {
-                uint32_t set     = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
-                uint32_t binding = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
+                uint32_t const location = compiler.get_decoration(uniformBuffer.id, spv::DecorationLocation);
+                uint32_t const set      = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
+                uint32_t const binding  = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
+
+                CLog::Debug(logTag(),
+                            "\nUniformBuffer: "
+                            "\n  ID:              %0"
+                            "\n  Name:            %1"
+                            "\n  Location:        %2"
+                            "\n  Set:             %3"
+                            "\n  Binding:         %4",
+                            uniformBuffer.id,
+                            uniformBuffer.name,
+                            location,
+                            set,
+                            binding);
             }
 
             // Read Textures
             for (spirv_cross::Resource const &sampledImage : resources.sampled_images)
             {
-                uint32_t set     = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
-                uint32_t binding = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
+                uint32_t const location = compiler.get_decoration(sampledImage.id, spv::DecorationLocation);
+                uint32_t const set      = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
+                uint32_t const binding  = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
+
+                CLog::Debug(logTag(),
+                            "\nSampledImage: "
+                            "\n  ID:              %0"
+                            "\n  Name:            %1"
+                            "\n  Location:        %2"
+                            "\n  Set:             %3"
+                            "\n  Binding:         %4",
+                            sampledImage.id,
+                            sampledImage.name,
+                            location,
+                            set,
+                            binding);
             }
         };
         std::for_each(aUnit.elements.begin(), aUnit.elements.end(), reflect);
@@ -772,10 +700,16 @@ public_methods:
             return EResult::InputInvalid;
         }
 
-        SShaderCompilationUnit const unit = unitGeneration.data();
+        SShaderCompilationUnit unit = unitGeneration.data();
 
-        EResult const glslangResult    = runGlslang(unit);
-        EResult const spirvDisResult   = runSpirVDisassembler(unit);
+        EResult const glslangResult = runGlslang(unit, true);
+        if(EResult::Success != glslangResult)
+        {
+            CLog::Error(logTag(), "Failed to run glslang.");
+            return glslangResult;
+        }
+
+        // EResult const spirvDisResult   = runSpirVDisassembler(unit.outputFiles);
         EResult const spirvCrossResult = invokeSpirVCross(unit);
 
         return EResult::Success;

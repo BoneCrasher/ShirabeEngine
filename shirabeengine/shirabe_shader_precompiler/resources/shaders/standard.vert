@@ -1,19 +1,52 @@
 #version 440 core
+#extension GL_GOOGLE_include_directive : require
+#include "include/base.glsl"
 
-// Vertex Layout
-layout (location = 0) in vec3 vertex_position;
-layout (location = 1) in vec3 vertex_normal;
-layout (location = 2) in vec3 vertex_tangent;
-layout (location = 3) in vec2 vertex_texcoord;
+//
+// Uniform Buffer to hold the camera matrices
+//
+layout (std140, set = 2, binding = 0)
+uniform CameraMatrices
+{
+    mat4 view;
+    mat4 projection;
+}
+cameraMatrices;
 
-layout (location=0)
+//
+// Model specific matrices.
+//
+layout (std140, set = 3, binding = 0)
+uniform ModelMatrices
+{
+    mat4 world;
+    mat4 inverseTransposeWorld;
+}
+modelMatrices;
+
+//
+// Input description
+//
+layout (location = 0)
+in vec3 vertex_position;
+layout (location = 1)
+in vec3 vertex_normal;
+layout (location = 2)
+in vec3 vertex_tangent;
+layout (location = 3)
+in vec2 vertex_texcoord;
+
+//
+// Vertex shader output
+//
+layout (location = 0)
 out struct_Output
 {
     vec3 vertex_position;
     vec3 vertex_normal;
     vec3 vertex_tangent;
     vec2 vertex_texcoord;
-} Output;
+} shader_output;
 
 void main()
 {
