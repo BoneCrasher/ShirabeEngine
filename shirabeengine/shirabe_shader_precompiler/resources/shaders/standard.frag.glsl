@@ -1,6 +1,6 @@
 #version 440 core
 #extension GL_GOOGLE_include_directive : require
-#include "include/base.glsl"
+#include "base.glsl"
 
 // Attachment binding
 layout(input_attachment_index = 0, set = 0, binding = 0)

@@ -1,6 +1,6 @@
 #version 440 core
 #extension GL_GOOGLE_include_directive : require
-#include "include/base.glsl"
+#include "base.glsl"
 
 //
 // Uniform Buffer to hold the camera matrices

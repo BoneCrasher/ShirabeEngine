@@ -275,6 +275,7 @@ private_structs:
         std::vector<std::string>                inputPaths;
         std::string                             outputPath;
         std::vector<std::string>                outputFilenames;
+        std::vector<std::string>                includePaths;
         core::CBitField<CPrecompiler::EOptions> options;
     };
 
@@ -297,9 +298,10 @@ public_methods:
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
-        core::CBitField<EOptions> options    = {};
-        std::string               outputPath = {};
-        std::vector<std::string>  inputPaths = {};
+        core::CBitField<EOptions> options      = {};
+        std::string               outputPath   = {};
+        std::vector<std::string>  inputPaths   = {};
+        std::vector<std::string>  includePaths = {};
 
         //
         // Process all options provided to the application.
@@ -340,6 +342,7 @@ public_methods:
                 { "--debug",          [&] () { options.set(CPrecompiler::EOptions::DebugMode);             return true; }},
                 { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
                 { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
+                { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
                 { "-o",               [&] () { outputPath = referencableValue;                             return true; }},
                 { "-i",               [&] () { inputPaths = readInputPaths(referencableValue).data();      return true; }},
             };
@@ -430,9 +433,9 @@ public_methods:
         }
 
         SConfiguration config {};
-        config.options    = options;
-        config.outputPath = outputPath;
-
+        config.options      = options;
+        config.outputPath   = outputPath;
+        config.includePaths = includePaths;
         //
         //  Reduce the list of per-path derived filenames to a single filename list.
         //
@@ -454,10 +457,16 @@ public_methods:
      * @return      EResult::Success           if successful.
      * @return      EResult::CompilationFailed on error.
      */
-    EResult runGlslang(SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
+    EResult runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
     {
         std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
-        std::string const options     = "-v -d -g -Od -V --target-env vulkan1.1";
+        std::string       options     = "-v -d -g -Od -V --target-env vulkan1.1";
+
+        auto const appendIncludes = [&options] (std::string const &aInclude) -> void
+        {
+            options.append(" -I" + aInclude);
+        };
+        std::for_each(aConfiguration.includePaths.begin(), aConfiguration.includePaths.end(), appendIncludes);
 
         std::underlying_type_t<EResult> result = 0;
 
@@ -702,7 +711,7 @@ public_methods:
 
         SShaderCompilationUnit unit = unitGeneration.data();
 
-        EResult const glslangResult = runGlslang(unit, true);
+        EResult const glslangResult = runGlslang(mConfig, unit, true);
         if(EResult::Success != glslangResult)
         {
             CLog::Error(logTag(), "Failed to run glslang.");
@@ -711,6 +720,11 @@ public_methods:
 
         // EResult const spirvDisResult   = runSpirVDisassembler(unit.outputFiles);
         EResult const spirvCrossResult = invokeSpirVCross(unit);
+        if(EResult::Success != glslangResult)
+        {
+            CLog::Error(logTag(), "Failed to run glslang.");
+            return glslangResult;
+        }
 
         return EResult::Success;
     }
