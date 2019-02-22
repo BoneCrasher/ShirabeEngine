@@ -26,8 +26,7 @@ namespace engine
          * @tparam TInterfaceDeserialization The deserializer type to support interaction with.
          */
         template <
-                typename TInterfaceSerialization,
-                typename TInterfaceDeserialization
+                typename TInterfaceSerialization
                 >
         class ISerializable
         {
@@ -35,13 +34,31 @@ namespace engine
 
             public_api:
                 /*!
-                     * Accept a specific serializer and conduct the type serialization process
-                     * with it.
-                     *
-                     * @param aSerializer The serializer instance to perform serialization with.
-                     * @return            True, if serialization was successful. False otherwise.
-                     */
+                 * Accept a specific serializer and conduct the type serialization process
+                 * with it.
+                 *
+                 * @param aSerializer The serializer instance to perform serialization with.
+                 * @return            True, if serialization was successful. False otherwise.
+                 */
                 virtual bool acceptSerializer(TInterfaceSerialization &aSerializer) const = 0;
+        };
+
+        /*!
+         * The ISerializable interface declares the two basic methods required for
+         * serializable objects to become compatible with a specific serializer of
+         * type TInterfaceSerialization and deserializer of type TInterfaceDeserialization.
+         *
+         * @tparam TInterfaceSerialization   The serializer type to support interaction with.
+         * @tparam TInterfaceDeserialization The deserializer type to support interaction with.
+         */
+        template <
+                typename TInterfaceDeserialization
+                >
+        class IDeserializable
+        {
+            SHIRABE_DECLARE_INTERFACE(IDeserializable)
+
+            public_api:
 
                 /*!
                  * Accept a specific serializer and conduct the type serialization process

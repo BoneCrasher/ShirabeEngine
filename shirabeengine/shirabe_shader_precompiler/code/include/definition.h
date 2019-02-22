@@ -7,6 +7,7 @@
 #include <base/declaration.h>
 #include <base/string.h>
 #include <log/log.h>
+#include <core/serialization/serialization.h>
 
 #if ENABLE_OPT
 static constexpr bool const OPTIMIZATION_ENABLED = true;
@@ -16,6 +17,11 @@ static constexpr bool const OPTIMIZATION_ENABLED = false;
 
 namespace shader_precompiler
 {
+    namespace serialization
+    {
+        class IMaterialSerializer;
+    }
+
     SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
 
     using namespace engine;
@@ -76,6 +82,7 @@ namespace shader_precompiler
      * @brief The SShaderCompilationElement struct
      */
     struct SShaderCompilationElement
+            : engine::serialization::ISerializable<serialization::IMaterialSerializer>
     {
         std::string  fileName;
         std::string  outputPath;
@@ -89,7 +96,8 @@ namespace shader_precompiler
          */
         SHIRABE_INLINE
         SShaderCompilationElement()
-            : fileName({})
+            : ISerializable<serialization::IMaterialSerializer>()
+            , fileName({})
             , contents({})
             , stage(EShaderStage::NotApplicable)
         {}
@@ -105,10 +113,50 @@ namespace shader_precompiler
         SShaderCompilationElement(std::string  const &aFileName,
                                   std::string  const &aContents,
                                   EShaderStage const aStage)
-            : fileName(aFileName)
+            : ISerializable<serialization::IMaterialSerializer>()
+            , fileName(aFileName)
             , contents(aContents)
             , stage(aStage)
         {}
+
+        /**
+         * @brief SShaderCompilationElement
+         * @param aOther
+         */
+        SHIRABE_INLINE
+        SShaderCompilationElement(SShaderCompilationElement const &aOther)
+            : ISerializable<serialization::IMaterialSerializer>()
+            , fileName(aOther.fileName)
+            , contents(aOther.contents)
+            , stage(aOther.stage)
+        {}
+
+        /**
+         * @brief SShaderCompilationElement
+         * @param aOther
+         */
+        SHIRABE_INLINE
+        SShaderCompilationElement(SShaderCompilationElement &&aOther)
+            : ISerializable<serialization::IMaterialSerializer>()
+            , fileName(std::move(aOther.fileName))
+            , contents(std::move(aOther.contents))
+            , stage(aOther.stage)
+        {}
+
+    public_destructors:
+        virtual ~SShaderCompilationElement() = default;
+
+    public_methods:
+        /**
+         * @brief acceptSerializer
+         * @param aSerializer
+         * @return
+         */
+        SHIRABE_INLINE
+        bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const
+        {
+            return true;
+        }
     };
 
     /**
@@ -116,6 +164,7 @@ namespace shader_precompiler
      * and separation of handling file IO versus API (programmatic) compilation.
      */
     struct SShaderCompilationUnit
+            : engine::serialization::ISerializable<serialization::IMaterialSerializer>
     {
         EShaderCompiler           compiler;
         EShadingLanguage          language;
@@ -147,7 +196,40 @@ namespace shader_precompiler
             , language(aLanguage)
         { }
 
+        /**
+         * @brief SShaderCompilationUnit
+         * @param aOther
+         */
+        SHIRABE_INLINE
+        SShaderCompilationUnit(SShaderCompilationUnit const &aOther)
+            : compiler(aOther.compiler)
+            , language(aOther.language)
+        {}
+
+        /**
+         * @brief SShaderCompilationUnit
+         * @param aOther
+         */
+        SHIRABE_INLINE
+        SShaderCompilationUnit(SShaderCompilationUnit &&aOther)
+            : compiler(std::move(aOther.compiler))
+            , language(std::move(aOther.language))
+        {}
+
+    public_destructors:
+        virtual ~SShaderCompilationUnit() = default;
+
     public_methods:
+        /**
+         * @brief acceptSerializer
+         * @param aSerializer
+         * @return
+         */
+        SHIRABE_INLINE
+        bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const
+        {
+            return true;
+        }
 
         /**
          * @brief addElement

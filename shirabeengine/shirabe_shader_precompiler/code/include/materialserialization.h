@@ -18,6 +18,7 @@ namespace shader_precompiler
     namespace serialization
     {
         using engine::serialization::ISerializer;
+        using engine::serialization::ISerializable;
 
         /**
          * The IFrameGraphSerializer interface describes the basic requiremets
@@ -29,13 +30,11 @@ namespace shader_precompiler
             SHIRABE_DECLARE_INTERFACE(IMaterialSerializer);
 
         public_api:
-            virtual bool serializeUnit(SShaderCompilationUnit const &aUnit) = 0;
+            virtual bool writeProgramHeader(SShaderCompilationUnit const &aUnit) = 0;
 
-            virtual bool serializeStage(SShaderCompilationElement const &aStage) = 0;
+            virtual bool writeInputDescriptionElement(std::vector<spirv_cross::Resource> const &aResource) = 0;
 
-            virtual bool serializeInputDescription(std::vector<spirv_cross::Resource> const &aResource) = 0;
-
-            virtual bool serializeSubpassInputs(std::vector<spirv_cross::Resource> const &aResource) = 0;
+            virtual bool writeSubpassInputs(std::vector<spirv_cross::Resource> const &aResource) = 0;
 
             virtual bool serializeSubpassOutputs(std::vector<spirv_cross::Resource> const &aResource) = 0;
 
@@ -129,5 +128,4 @@ namespace shader_precompiler
     }
 }
 
-#endif
 #endif
