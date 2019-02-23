@@ -14,184 +14,20 @@
 #include <thread>
 #include <functional>
 
-#include <spirv_cross/spirv_cross.hpp>
-
 #include <log/log.h>
 #include <base/string.h>
 #include <core/bitfield.h>
 #include <core/enginetypehelper.h>
 #include <core/result.h>
+#include <material/materialserialization.h>
 
 #include "definition.h"
+#include "helpers.h"
+#include "extraction.h"
 
 using namespace engine;
 using namespace shader_precompiler;
 
-CResult<std::string> executeCmd(std::string const &aCommand)
-{
-    std::array<char, 128> buffer {};
-    std::string           result {};
-
-    std::string const cmd = aCommand + " 2>&1";
-
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
-    if (nullptr == pipe)
-    {
-        CLog::Error(shader_precompiler::logTag(), CString::format("Failed to open command pipe for command '%0'", cmd));
-        return { false };
-    }
-
-    while(not feof(pipe.get()))
-    {
-        if(nullptr != fgets(buffer.data(), buffer.size(), pipe.get()))
-        {
-            result.append(buffer.data());
-        }
-    }
-
-    return result;
-}
-
-//<-----------------------------------------------------------------------------
-//
-//<-----------------------------------------------------------------------------
-
-/**
- * Helper to extract the numeric representation of the provided flag value
- * of an arbitrary enum class type.
- *
- * @param aEnumFlag The flag to convert to it's numeric representation.
- * @return          See brief.
- */
-template <typename TEnum>
-std::underlying_type_t<TEnum> EnumValueOf(TEnum const &aEnumFlag)
-{
-    return static_cast<std::underlying_type_t<TEnum>>(aEnumFlag);
-}
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Accept an inline list of options and check if a specific value is contained in this list.
- *
- * @param aOptions
- * @param aCompare
- * @return
- */
-template <typename TValue>
-static bool anyOf(std::vector<TValue> const &&aOptions, TValue const &aCompare)
-{
-    return (aOptions.end() != std::find(aOptions.begin(), aOptions.end(), aCompare));
-}
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Accept an inline assignment and check, whether an assignment for a specific key exists.
- * Return it's value.
- *
- * @param aExtension
- * @param aOptions
- * @return
- */
-template <typename TKey, typename TValue>
-static std::enable_if_t<std::is_default_constructible_v<TValue>, TValue> const mapValue(TKey const &aExtension, std::unordered_map<TKey, TValue> const &&aOptions)
-{
-    bool const contained = (aOptions.end() != aOptions.find(aExtension));
-    if(not contained)
-    {
-        return TValue();
-    }
-    else
-    {
-        return aOptions.at(aExtension);
-    }
-}
-
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Read a file into a string.
- *
- * @param aFileName Filename of the file to read.
- * @return          See brief.
- */
-static std::string readFile(std::string const &aFileName)
-{
-    bool const fileExists = std::filesystem::exists(aFileName);
-    if(not fileExists)
-    {
-        return std::string();
-    }
-
-    std::ifstream inputFileStream(aFileName);
-    bool const inputStreamOk = inputFileStream.operator bool();
-    if(not inputStreamOk)
-    {
-        return std::string();
-    }
-
-    std::string inputData((std::istreambuf_iterator<char>(inputFileStream)),
-                           std::istreambuf_iterator<char>());
-
-    return inputData;
-}
-
-//<-----------------------------------------------------------------------------
-
-//<-----------------------------------------------------------------------------
-//<
-//<-----------------------------------------------------------------------------
-
-/**
- * Read a file into a string.
- *
- * @param aFileName Filename of the file to read.
- * @return          See brief.
- */
-static std::vector<uint32_t> const readSpirVFile(std::string const &aFileName)
-{
-    bool const fileExists = std::filesystem::exists(aFileName);
-    if(not fileExists)
-    {
-        return {};
-    }
-
-    std::ifstream inputFileStream(aFileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-
-    std::streamoff filesize = inputFileStream.tellg();
-    uint64_t       datasize = static_cast<uint64_t>(filesize) / 4;
-
-    inputFileStream.seekg(0, std::ios::beg);
-
-    bool const inputFileStreamOk = inputFileStream.operator bool();
-    if(not inputFileStreamOk)
-    {
-        return {};
-    }
-
-    std::vector<uint32_t> inputData;
-    inputData.resize(datasize);
-
-    for(uint64_t k=0; k<datasize; ++k)
-    {
-        uint32_t *const data = (inputData.data() + k);
-        char     *const ch   = reinterpret_cast<char *const>(data);
-        inputFileStream.read(ch, 4);
-    }
-
-    return inputData;
-}
 //<-----------------------------------------------------------------------------
 
 //<-----------------------------------------------------------------------------
@@ -557,143 +393,6 @@ public_methods:
     }
 
     /**
-     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
-     *
-     * @param aUnit Source data information for the glslangValidator command.
-     * @return      EResult::Success      if successful.
-     * @return      EResult::InputInvalid on error.
-     */
-    EResult invokeSpirVCross(SShaderCompilationUnit const &aUnit)
-    {
-        std::underlying_type_t<EResult> result = 0;
-
-        auto const reflect = [&] (SShaderCompilationElement const &aElement) -> void
-        {
-            std::string           const inputFile   = aElement.outputPath;
-            // std::string           const outputFile  = aElement.outputPath;
-            std::vector<uint32_t> const spirvSource = readSpirVFile(inputFile);
-
-            spirv_cross::Compiler compiler(std::move(spirvSource));
-
-            spirv_cross::ShaderResources const resources = compiler.get_shader_resources();
-
-            CLog::Debug(logTag(), "Reflecting %0", inputFile);
-
-            // Read Stage Inputs
-            for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
-            {
-                uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
-                uint32_t const set      = compiler.get_decoration(stageInput.id, spv::DecorationDescriptorSet);
-                uint32_t const binding  = compiler.get_decoration(stageInput.id, spv::DecorationBinding);
-                CLog::Debug(logTag(),
-                            "\nStageInput: "
-                            "\n  ID:       %0"
-                            "\n  Name:     %1"
-                            "\n  Location: %2"
-                            "\n  Set:      %3"
-                            "\n  Binding:  %4",
-                            stageInput.id,
-                            stageInput.name,
-                            location,
-                            set,
-                            binding);
-            }
-
-            // Stage Outputs
-            for (spirv_cross::Resource const &stageInput : resources.stage_outputs)
-            {
-                uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
-                uint32_t const set      = compiler.get_decoration(stageInput.id, spv::DecorationDescriptorSet);
-                uint32_t const binding  = compiler.get_decoration(stageInput.id, spv::DecorationBinding);
-                CLog::Debug(logTag(),
-                            "\nStageOutput: "
-                            "\n  ID:       %0"
-                            "\n  Name:     %1"
-                            "\n  Location: %2"
-                            "\n  Set:      %3"
-                            "\n  Binding:  %4",
-                            stageInput.id,
-                            stageInput.name,
-                            location,
-                            set,
-                            binding);
-            }
-
-            // Subpass Input
-            for (spirv_cross::Resource const &subPassInput : resources.subpass_inputs)
-            {
-                uint32_t const attachmentIndex = compiler.get_decoration(subPassInput.id, spv::DecorationInputAttachmentIndex);
-                uint32_t const location        = compiler.get_decoration(subPassInput.id, spv::DecorationLocation);
-                uint32_t const set             = compiler.get_decoration(subPassInput.id, spv::DecorationDescriptorSet);
-                uint32_t const binding         = compiler.get_decoration(subPassInput.id, spv::DecorationBinding);
-
-                CLog::Debug(logTag(),
-                            "\nSubpassInput: "
-                            "\n  ID:              %0"
-                            "\n  Name:            %1"
-                            "\n  AttachmentIndex: %2"
-                            "\n  Location:        %3"
-                            "\n  Set:             %4"
-                            "\n  Binding:         %5",
-                            subPassInput.id,
-                            subPassInput.name,
-                            attachmentIndex,
-                            location,
-                            set,
-                            binding);
-            }
-
-            // separate_samplers
-            // separate_images
-
-            // Read UBO
-            for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
-            {
-                uint32_t const location = compiler.get_decoration(uniformBuffer.id, spv::DecorationLocation);
-                uint32_t const set      = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
-                uint32_t const binding  = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
-
-                CLog::Debug(logTag(),
-                            "\nUniformBuffer: "
-                            "\n  ID:              %0"
-                            "\n  Name:            %1"
-                            "\n  Location:        %2"
-                            "\n  Set:             %3"
-                            "\n  Binding:         %4",
-                            uniformBuffer.id,
-                            uniformBuffer.name,
-                            location,
-                            set,
-                            binding);
-            }
-
-            // Read Textures
-            for (spirv_cross::Resource const &sampledImage : resources.sampled_images)
-            {
-                uint32_t const location = compiler.get_decoration(sampledImage.id, spv::DecorationLocation);
-                uint32_t const set      = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
-                uint32_t const binding  = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
-
-                CLog::Debug(logTag(),
-                            "\nSampledImage: "
-                            "\n  ID:              %0"
-                            "\n  Name:            %1"
-                            "\n  Location:        %2"
-                            "\n  Set:             %3"
-                            "\n  Binding:         %4",
-                            sampledImage.id,
-                            sampledImage.name,
-                            location,
-                            set,
-                            binding);
-            }
-        };
-        std::for_each(aUnit.elements.begin(), aUnit.elements.end(), reflect);
-
-        return static_cast<EResult>(result);
-    }
-
-    /**
      * Run the shader precompiler on the identified input items.
      *
      * @return EResult::Success      if successful.
@@ -718,13 +417,22 @@ public_methods:
             return glslangResult;
         }
 
-        // EResult const spirvDisResult   = runSpirVDisassembler(unit.outputFiles);
-        EResult const spirvCrossResult = invokeSpirVCross(unit);
-        if(EResult::Success != glslangResult)
+        EResult const extractionResult = spirvCrossExtract(unit);
+        if(EResult::Success != extractionResult)
         {
-            CLog::Error(logTag(), "Failed to run glslang.");
-            return glslangResult;
+            CLog::Error(logTag(), "Failed to extract data from Spir-V file(s).");
+            return extractionResult;
         }
+
+        using namespace shader_precompiler::serialization;
+
+        CStdSharedPtr_t<CMaterialSerializer::IResult> result = nullptr;
+
+        CStdUniquePtr_t<IMaterialSerializer> serializer = makeCStdUniquePtr<CMaterialSerializer>();
+        bool const initialized   = serializer->initialize();
+        // bool const serialized    = serializer->serialize(unit, result);
+        bool const deinitialized = serializer->deinitialize();
+        serializer = nullptr;
 
         return EResult::Success;
     }

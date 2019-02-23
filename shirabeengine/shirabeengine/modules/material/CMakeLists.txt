@@ -10,7 +10,8 @@ set(
         SHIRABEMODULECORE
         SHIRABEMODULELOG
         SHIRABEMODULEPLATFORM
-        SHIRABEMODULEBASE)
+        SHIRABEMODULEBASE
+        JSON)
 
 include(project_setup)
 

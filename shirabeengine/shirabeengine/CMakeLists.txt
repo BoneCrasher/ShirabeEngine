@@ -42,6 +42,7 @@ set(
         resources
         rendering
         graphicsapi
+        material
         vulkan
         asset)
 

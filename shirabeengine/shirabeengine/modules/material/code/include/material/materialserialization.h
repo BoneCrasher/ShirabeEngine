@@ -1,22 +1,23 @@
-#ifndef __SHIRABE_SHADERPRECOMP_MATERIAL_SERIALIZATION_H__
-#define __SHIRABE_SHADERPRECOMP_MATERIAL_SERIALIZATION_H__
+#ifndef __SHIRABE_MATERIAL_SERIALIZATION_H__
+#define __SHIRABE_MATERIAL_SERIALIZATION_H__
 
 #include <sstream>
 #include <optional>
 
 #include <nlohmann/json.hpp>
-#include <spirv_cross/spirv_cross.hpp>
 
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <core/serialization/serialization.h>
 
-#include "definition.h"
+#include "material/material_declaration.h"
 
-namespace shader_precompiler
+namespace engine
 {
     namespace serialization
     {
+        using namespace engine::material;
+
         using engine::serialization::ISerializer;
         using engine::serialization::ISerializable;
 
@@ -25,22 +26,19 @@ namespace shader_precompiler
          * to serialize a framegraph instance.
          */
         class IMaterialSerializer
-                : public ISerializer<SShaderCompilationUnit>
+                : public ISerializer<SMaterial>
         {
             SHIRABE_DECLARE_INTERFACE(IMaterialSerializer);
 
         public_api:
-            virtual bool writeProgramHeader(SShaderCompilationUnit const &aUnit) = 0;
-
-            virtual bool writeInputDescriptionElement(std::vector<spirv_cross::Resource> const &aResource) = 0;
-
-            virtual bool writeSubpassInputs(std::vector<spirv_cross::Resource> const &aResource) = 0;
-
-            virtual bool serializeSubpassOutputs(std::vector<spirv_cross::Resource> const &aResource) = 0;
-
-            virtual bool serializeUniformBuffers(std::vector<spirv_cross::Resource> const &aResource) = 0;
-
-            virtual bool serializeSampledImages(std::vector<spirv_cross::Resource> const &aResource) = 0;
+            /**
+             * Serialize a compilation element (implicit: a shader stage).
+             *
+             * @param aStage The stage to serialize.
+             * @return       True, if successful.
+             * @return       False, on error.
+             */
+            virtual bool serializeStage(SMaterialStage const &aStage) = 0;
         };
 
         /**
@@ -52,16 +50,24 @@ namespace shader_precompiler
         {
             SHIRABE_DECLARE_LOG_TAG(CMaterialSerializer);
 
+        public_destructors:
+            virtual ~CMaterialSerializer() = default;
+
         public_structs:
             /*!
              * The IResult interface of the ISerializer<T> interface declares required
              * signatures for result retrieval from a serialization process.
              */
-            class CMaterialSerializationResult
-                    : public ISerializer<SShaderCompilationUnit>::IResult
+            class SHIRABE_TEST_EXPORT CMaterialSerializationResult
+                    : public ISerializer<SMaterial>::IResult
             {
             public_constructors:
+                CMaterialSerializationResult();
+
                 CMaterialSerializationResult(nlohmann::json const &aResult);
+
+            public_destructors:
+                virtual ~CMaterialSerializationResult() = default;
 
             public_methods:
                 bool asString      (std::string          &aOutString) const;
@@ -90,37 +96,21 @@ namespace shader_precompiler
              * Serialize an instance of type SShaderCompilationUnit into whichever internal representation and
              * provide it using a pointer to IResult.
              *
-             * @param aUnit      Input data for serialization.
+             * @param aMaterial  Input data for serialization.
              * @param aOutResult Result-Instance holding the serialized data, providing access to
              *                   it in various output formats.
              * @return
              */
-            bool serialize(SShaderCompilationUnit const &aUnit, CStdSharedPtr_t<IResult> &aOutResult);
+            bool serialize(SMaterial const &aMaterial, CStdSharedPtr_t<IResult> &aOutResult);
 
-            bool serializeUnit(SShaderCompilationUnit const &aUnit);
-
-            bool serializeStage(SShaderCompilationElement const &aStage);
-
-            bool serializeInputDescription(std::vector<spirv_cross::Resource> const &aResource);
-
-            bool serializeSubpassInputs(std::vector<spirv_cross::Resource> const &aResource);
-
-            bool serializeSubpassOutputs(std::vector<spirv_cross::Resource> const &aResource);
-
-            bool serializeUniformBuffers(std::vector<spirv_cross::Resource> const &aResource);
-
-            bool serializeSampledImages(std::vector<spirv_cross::Resource> const &aResource);
-
-        private_methods:
             /**
-             * Begin writing the framegraph, writing out some header information and style data for
-             * the dot layout engine.
+             * Serialize a compilation element (implicit: a shader stage).
+             *
+             * @param aStage The stage to serialize.
+             * @return       True, if successful.
+             * @return       False, on error.
              */
-            void beginGraph();
-            /**
-             * Finalize the dot graph.
-             */
-            void endGraph();
+            bool serializeStage(SMaterialStage const &aStage);
 
         private_members:
             std::stringstream mStream;

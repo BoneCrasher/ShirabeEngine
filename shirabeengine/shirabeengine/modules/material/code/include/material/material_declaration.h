@@ -7,13 +7,188 @@
 #include <stdint.h>
 
 #include <base/declaration.h>
+#include <base/stl_container_helpers.h>
 #include <platform/platform.h>
 #include <core/enginestatus.h>
+#include <core/serialization/serialization.h>
 
 namespace engine
 {
+    namespace serialization
+    {
+        class IMaterialSerializer;
+    }
+
     namespace material
     {
+
+        /**
+         * Describes the stage of the shader to compile.
+         */
+        enum class EShaderStage
+        {
+            NotApplicable = 0,
+            Vertex,
+            TesselationControlPoint,
+            TesselationEvaluation,
+            Geometry,
+            Fragment,
+            Compute
+        };
+
+        /**
+         * Describes a shader stage input by it's name and explicit location.
+         */
+        struct SStageInput
+        {
+            std::string name;
+            uint32_t    location;
+        };
+
+        /**
+         * Describes a shader stage input by it's name and explicit location.
+         */
+        struct SStageOutput
+        {
+            std::string name;
+            uint32_t    location;
+        };
+
+        /**
+         * Describes a fragment shader subpass input. Will be empty for all other shader types.
+         */
+        struct SSubpassInput
+        {
+            std::string name;
+            uint32_t    attachmentIndex;
+            uint32_t    set;
+            uint32_t    binding;
+        };
+
+        /**
+         * The SBufferLocation struct describes a specific location within a data buffer used to read
+         * or write the respective value.
+         */
+        struct SBufferLocation
+        {
+            uint64_t offset;
+            uint64_t length;
+            uint64_t padding;
+        };
+
+        /**
+         * @brief The SUniformBufferMember struct
+         */
+        struct SUniformBufferMember
+        {
+            std::string     name;
+            SBufferLocation location;
+        };
+        using UniformBufferMemberMap_t = std::unordered_map<std::string, SUniformBufferMember>;
+
+        /**
+         * @brief The SUniformBuffer struct
+         */
+        struct SUniformBuffer
+        {
+            std::string              name;
+            SBufferLocation          location;
+            UniformBufferMemberMap_t members;
+        };
+
+        /**
+         * Describes a single shader stage including all it's inputs, outputs and resources.
+         */
+        struct SMaterialStage
+                : engine::serialization::ISerializable<serialization::IMaterialSerializer>
+        {
+        public_members:
+            std::string                 filename;
+            std::vector<SStageInput>    inputs;
+            std::vector<SStageOutput>   outputs;
+
+        public_constructors:
+            SMaterialStage() = default;
+
+            SHIRABE_INLINE
+            SMaterialStage(SMaterialStage const &aOther)
+                : filename(aOther.filename)
+                , inputs(aOther.inputs)
+                , outputs(aOther.outputs)
+            {}
+
+        public_operators:
+            SMaterialStage &operator=(SMaterialStage const &aOther)
+            {
+                filename = aOther.filename;
+                inputs   = aOther.inputs;
+                outputs  = aOther.outputs;
+
+                return (*this);
+            }
+
+        public_methods:
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const;
+        };
+        using StageMap_t = std::unordered_map<EShaderStage, SMaterialStage>;
+
+        /**
+         * @brief The SMaterial struct
+         */
+        struct SMaterial
+                : engine::serialization::ISerializable<serialization::IMaterialSerializer>
+        {
+        public_members:
+            std::string                 name;
+            StageMap_t                  stages;
+            // Although each stage defines uniform buffers individually, they are shared
+            // across all stages, due to indexing them with set and binding.
+            std::vector<SUniformBuffer> uniformBuffers;
+            // Fragment shader only
+            std::vector<SSubpassInput>  subpassInputs;
+
+        public_constructors:
+            SMaterial() = default;
+
+            SHIRABE_INLINE
+            SMaterial(SMaterial const &aOther)
+                : name(aOther.name)
+                , stages(aOther.stages)
+                , uniformBuffers(aOther.uniformBuffers)
+                , subpassInputs(aOther.subpassInputs)
+            {}
+
+        public_operators:
+            SMaterial &operator=(SMaterial const &aOther)
+            {
+                name           = aOther.name;
+                stages         = aOther.stages;
+                uniformBuffers = aOther.uniformBuffers;
+                subpassInputs  = aOther.subpassInputs;
+
+                return (*this);
+            }
+
+        public_methods:
+            SHIRABE_INLINE bool hasVertexStage()          const { return stages.end() != stages.find(EShaderStage::Vertex);                  }
+            SHIRABE_INLINE bool hasTessControlStage()     const { return stages.end() != stages.find(EShaderStage::TesselationControlPoint); }
+            SHIRABE_INLINE bool hasTessEvalutationStage() const { return stages.end() != stages.find(EShaderStage::TesselationEvaluation);   }
+            SHIRABE_INLINE bool hasGeometryStage()        const { return stages.end() != stages.find(EShaderStage::Geometry);                }
+            SHIRABE_INLINE bool hasFragmentStage()        const { return stages.end() != stages.find(EShaderStage::Fragment);                }
+            SHIRABE_INLINE bool hasComputeStage()         const { return stages.end() != stages.find(EShaderStage::Compute);                 }
+
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const;
+        };
 
         /**
          * The CMaterialInterface class defines the public interface into the
@@ -77,15 +252,6 @@ namespace engine
                     TDataType   const &aFieldValue);
 
         private_structs:
-            /**
-             * The SBufferLocation struct describes a specific location within a data buffer used to read
-             * or write the respective value.
-             */
-            struct SBufferLocation
-            {
-                uint64_t offset;
-                uint64_t length;
-            };
 
             /**
              * The SBufferData class encapsulates a set buffer locations for a single
