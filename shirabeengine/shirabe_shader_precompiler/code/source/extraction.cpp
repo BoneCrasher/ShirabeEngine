@@ -25,6 +25,7 @@ namespace shader_precompiler
         uint64_t       datasize = static_cast<uint64_t>(filesize) / 4;
 
         inputFileStream.seekg(0, std::ios::beg);
+        result |= EnumValueOf(EResult::Success);
 
         bool const inputFileStreamOk = inputFileStream.operator bool();
         if(not inputFileStreamOk)
