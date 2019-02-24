@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <optional>
+#include <stack>
 
 #include <nlohmann/json.hpp>
 
@@ -32,13 +33,57 @@ namespace engine
 
         public_api:
             /**
-             * Serialize a compilation element (implicit: a shader stage).
+             * Begin a JSON array, to which the upcoming objects will be added.
              *
-             * @param aStage The stage to serialize.
-             * @return       True, if successful.
-             * @return       False, on error.
+             * @param aName Name of the array to begin.
+             * @return
              */
-            virtual bool serializeStage(SMaterialStage const &aStage) = 0;
+            virtual bool beginArray(std::string const &aName) = 0;
+
+            /**
+             * End the current array. If any.
+             * @return
+             */
+            virtual bool endArray() = 0;
+
+            /**
+             * Begin a new object w/ the given name.
+             *
+             * @param aName
+             * @return
+             */
+            virtual bool beginObject(std::string const &aName) = 0;
+
+            /**
+             * End the current object, if any.
+             *
+             * @return
+             */
+            virtual bool endObject() = 0;
+
+            /**
+             * Write a string value to the current object/array.
+             *
+             * @param aKey
+             * @param aValue
+             * @return
+             */
+            virtual bool writeValue(std::string const &aKey, std::string const &aValue) = 0;
+
+            /**
+             * Write a numeric value to the current object/array by converting
+             * it to string beforehand.
+             *
+             * @param aKey
+             * @param aValue
+             * @return
+             */
+            template <typename TValue>
+            bool writeNumericValue(std::string const &aKey, TValue const &aValue)
+            {
+                std::string const value = CString::toString<TValue>(aValue);
+                return writeValue(aKey, value);
+            }
         };
 
         /**
@@ -104,16 +149,70 @@ namespace engine
             bool serialize(SMaterial const &aMaterial, CStdSharedPtr_t<IResult> &aOutResult);
 
             /**
-             * Serialize a compilation element (implicit: a shader stage).
+             * Begin a JSON array, to which the upcoming objects will be added.
              *
-             * @param aStage The stage to serialize.
-             * @return       True, if successful.
-             * @return       False, on error.
+             * @param aName Name of the array to begin.
+             * @return
              */
-            bool serializeStage(SMaterialStage const &aStage);
+            bool beginArray(std::string const &aName);
+
+            /**
+             * End the current array. If any.
+             * @return
+             */
+            bool endArray();
+
+            /**
+             * Begin a new object w/ the given name.
+             *
+             * @param aName
+             * @return
+             */
+            bool beginObject(std::string const &aName);
+
+            /**
+             * End the current object, if any.
+             *
+             * @return
+             */
+            bool endObject();
+
+            /**
+             * Write a string value to the current object/array.
+             *
+             * @param aKey
+             * @param aValue
+             * @return
+             */
+            bool writeValue(std::string const &aKey, std::string const &aValue);
+
+        private_methods:
+
+            /**
+             * Check, whether there's a current top level item.
+             *
+             * @return
+             */
+            bool hasCurrentItem() const
+            {
+                return (not mCurrentJSONState.empty());
+            }
+
+            /**
+             * Return a reference to the current top level item.
+             *
+             * @return
+             */
+            SHIRABE_INLINE
+            nlohmann::json &getCurrentItem()
+            {
+                return mCurrentJSONState.top().get();
+            }
 
         private_members:
-            std::stringstream mStream;
+
+            nlohmann::json                                     mRoot;
+            std::stack<std::reference_wrapper<nlohmann::json>> mCurrentJSONState;
         };
     }
 }

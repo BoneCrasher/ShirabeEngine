@@ -433,6 +433,12 @@ public_methods:
         CStdUniquePtr_t<IMaterialSerializer> serializer = makeCStdUniquePtr<CMaterialSerializer>();
         bool const initialized   = serializer->initialize();
         bool const serialized    = serializer->serialize(extractionResult.data(), result);
+
+        std::string str {};
+        bool const fetched = result->asString(str);
+
+        CLog::Debug(logTag(), str);
+
         bool const deinitialized = serializer->deinitialize();
         serializer = nullptr;
 

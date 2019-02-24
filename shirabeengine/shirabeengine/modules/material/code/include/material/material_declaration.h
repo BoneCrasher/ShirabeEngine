@@ -1,4 +1,4 @@
-#ifndef __SHIRABE_MATERIAL_DECLARATION_H__
+﻿#ifndef __SHIRABE_MATERIAL_DECLARATION_H__
 #define __SHIRABE_MATERIAL_DECLARATION_H__
 
 #include <assert.h>
@@ -91,9 +91,30 @@ namespace engine
          */
         struct SUniformBuffer
         {
+        public_members:
             std::string              name;
             SBufferLocation          location;
-            UniformBufferMemberMap_t members;
+            UniformBufferMemberMap_t members;            
+
+        public_constructors:
+            SUniformBuffer() = default;
+
+            SHIRABE_INLINE
+            SUniformBuffer(SUniformBuffer const &aOther)
+                : name    (aOther.name    )
+                , location(aOther.location)
+                , members (aOther.members )
+            {}
+
+        public_operators:
+            SUniformBuffer &operator=(SUniformBuffer const &aOther)
+            {
+                name     = aOther.name;
+                location = aOther.location;
+                members  = aOther.members;
+
+                return (*this);
+            }
         };
 
         /**
@@ -110,9 +131,10 @@ namespace engine
          * Describes a single shader stage including all it's inputs, outputs and resources.
          */
         struct SMaterialStage
-                : engine::serialization::ISerializable<serialization::IMaterialSerializer>
         {
         public_members:
+            EShaderStage                stage;
+            std::string                 stageName;
             std::string                 filename;
             std::vector<SStageInput>    inputs;
             std::vector<SStageOutput>   outputs;
@@ -122,7 +144,9 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialStage(SMaterialStage const &aOther)
-                : filename(aOther.filename)
+                : stage(aOther.stage)
+                , stageName(aOther.stageName)
+                , filename(aOther.filename)
                 , inputs(aOther.inputs)
                 , outputs(aOther.outputs)
             {}
@@ -130,20 +154,14 @@ namespace engine
         public_operators:
             SMaterialStage &operator=(SMaterialStage const &aOther)
             {
-                filename = aOther.filename;
-                inputs   = aOther.inputs;
-                outputs  = aOther.outputs;
+                stage     = aOther.stage;
+                stageName = aOther.stageName;
+                filename  = aOther.filename;
+                inputs    = aOther.inputs;
+                outputs   = aOther.outputs;
 
                 return (*this);
             }
-
-        public_methods:
-            /**
-             * @brief acceptSerializer
-             * @param aSerializer
-             * @return
-             */
-            bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const;
         };
         using StageMap_t = std::unordered_map<EShaderStage, SMaterialStage>;
 
@@ -168,9 +186,11 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterial(SMaterial const &aOther)
-                : name(aOther.name)
+                : engine::serialization::ISerializable<serialization::IMaterialSerializer>()
+                , name(aOther.name)
                 , stages(aOther.stages)
                 , uniformBuffers(aOther.uniformBuffers)
+                , sampledImages(aOther.sampledImages)
                 , subpassInputs(aOther.subpassInputs)
             {}
 
@@ -180,6 +200,7 @@ namespace engine
                 name           = aOther.name;
                 stages         = aOther.stages;
                 uniformBuffers = aOther.uniformBuffers;
+                sampledImages  = aOther.sampledImages;
                 subpassInputs  = aOther.subpassInputs;
 
                 return (*this);
@@ -540,7 +561,7 @@ namespace engine
                 bool const layerAvailable = hasLayer(aLayerId);
                 if(not layerAvailable)
                 {
-                    return CEngineResult(EEngineStatus::Error, nullptr);
+                    return { EEngineStatus::Error };
                 }
 
                 CMaterialLayer &layer = mLayers[aLayerId];

@@ -7,10 +7,10 @@ layout(set = 2, binding = 1) uniform sampler2D specularReflectanceGlossTexture;
 layout(set = 2, binding = 2) uniform sampler2D normalTexture;
 
 // Attachment binding
-layout(input_attachment_index = 0, set = 0, binding = 0) uniform subpassInput gbuffer0;
-layout(input_attachment_index = 1, set = 0, binding = 1) uniform subpassInput gbuffer1;
-layout(input_attachment_index = 2, set = 0, binding = 2) uniform subpassInput gbuffer2;
-layout(input_attachment_index = 3, set = 0, binding = 3) uniform subpassInput gbuffer3;
+layout(input_attachment_index = 0, set = 3, binding = 0) uniform subpassInput gbuffer0;
+layout(input_attachment_index = 1, set = 3, binding = 1) uniform subpassInput gbuffer1;
+layout(input_attachment_index = 2, set = 3, binding = 2) uniform subpassInput gbuffer2;
+layout(input_attachment_index = 3, set = 3, binding = 3) uniform subpassInput gbuffer3;
 
 // Input
 layout (location = 0)

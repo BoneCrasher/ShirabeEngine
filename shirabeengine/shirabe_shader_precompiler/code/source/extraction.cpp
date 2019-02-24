@@ -25,7 +25,6 @@ namespace shader_precompiler
         uint64_t       datasize = static_cast<uint64_t>(filesize) / 4;
 
         inputFileStream.seekg(0, std::ios::beg);
-        result |= EnumValueOf(EResult::Success);
 
         bool const inputFileStreamOk = inputFileStream.operator bool();
         if(not inputFileStreamOk)
@@ -45,6 +44,24 @@ namespace shader_precompiler
 
         return inputData;
     }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    static std::string const determineStageName(EShaderStage const &aStage)
+    {
+        switch(aStage)
+        {
+        case EShaderStage::Vertex:                  return "vertex";
+        case EShaderStage::TesselationControlPoint: return "tesselation_controlpoint";
+        case EShaderStage::TesselationEvaluation:   return "tesselation_evaluation";
+        case EShaderStage::Geometry:                return "geometry";
+        case EShaderStage::Fragment:                return "fragment";
+        case EShaderStage::Compute:                 return "compute";
+        default:                                    return "unknown";
+        }
+    }
 
     //<-----------------------------------------------------------------------------
 
@@ -60,6 +77,9 @@ namespace shader_precompiler
         auto const reflect = [&] (SShaderCompilationElement const &aElement) -> void
         {
             SMaterialStage stageExtracted {};
+            stageExtracted.stage     = aElement.stage;
+            stageExtracted.stageName = determineStageName(aElement.stage);
+            stageExtracted.filename  = aElement.fileName;
 
             std::string           const inputFile   = aElement.outputPath;
             std::vector<uint32_t> const spirvSource = readSpirVFile(inputFile);
@@ -94,6 +114,9 @@ namespace shader_precompiler
             for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
             {
                 uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
+
+                spirv_cross::SPIRType const &type = compiler.get_type(stageInput.base_type_id);
+                // TODO: Go on to extract the type for input layout matching!
 
                 SStageInput stageInputExtracted{};
                 stageInputExtracted.name     = stageInput.name;
@@ -142,9 +165,10 @@ namespace shader_precompiler
                 uint32_t const binding         = compiler.get_decoration(subPassInput.id, spv::DecorationBinding);
 
                 SSubpassInput stageSubpassInputExtracted{};
-                stageSubpassInputExtracted.name     = subPassInput.name;
-                stageSubpassInputExtracted.set      = set;
-                stageSubpassInputExtracted.binding  = binding;
+                stageSubpassInputExtracted.name            = subPassInput.name;
+                stageSubpassInputExtracted.attachmentIndex = attachmentIndex;
+                stageSubpassInputExtracted.set             = set;
+                stageSubpassInputExtracted.binding         = binding;
                 materialExtracted.subpassInputs.push_back(stageSubpassInputExtracted);
 
                 CLog::Debug(logTag(),
