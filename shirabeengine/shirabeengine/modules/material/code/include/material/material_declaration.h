@@ -97,6 +97,16 @@ namespace engine
         };
 
         /**
+         * Describes a sampled image in a GLSL shader.
+         */
+        struct SSampledImage
+        {
+            std::string name;
+            uint32_t    set;
+            uint32_t    binding;
+        };
+
+        /**
          * Describes a single shader stage including all it's inputs, outputs and resources.
          */
         struct SMaterialStage
@@ -149,6 +159,7 @@ namespace engine
             // Although each stage defines uniform buffers individually, they are shared
             // across all stages, due to indexing them with set and binding.
             std::vector<SUniformBuffer> uniformBuffers;
+            std::vector<SSampledImage>  sampledImages;
             // Fragment shader only
             std::vector<SSubpassInput>  subpassInputs;
 

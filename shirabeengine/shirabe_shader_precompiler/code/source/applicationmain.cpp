@@ -310,7 +310,9 @@ public_methods:
         {
             std::string          const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
             CResult<std::string> const commandResult = executeCmd(command);
-            if(not commandResult.successful())
+
+            bool const compilationError = (std::string::npos != commandResult.data().find("compilation error"));
+            if(compilationError || not commandResult.successful())
             {
                 CLog::Error(logTag(), commandResult.data());
                 result |= EnumValueOf(EResult::CompilationFailed);
@@ -417,11 +419,11 @@ public_methods:
             return glslangResult;
         }
 
-        EResult const extractionResult = spirvCrossExtract(unit);
-        if(EResult::Success != extractionResult)
+        CResult<SMaterial> const extractionResult = spirvCrossExtract(unit);
+        if(not extractionResult.successful())
         {
             CLog::Error(logTag(), "Failed to extract data from Spir-V file(s).");
-            return extractionResult;
+            return EResult::InputInvalid;
         }
 
         using namespace shader_precompiler::serialization;
@@ -430,7 +432,7 @@ public_methods:
 
         CStdUniquePtr_t<IMaterialSerializer> serializer = makeCStdUniquePtr<CMaterialSerializer>();
         bool const initialized   = serializer->initialize();
-        // bool const serialized    = serializer->serialize(unit, result);
+        bool const serialized    = serializer->serialize(extractionResult.data(), result);
         bool const deinitialized = serializer->deinitialize();
         serializer = nullptr;
 

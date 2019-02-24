@@ -206,7 +206,7 @@ namespace engine
                         break;
                     }
                 default:
-                    if(readNumber && formattedArguments.size() > number)
+                    if( readNumber && (formattedArguments.size() > number) )
                     {
                         stream << formattedArguments[std::size_t(number)];
                         readNumber = false;

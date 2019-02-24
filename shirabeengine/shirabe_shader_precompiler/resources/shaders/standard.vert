@@ -1,4 +1,4 @@
-#version 440 core
+#version 450 core
 #extension GL_GOOGLE_include_directive : require
 #include "base.glsl"
 
@@ -27,14 +27,10 @@ modelMatrices;
 //
 // Input description
 //
-layout (location = 0)
-in vec3 vertex_position;
-layout (location = 1)
-in vec3 vertex_normal;
-layout (location = 2)
-in vec3 vertex_tangent;
-layout (location = 3)
-in vec2 vertex_texcoord;
+layout (location = 0) in vec3 vertex_position;
+layout (location = 1) in vec3 vertex_normal;
+layout (location = 2) in vec3 vertex_tangent;
+layout (location = 3) in vec2 vertex_texcoord;
 
 //
 // Vertex shader output

@@ -50,7 +50,7 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EResult spirvCrossExtract(SShaderCompilationUnit const &aUnit)
+    CResult<SMaterial> spirvCrossExtract(SShaderCompilationUnit const &aUnit)
     {
         std::underlying_type_t<EResult> result = EnumValueOf(EResult::Success);
 
@@ -65,16 +65,34 @@ namespace shader_precompiler
 
             spirv_cross::Compiler compiler(std::move(spirvSource));
 
+            //
+            // Handle entry points
+            //
+            std::vector<spirv_cross::EntryPoint> entryPoints = compiler.get_entry_points_and_stages();
+            auto const reflectEntryPoints = [&] (spirv_cross::EntryPoint const &aEntryPoint) -> void
+            {
+                SHIRABE_UNUSED(aEntryPoint);
+
+                // Should be 'main', due to glsl requirement and no renaming being used.
+                // aEntryPoint.name;
+                // Value of spv::ExecutionModel. Could be used to validate the input.
+                // aEntryPoint.execution_model;
+            };
+            std::for_each(entryPoints.begin(), entryPoints.end(), reflectEntryPoints);
+
+            //
+            // Handle resources
+            //
             spirv_cross::ShaderResources const resources = compiler.get_shader_resources();
 
             CLog::Debug(logTag(), "Reflecting %0", inputFile);
 
+            //
             // Read Stage Inputs
+            //
             for (spirv_cross::Resource const &stageInput : resources.stage_inputs)
             {
                 uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
-                uint32_t const set      = compiler.get_decoration(stageInput.id, spv::DecorationDescriptorSet);
-                uint32_t const binding  = compiler.get_decoration(stageInput.id, spv::DecorationBinding);
 
                 SStageInput stageInputExtracted{};
                 stageInputExtracted.name     = stageInput.name;
@@ -85,14 +103,10 @@ namespace shader_precompiler
                             "\nStageInput: "
                             "\n  ID:       %0"
                             "\n  Name:     %1"
-                            "\n  Location: %2"
-                            "\n  Set:      %3"
-                            "\n  Binding:  %4",
+                            "\n  Location: %2",
                             stageInput.id,
                             stageInput.name,
-                            location,
-                            set,
-                            binding);
+                            location);
             }
 
             //
@@ -101,8 +115,6 @@ namespace shader_precompiler
             for (spirv_cross::Resource const &stageOutput : resources.stage_outputs)
             {
                 uint32_t const location = compiler.get_decoration(stageOutput.id, spv::DecorationLocation);
-                uint32_t const set      = compiler.get_decoration(stageOutput.id, spv::DecorationDescriptorSet);
-                uint32_t const binding  = compiler.get_decoration(stageOutput.id, spv::DecorationBinding);
 
                 SStageOutput stageOutputExtracted{};
                 stageOutputExtracted.name     = stageOutput.name;
@@ -113,14 +125,10 @@ namespace shader_precompiler
                             "\nStageOutput: "
                             "\n  ID:       %0"
                             "\n  Name:     %1"
-                            "\n  Location: %2"
-                            "\n  Set:      %3"
-                            "\n  Binding:  %4",
+                            "\n  Location: %2",
                             stageOutput.id,
                             stageOutput.name,
-                            location,
-                            set,
-                            binding);
+                            location);
             }
 
             //
@@ -129,7 +137,6 @@ namespace shader_precompiler
             for (spirv_cross::Resource const &subPassInput : resources.subpass_inputs)
             {
                 uint32_t const attachmentIndex = compiler.get_decoration(subPassInput.id, spv::DecorationInputAttachmentIndex);
-                uint32_t const location        = compiler.get_decoration(subPassInput.id, spv::DecorationLocation);
                 uint32_t const set             = compiler.get_decoration(subPassInput.id, spv::DecorationDescriptorSet);
                 uint32_t const binding         = compiler.get_decoration(subPassInput.id, spv::DecorationBinding);
 
@@ -144,24 +151,20 @@ namespace shader_precompiler
                             "\n  ID:              %0"
                             "\n  Name:            %1"
                             "\n  AttachmentIndex: %2"
-                            "\n  Location:        %3"
-                            "\n  Set:             %4"
-                            "\n  Binding:         %5",
+                            "\n  Set:             %3"
+                            "\n  Binding:         %4",
                             subPassInput.id,
                             subPassInput.name,
                             attachmentIndex,
-                            location,
                             set,
                             binding);
             }
 
-            // separate_samplers
-            // separate_images
-
-            // Read UBO
+            //
+            // Read UBOs
+            //
             for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
             {
-                uint32_t const location = compiler.get_decoration(uniformBuffer.id, spv::DecorationLocation);
                 uint32_t const set      = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
                 uint32_t const binding  = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
 
@@ -178,13 +181,11 @@ namespace shader_precompiler
                             "\nUniformBuffer: "
                             "\n  ID:              %0"
                             "\n  Name:            %1"
-                            "\n  Location:        %2"
-                            "\n  Set:             %3"
-                            "\n  Binding:         %4",
-                            "\n  Buf.-Size:       %5",
+                            "\n  Set:             %2"
+                            "\n  Binding:         %3",
+                            "\n  Buf.-Size:       %4",
                             uniformBuffer.id,
                             uniformBuffer.name,
-                            location,
                             set,
                             binding,
                             bufferSize);
@@ -193,6 +194,7 @@ namespace shader_precompiler
                 for(uint32_t k=0; k<memberCount; ++k)
                 {
                     spirv_cross::SPIRType const &memberType = compiler.get_type(type.member_types[k]);
+                    SHIRABE_UNUSED(memberType);
 
                     // Fetch basic information
                     std::string const &name   = compiler.get_member_name(type.self, k);
@@ -223,8 +225,11 @@ namespace shader_precompiler
                     // {
                     //     // Get bytes stride between columns (if column major), for float4x4 -> 16 bytes.
                     //     size_t matrixStride = compiler.type_struct_member_matrix_stride(type, k);
-                    // }
-                }
+                    // }                    
+                }                
+
+                // separate_samplers
+                // separate_images
 
                 materialExtracted.uniformBuffers.push_back(uniformBufferExtracted);
             }
@@ -232,20 +237,23 @@ namespace shader_precompiler
             // Read Textures
             for (spirv_cross::Resource const &sampledImage : resources.sampled_images)
             {
-                uint32_t const location = compiler.get_decoration(sampledImage.id, spv::DecorationLocation);
                 uint32_t const set      = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
                 uint32_t const binding  = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
+
+                SSampledImage image{};
+                image.name    = sampledImage.name;
+                image.set     = set;
+                image.binding = binding;
+                materialExtracted.sampledImages.push_back(image);
 
                 CLog::Debug(logTag(),
                             "\nSampledImage: "
                             "\n  ID:              %0"
                             "\n  Name:            %1"
-                            "\n  Location:        %2"
-                            "\n  Set:             %3"
-                            "\n  Binding:         %4",
+                            "\n  Set:             %2"
+                            "\n  Binding:         %3",
                             sampledImage.id,
                             sampledImage.name,
-                            location,
                             set,
                             binding);
             }
@@ -257,7 +265,7 @@ namespace shader_precompiler
 
         std::for_each(aUnit.elements.begin(), aUnit.elements.end(), reflect);
 
-        return static_cast<EResult>(result);
+        return { ( EResult::Success == static_cast<EResult>(result) ), materialExtracted };
     }
     //<-----------------------------------------------------------------------------
 }

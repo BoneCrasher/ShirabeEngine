@@ -10,7 +10,7 @@
 namespace shader_precompiler
 {
     /**
-     * Read a file into a string.
+     * Read a uint32_t word SPIR-V file into a vector<uint32_t>.
      *
      * @param aFileName Filename of the file to read.
      * @return          See brief.
@@ -22,7 +22,7 @@ namespace shader_precompiler
      * @param aUnit
      * @return
      */
-    EResult spirvCrossExtract(SShaderCompilationUnit const &aUnit);
+    CResult<SMaterial> spirvCrossExtract(SShaderCompilationUnit const &aUnit);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_EXTRACTION_H_
