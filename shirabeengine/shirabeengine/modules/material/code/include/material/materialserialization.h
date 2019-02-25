@@ -267,7 +267,7 @@ namespace engine
              * @param aName Name of the array to begin.
              * @return
              */
-            virtual bool beginArray(std::string const &aName) = 0;
+            virtual bool beginArray(std::string const &aName, uint32_t &aOutArraySize) = 0;
 
             /**
              * End the current array. If any.
@@ -282,6 +282,14 @@ namespace engine
              * @return
              */
             virtual bool beginObject(std::string const &aName) = 0;
+
+            /**
+             * Begin a new object w/ the given index into an array.
+             *
+             * @param aName
+             * @return
+             */
+            virtual bool beginObject(uint32_t const &aIndex) = 0;
 
             /**
              * End the current object, if any.
@@ -380,7 +388,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            bool deserialize(std::vector<int8_t> const &aSource, CStdSharedPtr_t<IResult> &aOutResult);
+            bool deserialize(std::vector<uint8_t> const &aSource, CStdSharedPtr_t<IResult> &aOutResult);
 
             /**
              * Begin a JSON array, to which the upcoming objects will be added.
@@ -388,7 +396,7 @@ namespace engine
              * @param aName Name of the array to begin.
              * @return
              */
-            bool beginArray(std::string const &aName);
+            bool beginArray(std::string const &aName, uint32_t &aOutArraySize);
 
             /**
              * End the current array. If any.
@@ -403,6 +411,14 @@ namespace engine
              * @return
              */
             bool beginObject(std::string const &aName);
+
+            /**
+             * Begin a new object w/ the given name.
+             *
+             * @param aName
+             * @return
+             */
+            bool beginObject(uint32_t const &aIndex);
 
             /**
              * End the current object, if any.

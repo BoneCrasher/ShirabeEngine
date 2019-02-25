@@ -17,6 +17,7 @@ namespace engine
     namespace serialization
     {
         class IMaterialSerializer;
+        class IMaterialDeserializer;
     }
 
     namespace material
@@ -184,6 +185,7 @@ namespace engine
          */
         struct SMaterial
                 : engine::serialization::ISerializable<serialization::IMaterialSerializer>
+                , engine::serialization::IDeserializable<serialization::IMaterialDeserializer>
         {
         public_members:
             std::string                 name;
@@ -234,6 +236,13 @@ namespace engine
              * @return
              */
             bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const;
+
+            /**
+             * @brief acceptDeserializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptDeserializer(serialization::IMaterialDeserializer &aDeserializer);
         };
 
         /**

@@ -297,7 +297,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CMaterialDeserializer::deserialize(std::vector<int8_t> const &aSource, CStdSharedPtr_t<IResult> &aOutResult)
+        bool CMaterialDeserializer::deserialize(std::vector<uint8_t> const &aSource, CStdSharedPtr_t<IResult> &aOutResult)
         {
             nlohmann::json json = nlohmann::json::from_msgpack(aSource);
             mRoot = json;
@@ -321,7 +321,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CMaterialDeserializer::beginArray(std::string const &aName)
+        bool CMaterialDeserializer::beginArray(std::string const &aName, uint32_t &aOutArraySize)
         {
             if(not hasCurrentItem())
             {
@@ -339,6 +339,7 @@ namespace engine
                 return false;
             }
 
+            aOutArraySize = static_cast<uint32_t>(arr.size());
             mCurrentJSONState.push(arr);
 
             return true;
@@ -386,15 +387,9 @@ namespace engine
             nlohmann::json &top = getCurrentItem();
             if(top.is_array())
             {
-                nlohmann::json &obj = top.at(0); // TODO: How to properly read array.
-                if(not obj.is_object())
-                {
-                    // Invalid use!
-                    CLog::Error(logTag(), "Cannot read object '%0'. Incompatible types.", aName);
-                    return false;
-                }
-
-                mCurrentJSONState.push(obj);
+                // Invalid use!
+                CLog::Error(logTag(), "Cannot read object '%0'. Incompatible types.", aName);
+                return false;
             }
             else
             {
@@ -407,6 +402,42 @@ namespace engine
                 }
 
                 mCurrentJSONState.push(obj);
+            }
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CMaterialDeserializer::beginObject(uint32_t const &aIndex)
+        {
+            if(not hasCurrentItem())
+            {
+                // Invalid use!
+                CLog::Error(logTag(), "Cannot read object on non-existent top level object.");
+                return true;
+            }
+
+            nlohmann::json &top = getCurrentItem();
+            if(top.is_array())
+            {
+                nlohmann::json &obj = top.at(aIndex); // TODO: How to properly read array.
+                if(not obj.is_object())
+                {
+                    // Invalid use
+                    CLog::Error(logTag(), "Cannot read object. Incompatible types.");
+                    return false;
+                }
+
+                mCurrentJSONState.push(obj);
+            }
+            else
+            {
+                // Invalid use!
+                CLog::Error(logTag(), "Cannot read object, since current item is no array.");
+                return false;
             }
 
             return true;
