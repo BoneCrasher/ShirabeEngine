@@ -62,6 +62,39 @@ namespace shader_precompiler
         default:                                    return "unknown";
         }
     }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    static std::string const determineSPIRVTypeName(spirv_cross::SPIRType const &aType)
+    {
+        switch(aType.basetype)
+        {
+        case spirv_cross::SPIRType::BaseType::Unknown          : return "Unknown";
+        case spirv_cross::SPIRType::BaseType::Void             : return "Void";
+        case spirv_cross::SPIRType::BaseType::Boolean          : return "Boolean";
+        case spirv_cross::SPIRType::BaseType::Char             : return "Char";
+        case spirv_cross::SPIRType::BaseType::SByte            : return "SByte";
+        case spirv_cross::SPIRType::BaseType::UByte            : return "UByte";
+        case spirv_cross::SPIRType::BaseType::Short            : return "Short";
+        case spirv_cross::SPIRType::BaseType::UShort           : return "UShort";
+        case spirv_cross::SPIRType::BaseType::Int              : return "Int";
+        case spirv_cross::SPIRType::BaseType::UInt             : return "UInt";
+        case spirv_cross::SPIRType::BaseType::Int64            : return "Int64";
+        case spirv_cross::SPIRType::BaseType::UInt64           : return "UInt64";
+        case spirv_cross::SPIRType::BaseType::AtomicCounter    : return "AtomicCounter";
+        case spirv_cross::SPIRType::BaseType::Half             : return "Half";
+        case spirv_cross::SPIRType::BaseType::Float            : return "Float";
+        case spirv_cross::SPIRType::BaseType::Double           : return "Double";
+        case spirv_cross::SPIRType::BaseType::Struct           : return "Struct";
+        case spirv_cross::SPIRType::BaseType::Image            : return "Image";
+        case spirv_cross::SPIRType::BaseType::SampledImage     : return "SampledImage";
+        case spirv_cross::SPIRType::BaseType::Sampler          : return "Sampler";
+        case spirv_cross::SPIRType::BaseType::ControlPointArray: return "ControlPointArray";
+        default:                                                 return "Unknown";
+        }
+    }
 
     //<-----------------------------------------------------------------------------
 
@@ -73,6 +106,51 @@ namespace shader_precompiler
         std::underlying_type_t<EResult> result = EnumValueOf(EResult::Success);
 
         SMaterial materialExtracted {};
+
+        auto const reflectType = [] (spirv_cross::SPIRType const &aType) -> SMaterialType
+        {
+            std::string           const  typeName       = determineSPIRVTypeName(aType);
+            uint32_t              const  typeByteWidth  = (aType.width /* bit */ / 8);
+            uint32_t              const  typeVectorSize = aType.vecsize;
+
+            uint32_t arraySize     = 1;
+            uint32_t arrayStride   = (typeVectorSize * typeByteWidth);
+            uint32_t matrixRows    = typeVectorSize;
+            uint32_t matrixColumns = aType.columns;
+            uint32_t matrixStride  = (typeVectorSize * typeByteWidth);
+            if (not aType.array.empty())
+            {
+                arraySize = aType.array[0]; // Multidimensional arrays not yet supported.
+            }
+
+            SMaterialType type {};
+            type.name               = determineSPIRVTypeName(aType);
+            type.vectorSize         = typeVectorSize;
+            type.arraySize          = arraySize;
+            type.arrayStride        = arrayStride;
+            type.matrixRows         = matrixRows;
+            type.matrixColumns      = matrixColumns;
+            type.matrixColumnStride = matrixStride;
+
+            CLog::Debug(logTag(),
+                        "\n     Type:                       "
+                        "\n         Type-Name:            %0"
+                        "\n         Vector-Size:          %1"
+                        "\n         Array-Size:           %2"
+                        "\n         Array-Stride:         %3"
+                        "\n         Matrix-Rows:          %4"
+                        "\n         Matrix-Columns:       %5"
+                        "\n         Matrix-Column-Stride: %6",
+                        type.name,
+                        type.vectorSize,
+                        type.arraySize,
+                        type.arrayStride,
+                        type.matrixRows,
+                        type.matrixColumns,
+                        type.matrixColumnStride);
+
+            return type;
+        };
 
         auto const reflect = [&] (SShaderCompilationElement const &aElement) -> void
         {
@@ -115,16 +193,17 @@ namespace shader_precompiler
             {
                 uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
 
-                spirv_cross::SPIRType const &type = compiler.get_type(stageInput.base_type_id);
-                // TODO: Go on to extract the type for input layout matching!
+                spirv_cross::SPIRType const &type          = compiler.get_type(stageInput.type_id);
+                SMaterialType         const  typeExtracted = reflectType(type);
 
                 SStageInput stageInputExtracted{};
                 stageInputExtracted.name     = stageInput.name;
                 stageInputExtracted.location = location;
+                stageInputExtracted.type     = typeExtracted;
                 stageExtracted.inputs.push_back(stageInputExtracted);
 
                 CLog::Debug(logTag(),
-                            "\nStageInput: "
+                            "\nStageInput:   "
                             "\n  ID:       %0"
                             "\n  Name:     %1"
                             "\n  Location: %2",
@@ -140,9 +219,13 @@ namespace shader_precompiler
             {
                 uint32_t const location = compiler.get_decoration(stageOutput.id, spv::DecorationLocation);
 
+                spirv_cross::SPIRType const &type          = compiler.get_type(stageOutput.type_id);
+                SMaterialType         const  typeExtracted = reflectType(type);
+
                 SStageOutput stageOutputExtracted{};
                 stageOutputExtracted.name     = stageOutput.name;
                 stageOutputExtracted.location = location;
+                stageOutputExtracted.type     = typeExtracted;
                 stageExtracted.outputs.push_back(stageOutputExtracted);
 
                 CLog::Debug(logTag(),
@@ -239,18 +322,6 @@ namespace shader_precompiler
                                 "\n      Offset:          %1"
                                 "\n      Size:            %2",
                                 name, offset, size);
-
-                    // if (not memberType.array.empty())
-                    // {
-                    //     // Get array stride, e.g. float4 foo[]; Will have array stride of 16 bytes.
-                    //     size_t arrayStride = compiler.type_struct_member_array_stride(type, k);
-                    // }
-                    //
-                    // if (1 < memberType.columns)
-                    // {
-                    //     // Get bytes stride between columns (if column major), for float4x4 -> 16 bytes.
-                    //     size_t matrixStride = compiler.type_struct_member_matrix_stride(type, k);
-                    // }                    
                 }                
 
                 // separate_samplers

@@ -36,13 +36,26 @@ namespace engine
             Compute
         };
 
+        struct SMaterialType
+        {
+            std::string name;
+            uint32_t    byteSize;
+            uint32_t    vectorSize;
+            uint32_t    matrixRows;
+            uint32_t    matrixColumns;
+            uint32_t    matrixColumnStride;
+            uint32_t    arraySize;
+            uint32_t    arrayStride;
+        };
+
         /**
          * Describes a shader stage input by it's name and explicit location.
          */
         struct SStageInput
         {
-            std::string name;
-            uint32_t    location;
+            std::string   name;
+            uint32_t      location;
+            SMaterialType type;
         };
 
         /**
@@ -50,8 +63,9 @@ namespace engine
          */
         struct SStageOutput
         {
-            std::string name;
-            uint32_t    location;
+            std::string   name;
+            uint32_t      location;
+            SMaterialType type;
         };
 
         /**
