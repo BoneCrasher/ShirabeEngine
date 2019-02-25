@@ -209,6 +209,7 @@ namespace engine
                 {
                     SUniformBufferMember member{};
                     iterate(member, k);
+                    aBuffer.members[member.name] = member;
                 }
 
                 aDeserializer.endArray();
@@ -225,77 +226,105 @@ namespace engine
             //
             // Serialize sampled images
             //
-            aSerializer.beginArray("sampledImages");
-            auto const iterateSampledImages = [&] (SSampledImage const &aSampledImage) -> void
+            uint32_t sampledImageCount = 0;
+            aDeserializer.beginArray("sampledImages", sampledImageCount);
+            sampledImages.resize(sampledImageCount);
+
+            auto const iterateSampledImages = [&] (SSampledImage &aSampledImage, uint32_t const &aIndex) -> void
             {
-                aSerializer.beginObject(aSampledImage.name);
-                aSerializer.writeValue("name",    aSampledImage.name);
-                aSerializer.writeValue("set",     aSampledImage.set);
-                aSerializer.writeValue("binding", aSampledImage.binding);
-                aSerializer.endObject();
+                aDeserializer.beginObject(aIndex);
+                aDeserializer.readValue("name",    aSampledImage.name);
+                aDeserializer.readValue("set",     aSampledImage.set);
+                aDeserializer.readValue("binding", aSampledImage.binding);
+                aDeserializer.endObject();
             };
-            std::for_each(this->sampledImages.begin(), this->sampledImages.end(), iterateSampledImages);
-            aSerializer.endArray();
+
+            for(uint32_t k=0; k<sampledImageCount; ++k)
+            {
+                iterateSampledImages(*(sampledImages.data() + k), k);
+            }
+
+            aDeserializer.endArray();
 
             //
             // Loop through stages
             //
-            aSerializer.beginArray("stages");
-            auto const iterateStages = [&] (std::pair<EShaderStage, SMaterialStage> const &aStage) -> void
+            uint32_t stageCount = 0;
+            aDeserializer.beginArray("stages", stageCount);
+
+            auto const iterateStages = [&] (SMaterialStage &aStage, uint32_t const &aIndex) -> void
             {
-                auto const writeType = [&] (SMaterialType const &aType) -> void
+                auto const readType = [&] (SMaterialType &aType) -> void
                 {
-                    aSerializer.beginObject("type");
-                    aSerializer.writeValue("name",               aType.name);
-                    aSerializer.writeValue("byteSize",           aType.byteSize);
-                    aSerializer.writeValue("vectorSize",         aType.vectorSize);
-                    aSerializer.writeValue("matrixRows",         aType.matrixRows);
-                    aSerializer.writeValue("matrixColumns",      aType.matrixColumns);
-                    aSerializer.writeValue("matrixColumnStride", aType.matrixColumnStride);
-                    aSerializer.writeValue("arraySize",          aType.arraySize);
-                    aSerializer.writeValue("arrayStride",        aType.arrayStride);
-                    aSerializer.endObject();
+                    aDeserializer.beginObject("type");
+                    aDeserializer.readValue("name",               aType.name);
+                    aDeserializer.readValue("byteSize",           aType.byteSize);
+                    aDeserializer.readValue("vectorSize",         aType.vectorSize);
+                    aDeserializer.readValue("matrixRows",         aType.matrixRows);
+                    aDeserializer.readValue("matrixColumns",      aType.matrixColumns);
+                    aDeserializer.readValue("matrixColumnStride", aType.matrixColumnStride);
+                    aDeserializer.readValue("arraySize",          aType.arraySize);
+                    aDeserializer.readValue("arrayStride",        aType.arrayStride);
+                    aDeserializer.endObject();
                 };
 
-                EShaderStage   const key   = aStage.first;
-                SMaterialStage const stage = aStage.second;
+                aDeserializer.beginObject(aIndex);
+                aDeserializer.readValue("name",     aStage.stageName);
+                aDeserializer.readValue("filename", aStage.filename);
 
-                SHIRABE_UNUSED(key);
+                uint32_t inputCount = 0;
+                aDeserializer.beginArray("inputs", inputCount);
+                aStage.inputs.resize(inputCount);
 
-                aSerializer.beginObject(stage.stageName);
-                aSerializer.writeValue("name",     stage.stageName);
-                aSerializer.writeValue("filename", stage.filename);
-
-                aSerializer.beginArray("inputs");
-                auto const iterateInputs = [&] (SStageInput const &aInput) -> void
+                auto const iterateInputs = [&] (SStageInput &aInput, uint32_t const &aIndex) -> void
                 {
-                   aSerializer.beginObject(aInput.name);
-                   aSerializer.writeValue("name",     aInput.name);
-                   aSerializer.writeValue("location", aInput.location);
+                   aDeserializer.beginObject(aIndex);
+                   aDeserializer.readValue("name",     aInput.name);
+                   aDeserializer.readValue("location", aInput.location);
 
-                   writeType(aInput.type);
+                   readType(aInput.type);
 
-                   aSerializer.endObject();
+                   aDeserializer.endObject();
                 };
-                std::for_each(stage.inputs.begin(), stage.inputs.end(), iterateInputs);
-                aSerializer.endArray();
 
-                aSerializer.beginArray("outputs");
-                auto const iterateOutputs = [&] (SStageOutput const &aOutput) -> void
+                for(uint32_t k=0; k<inputCount; ++k)
                 {
-                    aSerializer.beginObject(aOutput.name);
-                    aSerializer.writeValue("name",     aOutput.name);
-                    aSerializer.writeValue("location", aOutput.location);
-                    aSerializer.endObject();
+                    iterateInputs(*(aStage.inputs.data() + k), k);
+                }
+
+                aDeserializer.endArray();
+
+                uint32_t outputCount = 0;
+                aDeserializer.beginArray("outputs", outputCount);
+                aStage.outputs.resize(outputCount);
+
+                auto const iterateOutputs = [&] (SStageOutput &aOutput, uint32_t const &aIndex) -> void
+                {
+                    aDeserializer.beginObject(aIndex);
+                    aDeserializer.readValue("name",     aOutput.name);
+                    aDeserializer.readValue("location", aOutput.location);
+                    aDeserializer.endObject();
                 };
-                std::for_each(stage.outputs.begin(), stage.outputs.end(), iterateOutputs);
-                aSerializer.endArray();
-                aSerializer.endObject();
+
+                for(uint32_t k=0; k<inputCount; ++k)
+                {
+                    iterateOutputs(*(aStage.outputs.data() + k), k);
+                }
+
+                aDeserializer.endArray();
+                aDeserializer.endObject();
             };
-            std::for_each(this->stages.begin(), this->stages.end(), iterateStages);
 
-            aSerializer.endArray();
-            aSerializer.endObject();
+            for(uint32_t k=0; k<stageCount; ++k)
+            {
+                SMaterialStage stage{};
+
+                iterateStages(stage, k);
+                stages[stage.stage] = stage;
+            }
+
+            aDeserializer.endArray();
+            aDeserializer.endObject();
 
             return true;
         }
