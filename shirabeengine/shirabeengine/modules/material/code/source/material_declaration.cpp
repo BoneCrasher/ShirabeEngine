@@ -21,10 +21,10 @@ namespace engine
             auto const iterateSubpassInputs = [&] (SSubpassInput const &aSubpassInput) -> void
             {
                 aSerializer.beginObject(aSubpassInput.name);
-                aSerializer.writeValue       ("name",            aSubpassInput.name);
-                aSerializer.writeNumericValue("attachmentIndex", aSubpassInput.attachmentIndex);
-                aSerializer.writeNumericValue("set",             aSubpassInput.set);
-                aSerializer.writeNumericValue("binding",         aSubpassInput.binding);
+                aSerializer.writeValue("name",            aSubpassInput.name);
+                aSerializer.writeValue("attachmentIndex", aSubpassInput.attachmentIndex);
+                aSerializer.writeValue("set",             aSubpassInput.set);
+                aSerializer.writeValue("binding",         aSubpassInput.binding);
                 aSerializer.endObject();
             };
             std::for_each(this->subpassInputs.begin(), this->subpassInputs.end(), iterateSubpassInputs);
@@ -37,10 +37,10 @@ namespace engine
             auto const iterateUniformBuffers = [&] (SUniformBuffer const &aBuffer) -> void
             {
                 aSerializer.beginObject(aBuffer.name);                
-                aSerializer.writeValue       ("name",    aBuffer.name);
-                aSerializer.writeNumericValue("offset",  aBuffer.location.offset);
-                aSerializer.writeNumericValue("size",    aBuffer.location.length);
-                aSerializer.writeNumericValue("padding", aBuffer.location.padding);
+                aSerializer.writeValue("name",    aBuffer.name);
+                aSerializer.writeValue("offset",  aBuffer.location.offset);
+                aSerializer.writeValue("size",    aBuffer.location.length);
+                aSerializer.writeValue("padding", aBuffer.location.padding);
 
                 aSerializer.beginArray("members");
                 auto const iterate = [&] (std::pair<std::string, SUniformBufferMember> const &aMember)
@@ -49,10 +49,10 @@ namespace engine
                     SUniformBufferMember const aValue = aMember.second;
 
                     aSerializer.beginObject(aKey);
-                    aSerializer.writeValue       ("name",    aKey);
-                    aSerializer.writeNumericValue("offset",  aValue.location.offset);
-                    aSerializer.writeNumericValue("size",    aValue.location.length);
-                    aSerializer.writeNumericValue("padding", aValue.location.padding);
+                    aSerializer.writeValue("name",    aKey);
+                    aSerializer.writeValue("offset",  aValue.location.offset);
+                    aSerializer.writeValue("size",    aValue.location.length);
+                    aSerializer.writeValue("padding", aValue.location.padding);
                     aSerializer.endObject();
                 };
                 std::for_each(aBuffer.members.begin(), aBuffer.members.end(), iterate);
@@ -70,9 +70,9 @@ namespace engine
             auto const iterateSampledImages = [&] (SSampledImage const &aSampledImage) -> void
             {
                 aSerializer.beginObject(aSampledImage.name);
-                aSerializer.writeValue       ("name",    aSampledImage.name);
-                aSerializer.writeNumericValue("set",     aSampledImage.set);
-                aSerializer.writeNumericValue("binding", aSampledImage.binding);
+                aSerializer.writeValue("name",    aSampledImage.name);
+                aSerializer.writeValue("set",     aSampledImage.set);
+                aSerializer.writeValue("binding", aSampledImage.binding);
                 aSerializer.endObject();
             };
             std::for_each(this->sampledImages.begin(), this->sampledImages.end(), iterateSampledImages);
@@ -84,6 +84,20 @@ namespace engine
             aSerializer.beginArray("stages");
             auto const iterateStages = [&] (std::pair<EShaderStage, SMaterialStage> const &aStage) -> void
             {
+                auto const writeType = [&] (SMaterialType const &aType) -> void
+                {
+                    aSerializer.beginObject("type");
+                    aSerializer.writeValue("name",               aType.name);
+                    aSerializer.writeValue("byteSize",           aType.byteSize);
+                    aSerializer.writeValue("vectorSize",         aType.vectorSize);
+                    aSerializer.writeValue("matrixRows",         aType.matrixRows);
+                    aSerializer.writeValue("matrixColumns",      aType.matrixColumns);
+                    aSerializer.writeValue("matrixColumnStride", aType.matrixColumnStride);
+                    aSerializer.writeValue("arraySize",          aType.arraySize);
+                    aSerializer.writeValue("arrayStride",        aType.arrayStride);
+                    aSerializer.endObject();
+                };
+
                 EShaderStage   const key   = aStage.first;
                 SMaterialStage const stage = aStage.second;
 
@@ -97,8 +111,11 @@ namespace engine
                 auto const iterateInputs = [&] (SStageInput const &aInput) -> void
                 {
                    aSerializer.beginObject(aInput.name);
-                   aSerializer.writeValue       ("name",     aInput.name);
-                   aSerializer.writeNumericValue("location", aInput.location);
+                   aSerializer.writeValue("name",     aInput.name);
+                   aSerializer.writeValue("location", aInput.location);
+
+                   writeType(aInput.type);
+
                    aSerializer.endObject();
                 };
                 std::for_each(stage.inputs.begin(), stage.inputs.end(), iterateInputs);
@@ -108,8 +125,8 @@ namespace engine
                 auto const iterateOutputs = [&] (SStageOutput const &aOutput) -> void
                 {
                     aSerializer.beginObject(aOutput.name);
-                    aSerializer.writeValue       ("name",     aOutput.name);
-                    aSerializer.writeNumericValue("location", aOutput.location);
+                    aSerializer.writeValue("name",     aOutput.name);
+                    aSerializer.writeValue("location", aOutput.location);
                     aSerializer.endObject();
                 };
                 std::for_each(stage.outputs.begin(), stage.outputs.end(), iterateOutputs);

@@ -62,28 +62,23 @@ namespace engine
             virtual bool endObject() = 0;
 
             /**
-             * Write a string value to the current object/array.
+             * Write a value to the current object/array.
              *
              * @param aKey
              * @param aValue
              * @return
              */
             virtual bool writeValue(std::string const &aKey, std::string const &aValue) = 0;
-
-            /**
-             * Write a numeric value to the current object/array by converting
-             * it to string beforehand.
-             *
-             * @param aKey
-             * @param aValue
-             * @return
-             */
-            template <typename TValue>
-            bool writeNumericValue(std::string const &aKey, TValue const &aValue)
-            {
-                std::string const value = CString::toString<TValue>(aValue);
-                return writeValue(aKey, value);
-            }
+            virtual bool writeValue(std::string const &aKey, int8_t      const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int16_t     const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int32_t     const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int64_t     const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint8_t     const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint16_t    const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint32_t    const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint64_t    const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, float       const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, double      const &aValue) = 0;
         };
 
         /**
@@ -185,8 +180,48 @@ namespace engine
              * @return
              */
             bool writeValue(std::string const &aKey, std::string const &aValue);
+            bool writeValue(std::string const &aKey, int8_t      const &aValue);
+            bool writeValue(std::string const &aKey, int16_t     const &aValue);
+            bool writeValue(std::string const &aKey, int32_t     const &aValue);
+            bool writeValue(std::string const &aKey, int64_t     const &aValue);
+            bool writeValue(std::string const &aKey, uint8_t     const &aValue);
+            bool writeValue(std::string const &aKey, uint16_t    const &aValue);
+            bool writeValue(std::string const &aKey, uint32_t    const &aValue);
+            bool writeValue(std::string const &aKey, uint64_t    const &aValue);
+            bool writeValue(std::string const &aKey, float       const &aValue);
+            bool writeValue(std::string const &aKey, double      const &aValue);
 
         private_methods:
+
+            /**
+             *
+             *
+             * @param aKey
+             * @param aValue
+             * @return
+             */
+            template <typename TValue>
+            bool writeValueImpl(std::string const &aKey, TValue const &aValue)
+            {
+                if(not hasCurrentItem())
+                {
+                    // Invalid use!
+                    CLog::Error(logTag(), "Cannot add value to non-existent top-level item.");
+                    return false;
+                }
+
+                nlohmann::json &top = getCurrentItem();
+                if(top.is_array())
+                {
+                    top.push_back(aValue);
+                }
+                else
+                {
+                    top[aKey] = aValue;
+                }
+
+                return true;
+            }
 
             /**
              * Check, whether there's a current top level item.

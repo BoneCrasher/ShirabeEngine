@@ -158,24 +158,57 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool CMaterialSerializer::writeValue(std::string const &aKey, std::string const &aValue)
         {
-            if(not hasCurrentItem())
-            {
-                // Invalid use!
-                CLog::Error(logTag(), "Cannot add value to non-existent top-level item.");
-                return false;
-            }
+            return writeValueImpl(aKey, aValue);
+        }
 
-            nlohmann::json &top = getCurrentItem();
-            if(top.is_array())
-            {
-                top.push_back(aValue);
-            }
-            else
-            {
-                top[aKey] = aValue;
-            }
+        bool CMaterialSerializer::writeValue(std::string const &aKey, int8_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
 
-            return true;
+        bool CMaterialSerializer::writeValue(std::string const &aKey, int16_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, int32_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, int64_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, uint8_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, uint16_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, uint32_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, uint64_t const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, float const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+
+        bool CMaterialSerializer::writeValue(std::string const &aKey, double const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
         }
         //<-----------------------------------------------------------------------------
 
