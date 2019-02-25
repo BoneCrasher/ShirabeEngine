@@ -180,35 +180,47 @@ namespace engine
             //
             // Serialize uniform buffers
             //
-            aSerializer.beginArray("uniformBuffers");
-            auto const iterateUniformBuffers = [&] (SUniformBuffer const &aBuffer) -> void
+            uint32_t uniformBufferCount = 0;
+            aDeserializer.beginArray("uniformBuffers", uniformBufferCount);
+            uniformBuffers.resize(uniformBufferCount);
+
+            auto const iterateUniformBuffers = [&] (SUniformBuffer &aBuffer, uint32_t const &aIndex) -> void
             {
-                aSerializer.beginObject(aBuffer.name);
-                aSerializer.writeValue("name",    aBuffer.name);
-                aSerializer.writeValue("offset",  aBuffer.location.offset);
-                aSerializer.writeValue("size",    aBuffer.location.length);
-                aSerializer.writeValue("padding", aBuffer.location.padding);
+                aDeserializer.beginObject(aIndex);
+                aDeserializer.readValue("name",    aBuffer.name);
+                aDeserializer.readValue("offset",  aBuffer.location.offset);
+                aDeserializer.readValue("size",    aBuffer.location.length);
+                aDeserializer.readValue("padding", aBuffer.location.padding);
 
-                aSerializer.beginArray("members");
-                auto const iterate = [&] (std::pair<std::string, SUniformBufferMember> const &aMember)
+                uint32_t uniformBufferMemberCount = 0;
+                aDeserializer.beginArray("members", uniformBufferMemberCount);
+
+                auto const iterate = [&] (SUniformBufferMember &aMember, uint32_t const &aIndex) -> void
                 {
-                    std::string          const aKey   = aMember.first;
-                    SUniformBufferMember const aValue = aMember.second;
-
-                    aSerializer.beginObject(aKey);
-                    aSerializer.writeValue("name",    aKey);
-                    aSerializer.writeValue("offset",  aValue.location.offset);
-                    aSerializer.writeValue("size",    aValue.location.length);
-                    aSerializer.writeValue("padding", aValue.location.padding);
-                    aSerializer.endObject();
+                    aDeserializer.beginObject(aIndex);
+                    aDeserializer.readValue("name",    aMember.name);
+                    aDeserializer.readValue("offset",  aMember.location.offset);
+                    aDeserializer.readValue("size",    aMember.location.length);
+                    aDeserializer.readValue("padding", aMember.location.padding);
+                    aDeserializer.endObject();
                 };
-                std::for_each(aBuffer.members.begin(), aBuffer.members.end(), iterate);
-                aSerializer.endArray();
 
-                aSerializer.endObject();
+                for(uint32_t k=0; k<uniformBufferMemberCount; ++k)
+                {
+                    SUniformBufferMember member{};
+                    iterate(member, k);
+                }
+
+                aDeserializer.endArray();
+                aDeserializer.endObject();
             };
-            std::for_each(this->uniformBuffers.begin(), this->uniformBuffers.end(), iterateUniformBuffers);
-            aSerializer.endArray();
+
+            for(uint32_t k=0; k<uniformBufferCount; ++k)
+            {
+                iterateUniformBuffers(*(uniformBuffers.data() + k), k);
+            }
+
+            aDeserializer.endArray();
 
             //
             // Serialize sampled images
