@@ -39,7 +39,6 @@ namespace engine
          */
         std::string const stageToString(EShaderStage const &aStage);
 
-
         /**
          * The IFrameGraphSerializer interface describes the basic requiremets
          * to serialize a material instance.
@@ -363,7 +362,7 @@ namespace engine
         template <typename T>
         bool CJSONSerializer<T>::serialize(T const &aInput, CStdSharedPtr_t<typename IJSONSerializer<T>::IResult> &aOutResult)
         {
-            IMaterialSerializer &serializer = *this;
+            IJSONSerializer<T> &serializer = *this;
 
             bool const successful = aInput.acceptSerializer(serializer);
             if(successful)
@@ -815,7 +814,7 @@ namespace engine
             mRoot = json;
             mCurrentJSONState.push(mRoot);
 
-            IMaterialDeserializer &deserializer = *this;
+            IDeserializer<T> &deserializer = *this;
 
             auto material = makeCStdSharedPtr<T>();
 
@@ -841,7 +840,7 @@ namespace engine
             mRoot = json;
             mCurrentJSONState.push(mRoot);
 
-            IMaterialDeserializer &deserializer = *this;
+            IDeserializable<T> &deserializer = *this;
 
             auto material = makeCStdSharedPtr<T>();
 

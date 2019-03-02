@@ -9,14 +9,62 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         bool SMaterialIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialIndex> &aSerializer) const
-        {}
+        {
+            aSerializer.beginObject(name);
+
+            aSerializer.writeValue("uid",  uid);
+            aSerializer.writeValue("name", name);
+
+            aSerializer.beginArray("stages");
+            for(auto const &[stage, path] : stages)
+            {
+                std::string const stageName = serialization::stageToString(stage);
+                aSerializer.beginObject(stageName);
+                aSerializer.writeValue("name", stageName);
+                aSerializer.writeValue("path", path);
+                aSerializer.endObject();
+            }
+            aSerializer.endArray();
+
+            aSerializer.endObject();
+
+            return true;
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         bool SMaterialIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer)
-        {}
+        {
+            aDeserializer.beginObject(name);
+
+            aDeserializer.readValue("uid",  uid);
+            aDeserializer.readValue("name", name);
+
+            uint32_t stageCount = 0;
+            aDeserializer.beginArray("stages", stageCount);
+
+            for(uint32_t k=0; k<stageCount; ++k)
+            {
+                std::string stageName  = std::string();
+                std::string pathString = "";
+
+                EShaderStage stage = serialization::stageFromString(stageName);
+
+                aDeserializer.beginObject("yet_undefined");
+                aDeserializer.readValue("name", stageName);
+                aDeserializer.readValue("path", pathString);
+                aDeserializer.endObject();
+
+                stages[stage] = std::filesystem::path(pathString);
+            }
+            aDeserializer.endArray();
+
+            aDeserializer.endObject();
+
+            return true;
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

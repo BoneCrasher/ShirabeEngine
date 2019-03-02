@@ -371,9 +371,9 @@ public_methods:
 
         using namespace shader_precompiler::serialization;
 
-        CStdSharedPtr_t<CMaterialSerializer::IResult> result = nullptr;
+        CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result = nullptr;
 
-        CStdUniquePtr_t<IMaterialSerializer> serializer = makeCStdUniquePtr<CMaterialSerializer>();
+        CStdUniquePtr_t<IJSONSerializer<SMaterial>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
         bool const initialized   = serializer->initialize();
         bool const serialized    = serializer->serialize(extractionResult.data(), result);
 
@@ -382,7 +382,7 @@ public_methods:
 
         CLog::Debug(logTag(), serializedData);
 
-        writeFile(unit. serializedData);
+        writeFile(unit, serializedData);
 
         bool const deinitialized= serializer->deinitialize();
         serializer = nullptr;
