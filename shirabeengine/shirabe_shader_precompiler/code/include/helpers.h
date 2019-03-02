@@ -78,6 +78,26 @@ namespace shader_precompiler
      * @return          See brief.
      */
     std::string readFile(std::string const &aFileName);
+
+    /**
+     * Write a string to a file.
+     *
+     * @param aFilename The filename of the file to write to. Will be overwritten, if extist.
+     * @param aData     The data to write.
+     * @return          EResult::Success, if successful.
+     * @return          EResult::WriteFailed, on error.
+     */
+    EResult writeFile(std::string const &aFilename, std::string const &aData);
+
+    /**
+     * Write a byte vector to a file.
+     *
+     * @param aFilename The filename of the file to write to. Will be overwritten, if extist.
+     * @param aData     The data to write.
+     * @return          EResult::Success, if successful.
+     * @return          EResult::WriteFailed, on error.
+     */
+    EResult writeFile(std::string const &aFilename, std::vector<int8_t> const &aData);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_HELPERS_H_

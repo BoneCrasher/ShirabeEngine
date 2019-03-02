@@ -1,3 +1,4 @@
+#include <fstream>
 #include "helpers.h"
 
 namespace shader_precompiler
@@ -53,6 +54,61 @@ namespace shader_precompiler
                                std::istreambuf_iterator<char>());
 
         return inputData;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    EResult writeFile(std::string const &aFilename, std::string const &aData)
+    {
+        std::ofstream output(aFilename);
+        if(output.bad() || output.fail() || output.eof())
+        {
+            return EResult::WriteFailed;
+        }
+
+        try
+        {
+            output << aData;
+            output.close();
+
+            return EResult::Success;
+        }
+        catch (...)
+        {
+            return EResult::WriteFailed;
+        }
+    }
+
+    /**
+     * Write a byte vector to a file.
+     *
+     * @param aFilename The filename of the file to write to. Will be overwritten, if extist.
+     * @param aData     The data to write.
+     * @return          EResult::Success, if successful.
+     * @return          EResult::WriteFailed, on error.
+     */
+    EResult writeFile(std::string const &aFilename, std::vector<int8_t> const &aData)
+    {
+        std::ofstream output(aFilename, std::ofstream::binary);
+        if(output.bad() || output.fail() || output.eof())
+        {
+            return EResult::WriteFailed;
+        }
+
+        try
+        {
+            output.write(reinterpret_cast<char const *>(&aData[0]),
+                         static_cast<int64_t>(aData.size() * sizeof(int8_t)));
+            output.close();
+
+            return EResult::Success;
+        }
+        catch (...)
+        {
+            return EResult::WriteFailed;
+        }
     }
     //<-----------------------------------------------------------------------------
 }

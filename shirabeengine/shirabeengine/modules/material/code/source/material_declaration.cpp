@@ -8,10 +8,22 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        bool SMaterial::acceptSerializer(serialization::IMaterialSerializer &aSerializer) const
-        {
-            bool result = true;
+        bool SMaterialIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialIndex> &aSerializer) const
+        {}
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SMaterialIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SMaterial::acceptSerializer(serialization::IJSONSerializer<SMaterial> &aSerializer) const
+        {
             aSerializer.beginObject(name);
 
             //
@@ -151,7 +163,7 @@ namespace engine
          * @param aSerializer
          * @return
          */
-        bool SMaterial::acceptDeserializer(serialization::IMaterialDeserializer &aDeserializer)
+        bool SMaterial::acceptDeserializer(serialization::IJSONDeserializer<SMaterial> &aDeserializer)
         {
             //
             // Serialize subpass input
@@ -271,6 +283,7 @@ namespace engine
                 aDeserializer.beginObject(aIndex);
                 aDeserializer.readValue("name",     aStage.stageName);
                 aDeserializer.readValue("filename", aStage.filename);
+                // TODO: Determine stage from stage-key or sth.
 
                 uint32_t inputCount = 0;
                 aDeserializer.beginArray("inputs", inputCount);
@@ -306,7 +319,7 @@ namespace engine
                     aDeserializer.endObject();
                 };
 
-                for(uint32_t k=0; k<inputCount; ++k)
+                for(uint32_t k=0; k<outputCount; ++k)
                 {
                     iterateOutputs(*(aStage.outputs.data() + k), k);
                 }

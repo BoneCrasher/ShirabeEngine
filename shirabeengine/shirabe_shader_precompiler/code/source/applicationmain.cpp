@@ -134,10 +134,10 @@ public_methods:
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
-        core::CBitField<EOptions> options      = {};
-        std::string               outputPath   = {};
-        std::vector<std::string>  inputPaths   = {};
-        std::vector<std::string>  includePaths = {};
+        core::CBitField<EOptions> options    = {};
+        std::string               dataFile   = {};
+        std::string               indexFile  = {};
+        std::string               outputPath = {};
 
         //
         // Process all options provided to the application.
@@ -178,9 +178,8 @@ public_methods:
                 { "--debug",          [&] () { options.set(CPrecompiler::EOptions::DebugMode);             return true; }},
                 { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
                 { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
-                { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
                 { "-o",               [&] () { outputPath = referencableValue;                             return true; }},
-                { "-i",               [&] () { inputPaths = readInputPaths(referencableValue).data();      return true; }},
+                { "-i",               [&] () { indexFile  = referencableValue;                             return true; }},
             };
 
             auto const fn = mapValue<std::string, std::function<bool()>>(option, std::move(handlers));
@@ -195,71 +194,6 @@ public_methods:
         };
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
-        //
-        // Derive filenames from the list of input paths.
-        //
-        std::vector<std::vector<std::string>> derivedFilenames{};
-
-        auto const deriveInputFilenames = [&] (std::string const &aInputPath) -> std::vector<std::string>
-        {
-            std::vector<std::string> inputFilenames{};
-            std::vector<std::string> outputFilenames{};
-
-            //
-            // Determine a list of filenames.
-            // IF the input path itself is a filename, it is just used.
-            // Otherwise, if it's a directory, scan it for input files.
-            // A directory can be scanned recursively, if configured to do so.
-            //
-            auto const inputFilename = std::filesystem::path(aInputPath);
-
-            bool const exists = std::filesystem::exists(aInputPath);
-            if(not exists)
-            {
-                CLog::Debug(logTag(), CString::format("Path '%0' does not exist. Skipping.", aInputPath));
-                return {};
-            }
-
-            bool const isDirectory = std::filesystem::is_directory(inputFilename);
-            if(isDirectory)
-            {
-                if(options.check(CPrecompiler::EOptions::RecursiveScan))
-                {
-                    auto const fileIterator = std::filesystem::recursive_directory_iterator(inputFilename);
-                    for(std::filesystem::directory_entry const &file : fileIterator)
-                    {
-                        if(not file.is_regular_file())
-                        {
-                            continue;
-                        }
-
-                        inputFilenames.push_back(file.path().string());
-                    }
-                }
-                else
-                {
-                    auto const fileIterator = std::filesystem::directory_iterator(inputFilename);
-                    for(std::filesystem::directory_entry const &file : fileIterator)
-                    {
-                        if(not file.is_regular_file())
-                        {
-                            continue;
-                        }
-
-                        inputFilenames.push_back(file.path().string());
-                    }
-                }
-            }
-            else
-            {
-                CLog::Debug(logTag(), CString::format("Output path '%0' does not exist. Creating.", outputPath));
-                inputFilenames.push_back(aInputPath);
-            }
-
-            return inputFilenames;
-        };
-        std::transform(inputPaths.begin(), inputPaths.end(), std::back_inserter(derivedFilenames), deriveInputFilenames);
-
         // Make sure the output config is correct.
         bool const outputPathExists = std::filesystem::exists(outputPath);
         if(not outputPathExists)
@@ -268,18 +202,27 @@ public_methods:
             std::filesystem::create_directory(outputPathAbsolute);
         }
 
+        std::filesystem::path const indexFilePath(indexFile);
+        std::filesystem::path const indexFileBaseName = indexFilePath.stem();
+
+
+
+
+
         SConfiguration config {};
         config.options      = options;
         config.outputPath   = outputPath;
-        config.includePaths = includePaths;
-        //
-        //  Reduce the list of per-path derived filenames to a single filename list.
-        //
-        auto const reducer = [&config] (std::vector<std::string> const &fileNames)
-        {
-            config.inputPaths.insert(config.inputPaths.end(), fileNames.begin(), fileNames.end());
-        };
-        std::for_each(derivedFilenames.begin(), derivedFilenames.end(), reducer);
+
+
+        // config.includePaths = includePaths;
+        // //
+        // //  Reduce the list of per-path derived filenames to a single filename list.
+        // //
+        // auto const reducer = [&config] (std::vector<std::string> const &fileNames)
+        // {
+        //     config.inputPaths.insert(config.inputPaths.end(), fileNames.begin(), fileNames.end());
+        // };
+        // std::for_each(derivedFilenames.begin(), derivedFilenames.end(), reducer);
 
         mConfig = config;
 
@@ -434,13 +377,26 @@ public_methods:
         bool const initialized   = serializer->initialize();
         bool const serialized    = serializer->serialize(extractionResult.data(), result);
 
-        std::string str {};
-        bool const fetched = result->asString(str);
+        std::string serializedData {};
+        bool const fetched = result->asString(serializedData);
 
-        CLog::Debug(logTag(), str);
+        CLog::Debug(logTag(), serializedData);
 
-        bool const deinitialized = serializer->deinitialize();
+        writeFile(unit. serializedData);
+
+        bool const deinitialized= serializer->deinitialize();
         serializer = nullptr;
+
+        // CStdSharedPtr_t<CMaterialDeserializer::IResult> result1 = nullptr;
+        //
+        // CStdUniquePtr_t<IMaterialDeserializer> deserializer = makeCStdUniquePtr<CMaterialDeserializer>();
+        // bool const initialized1   = deserializer->initialize();
+        // bool const deserialized    = deserializer->deserialize(str, result1);
+        //
+        // CStdSharedPtr_t<SMaterial> mat{};
+        // bool const fetched1 = result1->asT(mat);
+        //
+        // bool const deinitialized1 = deserializer->deinitialize();
 
         return EResult::Success;
     }

@@ -29,6 +29,8 @@ namespace shader_precompiler
         WrongUsage   = -100000,
         NoInput,
         FileError,
+        ReadFailed,
+        WriteFailed,
         InputInvalid,
         CompilationFailed,
         LinkFailed

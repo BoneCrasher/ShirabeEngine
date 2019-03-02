@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <filesystem>
 
 #include <base/declaration.h>
 #include <base/stl_container_helpers.h>
@@ -16,8 +17,11 @@ namespace engine
 {
     namespace serialization
     {
-        class IMaterialSerializer;
-        class IMaterialDeserializer;
+        template <typename T>
+        class IJSONSerializer;
+
+        template <typename T>
+        class IJSONDeserializer;
     }
 
     namespace material
@@ -35,6 +39,36 @@ namespace engine
             Geometry,
             Fragment,
             Compute
+        };
+
+        /**
+         * The SMaterialIndex describes all necessary data for a basic material composition
+         * in the engine.
+         * The specific implementation will be provided in files referenced by the stages member.
+         */
+        struct SMaterialIndex
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>
+        {
+        public_members:
+            uint64_t                                                uid;
+            std::string                                             name;
+            std::unordered_map<EShaderStage, std::filesystem::path> stages;
+
+        public_methods:
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterialIndex> &aSerializer) const;
+
+            /**
+             * @brief acceptDeserializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer);
         };
 
         struct SMaterialType
@@ -184,8 +218,8 @@ namespace engine
          * @brief The SMaterial struct
          */
         struct SMaterial
-                : engine::serialization::ISerializable<serialization::IMaterialSerializer>
-                , engine::serialization::IDeserializable<serialization::IMaterialDeserializer>
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterial>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterial>>
         {
         public_members:
             std::string                 name;
@@ -202,7 +236,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterial(SMaterial const &aOther)
-                : engine::serialization::ISerializable<serialization::IMaterialSerializer>()
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterial>>()
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterial>>()
                 , name(aOther.name)
                 , stages(aOther.stages)
                 , uniformBuffers(aOther.uniformBuffers)
@@ -235,14 +270,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IMaterialSerializer &aSerializer) const;
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterial> &aSerializer) const;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IMaterialDeserializer &aDeserializer);
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterial> &aDeserializer);
         };
 
         /**
