@@ -15,16 +15,15 @@ namespace engine
             aSerializer.writeValue("uid",  uid);
             aSerializer.writeValue("name", name);
 
-            aSerializer.beginArray("stages");
+            aSerializer.beginObject("stages");
+
             for(auto const &[stage, path] : stages)
             {
                 std::string const stageName = serialization::stageToString(stage);
-                aSerializer.beginObject(stageName);
-                aSerializer.writeValue("name", stageName);
-                aSerializer.writeValue("path", path);
-                aSerializer.endObject();
+                aSerializer.writeValue(stageName, path);
             }
-            aSerializer.endArray();
+
+            aSerializer.endObject();
 
             aSerializer.endObject();
 
@@ -37,29 +36,27 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool SMaterialIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer)
         {
-            aDeserializer.beginObject(name);
-
             aDeserializer.readValue("uid",  uid);
             aDeserializer.readValue("name", name);
 
-            uint32_t stageCount = 0;
-            aDeserializer.beginArray("stages", stageCount);
+            aDeserializer.beginObject("stages");
 
-            for(uint32_t k=0; k<stageCount; ++k)
+            std::vector<EShaderStage> stageList = { EShaderStage::Vertex,
+                                                    EShaderStage::TesselationControlPoint,
+                                                    EShaderStage::TesselationEvaluation,
+                                                    EShaderStage::Geometry,
+                                                    EShaderStage::Fragment,
+                                                    EShaderStage::Compute
+                                                  };
+
+            for(auto const stage : stageList)
             {
-                std::string stageName  = std::string();
-                std::string pathString = "";
+                std::string const stageName = serialization::stageToString(stage);
+                std::string       path      = std::string();
 
-                EShaderStage stage = serialization::stageFromString(stageName);
-
-                aDeserializer.beginObject("yet_undefined");
-                aDeserializer.readValue("name", stageName);
-                aDeserializer.readValue("path", pathString);
-                aDeserializer.endObject();
-
-                stages[stage] = std::filesystem::path(pathString);
+                aDeserializer.readValue(stageName, path);
+                stages[stage] = path;
             }
-            aDeserializer.endArray();
 
             aDeserializer.endObject();
 

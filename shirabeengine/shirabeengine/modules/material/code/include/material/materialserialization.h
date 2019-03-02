@@ -750,7 +750,8 @@ namespace engine
                 }
                 else
                 {
-                    TValue value = top[aKey];
+                    nlohmann::json const &valueNode = top[aKey];
+                    TValue value = valueNode.is_null() ? TValue() : static_cast<TValue>(valueNode);
                     aOutValue = value;
                 }
 
@@ -814,7 +815,7 @@ namespace engine
             mRoot = json;
             mCurrentJSONState.push(mRoot);
 
-            IDeserializer<T> &deserializer = *this;
+            IJSONDeserializer<T> &deserializer = *this;
 
             auto material = makeCStdSharedPtr<T>();
 
@@ -840,7 +841,7 @@ namespace engine
             mRoot = json;
             mCurrentJSONState.push(mRoot);
 
-            IDeserializable<T> &deserializer = *this;
+            IJSONDeserializer<T> &deserializer = *this;
 
             auto material = makeCStdSharedPtr<T>();
 

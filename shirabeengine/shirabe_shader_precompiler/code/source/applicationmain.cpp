@@ -108,10 +108,10 @@ private_structs:
      */
     struct SConfiguration
     {
+        std::vector<std::string>                includePaths;
         std::vector<std::string>                inputPaths;
         std::string                             outputPath;
-        std::vector<std::string>                outputFilenames;
-        std::vector<std::string>                includePaths;
+        std::filesystem::path                   outputFile;
         core::CBitField<CPrecompiler::EOptions> options;
     };
 
@@ -134,10 +134,11 @@ public_methods:
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
-        core::CBitField<EOptions> options    = {};
-        std::string               dataFile   = {};
-        std::string               indexFile  = {};
-        std::string               outputPath = {};
+        core::CBitField<EOptions> options      = {};
+        std::string               dataFile     = {};
+        std::vector<std::string>  includePaths = {};
+        std::string               indexFile    = {};
+        std::string               outputPath   = {};
 
         //
         // Process all options provided to the application.
@@ -178,6 +179,7 @@ public_methods:
                 { "--debug",          [&] () { options.set(CPrecompiler::EOptions::DebugMode);             return true; }},
                 { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
                 { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
+                { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
                 { "-o",               [&] () { outputPath = referencableValue;                             return true; }},
                 { "-i",               [&] () { indexFile  = referencableValue;                             return true; }},
             };
@@ -195,34 +197,47 @@ public_methods:
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
         // Make sure the output config is correct.
+        std::filesystem::path const outputPathAbsolute = std::filesystem::current_path() / outputPath;
+
         bool const outputPathExists = std::filesystem::exists(outputPath);
         if(not outputPathExists)
         {
-            std::filesystem::path const outputPathAbsolute = std::filesystem::current_path() / outputPath;
             std::filesystem::create_directory(outputPathAbsolute);
         }
 
         std::filesystem::path const indexFilePath(indexFile);
-        std::filesystem::path const indexFileBaseName = indexFilePath.stem();
+        std::filesystem::path const indexFileParentPath = indexFilePath.parent_path();
+        std::filesystem::path const indexFileBaseName   = indexFilePath.stem();
 
+        std::string const indexFileContents = readFile(indexFilePath);
 
+        CStdSharedPtr_t<serialization::IDeserializer<SMaterialIndex>::IResult> indexDeserializationResult = nullptr;
+        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>> indexDeserializer =
+                makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
+        indexDeserializer->initialize();
+        indexDeserializer->deserialize(indexFileContents, indexDeserializationResult);
+        indexDeserializer->deinitialize();
 
+        std::vector<std::string> inputFiles;
 
+        CStdSharedPtr_t<SMaterialIndex> indexData = nullptr;
+        indexDeserializationResult->asT(indexData);
+        for(auto const &[stage, path] : indexData->stages)
+        {
+            if(not path.empty())
+            {
+                inputFiles.push_back(std::filesystem::current_path()/indexFileParentPath/path);
+            }
+        }
+
+        std::filesystem::path const outputFileName = outputPathAbsolute/indexFileBaseName/".data";
 
         SConfiguration config {};
         config.options      = options;
+        config.inputPaths   = inputFiles;
+        config.includePaths = includePaths;
         config.outputPath   = outputPath;
-
-
-        // config.includePaths = includePaths;
-        // //
-        // //  Reduce the list of per-path derived filenames to a single filename list.
-        // //
-        // auto const reducer = [&config] (std::vector<std::string> const &fileNames)
-        // {
-        //     config.inputPaths.insert(config.inputPaths.end(), fileNames.begin(), fileNames.end());
-        // };
-        // std::for_each(derivedFilenames.begin(), derivedFilenames.end(), reducer);
+        config.outputFile   = outputFileName;
 
         mConfig = config;
 
@@ -382,7 +397,7 @@ public_methods:
 
         CLog::Debug(logTag(), serializedData);
 
-        writeFile(unit, serializedData);
+        writeFile(mConfig.outputFile, serializedData);
 
         bool const deinitialized= serializer->deinitialize();
         serializer = nullptr;

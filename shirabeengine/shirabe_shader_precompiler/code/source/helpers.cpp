@@ -62,14 +62,11 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     EResult writeFile(std::string const &aFilename, std::string const &aData)
     {
-        std::ofstream output(aFilename);
-        if(output.bad() || output.fail() || output.eof())
-        {
-            return EResult::WriteFailed;
-        }
+        std::ofstream output;
 
         try
         {
+            output.open(aFilename, std::ofstream::out);
             output << aData;
             output.close();
 
@@ -77,6 +74,7 @@ namespace shader_precompiler
         }
         catch (...)
         {
+            output.close();
             return EResult::WriteFailed;
         }
     }

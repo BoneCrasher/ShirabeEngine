@@ -2,7 +2,7 @@
 
 namespace shader_precompiler
 {
-    using serialization::IMaterialSerializer;
+    using serialization::IJSONSerializer;
 
     //<-----------------------------------------------------------------------------
     //
