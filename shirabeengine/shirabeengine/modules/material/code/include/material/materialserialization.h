@@ -577,7 +577,8 @@ namespace engine
         template <typename T>
         bool CJSONSerializer<T>::CSerializationResult::asString(std::string &aOutString) const
         {
-            aOutString = mResult.dump();
+            static uint64_t const sIndentWidth = 4;
+            aOutString = mResult.dump(sIndentWidth);
 
             return true;
         }

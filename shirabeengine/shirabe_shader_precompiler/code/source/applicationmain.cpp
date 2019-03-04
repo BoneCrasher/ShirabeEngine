@@ -550,48 +550,48 @@ private_methods:
     {
         std::string extension{};
 
-        static std::unordered_map<EShaderStage, std::string> glslStageAssignment =
-        {
-            { EShaderStage::Vertex                  , "vert.glsl.spv" },
-            { EShaderStage::TesselationControlPoint , "tesc.glsl.spv" },
-            { EShaderStage::TesselationEvaluation   , "tese.glsl.spv" },
-            { EShaderStage::Geometry                , "geom.glsl.spv" },
-            { EShaderStage::Fragment                , "frag.glsl.spv" },
-            { EShaderStage::Compute                 , "comp.glsl.spv" },
-    #ifdef NV_EXTENSIONS
-            { EShaderStage::NVRayGen                , "rgen.spv"      },
-            { EShaderStage::NVIntersect             , "rint.spv"      },
-            { EShaderStage::NVAnyHit                , "rahit.spv"     },
-            { EShaderStage::NVClosestHit            , "rchit.spv"     },
-            { EShaderStage::NVMiss                  , "rmiss.spv"     },
-            { EShaderStage::NVCallable              , "rcall.spv"     },
-            { EShaderStage::NVMesh                  , "mesh.spv"      },
-            { EShaderStage::NVTask                  , "task.spv"      },
-    #endif
-            { EShaderStage::NotApplicable           , "unknown"       },
-        };
-
-        static std::unordered_map<EShaderStage, std::string> hlslStageAssignment =
-        {
-            { EShaderStage::Vertex                  , "vs.hlsl.spv" },
-            { EShaderStage::TesselationControlPoint , "hs.hlsl.spv" },
-            { EShaderStage::TesselationEvaluation   , "ds.hlsl.spv" },
-            { EShaderStage::Geometry                , "gs.hlsl.spv" },
-            { EShaderStage::Fragment                , "ps.hlsl.spv" },
-            { EShaderStage::Compute                 , "cs.hlsl.spv" },
-            { EShaderStage::NotApplicable           , "unknown"     },
-        };
-
-        std::string const hlslStage = mapValue<EShaderStage, std::string>(aStage, std::move(hlslStageAssignment));
-        std::string const glslStage = mapValue<EShaderStage, std::string>(aStage, std::move(glslStageAssignment));
+    //     static std::unordered_map<EShaderStage, std::string> glslStageAssignment =
+    //     {
+    //         { EShaderStage::Vertex                  , "vert.glsl.spv" },
+    //         { EShaderStage::TesselationControlPoint , "tesc.glsl.spv" },
+    //         { EShaderStage::TesselationEvaluation   , "tese.glsl.spv" },
+    //         { EShaderStage::Geometry                , "geom.glsl.spv" },
+    //         { EShaderStage::Fragment                , "frag.glsl.spv" },
+    //         { EShaderStage::Compute                 , "comp.glsl.spv" },
+    // #ifdef NV_EXTENSIONS
+    //         { EShaderStage::NVRayGen                , "rgen.spv"      },
+    //         { EShaderStage::NVIntersect             , "rint.spv"      },
+    //         { EShaderStage::NVAnyHit                , "rahit.spv"     },
+    //         { EShaderStage::NVClosestHit            , "rchit.spv"     },
+    //         { EShaderStage::NVMiss                  , "rmiss.spv"     },
+    //         { EShaderStage::NVCallable              , "rcall.spv"     },
+    //         { EShaderStage::NVMesh                  , "mesh.spv"      },
+    //         { EShaderStage::NVTask                  , "task.spv"      },
+    // #endif
+    //         { EShaderStage::NotApplicable           , "unknown"       },
+    //     };
+    //
+    //     static std::unordered_map<EShaderStage, std::string> hlslStageAssignment =
+    //     {
+    //         { EShaderStage::Vertex                  , "vs.hlsl.spv" },
+    //         { EShaderStage::TesselationControlPoint , "hs.hlsl.spv" },
+    //         { EShaderStage::TesselationEvaluation   , "ds.hlsl.spv" },
+    //         { EShaderStage::Geometry                , "gs.hlsl.spv" },
+    //         { EShaderStage::Fragment                , "ps.hlsl.spv" },
+    //         { EShaderStage::Compute                 , "cs.hlsl.spv" },
+    //         { EShaderStage::NotApplicable           , "unknown"     },
+    //     };
+    //
+    //     std::string const hlslStage = mapValue<EShaderStage, std::string>(aStage, std::move(hlslStageAssignment));
+    //     std::string const glslStage = mapValue<EShaderStage, std::string>(aStage, std::move(glslStageAssignment));
 
         std::unordered_map<EShadingLanguage, std::string> languageAssignment  =
         {
-            { EShadingLanguage::CGLanguage, "cg.spv"  },
-            { EShadingLanguage::XShade,     "xs.spv"  },
-            { EShadingLanguage::GLSL,       glslStage },
-            { EShadingLanguage::HLSL,       hlslStage },
-            { EShadingLanguage::Unknown,    "unknown" }
+            { EShadingLanguage::CGLanguage, "cg.spv"   },
+            { EShadingLanguage::XShade,     "xs.spv"   },
+            { EShadingLanguage::GLSL,       "glsl.spv" },
+            { EShadingLanguage::HLSL,       "hlsl.spv" },
+            { EShadingLanguage::Unknown,    "unknown"  }
         };
 
         extension = mapValue<EShadingLanguage, std::string>(aLanguage, std::move(languageAssignment));
