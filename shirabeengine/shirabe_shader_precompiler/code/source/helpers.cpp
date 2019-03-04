@@ -1,4 +1,5 @@
 #include <fstream>
+#include <cstring>
 #include "helpers.h"
 
 namespace shader_precompiler
@@ -67,6 +68,12 @@ namespace shader_precompiler
         try
         {
             output.open(aFilename, std::ofstream::out);
+            if(not output.good())
+            {
+                CLog::Error(logTag(), "Failed to open file '%0' for writing. Error %1.", aFilename, std::strerror(errno));
+                return EResult::WriteFailed;
+            }
+
             output << aData;
             output.close();
 

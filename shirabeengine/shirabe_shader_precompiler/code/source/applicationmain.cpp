@@ -197,7 +197,7 @@ public_methods:
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
         // Make sure the output config is correct.
-        std::filesystem::path const outputPathAbsolute = std::filesystem::current_path() / outputPath;
+        std::filesystem::path const outputPathAbsolute = (std::filesystem::current_path() / outputPath).lexically_normal();
 
         bool const outputPathExists = std::filesystem::exists(outputPath);
         if(not outputPathExists)
@@ -205,15 +205,14 @@ public_methods:
             std::filesystem::create_directory(outputPathAbsolute);
         }
 
-        std::filesystem::path const indexFilePath(indexFile);
-        std::filesystem::path const indexFileParentPath = indexFilePath.parent_path();
+        std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/indexFile).lexically_normal();
+        std::filesystem::path const indexFileParentPath = (std::filesystem::current_path()/indexFilePath.parent_path()).lexically_normal();
         std::filesystem::path const indexFileBaseName   = indexFilePath.stem();
 
         std::string const indexFileContents = readFile(indexFilePath);
 
         CStdSharedPtr_t<serialization::IDeserializer<SMaterialIndex>::IResult> indexDeserializationResult = nullptr;
-        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>> indexDeserializer =
-                makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
+        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>>      indexDeserializer          = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
         indexDeserializer->initialize();
         indexDeserializer->deserialize(indexFileContents, indexDeserializationResult);
         indexDeserializer->deinitialize();
@@ -230,14 +229,15 @@ public_methods:
             }
         }
 
-        std::filesystem::path const outputFileName = outputPathAbsolute/indexFileBaseName/".data";
+        std::filesystem::path const outputFileName = indexFileBaseName.string() + ".data";
+        std::filesystem::path const outputFilePath = outputPathAbsolute/outputFileName;
 
         SConfiguration config {};
         config.options      = options;
         config.inputPaths   = inputFiles;
         config.includePaths = includePaths;
         config.outputPath   = outputPath;
-        config.outputFile   = outputFileName;
+        config.outputFile   = outputFilePath;
 
         mConfig = config;
 
@@ -386,11 +386,10 @@ public_methods:
 
         using namespace shader_precompiler::serialization;
 
-        CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result = nullptr;
-
-        CStdUniquePtr_t<IJSONSerializer<SMaterial>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
-        bool const initialized   = serializer->initialize();
-        bool const serialized    = serializer->serialize(extractionResult.data(), result);
+        CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result     = nullptr;
+        CStdUniquePtr_t<IJSONSerializer<SMaterial>>          serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
+        bool const initialized = serializer->initialize();
+        bool const serialized  = serializer->serialize(extractionResult.data(), result);
 
         std::string serializedData {};
         bool const fetched = result->asString(serializedData);
