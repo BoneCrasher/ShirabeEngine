@@ -7,13 +7,15 @@
 #include <unordered_map>
 
 #include <log/log.h>
-#include <core/result.h>
+#include "result.h"
+#include "enginestatus.h"
 
-#include "definition.h"
-
-namespace shader_precompiler
+namespace engine
 {
-    using namespace engine;
+    namespace helpers
+    {
+        SHIRABE_DECLARE_LOG_TAG(ShirabeHelpers);
+    }
 
     /**
      * Execute an external command and fetch the result.
@@ -21,7 +23,7 @@ namespace shader_precompiler
      * @param aCommand
      * @return
      */
-    CResult<std::string> executeCmd(std::string const &aCommand);
+    CEngineResult<std::string> executeCmd(std::string const &aCommand);
 
     /**
      * Helper to extract the numeric representation of the provided flag value
@@ -87,7 +89,7 @@ namespace shader_precompiler
      * @return          EResult::Success, if successful.
      * @return          EResult::WriteFailed, on error.
      */
-    EResult writeFile(std::string const &aFilename, std::string const &aData);
+    CEngineResult<> writeFile(std::string const &aFilename, std::string const &aData);
 
     /**
      * Write a byte vector to a file.
@@ -97,7 +99,7 @@ namespace shader_precompiler
      * @return          EResult::Success, if successful.
      * @return          EResult::WriteFailed, on error.
      */
-    EResult writeFile(std::string const &aFilename, std::vector<int8_t> const &aData);
+    CEngineResult<> writeFile(std::string const &aFilename, std::vector<int8_t> const &aData);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_HELPERS_H_

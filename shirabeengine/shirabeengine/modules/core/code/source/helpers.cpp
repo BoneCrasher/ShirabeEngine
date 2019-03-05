@@ -1,13 +1,13 @@
 #include <fstream>
 #include <cstring>
-#include "helpers.h"
+#include "core/helpers.h"
 
-namespace shader_precompiler
+namespace engine
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CResult<std::string> executeCmd(std::string const &aCommand)
+    CEngineResult<std::string> executeCmd(std::string const &aCommand)
     {
         std::array<char, 128> buffer {};
         std::string           result {};
@@ -17,8 +17,8 @@ namespace shader_precompiler
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
         if (nullptr == pipe)
         {
-            CLog::Error(shader_precompiler::logTag(), CString::format("Failed to open command pipe for command '%0'", cmd));
-            return { false };
+            CLog::Error(helpers::logTag(), CString::format("Failed to open command pipe for command '%0'", cmd));
+            return { EEngineStatus::Error };
         }
 
         while(not feof(pipe.get()))
@@ -29,7 +29,7 @@ namespace shader_precompiler
             }
         }
 
-        return result;
+        return { EEngineStatus::Ok, result };
     }
     //<-----------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EResult writeFile(std::string const &aFilename, std::string const &aData)
+    CEngineResult<> writeFile(std::string const &aFilename, std::string const &aData)
     {
         std::ofstream output;
 
@@ -70,19 +70,19 @@ namespace shader_precompiler
             output.open(aFilename, std::ofstream::out);
             if(not output.good())
             {
-                CLog::Error(logTag(), "Failed to open file '%0' for writing. Error %1.", aFilename, std::strerror(errno));
-                return EResult::WriteFailed;
+                CLog::Error(helpers::logTag(), "Failed to open file '%0' for writing. Error %1.", aFilename, std::strerror(errno));
+                return { EEngineStatus::Error };
             }
 
             output << aData;
             output.close();
 
-            return EResult::Success;
+            return { EEngineStatus::Ok };
         }
         catch (...)
         {
             output.close();
-            return EResult::WriteFailed;
+            return { EEngineStatus::Error };
         }
     }
 
@@ -94,12 +94,12 @@ namespace shader_precompiler
      * @return          EResult::Success, if successful.
      * @return          EResult::WriteFailed, on error.
      */
-    EResult writeFile(std::string const &aFilename, std::vector<int8_t> const &aData)
+    CEngineResult<> writeFile(std::string const &aFilename, std::vector<int8_t> const &aData)
     {
         std::ofstream output(aFilename, std::ofstream::binary);
         if(output.bad() || output.fail() || output.eof())
         {
-            return EResult::WriteFailed;
+            return { EEngineStatus::Error };
         }
 
         try
@@ -108,11 +108,11 @@ namespace shader_precompiler
                          static_cast<int64_t>(aData.size() * sizeof(int8_t)));
             output.close();
 
-            return EResult::Success;
+            return { EEngineStatus::Ok };
         }
         catch (...)
         {
-            return EResult::WriteFailed;
+            return { EEngineStatus::Error };
         }
     }
     //<-----------------------------------------------------------------------------

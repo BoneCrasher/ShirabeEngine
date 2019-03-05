@@ -19,10 +19,10 @@
 #include <core/bitfield.h>
 #include <core/enginetypehelper.h>
 #include <core/result.h>
+#include <core/helpers.h>
 #include <material/materialserialization.h>
 
 #include "definition.h"
-#include "helpers.h"
 #include "extraction.h"
 
 using namespace engine;
@@ -600,8 +600,8 @@ private_methods:
 
         auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
         {
-            std::string          const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
-            CResult<std::string> const commandResult = executeCmd(command);
+            std::string                const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
+            CEngineResult<std::string> const commandResult = executeCmd(command);
 
             bool const compilationError = (std::string::npos != commandResult.data().find("compilation error"));
             if(compilationError || not commandResult.successful())
@@ -668,8 +668,8 @@ private_methods:
             std::string const inputFile  = aElement;
             std::string const outputFile = aElement + ".dis";
 
-            std::string          const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFile, inputFile);
-            CResult<std::string> const commandResult = executeCmd(command);
+            std::string                const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFile, inputFile);
+            CEngineResult<std::string> const commandResult = executeCmd(command);
             if(not commandResult.successful())
             {
                 CLog::Error(logTag(), commandResult.data());

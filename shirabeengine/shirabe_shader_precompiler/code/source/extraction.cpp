@@ -2,8 +2,7 @@
 #include <fstream>
 
 #include <spirv_cross/spirv_cross.hpp>
-
-#include "helpers.h"
+#include <core/helpers.h>
 #include "extraction.h"
 
 namespace shader_precompiler
