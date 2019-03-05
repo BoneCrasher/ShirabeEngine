@@ -652,9 +652,9 @@ private_methods:
     /**
      * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
      *
-     * @param aUnit Source data information for the glslangValidator command.
-     * @return      EResult::Success      if successful.
-     * @return      EResult::InputInvalid on error.
+     * @param aInputFilenames Source data information for the glslangValidator command.
+     * @return                EResult::Success      if successful.
+     * @return                EResult::InputInvalid on error.
      */
     CResult<EResult> runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
     {
@@ -663,10 +663,10 @@ private_methods:
 
         std::underlying_type_t<EResult> result = 0;
 
-        auto const disassemble = [&] (std::string const &aElement) -> void
+        auto const disassemble = [&] (std::string const &aFilename) -> void
         {
-            std::string const inputFile  = aElement;
-            std::string const outputFile = aElement + ".dis";
+            std::string const inputFile  = aFilename;
+            std::string const outputFile = aFilename + ".dis";
 
             std::string                const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFile, inputFile);
             CEngineResult<std::string> const commandResult = executeCmd(command);
