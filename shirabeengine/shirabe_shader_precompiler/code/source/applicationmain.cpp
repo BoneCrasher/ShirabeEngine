@@ -386,20 +386,20 @@ public_methods:
 
         using namespace shader_precompiler::serialization;
 
+        std::string serializedData {};
+
         CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result     = nullptr;
         CStdUniquePtr_t<IJSONSerializer<SMaterial>>          serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
-        bool const initialized = serializer->initialize();
-        bool const serialized  = serializer->serialize(extractionResult.data(), result);
-
-        std::string serializedData {};
-        bool const fetched = result->asString(serializedData);
-
-        CLog::Debug(logTag(), serializedData);
+        bool const initialized   = serializer->initialize();
+        bool const serialized    = serializer->serialize(extractionResult.data(), result);
+        bool const fetched       = result->asString(serializedData);
 
         writeFile(mConfig.outputFile, serializedData);
 
-        bool const deinitialized= serializer->deinitialize();
+        bool const deinitialized = serializer->deinitialize();
         serializer = nullptr;
+
+        CLog::Debug(logTag(), serializedData);
 
         // CStdSharedPtr_t<CMaterialDeserializer::IResult> result1 = nullptr;
         //

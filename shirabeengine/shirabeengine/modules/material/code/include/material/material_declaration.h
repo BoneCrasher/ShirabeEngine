@@ -123,6 +123,35 @@ namespace engine
             uint64_t offset;
             uint64_t length;
             uint64_t padding;
+
+            SHIRABE_INLINE
+            bool equals(SBufferLocation const &aOther) const
+            {
+                bool const offsetEq  = (offset == aOther.offset);
+                bool const lengthEq  = (length == aOther.length);
+                bool const paddingEq = (padding == aOther.padding);
+
+                return (offsetEq and lengthEq and paddingEq);
+            }
+
+            SHIRABE_INLINE
+            bool overlapsWith(SBufferLocation const &aOther) const
+            {
+                // Consider:
+                //
+                // I)          x1 <= C <= x2
+                // II)         y1 <= C <= y2
+                // -------------------------
+                // III) x1 <= y2 && y1 <= x2
+
+                uint64_t const x1 = (offset);
+                uint64_t const x2 = (offset + length + padding);
+                uint64_t const y1 = (aOther.offset);
+                uint64_t const y2 = (aOther.offset + aOther.length + aOther.padding);
+
+                bool const overlap = (x1 <= y2 && y1 <= x2);
+                return overlap;
+            }
         };
 
         /**
@@ -143,7 +172,9 @@ namespace engine
         public_members:
             std::string              name;
             SBufferLocation          location;
-            UniformBufferMemberMap_t members;            
+            uint64_t                 set;
+            uint64_t                 binding;
+            UniformBufferMemberMap_t members;
 
         public_constructors:
             SUniformBuffer() = default;
@@ -152,6 +183,8 @@ namespace engine
             SUniformBuffer(SUniformBuffer const &aOther)
                 : name    (aOther.name    )
                 , location(aOther.location)
+                , set     (aOther.set     )
+                , binding (aOther.binding )
                 , members (aOther.members )
             {}
 
@@ -160,6 +193,8 @@ namespace engine
             {
                 name     = aOther.name;
                 location = aOther.location;
+                set      = aOther.set;
+                binding  = aOther.binding;
                 members  = aOther.members;
 
                 return (*this);

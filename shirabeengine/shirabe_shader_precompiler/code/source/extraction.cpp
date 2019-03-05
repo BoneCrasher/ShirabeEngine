@@ -1,4 +1,4 @@
-#include <filesystem>
+﻿#include <filesystem>
 #include <fstream>
 
 #include <spirv_cross/spirv_cross.hpp>
@@ -268,6 +268,68 @@ namespace shader_precompiler
                             binding);
             }
 
+            auto const checkForInvalidUBO = [&materialExtracted] (SUniformBuffer const &aBuffer) -> bool
+            {
+                if(materialExtracted.uniformBuffers.empty())
+                {
+                    goto valid;
+                }
+
+                for(SUniformBuffer const &aCompareBuffer : materialExtracted.uniformBuffers)
+                {
+                    // Make sure that globally, there are no duplicate buffer names.
+                    if( 0 == aCompareBuffer.name.compare(aBuffer.name) )
+                    {
+                        goto invalid;
+                    }
+
+                    // Make sure that globally, no buffers have equal sets and bindings.
+                    if( aCompareBuffer.set == aBuffer.set
+                        and aCompareBuffer.binding == aBuffer.binding )
+                    {
+                        goto invalid;
+                    }
+
+                    // if ( aCompareBuffer.location.equals(aBuffer.location)
+                    //      or aCompareBuffer.location.overlapsWith(aBuffer.location) )
+                    // {
+                    //     // Locations may not overlap.
+                    //     goto invalid;
+                    // }
+                    //
+                    // for( auto const &[name, member] : aCompareBuffer.members )
+                    // {
+                        //
+                        // We don't have to check the members itself, since duplicate names inside a
+                        // single GLSL file are caught by the glslangValidator and cross-stage duplicate
+                        // names are no problem.
+                        //
+
+                        // bool const containsMember = (aBuffer.members.end() != aBuffer.members.find(name));
+                        // if(containsMember)
+                        // {
+                        //     // Duplicate name in other buffer. Not allowed.
+                        //     goto invalid;
+                        // }
+
+                        // SUniformBufferMember const &otherMember = aBuffer.members.at(name);
+                        // if ( member.location.equals(otherMember.location)
+                        //      or member.location.overlapsWith(otherMember.location) )
+                        // {
+                        //     // Locations may not overlap.
+                        //     goto invalid;
+                        // }
+                    // }
+                }
+
+                goto valid;
+
+                invalid:
+                return true;
+                valid:
+                return false;
+            };
+
             //
             // Read UBOs
             //
@@ -280,7 +342,9 @@ namespace shader_precompiler
                 size_t                const  bufferSize = compiler.get_declared_struct_size(type);
 
                 SUniformBuffer uniformBufferExtracted{};
-                uniformBufferExtracted.name     = uniformBuffer.name;
+                uniformBufferExtracted.name             = uniformBuffer.name;
+                uniformBufferExtracted.set              = set;
+                uniformBufferExtracted.binding          = binding;
                 uniformBufferExtracted.location.offset  = 0;
                 uniformBufferExtracted.location.length  = bufferSize;
                 uniformBufferExtracted.location.padding = 0;
@@ -327,7 +391,15 @@ namespace shader_precompiler
                 // separate_samplers
                 // separate_images
 
-                materialExtracted.uniformBuffers.push_back(uniformBufferExtracted);
+                bool const valid = not checkForInvalidUBO(uniformBufferExtracted);
+                if(not valid)
+                {
+                    CLog::Warning(logTag(), "Uniform buffer '%0' invalid. Ignoring.", uniformBufferExtracted.name);
+                }
+                else
+                {
+                    materialExtracted.uniformBuffers.push_back(uniformBufferExtracted);
+                }
             }
 
             // Read Textures
