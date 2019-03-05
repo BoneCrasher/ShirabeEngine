@@ -34,7 +34,8 @@ namespace shader_precompiler
         InputInvalid,
         CompilationFailed,
         LinkFailed,
-        ExtractionFailed
+        ExtractionFailed,
+        SerializationFailed
     };
 
     /**

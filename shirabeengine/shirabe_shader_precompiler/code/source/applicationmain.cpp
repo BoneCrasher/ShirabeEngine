@@ -111,14 +111,15 @@ private_structs:
         std::vector<std::string>                includePaths;
         std::vector<std::string>                inputPaths;
         std::string                             outputPath;
-        std::filesystem::path                   outputFile;
+        std::filesystem::path                   signatureOutputFile;
+        std::filesystem::path                   configOutputFile;
         core::CBitField<CPrecompiler::EOptions> options;
     };
 
 public_methods:
 
 
-    EResult initialize()
+    CResult<EResult> initialize()
     {
         return EResult::Success;
     }
@@ -130,7 +131,7 @@ public_methods:
      * @param aArgV
      * @return
      */
-    EResult processArguments(uint32_t const aArgC, char **aArgV)
+    CResult<EResult> processArguments(uint32_t const aArgC, char **aArgV)
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
@@ -143,7 +144,7 @@ public_methods:
         //
         // Process all options provided to the application.
         //
-        auto const processor = [&, this] (std::string const &aArgument) -> bool
+        auto const processor = [&] (std::string const &aArgument) -> bool
         {
             //
             // All options do have the format: <option>[=|:]<value>
@@ -229,127 +230,22 @@ public_methods:
             }
         }
 
-        std::filesystem::path const outputFileName = indexFileBaseName.string() + ".data";
-        std::filesystem::path const outputFilePath = outputPathAbsolute/outputFileName;
+        std::filesystem::path const signatureOutputFileName = indexFileBaseName.string() + ".signature";
+        std::filesystem::path const configOutputFileName    = indexFileBaseName.string() + ".config";
+        std::filesystem::path const signatureOutputFilePath = std::filesystem::path(outputPathAbsolute)/signatureOutputFileName;
+        std::filesystem::path const configOutputFilePath    = std::filesystem::path(outputPathAbsolute)/configOutputFileName;
 
         SConfiguration config {};
-        config.options      = options;
-        config.inputPaths   = inputFiles;
-        config.includePaths = includePaths;
-        config.outputPath   = outputPath;
-        config.outputFile   = outputFilePath;
+        config.options             = options;
+        config.inputPaths          = inputFiles;
+        config.includePaths        = includePaths;
+        config.outputPath          = outputPath;
+        config.signatureOutputFile = signatureOutputFilePath;
+        config.configOutputFile    = configOutputFilePath;
 
         mConfig = config;
 
         return EResult::Success;
-    }
-
-    /**
-     * Format a valid glslangValidator command line and invoke the command to create a .spv module reading its stdout/stderr output.
-     *
-     * @param aUnit Source data information for the glslangValidator command.
-     * @return      EResult::Success           if successful.
-     * @return      EResult::CompilationFailed on error.
-     */
-    EResult runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
-    {
-        std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
-        std::string       options     = "-v -d -g -Od -V --target-env vulkan1.1";
-
-        auto const appendIncludes = [&options] (std::string const &aInclude) -> void
-        {
-            options.append(" -I" + aInclude);
-        };
-        std::for_each(aConfiguration.includePaths.begin(), aConfiguration.includePaths.end(), appendIncludes);
-
-        std::underlying_type_t<EResult> result = 0;
-
-        auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
-        {
-            std::string          const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
-            CResult<std::string> const commandResult = executeCmd(command);
-
-            bool const compilationError = (std::string::npos != commandResult.data().find("compilation error"));
-            if(compilationError || not commandResult.successful())
-            {
-                CLog::Error(logTag(), commandResult.data());
-                result |= EnumValueOf(EResult::CompilationFailed);
-            }
-            else
-            {
-                CLog::Debug(logTag(), commandResult.data());
-                result |= EnumValueOf(EResult::Success);
-            }
-
-            CLog::Debug(logTag(), command);
-        };
-
-        if(aCompileStagesIndividually)
-        {
-            auto const compile = [&] (SShaderCompilationElement const &aElement) -> void
-            {
-                std::string const outputFile = aElement.outputPath;
-                std::string const inputFile  = aElement.fileName;
-
-                once(inputFile, outputFile);
-
-                aUnit.outputFiles.push_back(outputFile);
-            };
-            std::for_each(aUnit.elements.begin(), aUnit.elements.end(), compile);
-        }
-        else
-        {
-            std::string const outputFiles = aUnit.elements.at(0).outputPath;
-            std::string       inputFiles  = "";
-
-            auto const append = [&inputFiles] (SShaderCompilationElement const &aElement)
-            {
-                inputFiles.append(" " + aElement.fileName);
-            };
-            std::for_each(aUnit.elements.begin(), aUnit.elements.end(), append);
-
-            once(inputFiles, outputFiles);
-            aUnit.outputFiles.push_back(aUnit.elements.at(0).outputPath);
-        }
-
-        return static_cast<EResult>(result);
-    }
-
-    /**
-     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
-     *
-     * @param aUnit Source data information for the glslangValidator command.
-     * @return      EResult::Success      if successful.
-     * @return      EResult::InputInvalid on error.
-     */
-    EResult runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
-    {
-        std::string const application = CString::format("%0/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path());
-        std::string const options     = "";
-
-        std::underlying_type_t<EResult> result = 0;
-
-        auto const disassemble = [&] (std::string const &aElement) -> void
-        {
-            std::string const inputFile  = aElement;
-            std::string const outputFile = aElement + ".dis";
-
-            std::string          const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFile, inputFile);
-            CResult<std::string> const commandResult = executeCmd(command);
-            if(not commandResult.successful())
-            {
-                CLog::Error(logTag(), commandResult.data());
-                result |= EnumValueOf(EResult::InputInvalid);
-            }
-            else
-            {
-                CLog::Debug(logTag(), commandResult.data());
-                result |= EnumValueOf(EResult::Success);
-            }
-        };
-        std::for_each(aInputFilenames.begin(), aInputFilenames.end(), disassemble);
-
-        return static_cast<EResult>(result);
     }
 
     /**
@@ -358,7 +254,7 @@ public_methods:
      * @return EResult::Success      if successful.
      * @return EResult::InputInvalid on error.
      */
-    EResult run()
+    CResult<EResult> run()
     {
         // Determine compilation items and config.
         CResult<SShaderCompilationUnit> const unitGeneration = generateCompilationUnit(mConfig.inputPaths);
@@ -370,8 +266,8 @@ public_methods:
 
         SShaderCompilationUnit unit = unitGeneration.data();
 
-        EResult const glslangResult = runGlslang(mConfig, unit, true);
-        if(EResult::Success != glslangResult)
+        CResult<EResult> const glslangResult = runGlslang(mConfig, unit, true);
+        if(not glslangResult.successful())
         {
             CLog::Error(logTag(), "Failed to run glslang.");
             return glslangResult;
@@ -381,25 +277,29 @@ public_methods:
         if(not extractionResult.successful())
         {
             CLog::Error(logTag(), "Failed to extract data from Spir-V file(s).");
-            return EResult::InputInvalid;
+            return EResult::ExtractionFailed;
         }
 
-        using namespace shader_precompiler::serialization;
+        std::string serializedData = {};
 
-        std::string serializedData {};
+        CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
+        if(not signatureSerializationResult.successful())
+        {
+            CLog::Error(logTag(), "Failed to serialize signature data.");
+            return EResult::SerializationFailed;
+        }
 
-        CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result     = nullptr;
-        CStdUniquePtr_t<IJSONSerializer<SMaterial>>          serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
-        bool const initialized   = serializer->initialize();
-        bool const serialized    = serializer->serialize(extractionResult.data(), result);
-        bool const fetched       = result->asString(serializedData);
+        writeFile(mConfig.signatureOutputFile, serializedData);
 
-        writeFile(mConfig.outputFile, serializedData);
+        CMaterialConfig config = CMaterialConfig::fromMaterialDesc(extractionResult.data());
+        CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);
+        if(not configSerializationResult.successful())
+        {
+            CLog::Error(logTag(), "Failed to serialize config data.");
+            return EResult::SerializationFailed;
+        }
 
-        bool const deinitialized = serializer->deinitialize();
-        serializer = nullptr;
-
-        CLog::Debug(logTag(), serializedData);
+        writeFile(mConfig.configOutputFile, serializedData);
 
         // CStdSharedPtr_t<CMaterialDeserializer::IResult> result1 = nullptr;
         //
@@ -530,11 +430,6 @@ private_methods:
 
         return { language, stage };
     }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
 
     /**
      * Determine the output name of the compiled shader based on language, stage and file base name.
@@ -598,11 +493,6 @@ private_methods:
 
         return CString::format("%0.%1", aFileBaseName, extension);
     }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
 
     /**
      * @brief ReadInputPaths
@@ -624,11 +514,6 @@ private_methods:
 
         return { paths };
     }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
 
     /**
      * Compile a single shader file.
@@ -692,17 +577,197 @@ private_methods:
 
         return { unit };
     }
-    //<-----------------------------------------------------------------------------
 
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
+    /**
+     * Format a valid glslangValidator command line and invoke the command to create a .spv module reading its stdout/stderr output.
+     *
+     * @param aUnit Source data information for the glslangValidator command.
+     * @return      EResult::Success           if successful.
+     * @return      EResult::CompilationFailed on error.
+     */
+    CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
+    {
+        std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
+        std::string       options     = "-v -d -g -Od -V --target-env vulkan1.1";
 
-    //<-----------------------------------------------------------------------------
+        auto const appendIncludes = [&options] (std::string const &aInclude) -> void
+        {
+            options.append(" -I" + aInclude);
+        };
+        std::for_each(aConfiguration.includePaths.begin(), aConfiguration.includePaths.end(), appendIncludes);
 
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
+        std::underlying_type_t<EResult> result = 0;
+
+        auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
+        {
+            std::string          const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
+            CResult<std::string> const commandResult = executeCmd(command);
+
+            bool const compilationError = (std::string::npos != commandResult.data().find("compilation error"));
+            if(compilationError || not commandResult.successful())
+            {
+                CLog::Error(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::CompilationFailed);
+            }
+            else
+            {
+                CLog::Debug(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::Success);
+            }
+
+            CLog::Debug(logTag(), command);
+        };
+
+        if(aCompileStagesIndividually)
+        {
+            auto const compile = [&] (SShaderCompilationElement const &aElement) -> void
+            {
+                std::string const outputFile = aElement.outputPath;
+                std::string const inputFile  = aElement.fileName;
+
+                once(inputFile, outputFile);
+
+                aUnit.outputFiles.push_back(outputFile);
+            };
+            std::for_each(aUnit.elements.begin(), aUnit.elements.end(), compile);
+        }
+        else
+        {
+            std::string const outputFiles = aUnit.elements.at(0).outputPath;
+            std::string       inputFiles  = "";
+
+            auto const append = [&inputFiles] (SShaderCompilationElement const &aElement)
+            {
+                inputFiles.append(" " + aElement.fileName);
+            };
+            std::for_each(aUnit.elements.begin(), aUnit.elements.end(), append);
+
+            once(inputFiles, outputFiles);
+            aUnit.outputFiles.push_back(aUnit.elements.at(0).outputPath);
+        }
+
+        return static_cast<EResult>(result);
+    }
+
+    /**
+     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
+     *
+     * @param aUnit Source data information for the glslangValidator command.
+     * @return      EResult::Success      if successful.
+     * @return      EResult::InputInvalid on error.
+     */
+    CResult<EResult> runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
+    {
+        std::string const application = CString::format("%0/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path());
+        std::string const options     = "";
+
+        std::underlying_type_t<EResult> result = 0;
+
+        auto const disassemble = [&] (std::string const &aElement) -> void
+        {
+            std::string const inputFile  = aElement;
+            std::string const outputFile = aElement + ".dis";
+
+            std::string          const command       = CString::format("%0 %1 -o %2 %3", application, options, outputFile, inputFile);
+            CResult<std::string> const commandResult = executeCmd(command);
+            if(not commandResult.successful())
+            {
+                CLog::Error(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::InputInvalid);
+            }
+            else
+            {
+                CLog::Debug(logTag(), commandResult.data());
+                result |= EnumValueOf(EResult::Success);
+            }
+        };
+        std::for_each(aInputFilenames.begin(), aInputFilenames.end(), disassemble);
+
+        return static_cast<EResult>(result);
+    }
+
+    /**
+     * Accept a SMaterial instance and serialize it to a JSON string.
+     *
+     * @param aMaterial
+     * @param aOutSerializedData
+     * @return
+     */
+    CResult<EResult> serializeMaterialSignature(SMaterial const &aMaterial, std::string &aOutSerializedData)
+    {
+        using namespace shader_precompiler::serialization;
+
+        CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result     = nullptr;
+        CStdUniquePtr_t<IJSONSerializer<SMaterial>>          serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
+        bool const initialized = serializer->initialize();
+        if(false == initialized)
+        {
+            return EResult::SerializationFailed;
+        }
+        bool const serialized = serializer->serialize(aMaterial, result);
+        if(false == serialized)
+        {
+            return EResult::SerializationFailed;
+        }
+        bool const fetched = result->asString(aOutSerializedData);
+        if(false == fetched)
+        {
+            return EResult::SerializationFailed;
+        }
+
+        bool const deinitialized = serializer->deinitialize();
+        if(false == deinitialized)
+        {
+            return EResult::SerializationFailed;
+        }
+
+        serializer = nullptr;
+
+        CLog::Debug(logTag(), aOutSerializedData);
+
+        return EResult::Success;
+    }
+
+    /**
+     * @brief serializeMaterialConfig
+     * @param aMaterialConfig
+     * @param aOutSerializedData
+     * @return
+     */
+    CResult<EResult> serializeMaterialConfig(CMaterialConfig const &aMaterialConfig, std::string &aOutSerializedData)
+    {
+        using namespace shader_precompiler::serialization;
+
+        CStdSharedPtr_t<IJSONSerializer<CMaterialConfig>::IResult> result     = nullptr;
+        CStdUniquePtr_t<IJSONSerializer<CMaterialConfig>>          serializer = makeCStdUniquePtr<CJSONSerializer<CMaterialConfig>>();
+        bool const initialized = serializer->initialize();
+        if(false == initialized)
+        {
+            return EResult::SerializationFailed;
+        }
+        bool const serialized = serializer->serialize(aMaterialConfig, result);
+        if(false == serialized)
+        {
+            return EResult::SerializationFailed;
+        }
+        bool const fetched = result->asString(aOutSerializedData);
+        if(false == fetched)
+        {
+            return EResult::SerializationFailed;
+        }
+
+        bool const deinitialized = serializer->deinitialize();
+        if(false == deinitialized)
+        {
+            return EResult::SerializationFailed;
+        }
+
+        serializer = nullptr;
+
+        CLog::Debug(logTag(), aOutSerializedData);
+
+        return EResult::Success;
+    }
 
 private_members:
 

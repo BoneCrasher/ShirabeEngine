@@ -326,6 +326,70 @@ namespace engine
         private_members:
         };
 
+        class CMaterialConfig;
+
+        /**
+         * The SBufferData class encapsulates a set buffer locations for a single
+         * buffer, which in turn is stored in a larger data buffer.
+         *
+         * "getLocation" will provide information on where the buffer is effectively
+         * located in the larger data buffer.
+         *
+         * Individual data points can be read/written using "getValueLocation(...)".
+         */
+        class SBufferData
+        {
+            friend class CMaterialConfig;
+
+        public_methods:
+
+            /**
+             * Return the location of this buffer in the larger enclosing buffer.
+             *
+             * @return See brief.
+             */
+            SHIRABE_INLINE SBufferLocation const &getLocation() const
+            {
+                return mLocation;
+            }
+
+            /**
+             * @brief getValues
+             * @return
+             */
+            Map<std::string, SBufferLocation> const &getValues() const
+            {
+                return mValueIndex;
+            }
+
+            /**
+             * Return the location information for the desired buffer value.
+             *
+             * @param aBufferValue The name of the desired buffer value.
+             * @return See brief.
+             */
+            SHIRABE_INLINE SBufferLocation const &getValueLocation(std::string const &aBufferValue) const
+            {
+                return mValueIndex.at(aBufferValue);
+            }
+
+            /**
+             * Check, whether a desired value is available for a specific buffer.
+             *
+             * @param aBufferValue The name of the value to check for.
+             * @return True, if found. False otherwise.
+             */
+            SHIRABE_INLINE bool hasValue(std::string const &aBufferValue) const
+            {
+                bool const has = (mValueIndex.end() != mValueIndex.find(aBufferValue));
+                return has;
+            }
+
+        private_members:
+            SBufferLocation                   mLocation;
+            Map<std::string, SBufferLocation> mValueIndex;
+        };
+
         /**
          * The CMaterialData class describes all material data of the material layer,
          * which includes uniforms (push constants), uniform buffers, textures and samplers.
@@ -336,8 +400,65 @@ namespace engine
          * It will also provide access to data buffers pointers and sizes by their respective
          * names.
          */
-        class CMaterialData
+        class CMaterialConfig
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>
         {
+        public_static_functions:
+            static CMaterialConfig fromMaterialDesc(SMaterial const &aMaterial);
+
+        public_constructors:
+            /**
+             * Create a material config, optionally from another.
+             */
+            SHIRABE_INLINE
+            CMaterialConfig()
+                : serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>()
+                , mBufferIndex({})
+                , mData({})
+            { }
+
+            SHIRABE_INLINE
+            CMaterialConfig(CMaterialConfig const &aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>()
+                , mBufferIndex(aOther.mBufferIndex)
+                , mData       (aOther.mData)
+            { }
+
+            SHIRABE_INLINE
+            CMaterialConfig(CMaterialConfig  &&aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>()
+                , mBufferIndex(std::move(aOther.mBufferIndex))
+                , mData       (std::move(aOther.mData))
+            { }
+
+        public_destructors:
+            ~CMaterialConfig() = default;
+
+        public_operators:
+            /**
+             * Assign another material config.
+             */
+            SHIRABE_INLINE
+            CMaterialConfig &operator=(CMaterialConfig const &aOther)
+            {
+                mBufferIndex = aOther.mBufferIndex;
+                mData        = aOther.mData;
+
+                return (*this);
+            }
+
+            CMaterialConfig &operator=(CMaterialConfig &&aOther)
+            {
+                mBufferIndex = std::move(aOther.mBufferIndex);
+                mData        = std::move(aOther.mData);
+
+                return (*this);
+            }
+
         public_methods:
             /**
              * getBuffer
@@ -376,57 +497,19 @@ namespace engine
                     std::string const &aFieldName,
                     TDataType   const &aFieldValue);
 
-        private_structs:
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(serialization::IJSONSerializer<CMaterialConfig> &aSerializer) const;
 
             /**
-             * The SBufferData class encapsulates a set buffer locations for a single
-             * buffer, which in turn is stored in a larger data buffer.
-             *
-             * "getLocation" will provide information on where the buffer is effectively
-             * located in the larger data buffer.
-             *
-             * Individual data points can be read/written using "getValueLocation(...)".
+             * @brief acceptDeserializer
+             * @param aSerializer
+             * @return
              */
-            class SBufferData
-            {
-            public_methods:
-                /**
-                 * Return the location of this buffer in the larger enclosing buffer.
-                 *
-                 * @return See brief.
-                 */
-                SHIRABE_INLINE SBufferLocation const &getLocation() const
-                {
-                    return mLocation;
-                }
-
-                /**
-                 * Return the location information for the desired buffer value.
-                 *
-                 * @param aBufferValue The name of the desired buffer value.
-                 * @return See brief.
-                 */
-                SHIRABE_INLINE SBufferLocation const &getValueLocation(std::string const &aBufferValue) const
-                {
-                    return mValueIndex.at(aBufferValue);
-                }
-
-                /**
-                 * Check, whether a desired value is available for a specific buffer.
-                 *
-                 * @param aBufferValue The name of the value to check for.
-                 * @return True, if found. False otherwise.
-                 */
-                SHIRABE_INLINE bool hasValue(std::string const &aBufferValue) const
-                {
-                    bool const has = (mValueIndex.end() != mValueIndex.find(aBufferValue));
-                    return has;
-                }
-
-            private_members:
-                SBufferLocation                   mLocation;
-                Map<std::string, SBufferLocation> mValueIndex;
-            };
+            bool acceptDeserializer(serialization::IJSONDeserializer<CMaterialConfig> &aDeserializer);
 
         private_methods:
             /**
@@ -476,7 +559,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
-        CEngineResult<TDataType const*> CMaterialData::getBufferValuePointer(
+        CEngineResult<TDataType const*> CMaterialConfig::getBufferValuePointer(
                 std::string  const        &aBufferName,
                 std::string  const        &aBufferValue) const
         {
@@ -507,13 +590,13 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
-        CEngineResult<TDataType *> CMaterialData::getBufferValuePointer(
+        CEngineResult<TDataType *> CMaterialConfig::getBufferValuePointer(
                 std::string  const &aBufferName,
                 std::string  const &aBufferValue)
         {
             // Dirty hack to reuse the function implementation...
             TDataType                       const *constData = nullptr;
-            CEngineResult<TDataType const*> const  result    = static_cast<CMaterialData const*>(this)->getBufferValuePointer<TDataType>(aBufferName, aBufferValue);
+            CEngineResult<TDataType const*> const  result    = static_cast<CMaterialConfig const*>(this)->getBufferValuePointer<TDataType>(aBufferName, aBufferValue);
 
             return CEngineResult(result.result(), const_cast<TDataType *>(constData));
         }
@@ -523,7 +606,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TBufferType>
-        CEngineResult<TBufferType const*> CMaterialData::getBuffer(std::string const &aBufferName) const
+        CEngineResult<TBufferType const*> CMaterialConfig::getBuffer(std::string const &aBufferName) const
         {
             bool const has = hasBuffer(aBufferName);
             if(not has)
@@ -545,7 +628,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
-        CEngineResult<TDataType const*> CMaterialData::getBufferValue(
+        CEngineResult<TDataType const*> CMaterialConfig::getBufferValue(
                 std::string const &aBufferName,
                 std::string const &aFieldName) const
         {
@@ -557,7 +640,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
-        CEngineResult<> CMaterialData::setBufferValue(
+        CEngineResult<> CMaterialConfig::setBufferValue(
                 std::string const &aBufferName,
                 std::string const &aFieldName,
                 TDataType   const &aFieldValue)
@@ -578,7 +661,22 @@ namespace engine
          */
         class CMaterialLayer
         {
+        public_static_functions:
+            /**
+             * Create a material layer from config.
+             *
+             * @param aConfig
+             * @return
+             */
+            static CMaterialLayer fromConfig(CMaterialConfig const &aConfig)
+            {
+                CMaterialLayer layer;
+                layer.mConfig = aConfig;
+                return layer;
+            }
+
         public_methods:
+
             /**
              * getBuffer
              *
@@ -589,7 +687,7 @@ namespace engine
             template <typename TBufferType>
             CEngineResult<TBufferType const *> getBuffer(std::string const &aBufferName)
             {
-                return mData.getBuffer<TBufferType>(aBufferName);
+                return mConfig.getBuffer<TBufferType>(aBufferName);
             }
 
             /**
@@ -605,7 +703,7 @@ namespace engine
                     std::string const       &aBufferName,
                     std::string const       &aFieldName)
             {
-                return mData.getBufferValue<TDataType>(aBufferName, aFieldName);
+                return mConfig.getBufferValue<TDataType>(aBufferName, aFieldName);
             }
 
             /**
@@ -622,12 +720,12 @@ namespace engine
                     std::string const &aFieldName,
                     TDataType   const &aFieldValue)
             {
-                return mData.setBufferValue<TDataType>(aBufferName, aFieldName, aFieldValue);
+                return mConfig.setBufferValue<TDataType>(aBufferName, aFieldName, aFieldValue);
             }
 
 
         private_members:
-            CMaterialData mData;
+            CMaterialConfig mConfig;
         };
 
         /**

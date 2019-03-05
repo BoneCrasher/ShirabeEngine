@@ -86,17 +86,18 @@ namespace engine
              * @param aValue
              * @return
              */
-            virtual bool writeValue(std::string const &aKey, std::string const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, int8_t      const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, int16_t     const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, int32_t     const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, int64_t     const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, uint8_t     const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, uint16_t    const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, uint32_t    const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, uint64_t    const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, float       const &aValue) = 0;
-            virtual bool writeValue(std::string const &aKey, double      const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, std::string          const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int8_t               const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int16_t              const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int32_t              const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, int64_t              const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint8_t              const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint16_t             const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint32_t             const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, uint64_t             const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, float                const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, double               const &aValue) = 0;
+            virtual bool writeValue(std::string const &aKey, std::vector<uint8_t> const &aValue) = 0;
         };
 
         /**
@@ -154,17 +155,18 @@ namespace engine
              * @param aValue
              * @return
              */
-            virtual bool readValue(std::string const &aKey, std::string &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, int8_t      &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, int16_t     &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, int32_t     &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, int64_t     &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, uint8_t     &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, uint16_t    &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, uint32_t    &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, uint64_t    &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, float       &aOutValue) = 0;
-            virtual bool readValue(std::string const &aKey, double      &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, std::string          &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, int8_t               &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, int16_t              &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, int32_t              &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, int64_t              &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, uint8_t              &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, uint16_t             &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, uint32_t             &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, uint64_t             &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, float                &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, double               &aOutValue) = 0;
+            virtual bool readValue(std::string const &aKey, std::vector<uint8_t> &aOutValue) = 0;
         };
 
         /**
@@ -265,17 +267,18 @@ namespace engine
              * @param aValue
              * @return
              */
-            bool writeValue(std::string const &aKey, std::string const &aValue);
-            bool writeValue(std::string const &aKey, int8_t      const &aValue);
-            bool writeValue(std::string const &aKey, int16_t     const &aValue);
-            bool writeValue(std::string const &aKey, int32_t     const &aValue);
-            bool writeValue(std::string const &aKey, int64_t     const &aValue);
-            bool writeValue(std::string const &aKey, uint8_t     const &aValue);
-            bool writeValue(std::string const &aKey, uint16_t    const &aValue);
-            bool writeValue(std::string const &aKey, uint32_t    const &aValue);
-            bool writeValue(std::string const &aKey, uint64_t    const &aValue);
-            bool writeValue(std::string const &aKey, float       const &aValue);
-            bool writeValue(std::string const &aKey, double      const &aValue);
+            bool writeValue(std::string const &aKey, std::string          const &aValue);
+            bool writeValue(std::string const &aKey, int8_t               const &aValue);
+            bool writeValue(std::string const &aKey, int16_t              const &aValue);
+            bool writeValue(std::string const &aKey, int32_t              const &aValue);
+            bool writeValue(std::string const &aKey, int64_t              const &aValue);
+            bool writeValue(std::string const &aKey, uint8_t              const &aValue);
+            bool writeValue(std::string const &aKey, uint16_t             const &aValue);
+            bool writeValue(std::string const &aKey, uint32_t             const &aValue);
+            bool writeValue(std::string const &aKey, uint64_t             const &aValue);
+            bool writeValue(std::string const &aKey, float                const &aValue);
+            bool writeValue(std::string const &aKey, double               const &aValue);
+            bool writeValue(std::string const &aKey, std::vector<uint8_t> const &aValue);
 
         private_methods:
 
@@ -287,27 +290,7 @@ namespace engine
              * @return
              */
             template <typename TValue>
-            bool writeValueImpl(std::string const &aKey, TValue const &aValue)
-            {
-                if(not hasCurrentItem())
-                {
-                    // Invalid use!
-                    CLog::Error(logTag(), "Cannot add value to non-existent top-level item.");
-                    return false;
-                }
-
-                nlohmann::json &top = getCurrentItem();
-                if(top.is_array())
-                {
-                    top.push_back(aValue);
-                }
-                else
-                {
-                    top[aKey] = aValue;
-                }
-
-                return true;
-            }
+            bool writeValueImpl(std::string const &aKey, TValue const &aValue);
 
             /**
              * Check, whether there's a current top level item.
@@ -549,6 +532,46 @@ namespace engine
         {
             return writeValueImpl(aKey, aValue);
         }
+        template <typename T>
+        bool CJSONSerializer<T>::writeValue(std::string const &aKey, std::vector<uint8_t> const &aValue)
+        {
+            return writeValueImpl(aKey, aValue);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        template <typename TValue>
+        bool CJSONSerializer<T>::writeValueImpl(std::string const &aKey, TValue const &aValue)
+        {
+            if(not hasCurrentItem())
+            {
+                // Invalid use!
+                CLog::Error(logTag(), "Cannot add value to non-existent top-level item.");
+                return false;
+            }
+
+            nlohmann::json &top = getCurrentItem();
+            if(top.is_array())
+            {
+                top.push_back(aValue);
+            }
+            else
+            {
+                if constexpr(std::is_same_v<std::vector<uint8_t>, TValue>)
+                {
+                    top[aKey] = std::string(aValue.begin(), aValue.end());
+                }
+                else
+                {
+                    top[aKey] = aValue;
+                }
+            }
+
+            return true;
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -711,17 +734,18 @@ namespace engine
              * @param aValue
              * @return
              */
-            bool readValue(std::string const &aKey, std::string &aOutValue);
-            bool readValue(std::string const &aKey, int8_t      &aOutValue);
-            bool readValue(std::string const &aKey, int16_t     &aOutValue);
-            bool readValue(std::string const &aKey, int32_t     &aOutValue);
-            bool readValue(std::string const &aKey, int64_t     &aOutValue);
-            bool readValue(std::string const &aKey, uint8_t     &aOutValue);
-            bool readValue(std::string const &aKey, uint16_t    &aOutValue);
-            bool readValue(std::string const &aKey, uint32_t    &aOutValue);
-            bool readValue(std::string const &aKey, uint64_t    &aOutValue);
-            bool readValue(std::string const &aKey, float       &aOutValue);
-            bool readValue(std::string const &aKey, double      &aOutValue);
+            bool readValue(std::string const &aKey, std::string          &aOutValue);
+            bool readValue(std::string const &aKey, int8_t               &aOutValue);
+            bool readValue(std::string const &aKey, int16_t              &aOutValue);
+            bool readValue(std::string const &aKey, int32_t              &aOutValue);
+            bool readValue(std::string const &aKey, int64_t              &aOutValue);
+            bool readValue(std::string const &aKey, uint8_t              &aOutValue);
+            bool readValue(std::string const &aKey, uint16_t             &aOutValue);
+            bool readValue(std::string const &aKey, uint32_t             &aOutValue);
+            bool readValue(std::string const &aKey, uint64_t             &aOutValue);
+            bool readValue(std::string const &aKey, float                &aOutValue);
+            bool readValue(std::string const &aKey, double               &aOutValue);
+            bool readValue(std::string const &aKey, std::vector<uint8_t> &aOutValue);
 
         private_methods:
 
@@ -733,31 +757,7 @@ namespace engine
              * @return
              */
             template <typename TValue>
-            bool readValueImpl(std::string const &aKey, TValue &aOutValue)
-            {
-                if(not hasCurrentItem())
-                {
-                    // Invalid use!
-                    CLog::Error(logTag(), "Cannot add value to non-existent top-level item.");
-                    return false;
-                }
-
-                nlohmann::json &top = getCurrentItem();
-                if(top.is_array())
-                {
-                    // Invalid use!
-                    CLog::Error(logTag(), "Cannot read value '%0' from json entity, which is not an object.", aKey);
-                    return false;
-                }
-                else
-                {
-                    nlohmann::json const &valueNode = top[aKey];
-                    TValue value = valueNode.is_null() ? TValue() : static_cast<TValue>(valueNode);
-                    aOutValue = value;
-                }
-
-                return true;
-            }
+            bool readValueImpl(std::string const &aKey, TValue &aOutValue);
 
             /**
              * Check, whether there's a current top level item.
@@ -1082,6 +1082,56 @@ namespace engine
         bool CJSONDeserializer<T>::readValue(std::string const &aKey, double &aOutValue)
         {
             return readValueImpl(aKey, aOutValue);
+        }
+
+        template <typename T>
+        bool CJSONDeserializer<T>::readValue(std::string const &aKey, std::vector<uint8_t> &aOutValue)
+        {
+            return readValueImpl(aKey, aOutValue);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        template <typename TValue>
+        bool CJSONDeserializer<T>::readValueImpl(std::string const &aKey, TValue &aOutValue)
+        {
+            if(not hasCurrentItem())
+            {
+                // Invalid use!
+                CLog::Error(logTag(), "Cannot add value to non-existent top-level item.");
+                return false;
+            }
+
+            nlohmann::json &top = getCurrentItem();
+            if(top.is_array())
+            {
+                // Invalid use!
+                CLog::Error(logTag(), "Cannot read value '%0' from json entity, which is not an object.", aKey);
+                return false;
+            }
+            else
+            {
+                nlohmann::json const &valueNode = top[aKey];
+
+                TValue value {};
+
+                if constexpr (std::is_same_v<std::vector<uint8_t>, TValue>)
+                {
+                    std::string s = valueNode.is_null() ? std::string() : static_cast<std::string>(valueNode);
+                    std::copy( s.begin(), s.end(), std::back_inserter(value));
+                }
+                else
+                {
+                    value = valueNode.is_null() ? TValue() : static_cast<TValue>(valueNode);
+                }
+
+                aOutValue = value;
+            }
+
+            return true;
         }
         //<-----------------------------------------------------------------------------
 

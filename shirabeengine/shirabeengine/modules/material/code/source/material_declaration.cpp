@@ -98,6 +98,8 @@ namespace engine
                 aSerializer.writeValue("offset",  aBuffer.location.offset);
                 aSerializer.writeValue("size",    aBuffer.location.length);
                 aSerializer.writeValue("padding", aBuffer.location.padding);
+                aSerializer.writeValue("set",     aBuffer.set);
+                aSerializer.writeValue("binding", aBuffer.binding);
 
                 aSerializer.beginArray("members");
                 auto const iterate = [&] (std::pair<std::string, SUniformBufferMember> const &aMember)
@@ -248,6 +250,8 @@ namespace engine
                 aDeserializer.readValue("offset",  aBuffer.location.offset);
                 aDeserializer.readValue("size",    aBuffer.location.length);
                 aDeserializer.readValue("padding", aBuffer.location.padding);
+                aDeserializer.readValue("set",     aBuffer.set);
+                aDeserializer.readValue("binding", aBuffer.binding);
 
                 uint32_t uniformBufferMemberCount = 0;
                 aDeserializer.beginArray("members", uniformBufferMemberCount);
@@ -387,5 +391,151 @@ namespace engine
             return true;
         }
         //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CMaterialConfig CMaterialConfig::fromMaterialDesc(SMaterial const &aMaterial)
+        {
+            CMaterialConfig config {};
+
+            uint64_t previousSize = 0;
+            uint64_t currentSize  = 0;
+            uint64_t totalSize    = 0;
+
+            for(auto const &buffer : aMaterial.uniformBuffers)
+            {
+                SBufferLocation adjustedBufferLocation {};
+                adjustedBufferLocation.offset  = (totalSize + buffer.location.offset);
+                adjustedBufferLocation.length  = buffer.location.length;
+                adjustedBufferLocation.padding = buffer.location.padding;
+
+                SBufferData data{};
+                data.mLocation = adjustedBufferLocation;
+
+                for(auto const &[name, member] : buffer.members)
+                {
+                    SBufferLocation adjustedMemberLocation {};
+                    adjustedMemberLocation.offset  = (adjustedBufferLocation.offset + member.location.offset);
+                    adjustedMemberLocation.length  = member.location.length;
+                    adjustedMemberLocation.padding = member.location.padding;
+
+                    data.mValueIndex[name] = member.location;
+                }
+
+                config.mBufferIndex[buffer.name] = data;
+
+                previousSize = currentSize;
+                currentSize  = (buffer.location.offset + buffer.location.length + buffer.location.padding);
+                totalSize   += currentSize;
+            }
+
+            config.mData.resize(totalSize);
+            config.mData.assign(totalSize, 0);
+
+            return config;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CMaterialConfig::acceptSerializer(serialization::IJSONSerializer<CMaterialConfig> &aSerializer) const
+        {
+            aSerializer.beginObject("");
+
+            aSerializer.writeValue("uniformBufferData", mData);
+
+            aSerializer.beginArray("uniformBuffers");
+            auto const iterateUniformBuffers = [&] (std::pair<std::string, SBufferData> const &aBuffer) -> void
+            {
+                std::string const &name = aBuffer.first;
+                SBufferData const &data = aBuffer.second;
+
+                SBufferLocation const &location = data.getLocation();
+
+                aSerializer.beginObject(name);
+                aSerializer.writeValue("name",    name);
+                aSerializer.writeValue("offset",  location.offset);
+                aSerializer.writeValue("size",    location.length);
+                aSerializer.writeValue("padding", location.padding);
+
+                aSerializer.beginArray("members");
+                auto const iterate = [&] (std::pair<std::string, SBufferLocation> const &aMember)
+                {
+                    std::string     const name     = aMember.first;
+                    SBufferLocation const location = aMember.second;
+
+                    aSerializer.beginObject(name);
+                    aSerializer.writeValue("name",    name);
+                    aSerializer.writeValue("offset",  location.offset);
+                    aSerializer.writeValue("size",    location.length);
+                    aSerializer.writeValue("padding", location.padding);
+                    aSerializer.endObject();
+                };
+                std::for_each(data.mValueIndex.begin(), data.mValueIndex.end(), iterate);
+                aSerializer.endArray();
+
+                aSerializer.endObject();
+            };
+            std::for_each(mBufferIndex.begin(), mBufferIndex.end(), iterateUniformBuffers);
+            aSerializer.endArray();
+
+            aSerializer.endObject();
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer<CMaterialConfig> &aDeserializer)
+        {
+            aDeserializer.readValue("uniformBufferData", mData);
+
+            uint32_t bufferCount = 0;
+            aDeserializer.beginArray("uniformBuffers", bufferCount);
+            for(uint32_t k=0; k<bufferCount; ++k)
+            {
+                SBufferData buffer = {};
+
+                std::string     name     = {};
+
+                aDeserializer.beginObject(k);
+
+                aDeserializer.readValue("name",    name);
+                aDeserializer.readValue("offset",  buffer.mLocation.offset);
+                aDeserializer.readValue("size",    buffer.mLocation.length);
+                aDeserializer.readValue("padding", buffer.mLocation.padding);
+
+                uint32_t memberCount = 0;
+                aDeserializer.beginArray("members", memberCount);
+                for(uint32_t l=0; l<memberCount; ++l)
+                {
+                    std::string     name     ={};
+                    SBufferLocation location ={};
+
+                    aDeserializer.beginObject(l);
+
+                    aDeserializer.readValue("name",    name);
+                    aDeserializer.readValue("offset",  location.offset);
+                    aDeserializer.readValue("size",    location.length);
+                    aDeserializer.readValue("padding", location.padding);
+
+                    aDeserializer.endObject();
+
+                    buffer.mValueIndex[name] = location;
+                }
+                aDeserializer.endArray();
+
+                aDeserializer.endObject();
+
+                mBufferIndex[name] = buffer;
+            }
+            aDeserializer.endArray();
+
+            return true;
+        }
     }
 }
