@@ -12,6 +12,7 @@
 
 #include <base/declaration.h>
 #include "core/enginetypehelper.h"
+#include "core/result.h"
 
 namespace engine
 {
@@ -93,8 +94,8 @@ namespace engine
                 SHIRABE_DECLARE_INTERFACE(IResult)
 
             public_api:
-                virtual bool asString      (std::string          &aOutString) const = 0;
-                virtual bool asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const = 0;
+                virtual CResult<std::string>          asString      () const = 0;
+                virtual CResult<std::vector<uint8_t>> asBinaryBuffer() const = 0;
            };
 
         public_api:
@@ -121,7 +122,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            virtual bool serialize(T const&aSource, CStdSharedPtr_t<IResult> &aOutResult) = 0;
+            virtual CResult<CStdSharedPtr_t<IResult>> serialize(T const&aSource) = 0;
         };
 
         /*!
@@ -146,7 +147,7 @@ namespace engine
                 SHIRABE_DECLARE_INTERFACE(IResult)
 
             public_api:
-                virtual bool asT(CStdSharedPtr_t<T> &aOutResult) const = 0;
+                virtual CResult<T const&> asT() const = 0;
             };
 
         public_api:
@@ -172,9 +173,7 @@ namespace engine
              * @param aOutResult Result-Instance containing the deserialization result.
              * @return           True if successful, false otherwise.
              */
-            virtual bool deserialize(
-                    std::string              const &aSource,
-                    CStdSharedPtr_t<IResult>       &aOutResult) = 0;
+            virtual CResult<CStdSharedPtr_t<IResult>> deserialize(std::string const &aSource) = 0;
 
             /*!
              * Accept a byte buffer input of serialized data and invoke the deserialization process,
@@ -184,9 +183,7 @@ namespace engine
              * @param aOutResult Result-Instance containing the deserialization result.
              * @return           True if successful, false otherwise.
              */
-            virtual bool deserialize(
-                    std::vector<uint8_t>     const &aSource,
-                    CStdSharedPtr_t<IResult>       &aOutResult) = 0;
+            virtual CResult<CStdSharedPtr_t<IResult>> deserialize(std::vector<uint8_t> const &aSource) = 0;
         };
     }
 }

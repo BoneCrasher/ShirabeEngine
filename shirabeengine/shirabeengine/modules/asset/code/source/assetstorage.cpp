@@ -24,6 +24,30 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<> CAssetStorage::registerAssetLoader(EAssetType                    const &aAssetType,
+                                                           CStdSharedPtr_t<IAssetLoader> const  aLoader)
+        {
+            if(nullptr == aLoader)
+            {
+                return { EEngineStatus::Error };
+            }
+
+            bool const contained = (mLoaders.end() != mLoaders.find(aAssetType));
+            if(contained)
+            {
+                return { EEngineStatus::Error };
+            }
+
+            mLoaders[aAssetType] = aLoader;
+
+            return { EEngineStatus::Ok };
+        }
+
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         void CAssetStorage::readIndex(AssetIndex_t const &aIndex)
         {
             for(AssetIndex_t::value_type const &assignment : aIndex)
@@ -37,9 +61,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        AssetId_t CAssetStorage::createDynamicTextureAsset(
-                std::string  const &aName,
-                STextureInfo const &aTextureInfo)
+        AssetId_t CAssetStorage::createDynamicTextureAsset(std::string  const &aName,
+                                                           STextureInfo const &aTextureInfo)
         {
             AssetId_t aid   = 0;
             SAsset    asset = {};
@@ -74,16 +97,11 @@ namespace engine
         {
             CEngineResult<ByteBuffer> data = { EEngineStatus::Error };
 
-            switch(aAsset.type)
+            bool const hasLoader = (mLoaders.end() != mLoaders.find(aAsset.type));
+            if(hasLoader)
             {
-            case EAssetType::Texture:
-                data = loadTextureAsset(aAsset);
-                break;
-            case EAssetType::Buffer:
-                data = loadBufferAsset(aAsset);
-                break;
-            default:
-                break;
+                CStdSharedPtr_t<IAssetLoader> loader = mLoaders[aAsset.type];
+                data = loader->loadAsset(aAsset);
             }
 
             return data;
@@ -122,11 +140,14 @@ namespace engine
             int w = 0, h = 0, c = 0;
             unsigned char* stbuc = stbi_load(aFilename.c_str(), &w, &h, &c, 4);
 
-            uint64_t const size = (w * h * 4 * sizeof(int8_t));
+            uint64_t const size = (static_cast<uint64_t>(w) *
+                                   static_cast<uint64_t>(h) *
+                                   4u * sizeof(int8_t));
+
             image.data         = ByteBuffer::DataArrayFromSize(size);
-            image.width        = w;
-            image.height       = h;
-            image.channels     = c;
+            image.width        = static_cast<uint32_t>(w);
+            image.height       = static_cast<uint32_t>(h);
+            image.channels     = static_cast<uint32_t>(c);
 
             stbi_image_free(stbuc);
 

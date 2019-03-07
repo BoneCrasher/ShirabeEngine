@@ -198,8 +198,8 @@ namespace engine
                 virtual ~CSerializationResult() = default;
 
             public_methods:
-                bool asString      (std::string          &aOutString) const;
-                bool asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const;
+                CResult<std::string>          asString      () const;
+                CResult<std::vector<uint8_t>> asBinaryBuffer() const;
 
             private_members:
                 nlohmann::json const mResult;
@@ -229,7 +229,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            bool serialize(T const &aInput, CStdSharedPtr_t<typename IJSONSerializer<T>::IResult> &aOutResult);
+            CResult<CStdSharedPtr_t<typename IJSONSerializer<T>::IResult>> serialize(T const &aInput);
 
             /**
              * Begin a JSON array, to which the upcoming objects will be added.
@@ -343,7 +343,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        bool CJSONSerializer<T>::serialize(T const &aInput, CStdSharedPtr_t<typename IJSONSerializer<T>::IResult> &aOutResult)
+        CResult<CStdSharedPtr_t<typename IJSONSerializer<T>::IResult>> CJSONSerializer<T>::serialize(T const &aInput)
         {
             IJSONSerializer<T> &serializer = *this;
 
@@ -353,7 +353,7 @@ namespace engine
                 nlohmann::json &serializedData = mRoot; // For debug...
                 CStdSharedPtr_t<CSerializationResult> result = makeCStdSharedPtr<CSerializationResult>(serializedData);
 
-                aOutResult = std::move(result);
+                return { std::move(result) };
             }
 
             return successful;
@@ -598,24 +598,20 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        bool CJSONSerializer<T>::CSerializationResult::asString(std::string &aOutString) const
+        CResult<std::string> CJSONSerializer<T>::CSerializationResult::asString() const
         {
             static uint64_t const sIndentWidth = 4;
-            aOutString = mResult.dump(sIndentWidth);
-
-            return true;
+            return mResult.dump(sIndentWidth);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template <typename T>
-        bool CJSONSerializer<T>::CSerializationResult::asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const
+        template <typename T>        
+        CResult<std::vector<uint8_t>> CJSONSerializer<T>::CSerializationResult::asBinaryBuffer() const
         {
-            aOutBuffer = nlohmann::json::to_msgpack(mResult);
-
-            return true;
+            return nlohmann::json::to_msgpack(mResult);
         }
 
         /**
@@ -647,10 +643,10 @@ namespace engine
                 virtual ~CDeserializationResult() = default;
 
             public_methods:
-                bool asT(CStdSharedPtr_t<T> &aOutMaterial) const;
+                CResult<T const&> asT() const;
 
             private_members:
-                CStdSharedPtr_t<T> mResult;
+                T mResult;
             };
 
         public_methods:
@@ -677,7 +673,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            bool deserialize(std::string const &aSource, CStdSharedPtr_t<typename IDeserializer<T>::IResult> &aOutResult);
+            CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> deserialize(std::string const &aSource);
 
             /*!
              * Serialize an instance of type SShaderCompilationUnit into whichever internal representation and
@@ -688,7 +684,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            bool deserialize(std::vector<uint8_t> const &aSource, CStdSharedPtr_t<typename IDeserializer<T>::IResult> &aOutResult);
+            CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> deserialize(std::vector<uint8_t> const &aSource);
 
             /**
              * Begin a JSON array, to which the upcoming objects will be added.
@@ -810,7 +806,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        bool CJSONDeserializer<T>::deserialize(std::string const &aSource, CStdSharedPtr_t<typename IDeserializer<T>::IResult> &aOutResult)
+        CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> CJSONDeserializer<T>::deserialize(std::string const &aSource)
         {
             nlohmann::json json = nlohmann::json::parse(aSource);
             mRoot = json;
@@ -825,7 +821,7 @@ namespace engine
             {
                 auto result = makeCStdSharedPtr<CDeserializationResult>(material);
 
-                aOutResult = std::move(result);
+                return { std::move(result) };
             }
 
             return successful;
@@ -836,7 +832,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        bool CJSONDeserializer<T>::deserialize(std::vector<uint8_t> const &aSource, CStdSharedPtr_t<typename IDeserializer<T>::IResult> &aOutResult)
+        CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> CJSONDeserializer<T>::deserialize(std::vector<uint8_t> const &aSource)
         {
             nlohmann::json json = nlohmann::json::from_msgpack(aSource);
             mRoot = json;
@@ -851,7 +847,7 @@ namespace engine
             {
                 auto result = makeCStdSharedPtr<CDeserializationResult>(material);
 
-                aOutResult = std::move(result);
+                return { std::move(result) };
             }
 
             return successful;
@@ -1159,11 +1155,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        bool CJSONDeserializer<T>::CDeserializationResult::asT(CStdSharedPtr_t<T> &aOutMaterial) const
+        CResult<T const&> CJSONDeserializer<T>::CDeserializationResult::asT() const
         {
-            aOutMaterial = mResult;
-
-            return true;
+            return { mResult };
         }
         //<-----------------------------------------------------------------------------
 
