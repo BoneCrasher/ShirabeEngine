@@ -50,6 +50,34 @@ namespace engine
                 : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>
         {
+        public_constructors:
+            SHIRABE_INLINE
+            SMaterialIndex()
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
+                , uid   (0)
+                , name  ({})
+                , stages({})
+            {}
+
+            SHIRABE_INLINE
+            SMaterialIndex(SMaterialIndex const &aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
+                , uid   (aOther.uid   )
+                , name  (aOther.name  )
+                , stages(aOther.stages)
+            {}
+
+            SHIRABE_INLINE
+            SMaterialIndex(SMaterialIndex &&aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
+                , uid   (std::move(aOther.uid   ))
+                , name  (std::move(aOther.name  ))
+                , stages(std::move(aOther.stages))
+            {}
+
         public_members:
             uint64_t                                                uid;
             std::string                                             name;

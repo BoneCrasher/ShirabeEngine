@@ -178,6 +178,28 @@ namespace engine
         {
             SHIRABE_DECLARE_LOG_TAG(CJSONSerializer);
 
+        public_constructors:
+            SHIRABE_INLINE
+            CJSONSerializer()
+                : IJSONSerializer<T> ()
+                , mRoot({})
+                , mCurrentJSONState()
+            {}
+
+            SHIRABE_INLINE
+            CJSONSerializer(CJSONSerializer const &aOther)
+                : IJSONSerializer<T> ()
+                , mRoot            (aOther.mRoot            )
+                , mCurrentJSONState(aOther.mCurrentJSONState)
+            {}
+
+            SHIRABE_INLINE
+            CJSONSerializer(CJSONSerializer &&aOther)
+                : IJSONSerializer<T> ()
+                , mRoot            (std::move(aOther.mRoot            ))
+                , mCurrentJSONState(std::move(aOther.mCurrentJSONState))
+            {}
+
         public_destructors:
             virtual ~CJSONSerializer() = default;
 
@@ -623,6 +645,28 @@ namespace engine
         {
             SHIRABE_DECLARE_LOG_TAG(CJSONDeserializer);
 
+        public_constructors:
+            SHIRABE_INLINE
+            CJSONDeserializer()
+                : IJSONDeserializer<T> ()
+                , mRoot({})
+                , mCurrentJSONState()
+            {}
+
+            SHIRABE_INLINE
+            CJSONDeserializer(CJSONDeserializer const &aOther)
+                : IJSONDeserializer<T> ()
+                , mRoot            (aOther.mRoot            )
+                , mCurrentJSONState(aOther.mCurrentJSONState)
+            {}
+
+            SHIRABE_INLINE
+            CJSONDeserializer(CJSONDeserializer &&aOther)
+                : IJSONDeserializer<T> ()
+                , mRoot            (std::move(aOther.mRoot            ))
+                , mCurrentJSONState(std::move(aOther.mCurrentJSONState))
+            {}
+
         public_destructors:
             virtual ~CJSONDeserializer() = default;
 
@@ -637,13 +681,13 @@ namespace engine
             public_constructors:
                 CDeserializationResult();
 
-                CDeserializationResult(CStdSharedPtr_t<T> const &aResult);
+                CDeserializationResult(T const &aResult);
 
             public_destructors:
                 virtual ~CDeserializationResult() = default;
 
             public_methods:
-                CResult<T const&> asT() const;
+                CResult<T> const asT() const;
 
             private_members:
                 T mResult;
@@ -814,12 +858,12 @@ namespace engine
 
             IJSONDeserializer<T> &deserializer = *this;
 
-            auto material = makeCStdSharedPtr<T>();
+            T data {};
 
-            bool const successful = material->acceptDeserializer(deserializer);
+            bool const successful = data.acceptDeserializer(deserializer);
             if(successful)
             {
-                auto result = makeCStdSharedPtr<CDeserializationResult>(material);
+                auto result = makeCStdSharedPtr<CDeserializationResult>(data);
 
                 return { std::move(result) };
             }
@@ -840,12 +884,12 @@ namespace engine
 
             IJSONDeserializer<T> &deserializer = *this;
 
-            auto material = makeCStdSharedPtr<T>();
+            T data {};
 
-            bool const successful = material->acceptDeserializer(deserializer);
+            bool const successful = data.acceptDeserializer(deserializer);
             if(successful)
             {
-                auto result = makeCStdSharedPtr<CDeserializationResult>(material);
+                auto result = makeCStdSharedPtr<CDeserializationResult>(data);
 
                 return { std::move(result) };
             }
@@ -1137,7 +1181,7 @@ namespace engine
         template <typename T>
         CJSONDeserializer<T>::CDeserializationResult::CDeserializationResult()
             : IDeserializer<T>::IResult()
-            , mResult(nullptr)
+            , mResult({})
         { }
         //<-----------------------------------------------------------------------------
 
@@ -1145,7 +1189,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CJSONDeserializer<T>::CDeserializationResult::CDeserializationResult(CStdSharedPtr_t<T> const &aResult)
+        CJSONDeserializer<T>::CDeserializationResult::CDeserializationResult(T const &aResult)
             : IDeserializer<T>::IResult()
             , mResult(aResult)
         { }
@@ -1155,7 +1199,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CResult<T const&> CJSONDeserializer<T>::CDeserializationResult::asT() const
+        CResult<T> const CJSONDeserializer<T>::CDeserializationResult::asT() const
         {
             return { mResult };
         }

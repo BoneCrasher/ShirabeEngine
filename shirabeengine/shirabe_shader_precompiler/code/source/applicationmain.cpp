@@ -212,17 +212,23 @@ public_methods:
 
         std::string const indexFileContents = readFile(indexFilePath);
 
-        CStdSharedPtr_t<serialization::IDeserializer<SMaterialIndex>::IResult> indexDeserializationResult = nullptr;
-        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>>      indexDeserializer          = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
+
+        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
         indexDeserializer->initialize();
-        indexDeserializer->deserialize(indexFileContents, indexDeserializationResult);
+
+        CResult<CStdSharedPtr_t<serialization::IDeserializer<SMaterialIndex>::IResult>> serialization = indexDeserializer->deserialize(indexFileContents);
+        if(not serialization.successful())
+        {
+            CLog::Error(logTag(), "Could not serialize material index file.");
+            return false;
+        }
+
         indexDeserializer->deinitialize();
 
         std::vector<std::string> inputFiles;
 
-        CStdSharedPtr_t<SMaterialIndex> indexData = nullptr;
-        indexDeserializationResult->asT(indexData);
-        for(auto const &[stage, path] : indexData->stages)
+        CResult<SMaterialIndex> result = serialization.data()->asT();
+        for(auto const &[stage, path] : result.data().stages)
         {
             if(not path.empty())
             {
@@ -697,23 +703,20 @@ private_methods:
     {
         using namespace shader_precompiler::serialization;
 
-        CStdSharedPtr_t<IJSONSerializer<SMaterial>::IResult> result     = nullptr;
-        CStdUniquePtr_t<IJSONSerializer<SMaterial>>          serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
+        CStdUniquePtr_t<IJSONSerializer<SMaterial>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        bool const serialized = serializer->serialize(aMaterial, result);
-        if(false == serialized)
+        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterial>::IResult>> const serialization = serializer->serialize(aMaterial);
+        if(not serialization.successful())
         {
             return EResult::SerializationFailed;
         }
-        bool const fetched = result->asString(aOutSerializedData);
-        if(false == fetched)
-        {
-            return EResult::SerializationFailed;
-        }
+
+        CResult<std::string> data = serialization.data()->asString();
+        aOutSerializedData = data.data();
 
         bool const deinitialized = serializer->deinitialize();
         if(false == deinitialized)
@@ -738,23 +741,20 @@ private_methods:
     {
         using namespace shader_precompiler::serialization;
 
-        CStdSharedPtr_t<IJSONSerializer<CMaterialConfig>::IResult> result     = nullptr;
-        CStdUniquePtr_t<IJSONSerializer<CMaterialConfig>>          serializer = makeCStdUniquePtr<CJSONSerializer<CMaterialConfig>>();
+        CStdUniquePtr_t<IJSONSerializer<CMaterialConfig>> serializer = makeCStdUniquePtr<CJSONSerializer<CMaterialConfig>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        bool const serialized = serializer->serialize(aMaterialConfig, result);
-        if(false == serialized)
+        CResult<CStdSharedPtr_t<serialization::ISerializer<CMaterialConfig>::IResult>> const serialization = serializer->serialize(aMaterialConfig);
+        if(not serialization.successful())
         {
             return EResult::SerializationFailed;
         }
-        bool const fetched = result->asString(aOutSerializedData);
-        if(false == fetched)
-        {
-            return EResult::SerializationFailed;
-        }
+
+        CResult<std::string> data = serialization.data()->asString();
+        aOutSerializedData = data.data();
 
         bool const deinitialized = serializer->deinitialize();
         if(false == deinitialized)

@@ -23,6 +23,8 @@ namespace engine
              * @return
              */
             CEngineResult<ByteBuffer> loadAsset(asset::SAsset const &aAsset);
+
+        private_methods:
         };
 
     }

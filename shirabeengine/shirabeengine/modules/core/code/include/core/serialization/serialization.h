@@ -147,7 +147,7 @@ namespace engine
                 SHIRABE_DECLARE_INTERFACE(IResult)
 
             public_api:
-                virtual CResult<T const&> asT() const = 0;
+                virtual CResult<T> const asT() const = 0;
             };
 
         public_api:
