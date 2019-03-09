@@ -108,6 +108,8 @@ private_structs:
      */
     struct SConfiguration
     {
+        std::string                             indexFilename;
+        SMaterialIndex                          indexFile;
         std::vector<std::string>                includePaths;
         std::vector<std::string>                inputPaths;
         std::string                             outputPath;
@@ -212,7 +214,6 @@ public_methods:
 
         std::string const indexFileContents = readFile(indexFilePath);
 
-
         CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
         indexDeserializer->initialize();
 
@@ -227,27 +228,35 @@ public_methods:
 
         std::vector<std::string> inputFiles;
 
-        CResult<SMaterialIndex> result = serialization.data()->asT();
-        for(auto const &[stage, path] : result.data().stages)
+        SMaterialIndex index = serialization.data()->asT().data();
+
+        for(auto const &[stage, pathReferences] : index.stages)
         {
-            if(not path.empty())
+            if(not pathReferences.glslSourceFilename.empty())
             {
-                inputFiles.push_back(std::filesystem::current_path()/indexFileParentPath/path);
+                inputFiles.push_back(std::filesystem::current_path()/indexFileParentPath/pathReferences.glslSourceFilename);
             }
         }
 
+        std::filesystem::path const indexOutputFileName     = indexFileBaseName.string() + ".index";
         std::filesystem::path const signatureOutputFileName = indexFileBaseName.string() + ".signature";
         std::filesystem::path const configOutputFileName    = indexFileBaseName.string() + ".config";
+        std::filesystem::path const indexOutputFilePath     = std::filesystem::path(outputPathAbsolute)/indexOutputFileName;
         std::filesystem::path const signatureOutputFilePath = std::filesystem::path(outputPathAbsolute)/signatureOutputFileName;
         std::filesystem::path const configOutputFilePath    = std::filesystem::path(outputPathAbsolute)/configOutputFileName;
 
         SConfiguration config {};
         config.options             = options;
+        config.indexFilename       = indexOutputFilePath;
+        config.indexFile           = index;
         config.inputPaths          = inputFiles;
         config.includePaths        = includePaths;
         config.outputPath          = outputPath;
         config.signatureOutputFile = signatureOutputFilePath;
         config.configOutputFile    = configOutputFilePath;
+
+        config.indexFile.signatureFilename         = config.signatureOutputFile;
+        config.indexFile.baseConfigurationFilename = config.configOutputFile;
 
         mConfig = config;
 
@@ -287,6 +296,16 @@ public_methods:
         }
 
         std::string serializedData = {};
+
+        // Rewrite index
+        CResult<EResult> const indexSerializationResult = serializeMaterialIndex(mConfig.indexFile, serializedData);
+        if(not indexSerializationResult.successful())
+        {
+            CLog::Error(logTag(), "Failed to serialize index data.");
+            return EResult::SerializationFailed;
+        }
+
+        writeFile(mConfig.indexFilename, serializedData);
 
         CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
         if(not signatureSerializationResult.successful())
@@ -344,9 +363,6 @@ private_methods:
         // 2. <basename>.<language_unified_ext>         ; e.g. awesomeShader.hlsl, awesomeShader.cg
         // 3. <basename>.<stage>                        ; e.g. awesomeShader.vert, awesomeShader.vs
 
-        std::string primaryExtension   = std::string();
-        std::string secondaryExtension = std::string();
-
         std::string const filename = std::filesystem::path(aFileName).filename();
 
         size_t const primaryExtensionPosition   = filename.find_last_of(".");
@@ -354,6 +370,9 @@ private_methods:
 
         bool const hasPrimaryExtension   = (std::string::npos != primaryExtensionPosition);
         bool const hasSecondaryExtension = (std::string::npos != secondaryExtensionPosition);
+
+        std::string primaryExtension   = std::string();
+        std::string secondaryExtension = std::string();
 
         if(hasPrimaryExtension)
         {
@@ -561,14 +580,16 @@ private_methods:
                 return {};
             }
 
-            std::string const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
-            std::string const outputPath = std::filesystem::path(mConfig.outputPath) / outputName;
+            std::string           const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
+            std::filesystem::path const outputPath = std::filesystem::path(mConfig.outputPath) / outputName;
 
             SShaderCompilationElement element {};
             element.fileName   = aFilename;
             element.contents   = shaderString;
             element.stage      = stage;
             element.outputPath = outputPath;
+
+            mConfig.indexFile.stages[stage].spvModuleFilename = outputPath.filename().lexically_normal();
 
             return element;
         };
@@ -690,6 +711,45 @@ private_methods:
         std::for_each(aInputFilenames.begin(), aInputFilenames.end(), disassemble);
 
         return static_cast<EResult>(result);
+    }
+
+    /**
+     * Accept a SMaterial instance and serialize it to a JSON string.
+     *
+     * @param aMaterial
+     * @param aOutSerializedData
+     * @return
+     */
+    CResult<EResult> serializeMaterialIndex(SMaterialIndex const &aMaterialIndex, std::string &aOutSerializedData)
+    {
+        using namespace shader_precompiler::serialization;
+
+        CStdUniquePtr_t<IJSONSerializer<SMaterialIndex>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialIndex>>();
+        bool const initialized = serializer->initialize();
+        if(false == initialized)
+        {
+            return EResult::SerializationFailed;
+        }
+        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterialIndex>::IResult>> const serialization = serializer->serialize(aMaterialIndex);
+        if(not serialization.successful())
+        {
+            return EResult::SerializationFailed;
+        }
+
+        CResult<std::string> data = serialization.data()->asString();
+        aOutSerializedData = data.data();
+
+        bool const deinitialized = serializer->deinitialize();
+        if(false == deinitialized)
+        {
+            return EResult::SerializationFailed;
+        }
+
+        serializer = nullptr;
+
+        CLog::Debug(logTag(), aOutSerializedData);
+
+        return EResult::Success;
     }
 
     /**

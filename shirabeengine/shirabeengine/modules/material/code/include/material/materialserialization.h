@@ -1008,6 +1008,13 @@ namespace engine
             if(top.is_array())
             {
                 nlohmann::json &obj = top.at(aIndex); // TODO: How to properly read array.
+                if(obj.is_null())
+                {
+                    // Invalid use
+                    CLog::Error(logTag(), "Cannot read null object.");
+                    return false;
+                }
+
                 if(not obj.is_object())
                 {
                     // Invalid use

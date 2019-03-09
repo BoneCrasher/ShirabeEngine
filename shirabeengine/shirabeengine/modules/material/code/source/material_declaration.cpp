@@ -8,19 +8,37 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        std::unordered_map<EShaderStage, SMaterialIndexStage> const SMaterialIndex::sEmptyMap =
+        {
+            { EShaderStage::Vertex,                  {} },
+            { EShaderStage::TesselationControlPoint, {} },
+            { EShaderStage::TesselationEvaluation,   {} },
+            { EShaderStage::Geometry,                {} },
+            { EShaderStage::Fragment,                {} },
+            { EShaderStage::Compute,                 {} }
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         bool SMaterialIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialIndex> &aSerializer) const
         {
             aSerializer.beginObject(name);
 
-            aSerializer.writeValue("uid",  uid);
-            aSerializer.writeValue("name", name);
-
+            aSerializer.writeValue("uid",                       uid);
+            aSerializer.writeValue("name",                      name);
+            aSerializer.writeValue("signatureFilename",         signatureFilename);
+            aSerializer.writeValue("baseConfigurationFilename", baseConfigurationFilename);
             aSerializer.beginObject("stages");
 
-            for(auto const &[stage, path] : stages)
+            for(auto const &[stage, stageFileReferences] : stages)
             {
                 std::string const stageName = serialization::stageToString(stage);
-                aSerializer.writeValue(stageName, path);
+                aSerializer.beginObject(stageName);
+                aSerializer.writeValue("glslSourceFilename", stageFileReferences.glslSourceFilename);
+                aSerializer.writeValue("spvModuleFilename",  stageFileReferences.spvModuleFilename);
+                aSerializer.endObject();
             }
 
             aSerializer.endObject();
@@ -36,8 +54,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool SMaterialIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer)
         {
-            aDeserializer.readValue("uid",  uid);
-            aDeserializer.readValue("name", name);
+            aDeserializer.readValue("uid",                       uid);
+            aDeserializer.readValue("name",                      name);
+
+            std::string signatureFilenameString         {};
+            std::string baseConfigurationFilenameString {};
+            aDeserializer.readValue("signatureFilename",         signatureFilenameString);
+            aDeserializer.readValue("baseConfigurationFilename", baseConfigurationFilenameString);
+
+            signatureFilename         = signatureFilenameString;
+            baseConfigurationFilename = baseConfigurationFilenameString;
 
             aDeserializer.beginObject("stages");
 
@@ -51,11 +77,22 @@ namespace engine
 
             for(auto const stage : stageList)
             {
-                std::string const stageName = serialization::stageToString(stage);
-                std::string       path      = std::string();
+                std::string const stageName         = serialization::stageToString(stage);
+                std::string       glslFilename      = std::string();
+                std::string       spvModuleFilename = std::string();
 
-                aDeserializer.readValue(stageName, path);
-                stages[stage] = path;
+                bool const couldBeginObject = aDeserializer.beginObject(stageName);
+                if(not couldBeginObject)
+                {
+                    stages[stage] = { "", "" };
+                    continue;
+                }
+
+                aDeserializer.readValue("glslSourceFilename", glslFilename);
+                aDeserializer.readValue("spvModuleFilename",  spvModuleFilename);
+                aDeserializer.endObject();
+
+                stages[stage] = { glslFilename, spvModuleFilename };
             }
 
             aDeserializer.endObject();

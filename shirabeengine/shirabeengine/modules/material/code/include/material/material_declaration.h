@@ -42,6 +42,16 @@ namespace engine
         };
 
         /**
+         * The SMaterialIndexStage struct describes individual module's/stage's file
+         * references.
+         */
+        struct SMaterialIndexStage
+        {
+            std::filesystem::path glslSourceFilename;
+            std::filesystem::path spvModuleFilename;
+        };
+
+        /**
          * The SMaterialIndex describes all necessary data for a basic material composition
          * in the engine.
          * The specific implementation will be provided in files referenced by the stages member.
@@ -50,38 +60,73 @@ namespace engine
                 : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>
         {
+            static std::unordered_map<EShaderStage, SMaterialIndexStage> const sEmptyMap;
+
         public_constructors:
             SHIRABE_INLINE
             SMaterialIndex()
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
-                , uid   (0)
-                , name  ({})
-                , stages({})
+                , uid                      (0 )
+                , name                     ({})
+                , signatureFilename        (  )
+                , baseConfigurationFilename(  )
+                , stages                   (sEmptyMap)
             {}
 
             SHIRABE_INLINE
             SMaterialIndex(SMaterialIndex const &aOther)
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
-                , uid   (aOther.uid   )
-                , name  (aOther.name  )
-                , stages(aOther.stages)
+                , uid                      (aOther.uid                      )
+                , name                     (aOther.name                     )
+                , signatureFilename        (aOther.signatureFilename        )
+                , baseConfigurationFilename(aOther.baseConfigurationFilename)
+                , stages                   (aOther.stages                   )
             {}
 
             SHIRABE_INLINE
             SMaterialIndex(SMaterialIndex &&aOther)
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
-                , uid   (std::move(aOther.uid   ))
-                , name  (std::move(aOther.name  ))
-                , stages(std::move(aOther.stages))
+                , uid                      (std::move(aOther.uid                        ))
+                , name                     (std::move(aOther.name                       ))
+                , signatureFilename        (std::move(aOther.signatureFilename          ))
+                , baseConfigurationFilename(std::move(aOther.baseConfigurationFilename  ))
+                , stages                   (std::move(aOther.stages                     ))
             {}
 
+        public_operators:
+            SHIRABE_INLINE
+            SMaterialIndex &operator=(SMaterialIndex const &aOther)
+            {
+                uid                       = aOther.uid;
+                name                      = aOther.name;
+                signatureFilename         = aOther.signatureFilename;
+                baseConfigurationFilename = aOther.baseConfigurationFilename;
+                stages                    = aOther.stages;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            SMaterialIndex &operator=(SMaterialIndex &&aOther)
+            {
+                uid                       = std::move(aOther.uid);
+                name                      = std::move(aOther.name);
+                signatureFilename         = std::move(aOther.signatureFilename);
+                baseConfigurationFilename = std::move(aOther.baseConfigurationFilename);
+                stages                    = std::move(aOther.stages);
+
+                return (*this);
+            }
+
         public_members:
-            uint64_t                                                uid;
-            std::string                                             name;
-            std::unordered_map<EShaderStage, std::filesystem::path> stages;
+            uint64_t                                              uid;
+            std::string                                           name;
+            std::filesystem::path                                 signatureFilename;
+            std::filesystem::path                                 baseConfigurationFilename;
+            std::unordered_map<EShaderStage, SMaterialIndexStage> stages;
 
         public_methods:
             /**

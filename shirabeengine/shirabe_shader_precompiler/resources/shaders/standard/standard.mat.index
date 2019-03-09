@@ -1,13 +1,23 @@
 {
-    "uid"    : 1337,
-    "name"   : "Standard",
+    "uid"                       : 1337,
+    "name"                      : "Standard",
+    "signatureFilename"         : "",
+    "baseConfigurationFilename" : "",
     "stages" :
         {
-            "vertex"             : "standard.vert.glsl",
+            "vertex"             :
+                { 
+                    "glslSourceFilename" : "standard.vert.glsl",
+                    "spvModuleFilename"  : ""
+                },
             "tess_control_point" : null,
             "tess_evaluation"    : null,
             "geometry"           : null,
-            "fragment"           : "standard.frag.glsl",
+            "fragment"           : 
+                {
+                    "glslSourceFilename" : "standard.frag.glsl",
+                    "spvModuleFilename"  : ""
+                },
             "compute"            : null
         }
 }

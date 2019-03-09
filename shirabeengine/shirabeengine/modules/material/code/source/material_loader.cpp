@@ -37,6 +37,8 @@ namespace engine
             CResult<SMaterialIndex> const index = deserialization.data()->asT();
 
             deserializer.deinitialize();
+
+            return index;
         }
 
         CEngineResult<ByteBuffer> CMaterialLoader::loadAsset(asset::SAsset const &aAsset)
