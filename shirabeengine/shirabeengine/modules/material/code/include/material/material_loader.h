@@ -3,28 +3,30 @@
 
 #include <log/log.h>
 #include <core/enginestatus.h>
-#include <asset/assetstorage.h>
 
 namespace engine
 {
+    namespace asset
+    {
+        class IAssetStorage;
+    }
+
     namespace material
     {
+        class CMaterial;
 
         class CMaterialLoader
-                : public asset::IAssetLoader
         {
             SHIRABE_DECLARE_LOG_TAG(CMaterialLoader);
 
+        public_constructors:
+            CMaterialLoader(asset::IAssetStorage *const aAssetStorage);
+
         public_methods:
-            /**
-             * See IAssetLoader::loadAsset.
-             *
-             * @param aAsset
-             * @return
-             */
-            CEngineResult<ByteBuffer> loadAsset(asset::SAsset const &aAsset);
+            CEngineResult<CStdSharedPtr_t<CMaterial>> loadMaterial(std::string const &aMaterialId);
 
         private_methods:
+            asset::IAssetStorage *const mStorage;
         };
 
     }

@@ -35,6 +35,12 @@ namespace engine
     using CStdUniquePtr_t = std::unique_ptr<T>;
 
     /**
+     *
+     */
+    template <typename T>
+    using CStdWeakPtr_t = std::weak_ptr<T>;
+
+    /**
      * @brief makeCStdSharedPtr
      * @param aArgs
      * @return
@@ -65,8 +71,25 @@ namespace engine
         return CStdSharedPtr_t<T>(aInstance, aDeleter);
     }
 
+    /**
+     * @brief makeCStdSharedFromThis
+     * @param instance
+     * @return
+     */
     template <typename T, typename TPtr = CStdSharedPtr_t<T>>
-    static inline TPtr makeCStdSharedFromThis(T* instance) {
+    static inline TPtr makeCStdSharedFromThis(T* instance)
+    {
+        return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
+    }
+
+    /**
+     * @brief makeCStdSharedFromThis
+     * @param instance
+     * @return
+     */
+    template <typename T, typename TPtr = CStdWeakPtr_t<T>>
+    static inline TPtr makeCStdWeakFromThis(T* instance)
+    {
         return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
     }
 

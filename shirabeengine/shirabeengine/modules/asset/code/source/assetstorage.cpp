@@ -24,30 +24,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CAssetStorage::registerAssetLoader(EAssetType                    const &aAssetType,
-                                                           CStdSharedPtr_t<IAssetLoader> const  aLoader)
-        {
-            if(nullptr == aLoader)
-            {
-                return { EEngineStatus::Error };
-            }
-
-            bool const contained = (mLoaders.end() != mLoaders.find(aAssetType));
-            if(contained)
-            {
-                return { EEngineStatus::Error };
-            }
-
-            mLoaders[aAssetType] = aLoader;
-
-            return { EEngineStatus::Ok };
-        }
-
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         void CAssetStorage::readIndex(AssetIndex_t const &aIndex)
         {
             for(AssetIndex_t::value_type const &assignment : aIndex)
@@ -97,36 +73,14 @@ namespace engine
         {
             CEngineResult<ByteBuffer> data = { EEngineStatus::Error };
 
-            bool const hasLoader = (mLoaders.end() != mLoaders.find(aAsset.type));
-            if(hasLoader)
-            {
-                CStdSharedPtr_t<IAssetLoader> loader = mLoaders[aAsset.type];
-                data = loader->loadAsset(aAsset);
-            }
+            // bool const hasLoader = (mLoaders.end() != mLoaders.find(aAsset.type));
+            // if(hasLoader)
+            // {
+            //     CStdSharedPtr_t<IAssetLoader> loader = mLoaders[aAsset.type];
+            //     data = loader->loadAsset(aAsset);
+            // }
 
             return data;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<ByteBuffer> CAssetStorage::loadBufferAsset(SAsset const &aAsset)
-        {
-            ByteBuffer data;
-
-            /*Optional<TextureAsset> textureAsset = getTextureAsset(asset.id);
-
-                  Texture::Descriptor desc{};
-                  desc.name       = textureAsset->name;
-                  desc.textureInfo = textureAsset->textureInfo;
-
-                  Texture::CreationRequest request(desc);
-
-                  EEngineStatus status = m_resourceManager->createTexture(request, pid);
-                  HandleEngineStatusError(status, "Failed to create asset resource instance in resource manager.");
-            */
-            return CEngineResult<ByteBuffer>(EEngineStatus::Ok, data);
         }
         //<-----------------------------------------------------------------------------
 
@@ -152,19 +106,6 @@ namespace engine
             stbi_image_free(stbuc);
 
             return CEngineResult<SImage>(EEngineStatus::Ok, image);
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<ByteBuffer> CAssetStorage::loadTextureAsset(SAsset const &aAsset)
-        {
-            // Default for now...
-            // Will check cache and download from server if necessary
-            CEngineResult<SImage> image = loadImageFromFile(aAsset.URI);
-
-            return CEngineResult<ByteBuffer>(EEngineStatus::Ok, image.data().data);
         }
         //<-----------------------------------------------------------------------------
 

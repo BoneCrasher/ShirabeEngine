@@ -1,15 +1,29 @@
 #include <core/enginetypehelper.h>
 #include <core/helpers.h>
+#include <asset/assetstorage.h>
 
-#include "material/material_loader.h"
+#include "material/material_declaration.h"
 #include "material/materialserialization.h"
+#include "material/material_loader.h"
 
 namespace engine
 {
     namespace material
     {
+        using namespace asset;
+
         //<-----------------------------------------------------------------------------
         //
+        //<-----------------------------------------------------------------------------
+        CMaterialLoader::CMaterialLoader(asset::IAssetStorage *const aAssetStorage)
+            : mStorage(aAssetStorage)
+        {
+            assert(nullptr != aAssetStorage);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
         //<-----------------------------------------------------------------------------
         CResult<SMaterialIndex> readMaterialIndexFile(std::string const &aLogTag, asset::SAsset const &aAsset)
         {
@@ -40,14 +54,16 @@ namespace engine
 
             return index;
         }
+        //<-----------------------------------------------------------------------------
 
-        CEngineResult<ByteBuffer> CMaterialLoader::loadAsset(asset::SAsset const &aAsset)
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<CStdSharedPtr_t<CMaterial>> CMaterialLoader::loadMaterial(std::string const &aMaterialId)
         {
             CEngineResult<ByteBuffer> data = {};
 
-            CResult<SMaterialIndex> const index = readMaterialIndexFile(logTag(), aAsset);
-
-
+            // CResult<SMaterialIndex> const index = readMaterialIndexFile(logTag(), aAsset);
 
             return data;
         }
