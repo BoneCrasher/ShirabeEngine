@@ -15,7 +15,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CMaterialLoader::CMaterialLoader(asset::IAssetStorage *const aAssetStorage)
+        CMaterialLoader::CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> &aAssetStorage)
             : mStorage(aAssetStorage)
         {
             assert(nullptr != aAssetStorage);
@@ -25,19 +25,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CResult<SMaterialIndex> readMaterialIndexFile(std::string const &aLogTag, asset::SAsset const &aAsset)
+        CResult<SMaterialIndex> readMaterialIndexFile(std::string const &aLogTag, asset::IAssetStorage *aAssetStorage, asset::SAsset const &aAsset)
         {
             using namespace serialization;
 
-            std::string inputFile = aAsset.URI;
-
-            if(not std::filesystem::exists(inputFile))
+            CEngineResult<ByteBuffer> const dataFetch = aAssetStorage->loadAssetData(aAsset.id);
+            if(not dataFetch.successful())
             {
-                CLog::Error(aLogTag, "Could not find material index file '%0'", inputFile);
                 return { false };
             }
 
-            std::string rawInput = readFile(inputFile);
+            std::string rawInput(reinterpret_cast<char const *>(dataFetch.data().data()),
+                                 dataFetch.data().size());
 
             CJSONDeserializer<SMaterialIndex> deserializer {};
             deserializer.initialize();
@@ -65,7 +64,7 @@ namespace engine
 
             // CResult<SMaterialIndex> const index = readMaterialIndexFile(logTag(), aAsset);
 
-            return data;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 

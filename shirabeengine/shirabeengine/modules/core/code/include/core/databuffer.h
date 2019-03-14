@@ -21,6 +21,8 @@ namespace engine {
 
     public_constructors:
         CDataBuffer();
+        CDataBuffer(CDataBuffer const &aOther);
+        CDataBuffer(CDataBuffer      &&aOther);
 
     public_methods:
         /**
@@ -87,6 +89,26 @@ namespace engine {
         : mData()
         , mSize(0)
     {}
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T>::CDataBuffer(CDataBuffer<T> const &aOther)
+        : mData(aOther.mData)
+        , mSize(aOther.mSize)
+    { }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T>::CDataBuffer(CDataBuffer<T> &&aOther)
+        : mData(std::move(aOther.mData))
+        , mSize(std::move(aOther.mSize))
+    { }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------

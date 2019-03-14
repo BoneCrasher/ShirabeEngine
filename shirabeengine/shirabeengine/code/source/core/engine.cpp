@@ -270,9 +270,10 @@ namespace engine
             // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
             //
 
-            CAssetStorage::AssetIndex_t assetIndex ={}; // AssetIndex::loadIndexById("");
+            CAssetStorage::AssetRegistry_t assetIndex ={}; // AssetIndex::loadIndexById("");
 
-            CStdSharedPtr_t<CAssetStorage> assetStorage = makeCStdSharedPtr<CAssetStorage>();
+            CStdUniquePtr_t<IAssetDataSource> assetDataSource = nullptr;
+            CStdSharedPtr_t<CAssetStorage>    assetStorage    = makeCStdSharedPtr<CAssetStorage>(std::move(assetDataSource));
             mAssetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 

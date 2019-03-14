@@ -27,7 +27,7 @@ namespace engine
              * @brief CMaterialLoader
              * @param aAssetStorage
              */
-            CMaterialLoader(asset::IAssetStorage *const aAssetStorage);
+            CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> &aAssetStorage);
 
         public_methods:
             /**
@@ -38,7 +38,7 @@ namespace engine
             CEngineResult<CStdSharedPtr_t<CMaterial>> loadMaterial(std::string const &aMaterialId);
 
         private_methods:
-            asset::IAssetStorage *const mStorage;
+            CStdSharedPtr_t<asset::IAssetStorage> &mStorage;
         };
 
     }
