@@ -25,11 +25,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CResult<SMaterialIndex> readMaterialIndexFile(std::string const &aLogTag, asset::IAssetStorage *aAssetStorage, asset::SAsset const &aAsset)
+        CResult<SMaterialIndex> readMaterialIndexFile(std::string const &aLogTag, asset::IAssetStorage *aAssetStorage, asset::AssetId_t const &aAssetUID)
         {
             using namespace serialization;
 
-            CEngineResult<ByteBuffer> const dataFetch = aAssetStorage->loadAssetData(aAsset.id);
+            CEngineResult<ByteBuffer> const dataFetch = aAssetStorage->loadAssetData(aAssetUID);
             if(not dataFetch.successful())
             {
                 return { false };
@@ -44,7 +44,7 @@ namespace engine
             CResult<CStdSharedPtr_t<IDeserializer<SMaterialIndex>::IResult>> deserialization = deserializer.deserialize(rawInput);
             if(not deserialization.successful())
             {
-                CLog::Error(aLogTag, "Could not load material '%0'", aAsset.id);
+                CLog::Error(aLogTag, "Could not load material '%0'", aAssetUID);
             }
 
             CResult<SMaterialIndex> const index = deserialization.data()->asT();
