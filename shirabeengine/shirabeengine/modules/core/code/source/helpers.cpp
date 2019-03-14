@@ -115,5 +115,35 @@ namespace engine
             return { EEngineStatus::Error };
         }
     }
+
+    /**
+     * Write a byte vector to a file.
+     *
+     * @param aFilename The filename of the file to write to. Will be overwritten, if extist.
+     * @param aData     The data to write.
+     * @return          EResult::Success, if successful.
+     * @return          EResult::WriteFailed, on error.
+     */
+    CEngineResult<> writeFile(std::string const &aFilename, ByteBuffer const &aData)
+    {
+        std::ofstream output(aFilename, std::ofstream::binary);
+        if(output.bad() || output.fail() || output.eof())
+        {
+            return { EEngineStatus::Error };
+        }
+
+        try
+        {
+            output.write(reinterpret_cast<char const*>(aData.data()),
+                         static_cast<int64_t>(aData.size() * sizeof(int8_t)));
+            output.close();
+
+            return { EEngineStatus::Ok };
+        }
+        catch (...)
+        {
+            return { EEngineStatus::Error };
+        }
+    }
     //<-----------------------------------------------------------------------------
 }

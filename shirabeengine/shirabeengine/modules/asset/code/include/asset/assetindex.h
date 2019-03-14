@@ -3,7 +3,9 @@
 
 #include <core/enginetypehelper.h>
 #include <util/documents/xml.h>
-#include "assettypes.h"
+
+#include "asset/assettypes.h"
+#include "asset/assetregistry.h"
 
 namespace engine
 {

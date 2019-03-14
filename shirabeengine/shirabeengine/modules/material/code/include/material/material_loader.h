@@ -15,14 +15,26 @@ namespace engine
     {
         class CMaterial;
 
+        /**
+         * @brief The CMaterialLoader class
+         */
         class CMaterialLoader
         {
             SHIRABE_DECLARE_LOG_TAG(CMaterialLoader);
 
         public_constructors:
+            /**
+             * @brief CMaterialLoader
+             * @param aAssetStorage
+             */
             CMaterialLoader(asset::IAssetStorage *const aAssetStorage);
 
         public_methods:
+            /**
+             * @brief loadMaterial
+             * @param aMaterialId
+             * @return
+             */
             CEngineResult<CStdSharedPtr_t<CMaterial>> loadMaterial(std::string const &aMaterialId);
 
         private_methods:

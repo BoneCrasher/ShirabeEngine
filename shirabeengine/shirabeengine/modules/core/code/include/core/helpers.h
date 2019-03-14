@@ -9,6 +9,7 @@
 #include <log/log.h>
 #include "result.h"
 #include "enginestatus.h"
+#include "databuffer.h"
 
 namespace engine
 {
@@ -100,6 +101,16 @@ namespace engine
      * @return          EResult::WriteFailed, on error.
      */
     CEngineResult<> writeFile(std::string const &aFilename, std::vector<int8_t> const &aData);
+
+    /**
+     * Write a byte buffer to a file.
+     *
+     * @param aFilename The filename of the file to write to. Will be overwritten, if extist.
+     * @param aData     The data to write.
+     * @return          EResult::Success, if successful.
+     * @return          EResult::WriteFailed, on error.
+     */
+    CEngineResult<> writeFile(std::string const &aFilename, ByteBuffer const &aData);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_HELPERS_H_

@@ -98,7 +98,7 @@ namespace engine
             SAsset a = {};
             a.id     = from_string<AssetId_t>(aid);
             a.type   = from_string<EAssetType>(type);
-            a.URI    = uri;
+            a.uri    = uri;
 
             aOutRegistry.addAsset(a.id, a);
         }

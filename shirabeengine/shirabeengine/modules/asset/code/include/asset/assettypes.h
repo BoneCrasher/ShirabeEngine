@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <filesystem>
 
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
@@ -17,6 +18,11 @@ namespace engine
          * UniqueId type to identify assets.
          */
         using AssetId_t = uint64_t;
+
+        constexpr AssetId_t operator "" _uid( unsigned long long aUnit )
+        {
+          return static_cast<AssetId_t>(aUnit);
+        }
 
         /**
          * The EAssetType enum describes rough asset categorization.
@@ -36,9 +42,9 @@ namespace engine
         struct SAsset
         {
         public_members:
-            AssetId_t   id;
-            EAssetType  type;
-            std::string URI;
+            AssetId_t             id;
+            EAssetType            type;
+            std::filesystem::path uri;
         };
 
         /**
@@ -71,89 +77,6 @@ namespace engine
             ByteBuffer data;
             uint32_t   width, height, channels;
         };
-
-        /**
-         * The asset registry is the engine wide container for a specific engine asset type.
-         *
-         * @tparam T Underlying asset resource type of the registry.
-         */
-        template <typename T>
-        class CAssetRegistry
-        {
-        private_typedefs:
-            using Index_t = Map<AssetId_t, T>;
-
-        public_typedefs:
-            typedef typename Index_t::value_type value_type;
-
-        public_methods:
-            /**
-             * Dynamically add an asset by Id to the registry.
-             *
-             * @param aAssetId UID of the new asset.
-             * @param aAsset   Asset to add.
-             * @return         EAssetErrorCode::Ok, if successful. An error code otherwise.
-             */
-            EAssetErrorCode addAsset(
-                    AssetId_t const &aAssetId,
-                    T         const &aAsset);
-
-            /**
-             * Try to fetch a previously registered asset.
-             *
-             * @param aAssetId UID of the asset to fetch.
-             * @return         A filled optional of requested asset type T, or an empty optional.
-             */
-            CEngineResult<T> getAsset(AssetId_t const &aAssetId);
-
-            // Iterator compatibility
-            typename Index_t::iterator       begin()       { return mIndex.begin(); }
-            typename Index_t::iterator       end()         { return mIndex.end();   }
-            typename Index_t::const_iterator begin() const { return mIndex.begin(); }
-            typename Index_t::const_iterator end()   const { return mIndex.end();   }
-
-        private_members:
-            Index_t mIndex;
-        };
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        EAssetErrorCode CAssetRegistry<T>::addAsset(
-                AssetId_t const &aAssetId,
-                T         const &aAsset)
-        {
-            if(mIndex.end() != mIndex.find(aAssetId))
-            {
-                return EAssetErrorCode::AssetAlreadyAdded;
-            }
-
-            mIndex[aAssetId] = aAsset;
-
-            return EAssetErrorCode::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename T>
-        CEngineResult<T> CAssetRegistry<T>::getAsset(AssetId_t const &aAssetId)
-        {
-            CEngineResult<T> result = CEngineResult<T>(EEngineStatus::Error);
-
-            if(mIndex.end() != mIndex.find(aAssetId))
-            {
-                T const &asset = mIndex.at(aAssetId);
-
-                result = CEngineResult<T>(EEngineStatus::Ok, asset);
-            }
-
-            return result;
-        }
-        //<-----------------------------------------------------------------------------
     }
 
     /**

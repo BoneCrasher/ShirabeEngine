@@ -4,8 +4,10 @@
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <graphicsapi/resources/types/texture.h>
+
+#include "asset/iassetdatasource.h"
 #include "asset/asseterror.h"
-#include "asset/assettypes.h"
+#include "asset/assetregistry.h"
 
 namespace engine
 {
@@ -20,15 +22,18 @@ namespace engine
 
         public_api:
             /**
-             * Create a dynamic texture asset on disk during editing/runtime.
+             * Register an asset in the index and write the provided byte buffer as asset
+             * data to the harddisk (if not empty).
              *
-             * @param aAssetName   Name of the texture asset to create.
-             * @param aTextureInfo Texture information for resource creation.
-             * @return             A valid AssetId (> 0) if successful. 0 otherwise.
+             * @param aAssetType
+             * @param aAssetDirectory
+             * @return
              */
-            virtual AssetId_t createDynamicTextureAsset(
-                    std::string          const &aAssetName,
-                    gfxapi::STextureInfo const &aTextureInfo) = 0;
+            virtual AssetId_t createAsset(EAssetType  const &aAssetType,
+                                          std::string const &aAssetDirectory,
+                                          std::string const &aAssetFilename,
+                                          ByteBuffer  const &aInitialData = {}) = 0;
+
 
             /**
              * Load an asset from the respective asset source.
@@ -36,7 +41,7 @@ namespace engine
              * @param aAssetUID The UID of the asset to load.
              * @return          A valid asset if successful. Empty otherwise.
              */
-            virtual CEngineResult<SAsset> loadAsset(AssetId_t const &aAssetUID) = 0;
+            virtual CEngineResult<SAsset > loadAsset(AssetId_t const &aAssetUID) = 0;
 
             /**
              * Load the byte data for a provided asset descriptor.
@@ -44,7 +49,16 @@ namespace engine
              * @param aAsset The asset descriptor for which byte data should be loaded.
              * @return       A filled byte buffer if successful. False otherwise.
              */
-            virtual CEngineResult<ByteBuffer> loadAssetData(SAsset const &aAsset) = 0;
+            virtual CEngineResult<ByteBuffer> loadAssetData(AssetId_t const &aAsset) = 0;
+
+            /**
+             * Unload this asset and remove it's data from the index.
+             * Note: This won't delete the data from the hard disk.
+             *
+             * @param aAssetUID
+             * @return
+             */
+            virtual CEngineResult<> removeAsset(AssetId_t const &aAssetUID) = 0;
         };
 
         /**
@@ -53,15 +67,11 @@ namespace engine
         class SHIRABE_TEST_EXPORT CAssetStorage
                 : public IAssetStorage
         {
-        private_typedefs:
-            using TextureAssetData = CAssetRegistry<STextureAsset>;
-            using BufferAssetData  = CAssetRegistry<SBufferAsset>;
-
         public_typedefs:
-            using AssetIndex_t = CAssetRegistry<SAsset>;
+            using AssetRegistry_t = CAssetRegistry<SAsset>;
 
         public_constructors:
-            CAssetStorage();
+            CAssetStorage(CStdUniquePtr_t<IAssetDataSource> &&aAssetDataSource);
 
         public_methods:
             /**
@@ -69,18 +79,19 @@ namespace engine
              *
              * @param aIndex
              */
-            void readIndex(AssetIndex_t const &aIndex);
+            void readIndex(AssetRegistry_t const &aIndex);
 
             /**
-             * Create a dynamic texture asset on disk during editing/runtime.
+             * @brief createAsset
              *
-             * @param aAssetName   Name of the texture asset to create.
-             * @param aTextureInfo Texture information for resource creation.
-             * @return             A valid AssetId (> 0) if successful. 0 otherwise.
+             * @param aAssetType
+             * @param aAssetDirectory
+             * @return
              */
-            AssetId_t createDynamicTextureAsset(
-                    std::string          const &aName,
-                    gfxapi::STextureInfo const &aTextureInfo);
+            AssetId_t createAsset(EAssetType  const &aAssetType,
+                                  std::string const &aAssetDirectory,
+                                  std::string const &aAssetFilename,
+                                  ByteBuffer  const &aInitialData);
 
             /**
              * Load an asset from the respective asset source.
@@ -88,7 +99,7 @@ namespace engine
              * @param aAssetUID The UID of the asset to load.
              * @return          A valid asset if successful. Empty otherwise.
              */
-            CEngineResult<SAsset> loadAsset(AssetId_t const &aAssetUID);
+            CEngineResult<SAsset > loadAsset(AssetId_t const &aAssetUID);
 
             /**
              * Load the byte data for a provided asset descriptor.
@@ -96,12 +107,20 @@ namespace engine
              * @param aAsset The asset descriptor for which byte data should be loaded.
              * @return       A filled byte buffer if successful. False otherwise.
              */
-            CEngineResult<ByteBuffer> loadAssetData(SAsset const &aAsset);
+            CEngineResult<ByteBuffer> loadAssetData(AssetId_t const &aAsset);
+
+            /**
+             * Unload this asset and remove it's data from the index.
+             * Note: This won't delete the data from the hard disk.
+             *
+             * @param aAssetUID
+             * @return
+             */
+            CEngineResult<> removeAsset(AssetId_t const &aAssetUID);
 
         private_members:
-            AssetIndex_t     mAssetIndex;
-            TextureAssetData mTextureAssets;
-            BufferAssetData  mBufferAssets;
+            AssetRegistry_t                   mAssetIndex;
+            CStdUniquePtr_t<IAssetDataSource> mAssetDataSource;
         };        
 
     }
