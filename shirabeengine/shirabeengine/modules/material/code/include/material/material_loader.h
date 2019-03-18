@@ -1,4 +1,4 @@
-#ifndef __SHIARBE_MATERIAL_LOADER_H__
+﻿#ifndef __SHIARBE_MATERIAL_LOADER_H__
 #define __SHIARBE_MATERIAL_LOADER_H__
 
 #include <log/log.h>
@@ -8,6 +8,8 @@ namespace engine
 {
     namespace asset
     {
+        using AssetID_t = uint64_t;
+
         class IAssetStorage;
     }
 
@@ -39,6 +41,7 @@ namespace engine
 
         private_methods:
             CStdSharedPtr_t<asset::IAssetStorage> &mStorage;
+            Map<std::string, asset::AssetID_t>     mMaterial2AssetMapping;
         };
 
     }

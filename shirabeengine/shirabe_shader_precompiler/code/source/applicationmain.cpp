@@ -109,7 +109,7 @@ private_structs:
     struct SConfiguration
     {
         std::string                             indexFilename;
-        SMaterialIndex                          indexFile;
+        SMaterialMasterIndex                    indexFile;
         std::vector<std::string>                includePaths;
         std::vector<std::string>                inputPaths;
         std::string                             outputPath;
@@ -214,10 +214,10 @@ public_methods:
 
         std::string const indexFileContents = readFile(indexFilePath);
 
-        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialIndex>>();
+        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
         indexDeserializer->initialize();
 
-        CResult<CStdSharedPtr_t<serialization::IDeserializer<SMaterialIndex>::IResult>> serialization = indexDeserializer->deserialize(indexFileContents);
+        CResult<CStdSharedPtr_t<serialization::IDeserializer<SMaterialMasterIndex>::IResult>> serialization = indexDeserializer->deserialize(indexFileContents);
         if(not serialization.successful())
         {
             CLog::Error(logTag(), "Could not serialize material index file.");
@@ -228,7 +228,7 @@ public_methods:
 
         std::vector<std::string> inputFiles;
 
-        SMaterialIndex index = serialization.data()->asT().data();
+        SMaterialMasterIndex index = serialization.data()->asT().data();
 
         for(auto const &[stage, pathReferences] : index.stages)
         {
@@ -288,7 +288,7 @@ public_methods:
             return glslangResult;
         }
 
-        CResult<SMaterial> const extractionResult = spirvCrossExtract(unit);
+        CResult<SMaterialSignature> const extractionResult = spirvCrossExtract(unit);
         if(not extractionResult.successful())
         {
             CLog::Error(logTag(), "Failed to extract data from Spir-V file(s).");
@@ -720,17 +720,17 @@ private_methods:
      * @param aOutSerializedData
      * @return
      */
-    CResult<EResult> serializeMaterialIndex(SMaterialIndex const &aMaterialIndex, std::string &aOutSerializedData)
+    CResult<EResult> serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData)
     {
         using namespace shader_precompiler::serialization;
 
-        CStdUniquePtr_t<IJSONSerializer<SMaterialIndex>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialIndex>>();
+        CStdUniquePtr_t<IJSONSerializer<SMaterialMasterIndex>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialMasterIndex>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterialIndex>::IResult>> const serialization = serializer->serialize(aMaterialIndex);
+        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterialMasterIndex>::IResult>> const serialization = serializer->serialize(aMaterialIndex);
         if(not serialization.successful())
         {
             return EResult::SerializationFailed;
@@ -759,17 +759,17 @@ private_methods:
      * @param aOutSerializedData
      * @return
      */
-    CResult<EResult> serializeMaterialSignature(SMaterial const &aMaterial, std::string &aOutSerializedData)
+    CResult<EResult> serializeMaterialSignature(SMaterialSignature const &aMaterial, std::string &aOutSerializedData)
     {
         using namespace shader_precompiler::serialization;
 
-        CStdUniquePtr_t<IJSONSerializer<SMaterial>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterial>>();
+        CStdUniquePtr_t<IJSONSerializer<SMaterialSignature>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialSignature>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterial>::IResult>> const serialization = serializer->serialize(aMaterial);
+        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterialSignature>::IResult>> const serialization = serializer->serialize(aMaterial);
         if(not serialization.successful())
         {
             return EResult::SerializationFailed;

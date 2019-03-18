@@ -100,11 +100,11 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CResult<SMaterial> spirvCrossExtract(SShaderCompilationUnit const &aUnit)
+    CResult<SMaterialSignature> spirvCrossExtract(SShaderCompilationUnit const &aUnit)
     {
         std::underlying_type_t<EResult> result = EnumValueOf(EResult::Success);
 
-        SMaterial materialExtracted {};
+        SMaterialSignature materialExtracted {};
 
         auto const reflectType = [] (spirv_cross::SPIRType const &aType) -> SMaterialType
         {

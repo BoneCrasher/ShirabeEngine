@@ -1,4 +1,4 @@
-#include "material/material_declaration.h"
+﻿#include "material/material_declaration.h"
 #include "material/materialserialization.h"
 
 namespace engine
@@ -8,7 +8,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        std::unordered_map<EShaderStage, SMaterialIndexStage> const SMaterialIndex::sEmptyMap =
+        std::unordered_map<EShaderStage, SMaterialIndexStage> const SMaterialMasterIndex::sEmptyMap =
         {
             { EShaderStage::Vertex,                  {} },
             { EShaderStage::TesselationControlPoint, {} },
@@ -22,7 +22,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool SMaterialIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialIndex> &aSerializer) const
+        bool SMaterialMasterIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const
         {
             aSerializer.beginObject(name);
 
@@ -52,7 +52,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool SMaterialIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer)
+        bool SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer)
         {
             aDeserializer.readValue("uid",                       uid);
             aDeserializer.readValue("name",                      name);
@@ -104,7 +104,46 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool SMaterial::acceptSerializer(serialization::IJSONSerializer<SMaterial> &aSerializer) const
+        bool SMaterialInstanceIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const
+        {
+            aSerializer.beginObject(name);
+
+            aSerializer.writeValue("uid",                   uid);
+            aSerializer.writeValue("name",                  name);
+            aSerializer.writeValue("masterIndexFilename",   masterIndexFilename);
+            aSerializer.writeValue("configurationFilename", configurationFilename);
+
+            aSerializer.endObject();
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SMaterialInstanceIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer)
+        {
+            aDeserializer.readValue("uid",  uid);
+            aDeserializer.readValue("name", name);
+
+            std::string masterIndexFilenameString {};
+            aDeserializer.readValue("masterIndexFilename", masterIndexFilenameString);
+
+            std::string configurationFilenameString {};
+            aDeserializer.readValue("configurationFilename", configurationFilenameString);
+
+            masterIndexFilename   = masterIndexFilenameString;
+            configurationFilename = configurationFilenameString;
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SMaterialSignature::acceptSerializer(serialization::IJSONSerializer<SMaterialSignature> &aSerializer) const
         {
             aSerializer.beginObject(name);
 
@@ -247,7 +286,7 @@ namespace engine
          * @param aSerializer
          * @return
          */
-        bool SMaterial::acceptDeserializer(serialization::IJSONDeserializer<SMaterial> &aDeserializer)
+        bool SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer<SMaterialSignature> &aDeserializer)
         {
             //
             // Serialize subpass input
@@ -432,7 +471,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CMaterialConfig CMaterialConfig::fromMaterialDesc(SMaterial const &aMaterial)
+        CMaterialConfig CMaterialConfig::fromMaterialDesc(SMaterialSignature const &aMaterial)
         {
             CMaterialConfig config {};
 
@@ -471,6 +510,50 @@ namespace engine
             config.mData.assign(totalSize, 0);
 
             return config;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool checkIsZeroArray(uint8_t const *aValue, SBufferLocation const &aLocation)
+        {
+            uint8_t chk = 0;
+            for(uint64_t k=0; k<aLocation.length; ++k)
+            {
+                chk |= *(aValue + k);
+            }
+
+            return (0 == chk);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CMaterialConfig::override(CMaterialConfig const &aOther)
+        {
+            for(auto const &[bufferId, data] : mBufferIndex)
+            {
+                for(auto const &[valueId, location] : data.mValueIndex)
+                {
+                    CEngineResult<uint8_t const *> valueFetch = aOther.getBufferValue(location);
+                    if(not valueFetch.successful())
+                    {
+                        // Ignore, as the desired value might not be part of the master material.
+                        continue;
+                    }
+
+                    // If override value is not null-array. Override.
+                    uint8_t const *const value = valueFetch.data();
+                    if(not checkIsZeroArray(value, location))
+                    {
+                        CEngineResult<> result = setBufferValue(location, value);
+                    }
+                }
+            }
+
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
@@ -574,5 +657,12 @@ namespace engine
 
             return true;
         }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CMaterialLayer const CMaterial::sEmptyLayer = {};
+        //<-----------------------------------------------------------------------------
     }
 }

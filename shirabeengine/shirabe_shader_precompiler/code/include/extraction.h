@@ -22,7 +22,7 @@ namespace shader_precompiler
      * @param aUnit
      * @return
      */
-    CResult<SMaterial> spirvCrossExtract(SShaderCompilationUnit const &aUnit);
+    CResult<SMaterialSignature> spirvCrossExtract(SShaderCompilationUnit const &aUnit);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_EXTRACTION_H_

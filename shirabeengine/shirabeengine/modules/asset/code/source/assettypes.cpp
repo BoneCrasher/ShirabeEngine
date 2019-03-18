@@ -10,13 +10,15 @@ namespace engine
     {
         using namespace asset;
 
-        if(aInput.compare("Mesh") == 0)
+        if(0 == aInput.compare("Mesh"))
             return EAssetType::Mesh;
-        if(aInput.compare("Material") == 0)
-            return EAssetType::Material;
-        if(aInput.compare("Texture") == 0)
+        if(0 == aInput.compare("MaterialMaster"))
+            return EAssetType::MaterialMaster;
+        if(0 == aInput.compare("MaterialInstance"))
+            return EAssetType::MaterialInstance;
+        if(0 == aInput.compare("Texture"))
             return EAssetType::Texture;
-        if(aInput.compare("Buffer") == 0)
+        if(0 == aInput.compare("Buffer"))
             return EAssetType::Buffer;
 
         return EAssetType::Undefined;

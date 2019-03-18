@@ -1,4 +1,4 @@
-﻿#ifndef __SHIRABE_MATERIAL_DECLARATION_H__
+#ifndef __SHIRABE_MATERIAL_DECLARATION_H__
 #define __SHIRABE_MATERIAL_DECLARATION_H__
 
 #include <assert.h>
@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdint.h>
 #include <filesystem>
+#include <cstring>
 
 #include <base/declaration.h>
 #include <base/stl_container_helpers.h>
@@ -56,17 +57,17 @@ namespace engine
          * in the engine.
          * The specific implementation will be provided in files referenced by the stages member.
          */
-        struct SMaterialIndex
-                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>
+        struct SMaterialMasterIndex
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>
         {
             static std::unordered_map<EShaderStage, SMaterialIndexStage> const sEmptyMap;
 
         public_constructors:
             SHIRABE_INLINE
-            SMaterialIndex()
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
+            SMaterialMasterIndex()
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                      (0 )
                 , name                     ({})
                 , signatureFilename        (  )
@@ -75,9 +76,9 @@ namespace engine
             {}
 
             SHIRABE_INLINE
-            SMaterialIndex(SMaterialIndex const &aOther)
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
+            SMaterialMasterIndex(SMaterialMasterIndex const &aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                      (aOther.uid                      )
                 , name                     (aOther.name                     )
                 , signatureFilename        (aOther.signatureFilename        )
@@ -86,9 +87,9 @@ namespace engine
             {}
 
             SHIRABE_INLINE
-            SMaterialIndex(SMaterialIndex &&aOther)
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialIndex>>()
+            SMaterialMasterIndex(SMaterialMasterIndex &&aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                      (std::move(aOther.uid                        ))
                 , name                     (std::move(aOther.name                       ))
                 , signatureFilename        (std::move(aOther.signatureFilename          ))
@@ -98,7 +99,7 @@ namespace engine
 
         public_operators:
             SHIRABE_INLINE
-            SMaterialIndex &operator=(SMaterialIndex const &aOther)
+            SMaterialMasterIndex &operator=(SMaterialMasterIndex const &aOther)
             {
                 uid                       = aOther.uid;
                 name                      = aOther.name;
@@ -110,7 +111,7 @@ namespace engine
             }
 
             SHIRABE_INLINE
-            SMaterialIndex &operator=(SMaterialIndex &&aOther)
+            SMaterialMasterIndex &operator=(SMaterialMasterIndex &&aOther)
             {
                 uid                       = std::move(aOther.uid);
                 name                      = std::move(aOther.name);
@@ -134,16 +135,106 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterialIndex> &aSerializer) const;
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialIndex> &aDeserializer);
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer);
         };
 
+        /**
+         * The SMaterialIndex describes all necessary data for a basic material composition
+         * in the engine.
+         * The specific implementation will be provided in files referenced by the stages member.
+         */
+        struct SMaterialInstanceIndex
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>
+        {
+            static std::unordered_map<EShaderStage, SMaterialIndexStage> const sEmptyMap;
+
+        public_constructors:
+            SHIRABE_INLINE
+            SMaterialInstanceIndex()
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
+                , uid                  (0 )
+                , name                 ({})
+                , masterIndexFilename  (  )
+                , configurationFilename(  )
+            {}
+
+            SHIRABE_INLINE
+            SMaterialInstanceIndex(SMaterialInstanceIndex const &aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
+                , uid                  (aOther.uid                  )
+                , name                 (aOther.name                 )
+                , masterIndexFilename  (aOther.masterIndexFilename  )
+                , configurationFilename(aOther.configurationFilename)
+            {}
+
+            SHIRABE_INLINE
+            SMaterialInstanceIndex(SMaterialInstanceIndex &&aOther)
+                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
+                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
+                , uid                  (std::move(aOther.uid                    ))
+                , name                 (std::move(aOther.name                   ))
+                , masterIndexFilename  (std::move(aOther.masterIndexFilename    ))
+                , configurationFilename(std::move(aOther.configurationFilename  ))
+            {}
+
+        public_operators:
+            SHIRABE_INLINE
+            SMaterialInstanceIndex &operator=(SMaterialInstanceIndex const &aOther)
+            {
+                uid                   = aOther.uid;
+                name                  = aOther.name;
+                masterIndexFilename   = aOther.masterIndexFilename;
+                configurationFilename = aOther.configurationFilename;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            SMaterialInstanceIndex &operator=(SMaterialInstanceIndex &&aOther)
+            {
+                uid                   = std::move(aOther.uid);
+                name                  = std::move(aOther.name);
+                masterIndexFilename   = std::move(aOther.masterIndexFilename);
+                configurationFilename = std::move(aOther.configurationFilename);
+
+                return (*this);
+            }
+
+        public_members:
+            uint64_t              uid;
+            std::string           name;
+            std::filesystem::path masterIndexFilename;
+            std::filesystem::path configurationFilename;
+
+        public_methods:
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const;
+
+            /**
+             * @brief acceptDeserializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer);
+        };
+
+        /**
+         * @brief The SMaterialType struct
+         */
         struct SMaterialType
         {
             std::string name;
@@ -325,9 +416,9 @@ namespace engine
         /**
          * @brief The SMaterial struct
          */
-        struct SMaterial
-                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterial>>
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterial>>
+        struct SMaterialSignature
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>
         {
         public_members:
             std::string                 name;
@@ -340,12 +431,12 @@ namespace engine
             std::vector<SSubpassInput>  subpassInputs;
 
         public_constructors:
-            SMaterial() = default;
+            SMaterialSignature() = default;
 
             SHIRABE_INLINE
-            SMaterial(SMaterial const &aOther)
-                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterial>>()
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterial>>()
+            SMaterialSignature(SMaterialSignature const &aOther)
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>()
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>()
                 , name(aOther.name)
                 , stages(aOther.stages)
                 , uniformBuffers(aOther.uniformBuffers)
@@ -354,7 +445,7 @@ namespace engine
             {}
 
         public_operators:
-            SMaterial &operator=(SMaterial const &aOther)
+            SMaterialSignature &operator=(SMaterialSignature const &aOther)
             {
                 name           = aOther.name;
                 stages         = aOther.stages;
@@ -378,14 +469,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterial> &aSerializer) const;
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterialSignature> &aSerializer) const;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterial> &aDeserializer);
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialSignature> &aDeserializer);
         };
 
         /**
@@ -478,7 +569,7 @@ namespace engine
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>
         {
         public_static_functions:
-            static CMaterialConfig fromMaterialDesc(SMaterial const &aMaterial);
+            static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial);
 
         public_constructors:
             /**
@@ -557,6 +648,17 @@ namespace engine
                     std::string const &aFieldName) const;
 
             /**
+             * getValue
+             *
+             * @param aBufferName
+             * @param aFieldName
+             * @param aOutValue
+             * @return
+             */
+            SHIRABE_INLINE
+            CEngineResult<uint8_t const*> getBufferValue(SBufferLocation const &aLocation) const;
+
+            /**
              * setValue
              *
              * @param aBufferName
@@ -569,6 +671,28 @@ namespace engine
                     std::string const &aBufferName,
                     std::string const &aFieldName,
                     TDataType   const &aFieldValue);
+
+            /**
+             * setValue
+             *
+             * @param aBufferName
+             * @param aFieldName
+             * @param aFieldValue
+             * @return
+             */
+            SHIRABE_INLINE
+            CEngineResult<> setBufferValue(
+                    SBufferLocation const       &aLocation,
+                    uint8_t         const *const aData);
+
+            /**
+             * Override individual data points in the configuration in order to implement
+             * material instance behaviour.
+             *
+             * @param aOther
+             * @return
+             */
+            CEngineResult<> override(CMaterialConfig const &aOther);
 
             /**
              * @brief acceptSerializer
@@ -655,7 +779,7 @@ namespace engine
             uint8_t   const *const data       = (mData.data() + location.offset);
             TDataType const *const bufferData = reinterpret_cast<TDataType const *>(data);
 
-            return CEngineResult<TDataType const *>(EEngineStatus::Error, bufferData);
+            return CEngineResult<TDataType const *>(EEngineStatus::Ok, bufferData);
         }
         //<-----------------------------------------------------------------------------
 
@@ -712,6 +836,21 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<uint8_t const*> CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const
+        {
+            bool const validRequest = (0 < aLocation.offset && mData.size() > (aLocation.offset + aLocation.length));
+            if(not validRequest)
+            {
+                return { EEngineStatus::Error };
+            }
+
+            return { EEngineStatus::Ok, (mData.data() + aLocation.offset) };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         template <typename TDataType>
         CEngineResult<> CMaterialConfig::setBufferValue(
                 std::string const &aBufferName,
@@ -728,77 +867,155 @@ namespace engine
         }
         //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CMaterialConfig::setBufferValue(
+                SBufferLocation const       &aLocation,
+                uint8_t         const *const aData)
+        {
+            std::memcpy(mData.data() + aLocation.offset, aData, sizeof(uint8_t) * aLocation.length);
+            return { EEngineStatus::Ok };
+        }
+        //<-----------------------------------------------------------------------------
+
         /**
-         * The CMaterialLayer class describes a single layer of a material, which can be imagined
+         * A material instance describes a configurable and bindable material state which can be imagined
          * to be a single render call for an object having this material assigned.
          */
-        class CMaterialLayer
+        class CMaterialInstance
         {
-        public_static_functions:
-            /**
-             * Create a material layer from config.
-             *
-             * @param aConfig
-             * @return
-             */
-            static CMaterialLayer fromConfig(CMaterialConfig const &aConfig)
-            {
-                CMaterialLayer layer;
-                layer.mConfig = aConfig;
-                return layer;
-            }
+            public_constructors:
+                CMaterialInstance() = default;
+
+                SHIRABE_INLINE
+                CMaterialInstance(std::string        const &aName,
+                                  SMaterialSignature      &&aSignature,
+                                  CMaterialConfig         &&aConfig)
+                    : mName         (aName                )
+                    , mSignature    (std::move(aSignature))
+                    , mConfiguration(std::move(aConfig)   )
+                {}
+
+                SHIRABE_INLINE
+                CMaterialInstance(CMaterialInstance const &aOther)
+                    : mName         (aOther.mName         )
+                    , mSignature    (aOther.mSignature    )
+                    , mConfiguration(aOther.mConfiguration)
+                {}
+
+                SHIRABE_INLINE
+                CMaterialInstance(CMaterialInstance &&aOther)
+                    : mName         (std::move(aOther.mName         ))
+                    , mSignature    (std::move(aOther.mSignature    ))
+                    , mConfiguration(std::move(aOther.mConfiguration))
+                {}
+
+            public_destructors:
+                ~CMaterialInstance() = default;
+
+            public_operators:
+                SHIRABE_INLINE
+                CMaterialInstance &operator=(CMaterialInstance const &aOther)
+                {
+                    mName          = aOther.mName;
+                    mSignature     = aOther.mSignature;
+                    mConfiguration = aOther.mConfiguration;
+
+                    return (*this);
+                }
+
+                SHIRABE_INLINE
+                CMaterialInstance &operator=(CMaterialInstance &&aOther)
+                {
+                    mName          = std::move(aOther.mName         );
+                    mSignature     = std::move(aOther.mSignature    );
+                    mConfiguration = std::move(aOther.mConfiguration);
+
+                    return (*this);
+                }
 
         public_methods:
 
-            /**
-             * getBuffer
-             *
-             * @param aBufferName
-             * @param aOutBuffer
-             * @return
-             */
-            template <typename TBufferType>
-            CEngineResult<TBufferType const *> getBuffer(std::string const &aBufferName)
+        private_members:
+            std::string        mName;
+            SMaterialSignature mSignature;
+            CMaterialConfig    mConfiguration;
+        };
+
+        /**
+         * The CMaterialLayer class describes a single layer of a material container, referencing a material instance.
+         */
+        class CMaterialLayer
+        {
+        public_constructors:
+            CMaterialLayer() = default;
+
+            SHIRABE_INLINE
+            CMaterialLayer(std::string const &aName)
+                : mName(aName)
+                , mMaterialInstance(nullptr)
+                , mEnabled(false)
+            {}
+
+            SHIRABE_INLINE
+            CMaterialLayer(CMaterialLayer const &aOther)
+                : mName            (aOther.mName            )
+                , mMaterialInstance(aOther.mMaterialInstance)
+                , mEnabled         (aOther.mEnabled         )
+            {}
+
+            SHIRABE_INLINE
+            CMaterialLayer(CMaterialLayer &&aOther)
+                : mName            (std::move(aOther.mName            ))
+                , mMaterialInstance(std::move(aOther.mMaterialInstance))
+                , mEnabled         (std::move(aOther.mEnabled         ))
             {
-                return mConfig.getBuffer<TBufferType>(aBufferName);
+                aOther.mMaterialInstance = nullptr;
             }
 
-            /**
-             * getValue
-             *
-             * @param aBufferName
-             * @param aFieldName
-             * @param aOutValue
-             * @return
-             */
-            template <typename TDataType>
-            CEngineResult<TDataType const *> getValue(
-                    std::string const       &aBufferName,
-                    std::string const       &aFieldName)
+        public_destructors:
+            ~CMaterialLayer() = default;
+
+        public_operators:
+            SHIRABE_INLINE
+            CMaterialLayer &operator=(CMaterialLayer const &aOther)
             {
-                return mConfig.getBufferValue<TDataType>(aBufferName, aFieldName);
+                mName             = aOther.mName;
+                mMaterialInstance = aOther.mMaterialInstance;
+                mEnabled          = aOther.mEnabled;
+
+                return (*this);
             }
 
-            /**
-             * setValue
-             *
-             * @param aBufferName
-             * @param aFieldName
-             * @param aFieldValue
-             * @return
-             */
-            template <typename TDataType>
-            CEngineResult<> setValue(
-                    std::string const &aBufferName,
-                    std::string const &aFieldName,
-                    TDataType   const &aFieldValue)
+            SHIRABE_INLINE
+            CMaterialLayer &operator=(CMaterialLayer &&aOther)
             {
-                return mConfig.setBufferValue<TDataType>(aBufferName, aFieldName, aFieldValue);
+                mName             = std::move(aOther.mName            );
+                mMaterialInstance = std::move(aOther.mMaterialInstance);
+                mEnabled          = std::move(aOther.mEnabled         );
+
+                mMaterialInstance = nullptr;
+
+                return (*this);
+            }
+        public_methods:
+            SHIRABE_INLINE
+            void assignMaterialInstance(CStdSharedPtr_t<CMaterialInstance> const &aInstance)
+            {
+                mMaterialInstance = aInstance;
             }
 
+            SHIRABE_INLINE
+            CStdSharedPtr_t<CMaterialInstance> getAssignedMaterialInstance()
+            {
+                return mMaterialInstance;
+            }
 
         private_members:
-            CMaterialConfig mConfig;
+            std::string                        mName;
+            CStdSharedPtr_t<CMaterialInstance> mMaterialInstance;
+            bool                               mEnabled;
         };
 
         /**
@@ -808,102 +1025,68 @@ namespace engine
          */
         class CMaterial
         {
+        public_constructors:
+        public_destructors:
+        public_operators:
         public_methods:
             /**
-             * getLayerBuffer
+             *
              *
              * @param aLayerId
-             * @param aBufferName
-             * @param aOutBuffer
              * @return
              */
-            template <typename TBufferType>
-            CEngineResult<TBufferType const *> getLayerBuffer(
-                    std::string const &aLayerId,
-                    std::string const &aBufferName)
+            SHIRABE_INLINE
+            CEngineResult<CMaterialLayer *> addLayer(std::string const &aLayerId)
             {
-                bool const layerAvailable = hasLayer(aLayerId);
-                if(not layerAvailable)
+                bool const has = hasLayer(aLayerId);
+                if(has)
                 {
-                    return { EEngineStatus::Error };
+                    return { EEngineStatus::Error, nullptr };
                 }
 
-                CMaterialLayer &layer = mLayers[aLayerId];
-
-                return layer.getBuffer<TBufferType>(aBufferName);
+                CMaterialLayer &layer = mLayers[aLayerId] = { aLayerId };
+                return { EEngineStatus::Ok,  &layer };
             }
 
             /**
-             * getLayerValue
+             *
              *
              * @param aLayerId
-             * @param aBufferName
-             * @param aFieldName
-             * @param aOutValue
              * @return
              */
-            template <typename TDataType>
-            CEngineResult<TDataType const *> getLayerValue(
-                    std::string const &aLayerId,
-                    std::string const &aBufferName,
-                    std::string const &aFieldName)
+            SHIRABE_INLINE
+            CEngineResult<CMaterialLayer *> getLayer(std::string const &aLayerId)
             {
-                bool const layerAvailable = hasLayer(aLayerId);
-                if(not layerAvailable)
+                bool const has = hasLayer(aLayerId);
+                if(not has)
                 {
-                    return CEngineResult<TDataType const *>(EEngineStatus::Error, nullptr);
+                    return { EEngineStatus::Error, nullptr };
                 }
 
-                CMaterialLayer &layer = mLayers[aLayerId];
-
-                return layer.getValue<TDataType>(aBufferName, aFieldName);
-            }
-
-            /**
-             * setLayerValue
-             *
-             * @param aLayerId
-             * @param aBufferName
-             * @param aFieldName
-             * @param aFieldValue
-             * @return
-             */
-            template <typename TDataType>
-            CEngineResult<> setLayerValue(
-                    std::string const &aLayerId,
-                    std::string const &aBufferName,
-                    std::string const &aFieldName,
-                    TDataType   const &aFieldValue)
-            {
-                bool const layerAvailable = hasLayer(aLayerId);
-                if(not layerAvailable)
-                {
-                    return CEngineResult<>(EEngineStatus::Error);
-                }
-
-                CMaterialLayer &layer = mLayers[aLayerId];
-
-                return layer.setValue<TDataType>(aBufferName, aFieldName, aFieldValue);
+                CMaterialLayer &layer = mLayers.at(aLayerId);
+                return { EEngineStatus::Ok, &layer };
             }
 
         private_methods:
+            /**
+             *
+             *
+             * @param aLayerId
+             * @return
+             */
             SHIRABE_INLINE bool hasLayer(std::string const &aLayerId) const
             {
                 bool const has = (mLayers.end() != mLayers.find(aLayerId));
                 return has;
             }
 
+        private_static_fields:
+            static CMaterialLayer const sEmptyLayer;
+
         private_members:
             std::string                      mName;
             Map<std::string, CMaterialLayer> mLayers;
         };
-
-        static void foo()
-        {
-            CMaterial material = {};
-
-            CEngineResult<uint32_t const *> value = material.getLayerValue<uint32_t>("DefaultLayer", "Buffer", "Test");
-        }
 
     }
 }

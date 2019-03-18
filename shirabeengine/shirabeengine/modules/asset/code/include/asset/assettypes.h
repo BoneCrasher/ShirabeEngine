@@ -29,11 +29,12 @@ namespace engine
          */
         enum class EAssetType
         {
-            Undefined = 0,
-            Mesh      = 1,
-            Material  = 2,
-            Texture   = 3,
-            Buffer    = 4,
+            Undefined        = 0,
+            Mesh                ,
+            MaterialMaster      ,
+            MaterialInstance    ,
+            Texture             ,
+            Buffer              ,
         };
         
         /**
