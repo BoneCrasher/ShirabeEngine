@@ -263,7 +263,11 @@ namespace engine
             /**
              * Destroy and run...
              */
-            ~CLooper() = default;
+            SHIRABE_INLINE
+            ~CLooper()
+            {
+                abortAndJoin();
+            }
 
         public_methods:
             /**

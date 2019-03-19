@@ -46,6 +46,13 @@ namespace engine
             virtual CEngineResult<> commitCommandBuffer() = 0;
 
             /**
+             * @brief copyToBackBuffer
+             * @param aImageId
+             * @return
+             */
+            virtual CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage) = 0;
+
+            /**
              * Bind a swapchain, if any, for further framegraph operations.
              *
              * @param  aSwapChainResource The resource handle created for the swapchain in the FG.
@@ -74,6 +81,29 @@ namespace engine
                     std::string                     const &aRenderPassId,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
                     CFrameGraphMutableResources     const &aFrameGraphResources) = 0;
+
+            /**
+             * Bind the framebuffer and render pass in the command buffer.
+             * Has to be invoked after a command buffer has been activated.
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to bind.
+             * @param aRenderPassId        Unique Id of the render pass instance  to bind.
+             * @return
+             */
+            virtual CEngineResult<> bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                 std::string const &aRenderPassId) = 0;
+
+
+            /**
+             * Unbind the framebuffer and render pass in the command buffer.
+             * Has to be invoked before a command buffer will be deactivated.
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to unbind.
+             * @param aRenderPassId        Unique Id of the render pass instance  to unbind.
+             * @return
+             */
+            virtual CEngineResult<> unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                   std::string const &aRenderPassId) = 0;
 
             /**
              * Import a texture for use with framegraph render operations.
@@ -275,6 +305,8 @@ namespace engine
 
             CEngineResult<> commitCommandBuffer();
 
+            CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage);
+
             /**
              * Bind a swapchain, if any, for further framegraph operations.
              *
@@ -305,6 +337,28 @@ namespace engine
                     std::string                     const &aRenderPassId,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
                     CFrameGraphMutableResources     const &aFrameGraphResources);
+
+            /**
+             * Bind the framebuffer and render pass in the command buffer.
+             * Has to be invoked after a command buffer has been activated.
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to bind.
+             * @param aRenderPassId        Unique Id of the render pass instance  to bind.
+             * @return
+             */
+            CEngineResult<> bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                         std::string const &aRenderPassId);
+
+            /**
+             * Unbind the framebuffer and render pass in the command buffer.
+             * Has to be invoked after a command buffer has been activated.
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to unbind.
+             * @param aRenderPassId        Unique Id of the render pass instance  to unbind.
+             * @return
+             */
+            CEngineResult<> unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                           std::string const &aRenderPassId);
 
             /**
              * Import a texture for use with framegraph render operations.

@@ -208,7 +208,7 @@ namespace engine
             static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
             static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
 
-            CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+            CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
             if(not setUpRenderPassAndFrameBuffer.successful())
             {
                 return setUpRenderPassAndFrameBuffer;
@@ -267,6 +267,7 @@ namespace engine
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
+                {
                     texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
 
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
@@ -285,7 +286,9 @@ namespace engine
                     }
 
                     break;
+                }
                 case EFrameGraphResourceType::TextureView:
+                {
                     subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(resource->subjacentResource);
                     if(not subjacentFetch.successful())
                     {
@@ -308,14 +311,29 @@ namespace engine
                             {
                                 EngineStatusPrintOnError(initialization.result(), logTag(), "Failed to initialize texture.");
                                 result = initialization;
+                                break;
                             }
                             else
                             {
                                 mInstantiatedResources.push_back(textureView->resourceId);
                             }
                         }
+
+                        // Don't forget to create the texture view...
+                        CEngineResult<> const textureViewInitialization = initializeTextureView(aRenderContext, texture, textureView);
+                        if(not textureViewInitialization.successful())
+                        {
+                            EngineStatusPrintOnError(textureViewInitialization.result(), logTag(), "Failed to initialize texture view.");
+                            result = textureViewInitialization;
+                            break;
+                        }
+                        else
+                        {
+                            mInstantiatedResources.push_back(textureView->resourceId);
+                        }
                     }
-                    break;
+                }
+                break;
                 default:
                     break;
                 }

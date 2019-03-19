@@ -690,7 +690,7 @@ namespace engine
             vkSwapChainCreateInfo.imageColorSpace       = vkSelectedFormat.colorSpace;
             vkSwapChainCreateInfo.imageExtent           = vkBackBufferExtents;
             vkSwapChainCreateInfo.imageArrayLayers      = 1;
-            vkSwapChainCreateInfo.imageUsage            = VK_IMAGE_USAGE_TRANSFER_DST_BIT; // Image will be moved into...
+            vkSwapChainCreateInfo.imageUsage            = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT; // Image will also be moved into...
             vkSwapChainCreateInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
             vkSwapChainCreateInfo.queueFamilyIndexCount = 0; // Optional due to sharing mode exclusive!
             vkSwapChainCreateInfo.pQueueFamilyIndices   = nullptr;

@@ -622,6 +622,7 @@ namespace engine
             if(not resourceProxyFetch.successful())
             {
                 EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Cannot find resource proxy.");
+                return resourceProxyFetch.result();
             }
 
             CStdSharedPtr_t<IResourceProxyBase> &base = baseProxyCast(resourceProxyFetch.data());

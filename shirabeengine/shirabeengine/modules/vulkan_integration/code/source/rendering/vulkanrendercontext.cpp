@@ -1,4 +1,7 @@
 #include "vulkan/rendering/vulkanrendercontext.h"
+#include "vulkan/resources/types/vulkantextureresource.h"
+#include "vulkan/resources/types/vulkanframebufferresource.h"
+#include "vulkan/resources/types/vulkanrenderpassresource.h"
 
 #include <thread>
 #include <base/string.h>
@@ -62,6 +65,52 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::copyToBackBuffer(PublicResourceId_t const &aImageId)
+        {
+            CEngineResult<CStdSharedPtr_t<SVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aImageId);
+            if(not resourceFetch.successful())
+            {
+                CLog::Error(logTag(), "Failed to fetch copy source image '%0'.", aImageId);
+                return resourceFetch.result();
+            }
+
+            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+
+            VkImageAspectFlags vkAspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
+
+            VkImageSubresourceLayers vkSubresourceLayers {};
+            vkSubresourceLayers.baseArrayLayer = 0;
+            vkSubresourceLayers.layerCount     = 1;
+            vkSubresourceLayers.mipLevel       = 0;
+            vkSubresourceLayers.aspectMask     = vkAspectMask;
+
+            VkExtent3D vkExtent {};
+            vkExtent.width  = state.swapChain.selectedExtents.width;
+            vkExtent.height = state.swapChain.selectedExtents.height;
+            vkExtent.depth  = 1;
+
+            VkImageCopy vkRegion {};
+            vkRegion.srcOffset      = { 0, 0, 0 };
+            vkRegion.srcSubresource = vkSubresourceLayers;
+            vkRegion.dstOffset      = { 0, 0, 0 };
+            vkRegion.dstSubresource = vkSubresourceLayers;
+            vkRegion.extent         = vkExtent;
+
+            vkCmdCopyImage(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex),
+                           resourceFetch.data()->handle,
+                           VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                           state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex),
+                           VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                           1,
+                           &vkRegion);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::commitGraphicsCommandBuffer()
         {
             CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
@@ -71,6 +120,83 @@ namespace engine
             {
                 throw new CVulkanError("Failed to record and commit command buffer.", result);
             }
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                         std::string const &aRenderPassId)
+        {
+            CEngineResult<CStdSharedPtr_t<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
+            if(not frameBufferFetch.successful())
+            {
+                CLog::Error(logTag(), "Failed to fetch frame buffer '%0'.", aFrameBufferId);
+                return frameBufferFetch.result();
+            }
+
+            CEngineResult<CStdSharedPtr_t<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
+            if(not renderPassFetch.successful())
+            {
+                CLog::Error(logTag(), "Failed to fetch render pass '%0'.", aRenderPassId);
+                return renderPassFetch.result();
+            }
+
+            SVulkanFrameBufferResource const &frameBuffer = *frameBufferFetch.data();
+            SVulkanRenderPassResource  const &renderPass  = *renderPassFetch.data();
+
+            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+
+            VkClearValue clearColor = { 0.0f, 0.5f, 0.5f, 1.0f };
+
+            VkRenderPassBeginInfo vkRenderPassBeginInfo {};
+            vkRenderPassBeginInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            vkRenderPassBeginInfo.pNext             = nullptr;
+            vkRenderPassBeginInfo.renderPass        = renderPass.handle;
+            vkRenderPassBeginInfo.framebuffer       = frameBuffer.handle;
+            vkRenderPassBeginInfo.renderArea.offset = { 0, 0 };
+            vkRenderPassBeginInfo.renderArea.extent = state.swapChain.selectedExtents;
+            vkRenderPassBeginInfo.clearValueCount   = 1;
+            vkRenderPassBeginInfo.pClearValues      = &clearColor;
+
+            vkCmdBeginRenderPass(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex), &vkRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                           std::string const &aRenderPassId)
+        {
+            SHIRABE_UNUSED(aFrameBufferId);
+            SHIRABE_UNUSED(aRenderPassId);
+
+            // CEngineResult<CStdSharedPtr_t<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
+            // if(not frameBufferFetch.successful())
+            // {
+            //     CLog::Error(logTag(), "Failed to fetch frame buffer '%0'.", aFrameBufferId);
+            //     return frameBufferFetch.result();
+            // }
+            //
+            // CEngineResult<CStdSharedPtr_t<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
+            // if(not renderPassFetch.successful())
+            // {
+            //     CLog::Error(logTag(), "Failed to fetch render pass '%0'.", aRenderPassId);
+            //     return renderPassFetch.result();
+            // }
+            //
+            // SVulkanFrameBufferResource const &frameBuffer = *frameBufferFetch.data();
+            // SVulkanRenderPassResource  const &renderPass  = *renderPassFetch.data();
+
+            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+
+            vkCmdEndRenderPass(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex));
 
             return EEngineStatus::Ok;
         }
@@ -141,23 +267,45 @@ namespace engine
         {
             CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
 
-            VkQueue presentQueue = mVulkanEnvironment->getPresentQueue();
+            VkQueue presentQueue  = mVulkanEnvironment->getPresentQueue();
+            VkQueue graphicsQueue = mVulkanEnvironment->getGraphicsQueue();
+
+            VkCommandBuffer commandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
             VkSwapchainKHR swapChains[]       = { vkState.swapChain.handle                   };
             VkSemaphore    waitSemaphores[]   = { vkState.swapChain.imageAvailableSemaphore  };
             VkSemaphore    signalSemaphores[] = { vkState.swapChain.renderCompletedSemaphore };
 
+            VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT };
+
+            VkSubmitInfo vkSubmitInfo {};
+            vkSubmitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            vkSubmitInfo.pNext                = nullptr;
+            vkSubmitInfo.waitSemaphoreCount   = 1;
+            vkSubmitInfo.pWaitSemaphores      = waitSemaphores;
+            vkSubmitInfo.pWaitDstStageMask    = waitStages;
+            vkSubmitInfo.commandBufferCount   = 1;
+            vkSubmitInfo.pCommandBuffers      = &commandBuffer;
+            vkSubmitInfo.signalSemaphoreCount = 0;
+            vkSubmitInfo.pSignalSemaphores    = nullptr;
+
+            VkResult result = vkQueueSubmit(graphicsQueue, 1, &vkSubmitInfo, VK_NULL_HANDLE);
+            if(VK_SUCCESS != result)
+            {
+                throw CVulkanError("Failed to execute 'vkQueueSubmit'", result);
+            }
+
             VkPresentInfoKHR vkPresentInfo {};
             vkPresentInfo.sType              =  VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
             vkPresentInfo.pNext              =  nullptr;
-            vkPresentInfo.waitSemaphoreCount =  0;  // 1;
-            vkPresentInfo.pWaitSemaphores    =  {}; // signalSemaphores;
+            vkPresentInfo.waitSemaphoreCount =  1;
+            vkPresentInfo.pWaitSemaphores    =  waitSemaphores;
             vkPresentInfo.swapchainCount     =  1;
             vkPresentInfo.pSwapchains        =  swapChains;
             vkPresentInfo.pImageIndices      = &(vkState.swapChain.currentSwapChainImageIndex);
             vkPresentInfo.pResults           =  nullptr;
 
-            VkResult result = vkQueuePresentKHR(presentQueue, &vkPresentInfo);
+            result = vkQueuePresentKHR(presentQueue, &vkPresentInfo);
             if(VK_SUCCESS != result)
             {
                 throw CVulkanError("Failed to execute 'vkQueuePresentKHR'", result);

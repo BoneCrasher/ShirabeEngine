@@ -36,7 +36,8 @@ namespace engine
                 imageType = VkImageType::VK_IMAGE_TYPE_1D;
             }
 
-            VkImageUsageFlags imageUsage {};
+            VkImageUsageFlags imageUsage = {};
+            VkImageLayout     layout     = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
             if(desc.gpuBinding.check(EBufferBinding::TextureInput))
             {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -61,6 +62,10 @@ namespace engine
             {
                 imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
             }
+            if(desc.gpuBinding.check(EBufferBinding::PresentSource))
+            {
+                layout = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            }
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
@@ -74,7 +79,7 @@ namespace engine
                 vkImageCreateInfo.arrayLayers   = desc.textureInfo.arraySize;
                 vkImageCreateInfo.format        = CVulkanDeviceCapsHelper::convertFormatToVk(desc.textureInfo.format);
                 vkImageCreateInfo.usage         = imageUsage;
-                vkImageCreateInfo.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+                vkImageCreateInfo.initialLayout = layout;
                 vkImageCreateInfo.tiling        = VkImageTiling::VK_IMAGE_TILING_OPTIMAL;
                 vkImageCreateInfo.sharingMode   = VkSharingMode::VK_SHARING_MODE_EXCLUSIVE;
                 vkImageCreateInfo.samples       = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
@@ -143,7 +148,7 @@ namespace engine
                 };
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
-                assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
+                assignment.publicResourceHandle   = desc.name;
                 assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanTextureResource>(textureResource, deleter);
 
                 return { EEngineStatus::Ok, assignment };

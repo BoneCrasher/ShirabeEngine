@@ -46,6 +46,14 @@ namespace engine
 
             EEngineStatus commitGraphicsCommandBuffer();
 
+            EEngineStatus copyToBackBuffer(PublicResourceId_t const &aImageId);
+
+            EEngineStatus bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                       std::string const &aRenderPassId);
+
+            EEngineStatus unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                         std::string const &aRenderPassId);
+
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
              *

@@ -147,6 +147,16 @@ namespace engine
                     EImportStorageMode    const &aImportStorageMode = EImportStorageMode::NoOverwrite);
 
             /**
+             * Try to fetch a previously loaded resource from the registry and return the internal handle.
+             *
+             * @param aId Resource id of the resource to fetch.
+             * @return    EEngineStatus::Ok, if successful.
+             * @return    EEngineStatus::NotFound, if the resource was not available.
+             */
+            template <typename T>
+            CEngineResult<CStdSharedPtr_t<T>> const getResource(PublicResourceId_t const &aId);
+
+            /**
              * Register a resource task backend used for creating specific op-tasks based
              * on the selected graphics API.
              *
@@ -206,6 +216,33 @@ namespace engine
             threading::CLooper<ResourceTaskFn_t::result_type>            mResourceThread;
             threading::CLooper<ResourceTaskFn_t::result_type>::CHandler &mResourceThreadHandler;
         };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CEngineResult<CStdSharedPtr_t<T>> const CGFXAPIResourceBackend::getResource(PublicResourceId_t const &aId)
+        {
+            // Check, whether the resource is available.
+            bool const contained = (mStorage.end() != mStorage.find(aId));
+            if(not contained)
+            {
+                CLog::Warning(logTag(), "Resource '%0' not found.", aId);
+                return { EEngineStatus::ResourceError_NotFound };
+            }
+
+            // Check, whether the resoruce is of correct type.
+            CStdSharedPtr_t<void> resource = mStorage.at(aId);
+            CStdSharedPtr_t<T>    result   = std::static_pointer_cast<T>(resource);
+            if(nullptr == result)
+            {
+                CLog::Error(logTag(), "Resource '%0' not of expected type.", aId);
+                return { EEngineStatus::Error };
+            }
+
+            return { EEngineStatus::Ok, result };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

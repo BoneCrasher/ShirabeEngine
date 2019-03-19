@@ -33,6 +33,8 @@ namespace engine
 
             virtual EEngineStatus commitGraphicsCommandBuffer() = 0;
 
+            virtual EEngineStatus copyToBackBuffer(PublicResourceId_t const &aImageId) = 0;
+
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
              *
@@ -40,6 +42,12 @@ namespace engine
              * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
             virtual EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId) = 0;
+
+            virtual EEngineStatus bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                               std::string const &aRenderPassId) = 0;
+
+            virtual EEngineStatus unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                 std::string const &aRenderPassId) = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.

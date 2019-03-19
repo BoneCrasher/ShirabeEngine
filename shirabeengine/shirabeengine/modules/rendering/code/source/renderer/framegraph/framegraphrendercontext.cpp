@@ -117,6 +117,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::copyToBackBuffer(SFrameGraphTexture const &aImage)
+        {
+            CEngineResult<> const status = mGraphicsAPIRenderContext->copyToBackBuffer(aImage.readableName);
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindSwapChain(SFrameGraphResource const &aSwapChainResource)
         {
             CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(aSwapChainResource.readableName);
@@ -238,13 +249,15 @@ namespace engine
 
                     uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
 
+                    // For the choice of image layouts, check: https://github.com/SaschaWillems/Vulkan/issues/155
+
                     SAttachmentDescription attachmentDesc = {};
                     attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
                     attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
                     attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
                     attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                     attachmentDesc.format         = textureView.format;
-                    attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;       // For now we don't care about the initial layout...
+                    attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                     attachmentDesc.finalLayout    = EImageLayout::PRESENT_SRC_KHR; // For now we just assume everything to be presentable...
 
                     renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
@@ -320,6 +333,26 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                               std::string const &aRenderPassId)
+        {
+            return mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
+                                                                                 std::string const &aRenderPassId)
+        {
+            return mGraphicsAPIRenderContext->unbindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
             PublicResourceId_t const pid = "";
@@ -338,6 +371,9 @@ namespace engine
             CTexture::SDescriptor desc = {};
             desc.name        = aTexture.readableName;
             desc.textureInfo = aTexture;
+            // Always set those...
+            desc.gpuBinding.set(EBufferBinding::CopySource);
+            desc.gpuBinding.set(EBufferBinding::CopyTarget);
 
             if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment))
             {

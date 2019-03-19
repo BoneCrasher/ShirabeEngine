@@ -37,20 +37,21 @@ namespace engine
         enum class EBufferBinding
                 : uint16_t
         {
-            VertexBuffer                 = 1,   //< The buffer resource can be used as a vertex source
-                                                //   in the input assembly stage.
-            IndexBuffer                  = 2,   //< The buffer resource can be used as an index source
-                                                //   in the input assembly stage.
-            UniformBuffer                = 4,   //< The buffer resource can be used as a uniform data
-                                                //   source bound against the pipeline registers.
-            TextureInput                 = 8,   //< The buffer resource can be used as a sampled input texture.
-            InputAttachment              = 16,  //< The buffer resource can be used as a frame buffer input attachement (Read).
-            ColorAttachment              = 32,  //< The buffer resource can be used as a frame buffer color attachement (Write).
-            DepthAttachment              = 64,  //< The buffer resource can be used as a frame buffer depth attachement (Write).
-            ShaderOutput_StreamOutput    = 128, //< The buffer resource can be used as a compute/shader data output target.
-            UnorderedMultithreadedAccess = 256, //< The buffer resource can be accessed from multiple GPU threads in unordered fashion.
-            CopySource                   = 512, //< The buffer will be used as a copy source buffer for copy operations.
-            CopyTarget                   = 1024 //< The buffer will be used as a copy target buffer for copy operations.
+            VertexBuffer                 = 1,    //< The buffer resource can be used as a vertex source
+                                                 //   in the input assembly stage.
+            IndexBuffer                  = 2,    //< The buffer resource can be used as an index source
+                                                 //   in the input assembly stage.
+            UniformBuffer                = 4,    //< The buffer resource can be used as a uniform data
+                                                 //   source bound against the pipeline registers.
+            TextureInput                 = 8,    //< The buffer resource can be used as a sampled input texture.
+            InputAttachment              = 16,   //< The buffer resource can be used as a frame buffer input attachement (Read).
+            ColorAttachment              = 32,   //< The buffer resource can be used as a frame buffer color attachement (Write).
+            DepthAttachment              = 64,   //< The buffer resource can be used as a frame buffer depth attachement (Write).
+            ShaderOutput_StreamOutput    = 128,  //< The buffer resource can be used as a compute/shader data output target.
+            UnorderedMultithreadedAccess = 256,  //< The buffer resource can be accessed from multiple GPU threads in unordered fashion.
+            CopySource                   = 512,  //< The buffer will be used as a copy source buffer for copy operations.
+            CopyTarget                   = 1024, //< The buffer will be used as a copy target buffer for copy operations.
+            PresentSource                = 2048
         };
 
         /**

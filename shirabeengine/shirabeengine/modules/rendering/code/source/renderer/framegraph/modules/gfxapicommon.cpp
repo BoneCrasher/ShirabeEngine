@@ -94,8 +94,12 @@ namespace engine
 
                 CLog::Verbose(logTag(), "PrePass");
 
+                static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+                static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+
                 aContext->bindSwapChain(aPassData.importData.backBufferInput);
                 aContext->bindCommandBuffer();
+                aContext->bindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
                 return { EEngineStatus::Ok };
             };
@@ -168,8 +172,31 @@ namespace engine
 
                 using namespace engine::rendering;
 
-                CLog::Verbose(logTag(), "SwapChainPass");
+                CLog::Verbose(logTag(), "PresentPass");
 
+                static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+                static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+
+
+                // Important: The whole copyToBackBuffer-stuff may not be called from within a render pass.
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(aPassData.importData.finalOutputId);
+                if(not viewFetch.successful())
+                {
+                    CLog::Error(logTag(), "Failed to fetch source image texture view resource.");
+                }
+
+                SFrameGraphTextureView const &view = *viewFetch.data();
+
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>> const textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(view.subjacentResource);
+                if(not textureFetch.successful())
+                {
+                    CLog::Error(logTag(), "Failed to fetch source image texture resource.");
+                }
+
+                SFrameGraphTexture const &texture = *textureFetch.data();
+
+                aContext->unbindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                aContext->copyToBackBuffer(texture);
                 aContext->commitCommandBuffer();
                 aContext->present();
 

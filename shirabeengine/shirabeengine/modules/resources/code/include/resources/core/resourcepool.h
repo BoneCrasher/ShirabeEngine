@@ -114,7 +114,7 @@ namespace engine
                 TValue const&resource)
         {
             CEngineResult<bool> const has = hasResource(index);
-            if(not has.data())
+            if(has.data())
             {
                 return { EEngineStatus::Error };
             }
