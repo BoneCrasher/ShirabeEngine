@@ -202,10 +202,21 @@ public_methods:
         // Make sure the output config is correct.
         std::filesystem::path const outputPathAbsolute = (std::filesystem::current_path() / outputPath).lexically_normal();
 
-        bool const outputPathExists = std::filesystem::exists(outputPath);
+        bool const outputPathExists = std::filesystem::exists(outputPathAbsolute);
         if(not outputPathExists)
         {
-            std::filesystem::create_directory(outputPathAbsolute);
+            try
+            {
+                bool const created = std::filesystem::create_directories(outputPathAbsolute);
+                if(not created)
+                {
+                    CLog::Error(logTag(), "Can't create directory '%0'", outputPathAbsolute);
+                }
+            }
+            catch(std::filesystem::filesystem_error fserr)
+            {
+                CLog::Error(logTag(), "Cant create directory '%0'. Error: %1", outputPathAbsolute, fserr.what());
+            }
         }
 
         std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/indexFile).lexically_normal();
@@ -614,7 +625,7 @@ private_methods:
      */
     CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
     {
-        std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path());
+        std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
         std::string       options     = "-v -d -g -Od -V --target-env vulkan1.1";
 
         auto const appendIncludes = [&options] (std::string const &aInclude) -> void
@@ -630,7 +641,8 @@ private_methods:
             std::string                const command       = CString::format("%0 -o %2 %1 %3", application, options, aOutputFilename, aInputFilenames);
             CEngineResult<std::string> const commandResult = executeCmd(command);
 
-            bool const compilationError = (std::string::npos != commandResult.data().find("compilation error"));
+            bool const compilationError = (std::string::npos != commandResult.data().find("compilation error")
+                                          or std::string::npos != commandResult.data().find("not found"));
             if(compilationError || not commandResult.successful())
             {
                 CLog::Error(logTag(), commandResult.data());
@@ -858,16 +870,24 @@ int main(int aArgC, char **aArgV)
 
     try
     {
+        std::filesystem::path exec_dir = std::filesystem::current_path();
+        CLog::Error(logTag(), exec_dir);
+
         std::shared_ptr<CPrecompiler> precompiler = std::make_shared<CPrecompiler>();
 
         // Read all shader-files and convert them to spirv.
         // Then go for SPIRV-cross, perform reflection and generate headers
         // for all shaders.
-        precompiler->initialize();
-        precompiler->processArguments(static_cast<uint32_t>(aArgC), aArgV);
-        precompiler->run();
-        precompiler->deinitialize();
-        precompiler.reset();
+
+        try {
+            precompiler->initialize();
+            precompiler->processArguments(static_cast<uint32_t>(aArgC), aArgV);
+            precompiler->run();
+            precompiler->deinitialize();
+            precompiler.reset();
+        } catch (std::exception &e) {
+            CLog::Error(logTag(), "Failed to run precompiler. Error: %0", e.what());
+        }
     }
     catch (...)
     {
