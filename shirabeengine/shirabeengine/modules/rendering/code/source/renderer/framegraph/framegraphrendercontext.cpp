@@ -95,6 +95,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::nextPass()
+        {
+            CEngineResult<> const status = mGraphicsAPIRenderContext->nextPass();
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindCommandBuffer()
         {
             CEngineResult<> const status = mGraphicsAPIRenderContext->bindGraphicsCommandBuffer();
@@ -249,16 +260,16 @@ namespace engine
 
                     uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
 
-                    // For the choice of image layouts, check: https://github.com/SaschaWillems/Vulkan/issues/155
+                    // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
 
                     SAttachmentDescription attachmentDesc = {};
-                    attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
+                    attachmentDesc.loadOp         = EAttachmentLoadOp::DONT_CARE;
                     attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
-                    attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
+                    attachmentDesc.storeOp        = EAttachmentStoreOp::DONT_CARE;
                     attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                     attachmentDesc.format         = textureView.format;
                     attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
-                    attachmentDesc.finalLayout    = EImageLayout::PRESENT_SRC_KHR; // For now we just assume everything to be presentable...
+                    attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
 
                     renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
 
@@ -276,7 +287,15 @@ namespace engine
                     }
                     else if(isDepthAttachment)
                     {
-                        attachmentReference.layout = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
+                        {
+                            attachmentReference.layout = EImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+                        }
+                        else
+                        {
+                            attachmentReference.layout = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        }
+
                         subpassDesc.depthStencilAttachments.push_back(attachmentReference);
                     }
                     else if(isInputAttachment)

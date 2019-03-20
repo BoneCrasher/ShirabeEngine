@@ -29,6 +29,8 @@ namespace engine
 
         public_api:
 
+            virtual EEngineStatus nextPass() = 0;
+
             virtual EEngineStatus bindGraphicsCommandBuffer() = 0;
 
             virtual EEngineStatus commitGraphicsCommandBuffer() = 0;

@@ -41,6 +41,7 @@ namespace engine
              */
             bool deinitialize();
 
+            EEngineStatus nextPass();
 
             EEngineStatus bindGraphicsCommandBuffer();
 

@@ -34,6 +34,12 @@ namespace engine
         public_api:
 
             /**
+             * @brief nextPass
+             * @return
+             */
+            virtual CEngineResult<> nextPass() = 0;
+
+            /**
              * @brief bindCommandBuffer
              * @return
              */
@@ -300,6 +306,8 @@ namespace engine
                     CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
                     CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                     CStdSharedPtr_t<IRenderContext>       aRenderer);
+
+            CEngineResult<> nextPass();
 
             CEngineResult<> bindCommandBuffer();
 

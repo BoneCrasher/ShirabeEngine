@@ -45,7 +45,7 @@ int main(int aArgc, char **aArgv)
 
     CEngineResult<> engineUpdate = { EEngineStatus::Ok };
 
-    while (not (engineUpdate = engine->update()).successful())
+    while ((engineUpdate = engine->update()).successful())
     {
         // Just run the shit out of the engine...
         // If it returns we had an error or something had it close.

@@ -41,6 +41,20 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::nextPass()
+        {
+            CVulkanEnvironment::SVulkanState &state         = mVulkanEnvironment->getState();
+            VkCommandBuffer                   commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+
+            vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::bindGraphicsCommandBuffer()
         {
             CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
@@ -76,7 +90,35 @@ namespace engine
 
             CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
 
-            VkImageAspectFlags vkAspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
+            VkCommandBuffer const vkCommandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
+            VkImage         const swapChainImage  = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
+
+            VkImageMemoryBarrier vkImageMemoryBarrier {};
+            vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            vkImageMemoryBarrier.pNext                           = nullptr;
+            vkImageMemoryBarrier.srcAccessMask                   = VK_ACCESS_TRANSFER_WRITE_BIT;
+            vkImageMemoryBarrier.dstAccessMask                   = 0;
+            vkImageMemoryBarrier.oldLayout                       = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+            vkImageMemoryBarrier.newLayout                       = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            vkImageMemoryBarrier.srcQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
+            vkImageMemoryBarrier.dstQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
+            vkImageMemoryBarrier.image                           = swapChainImage;
+            vkImageMemoryBarrier.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            vkImageMemoryBarrier.subresourceRange.baseMipLevel   = 0;
+            vkImageMemoryBarrier.subresourceRange.levelCount     = 1;
+            vkImageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+            vkImageMemoryBarrier.subresourceRange.layerCount     = 1;
+
+            // Create pipeline barrier on swap chain image to move it to correct format.
+            vkCmdPipelineBarrier(vkCommandBuffer,
+                                 VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                 VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                 VkDependencyFlagBits::VK_DEPENDENCY_BY_REGION_BIT,
+                                 0, nullptr,
+                                 0, nullptr,
+                                 1, &vkImageMemoryBarrier);
+
+            VkImageAspectFlags const vkAspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
 
             VkImageSubresourceLayers vkSubresourceLayers {};
             vkSubresourceLayers.baseArrayLayer = 0;
@@ -96,10 +138,10 @@ namespace engine
             vkRegion.dstSubresource = vkSubresourceLayers;
             vkRegion.extent         = vkExtent;
 
-            vkCmdCopyImage(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex),
+            vkCmdCopyImage(vkCommandBuffer,
                            resourceFetch.data()->handle,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                           state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex),
+                           swapChainImage,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                            1,
                            &vkRegion);
@@ -113,9 +155,39 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::commitGraphicsCommandBuffer()
         {
-            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+            CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
+            VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkImage         const swapChainImage  = vkState.swapChain.swapChainImages.at(vkState.swapChain.currentSwapChainImageIndex);
 
-            VkResult const result = vkEndCommandBuffer(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex)); // The commandbuffers and swapchain count currently match
+            //
+            // Make sure the swap chain is presentable.
+            //
+            VkImageMemoryBarrier vkImageMemoryBarrier {};
+            vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            vkImageMemoryBarrier.pNext                           = nullptr;
+            vkImageMemoryBarrier.srcAccessMask                   = 0;
+            vkImageMemoryBarrier.dstAccessMask                   = 0;
+            vkImageMemoryBarrier.oldLayout                       = VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            vkImageMemoryBarrier.newLayout                       = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            vkImageMemoryBarrier.srcQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
+            vkImageMemoryBarrier.dstQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
+            vkImageMemoryBarrier.image                           = swapChainImage;
+            vkImageMemoryBarrier.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            vkImageMemoryBarrier.subresourceRange.baseMipLevel   = 0;
+            vkImageMemoryBarrier.subresourceRange.levelCount     = 1;
+            vkImageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+            vkImageMemoryBarrier.subresourceRange.layerCount     = 1;
+
+            // Create pipeline barrier on swap chain image to move it to correct format.
+            vkCmdPipelineBarrier(vkCommandBuffer,
+                                 VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+                                 VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+                                 VkDependencyFlagBits::VK_DEPENDENCY_BY_REGION_BIT,
+                                 0, nullptr,
+                                 0, nullptr,
+                                 1, &vkImageMemoryBarrier);
+
+            VkResult const result = vkEndCommandBuffer(vkCommandBuffer); // The commandbuffers and swapchain count currently match
             if(VkResult::VK_SUCCESS != result)
             {
                 throw new CVulkanError("Failed to record and commit command buffer.", result);
@@ -270,7 +342,7 @@ namespace engine
             VkQueue presentQueue  = mVulkanEnvironment->getPresentQueue();
             VkQueue graphicsQueue = mVulkanEnvironment->getGraphicsQueue();
 
-            VkCommandBuffer commandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
             VkSwapchainKHR swapChains[]       = { vkState.swapChain.handle                   };
             VkSemaphore    waitSemaphores[]   = { vkState.swapChain.imageAvailableSemaphore  };
@@ -285,9 +357,9 @@ namespace engine
             vkSubmitInfo.pWaitSemaphores      = waitSemaphores;
             vkSubmitInfo.pWaitDstStageMask    = waitStages;
             vkSubmitInfo.commandBufferCount   = 1;
-            vkSubmitInfo.pCommandBuffers      = &commandBuffer;
-            vkSubmitInfo.signalSemaphoreCount = 0;
-            vkSubmitInfo.pSignalSemaphores    = nullptr;
+            vkSubmitInfo.pCommandBuffers      = &vkCommandBuffer;
+            vkSubmitInfo.signalSemaphoreCount = 1;
+            vkSubmitInfo.pSignalSemaphores    = signalSemaphores;
 
             VkResult result = vkQueueSubmit(graphicsQueue, 1, &vkSubmitInfo, VK_NULL_HANDLE);
             if(VK_SUCCESS != result)
@@ -299,7 +371,7 @@ namespace engine
             vkPresentInfo.sType              =  VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
             vkPresentInfo.pNext              =  nullptr;
             vkPresentInfo.waitSemaphoreCount =  1;
-            vkPresentInfo.pWaitSemaphores    =  waitSemaphores;
+            vkPresentInfo.pWaitSemaphores    =  signalSemaphores;
             vkPresentInfo.swapchainCount     =  1;
             vkPresentInfo.pSwapchains        =  swapChains;
             vkPresentInfo.pImageIndices      = &(vkState.swapChain.currentSwapChainImageIndex);
@@ -313,11 +385,11 @@ namespace engine
 
             // Temporary workaround to avoid memory depletion from GPU workloads using validation layers.
             // Implement better synchronization and throttling, once ready.
-            // result = vkQueueWaitIdle(presentQueue);
-            // if(VK_SUCCESS != result)
-            // {
-            //     throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
-            // }
+            result = vkQueueWaitIdle(presentQueue);
+            if(VK_SUCCESS != result)
+            {
+                throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
+            }
 
             return EEngineStatus::Ok;
         }

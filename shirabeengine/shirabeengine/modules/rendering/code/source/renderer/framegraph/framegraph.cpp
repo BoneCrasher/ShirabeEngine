@@ -214,6 +214,9 @@ namespace engine
                 return setUpRenderPassAndFrameBuffer;
             }
 
+            SFrameGraphAttachmentCollection const &attachments = mResourceData.getAttachments();
+
+
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
             {
@@ -231,6 +234,14 @@ namespace engine
                 }
 
                 copy.pop();
+
+                if(not copy.empty())
+                {
+                    if(attachments.getAttachmentPassAssignment().end() != attachments.getAttachmentPassAssignment().find(passUID))
+                    {
+                        aRenderContext->nextPass();
+                    }
+                }
             }
 
             CEngineResult<> const cleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
