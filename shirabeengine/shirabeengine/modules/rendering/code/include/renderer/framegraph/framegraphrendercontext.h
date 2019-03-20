@@ -37,7 +37,18 @@ namespace engine
              * @brief nextPass
              * @return
              */
-            virtual CEngineResult<> nextPass() = 0;
+            virtual CEngineResult<> nextPass() = 0;asdfasfdasfdasdf
+
+            TODO: Think about how to abstract away those vulkan specifics, which can by no means be projected to any other graphics API...
+                  E.g.: Things like beginPass/endPass outside of VK context.
+
+
+            /**
+             * @brief copyToBackBuffer
+             * @param aImageId
+             * @return
+             */
+            virtual CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage) = 0;
 
             /**
              * @brief bindCommandBuffer
@@ -50,13 +61,6 @@ namespace engine
              * @return
              */
             virtual CEngineResult<> commitCommandBuffer() = 0;
-
-            /**
-             * @brief copyToBackBuffer
-             * @param aImageId
-             * @return
-             */
-            virtual CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage) = 0;
 
             /**
              * Bind a swapchain, if any, for further framegraph operations.

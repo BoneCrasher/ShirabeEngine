@@ -41,7 +41,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::nextPass()
+        EEngineStatus CVulkanRenderContext::beginSubpass()
+        {
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::endSubpass()
         {
             CVulkanEnvironment::SVulkanState &state         = mVulkanEnvironment->getState();
             VkCommandBuffer                   commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
@@ -55,23 +64,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindGraphicsCommandBuffer()
+
+        EEngineStatus CVulkanRenderContext::copyImage(PublicResourceId_t const &aSourceImageId,
+                                                      PublicResourceId_t const &aTargetImageId)
         {
-            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
-
-            VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
-            vkCommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            vkCommandBufferBeginInfo.pNext = nullptr;
-            vkCommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
-
-            VkResult const result = vkBeginCommandBuffer(commandBuffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
-            if(VkResult::VK_SUCCESS != result)
-            {
-                throw new CVulkanError("Failed to begin command buffer.", result);
-            }
-
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -145,6 +141,30 @@ namespace engine
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                            1,
                            &vkRegion);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::beginGraphicsCommandBuffer()
+        {
+            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+
+            VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
+            vkCommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            vkCommandBufferBeginInfo.pNext = nullptr;
+            vkCommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+
+            VkResult const result = vkBeginCommandBuffer(commandBuffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw new CVulkanError("Failed to begin command buffer.", result);
+            }
 
             return EEngineStatus::Ok;
         }

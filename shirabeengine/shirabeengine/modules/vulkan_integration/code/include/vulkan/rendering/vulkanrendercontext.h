@@ -2,7 +2,7 @@
 #define __SHIRABE_VULKAN_RENDERCONTEXT_H__
 
 #include <log/log.h>
-#include <renderer/irenderer.h>
+#include <renderer/irendercontext.h>
 #include <renderer/renderertypes.h>
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
 #include "vulkan/vulkanenvironment.h"
@@ -41,17 +41,81 @@ namespace engine
              */
             bool deinitialize();
 
-            EEngineStatus nextPass();
+            //
+            // IRenderContext implementation
+            //
 
-            EEngineStatus bindGraphicsCommandBuffer();
+            /**
+             * Begin a subpass.
+             *
+             * @return EEngineStatus::Ok, if successful.
+             */
+            EEngineStatus beginSubpass();
 
+            /**
+             * End a subpass.
+             *
+             * @return EEngineStatus::Ok, if successful.
+             */
+            EEngineStatus endSubpass();
+
+            /**
+             * Copy one image to another.
+             * This will incorporate explicit image memory barriers.
+             *
+             * @param aSourceImageId The id of the image to copy from.
+             * @param aTargetImageId The id of the image to copy to.
+             * @return               EEngineStatus::Ok, if successful.
+             * @return               EEngineStatus::Error on any error.
+             */
+            EEngineStatus copyImage(PublicResourceId_t const &aSourceImageId,
+                                    PublicResourceId_t const &aTargetImageId);
+
+            /**
+             * Copy one image to the current backbuffer.
+             * This will incorporate explicit image memory barriers.
+             *
+             * @param aImageId
+             * @return
+             */
+            EEngineStatus copyToBackBuffer(PublicResourceId_t const &aImageId);
+            /**
+             * Put the current internal command buffer into recording mode.
+             *
+             * @return EEngineStatus::Ok, if successful.
+             * @return EEngineStatus::Error, on any error.
+             */
+            EEngineStatus beginGraphicsCommandBuffer();
+
+            /**
+             * Stop recording in the current internal command buffer.
+             *
+             * @return EEngineStatus::Ok, if successful.
+             * @return EEngineStatus::Error, on any error.
+             */
             EEngineStatus commitGraphicsCommandBuffer();
 
-            EEngineStatus copyToBackBuffer(PublicResourceId_t const &aImageId);
-
+            /**
+             * Bind the framebuffer and render pass with the provided ids, if found.
+             * Will implicitly begin the render pass.
+             *
+             * @param aFrameBufferId The id of the framebuffer to bind.
+             * @param aRenderPassId  The id of the render pass to begin with.
+             * @return               EEngineStatus::Ok, if successful.
+             * @return               EEngineStatus::Error, on any error.
+             */
             EEngineStatus bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                        std::string const &aRenderPassId);
 
+            /**
+             * Bind the framebuffer and render pass with the provided ids, if found.
+             * Will implicitly end the render pass.
+             *
+             * @param aFrameBufferId The id of the framebuffer to unbind.
+             * @param aRenderPassId  The id of the render pass to end.
+             * @return               EEngineStatus::Ok, if successful.
+             * @return               EEngineStatus::Error, on any error.
+             */
             EEngineStatus unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                          std::string const &aRenderPassId);
 
