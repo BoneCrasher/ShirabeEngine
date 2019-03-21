@@ -95,9 +95,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::nextPass()
+        CEngineResult<> CFrameGraphRenderContext::beginPass()
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->nextPass();
+            return { EEngineStatus::Error };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::endPass()
+        {
+            CEngineResult<> const status = mGraphicsAPIRenderContext->beginSubpass();
 
             return status;
         }
@@ -106,20 +115,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindCommandBuffer()
+        CEngineResult<> CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceImage,
+                                                            SFrameGraphTexture const &aTargetImage)
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->bindGraphicsCommandBuffer();
-
-            return status;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::commitCommandBuffer()
-        {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->commitGraphicsCommandBuffer();
+            CEngineResult<> const status = mGraphicsAPIRenderContext->copyImage(aSourceImage.readableName, aTargetImage.readableName);
 
             return status;
         }
@@ -153,6 +152,28 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::present()
         {
             CEngineResult<> const status = mGraphicsAPIRenderContext->present();
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::beginCommandBuffer()
+        {
+            CEngineResult<> const status = mGraphicsAPIRenderContext->beginGraphicsCommandBuffer();
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::commitCommandBuffer()
+        {
+            CEngineResult<> const status = mGraphicsAPIRenderContext->commitGraphicsCommandBuffer();
 
             return status;
         }
@@ -372,6 +393,45 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::destroyFrameBufferAndRenderPass(
+                std::string                     const &aFrameBufferId,
+                std::string                     const &aRenderPassId)
+        {
+            CEngineResult<> destruction = mResourceManager->destroyResource<CFrameBuffer>(aFrameBufferId);
+            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy frame buffer.");
+
+            destruction = mResourceManager->destroyResource<CRenderPass>(aRenderPassId);
+            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy render pass.");
+
+            return destruction;
+
+            // return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::loadTextureAsset(AssetId_t const &aAssetUID)
+        {
+            SHIRABE_UNUSED(aAssetUID);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unloadTextureAsset(AssetId_t const &aAssetUID)
+        {
+            SHIRABE_UNUSED(aAssetUID);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
             PublicResourceId_t const pid = "";
@@ -432,6 +492,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::destroyTexture(SFrameGraphTexture const &aTexture)
+        {
+            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
+
+            CEngineResult<> status = mResourceManager->destroyResource<CTexture>(aTexture.readableName);
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::createTextureView(
                 SFrameGraphTexture     const &aTexture,
                 SFrameGraphTextureView const &aView)
@@ -458,68 +531,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::createBuffer(
-                FrameGraphResourceId_t const &aResourceId,
-                SFrameGraphResource    const &aResource,
-                SFrameGraphBuffer      const &aBuffer)
-        {
-            SHIRABE_UNUSED(aResourceId);
-            SHIRABE_UNUSED(aResource);
-            SHIRABE_UNUSED(aBuffer);
-
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::createBufferView(
-                FrameGraphResourceId_t const &aResourceId,
-                SFrameGraphResource    const &aResource,
-                SFrameGraphBufferView  const &aBufferView)
-        {
-            SHIRABE_UNUSED(aResourceId);
-            SHIRABE_UNUSED(aResource);
-            SHIRABE_UNUSED(aBufferView);
-
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadTextureAsset(AssetId_t const &aAssetUID)
-        {
-            SHIRABE_UNUSED(aAssetUID);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadBufferAsset(AssetId_t const &aAssetUID)
-        {
-            SHIRABE_UNUSED(aAssetUID);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetUID)
-        {
-            SHIRABE_UNUSED(aAssetUID);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindTextureView(SFrameGraphTextureView const &aView)
         {
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
@@ -534,26 +545,6 @@ namespace engine
             }
 
             return { subjacentResourcesFetch.result() };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t  const &aResourceId)
-        {
-            SHIRABE_UNUSED(aResourceId);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindMesh(AssetId_t const&aAssetUID)
-        {
-            SHIRABE_UNUSED(aAssetUID);
-            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -581,27 +572,21 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId)
+        CEngineResult<> CFrameGraphRenderContext::destroyTextureView(SFrameGraphTextureView  const &aView)
         {
-            SHIRABE_UNUSED(aResourceId);
-            return EEngineStatus::Ok;
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+
+            CEngineResult<> status = EEngineStatus::Ok;
+            status = mResourceManager->destroyResource<CTextureView>(aView.readableName);
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unbindMesh(AssetId_t const &aAssetUID)
-        {
-            SHIRABE_UNUSED(aAssetUID);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unloadTextureAsset(AssetId_t const &aAssetUID)
+        CEngineResult<> CFrameGraphRenderContext::loadBufferAsset(AssetId_t const &aAssetUID)
         {
             SHIRABE_UNUSED(aAssetUID);
             return EEngineStatus::Ok;
@@ -621,9 +606,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetUID)
+        CEngineResult<> CFrameGraphRenderContext::createBuffer(
+                FrameGraphResourceId_t const &aResourceId,
+                SFrameGraphResource    const &aResource,
+                SFrameGraphBuffer      const &aBuffer)
         {
-            SHIRABE_UNUSED(aAssetUID);
+            SHIRABE_UNUSED(aResourceId);
+            SHIRABE_UNUSED(aResource);
+            SHIRABE_UNUSED(aBuffer);
+
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -631,34 +622,43 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::destroyTexture(SFrameGraphTexture const &aTexture)
-        {
-            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
-
-            CEngineResult<> status = mResourceManager->destroyResource<CTexture>(aTexture.readableName);
-
-            return status;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::destroyTextureView(SFrameGraphTextureView  const &aView)
-        {
-            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
-
-            CEngineResult<> status = EEngineStatus::Ok;
-            status = mResourceManager->destroyResource<CTextureView>(aView.readableName);
-
-            return status;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::destroyBuffer(FrameGraphResourceId_t const &aResourceId)
+        {
+            SHIRABE_UNUSED(aResourceId);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::createBufferView(
+                FrameGraphResourceId_t const &aResourceId,
+                SFrameGraphResource    const &aResource,
+                SFrameGraphBufferView  const &aBufferView)
+        {
+            SHIRABE_UNUSED(aResourceId);
+            SHIRABE_UNUSED(aResource);
+            SHIRABE_UNUSED(aBufferView);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t  const &aResourceId)
+        {
+            SHIRABE_UNUSED(aResourceId);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId)
         {
             SHIRABE_UNUSED(aResourceId);
             return EEngineStatus::Ok;
@@ -678,19 +678,40 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::destroyFrameBufferAndRenderPass(
-                std::string                     const &aFrameBufferId,
-                std::string                     const &aRenderPassId)
+        CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetUID)
         {
-            CEngineResult<> destruction = mResourceManager->destroyResource<CFrameBuffer>(aFrameBufferId);
-            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy frame buffer.");
+            SHIRABE_UNUSED(aAssetUID);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
 
-            destruction = mResourceManager->destroyResource<CRenderPass>(aRenderPassId);
-            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy render pass.");
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetUID)
+        {
+            SHIRABE_UNUSED(aAssetUID);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
 
-            return destruction;
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::bindMesh(AssetId_t const&aAssetUID)
+        {
+            SHIRABE_UNUSED(aAssetUID);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
 
-            // return EEngineStatus::Ok;
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unbindMesh(AssetId_t const &aAssetUID)
+        {
+            SHIRABE_UNUSED(aAssetUID);
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 

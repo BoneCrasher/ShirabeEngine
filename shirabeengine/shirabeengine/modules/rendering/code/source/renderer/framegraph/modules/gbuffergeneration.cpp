@@ -87,7 +87,7 @@ namespace engine
             auto const execute = [=] (
                     SPassData                                 const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext)
+                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aRenderContext)
                     -> CEngineResult<>
             {
                 using namespace engine::rendering;
@@ -127,17 +127,21 @@ namespace engine
                 }
 #endif
 
+                aRenderContext->beginPass();
+
                 for(FrameGraphResourceId_t const &renderableId : renderableView->renderableRefIndices)
                 {
                     FrameGraphRenderable_t const &renderable = renderableList->renderableList.at(renderableId);
 
-                    CEngineResult<> renderCall = aContext->render(renderable);
+                    CEngineResult<> renderCall = aRenderContext->render(renderable);
                     if(not renderCall.successful())
                     {
                         CLog::Error(logTag(), "Failed to render renderable.");
                         return { renderCall.result() };
                     }
                 }
+
+                aRenderContext->endPass();
 
                 return { EEngineStatus::Ok };
             };

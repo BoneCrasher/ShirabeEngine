@@ -98,7 +98,8 @@ namespace engine
                 static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
 
                 aContext->bindSwapChain(aPassData.importData.backBufferInput);
-                aContext->bindCommandBuffer();
+
+                aContext->beginCommandBuffer();
                 aContext->bindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
                 return { EEngineStatus::Ok };

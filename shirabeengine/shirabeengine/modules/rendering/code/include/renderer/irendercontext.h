@@ -1,5 +1,5 @@
-#ifndef __SHIRABE_IRENDERER_H__
-#define __SHIRABE_IRENDERER_H__
+#ifndef __SHIRABE_IRENDERCONTEXT_H__
+#define __SHIRABE_IRENDERCONTEXT_H__
 
 #include <core/basictypes.h>
 #include <core/enginestatus.h>
@@ -8,7 +8,6 @@
 #include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"
-#include "renderer/framegraph/framegraphrendercontext.h"
 
 namespace engine
 {
@@ -16,8 +15,6 @@ namespace engine
     {
         using namespace os;
         using namespace engine::resources;
-
-        using engine::framegraph::IFrameGraphRenderContext;
 
         /**
          * The IRenderContext interface describes rendering operations supported in

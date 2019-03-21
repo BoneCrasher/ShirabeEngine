@@ -205,26 +205,12 @@ namespace engine
         {
             assert(aRenderContext != nullptr);
 
-            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
-            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
-
-            CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
-            if(not setUpRenderPassAndFrameBuffer.successful())
-            {
-                return setUpRenderPassAndFrameBuffer;
-            }
-
-            SFrameGraphAttachmentCollection const &attachments = mResourceData.getAttachments();
-
-
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
             {
                 PassUID_t                             const passUID  = copy.top();
                 CStdSharedPtr_t<CPassBase>            const pass     = mPasses.at(passUID);
                 CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
-
-                // FrameGraphResourceIdList const &passResources = accessor->resourceReferences();
 
                 CEngineResult<> executed = pass->execute(mResourceData, aRenderContext);
                 if(not executed.successful())
@@ -234,20 +220,6 @@ namespace engine
                 }
 
                 copy.pop();
-
-                if(not copy.empty())
-                {
-                    if(attachments.getAttachmentPassAssignment().end() != attachments.getAttachmentPassAssignment().find(passUID))
-                    {
-                        aRenderContext->nextPass();
-                    }
-                }
-            }
-
-            CEngineResult<> const cleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
-            if(not cleanedUpRenderPassAndFrameBuffer.successful())
-            {
-                return cleanedUpRenderPassAndFrameBuffer;
             }
 
             return { EEngineStatus::Ok };

@@ -36,14 +36,16 @@ namespace engine
             /**
              * Begin a pass.
              *
-             * @return EEngineStatus::Ok, if successful.
+             * @return EEngineStatus::Ok if successful.
+             * @return EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> beginPass() = 0;
 
             /**
              * End a pass.
              *
-             * @return EEngineStatus::Ok, if successful.
+             * @return EEngineStatus::Ok if successful.
+             * @return EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> endPass() = 0;
 
@@ -52,7 +54,8 @@ namespace engine
              *
              * @param aSourceImage
              * @param aTargetImage
-             * @return
+             * @return             EEngineStatus::Ok if successful.
+             * @return             EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> copyImage(SFrameGraphTexture const &aSourceImage,
                                               SFrameGraphTexture const &aTargetImage) = 0;
@@ -61,7 +64,8 @@ namespace engine
              * Copy the content of an image to the backbuffer.
              *
              * @param aImageId
-             * @return
+             * @return         EEngineStatus::Ok if successful.
+             * @return         EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage) = 0;
 
@@ -73,14 +77,16 @@ namespace engine
              * Bind a swapchain, if any, for further framegraph operations.
              *
              * @param  aSwapChainResource The resource handle created for the swapchain in the FG.
-             * @return                    EEngineStatus::Ok if successful. False otherwise.
+             * @return                    EEngineStatus::Ok if successful.
+             * @return                    EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> bindSwapChain(SFrameGraphResource const &aSwapChainResource) = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
              *
-             * @return EEngineStatus::Ok if successful. False otherwise.
+             * @return EEngineStatus::Ok if successful.
+             * @return EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> present() = 0;
 
@@ -89,14 +95,18 @@ namespace engine
             //
 
             /**
-             * @brief bindCommandBuffer
-             * @return
+             * Put the internal command buffer into recording state.
+             *
+             * @return EEngineStatus::Ok if successful.
+             * @return EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> beginCommandBuffer() = 0;
 
             /**
-             * @brief commitCommandBuffer
-             * @return
+             * Put the internal command buffer into non-recording state.
+             *
+             * @return EEngineStatus::Ok if successful.
+             * @return EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> commitCommandBuffer() = 0;
 
@@ -110,7 +120,8 @@ namespace engine
              * @param aRenderPassId        Unique Id of the render pass instance to create.
              * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
              * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
-             * @return EEngineStatus::Ok, if successful. An errorcode otherwise.
+             * @return                     EEngineStatus::Ok if successful.
+             * @return                     EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> createFrameBufferAndRenderPass(
                     std::string                     const &aFrameBufferId,
@@ -122,9 +133,10 @@ namespace engine
              * Bind the framebuffer and render pass in the command buffer.
              * Has to be invoked after a command buffer has been activated.
              *
-             * @param aFrameBufferId       Unique Id of the frame buffer instance to bind.
-             * @param aRenderPassId        Unique Id of the render pass instance  to bind.
-             * @return
+             * @param aFrameBufferId Unique Id of the frame buffer instance to bind.
+             * @param aRenderPassId  Unique Id of the render pass instance  to bind.
+             * @return               EEngineStatus::Ok if successful.
+             * @return               EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                  std::string const &aRenderPassId) = 0;
@@ -134,9 +146,10 @@ namespace engine
              * Unbind the framebuffer and render pass in the command buffer.
              * Has to be invoked before a command buffer will be deactivated.
              *
-             * @param aFrameBufferId       Unique Id of the frame buffer instance to unbind.
-             * @param aRenderPassId        Unique Id of the render pass instance  to unbind.
-             * @return
+             * @param aFrameBufferId Unique Id of the frame buffer instance to unbind.
+             * @param aRenderPassId  Unique Id of the render pass instance  to unbind.
+             * @return               EEngineStatus::Ok if successful.
+             * @return               EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                    std::string const &aRenderPassId) = 0;
@@ -144,9 +157,10 @@ namespace engine
             /**
              * Destroy the frame buffer and render pass identified by the arguments' UIDs.
              *
-             * @param aFrameBufferId       Unique Id of the frame buffer to destroy
-             * @param aRenderPassId        Unique Id of the render pass to destroy
-             * @return EEngineStatus::Ok, if successful. An error code otherwise.
+             * @param aFrameBufferId Unique Id of the frame buffer to destroy
+             * @param aRenderPassId  Unique Id of the render pass to destroy
+             * @return               EEngineStatus::Ok if successful.
+             * @return               EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> destroyFrameBufferAndRenderPass(
                     std::string                     const &aFrameBufferId,
@@ -160,7 +174,8 @@ namespace engine
              * Load a texture asset using the asset manager into the graphics API.
              *
              * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> loadTextureAsset(AssetId_t const &aAssetUID) = 0;
 
@@ -168,7 +183,8 @@ namespace engine
              * Unload a texture asset from the graphics API.
              *
              * @param aAssetUID The UID of the asset to Unload.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unloadTextureAsset(AssetId_t const &aAssetUID) = 0;
 
@@ -176,7 +192,8 @@ namespace engine
              * Import a texture for use with framegraph render operations.
              *
              * @param aTexture The texture to import.
-             * @return         EEngineStatus::Ok if successful. False otherwise.
+             * @return         EEngineStatus::Ok if successful.
+             * @return         EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> importTexture(SFrameGraphTexture const &aTexture) = 0;
 
@@ -184,7 +201,8 @@ namespace engine
              * Create a texture in the graphics API for use within render operations.
              *
              * @param aTexture Descriptor of the texture to create.
-             * @return         EEngineStatus::Ok if successful. False otherwise.
+             * @return         EEngineStatus::Ok if successful.
+             * @return         EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> createTexture(SFrameGraphTexture const &aTexture) = 0;
 
@@ -192,7 +210,8 @@ namespace engine
              * Destroy a texture in the system.
              *
              * @param aTexture The texture to destroy.
-             * @return         EEngineStatus::Ok if successful. False otherwise.
+             * @return         EEngineStatus::Ok if successful.
+             * @return         EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> destroyTexture(SFrameGraphTexture const &aTexture) = 0;
 
@@ -201,7 +220,8 @@ namespace engine
              *
              * @param aTexture The texture to base the view on.
              * @param aView    Descriptor of the view to create.
-             * @return         EEngineStatus::Ok if successful. False otherwise.
+             * @return         EEngineStatus::Ok if successful.
+             * @return         EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> createTextureView(
                     SFrameGraphTexture     const &aTexture,
@@ -211,7 +231,8 @@ namespace engine
              * Bind a texture view to the graphics API.
              *
              * @param aView The view to bind.
-             * @return      EEngineStatus::Ok if successful. False otherwise.
+             * @return      EEngineStatus::Ok if successful.
+             * @return      EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> bindTextureView(SFrameGraphTextureView const &aView) = 0;
 
@@ -219,7 +240,8 @@ namespace engine
              * Unbind a texture view from the graphics API.
              *
              * @param aView The view to Unbind.
-             * @return      EEngineStatus::Ok if successful. False otherwise.
+             * @return      EEngineStatus::Ok if successful.
+             * @return      EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unbindTextureView(SFrameGraphTextureView const &aView) = 0;
 
@@ -227,13 +249,23 @@ namespace engine
              * Destroy a texture view in the system.
              *
              * @param aView The texture view to destroy.
-             * @return      EEngineStatus::Ok if successful. False otherwise.
+             * @return      EEngineStatus::Ok if successful.
+             * @return      EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> destroyTextureView(SFrameGraphTextureView const &aView) = 0;
 
             //
             // Buffer
             //
+            /**
+             * Create a buffer in the system.
+             *
+             * @param aResourceId
+             * @param aResource
+             * @param aBuffer
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
+             */
             virtual CEngineResult<> createBuffer(
                     FrameGraphResourceId_t const &aResourceId,
                     SFrameGraphResource    const &aResource,
@@ -243,7 +275,8 @@ namespace engine
              * Load a buffer asset using the asset manager into the graphics API.
              *
              * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> loadBufferAsset(AssetId_t const &aAssetUID) = 0;
 
@@ -251,7 +284,8 @@ namespace engine
              * Unload a texture asset from the graphics API.
              *
              * @param aAssetUID The UID of the asset to Unload.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unloadBufferAsset(AssetId_t const &aAssetUID) = 0;
 
@@ -259,10 +293,20 @@ namespace engine
              * Destroy a buffer in the system.
              *
              * @param aResourceId The buffer id of the buffer to destroy.
-             * @return            EEngineStatus::Ok if successful. False otherwise.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> destroyBuffer(FrameGraphResourceId_t const &aResourceId) = 0;
 
+            /**
+             * Create a buffer view in the system.
+             *
+             * @param aResourceId
+             * @param aResource
+             * @param aBufferView
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
+             */
             virtual CEngineResult<> createBufferView(
                     FrameGraphResourceId_t const &aResourceId,
                     SFrameGraphResource    const &aResource,
@@ -272,7 +316,8 @@ namespace engine
              * Bind a buffer view to the graphics API.
              *
              * @param aResourceId The buffer view to bind.
-             * @return            EEngineStatus::Ok if successful. False otherwise.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> bindBufferView(FrameGraphResourceId_t const &aResourceId) = 0;
 
@@ -280,14 +325,17 @@ namespace engine
              * Unbind a buffer view from the graphics API.
              *
              * @param aResource The view to Unbind.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unbindBufferView(FrameGraphResourceId_t  const &aResource) = 0;
+
             /**
              * Destroy a buffer view in the system.
              *
              * @param aResourceId The id of the buffer view to destroy.
-             * @return            EEngineStatus::Ok if successful. False otherwise.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> destroyBufferView(FrameGraphResourceId_t const &aResourceId) = 0;
 
@@ -295,7 +343,8 @@ namespace engine
              * Load a mesh asset using the asset manager into the graphics API.
              *
              * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> loadMeshAsset(AssetId_t const &aAssetUID) = 0;
 
@@ -303,7 +352,8 @@ namespace engine
              * Unload a mesh asset from the graphics API.
              *
              * @param aAssetUID The UID of the asset to Unload.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unloadMeshAsset(AssetId_t const &aAssetUID) = 0;
 
@@ -311,14 +361,17 @@ namespace engine
              * Bind a mesh asset using the asset manager into the graphics API.
              *
              * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> bindMesh(AssetId_t const&aAssetUID) = 0;
+
             /**
              * Unbind a mesh asset from the graphics API.
              *
              * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful. False otherwise.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> unbindMesh(AssetId_t const &aAssetUID) = 0;
 
@@ -326,7 +379,8 @@ namespace engine
              * Render a renderable entity using the graphicsAPI.
              *
              * @param aRenderable The renderable to process.
-             * @return            EEngineStatus::Ok if successful. False otherwise.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> render(SRenderable const &aRenderable) = 0;
         };
