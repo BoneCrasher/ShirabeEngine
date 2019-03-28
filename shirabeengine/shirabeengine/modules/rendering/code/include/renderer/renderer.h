@@ -16,6 +16,8 @@ namespace engine
         class CRenderer
                 : public IRenderer
         {
+            SHIRABE_DECLARE_LOG_TAG(CRenderer);
+
         public_constructors:
             CRenderer();
 

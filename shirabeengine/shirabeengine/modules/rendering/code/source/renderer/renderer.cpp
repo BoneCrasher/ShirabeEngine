@@ -1,4 +1,4 @@
-#include "renderer/framegraph/graphbuilder.h"
+﻿#include "renderer/framegraph/graphbuilder.h"
 #include "renderer/framegraph/passbuilder.h"
 #include "renderer/framegraph/modules/gfxapicommon.h"
 #include "renderer/framegraph/modules/gbuffergeneration.h"
@@ -148,6 +148,8 @@ namespace engine
 
             CGraphBuilder graphBuilder{ };
             graphBuilder.initialize(mAppEnvironment, mDisplay);
+            graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
+            graphBuilder.setRenderToBackBuffer(true);
 
             RenderableList renderableCollection ={
                 { "Cube",    0, 0 },
@@ -163,20 +165,20 @@ namespace engine
             CFrameGraphModule<SCompositingModuleTag_t>                           compositingModule      { };
             CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPrePassExportData prePassExportData{ };
 
-            static std::string const sPrePassID               = "PrePass";
+            // static std::string const sPrePassID               = "PrePass";
             static std::string const sGBufferGenerationPassID = "GBufferGenerationPass";
             static std::string const sLightingPassID          = "LightingPass";
             static std::string const sCompositingPassID       = "CompositingPass";
-            static std::string const sPresentPassID           = "PresentPass";
+            // static std::string const sPresentPassID           = "PresentPass";
 
             // Prepass
-            prePassExportData =
-                    graphicsAPICommonModule.addPrePass(
-                        sPrePassID,
-                        graphBuilder,
-                        width,
-                        height,
-                        FrameGraphFormat_t::R8G8B8A8_UNORM).data();
+            // prePassExportData =
+            //         graphicsAPICommonModule.addPrePass(
+            //             sPrePassID,
+            //             graphBuilder,
+            //             width,
+            //             height,
+            //             FrameGraphFormat_t::R8G8B8A8_UNORM).data();
 
             // GBuffer
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
@@ -187,7 +189,7 @@ namespace engine
                         renderables).data();
 
             // Link SwapChain pass and GBuffer
-            graphBuilder.createPassDependency(sPrePassID, sGBufferGenerationPassID);
+            // graphBuilder.createPassDependency(sPrePassID, sGBufferGenerationPassID);
 
             // Lighting
             CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
@@ -213,18 +215,25 @@ namespace engine
                         lightingExportData.lightAccumulationBuffer).data();
 
             // Present
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
-            presentPassExportData =
-                    graphicsAPICommonModule.addPresentPass(
-                        sPresentPassID,
-                        graphBuilder,
-                        compositingExportData.output).data();
-
+            // CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
+            // presentPassExportData =
+            //         graphicsAPICommonModule.addPresentPass(
+            //             sPresentPassID,
+            //             graphBuilder,
+            //             compositingExportData.output).data();
+            //
             // Link Compositing and Present
-            graphBuilder.createPassDependency(sCompositingPassID, sPresentPassID);
+            // graphBuilder.createPassDependency(sCompositingPassID, sPresentPassID);
 
             // Compile the whole thing :)
-            CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = std::move(graphBuilder.compile().data());
+            CEngineResult<CStdUniquePtr_t<engine::framegraph::CGraph>> compilation = graphBuilder.compile();
+            if(not compilation.successful())
+            {
+                CLog::Error(logTag(), "Failed to compile the framegraph.");
+                return EEngineStatus::Ok;
+            }
+
+            CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = std::move(compilation.data());
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             static bool serializedOnce = false;

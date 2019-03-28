@@ -62,6 +62,7 @@ namespace engine
                     return { backBufferImport.result() };
                 }
 #endif
+
                 aOutPassData.importData.backBufferInput = backBufferImport.data();
 
                 SFrameGraphResourceFlags flags{};
@@ -94,12 +95,11 @@ namespace engine
 
                 CLog::Verbose(logTag(), "PrePass");
 
-                static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
-                static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
-
+                // Fetch the next backbuffer image and make it available to the resource manager.
                 aContext->bindSwapChain(aPassData.importData.backBufferInput);
-
+                // Begin a command buffer.
                 aContext->beginCommandBuffer();
+                // Begin a render pass w/ a given framebuffer.
                 aContext->bindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
                 return { EEngineStatus::Ok };

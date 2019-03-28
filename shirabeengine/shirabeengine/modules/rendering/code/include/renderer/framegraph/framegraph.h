@@ -33,6 +33,19 @@ namespace engine
         {
             SHIRABE_DECLARE_LOG_TAG(CGraph)
 
+        public_enums:
+            /**
+             * The EGraphMode enum determines resource life cycle management
+             * behaviour for graphics and compute pipelines.
+             *
+             * E.g., whether to create a render pass and frame buffer or not.
+             */
+            enum class EGraphMode
+            {
+                Graphics,
+                Compute
+            };
+
         public_classes:
             /**
              * The CAccessor class immutably provides all data members of the graph.
@@ -57,6 +70,8 @@ namespace engine
                 std::stack<FrameGraphResourceId_t>                    const &resourceOrder()           const;
                 AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &passToResourceAdjacency() const;
 #endif
+                EGraphMode                                                   graphMode()               const;
+                bool                                                         renderToBackBuffer()      const;
 
             private_members:
                 CGraph const *m_graph;
@@ -85,7 +100,9 @@ namespace engine
                 AdjacencyListMap_t<FrameGraphResourceId_t>            &mutableResourceAdjacency();
                 std::stack<FrameGraphResourceId_t>                    &mutableResourceOrder();
                 AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> &mutablePassToResourceAdjacency();
-#endif
+#endif                
+                EGraphMode                                            &mutableGraphMode();
+                bool                                                  &mutableRenderToBackBuffer();
 
                 /**
                  * Create a new pass of type TPass given a uid and name.
@@ -106,6 +123,10 @@ namespace engine
             private_members:
                 CGraph *mGraph;
             };
+
+        private_static_fields:
+            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
 
         public_methods:
             /**
@@ -366,24 +387,28 @@ namespace engine
              * @param aArgs The arguments reuqired to create the pass.
              * @return      A pointer to the newly created pass or nullptr.
              */
-            template <
-                    typename    TPass,
-                    typename... TPassCreationArgs
-                    >
+            template
+            <
+                typename    TPass,
+                typename... TPassCreationArgs
+            >
             CEngineResult<CStdSharedPtr_t<TPass>> createPass(
                     PassUID_t         const &aUID,
                     std::string       const &aName,
                     TPassCreationArgs       &&...aArgs);
 
         private_members:
-            CStdSharedPtr_t<CResourceManagerBase>                 mResourceManager;
+            CStdSharedPtr_t<CResourceManagerBase> mResourceManager;
 
-            PassMap                                               mPasses;
-            AdjacencyListMap_t<PassUID_t>                         mPassAdjacency;
-            std::stack<PassUID_t>                                 mPassExecutionOrder;
-            FrameGraphResourceIdList                              mResources;
-            CFrameGraphMutableResources                           mResourceData;
-            FrameGraphResourceIdList                              mInstantiatedResources;
+            PassMap                               mPasses;
+            AdjacencyListMap_t<PassUID_t>         mPassAdjacency;
+            std::stack<PassUID_t>                 mPassExecutionOrder;
+            FrameGraphResourceIdList              mResources;
+            CFrameGraphMutableResources           mResourceData;
+            FrameGraphResourceIdList              mInstantiatedResources;
+
+            EGraphMode                            mGraphMode;
+            bool                                  mRenderToBackBuffer;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             AdjacencyListMap_t<FrameGraphResourceId_t>            mResourceAdjacency;

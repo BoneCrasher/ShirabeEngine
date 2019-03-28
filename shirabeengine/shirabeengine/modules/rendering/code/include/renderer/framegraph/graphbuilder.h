@@ -31,7 +31,7 @@ namespace engine
          */
         class SHIRABE_TEST_EXPORT CGraphBuilder
         {
-            SHIRABE_DECLARE_LOG_TAG(CGraphBuilder)
+            SHIRABE_DECLARE_LOG_TAG(CGraphBuilder);
 
         public_constructors:
             /**
@@ -65,6 +65,23 @@ namespace engine
              * @return True, if successful. False otherwise.
              */
             CEngineResult<> deinitialize();
+
+            /**
+             * Set the graph mode used for resource management configuration.
+             *
+             * @param aMode The requested mode to use.
+             */
+            SHIRABE_INLINE
+            void setGraphMode(framegraph::CGraph::EGraphMode const &aMode)
+            {
+                mGraphMode = aMode;
+            }
+
+            SHIRABE_INLINE
+            void setRenderToBackBuffer(bool const &aRenderToBackBuffer)
+            {
+                mRenderToBackBuffer = aRenderToBackBuffer;
+            }
 
             /**
              * Fetch the internal resource UID generator to request a new UID.
@@ -192,7 +209,8 @@ namespace engine
              *                              aResourceToSearchFrom and the subjacent resource.
              * @param aResourceToSearchFrom Starting point of the path towards the subjacent resource.
              * @return                      The FrameGraphResourceId_t of the subjacent resource or 0 if not found.
-             */
+EST_EXPORT CGraphBuilder
+        {*/
             CEngineResult<FrameGraphResourceId_t> findSubjacentResource(
                     SFrameGraphResourceMap const &aResourceMap,
                     SFrameGraphResource    const &aResourceToSearchFrom);
@@ -283,6 +301,10 @@ namespace engine
                     SFrameGraphBufferView const &aBufferView);
 
         private_members:
+
+            framegraph::CGraph::EGraphMode mGraphMode;
+            bool                           mRenderToBackBuffer;
+
             CStdSharedPtr_t<SApplicationEnvironment>               mApplicationEnvironment;
             CStdSharedPtr_t<wsi::CWSIDisplay>                      mDisplay;
 

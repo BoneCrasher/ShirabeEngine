@@ -27,6 +27,10 @@ namespace engine
         {
             SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SGraphicsAPICommonModuleTag_t>);
 
+        public_static_fields:
+            static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
+            static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+
         public_structs:
             /**
              * The SPrePassImportData struct describes all imported data for the

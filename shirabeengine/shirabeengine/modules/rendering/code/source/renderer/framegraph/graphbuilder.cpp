@@ -349,10 +349,14 @@ namespace engine
             accessor->mutableResources()     = std::move(this->mResources);
             accessor->mutableResourceData().mergeIn(this->mResourceData);
 
+            accessor->mutableGraphMode()          = mGraphMode;
+            accessor->mutableRenderToBackBuffer() = mRenderToBackBuffer;
+
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             accessor->mutableResourceAdjacency()       = std::move(this->mResourceAdjacency);
             accessor->mutablePassToResourceAdjacency() = std::move(this->mPassToResourceAdjacency);
 #endif
+
 
             return { EEngineStatus::Ok, std::move(graph()) };
         }

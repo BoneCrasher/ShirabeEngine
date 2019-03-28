@@ -81,7 +81,24 @@ namespace engine
         }
 
 #endif
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CGraph::EGraphMode CGraph::CAccessor::graphMode() const
+        {
+            return m_graph->mGraphMode;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool CGraph::CAccessor::renderToBackBuffer() const
+        {
+            return m_graph->mRenderToBackBuffer;
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -163,6 +180,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CGraph::EGraphMode &CGraph::CMutableAccessor::mutableGraphMode()
+        {
+            return mGraph->mGraphMode;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool &CGraph::CMutableAccessor::mutableRenderToBackBuffer()
+        {
+            return mGraph->mRenderToBackBuffer;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         bool CGraph::acceptSerializer(IFrameGraphSerializer &aSerializer) const
         {
@@ -205,6 +240,24 @@ namespace engine
         {
             assert(aRenderContext != nullptr);
 
+            if(EGraphMode::Graphics == mGraphMode)
+            {
+                aRenderContext->bindSwapChain()
+
+                CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+                if(not setUpRenderPassAndFrameBuffer.successful())
+                {
+                    return setUpRenderPassAndFrameBuffer;
+                }
+            }
+
+            aRenderContext->beginCommandBuffer();
+
+            if(EGraphMode::Graphics == mGraphMode)
+            {
+                aRenderContext->bindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+            }
+
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(!copy.empty())
             {
@@ -220,6 +273,19 @@ namespace engine
                 }
 
                 copy.pop();
+            }
+
+            aRenderContext->commitCommandBuffer();
+
+            if(EGraphMode::Graphics == mGraphMode)
+            {
+                CEngineResult<> const cleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
+                if(not cleanedUpRenderPassAndFrameBuffer.successful())
+                {
+                    return cleanedUpRenderPassAndFrameBuffer;
+                }
+
+                aRenderContext->present();
             }
 
             return { EEngineStatus::Ok };
@@ -338,7 +404,7 @@ namespace engine
             std::vector<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewReferences{};
 
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
-            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementResourceIds();
+            FrameGraphResourceIdList        const &attachmentResourceIds = attachments  .getAttachementResourceIds();
 
             // Make sure that all texture views and their subjacent textures are created upfront!
             CEngineResult<> const initialization = initializeResources(aRenderContext, attachmentResourceIds);
