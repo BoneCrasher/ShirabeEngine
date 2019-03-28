@@ -219,6 +219,10 @@ namespace engine
             // framebuffer can bind to it.
             PublicResourceIdList_t textureViewIds = {};
 
+            // asdfjialkfdaj;klfj;kl fd
+            //
+            // The derivation of whether something is an input/color/depth attachment or not is most likely broken.
+
             //<-----------------------------------------------------------------------------
             // Begin the render pass derivation
             //<-----------------------------------------------------------------------------
@@ -282,7 +286,6 @@ namespace engine
                     uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
 
                     // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
-
                     SAttachmentDescription attachmentDesc = {};
                     attachmentDesc.loadOp         = EAttachmentLoadOp::DONT_CARE;
                     attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
@@ -294,9 +297,9 @@ namespace engine
 
                     renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
 
-                    bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getColorAttachments(), attachmentIndex);
-                    bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getDepthAttachments(), attachmentIndex);
-                    bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getInputAttachments(), attachmentIndex);
+                    bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getColorAttachments(), attachmentIndex + 1);
+                    bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getDepthAttachments(), attachmentIndex + 1);
+                    bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getInputAttachments(), attachmentIndex + 1);
 
                     SAttachmentReference attachmentReference {};
                     attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);

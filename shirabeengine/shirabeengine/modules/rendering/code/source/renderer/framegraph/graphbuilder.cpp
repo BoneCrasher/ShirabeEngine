@@ -489,7 +489,6 @@ namespace engine
                         SFrameGraphTexture     &texture     = *(textureFetch.data());
                         SFrameGraphTextureView &textureView = *(textureViewFetch.data());
 
-
                         // Auto adjust format if requested
                         if(FrameGraphFormat_t::Automatic == textureView.format)
                         {
