@@ -104,6 +104,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        FrameGraphResourceId_t const &CGraph::CAccessor::outputTextureResourceId() const
+        {
+            return m_graph->mOutputTextureResourceId;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CGraph::CMutableAccessor::CMutableAccessor(CGraph *aGraph)
             : CAccessor(aGraph)
             , mGraph(aGraph)
@@ -198,6 +207,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        FrameGraphResourceId_t &CGraph::CMutableAccessor::mutableOutputTextureResourceId()
+        {
+            return mGraph->mOutputTextureResourceId;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         bool CGraph::acceptSerializer(IFrameGraphSerializer &aSerializer) const
         {
@@ -228,6 +246,8 @@ namespace engine
             mResourceOrder           = aOther.mResourceOrder;
             mPassToResourceAdjacency = aOther.mPassToResourceAdjacency;
 #endif
+            mGraphMode               = EGraphMode::Compute;
+            mRenderToBackBuffer      = false;
 
             return (*this);
         }
@@ -242,7 +262,10 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext->bindSwapChain()
+                if(mRenderToBackBuffer)
+                {
+                    aRenderContext->bindSwapChain(sSwapChainResourceId);
+                }
 
                 CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
                 if(not setUpRenderPassAndFrameBuffer.successful())
@@ -251,6 +274,7 @@ namespace engine
                 }
             }
 
+            // In any case...
             aRenderContext->beginCommandBuffer();
 
             if(EGraphMode::Graphics == mGraphMode)
@@ -275,17 +299,35 @@ namespace engine
                 copy.pop();
             }
 
+            if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
+            {
+                aRenderContext->unbindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>> sourceResourceFetch = mResourceData.get<SFrameGraphTexture>(mOutputTextureResourceId);
+                if(not sourceResourceFetch.successful())
+                {
+                    CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer."));
+                    return {sourceResourceFetch.result()};
+                }
+
+                aRenderContext->copyImageToBackBuffer(*(sourceResourceFetch.data()));
+            }
+
+            // In any case...
             aRenderContext->commitCommandBuffer();
 
             if(EGraphMode::Graphics == mGraphMode)
             {
+                if(mRenderToBackBuffer)
+                {
+                    aRenderContext->present();
+                }
+
                 CEngineResult<> const cleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
                 if(not cleanedUpRenderPassAndFrameBuffer.successful())
                 {
                     return cleanedUpRenderPassAndFrameBuffer;
                 }
-
-                aRenderContext->present();
             }
 
             return { EEngineStatus::Ok };
@@ -397,8 +439,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeRenderPassAndFrameBuffer(
                 CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                std::string                               const &aFrameBufferId,
-                std::string                               const &aRenderPassId)
+                std::string                               const &aRenderPassId,
+                std::string                               const &aFrameBufferId)
         {
             std::vector<CStdSharedPtr_t<SFrameGraphTexture>>     textureReferences{};
             std::vector<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewReferences{};
@@ -426,8 +468,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeRenderPassAndFrameBuffer(
                 CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                std::string                               const &aFrameBufferId,
-                std::string                               const &aRenderPassId)
+                std::string                               const &aRenderPassId,
+                std::string                               const &aFrameBufferId)
         {
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
             FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementResourceIds();

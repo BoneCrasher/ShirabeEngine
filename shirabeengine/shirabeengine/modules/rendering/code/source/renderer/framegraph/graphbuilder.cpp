@@ -59,7 +59,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CGraphBuilder::CGraphBuilder()
-            : mApplicationEnvironment (nullptr                                   )
+            : mGraphMode              (framegraph::CGraph::EGraphMode::Compute   )
+            , mRenderToBackBuffer     (false                                     )
+            , mOutputResourceId       (0                                         )
+            , mApplicationEnvironment (nullptr                                   )
             , mDisplay                (nullptr                                   )
             , mPassUIDGenerator       (std::make_shared<CSequenceUIDGenerator>(0))
             , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator>(1))
@@ -349,8 +352,9 @@ namespace engine
             accessor->mutableResources()     = std::move(this->mResources);
             accessor->mutableResourceData().mergeIn(this->mResourceData);
 
-            accessor->mutableGraphMode()          = mGraphMode;
-            accessor->mutableRenderToBackBuffer() = mRenderToBackBuffer;
+            accessor->mutableGraphMode()               = mGraphMode;
+            accessor->mutableRenderToBackBuffer()      = mRenderToBackBuffer;
+            accessor->mutableOutputTextureResourceId() = mOutputResourceId;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             accessor->mutableResourceAdjacency()       = std::move(this->mResourceAdjacency);

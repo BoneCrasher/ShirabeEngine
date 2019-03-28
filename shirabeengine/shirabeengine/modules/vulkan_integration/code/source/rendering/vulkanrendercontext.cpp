@@ -75,12 +75,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::copyToBackBuffer(PublicResourceId_t const &aImageId)
+        EEngineStatus CVulkanRenderContext::copyToBackBuffer(PublicResourceId_t const &aSourceImageId)
         {
-            CEngineResult<CStdSharedPtr_t<SVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aImageId);
+            CEngineResult<CStdSharedPtr_t<SVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
             if(not resourceFetch.successful())
             {
-                CLog::Error(logTag(), "Failed to fetch copy source image '%0'.", aImageId);
+                CLog::Error(logTag(), "Failed to fetch copy source image '%0'.", aSourceImageId);
                 return resourceFetch.result();
             }
 
@@ -109,7 +109,7 @@ namespace engine
             vkCmdPipelineBarrier(vkCommandBuffer,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                 VkDependencyFlagBits::VK_DEPENDENCY_BY_REGION_BIT,
+                                 VkDependencyFlagBits   ::VK_DEPENDENCY_BY_REGION_BIT,
                                  0, nullptr,
                                  0, nullptr,
                                  1, &vkImageMemoryBarrier);
@@ -202,7 +202,7 @@ namespace engine
             vkCmdPipelineBarrier(vkCommandBuffer,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-                                 VkDependencyFlagBits::VK_DEPENDENCY_BY_REGION_BIT,
+                                 VkDependencyFlagBits   ::VK_DEPENDENCY_BY_REGION_BIT,
                                  0, nullptr,
                                  0, nullptr,
                                  1, &vkImageMemoryBarrier);

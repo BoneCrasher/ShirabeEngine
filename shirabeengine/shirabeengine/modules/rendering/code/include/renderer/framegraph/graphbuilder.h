@@ -74,6 +74,11 @@ namespace engine
             SHIRABE_INLINE
             void setGraphMode(framegraph::CGraph::EGraphMode const &aMode)
             {
+                if(framegraph::CGraph::EGraphMode::Graphics != aMode && mRenderToBackBuffer)
+                {
+                    return; // render to backbuffer implies graphics mode.
+                }
+
                 mGraphMode = aMode;
             }
 
@@ -81,6 +86,13 @@ namespace engine
             void setRenderToBackBuffer(bool const &aRenderToBackBuffer)
             {
                 mRenderToBackBuffer = aRenderToBackBuffer;
+                setGraphMode(framegraph::CGraph::EGraphMode::Graphics);
+            }
+
+            SHIRABE_INLINE
+            void setOutputTextureResourceId(FrameGraphResourceId_t const &aOutputResourceId)
+            {
+                mOutputResourceId = aOutputResourceId;
             }
 
             /**
@@ -302,8 +314,9 @@ EST_EXPORT CGraphBuilder
 
         private_members:
 
-            framegraph::CGraph::EGraphMode mGraphMode;
-            bool                           mRenderToBackBuffer;
+            framegraph::CGraph::EGraphMode                         mGraphMode;
+            bool                                                   mRenderToBackBuffer;
+            FrameGraphResourceId_t                                 mOutputResourceId;
 
             CStdSharedPtr_t<SApplicationEnvironment>               mApplicationEnvironment;
             CStdSharedPtr_t<wsi::CWSIDisplay>                      mDisplay;

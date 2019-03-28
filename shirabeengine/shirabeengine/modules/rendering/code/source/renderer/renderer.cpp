@@ -214,6 +214,8 @@ namespace engine
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer).data();
 
+            graphBuilder.setOutputTextureResourceId(compositingExportData.output);
+
             // Present
             // CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
             // presentPassExportData =

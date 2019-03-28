@@ -63,11 +63,11 @@ namespace engine
             /**
              * Copy the content of an image to the backbuffer.
              *
-             * @param aImageId
+             * @param aSourceImageId
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage) = 0;
+            virtual CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId) = 0;
 
             //
             // SwapChain and Presentation
@@ -80,7 +80,7 @@ namespace engine
              * @return                    EEngineStatus::Ok if successful.
              * @return                    EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> bindSwapChain(SFrameGraphResource const &aSwapChainResource) = 0;
+            virtual CEngineResult<> bindSwapChain(std::string const &aSwapChainId) = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.

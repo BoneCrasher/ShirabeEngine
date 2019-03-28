@@ -83,7 +83,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            CEngineResult<> copyToBackBuffer(SFrameGraphTexture const &aImage);
+            CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId);
 
             /**
              * Bind a swapchain, if any, for further framegraph operations.
@@ -92,7 +92,7 @@ namespace engine
              * @return                    EEngineStatus::Ok if successful.
              * @return                    EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindSwapChain(SFrameGraphResource const &aSwapChainResource);
+            CEngineResult<> bindSwapChain(std::string const &aSwapChainId);
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.

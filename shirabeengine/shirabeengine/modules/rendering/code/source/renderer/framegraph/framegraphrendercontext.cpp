@@ -127,9 +127,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::copyToBackBuffer(SFrameGraphTexture const &aImage)
+        CEngineResult<> CFrameGraphRenderContext::copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId)
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->copyToBackBuffer(aImage.readableName);
+            CEngineResult<> const status = mGraphicsAPIRenderContext->copyToBackBuffer(aSourceImageId.readableName);
 
             return status;
         }
@@ -138,9 +138,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindSwapChain(SFrameGraphResource const &aSwapChainResource)
+        CEngineResult<> CFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(aSwapChainResource.readableName);
+            CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(aSwapChainId);
 
             return status;
         }

@@ -72,6 +72,7 @@ namespace engine
 #endif
                 EGraphMode                                                   graphMode()               const;
                 bool                                                         renderToBackBuffer()      const;
+                FrameGraphResourceId_t                                const &outputTextureResourceId() const;
 
             private_members:
                 CGraph const *m_graph;
@@ -103,6 +104,7 @@ namespace engine
 #endif                
                 EGraphMode                                            &mutableGraphMode();
                 bool                                                  &mutableRenderToBackBuffer();
+                FrameGraphResourceId_t                                &mutableOutputTextureResourceId();
 
                 /**
                  * Create a new pass of type TPass given a uid and name.
@@ -127,6 +129,7 @@ namespace engine
         private_static_fields:
             static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
             static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
+            static constexpr char const *sSwapChainResourceId   = "BackBuffer";
 
         public_methods:
             /**
@@ -409,6 +412,7 @@ namespace engine
 
             EGraphMode                            mGraphMode;
             bool                                  mRenderToBackBuffer;
+            FrameGraphResourceId_t                mOutputTextureResourceId;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             AdjacencyListMap_t<FrameGraphResourceId_t>            mResourceAdjacency;
