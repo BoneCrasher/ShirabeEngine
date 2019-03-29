@@ -69,6 +69,15 @@ namespace engine
                 result = EEngineStatus::Timer_PlatformTimeInstanceInitFailed;
 			}
 
+            result = mTimeInterface->getConversionConstant(mConversionConstant);
+            if (CheckEngineError(result))
+            {
+                CLog::Error(logTag(),
+                            "Couldn't fetch the timer conversion constant.");
+
+                result = EEngineStatus::Timer_PlatformTimeInstanceInitFailed;
+            }
+
             timespec initial = {};
             result = mTimeInterface->getTimestamp(initial);
             if (CheckEngineError(result))
@@ -132,6 +141,8 @@ namespace engine
             else {
                 mCurrent = static_cast<uint64_t>(current.tv_sec * 1000000000) + static_cast<uint64_t>(current.tv_nsec);
                 mElapsed = (mCurrent - mElapsed);
+
+                mTickElapsed += elapsed(ETimeUnit::MilliSeconds);
 
                 mChunkCounter += elapsed(ETimeUnit::Seconds);
                 if (mChunkCounter >= 1.0)

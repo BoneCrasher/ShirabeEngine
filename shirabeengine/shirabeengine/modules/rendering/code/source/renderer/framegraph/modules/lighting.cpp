@@ -101,6 +101,7 @@ namespace engine
 
                 CLog::Verbose(logTag(), "Lighting");
 
+
                 return { EEngineStatus::Ok };
             };
 

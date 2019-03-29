@@ -856,7 +856,7 @@ namespace engine
             vkCommandPoolCreateInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
             vkCommandPoolCreateInfo.pNext            = nullptr;
             vkCommandPoolCreateInfo.queueFamilyIndex = graphicsQueueIndices.at(0);
-            vkCommandPoolCreateInfo.flags            = 0;
+            vkCommandPoolCreateInfo.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
             VkCommandPool vkCommandPool = VK_NULL_HANDLE;
 

@@ -92,6 +92,24 @@ namespace engine
          * @return
          */
 		float FPS();
+
+        SHIRABE_INLINE
+        void setTickDeltaMilliseconds(double const &aTickDeltaMilliseconds)
+        {
+            mTickDelta = aTickDeltaMilliseconds;
+        }
+
+        SHIRABE_INLINE
+        bool isTick()
+        {
+            return (mTickElapsed >= mTickDelta);
+        }
+
+        SHIRABE_INLINE
+        void resetTick()
+        {
+            mTickElapsed -= mTickDelta;
+        }
 		
     private_typedefs:
 
@@ -114,13 +132,16 @@ namespace engine
         CStdSharedPtr_t<InternalTimeType_t> mTimeInterface;
 
         InternalTimeValueType_t             mConversionConstant;
-        uint64_t             mInitial;
-        uint64_t             mCurrent;
-        uint64_t             mElapsed;
+        uint64_t                            mInitial;
+        uint64_t                            mCurrent;
+        uint64_t                            mElapsed;
 
         FPSDataStore_t                      mDataStore;
         double                              mChunkCounter;
         int                                 mFrames;
+
+        double                              mTickElapsed;
+        double                              mTickDelta;
 	};
 }
 

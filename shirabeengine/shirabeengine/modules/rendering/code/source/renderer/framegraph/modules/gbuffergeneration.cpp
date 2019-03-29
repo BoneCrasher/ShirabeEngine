@@ -127,8 +127,6 @@ namespace engine
                 }
 #endif
 
-                aRenderContext->beginPass();
-
                 for(FrameGraphResourceId_t const &renderableId : renderableView->renderableRefIndices)
                 {
                     FrameGraphRenderable_t const &renderable = renderableList->renderableList.at(renderableId);
@@ -140,8 +138,6 @@ namespace engine
                         return { renderCall.result() };
                     }
                 }
-
-                aRenderContext->endPass();
 
                 return { EEngineStatus::Ok };
             };

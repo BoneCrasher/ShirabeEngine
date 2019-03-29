@@ -26,7 +26,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     EEngineStatus CLinuxTime::getTimestamp(InternalTimeValueType_t &aBuffer) const
     {
-        EEngineStatus const result = getClockResolution(aBuffer);
+        EEngineStatus const result = getClockTimestamp(aBuffer);
 
         return result;
 	};
@@ -65,7 +65,7 @@ namespace engine
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-        if(!clock_getres(CLOCK_REALTIME, &aBuffer))
+        if(0 > clock_getres(CLOCK_REALTIME, &aBuffer))
         {
 #ifdef _DEBUG
             CLog::Error(logTag(),
@@ -86,7 +86,7 @@ namespace engine
 	{
 		EEngineStatus result = EEngineStatus::Ok;
 
-        if (!clock_gettime(CLOCK_REALTIME, &aBuffer))
+        if (0 > clock_gettime(CLOCK_REALTIME, &aBuffer))
         {
 #ifdef _DEBUG
             CLog::Error(logTag(),

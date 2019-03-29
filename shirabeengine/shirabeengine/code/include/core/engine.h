@@ -5,6 +5,7 @@
 #include <os/applicationenvironment.h>
 #include <core/enginestatus.h>
 #include <core/enginetypehelper.h>
+#include <core/benchmarking/timer/timer.h>
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
 #include <resources/core/resourceproxyfactory.h>
@@ -73,6 +74,9 @@ namespace engine
     private_members:
         // Application
         CStdSharedPtr_t<os::SApplicationEnvironment> mApplicationEnvironment;
+
+        // Timing
+        CTimer                                 mTimer;
 
         // WSI
         CStdSharedPtr_t<CWindowManager>        mWindowManager;

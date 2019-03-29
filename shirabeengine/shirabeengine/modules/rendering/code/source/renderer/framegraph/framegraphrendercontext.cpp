@@ -97,7 +97,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::beginPass()
         {
-            return { EEngineStatus::Error };
+            CEngineResult<> const status = mGraphicsAPIRenderContext->beginSubpass();
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 
@@ -106,7 +108,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::endPass()
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->beginSubpass();
+            CEngineResult<> const status = mGraphicsAPIRenderContext->endSubpass();
 
             return status;
         }
@@ -191,11 +193,13 @@ namespace engine
             //<-----------------------------------------------------------------------------
             // Helper function to find attachment indices in index lists.
             //<-----------------------------------------------------------------------------
-            auto const findAttachmentRelationFn = [] (Vector<uint64_t> const &aRelationIndices, uint64_t const &aIndex) -> bool
+            auto const findAttachmentRelationFn = [] (Vector<FrameGraphResourceId_t> const &aResourceIdIndex,
+                                                      Vector<uint64_t>               const &aRelationIndices,
+                                                      uint64_t                       const &aIndex)            -> bool
             {
                 auto const predicate = [&] (uint64_t const &aTestIndex) -> bool
                 {
-                    return (aIndex == aTestIndex);
+                    return ( (aResourceIdIndex.size() > aTestIndex) and (aIndex == aResourceIdIndex.at(aTestIndex)) );
                 };
 
                 auto const &iterator = std::find_if(aRelationIndices.begin(), aRelationIndices.end(), predicate);
@@ -297,9 +301,9 @@ namespace engine
 
                     renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
 
-                    bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getColorAttachments(), attachmentIndex + 1);
-                    bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getDepthAttachments(), attachmentIndex + 1);
-                    bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getInputAttachments(), attachmentIndex + 1);
+                    bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
+                    bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
+                    bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
 
                     SAttachmentReference attachmentReference {};
                     attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);

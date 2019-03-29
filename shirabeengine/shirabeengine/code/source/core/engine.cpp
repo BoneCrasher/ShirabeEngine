@@ -342,6 +342,9 @@ namespace engine
         {
             CEngineResult<> creation = { EEngineStatus::Ok };
 
+            mTimer.initialize();
+            mTimer.setTickDeltaMilliseconds(1000.0 / 60.0);
+
             creation = fnCreatePlatformWindowSystem();
             creation = fnCreateDefaultGFXAPI();
             creation = fnCreatePlatformResourceSystem();
@@ -394,6 +397,8 @@ namespace engine
                 mMainWindow = nullptr;
         }
 
+        mTimer.cleanup();
+
         mWindowManager = nullptr;
 
         return status;
@@ -406,11 +411,20 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineResult<> CEngineInstance::update()
     {
+        mTimer.update();
+
         if(CheckWindowManagerError(mWindowManager->update()))
         {
                 CLog::Error(logTag(), "Failed to update window manager.");
                 return { EEngineStatus::UpdateError };
+        }        
+
+        if(not mTimer.isTick())
+        {
+            return { EEngineStatus::Ok };
         }
+
+        mTimer.resetTick();
 
         mScene.update();
 

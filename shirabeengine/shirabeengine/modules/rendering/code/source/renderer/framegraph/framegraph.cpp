@@ -283,8 +283,10 @@ namespace engine
             }
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
-            while(!copy.empty())
+            while(not copy.empty())
             {
+                aRenderContext->beginPass();
+
                 PassUID_t                             const passUID  = copy.top();
                 CStdSharedPtr_t<CPassBase>            const pass     = mPasses.at(passUID);
                 CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
@@ -296,6 +298,11 @@ namespace engine
                     return {executed};
                 }
 
+                if( copy.size() > 2) // Implicit last pass '0' and effective last pass --> 2 passes
+                {
+                    aRenderContext->endPass();
+                }
+
                 copy.pop();
             }
 
@@ -303,14 +310,21 @@ namespace engine
             {
                 aRenderContext->unbindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>> sourceResourceFetch = mResourceData.get<SFrameGraphTexture>(mOutputTextureResourceId);
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> sourceResourceFetch = mResourceData.get<SFrameGraphTextureView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
                 {
-                    CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer."));
+                    CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture view."));
                     return {sourceResourceFetch.result()};
                 }
 
-                aRenderContext->copyImageToBackBuffer(*(sourceResourceFetch.data()));
+                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>> parentResourceFetch = mResourceData.get<SFrameGraphTexture>(sourceResourceFetch.data()->subjacentResource);
+                if(not parentResourceFetch.successful())
+                {
+                    CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));
+                    return {sourceResourceFetch.result()};
+                }
+
+                aRenderContext->copyImageToBackBuffer(*(parentResourceFetch.data()));
             }
 
             // In any case...
