@@ -36,6 +36,20 @@ namespace engine
             Texture             ,
             Buffer              ,
         };
+
+        /**
+         * The EAssetType enum describes detailed asset categorization.
+         */
+        enum class EAssetSubtype
+        {
+            Undefined = 0,
+            /** Material **/
+            Master    = 10,
+            Signature,
+            Config,
+            SPVModule,
+            Instance
+        };
         
         /**
          * The SAsset struct is the common descriptor for an engine asset.
@@ -44,7 +58,9 @@ namespace engine
         {
         public_members:
             AssetId_t             id;
+            AssetId_t             parent;
             EAssetType            type;
+            EAssetSubtype         subtype;
             std::filesystem::path uri;
         };
 
@@ -78,6 +94,28 @@ namespace engine
             ByteBuffer data;
             uint32_t   width, height, channels;
         };
+
+        /**
+         * Base class of all created assets to store the referenced
+         * asset id.
+         */
+        class CAssetReference
+        {
+        public_constructors:
+            SHIRABE_INLINE
+            CAssetReference(AssetId_t const &aAssetId)
+                : mAssetId(aAssetId)
+            {}
+
+            SHIRABE_INLINE
+            AssetId_t const &getAssetId() const
+            {
+                return mAssetId;
+            }
+
+        private_members:
+            AssetId_t mAssetId;
+        };
     }
 
     /**
@@ -88,6 +126,15 @@ namespace engine
      *               If not matched, EAssetType::Undefined is returned.
      */
     template <> asset::EAssetType from_string<asset::EAssetType>(std::string const &aInput);
+
+    /**
+     * Extract an EAssetSubtype from string.
+     *
+     * @param aInput Input string.
+     * @return       A EAssetType representation of the input string.
+     *               If not matched, EAssetType::Undefined is returned.
+     */
+    template <> asset::EAssetSubtype from_string<asset::EAssetSubtype>(std::string const &aInput);
 }
 
 #endif

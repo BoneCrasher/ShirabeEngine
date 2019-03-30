@@ -91,13 +91,17 @@ namespace engine
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry)
         {
-            std::string const aid  = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"aid"));
-            std::string const type = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"type"));
-            std::string const uri  = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"uri"));
+            std::string const aid     = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"aid"));
+            std::string const parent  = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"parent_aid"));
+            std::string const type    = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"type"));
+            std::string const subtype = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"subtype"));
+            std::string const uri     = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"uri"));
 
             SAsset a = {};
             a.id     = from_string<AssetId_t>(aid);
+            a.parent = from_string<AssetId_t>(parent);
             a.type   = from_string<EAssetType>(type);
+            a.type   = from_string<EAssetSubtype>(type);
             a.uri    = uri;
 
             aOutRegistry.addAsset(a.id, a);

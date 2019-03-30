@@ -40,6 +40,23 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<SAsset> CAssetStorage::assetFromUri(std::filesystem::path const &aUri)
+        {
+            for(auto const &[uid, asset]: mAssetIndex)
+            {
+                if(0 == asset.uri.compare(aUri))
+                {
+                    return { EEngineStatus::Ok, asset };
+                }
+            }
+
+            return { EEngineStatus::Error };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         // AssetId_t CAssetStorage::createDynamicTextureAsset(std::string  const &aName,
         //                                                    STextureInfo const &aTextureInfo)
         // {

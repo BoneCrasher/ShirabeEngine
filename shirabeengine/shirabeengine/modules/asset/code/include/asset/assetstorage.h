@@ -21,6 +21,15 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IAssetStorage);
 
         public_api:
+
+            /**
+             * Determine an asset by Uid.
+             *
+             * @param aUri
+             * @return
+             */
+            virtual CEngineResult<SAsset> assetFromUri(std::filesystem::path const &aUri) = 0;
+
             /**
              * Register an asset in the index and write the provided byte buffer as asset
              * data to the harddisk (if not empty).
@@ -80,6 +89,14 @@ namespace engine
              * @param aIndex
              */
             void readIndex(AssetRegistry_t const &aIndex);
+
+            /**
+             * Determine an asset by Uid.
+             *
+             * @param aUri
+             * @return
+             */
+            CEngineResult<SAsset> assetFromUri(std::filesystem::path const &aUri);
 
             /**
              * @brief createAsset

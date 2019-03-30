@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<Index>
+  <!-- <Asset aid="1" parent_aid="0" type="Mesh"     uri="sphere.mesh"                       /> //-->
+  <Asset aid="2" parent_aid="0" type="Material" subtype="Master"    uri="shaders/standard.mat.index"                />
+  <Asset aid="3" parent_aid="2" type="Material" subtype="Signature" uri="shaders/standard.mat.signature"            />
+  <Asset aid="4" parent_aid="3" type="Material" subtype="Config"    uri="shaders/standard.mat.config"               />
+  <Asset aid="5" parent_aid="3" type="Material" subtype="SPVModule" uri="shaders/standard.vert.glsl.spv"            />
+  <Asset aid="6" parent_aid="3" type="Material" subtype="SPVModule" uri="shaders/standard.frag.glsl.spv"            />
+  <Asset aid="7" parent_aid="2" type="Material" subtype="Instance"  uri="shaders/standard.mat.instance_0000.index"  />
+  <Asset aid="8" parent_aid="7" type="Material" subtype="Config"    uri="shaders/standard.mat.instance_0000.config" />
+  <!-- <Asset aid="4" parent_aid="0" type="Texture"  uri="sphere_default_diffuse.texture"    /> //-->
+  <!-- <Asset aid="5" parent_aid="0" type="Texture"  uri="sphere_default_spec_gloss.texture" /> //-->
+  <!-- <Asset aid="6" parent_aid="0" type="Texture"  uri="sphere_default_normal.texture"     /> //-->
+</Index>

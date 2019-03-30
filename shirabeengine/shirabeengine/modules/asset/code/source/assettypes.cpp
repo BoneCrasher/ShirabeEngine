@@ -24,4 +24,27 @@ namespace engine
         return EAssetType::Undefined;
     }
     //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <>
+    asset::EAssetSubtype from_string<asset::EAssetSubtype>(std::string const &aInput)
+    {
+        using namespace asset;
+
+        if(0 == aInput.compare("Master"))
+            return EAssetSubtype::Master;
+        if(0 == aInput.compare("Signature"))
+            return EAssetSubtype::Signature;
+        if(0 == aInput.compare("Config"))
+            return EAssetSubtype::Config;
+        if(0 == aInput.compare("SPVModule"))
+            return EAssetSubtype::SPVModule;
+        if(0 == aInput.compare("Instance"))
+            return EAssetSubtype::Instance;
+
+        return EAssetSubtype::Undefined;
+    }
+    //<-----------------------------------------------------------------------------
 }

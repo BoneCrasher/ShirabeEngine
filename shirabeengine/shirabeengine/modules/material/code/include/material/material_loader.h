@@ -16,6 +16,7 @@ namespace engine
     namespace material
     {
         class CMaterial;
+        class CMaterialInstance;
 
         /**
          * @brief The CMaterialLoader class
@@ -32,16 +33,35 @@ namespace engine
             CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> &aAssetStorage);
 
         public_methods:
+
+            /**
+             * During editing-time, request the creation of a new material instance based on a base material asset id.
+             * This will register a new material instance in the asset manager and load the base material.
+             *
+             * @param aNewMaterialAssetId
+             * @param aBaseMaterialAssetId
+             * @return
+             */
+            CEngineResult<CStdSharedPtr_t<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
+
             /**
              * @brief loadMaterial
              * @param aMaterialId
              * @return
              */
-            CEngineResult<CStdSharedPtr_t<CMaterial>> loadMaterial(std::string const &aMaterialId);
+            CEngineResult<CStdSharedPtr_t<CMaterialInstance>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
+
+            /**
+             * @brief destroyMaterialInstance
+             * @param aMaterialInstanceAssetId
+             * @return
+             */
+            CEngineResult<> destroyMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
 
         private_methods:
-            CStdSharedPtr_t<asset::IAssetStorage> &mStorage;
-            Map<std::string, asset::AssetID_t>     mMaterial2AssetMapping;
+            CStdSharedPtr_t<asset::IAssetStorage>                    &mStorage;
+            Map<asset::AssetID_t, CStdSharedPtr_t<CMaterial>>         mInstantiatedMaterialMasters;
+            Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialInstance>> mInstantiatedMaterialInstances;
         };
 
     }
