@@ -108,6 +108,65 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        static
+        auto loadMasterMaterial(std::string                                             const &aLogTag,
+                                CStdSharedPtr_t<asset::IAssetStorage>                         &aAssetStorage,
+                                Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>       &aMasterMaterialIndex,
+                                asset::AssetID_t                                        const &aMasterMaterialAssetId) -> std::tuple<bool, std::string, SMaterialMasterIndex, SMaterialSignature, CMaterialConfig>
+        {
+            bool const masterAlreadyLoaded = (aMasterMaterialIndex.end() != aMasterMaterialIndex.find(aMasterMaterialAssetId));
+            if(not masterAlreadyLoaded)
+            {
+                return { false, {}, {}, {}, {} };
+            }
+
+            AssetID_t                       masterIndexId      = 0; // Needs to be here, since it will be shared across both case-blocks.
+            CResult<SMaterialMasterIndex>   masterIndexFetch   = {};
+
+            masterIndexFetch = readMaterialMasterIndexFile(aLogTag, aAssetStorage.get(), masterIndexId);
+            if(not masterIndexFetch.successful())
+            {
+                return { false, {}, {}, {}, {} };
+            }
+
+            SMaterialMasterIndex const &masterIndex = masterIndexFetch.data();
+
+            // Fetch signature
+            CEngineResult<SAsset> signatureAssetFetch  = aAssetStorage->assetFromUri(masterIndex.signatureFilename);
+            if(not signatureAssetFetch.successful())
+            {
+                return { false, {}, {}, {}, {} };
+            }
+
+            CEngineResult<SAsset> baseConfigAssetFetch = aAssetStorage->assetFromUri(masterIndex.baseConfigurationFilename);
+            if(not baseConfigAssetFetch.successful())
+            {
+                return { false, {}, {}, {}, {} };
+            }
+
+            CResult<SMaterialSignature> signatureFetch = readMaterialSignature(aLogTag, aAssetStorage.get(), signatureAssetFetch.data().id);
+            if(not signatureFetch.successful())
+            {
+                return { false, {}, {}, {}, {} };
+            }
+
+            CResult<CMaterialConfig> masterConfigFetch = readMaterialConfig(aLogTag, aAssetStorage.get(), baseConfigAssetFetch.data().id);
+            if(not masterConfigFetch.successful())
+            {
+                return { false, {}, {}, {}, {} };
+            }
+
+            std::string        const  masterName      = masterIndex.name;
+            SMaterialSignature const &masterSignature = signatureFetch.data();
+            CMaterialConfig    const &masterConfig    = masterConfigFetch.data();
+
+            return { true, masterName, masterIndex, masterSignature, masterConfig };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
         {
             CEngineResult<ByteBuffer> data = {};
@@ -130,82 +189,30 @@ namespace engine
             bool processInstance = false;
 
             AssetID_t                       masterIndexId      = 0; // Needs to be here, since it will be shared across both case-blocks.
-            CResult<SMaterialMasterIndex>   masterIndexFetch   = {};
             CResult<SMaterialInstanceIndex> instanceIndexFetch = {};
 
             SAsset const asset = assetFetch.data();
-            //switch(asset.type)
-            //{
-            //case asset::EAssetType::MaterialInstance:
-            //{
-            //    processInstance = true;
 
-            // AssetID_t const instanceIndexId  = rootAssetId;
-
-                instanceIndexFetch = readMaterialInstanceIndexFile(logTag(), mStorage.get(), instanceAssetId);
-                if(not instanceIndexFetch.successful())
-                {
-                    return { EEngineStatus::Error };
-                }
-
-                // Make sure to fetch master index w/ the corresponding asset UID as well ( fallthrough case ).
-                SMaterialInstanceIndex const instanceIndex = instanceIndexFetch.data();
-
-                masterIndexId = asset.parent;
-                if(0_uid == masterIndexId)
-                {
-                    return { EEngineStatus::Error };
-                }
-            // }
-            // [[fallthrough]];
-            // case asset::EAssetType::MaterialMaster:
-            // {
-                masterIndexFetch = readMaterialMasterIndexFile(logTag(), mStorage.get(), masterIndexId);
-                if(not masterIndexFetch.successful())
-                {
-                    return { EEngineStatus::Error };
-                }
-            //    break;
-            // }
-            // default:
-            //     return { EEngineStatus::Error };
-            // }
-
-            //--------------------------------------------------------------------------------------------------------------------
-            // Process master
-            //--------------------------------------------------------------------------------------------------------------------
-            SMaterialMasterIndex const &masterIndex = masterIndexFetch.data();
-
-            // Fetch signature
-            CEngineResult<SAsset> signatureAssetFetch  = mStorage->assetFromUri(masterIndex.signatureFilename);
-            if(not signatureAssetFetch.successful())
-            {
-                return { signatureAssetFetch.result() };
-            }
-
-            CEngineResult<SAsset> baseConfigAssetFetch = mStorage->assetFromUri(masterIndex.baseConfigurationFilename);
-            if(not baseConfigAssetFetch.successful())
-            {
-                return { baseConfigAssetFetch.result() };
-            }
-
-            CResult<SMaterialSignature> signatureFetch = readMaterialSignature(logTag(), mStorage.get(), signatureAssetFetch.data().id);
-            if(not signatureFetch.successful())
+            instanceIndexFetch = readMaterialInstanceIndexFile(logTag(), mStorage.get(), instanceAssetId);
+            if(not instanceIndexFetch.successful())
             {
                 return { EEngineStatus::Error };
             }
 
-            CResult<CMaterialConfig> masterConfigFetch = readMaterialConfig(logTag(), mStorage.get(), baseConfigAssetFetch.data().id);
-            if(not masterConfigFetch.successful())
+            // Make sure to fetch master index w/ the corresponding asset UID as well ( fallthrough case ).
+            SMaterialInstanceIndex const instanceIndex = instanceIndexFetch.data();
+
+            masterIndexId = asset.parent;
+            if(0_uid == masterIndexId)
             {
                 return { EEngineStatus::Error };
             }
 
-            std::string        const  masterName      = masterIndex.name;
-            SMaterialSignature const &masterSignature = signatureFetch.data();
-            CMaterialConfig    const &masterConfig    = masterConfigFetch.data();
+            // TBD: Refactor to const& again, when there's time this week.
+            auto [successful, masterName, masterIndex, masterSignature, masterConfig] = loadMasterMaterial(logTag(), mStorage, mInstantiatedMaterialMasters, masterIndexId);
+
             std::string        const  instanceName    = instanceIndex.name;
-            CMaterialConfig          &instanceConfig  = masterConfigFetch.data(); // Not const. Possibly overwritten.
+            CMaterialConfig          &instanceConfig  = masterConfig;
 
             //--------------------------------------------------------------------------------------------------------------------
             // If we process an instance...
@@ -219,15 +226,12 @@ namespace engine
                     return { configAssetFetch.result() };
                 }
 
-
                 CResult<CMaterialConfig> const configFetch = readMaterialConfig(logTag(), mStorage.get(), configAssetFetch.data().id);
                 if(not configFetch.successful())
                 {
                     return { EEngineStatus::Error };
                 }
 
-                // Copy master to instance.
-                instanceConfig = masterConfig;
                 // And override values.
                 CMaterialConfig const &overrideConfig = configFetch.data();
                 instanceConfig.override(overrideConfig);
@@ -236,9 +240,11 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Create Material instance
             //--------------------------------------------------------------------------------------------------------------------
-            CStdSharedPtr_t<CMaterialMaster>   master   = makeCStdSharedPtr<CMaterialMaster>(masterIndexId, masterName, std::move(masterSignature), std::move(masterConfig));
-            CStdSharedPtr_t<CMaterialInstance> instance = makeCStdSharedPtr<CMaterialInstance>(instanceAssetId, instanceName, std::move(instanceConfig));
+            CStdSharedPtr_t<CMaterialMaster>   master   = makeCStdSharedPtr<CMaterialMaster>  (masterIndexId,   masterName,   std::move(masterSignature), std::move(masterConfig));
+            CStdSharedPtr_t<CMaterialInstance> instance = makeCStdSharedPtr<CMaterialInstance>(instanceAssetId, instanceName, std::move(instanceConfig),  master);
 
+            mInstantiatedMaterialMasters  [master->getAssetId()]   = master;
+            mInstantiatedMaterialInstances[instance->getAssetId()] = instance;
 
             // CEngineResult<CMaterialLayer *> layerAddition = material->addLayer("Default");
             // if(not layerAddition.successful())

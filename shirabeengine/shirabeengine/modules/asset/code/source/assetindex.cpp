@@ -98,11 +98,11 @@ namespace engine
             std::string const uri     = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"uri"));
 
             SAsset a = {};
-            a.id     = from_string<AssetId_t>(aid);
-            a.parent = from_string<AssetId_t>(parent);
-            a.type   = from_string<EAssetType>(type);
-            a.type   = from_string<EAssetSubtype>(type);
-            a.uri    = uri;
+            a.id      = from_string<AssetId_t>(aid);
+            a.parent  = from_string<AssetId_t>(parent);
+            a.type    = from_string<EAssetType>(type);
+            a.subtype = from_string<EAssetSubtype>(type);
+            a.uri     = uri;
 
             aOutRegistry.addAsset(a.id, a);
         }

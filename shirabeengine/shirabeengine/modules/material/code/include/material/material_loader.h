@@ -15,7 +15,7 @@ namespace engine
 
     namespace material
     {
-        class CMaterial;
+        class CMaterialMaster;
         class CMaterialInstance;
 
         /**
@@ -59,8 +59,10 @@ namespace engine
             CEngineResult<> destroyMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
 
         private_methods:
+
+        private_members:
             CStdSharedPtr_t<asset::IAssetStorage>                    &mStorage;
-            Map<asset::AssetID_t, CStdSharedPtr_t<CMaterial>>         mInstantiatedMaterialMasters;
+            Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>   mInstantiatedMaterialMasters;
             Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialInstance>> mInstantiatedMaterialInstances;
         };
 
