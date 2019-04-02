@@ -13,6 +13,11 @@
 
 namespace engine
 {
+    namespace material
+    {
+        class CMaterialLoader;
+    }
+
     namespace rendering
     {
         class IRenderContext;
@@ -22,6 +27,7 @@ namespace engine
     {
         using engine::asset::AssetId_t;
         using engine::asset::IAssetStorage;
+        using engine::material::CMaterialLoader;
         using namespace engine::resources;
         using namespace engine::gfxapi;
         using namespace engine::rendering;
@@ -44,6 +50,7 @@ namespace engine
              */
             static CEngineResult<CStdSharedPtr_t<CFrameGraphRenderContext>> create(
                     CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
+                    CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
                     CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                     CStdSharedPtr_t<IRenderContext>       aRenderer);
 
@@ -391,6 +398,7 @@ namespace engine
              */
             CFrameGraphRenderContext(
                     CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
+                    CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
                     CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                     CStdSharedPtr_t<IRenderContext>       aRenderer);
 
@@ -425,6 +433,7 @@ namespace engine
 
         private_members:
             CStdSharedPtr_t<IAssetStorage>        mAssetStorage;
+            CStdSharedPtr_t<CMaterialLoader>      mMaterialLoader;
             CStdSharedPtr_t<CResourceManagerBase> mResourceManager;
             CStdSharedPtr_t<IRenderContext>       mGraphicsAPIRenderContext;
 

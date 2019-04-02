@@ -2,6 +2,8 @@
 
 #include <graphicsapi/resources/types/renderpass.h>
 #include <graphicsapi/resources/types/framebuffer.h>
+#include <material/material_loader.h>
+#include <material/material_declaration.h>
 
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
@@ -11,17 +13,20 @@ namespace engine
     namespace framegraph
     {
         using namespace engine::rendering;
+        using namespace engine::material;
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         CEngineResult<CStdSharedPtr_t<CFrameGraphRenderContext>> CFrameGraphRenderContext::create(
                 CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
+                CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
                 CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                 CStdSharedPtr_t<IRenderContext>       aRenderer)
         {
             bool const inputInvalid =
                     nullptr == aAssetStorage    or
+                    nullptr == aMaterialLoader  or
                     nullptr == aResourceManager or
                     nullptr == aRenderer;
 
@@ -30,7 +35,7 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            CStdSharedPtr_t<CFrameGraphRenderContext> context = CStdSharedPtr_t<CFrameGraphRenderContext>(new CFrameGraphRenderContext(aAssetStorage, aResourceManager, aRenderer));
+            CStdSharedPtr_t<CFrameGraphRenderContext> context = CStdSharedPtr_t<CFrameGraphRenderContext>(new CFrameGraphRenderContext(aAssetStorage, aMaterialLoader, aResourceManager, aRenderer));
             if(not context)
             {
                 CLog::Error(logTag(), "Failed to create render context from renderer and resourcemanager.");
@@ -48,9 +53,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CFrameGraphRenderContext::CFrameGraphRenderContext(
                 CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
+                CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
                 CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                 CStdSharedPtr_t<IRenderContext>       aRenderer)
             : mAssetStorage(aAssetStorage)
+            , mMaterialLoader(aMaterialLoader)
             , mResourceManager(aResourceManager)
             , mGraphicsAPIRenderContext(aRenderer)
         {}
@@ -728,6 +735,25 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::render(SRenderable const &aRenderable)
         {
             SHIRABE_UNUSED(aRenderable);
+
+            auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aRenderable.materialAssetId);
+            if(CheckEngineError(result))
+            {
+                return { result };
+            }
+
+            CStdSharedPtr_t<CMaterialMaster> const &master    = instance->master();
+            SMaterialSignature               const &signature = master  ->signature();
+            CMaterialConfig                  const &config    = instance->config();
+
+            //
+            // Traverse signature and derive pipeline configuration UNLESS a pipeline was
+            // created already for the given material instance.
+            //
+            // TODO: ResourceManager needs "hasResource"-method to check for a
+            //       proxy already created for a specific name.
+            //
+
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------

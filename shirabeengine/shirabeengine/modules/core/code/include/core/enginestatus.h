@@ -138,6 +138,7 @@ namespace engine
         // Reuse the base class constructors.
         using AResult<EEngineStatus, TData>::AResult;
         using AResult<EEngineStatus, TData>::operator=;
+        using AResult<EEngineStatus, TData>::get;
 
     public_methods:
         /**
@@ -175,6 +176,50 @@ namespace engine
      * @return
      */
     std::ostream& operator<<(std::ostream &aStream, EEngineStatus const &aStatus);
+}
+
+// Make CEngineResult decomposable...
+namespace std
+{
+    template <typename TData>
+    struct tuple_size<engine::CEngineResult<TData>>
+        : std::integral_constant<std::size_t, 2>
+    {};
+
+    template <>
+    struct tuple_size<engine::CEngineResult<void>>
+        : std::integral_constant<std::size_t, 1>
+    {};
+
+    template <typename TData>
+    struct tuple_element<0, engine::CEngineResult<TData>>
+    {
+        using type = engine::EEngineStatus;
+    };
+
+    template <typename TData>
+    struct tuple_element<1, engine::CEngineResult<TData>>
+    {
+        using type = TData;
+    };
+
+    template <>
+    struct tuple_element<0, engine::CEngineResult<void>>
+    {
+        using type = engine::EEngineStatus;
+    };
+
+    // template <std::size_t N, typename TResult, typename TData>
+    // struct tuple_element<N, engine::AResult<TResult, TData>>
+    // {
+    //     using type = decltype(std::declval<engine::AResult<TResult, TData>>().get<N>());
+    // };
+    //
+    // template <std::size_t N, typename TResult>
+    // struct tuple_element<N, engine::AResult<TResult, void>>
+    // {
+    //     using type = decltype(std::declval<engine::AResult<TResult, void>>().get<N>());
+    // };
 }
 
 #endif

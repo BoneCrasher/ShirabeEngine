@@ -4,6 +4,7 @@
 #include <optional>
 #include <base/declaration.h>
 
+
 namespace engine
 {
     /**
@@ -16,6 +17,9 @@ namespace engine
     template <typename TResult, typename TData>
     class AResult
     {
+        template <typename T>
+        friend T std::get();
+
     public_typedefs:
         typedef TData value_type;
 
@@ -195,6 +199,13 @@ namespace engine
             return mData;
         }
 
+        template <std::size_t N>
+        decltype(auto) get() const
+        {
+            if      constexpr (N == 0) return mResult;
+            else if constexpr (N == 1) return mData;
+        }
+
         /**
          * To be implemented by specific result classes.
          *
@@ -271,6 +282,12 @@ namespace engine
             return mResult;
         }
 
+        template <std::size_t N>
+        decltype(auto) get() const
+        {
+            if constexpr (N == 0) return mResult;
+        }
+
         /**
          * To be implemented by specific result classes.
          *
@@ -311,6 +328,50 @@ namespace engine
         }
     };
 
+}
+
+// Make AResult decomposable...
+namespace std
+{
+    template <typename TResult, typename TData>
+    struct tuple_size<engine::AResult<TResult, TData>>
+        : std::integral_constant<std::size_t, 2>
+    {};
+
+    template <typename TResult>
+    struct tuple_size<engine::AResult<TResult, void>>
+        : std::integral_constant<std::size_t, 1>
+    {};
+
+    template <typename TResult, typename TData>
+    struct tuple_element<0, engine::AResult<TResult, TData>>
+    {
+        using type = TResult;
+    };
+
+    template <typename TResult, typename TData>
+    struct tuple_element<1, engine::AResult<TResult, TData>>
+    {
+        using type = TData;
+    };
+
+    template <typename TResult>
+    struct tuple_element<0, engine::AResult<TResult, void>>
+    {
+        using type = TResult;
+    };
+
+    // template <std::size_t N, typename TResult, typename TData>
+    // struct tuple_element<N, engine::AResult<TResult, TData>>
+    // {
+    //     using type = decltype(std::declval<engine::AResult<TResult, TData>>().get<N>());
+    // };
+    //
+    // template <std::size_t N, typename TResult>
+    // struct tuple_element<N, engine::AResult<TResult, void>>
+    // {
+    //     using type = decltype(std::declval<engine::AResult<TResult, void>>().get<N>());
+    // };
 }
 
 #endif // RESULT_H

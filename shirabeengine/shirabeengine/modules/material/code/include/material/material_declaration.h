@@ -964,6 +964,23 @@ namespace engine
                 }
 
         public_methods:
+                SHIRABE_INLINE
+                std::string const &name() const
+                {
+                    return mName;
+                }
+
+                SHIRABE_INLINE
+                SMaterialSignature const &signature() const
+                {
+                    return mSignature;
+                }
+
+                SHIRABE_INLINE
+                CMaterialConfig const &config() const
+                {
+                    return mConfiguration;
+                }
 
         private_members:
             std::string        mName;
@@ -1037,6 +1054,23 @@ namespace engine
                 }
 
         public_methods:
+                SHIRABE_INLINE
+                std::string const &name() const
+                {
+                    return mName;
+                }
+
+                SHIRABE_INLINE
+                CMaterialConfig const &config() const
+                {
+                    return mConfiguration;
+                }
+
+                SHIRABE_INLINE
+                CStdSharedPtr_t<CMaterialMaster> const &master() const
+                {
+                    return mMasterReference;
+                }
 
         private_members:
             std::string                      mName;

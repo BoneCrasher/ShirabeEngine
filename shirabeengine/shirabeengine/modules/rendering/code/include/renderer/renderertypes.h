@@ -7,15 +7,12 @@
 #include <core/basictypes.h>
 #include <core/enginetypehelper.h>
 #include <base/string.h>
+#include <asset/assettypes.h>
 
 namespace engine
 {
     namespace rendering
     {
-
-        using MeshId_t     = uint64_t;
-        using MaterialId_t = uint64_t;
-
         /**
          * The SRenderable struct describes all data for a renderable entity,
          * so that a rendercontext can render it.
@@ -23,9 +20,9 @@ namespace engine
         struct SRenderable
         {
         public_members:
-            std::string  name;
-            MeshId_t     meshId;
-            MaterialId_t materialId;
+            std::string      name;
+            asset::AssetId_t meshAssetId;
+            asset::AssetId_t materialAssetId;
         };
         SHIRABE_DECLARE_LIST_OF_TYPE(SRenderable, Renderable);
     }
@@ -45,8 +42,8 @@ namespace engine
                     "    MeshId:     %1\n"
                     "    MaterialId: %2\n",
                     aRenderable.name,
-                    aRenderable.meshId,
-                    aRenderable.materialId);
+                    aRenderable.meshAssetId,
+                    aRenderable.materialAssetId);
         return message;
     }
 }
