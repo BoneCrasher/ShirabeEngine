@@ -7,6 +7,7 @@
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
 #include <graphicsapi/resources/gfxapiresourceproxy.h>
 #include <graphicsapi/resources/types/all.h>
+#include <material/material_loader.h>
 #include <vulkan/resources/vulkanresourcetaskbackend.h>
 #include <vulkan/rendering/vulkanrendercontext.h>
 #include <vulkan/vulkandevicecapabilities.h>
@@ -223,6 +224,8 @@ namespace engine
         rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
         rendererConfiguration.requestFullscreen       = false;
 
+        CStdSharedPtr_t<material::CMaterialLoader> materialLoader = nullptr;
+
         auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
         {
             if(EGFXAPI::Vulkan == gfxApi)
@@ -277,6 +280,8 @@ namespace engine
             mAssetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
+            materialLoader = makeCStdSharedPtr<material::CMaterialLoader>(assetStorage);
+
             CStdSharedPtr_t<CGFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
             // The graphics API resource backend is static and does not have to be replaced.
@@ -325,7 +330,7 @@ namespace engine
                 gfxApiRenderContext = vulkanRenderContext;
             }
 
-            CEngineResult<CStdSharedPtr_t<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
+            CEngineResult<CStdSharedPtr_t<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, materialLoader, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeCStdSharedPtr<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());

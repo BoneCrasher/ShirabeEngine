@@ -69,14 +69,26 @@ namespace engine
 
                 // This will create a list of render targets for the texutre array to render to.
                 // They'll be internally created and managed.
-                SFrameGraphWriteTextureFlags flags = {};
-                flags.requiredFormat = gbufferDesc.format;
-                flags.writeTarget    = EFrameGraphWriteTarget::Color;
+                SFrameGraphWriteTextureFlags baseFlags = {};
+                baseFlags.requiredFormat  = gbufferDesc.format;
+                baseFlags.writeTarget     = EFrameGraphWriteTarget::Color;
+                baseFlags.arraySliceRange = CRange(0, 1);
+                baseFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.exportData.gbuffer0 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.exportData.gbuffer1 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(1, 1), CRange(0, 1)).data();
-                aOutPassData.exportData.gbuffer2 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(2, 1), CRange(0, 1)).data();
-                aOutPassData.exportData.gbuffer3 = aBuilder.writeTexture(aOutPassData.state.gbufferTextureArrayId, flags, CRange(3, 1), CRange(0, 1)).data();
+                SFrameGraphWriteTextureFlags write0 = baseFlags,
+                                             write1 = baseFlags,
+                                             write2 = baseFlags,
+                                             write3 = baseFlags;
+
+                write0.arraySliceRange.offset = 0;
+                write1.arraySliceRange.offset = 1;
+                write2.arraySliceRange.offset = 2;
+                write3.arraySliceRange.offset = 3;
+
+                aOutPassData.exportData.gbuffer0 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write0).data();
+                aOutPassData.exportData.gbuffer1 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write1).data();
+                aOutPassData.exportData.gbuffer2 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write2).data();
+                aOutPassData.exportData.gbuffer3 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write3).data();
 
                 // Import renderable objects based on selector, flags, or whatever should be supported...
                 aOutPassData.importData.renderableListView = aBuilder.importRenderables("SceneRenderables", aRenderableInput).data();

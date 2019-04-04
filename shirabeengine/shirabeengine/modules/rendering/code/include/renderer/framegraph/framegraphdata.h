@@ -140,14 +140,16 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphViewSource enum describes the pipeline data source of a texture view.
+         * The EFrameGraphViewPurpose enum describes the pipeline data source of a texture view.
          */
-        enum class EFrameGraphViewSource
+        enum class EFrameGraphViewPurpose
                 : uint8_t
         {
             Undefined = 0,
-            Color,
-            Depth
+            ColorAttachment,
+            DepthAttachment,
+            InputAttachment,
+            ShaderInput
         };
 
         /**
@@ -343,7 +345,7 @@ namespace engine
             CRange                               mipSliceRange;
             FrameGraphFormat_t                   format;
             CBitField<EFrameGraphViewAccessMode> mode;
-            EFrameGraphViewSource                source;
+            EFrameGraphViewPurpose                source;
         };
 
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTextureView, SFrameGraphTextureView);
@@ -425,7 +427,6 @@ namespace engine
                 mAttachmentPassAssignment;
         };
 
-
         /**
          * Describes common resource flags for read/write operations.
          */
@@ -442,20 +443,31 @@ namespace engine
         };
 
         /**
-         * Describes flags required for reading textures.
+         * Describes specialized constraints for texture resouces.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphReadTextureFlags
+        struct SHIRABE_TEST_EXPORT SFrameGraphTextureResourceFlags
                 : public SFrameGraphResourceFlags
         {
         public_members:
-            EFrameGraphReadSource source;
+            CRange arraySliceRange;
+            CRange mipSliceRange;
+        };
+
+        /**
+         * Describes flags required for reading textures.
+         */
+        struct SHIRABE_TEST_EXPORT SFrameGraphReadTextureFlags
+                : public SFrameGraphTextureResourceFlags
+        {
+        public_members:
+            EFrameGraphReadSource readSource;
         };
 
         /**
          * Describes flags required for writing textures.
          */
         struct SHIRABE_TEST_EXPORT SFrameGraphWriteTextureFlags
-                : public SFrameGraphResourceFlags
+                : public SFrameGraphTextureResourceFlags
         {
         public_members:
             EFrameGraphWriteTarget writeTarget;

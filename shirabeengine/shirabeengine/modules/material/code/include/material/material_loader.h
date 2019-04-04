@@ -30,7 +30,7 @@ namespace engine
              * @brief CMaterialLoader
              * @param aAssetStorage
              */
-            CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> &aAssetStorage);
+            CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> aAssetStorage);
 
         public_methods:
 
@@ -61,7 +61,7 @@ namespace engine
         private_methods:
 
         private_members:
-            CStdSharedPtr_t<asset::IAssetStorage>                    &mStorage;
+            CStdSharedPtr_t<asset::IAssetStorage>                     mStorage;
             Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>   mInstantiatedMaterialMasters;
             Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialInstance>> mInstantiatedMaterialInstances;
         };

@@ -14,7 +14,7 @@ namespace engine
 
         //<-----------------------------------------------------------------------------
         //;---------------------------------------------------------
-        CMaterialLoader::CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> &aAssetStorage)
+        CMaterialLoader::CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> aAssetStorage)
             : mStorage(aAssetStorage)
         {
             assert(nullptr != aAssetStorage);

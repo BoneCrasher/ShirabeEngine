@@ -67,20 +67,24 @@ namespace engine
                 aOutPassData.state.compositingBufferId = aBuilder.createTexture("Compositing Buffer", compositingBufferDesc).data();
 
                 SFrameGraphReadTextureFlags readFlags{ };
-                readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
-                readFlags.source         = EFrameGraphReadSource::Color;
+                readFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
+                readFlags.readSource      = EFrameGraphReadSource::Color;
+                readFlags.arraySliceRange = CRange(0, 1);
+                readFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.importData.gbuffer0                = aBuilder.readTexture(aGbuffer0,                readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.gbuffer1                = aBuilder.readTexture(aGbuffer1,                readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.gbuffer2                = aBuilder.readTexture(aGbuffer2,                readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.gbuffer3                = aBuilder.readTexture(aGbuffer3,                readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.lightAccumulationBuffer = aBuilder.readTexture(aLightAccumulationBuffer, readFlags, CRange(0, 1), CRange(0, 1)).data();
+                aOutPassData.importData.gbuffer0                = aBuilder.readAttachment(aGbuffer0,                readFlags).data();
+                aOutPassData.importData.gbuffer1                = aBuilder.readAttachment(aGbuffer1,                readFlags).data();
+                aOutPassData.importData.gbuffer2                = aBuilder.readAttachment(aGbuffer2,                readFlags).data();
+                aOutPassData.importData.gbuffer3                = aBuilder.readAttachment(aGbuffer3,                readFlags).data();
+                aOutPassData.importData.lightAccumulationBuffer = aBuilder.readAttachment(aLightAccumulationBuffer, readFlags).data();
 
                 SFrameGraphWriteTextureFlags writeFlags{ };
-                writeFlags.requiredFormat = FrameGraphFormat_t::Automatic;
-                writeFlags.writeTarget    = EFrameGraphWriteTarget::Color;
+                writeFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
+                writeFlags.writeTarget     = EFrameGraphWriteTarget::Color;
+                writeFlags.arraySliceRange = CRange(0, 1);
+                writeFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.exportData.output = aBuilder.writeTexture(aOutPassData.state.compositingBufferId, writeFlags, CRange(0, 1), CRange(0, 1)).data();
+                aOutPassData.exportData.output = aBuilder.writeAttachment(aOutPassData.state.compositingBufferId, writeFlags).data();
 
                 return { EEngineStatus::Ok };
             };

@@ -118,16 +118,12 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to forward.
              * @param aFlags                   Flags detailing the texture forward operation.
-             * @param aArraySliceRange         The array range within the texture to forward.
-             * @param aMipSliceRange           The mip-range of within the texture to forward.
              * @return                         Return a framegraph resource handle for the texture
              *                                 forwarding.
              */
             CEngineResult<SFrameGraphResource> forwardTexture(
-                    SFrameGraphResource      const &aSubjacentTargetResource,
-                    SFrameGraphResourceFlags const &aFlags,
-                    CRange                   const &aArraySliceRange = CRange(0, 1),
-                    CRange                   const &aMipSliceRange   = CRange(0, 1));
+                    SFrameGraphResource             const &aSubjacentTargetResource,
+                    SFrameGraphTextureResourceFlags const &aFlags);
 
             /**
              * Accept a forwarded resource but do nothing further with it.
@@ -143,32 +139,37 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to write.
              * @param aFlags                   Flags detailing the texture write operation.
-             * @param aArraySliceRange         The array range within the texture to write to.
-             * @param aMipSliceRange           The mip-range of within the texture to write to.
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphResource> writeTexture(
+            CEngineResult<SFrameGraphResource> writeAttachment(
                     SFrameGraphResource          const &aSubjacentTargetResource,
-                    SFrameGraphWriteTextureFlags const &aFlags,
-                    CRange                       const &aArraySliceRange = CRange(0, 1),
-                    CRange                       const &aMipSliceRange   = CRange(0, 1));
+                    SFrameGraphWriteTextureFlags const &aFlags);
 
             /**
              * Request a read operation on a subjacent texture instance.
              *
              * @param aSubjacentTargetResource The resource id of the texture to read.
              * @param aFlags                   Flags detailing the texture read operation.
-             * @param aArraySliceRange         The array range within the texture to read to.
-             * @param aMipSliceRange           The mip-range of within the texture to read to.
+             * @return                         Return a framegraph resource handle for the texture
+             *                                 creation.
+             */
+            CEngineResult<SFrameGraphResource> readAttachment(
+                    SFrameGraphResource         const &aSubjacentTargetResource,
+                    SFrameGraphReadTextureFlags const &aFlags);
+
+            /**
+             * Request a read operation on a subjacent texture instance.
+             *
+             * @param aSubjacentTargetResource The resource id of the texture to read.
+             * @param aFlags                   Flags detailing the texture read operation.
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
             CEngineResult<SFrameGraphResource> readTexture(
-                    SFrameGraphResource         const &aSubjacentTargetResource,
-                    SFrameGraphReadTextureFlags const &aFlags,
-                    CRange                      const &aArraySliceRange = CRange(0, 1),
-                    CRange                      const &aMipSliceRange   = CRange(0, 1));
+                    SFrameGraphResource             const &subjacentTargetResource,
+                    SFrameGraphTextureResourceFlags const &aFlags);
+
 
             /**
              * Import a list of renderables for use in this pass, creating a
@@ -200,7 +201,7 @@ namespace engine
             CEngineResult<FrameGraphResourceId_t> findDuplicateTextureView(
                     FrameGraphResourceId_t               const &aSubjacentResourceId,
                     FrameGraphFormat_t                   const &aFormat,
-                    EFrameGraphViewSource                const &aViewSource,
+                    EFrameGraphViewPurpose                const &aViewSource,
                     CRange                               const &aArrayRange,
                     CRange                               const &aMipRange,
                     CBitField<EFrameGraphViewAccessMode> const &aMode);
@@ -297,7 +298,7 @@ namespace engine
         private_methods:
             CEngineResult<SFrameGraphResource> useTexture(
                     SFrameGraphResource          const &aSubjacentTargetResource,
-                    EFrameGraphViewSource        const &aSourceOrTarget,
+                    EFrameGraphViewPurpose        const &aSourceOrTarget,
                     EFormat                      const &aRequiredFormat,
                     CRange                       const &aArraySliceRange,
                     CRange                       const &aMipSliceRange,
@@ -305,9 +306,10 @@ namespace engine
                     EEngineStatus                const &aFailCode);
 
         private_members:
-            PassUID_t                    mPassUID;
-            CStdSharedPtr_t<CPassBase>   mPass;
-            CFrameGraphMutableResources &mResourceData;
+            PassUID_t                        mPassUID;
+            CStdSharedPtr_t<CPassBase>       mPass;
+            CFrameGraphMutableResources     &mResourceData;
+            SFrameGraphAttachmentCollection &mAttachmentCollection;
         };
 
     }

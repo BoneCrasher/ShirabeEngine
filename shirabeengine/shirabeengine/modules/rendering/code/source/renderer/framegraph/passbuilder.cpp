@@ -15,9 +15,10 @@ namespace engine
                 PassUID_t                   const &aPassUID,
                 CStdSharedPtr_t<CPassBase>         aPass,
                 CFrameGraphMutableResources       &aOutResourceData)
-            : mPassUID(aPassUID)
-            , mPass(aPass)
-            , mResourceData(aOutResourceData)
+            : mPassUID             (aPassUID                         )
+            , mPass                (aPass                            )
+            , mResourceData        (aOutResourceData                 )
+            , mAttachmentCollection(aOutResourceData.getAttachments())
         {}
         //<-----------------------------------------------------------------------------
 
@@ -73,7 +74,7 @@ namespace engine
         CEngineResult<FrameGraphResourceId_t> CPassBuilder::findDuplicateTextureView(
                 FrameGraphResourceId_t               const &aSubjacentResourceId,
                 FrameGraphFormat_t                   const &aFormat,
-                EFrameGraphViewSource                const &aViewSource,
+                EFrameGraphViewPurpose                const &aViewSource,
                 CRange                               const &aArrayRange,
                 CRange                               const &aMipRange,
                 CBitField<EFrameGraphViewAccessMode> const &aMode)
@@ -266,10 +267,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassBuilder::forwardTexture(
-                SFrameGraphResource      const &aSubjacentTargetResource,
-                SFrameGraphResourceFlags const &aFlags,
-                CRange                   const &aArraySliceRange,
-                CRange                   const &aMipSliceRange)
+                SFrameGraphResource             const &aSubjacentTargetResource,
+                SFrameGraphTextureResourceFlags const &aFlags)
         {
             CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
@@ -281,16 +280,16 @@ namespace engine
                      : aSubjacentTargetResource.subjacentResource;
 
             EFrameGraphViewAccessMode const mode   = EFrameGraphViewAccessMode::Forward;
-            EFrameGraphViewSource     const source = EFrameGraphViewSource::Undefined;
+            EFrameGraphViewPurpose     const source = EFrameGraphViewPurpose::Undefined;
 
-            CRange adjustedArraySliceRange = aArraySliceRange;
-            CRange adjustedMipSliceRange   = aMipSliceRange;
+            CRange adjustedArraySliceRange = aFlags.arraySliceRange;
+            CRange adjustedMipSliceRange   = aFlags.mipSliceRange;
 
             adjustArrayAndMipSliceRanges(
                         mResourceData,
                         aSubjacentTargetResource,
-                        aArraySliceRange,
-                        aMipSliceRange,
+                        aFlags.arraySliceRange,
+                        aFlags.mipSliceRange,
                         adjustedArraySliceRange,
                         adjustedMipSliceRange);
 
@@ -379,7 +378,7 @@ namespace engine
                      : aSubjacentTargetResource.subjacentResource;
 
             EFrameGraphViewAccessMode const mode   = EFrameGraphViewAccessMode::Accept;
-            EFrameGraphViewSource     const source = EFrameGraphViewSource::Undefined;
+            EFrameGraphViewPurpose     const source = EFrameGraphViewPurpose::Undefined;
 
             // TODO: Naming correct? SHouldn't it be parent resource?
             CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> const &subjacentTargetFetch = mResourceData.get<SFrameGraphTextureView>(aSubjacentTargetResource.resourceId);
@@ -480,7 +479,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassBuilder::useTexture(
                 SFrameGraphResource          const &aSubjacentTargetResource,
-                EFrameGraphViewSource        const &aSourceOrTarget,
+                EFrameGraphViewPurpose       const &aSourceOrTarget,
                 EFormat                      const &aRequiredFormat,
                 CRange                       const &aArraySliceRange,
                 CRange                       const &aMipSliceRange,
@@ -495,7 +494,7 @@ namespace engine
                      : aSubjacentTargetResource.subjacentResource;
 
             EFrameGraphViewAccessMode const mode   = aMode;
-            EFrameGraphViewSource     const source = aSourceOrTarget;
+            EFrameGraphViewPurpose    const source = aSourceOrTarget;
 
             CRange adjustedArraySliceRange = aArraySliceRange;
             CRange adjustedMipSliceRange   = aMipSliceRange;
@@ -522,14 +521,12 @@ namespace engine
             bool duplicateFound = false;
             if(EFrameGraphResourceType::TextureView == aSubjacentTargetResource.type)
             {
-                CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery =
-                        findDuplicateTextureView(
-                            subjacentResourceId,
-                            aRequiredFormat,
-                            source,
-                            adjustedArraySliceRange,
-                            adjustedMipSliceRange,
-                            mode);
+                CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery = findDuplicateTextureView(subjacentResourceId,
+                                                                                                            aRequiredFormat,
+                                                                                                            source,
+                                                                                                            adjustedArraySliceRange,
+                                                                                                            adjustedMipSliceRange,
+                                                                                                            mode);
 
                 if(not duplicateViewIdQuery.successful())
                 {
@@ -553,6 +550,12 @@ namespace engine
 
             if(not duplicateFound)
             {
+                auto const &[result, texture] = mResourceData.getMutable<SFrameGraphTexture>(subjacentResourceId);
+                if(CheckEngineError(result))
+                {
+                    return { result };
+                }
+
                 SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
                 view.arraySliceRange    = adjustedArraySliceRange;
                 view.mipSliceRange      = adjustedMipSliceRange;
@@ -567,14 +570,25 @@ namespace engine
                 view.type               = EFrameGraphResourceType::TextureView;
                 view.mode.set(mode);
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
-                if(not subjacentFetch.successful())
+                switch(view.source)
                 {
-                    return { subjacentFetch.result() };
+                case EFrameGraphViewPurpose::InputAttachment:
+                    texture->requestedUsage.set(EFrameGraphResourceUsage::InputAttachment);
+                    break;
+                case EFrameGraphViewPurpose::ColorAttachment:
+                    texture->requestedUsage.set(EFrameGraphResourceUsage::ColorAttachment);
+                    break;
+                case EFrameGraphViewPurpose::DepthAttachment:
+                    texture->requestedUsage.set(EFrameGraphResourceUsage::DepthAttachment);
+                    break;
+                case EFrameGraphViewPurpose::ShaderInput:
+                    texture->requestedUsage.set(EFrameGraphResourceUsage::SampledImage);
+                    break;
+                default:
+                    break;
                 }
 
-                SFrameGraphResource &subjacent = *(subjacentFetch.data());
-                ++(subjacent.referenceCount);
+                ++(texture->referenceCount);
 
                 resource = view;
             }
@@ -596,30 +610,66 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::writeTexture(
+        CEngineResult<SFrameGraphResource> CPassBuilder::writeAttachment(
                 SFrameGraphResource          const &aSubjacentTargetResource,
-                SFrameGraphWriteTextureFlags const &aFlags,
-                CRange                       const &aArraySliceRange,
-                CRange                       const &aMipSliceRange)
+                SFrameGraphWriteTextureFlags const &aFlags)
         {
-            EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
+            bool const isColorAttachment = (EFrameGraphWriteTarget::Color == aFlags.writeTarget);
+            bool const isDepthAttachment = (EFrameGraphWriteTarget::Depth == aFlags.writeTarget);
 
-            if(EFrameGraphWriteTarget::Color == aFlags.writeTarget)
+            EFrameGraphViewPurpose source = isColorAttachment
+                                                ? EFrameGraphViewPurpose::ColorAttachment
+                                                : isDepthAttachment
+                                                      ? EFrameGraphViewPurpose::DepthAttachment
+                                                      : EFrameGraphViewPurpose::Undefined;
+
+            auto const &[result, data] = useTexture(aSubjacentTargetResource,
+                                                    source,
+                                                    aFlags.requiredFormat,
+                                                    aFlags.arraySliceRange,
+                                                    aFlags.mipSliceRange,
+                                                    EFrameGraphViewAccessMode::Write,
+                                                    EEngineStatus::FrameGraph_PassBuilder_WriteResourceFailed);
+
+            if(not CheckEngineError(result))
             {
-                source = EFrameGraphViewSource::Color;
-            }
-            else if(EFrameGraphWriteTarget::Depth == aFlags.writeTarget)
-            {
-                source = EFrameGraphViewSource::Depth;
+                if(isColorAttachment)
+                {
+                    mAttachmentCollection.addColorAttachment(mPassUID, data.resourceId);
+                }
+                else if(isDepthAttachment)
+                {
+                    mAttachmentCollection.addDepthAttachment(mPassUID, data.resourceId);
+                }
             }
 
-            return useTexture(aSubjacentTargetResource,
-                              source,
-                              aFlags.requiredFormat,
-                              aArraySliceRange,
-                              aMipSliceRange,
-                              EFrameGraphViewAccessMode::Write,
-                              EEngineStatus::FrameGraph_PassBuilder_WriteResourceFailed);
+            return { result, data };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SFrameGraphResource> CPassBuilder::readAttachment(
+                SFrameGraphResource         const &aSubjacentTargetResource,
+                SFrameGraphReadTextureFlags const &aFlags)
+        {                        
+            EFrameGraphViewPurpose source = EFrameGraphViewPurpose::InputAttachment;
+
+            auto const &[result, data]  = useTexture(aSubjacentTargetResource,
+                                                     source,
+                                                     aFlags.requiredFormat,
+                                                     aFlags.arraySliceRange,
+                                                     aFlags.mipSliceRange,
+                                                     EFrameGraphViewAccessMode::Read,
+                                                     EEngineStatus::FrameGraph_PassBuilder_ReadResourceFailed);
+
+            if(not CheckEngineError(result))
+            {
+                mAttachmentCollection.addInputAttachment(mPassUID, data.resourceId);
+            }
+
+            return { result, data };
         }
         //<-----------------------------------------------------------------------------
 
@@ -627,27 +677,16 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassBuilder::readTexture(
-                SFrameGraphResource         const &aSubjacentTargetResource,
-                SFrameGraphReadTextureFlags const &aFlags,
-                CRange                      const &aArraySliceRange,
-                CRange                      const &aMipSliceRange)
-        {                        
-            EFrameGraphViewSource source = EFrameGraphViewSource::Undefined;
-
-            if(EFrameGraphReadSource::Color == aFlags.source)
-            {
-                source = EFrameGraphViewSource::Color;
-            }
-            else if(EFrameGraphReadSource::Depth == aFlags.source)
-            {
-                source = EFrameGraphViewSource::Depth;
-            }
+                SFrameGraphResource             const &aSubjacentTargetResource,
+                SFrameGraphTextureResourceFlags const &aFlags)
+        {
+            EFrameGraphViewPurpose source = EFrameGraphViewPurpose::ShaderInput;
 
             return useTexture(aSubjacentTargetResource,
                               source,
                               aFlags.requiredFormat,
-                              aArraySliceRange,
-                              aMipSliceRange,
+                              aFlags.arraySliceRange,
+                              aFlags.mipSliceRange,
                               EFrameGraphViewAccessMode::Read,
                               EEngineStatus::FrameGraph_PassBuilder_ReadResourceFailed);
         }

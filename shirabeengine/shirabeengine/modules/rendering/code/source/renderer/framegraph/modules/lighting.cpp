@@ -69,19 +69,23 @@ namespace engine
                 aOutPassData.state.lightAccumulationBufferTextureId = aBuilder.createTexture("Light Accumulation Buffer", lightAccBufferDesc).data();
 
                 SFrameGraphReadTextureFlags readFlags{ };
-                readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
-                readFlags.source         = EFrameGraphReadSource::Color;
+                readFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
+                readFlags.readSource      = EFrameGraphReadSource::Color;
+                readFlags.arraySliceRange = CRange(0, 1);
+                readFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.importData.gbuffer0 = aBuilder.readTexture(aGbuffer0, readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.gbuffer1 = aBuilder.readTexture(aGbuffer1, readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.gbuffer2 = aBuilder.readTexture(aGbuffer2, readFlags, CRange(0, 1), CRange(0, 1)).data();
-                aOutPassData.importData.gbuffer3 = aBuilder.readTexture(aGbuffer3, readFlags, CRange(0, 1), CRange(0, 1)).data();
+                aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aGbuffer0, readFlags).data();
+                aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aGbuffer1, readFlags).data();
+                aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aGbuffer2, readFlags).data();
+                aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aGbuffer3, readFlags).data();
 
                 SFrameGraphWriteTextureFlags writeFlags{ };
-                writeFlags.requiredFormat = FrameGraphFormat_t::Automatic;
-                writeFlags.writeTarget    = EFrameGraphWriteTarget::Color;
+                writeFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
+                writeFlags.writeTarget     = EFrameGraphWriteTarget::Color;
+                writeFlags.arraySliceRange = CRange(0, 1);
+                writeFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.exportData.lightAccumulationBuffer = aBuilder.writeTexture(aOutPassData.state.lightAccumulationBufferTextureId, writeFlags, CRange(0, 1), CRange(0, 1)).data();
+                aOutPassData.exportData.lightAccumulationBuffer = aBuilder.writeAttachment(aOutPassData.state.lightAccumulationBufferTextureId, writeFlags).data();
 
                 return { EEngineStatus::Ok };
             };

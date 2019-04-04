@@ -750,9 +750,7 @@ namespace engine
             // Traverse signature and derive pipeline configuration UNLESS a pipeline was
             // created already for the given material instance.
             //
-            // TODO: ResourceManager needs "hasResource"-method to check for a
-            //       proxy already created for a specific name.
-            //
+
 
             return EEngineStatus::Ok;
         }

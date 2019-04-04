@@ -65,7 +65,7 @@ namespace engine
 
                 aOutPassData.importData.backBufferInput = backBufferImport.data();
 
-                SFrameGraphResourceFlags flags{};
+                SFrameGraphTextureResourceFlags flags{};
                 flags.requiredFormat = FrameGraphFormat_t::Automatic;
 
                 CEngineResult<SFrameGraphResource> backBufferForward = aBuilder.forwardTexture(aOutPassData.importData.backBufferInput, flags);
@@ -155,9 +155,9 @@ namespace engine
             {
                 SFrameGraphReadTextureFlags readFlags{ };
                 readFlags.requiredFormat = FrameGraphFormat_t::Automatic;
-                readFlags.source         = EFrameGraphReadSource::Color;
+                readFlags.readSource     = EFrameGraphReadSource::Color;
 
-                aOutPassData.importData.finalOutputId = aBuilder.readTexture(aOutput, readFlags, CRange(0, 1), CRange(0, 1)).data();
+                aOutPassData.importData.finalOutputId = aBuilder.readAttachment(aOutput, readFlags).data();
 
                 return { EEngineStatus::Ok };
             };

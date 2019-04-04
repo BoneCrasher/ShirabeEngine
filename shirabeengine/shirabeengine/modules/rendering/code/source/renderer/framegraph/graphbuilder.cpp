@@ -494,35 +494,6 @@ namespace engine
                         {
                             textureView.format = texture.format;
                         }
-
-                        SFrameGraphAttachmentCollection &attachments = mResourceData.getAttachments();
-
-                        // Set required usage flags, so that the subjacent texture is properly created.
-                        // This will also derive all attachements of the to be created render pass.
-                        // Since we avoided simultaneous R/W, setting just one of the attachment flags
-                        // per texture view will work out.
-                        if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
-                        {
-                            texture.requestedUsage.set(EFrameGraphResourceUsage::InputAttachment);
-                            attachments.addInputAttachment(passUID, resource.resourceId);
-                        }
-                        else if(textureView.mode.check(EFrameGraphViewAccessMode::Write))
-                        {
-                            if(EFrameGraphViewSource::Color == textureView.source)
-                            {
-                                texture.requestedUsage.set(EFrameGraphResourceUsage::ColorAttachment);
-                                attachments.addColorAttachment(passUID, resource.resourceId);
-                            }
-                            else if(EFrameGraphViewSource::Depth == textureView.source)
-                            {
-                                texture.requestedUsage.set(EFrameGraphResourceUsage::DepthAttachment);
-                                attachments.addDepthAttachment(passUID, resource.resourceId);
-                            }
-                        }
-                        else
-                        {
-                            texture.requestedUsage.set(EFrameGraphResourceUsage::Unused);
-                        }
                     }
                     else if(EFrameGraphResourceType::BufferView == resource.type)
                     {
