@@ -295,7 +295,7 @@ namespace engine
                 if(not executed.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to execute pass %0", pass->passUID()));
-                    return {executed};
+                    break;
                 }
 
                 if( copy.size() > 2) // Implicit last pass '0' and effective last pass --> 2 passes
