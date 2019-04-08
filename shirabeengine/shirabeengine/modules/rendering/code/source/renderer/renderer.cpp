@@ -156,7 +156,7 @@ namespace engine
                 { "Sphere",  0, 0 },
                 { "Pyramid", 0, 0 }
             };
-            SFrameGraphResource renderables{ };
+            SFrameGraphRenderableList renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
             CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                     graphicsAPICommonModule{ };

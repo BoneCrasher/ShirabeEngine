@@ -65,7 +65,8 @@ namespace engine
             RASTERIZER_STATE      = 702,
             BLEND_STATE           = 703,
             RENDER_PASS           = 704,
-            FRAME_BUFFER          = 705
+            FRAME_BUFFER          = 705,
+            PIPELINE              = 750
         };
 
         /**

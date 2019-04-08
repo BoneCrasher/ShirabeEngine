@@ -269,7 +269,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphResource CGraphBuilder::registerRenderables(
+        SFrameGraphRenderableList CGraphBuilder::registerRenderables(
                 std::string               const &aReadableIdentifier,
                 rendering::RenderableList const &aRenderables)
         {

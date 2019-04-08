@@ -732,11 +732,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::render(SRenderable const &aRenderable)
+        CEngineResult<> CFrameGraphRenderContext::render(SFrameGraphMesh     const &aMesh,
+                                                         SFrameGraphMaterial const &aMaterial)
         {
-            SHIRABE_UNUSED(aRenderable);
-
-            auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aRenderable.materialAssetId);
+            auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
             if(CheckEngineError(result))
             {
                 return { result };

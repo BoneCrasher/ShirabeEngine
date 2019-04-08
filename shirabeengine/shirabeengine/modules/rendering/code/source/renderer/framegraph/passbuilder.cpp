@@ -695,40 +695,38 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::importRenderables(
-                std::string         const &aCollectionName,
-                SFrameGraphResource const &aRenderableListResource)
+        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(asset::AssetId_t const &aMaterialId)
         {
-            SFrameGraphRenderableListView &resource = mResourceData.spawnResource<SFrameGraphRenderableListView>();
-            resource.assignedPassUID                = mPassUID;
-            resource.readableName                   = aCollectionName;
-            resource.parentResource                 = aRenderableListResource.resourceId;
-            resource.subjacentResource              = aRenderableListResource.resourceId;
-            resource.type                           = EFrameGraphResourceType::RenderableListView;
-            resource.isExternalResource             = false;
+            SFrameGraphMaterial &materialResource = mResourceData.spawnResource<SFrameGraphMaterial>();
+            materialResource.readableName       = CString::format("Material %0", aMaterialId);
+            materialResource.type               = EFrameGraphResourceType::Material;
+            materialResource.assignedPassUID    = mPassUID;
+            materialResource.materialAssetId    = aMaterialId;
+            materialResource.isExternalResource = false;
+            materialResource.parentResource     = 0;
+            materialResource.referenceCount     = 0;
+            materialResource.subjacentResource  = 0;
 
-            CEngineResult<CStdSharedPtr_t<SFrameGraphRenderableList> const> const listResourceFetch =
-                    mResourceData.get<SFrameGraphRenderableList>(aRenderableListResource.resourceId);
+            return { EEngineStatus::Ok, materialResource };
+        }
+        //<-----------------------------------------------------------------------------
 
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-            if(not listResourceFetch.successful())
-            {
-                CLog::Error(logTag(), CString::format("Renderable list resource handle w/ id %0 is empty.", aRenderableListResource.resourceId));
-                return { EEngineStatus::FrameGraph_PassBuilder_ImportRenderablesFailed };
-            }
-#endif
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(asset::AssetId_t const &aMeshId)
+        {
+            SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
+            meshResource.readableName       = CString::format("Material %0", aMeshId);
+            meshResource.type               = EFrameGraphResourceType::Mesh;
+            meshResource.assignedPassUID    = mPassUID;
+            meshResource.meshAssetId        = aMeshId;
+            meshResource.isExternalResource = false;
+            meshResource.parentResource     = 0;
+            meshResource.referenceCount     = 0;
+            meshResource.subjacentResource  = 0;
 
-            SFrameGraphRenderableList const &list = *(listResourceFetch.data());
-
-            for(uint64_t k=0; k<list.renderableList.size(); ++k)
-            {
-                resource.renderableRefIndices.push_back(k);
-            }
-
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
-            accessor->registerResource(resource.resourceId);
-
-            return { EEngineStatus::Ok, resource };
+            return { EEngineStatus::Ok, meshResource };
         }
         //<-----------------------------------------------------------------------------
 

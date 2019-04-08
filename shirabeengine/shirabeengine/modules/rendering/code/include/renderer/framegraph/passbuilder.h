@@ -170,19 +170,20 @@ namespace engine
                     SFrameGraphResource             const &subjacentTargetResource,
                     SFrameGraphTextureResourceFlags const &aFlags);
 
+            /**
+             * Register a mesh for use in the framegraph.
+             *
+             * @param aMeshId
+             * @return
+             */
+            CEngineResult<SFrameGraphMesh> useMesh(asset::AssetId_t const &aMeshId);
 
             /**
-             * Import a list of renderables for use in this pass, creating a
-             * renderable list resource view for the specified range.
-             *
-             * @param aCollectionName         Name of the renderable collection to import.
-             * @param aRenderableListResource Source list of renderables to base on.
-             * @return                        Return a frame graph resource handle for the
-             *                                list view created.
+             * Register a material for use in the framegraph.
+             * @param aMaterialId
+             * @return
              */
-            CEngineResult<SFrameGraphResource> importRenderables(
-                    std::string         const &aCollectionName,
-                    SFrameGraphResource const &aRenderableListResource);
+            CEngineResult<SFrameGraphMaterial> useMaterial(asset::AssetId_t const &aMaterialId);
 
         private_methods:
             /**

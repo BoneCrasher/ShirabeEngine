@@ -17,6 +17,7 @@
 #include <graphicsapi/resources/types/definition.h>
 #include <graphicsapi/resources/types/texture.h>
 #include <graphicsapi/resources/types/textureview.h>
+#include <math/geometric/rect.h>
 #include "renderer/renderertypes.h"
 
 namespace engine
@@ -45,6 +46,8 @@ namespace engine
             Buffer,
             TextureView,
             BufferView,
+            Mesh,
+            Material,
             RenderableList,
             RenderableListView // To support renderable filtering...
         };
@@ -211,14 +214,14 @@ namespace engine
             }
 
         public_members:
-            uint32_t                referenceCount;
-            PassUID_t               assignedPassUID;
-            FrameGraphResourceId_t  resourceId;
-            FrameGraphResourceId_t  parentResource;
-            FrameGraphResourceId_t  subjacentResource;
-            std::string             readableName;
-            EFrameGraphResourceType type;
-            bool                    isExternalResource;
+            uint32_t                       referenceCount;
+            PassUID_t                      assignedPassUID;
+            FrameGraphResourceId_t         resourceId;
+            FrameGraphResourceId_t         parentResource;
+            FrameGraphResourceId_t         subjacentResource;
+            std::string                    readableName;
+            EFrameGraphResourceType        type;
+            bool                           isExternalResource;
         };
 
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphResource, SFrameGraphResource);
@@ -513,11 +516,31 @@ namespace engine
                 >
         using AdjacencyListMap_t = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
+        /**
+         * The frame graph material struct encapsulates information on
+         * the material used for rendering.
+         */
+        struct SFrameGraphMaterial
+            : SFrameGraphResource
+        {
+        public_members:
+            asset::AssetId_t materialAssetId;
+        };
+
+        struct SFrameGraphMesh
+            : SFrameGraphResource
+        {
+        public_members:
+            asset::AssetId_t meshAssetId;
+        };
+
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES  \
             SFrameGraphTexture,                              \
             SFrameGraphTextureView,                          \
             SFrameGraphBuffer,                               \
             SFrameGraphBufferView,                           \
+            SFrameGraphMaterial,                             \
+            SFrameGraphMesh,                                 \
             SFrameGraphRenderableList,                       \
             SFrameGraphRenderableListView
 

@@ -28,13 +28,19 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SGBufferModuleTag_t>);
 
         public_structs:
+            struct SRenderableResources
+            {
+                SFrameGraphResource meshResource;
+                SFrameGraphResource materialResource;
+            };
+
             /**
              * The SGBufferGenerationImportData struct describes all imported data for the
              * GBufferGeneration pass.
              */
             struct SGBufferGenerationImportData
             {
-                SFrameGraphResource renderableListView;
+                std::vector<SRenderableResources> renderables;
             };
 
             /**
@@ -59,9 +65,9 @@ namespace engine
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SGBufferGenerationExportData> addGBufferGenerationPass(
-                    std::string         const &aPassName,
-                    CGraphBuilder             &aGraphBuilder,
-                    SFrameGraphResource const &aRenderableInput);
+                    std::string               const &aPassName,
+                    CGraphBuilder                   &aGraphBuilder,
+                    SFrameGraphRenderableList const &aRenderableInput);
         };
 
     }

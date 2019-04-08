@@ -12,9 +12,9 @@ namespace engine
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
         >
         CFrameGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
-                std::string         const &aPassName,
-                CGraphBuilder             &aGraphBuilder,
-                SFrameGraphResource const &aRenderableInput)
+                std::string               const &aPassName,
+                CGraphBuilder                   &aGraphBuilder,
+                SFrameGraphRenderableList const &aRenderableInput)
         {
             /**
              * The SState struct is the internal state of the gbuffer generation pass.
@@ -90,8 +90,14 @@ namespace engine
                 aOutPassData.exportData.gbuffer2 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write2).data();
                 aOutPassData.exportData.gbuffer3 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write3).data();
 
-                // Import renderable objects based on selector, flags, or whatever should be supported...
-                aOutPassData.importData.renderableListView = aBuilder.importRenderables("SceneRenderables", aRenderableInput).data();
+                // Register all meshes and materials for use.
+                for(SRenderable const &renderable : aRenderableInput.renderableList)
+                {
+                    SFrameGraphResource const meshResource     = aBuilder.useMesh    (renderable.meshAssetId    ).data();
+                    SFrameGraphResource const materialResource = aBuilder.useMaterial(renderable.materialAssetId).data();
+
+                    aOutPassData.importData.renderables.push_back({ meshResource, materialResource });
+                }
 
                 return { EEngineStatus::Ok };
             };
@@ -105,51 +111,6 @@ namespace engine
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
-
-                CEngineResult<CStdSharedPtr_t<SFrameGraphRenderableListView> const> renderableViewFetch = aFrameGraphResources.get<SFrameGraphRenderableListView>(aPassData.importData.renderableListView.resourceId);
-                if(not renderableViewFetch.successful())
-                {
-                    CLog::Error(logTag(), "Failed to fetch renderable view.");
-                    return { renderableViewFetch.result() };
-                }
-
-                CStdSharedPtr_t<SFrameGraphRenderableListView> const &renderableView = renderableViewFetch.data();
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(nullptr == renderableView)
-                {
-                    CLog::Error(logTag(), CString::format("Renderable view with id %0 not found.", aPassData.importData.renderableListView.resourceId));
-                    return { renderableViewFetch.result() };
-                }
-#endif
-                CEngineResult<CStdSharedPtr_t<SFrameGraphRenderableList> const> renderableListFetch =
-                    aFrameGraphResources.get<SFrameGraphRenderableList>(aPassData.importData.renderableListView.subjacentResource);
-
-                if(not renderableListFetch.successful())
-                {
-                    CLog::Error(logTag(), "Failed to fetch renderable list.");
-                    return { EEngineStatus::NullPointer };
-                }
-
-                CStdSharedPtr_t<SFrameGraphRenderableList> const &renderableList = renderableListFetch.data();
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(nullptr == renderableList)
-                {
-                    CLog::Error(logTag(), CString::format("Renderable list with id %0 not found.", aPassData.importData.renderableListView.subjacentResource));
-                    return { EEngineStatus::NullPointer };
-                }
-#endif
-
-                for(FrameGraphResourceId_t const &renderableId : renderableView->renderableRefIndices)
-                {
-                    FrameGraphRenderable_t const &renderable = renderableList->renderableList.at(renderableId);
-
-                    CEngineResult<> renderCall = aRenderContext->render(renderable);
-                    if(not renderCall.successful())
-                    {
-                        CLog::Error(logTag(), "Failed to render renderable.");
-                        return { renderCall.result() };
-                    }
-                }
 
                 return { EEngineStatus::Ok };
             };

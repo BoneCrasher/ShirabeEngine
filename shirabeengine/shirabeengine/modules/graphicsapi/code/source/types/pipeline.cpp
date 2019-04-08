@@ -1,13 +1,14 @@
-#include "graphicsapi/resources/types/framebuffer.h"
+#include "graphicsapi/resources/types/pipeline.h"
 
 namespace engine
 {
     namespace gfxapi
     {
+
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CFrameBufferDeclaration::SDescriptor::SDescriptor()
+        CPipelineDeclaration::SDescriptor::SDescriptor()
             : name("")
         {}
         //<-----------------------------------------------------------------------------
@@ -15,11 +16,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        std::string CFrameBufferDeclaration::SDescriptor::toString() const
+        std::string CPipelineDeclaration::SDescriptor::toString() const
         {
             std::stringstream ss;
             ss
-                    << "FrameBuffer::SDescriptor ('" << name << "'): ";
+                    << "CPipeline::SDescriptor ('" << name << "'): ";
 
             return ss.str();
         }
@@ -28,29 +29,20 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CFrameBufferDeclaration::CCreationRequest::CCreationRequest(
+        CPipelineDeclaration::CCreationRequest::CCreationRequest(
                 SDescriptor            const &aDescriptor,
-                PublicResourceId_t     const &aRenderPassHandle,
-                PublicResourceIdList_t const &aTextureViewHandles)
+                PublicResourceIdList_t const &aTextureViewHandles,
+                PublicResourceIdList_t const &aBufferViewHandles)
             : CBaseDeclaration::CCreationRequestBase<SDescriptor>(aDescriptor)
-            , mRenderPassHandle(aRenderPassHandle)
             , mTextureViewHandles(aTextureViewHandles)
+            , mBufferViewHandles (aBufferViewHandles)
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        PublicResourceId_t const &CFrameBufferDeclaration::CCreationRequest::renderPassHandle() const
-        {
-            return mRenderPassHandle;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        PublicResourceIdList_t const &CFrameBufferDeclaration::CCreationRequest::textureViewHandles() const
+        PublicResourceIdList_t const &CPipelineDeclaration::CCreationRequest::textureViewHandles() const
         {
             return mTextureViewHandles;
         }
@@ -59,11 +51,20 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        std::string CFrameBufferDeclaration::CCreationRequest::toString() const
+        PublicResourceIdList_t const &CPipelineDeclaration::CCreationRequest::bufferViewHandles() const
+        {
+            return mBufferViewHandles;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        std::string CPipelineDeclaration::CCreationRequest::toString() const
         {
             std::stringstream ss;
             ss
-                    << "RenderTargetViewCreationRequest: \n"
+                    << "PipelineCreationRequest: \n"
                     << std::endl;
 
             return ss.str();
@@ -73,11 +74,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CFrameBuffer::CFrameBuffer(
-                const CFrameBuffer::SDescriptor &aDescriptor)
-            : CFrameBufferDeclaration()
-            , CResourceDescriptorAdapter<CFrameBufferDeclaration::SDescriptor>(aDescriptor)
+        CPipeline::CPipeline(CPipeline::SDescriptor const &aDescriptor)
+            : CPipelineDeclaration()
+            , CResourceDescriptorAdapter<CPipelineDeclaration::SDescriptor>(aDescriptor)
         {}
         //<-----------------------------------------------------------------------------
+
     }
 }

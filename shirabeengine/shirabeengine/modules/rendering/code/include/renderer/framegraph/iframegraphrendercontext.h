@@ -378,11 +378,13 @@ namespace engine
             /**
              * Render a renderable entity using the graphicsAPI.
              *
-             * @param aRenderable The renderable to process.
-             * @return            EEngineStatus::Ok if successful.
-             * @return            EEngineStatus::Error otherwise.
+             * @param aMesh     The renderable mesh to process.
+             * @param aMaterial The renderable material to process.
+             * @return          EEngineStatus::Ok if successful.
+             * @return          EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> render(SRenderable const &aRenderable) = 0;
+            virtual CEngineResult<> render(SFrameGraphMesh     const &aMesh,
+                                           SFrameGraphMaterial const &aMaterial) = 0;
         };
 
     }

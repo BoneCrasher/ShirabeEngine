@@ -174,7 +174,7 @@ namespace engine
              * @param renderables        The renderables to register.
              * @return                   Returns a framgraph resource hadnle for the list.
              */
-            SFrameGraphResource registerRenderables(
+            SFrameGraphRenderableList registerRenderables(
                     std::string               const &aReadableIdentifier,
                     rendering::RenderableList const &aRenderables);
 
