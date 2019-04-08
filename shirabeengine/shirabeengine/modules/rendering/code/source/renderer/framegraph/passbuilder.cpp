@@ -717,7 +717,7 @@ namespace engine
         CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(asset::AssetId_t const &aMeshId)
         {
             SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
-            meshResource.readableName       = CString::format("Material %0", aMeshId);
+            meshResource.readableName       = CString::format("Mesh %0", aMeshId);
             meshResource.type               = EFrameGraphResourceType::Mesh;
             meshResource.assignedPassUID    = mPassUID;
             meshResource.meshAssetId        = aMeshId;

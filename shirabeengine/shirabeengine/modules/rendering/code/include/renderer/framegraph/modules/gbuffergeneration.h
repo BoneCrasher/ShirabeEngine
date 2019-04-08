@@ -30,8 +30,8 @@ namespace engine
         public_structs:
             struct SRenderableResources
             {
-                SFrameGraphResource meshResource;
-                SFrameGraphResource materialResource;
+                SFrameGraphMesh     meshResource;
+                SFrameGraphMaterial materialResource;
             };
 
             /**
