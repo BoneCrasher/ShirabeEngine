@@ -2,6 +2,8 @@
 
 #include <graphicsapi/resources/types/renderpass.h>
 #include <graphicsapi/resources/types/framebuffer.h>
+#include <graphicsapi/resources/types/pipeline.h>
+
 #include <material/material_loader.h>
 #include <material/material_declaration.h>
 
@@ -692,9 +694,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetUID)
+        CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)
         {
-            SHIRABE_UNUSED(aAssetUID);
+            SHIRABE_UNUSED(aMesh);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -702,9 +704,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetUID)
+        CEngineResult<> CFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh)
         {
-            SHIRABE_UNUSED(aAssetUID);
+            SHIRABE_UNUSED(aMesh);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -712,9 +714,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindMesh(AssetId_t const&aAssetUID)
+        CEngineResult<> CFrameGraphRenderContext::bindMesh(SFrameGraphMesh const &aMesh)
         {
-            SHIRABE_UNUSED(aAssetUID);
+            SHIRABE_UNUSED(aMesh);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -722,9 +724,114 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unbindMesh(AssetId_t const &aAssetUID)
+        CEngineResult<> CFrameGraphRenderContext::unbindMesh(SFrameGraphMesh const &aMesh)
         {
-            SHIRABE_UNUSED(aAssetUID);
+            SHIRABE_UNUSED(aMesh);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
+        {
+            SMaterial material {};
+
+            auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
+            if(CheckEngineError(result))
+            {
+                return { result };
+            }
+
+            CStdSharedPtr_t<CMaterialMaster> const &master    = instance->master();
+            SMaterialSignature               const &signature = master  ->signature();
+            CMaterialConfig                  const &config    = instance->config();
+
+            for(auto const [stageKey, stage] : signature.stages)
+            {
+                if(EShaderStage::Vertex == stageKey)
+                {
+                    for(SStageInput const &input : stage.inputs)
+                    {
+                    }
+                }
+
+                if(EShaderStage::Fragment == stageKey)
+                {
+                    for(SStageOutput const &output : stage.outputs)
+                    {
+
+                    }
+                }
+            }
+
+            Vector<SMaterialSet> sets;
+
+            for(SUniformBuffer const &uniformBuffer : signature.uniformBuffers)
+            {
+                // Fill up...
+                while(sets.size() < uniformBuffer.set)
+                {
+                    sets.push_back({});
+                }
+
+                SMaterialSet             &set      = sets[uniformBuffer.set];
+                Vector<SMaterialBinding> &bindings = set.bindings;
+
+                while(bindings.size() < uniformBuffer.binding)
+                {
+                    bindings.push_back({});
+                }
+
+                SMaterialBinding &binding = bindings[uniformBuffer.binding];
+
+                bindings[uniformBuffer.binding].descriptorType  = ;
+                bindings[uniformBuffer.binding].descriptorCount = ;
+                bindings[uniformBuffer.binding].stageFlags      = ;
+            }
+
+            for(SSampledImage const &sampledImage : signature.sampledImages)
+            {
+
+            }
+
+            CPipelineDeclaration::SDescriptor pipelineDescriptor {};
+            pipelineDescriptor.name     = "";
+            pipelineDescriptor.material = material;
+
+            CPipeline::CCreationRequest request(pipelineDescriptor, {}, {});
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)
+        {
+            SHIRABE_UNUSED(aMaterial);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)
+        {
+            SHIRABE_UNUSED(aMaterial);
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
+        {
+            SHIRABE_UNUSED(aMaterial);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -735,15 +842,6 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::render(SFrameGraphMesh     const &aMesh,
                                                          SFrameGraphMaterial const &aMaterial)
         {
-            auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
-            if(CheckEngineError(result))
-            {
-                return { result };
-            }
-
-            CStdSharedPtr_t<CMaterialMaster> const &master    = instance->master();
-            SMaterialSignature               const &signature = master  ->signature();
-            CMaterialConfig                  const &config    = instance->config();
 
             //
             // Traverse signature and derive pipeline configuration UNLESS a pipeline was

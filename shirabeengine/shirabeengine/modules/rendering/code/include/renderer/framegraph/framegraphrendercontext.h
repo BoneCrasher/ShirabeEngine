@@ -346,38 +346,74 @@ namespace engine
             /**
              * Load a mesh asset using the asset manager into the graphics API.
              *
-             * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful.
-             * @return          EEngineStatus::Error otherwise.
+             * @param aResourceId The mesh asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> loadMeshAsset(AssetId_t const &aAssetUID);
+            CEngineResult<> loadMeshAsset(SFrameGraphMesh const &aMesh);
 
             /**
              * Unload a mesh asset from the graphics API.
              *
-             * @param aAssetUID The UID of the asset to Unload.
-             * @return          EEngineStatus::Ok if successful.
-             * @return          EEngineStatus::Error otherwise.
+             * @param aResourceId The mesh asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unloadMeshAsset(AssetId_t const &aAssetUID);
+            CEngineResult<> unloadMeshAsset(SFrameGraphMesh const &aMesh);
 
             /**
              * Bind a mesh asset using the asset manager into the graphics API.
              *
-             * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful.
-             * @return          EEngineStatus::Error otherwise.
+             * @param aResourceId The mesh asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindMesh(AssetId_t const &aAssetUID);
+            CEngineResult<> bindMesh(SFrameGraphMesh const &aMesh);
 
             /**
              * Unbind a mesh asset from the graphics API.
              *
-             * @param aAssetUID The UID of the asset to load.
-             * @return          EEngineStatus::Ok if successful.
-             * @return          EEngineStatus::Error otherwise.
+             * @param aResourceId The mesh asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unbindMesh(AssetId_t const &aAssetUID);
+            CEngineResult<> unbindMesh(SFrameGraphMesh const &aMesh);
+
+            /**
+             * Load a material asset using the asset manager into the graphics API.
+             *
+             * @param aResourceId The material asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
+             */
+            CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial);
+
+            /**
+             * Unload a material asset from the graphics API.
+             *
+             * @param aResourceId The material asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
+             */
+            CEngineResult<> unloadMaterialAsset(SFrameGraphMaterial const &aMaterial);
+
+            /**
+             * Bind a material asset using the asset manager into the graphics API.
+             *
+             * @param aResourceId The material asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
+             */
+            CEngineResult<> bindMaterial(SFrameGraphMaterial const &aMaterial);
+
+            /**
+             * Unbind a material asset from the graphics API.
+             *
+             * @param aResourceId The material asset resource id.
+             * @return            EEngineStatus::Ok if successful.
+             * @return            EEngineStatus::Error otherwise.
+             */
+            CEngineResult<> unbindMaterial(SFrameGraphMaterial const &aMaterial);
 
             /**
              * Render a renderable entity using the graphicsAPI.

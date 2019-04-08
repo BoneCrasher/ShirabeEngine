@@ -17,6 +17,7 @@
 #include "swapchain.h"
 #include "renderpass.h"
 #include "framebuffer.h"
+#include "pipeline.h"
 
 namespace engine
 {
