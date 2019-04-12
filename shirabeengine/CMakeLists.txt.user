@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.7.0, 2019-04-08T13:17:37. -->
+<!-- Written by QtCreator 4.7.0, 2019-04-12T11:45:07. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -67,7 +67,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{327b90b4-30e9-4861-8d39-64b65c10fc5a}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">1</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
+   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">2</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
     <valuelist type="QVariantList" key="CMake.Configuration"/>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/dotti/workspaces/shirabeengine/build-shirabeengine-GCC_8_x86_64bit-Default</value>
@@ -465,7 +465,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose\ --debug\ --optimize\ -I=./data/input/resources/shaders/include\ -o=./data/resources/shaders/standard\ -i=./data/input/resources/shaders/standard/standard.mat.index
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./data/input/resources/shaders/include -o=./data/resources/shaders/standard -i=./data/input/resources/shaders/standard/standard.mat.index
 </value>
     <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>

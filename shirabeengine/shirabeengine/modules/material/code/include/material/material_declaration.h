@@ -234,7 +234,7 @@ namespace engine
         };
 
         /**
-         * @brief The SMaterialType struct
+         * The SMaterialType struct describes a data type of a SPIR-V module and it's memory properties.
          */
         struct SMaterialType
         {
@@ -292,8 +292,8 @@ namespace engine
             SHIRABE_INLINE
             bool equals(SBufferLocation const &aOther) const
             {
-                bool const offsetEq  = (offset == aOther.offset);
-                bool const lengthEq  = (length == aOther.length);
+                bool const offsetEq  = (offset  == aOther.offset);
+                bool const lengthEq  = (length  == aOther.length);
                 bool const paddingEq = (padding == aOther.padding);
 
                 return (offsetEq and lengthEq and paddingEq);
@@ -320,7 +320,7 @@ namespace engine
         };
 
         /**
-         * @brief The SUniformBufferMember struct
+         * Describes a single uniform buffer member by name and buffer location.
          */
         struct SUniformBufferMember
         {
@@ -330,7 +330,8 @@ namespace engine
         using UniformBufferMemberMap_t = std::unordered_map<std::string, SUniformBufferMember>;
 
         /**
-         * @brief The SUniformBuffer struct
+         * Describes a uniform buffer, it's name, location, set and binding as well
+         * as a collection of buffer members.
          */
         struct SUniformBuffer
         {
@@ -367,7 +368,7 @@ namespace engine
         };
 
         /**
-         * Describes a sampled image in a GLSL shader.
+         * Describes a sampled image in a GLSL shader, as well as its set and binding.
          */
         struct SSampledImage
         {
@@ -415,7 +416,15 @@ namespace engine
         using StageMap_t = std::unordered_map<EShaderStage, SMaterialStage>;
 
         /**
-         * @brief The SMaterial struct
+         * Describes a material signature composed of:
+         *
+         *     1. Material name
+         *     2. A list of stages
+         *     3. A list of uniform buffer signatures
+         *     4. A list of sampled image signatures
+         *     5. A list of subpass input signatures
+         *
+         * Implements signature de/serialization to .signature files.
          */
         struct SMaterialSignature
                 : public asset::CAssetReference
@@ -494,17 +503,7 @@ namespace engine
             bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialSignature> &aDeserializer);
         };
 
-        /**
-         * The CMaterialInterface class defines the public interface into the
-         * pipeline behind a material layer, which is basically the vertex shader input description.
-         */
-        class CMaterialInterface
-        {
-        public_methods:
-
-        private_members:
-        };
-
+        // Fwd-Declare for friending...
         class CMaterialConfig;
 
         /**
@@ -570,7 +569,7 @@ namespace engine
         };
 
         /**
-         * The CMaterialData class describes all material data of the material layer,
+         * The CMaterialConfig class describes all material data of the material layer,
          * which includes uniforms (push constants), uniform buffers, textures and samplers.
          *
          * The class will store all data and permitts read/write access to individual
@@ -578,6 +577,8 @@ namespace engine
          *
          * It will also provide access to data buffers pointers and sizes by their respective
          * names.
+         *
+         * Implements de/serialization to .config files.
          */
         class CMaterialConfig
                 : public asset::CAssetReference
@@ -644,22 +645,24 @@ namespace engine
 
         public_methods:
             /**
-             * getBuffer
+             * Return a pointer to a specific data reinterpreted as TBufferType.
+             * The buffer is identified by it's name.
              *
-             * @param aBufferName
-             * @param aOutBuffer
-             * @return
+             * @tparam TBufferType Type of the buffer to be returned.
+             * @param aBufferName  The name of the buffer to fetch.
+             * @return             EEngineStatus::Ok and a valid pointer to the buffer, if successful.
+             * @return             EEngineStatus::Error and nullptr or any error code on failure.
              */
             template <typename TBufferType>
             CEngineResult<TBufferType const*> getBuffer(std::string const &aBufferName) const;
 
             /**
-             * getValue
+             * Return the value of a buffer member identified by buffername/fieldname.
              *
-             * @param aBufferName
-             * @param aFieldName
-             * @param aOutValue
-             * @return
+             * @param aBufferName  The name of the buffer containing the value to fetch.
+             * @param aFieldName   The name of the value to fetch.
+             * @return             EEngineStatus::Ok and a valid pointer to the data, if successful.
+             * @return             EEngineStatus::Error and nullptr or any error code on failure.
              */
             template <typename TDataType>
             CEngineResult<TDataType const*> getBufferValue(
@@ -667,12 +670,12 @@ namespace engine
                     std::string const &aFieldName) const;
 
             /**
-             * getValue
+             * Return the value of a buffer member identified by buffer location as byte-pointer.
              *
-             * @param aBufferName
-             * @param aFieldName
-             * @param aOutValue
-             * @return
+             * @param aBufferName  The name of the buffer containing the value to fetch.
+             * @param aFieldName   The name of the value to fetch.
+             * @return             EEngineStatus::Ok and a valid pointer to the data, if successful.
+             * @return             EEngineStatus::Error and nullptr or any error code on failure.
              */
             SHIRABE_INLINE
             CEngineResult<uint8_t const*> getBufferValue(SBufferLocation const &aLocation) const;
@@ -680,10 +683,12 @@ namespace engine
             /**
              * setValue
              *
-             * @param aBufferName
-             * @param aFieldName
-             * @param aFieldValue
-             * @return
+             * @tparam TDataType   Type of the data to be set.
+             * @param aBufferName  The name of the buffer containing the value to fetch.
+             * @param aFieldName   The name of the value to fetch.
+             * @param aFieldValue  The typed data to set.
+             * @return             EEngineStatus::Ok, if successful.
+             * @return             EEngineStatus::<ErrorCode> on error.
              */
             template <typename TDataType>
             CEngineResult<> setBufferValue(
@@ -692,12 +697,12 @@ namespace engine
                     TDataType   const &aFieldValue);
 
             /**
-             * setValue
+             * Set the value of a buffer member identified by buffer location
              *
-             * @param aBufferName
-             * @param aFieldName
-             * @param aFieldValue
-             * @return
+             * @param aLocation   The location in the material data buffer to set.
+             * @param aData       The byte data to set.
+             * @return            EEngineStatus::Ok, if successful.
+             * @return            EEngineStatus::<ErrorCode> on error.
              */
             SHIRABE_INLINE
             CEngineResult<> setBufferValue(
@@ -708,8 +713,9 @@ namespace engine
              * Override individual data points in the configuration in order to implement
              * material instance behaviour.
              *
-             * @param aOther
-             * @return
+             * @param aOther The configuration to apply to this instance.
+             * @return       EEngineStatus::Ok, if successful.
+             * @return       EEngineStatus::<ErrorCode> on error.
              */
             CEngineResult<> override(CMaterialConfig const &aOther);
 
@@ -729,7 +735,7 @@ namespace engine
 
         private_methods:
             /**
-             *
+             * Where there is a will there is a way
              *
              * @param aBufferName
              * @param aBufferValue
@@ -742,6 +748,7 @@ namespace engine
                     std::string const &aBufferValue) const;
 
             /**
+             * Where there is a will there is a way
              *
              * @param aBufferName
              * @param aBufferValue
@@ -899,8 +906,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         /**
-         * A material instance describes a configurable and bindable material state which can be imagined
-         * to be a single render call for an object having this material assigned.
+         * A material master is composed by a signature and base configuration.
+         * It will be used to create instances from this material.
          */
         class CMaterialMaster
                 : public asset::CAssetReference
@@ -991,6 +998,9 @@ namespace engine
         /**
          * A material instance describes a configurable and bindable material state which can be imagined
          * to be a single render call for an object having this material assigned.
+         *
+         * Instances track their master during edit-time, in case the master signature changes due to
+         * base configuration value changes or shader file updates.
          */
         class CMaterialInstance
                 : public asset::CAssetReference
@@ -1078,158 +1088,6 @@ namespace engine
             CStdSharedPtr_t<CMaterialMaster> mMasterReference;
         };
 
-        /**
-         * The CMaterialLayer class describes a single layer of a material container, referencing a material instance.
-         */
-        class CMaterialLayer
-        {
-        public_constructors:
-            CMaterialLayer() = default;
-
-            SHIRABE_INLINE
-            CMaterialLayer(std::string const &aName)
-                : mName(aName)
-                , mMaterialInstance(nullptr)
-                , mEnabled(false)
-            {}
-
-            SHIRABE_INLINE
-            CMaterialLayer(CMaterialLayer const &aOther)
-                : mName            (aOther.mName            )
-                , mMaterialInstance(aOther.mMaterialInstance)
-                , mEnabled         (aOther.mEnabled         )
-            {}
-
-            SHIRABE_INLINE
-            CMaterialLayer(CMaterialLayer &&aOther)
-                : mName            (std::move(aOther.mName            ))
-                , mMaterialInstance(std::move(aOther.mMaterialInstance))
-                , mEnabled         (std::move(aOther.mEnabled         ))
-            {
-                aOther.mMaterialInstance = nullptr;
-            }
-
-        public_destructors:
-            ~CMaterialLayer() = default;
-
-        public_operators:
-            SHIRABE_INLINE
-            CMaterialLayer &operator=(CMaterialLayer const &aOther)
-            {
-                mName             = aOther.mName;
-                mMaterialInstance = aOther.mMaterialInstance;
-                mEnabled          = aOther.mEnabled;
-
-                return (*this);
-            }
-
-            SHIRABE_INLINE
-            CMaterialLayer &operator=(CMaterialLayer &&aOther)
-            {
-                mName             = std::move(aOther.mName            );
-                mMaterialInstance = std::move(aOther.mMaterialInstance);
-                mEnabled          = std::move(aOther.mEnabled         );
-
-                mMaterialInstance = nullptr;
-
-                return (*this);
-            }
-        public_methods:
-            SHIRABE_INLINE
-            void assignMaterialInstance(CStdSharedPtr_t<CMaterialInstance> const &aInstance)
-            {
-                mMaterialInstance = aInstance;
-            }
-
-            SHIRABE_INLINE
-            CStdSharedPtr_t<CMaterialInstance> getAssignedMaterialInstance()
-            {
-                return mMaterialInstance;
-            }
-
-        private_members:
-            std::string                        mName;
-            CStdSharedPtr_t<CMaterialInstance> mMaterialInstance;
-            bool                               mEnabled;
-        };
-
-        /**
-         * The CMaterial class encapsulates at least one material layer
-         * and serves as the public access point to the entire material
-         * structure.
-         */
-        class CMaterial
-            : public asset::CAssetReference
-        {
-        public_constructors:
-            SHIRABE_INLINE
-            CMaterial(asset::AssetId_t const &aReferencedAssetId)
-                : asset::CAssetReference(aReferencedAssetId)
-            {}
-
-        public_destructors:
-
-        public_operators:
-
-        public_methods:
-            /**
-             *
-             *
-             * @param aLayerId
-             * @return
-             */
-            SHIRABE_INLINE
-            CEngineResult<CMaterialLayer *> addLayer(std::string const &aLayerId)
-            {
-                bool const has = hasLayer(aLayerId);
-                if(has)
-                {
-                    return { EEngineStatus::Error, nullptr };
-                }
-
-                CMaterialLayer &layer = mLayers[aLayerId] = { aLayerId };
-                return { EEngineStatus::Ok,  &layer };
-            }
-
-            /**
-             *
-             *
-             * @param aLayerId
-             * @return
-             */
-            SHIRABE_INLINE
-            CEngineResult<CMaterialLayer *> getLayer(std::string const &aLayerId)
-            {
-                bool const has = hasLayer(aLayerId);
-                if(not has)
-                {
-                    return { EEngineStatus::Error, nullptr };
-                }
-
-                CMaterialLayer &layer = mLayers.at(aLayerId);
-                return { EEngineStatus::Ok, &layer };
-            }
-
-        private_methods:
-            /**
-             *
-             *
-             * @param aLayerId
-             * @return
-             */
-            SHIRABE_INLINE bool hasLayer(std::string const &aLayerId) const
-            {
-                bool const has = (mLayers.end() != mLayers.find(aLayerId));
-                return has;
-            }
-
-        private_static_fields:
-            static CMaterialLayer const sEmptyLayer;
-
-        private_members:
-            std::string                      mName;
-            Map<std::string, CMaterialLayer> mLayers;
-        };
 
     }
 }

@@ -786,9 +786,9 @@ namespace engine
 
                 SMaterialBinding &binding = bindings[uniformBuffer.binding];
 
-                bindings[uniformBuffer.binding].descriptorType  = ;
-                bindings[uniformBuffer.binding].descriptorCount = ;
-                bindings[uniformBuffer.binding].stageFlags      = ;
+                // bindings[uniformBuffer.binding].descriptorType  = ;
+                // bindings[uniformBuffer.binding].descriptorCount = ;
+                // bindings[uniformBuffer.binding].stageFlags      = ;
             }
 
             for(SSampledImage const &sampledImage : signature.sampledImages)
