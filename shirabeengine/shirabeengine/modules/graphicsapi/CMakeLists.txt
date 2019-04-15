@@ -13,6 +13,7 @@ set(
         SHIRABEMODULELOG      
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM 
+        VULKANHEADERS
         JSON                  
         XML2
         ZLIB)

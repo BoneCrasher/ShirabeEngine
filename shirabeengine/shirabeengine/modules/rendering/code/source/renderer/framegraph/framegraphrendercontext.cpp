@@ -736,9 +736,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
         {
-            SMaterial material {};
-            material.inputAssemblyState.topology = EMaterialPrimitiveTopology::TriangleList;
-
             auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
             if(CheckEngineError(result))
             {
@@ -749,6 +746,14 @@ namespace engine
             SMaterialSignature               const &signature = master  ->signature();
             CMaterialConfig                  const &config    = instance->config();
 
+            CPipelineDeclaration::SDescriptor pipelineDescriptor {};
+
+            pipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+            pipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
+            pipelineDescriptor.inputAssemblyState.flags                  = 0;
+            pipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+            pipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
+
             for(auto const [stageKey, stage] : signature.stages)
             {
                 if(EShaderStage::Vertex == stageKey)
@@ -757,25 +762,25 @@ namespace engine
                     {
                         SStageInput const &input = stage.inputs.at(k);
 
-                        SMaterialVertexInputBinding binding {};
+                        VkVertexInputBindingDescription binding;
                         binding.binding   = k;
                         binding.stride    = input.type.byteSize;
-                        binding.inputRate = EMaterialVertexInputRate::Vertex;
+                        binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-                        SMaterialVertexAttributeDescription attribute {};
-                        attribute.binding    = k;
-                        attribute.location   = input.location;
-                        attribute.byteOffset = 0;
-                        attribute.format     = (2 == binding.stride)
-                                                    ? EFormat::R32G32_SFLOAT
-                                                    : (3 == binding.stride)
-                                                           ? EFormat::R32G32B32_SFLOAT
-                                                           : (4 == binding.stride)
-                                                                  ? EFormat::R32G32B32A32_FLOAT
-                                                                  : EFormat::Undefined;
+                        VkVertexInputAttributeDescription attribute;
+                        attribute.binding  = k;
+                        attribute.location = k;
+                        attribute.offset   = 0;
+                        attribute.format   = (2 == binding.stride)
+                                                  ? VkFormat::VK_FORMAT_R32G32_SFLOAT
+                                                  : (3 == binding.stride)
+                                                         ? VkFormat::VK_FORMAT_R32G32B32_SFLOAT
+                                                         : (4 == binding.stride)
+                                                                ? VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT
+                                                                : VkFormat::VK_FORMAT_UNDEFINED;
 
-                        material.vertexInputState.bufferBindings   .push_back(binding);
-                        material.vertexInputState.attributeBindings.push_back(attribute);
+                        pipelineDescriptor.vertexInputBindings  .push_back(binding);
+                        pipelineDescriptor.vertexInputAttributes.push_back(attribute);
                     }
                 }
 
@@ -783,12 +788,43 @@ namespace engine
                 {
                     for(SStageOutput const &output : stage.outputs)
                     {
-                        material...
+
                     }
                 }
             }
 
             Vector<SMaterialSet> sets;
+
+            for(SSubpassInput const &input : signature.subpassInputs)
+            {
+                VkPipelineColorBlendAttachmentState colorBlendAttachmentState {};
+                colorBlendAttachmentState.blendEnable         = VK_TRUE;
+                colorBlendAttachmentState.colorWriteMask      = VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT |
+                                                                VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT |
+                                                                VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT |
+                                                                VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
+                colorBlendAttachmentState.srcColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
+                colorBlendAttachmentState.dstColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                colorBlendAttachmentState.colorBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+                colorBlendAttachmentState.srcAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;
+                colorBlendAttachmentState.dstAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO;
+                colorBlendAttachmentState.alphaBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+
+                pipelineDescriptor.colorBlendAttachmentStates.push_back(colorBlendAttachmentState);
+            }
+
+            VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo {};
+            colorBlendCreateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+            colorBlendCreateInfo.pNext             = nullptr;
+            colorBlendCreateInfo.flags             = 0;
+            colorBlendCreateInfo.logicOpEnable     = VK_FALSE;
+            colorBlendCreateInfo.logicOp           = VK_LOGIC_OP_COPY;
+            colorBlendCreateInfo.blendConstants[0] = 0.0f;
+            colorBlendCreateInfo.blendConstants[1] = 0.0f;
+            colorBlendCreateInfo.blendConstants[2] = 0.0f;
+            colorBlendCreateInfo.blendConstants[3] = 0.0f;
+
+            pipelineDescriptor.colorBlendState = colorBlendCreateInfo;
 
             for(SUniformBuffer const &uniformBuffer : signature.uniformBuffers)
             {
