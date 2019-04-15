@@ -737,6 +737,7 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
         {
             SMaterial material {};
+            material.inputAssemblyState.topology = EMaterialPrimitiveTopology::TriangleList;
 
             auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
             if(CheckEngineError(result))
@@ -752,8 +753,29 @@ namespace engine
             {
                 if(EShaderStage::Vertex == stageKey)
                 {
-                    for(SStageInput const &input : stage.inputs)
+                    for(uint32_t k=0; k<stage.inputs.size(); ++k)
                     {
+                        SStageInput const &input = stage.inputs.at(k);
+
+                        SMaterialVertexInputBinding binding {};
+                        binding.binding   = k;
+                        binding.stride    = input.type.byteSize;
+                        binding.inputRate = EMaterialVertexInputRate::Vertex;
+
+                        SMaterialVertexAttributeDescription attribute {};
+                        attribute.binding    = k;
+                        attribute.location   = input.location;
+                        attribute.byteOffset = 0;
+                        attribute.format     = (2 == binding.stride)
+                                                    ? EFormat::R32G32_SFLOAT
+                                                    : (3 == binding.stride)
+                                                           ? EFormat::R32G32B32_SFLOAT
+                                                           : (4 == binding.stride)
+                                                                  ? EFormat::R32G32B32A32_FLOAT
+                                                                  : EFormat::Undefined;
+
+                        material.vertexInputState.bufferBindings   .push_back(binding);
+                        material.vertexInputState.attributeBindings.push_back(attribute);
                     }
                 }
 
@@ -761,7 +783,7 @@ namespace engine
                 {
                     for(SStageOutput const &output : stage.outputs)
                     {
-
+                        material...
                     }
                 }
             }

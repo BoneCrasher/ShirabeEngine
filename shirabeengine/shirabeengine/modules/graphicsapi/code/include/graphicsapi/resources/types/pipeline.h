@@ -201,6 +201,13 @@ namespace engine
             , MaxEnm                = 0x7FFFFFFF
         };
 
+        enum class EMaterialVertexInputRate
+        {
+            Vertex     = 0
+            , Instance
+            , MaxEnum  = 0x7FFFFFFF
+        };
+
         struct SViewPort
         {
             float
@@ -209,9 +216,27 @@ namespace engine
                 minDepth, maxDepth;
         };
 
+        // Buffer, one per element...
+        struct SMaterialVertexInputBinding
+        {
+            uint32_t                 binding;
+            uint32_t                 stride;
+            EMaterialVertexInputRate inputRate;
+        };
+
+        // Element in Buffer
+        struct SMaterialVertexAttributeDescription
+        {
+            uint32_t binding;
+            uint32_t location;
+            EFormat  format;
+            uint32_t byteOffset;
+        };
+
         struct SMaterialVertexInputState
         {
-
+            std::vector<SMaterialVertexInputBinding>         bufferBindings;
+            std::vector<SMaterialVertexAttributeDescription> attributeBindings;
         };
 
         struct SMaterialInputAssemblyState

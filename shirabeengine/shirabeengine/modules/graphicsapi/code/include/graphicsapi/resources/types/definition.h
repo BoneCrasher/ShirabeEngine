@@ -53,8 +53,16 @@ namespace engine {
             R16G16B16A16_SNORM,
             R16G16B16A16_UNORM,
             R16G16B16A16_FLOAT,
+            R32G32_UINT   ,
+            R32G32_SINT   ,
+            R32G32_SFLOAT ,
             R32_FLOAT_S8X24_TYPELESS,
             D32_FLOAT_S8X24_UINT,
+            // 96-bit formats
+            Format96BitFormatRangeFlag = 96,
+            R32G32B32_UINT,
+            R32G32B32_SINT,
+            R32G32B32_SFLOAT,
             // 128-bit formats
             Format128BitFormatRangeFlag = 128,
             R32G32B32A32_TYPELESS,
