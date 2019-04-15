@@ -148,6 +148,19 @@ namespace engine
             aSerializer.beginObject(name);
 
             //
+            // Write layout info
+            //
+            aSerializer.beginObject("layoutInfo");
+            aSerializer.writeValue("setCount", layoutInfo.setCount);
+            aSerializer.beginObject("setBindingCounts");
+            for(uint32_t k=0; k<layoutInfo.setBindingCount.size(); ++k)
+            {
+                aSerializer.writeValue(CString::format("%0", k), layoutInfo.setBindingCount[k]);
+            }
+            aSerializer.endObject();
+            aSerializer.endObject();
+
+            //
             // Serialize subpass input
             //
             aSerializer.beginArray("subpassInputs");
@@ -288,6 +301,22 @@ namespace engine
          */
         bool SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer<SMaterialSignature> &aDeserializer)
         {
+            //
+            // Read layout info
+            //
+            aDeserializer.beginObject("layoutInfo");
+            aDeserializer.readValue("setCount", layoutInfo.setCount);
+            aDeserializer.beginObject("setBindingCounts");
+
+            layoutInfo.setBindingCount.resize(layoutInfo.setCount);
+            for(uint32_t k=0; k<layoutInfo.setCount; ++k)
+            {
+                aDeserializer.readValue(CString::format("%0", k), *(layoutInfo.setBindingCount.data() + k));
+            }
+
+            aDeserializer.endObject();
+            aDeserializer.endObject();
+
             //
             // Serialize subpass input
             //

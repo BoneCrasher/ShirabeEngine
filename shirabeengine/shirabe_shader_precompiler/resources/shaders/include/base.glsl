@@ -16,6 +16,6 @@ globalData;
 // layout (std140, set = 1, binding = 0)
 // uniform Reserved
 // {
-//
+//     float _UNUSED;
 // }
-// reserved;
+reserved;

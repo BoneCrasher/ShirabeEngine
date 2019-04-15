@@ -416,6 +416,17 @@ namespace engine
         using StageMap_t = std::unordered_map<EShaderStage, SMaterialStage>;
 
         /**
+         * This struct stores basic layout structural information
+         * to ease recreation of materials.
+         */
+        struct SMaterialLayoutInfo
+        {
+        public_members:
+            uint32_t              setCount;
+            std::vector<uint32_t> setBindingCount;
+        };
+
+        /**
          * Describes a material signature composed of:
          *
          *     1. Material name
@@ -433,6 +444,7 @@ namespace engine
         {
         public_members:
             std::string                 name;
+            SMaterialLayoutInfo         layoutInfo;
             StageMap_t                  stages;
             // Although each stage defines uniform buffers individually, they are shared
             // across all stages, due to indexing them with set and binding.

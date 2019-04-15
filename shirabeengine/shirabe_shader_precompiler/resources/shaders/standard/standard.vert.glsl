@@ -32,11 +32,6 @@ layout (location = 1) in vec3 vertex_normal;
 layout (location = 2) in vec3 vertex_tangent;
 layout (location = 3) in vec2 vertex_texcoord;
 
-// layout (location = 0) in vec3 vertex_position;
-// layout (location = 1) in vec4 vertex_normal;
-// layout (location = 5) in mat4 vertex_tangent[3];
-// layout (location = 17) in mat4x2 vertex_texcoord;
-
 //
 // Vertex shader output
 //

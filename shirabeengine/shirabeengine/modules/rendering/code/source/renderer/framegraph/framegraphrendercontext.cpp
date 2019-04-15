@@ -754,7 +754,50 @@ namespace engine
             pipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
             pipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
 
-            for(auto const [stageKey, stage] : signature.stages)
+            pipelineDescriptor.rasterizerState.sType                     = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+            pipelineDescriptor.rasterizerState.pNext                     = nullptr;
+            pipelineDescriptor.rasterizerState.flags                     = 0;
+            pipelineDescriptor.rasterizerState.cullMode                  = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
+            pipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
+            pipelineDescriptor.rasterizerState.polygonMode               = VkPolygonMode::VK_POLYGON_MODE_FILL;
+            pipelineDescriptor.rasterizerState.lineWidth                 = 1.0f;
+            pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_TRUE;
+            pipelineDescriptor.rasterizerState.depthClampEnable          = VK_FALSE;
+            pipelineDescriptor.rasterizerState.depthBiasEnable           = VK_FALSE;
+            pipelineDescriptor.rasterizerState.depthBiasSlopeFactor      = 0.0f;
+            pipelineDescriptor.rasterizerState.depthBiasConstantFactor   = 0.0f;
+            pipelineDescriptor.rasterizerState.depthBiasClamp            = 0.0f;
+
+            pipelineDescriptor.multiSampler.sType                        = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+            pipelineDescriptor.multiSampler.pNext                        = nullptr;
+            pipelineDescriptor.multiSampler.flags                        = 0;
+            pipelineDescriptor.multiSampler.sampleShadingEnable          = VK_FALSE;
+            pipelineDescriptor.multiSampler.rasterizationSamples         = VK_SAMPLE_COUNT_1_BIT;
+            pipelineDescriptor.multiSampler.minSampleShading             = 1.0f;
+            pipelineDescriptor.multiSampler.pSampleMask                  = nullptr;
+            pipelineDescriptor.multiSampler.alphaToCoverageEnable        = VK_FALSE;
+            pipelineDescriptor.multiSampler.alphaToOneEnable             = VK_FALSE;
+
+            pipelineDescriptor.depthStencilState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+            pipelineDescriptor.depthStencilState.pNext                   = nullptr;
+            pipelineDescriptor.depthStencilState.flags                   = 0;
+            pipelineDescriptor.depthStencilState.depthTestEnable         = VK_TRUE;
+            pipelineDescriptor.depthStencilState.depthWriteEnable        = VK_TRUE;
+            pipelineDescriptor.depthStencilState.depthCompareOp          = VkCompareOp::VK_COMPARE_OP_LESS;
+            pipelineDescriptor.depthStencilState.stencilTestEnable       = VK_FALSE;
+            pipelineDescriptor.depthStencilState.front.passOp            = VkStencilOp::VK_STENCIL_OP_KEEP;
+            pipelineDescriptor.depthStencilState.front.failOp            = VkStencilOp::VK_STENCIL_OP_KEEP;
+            pipelineDescriptor.depthStencilState.front.depthFailOp       = VkStencilOp::VK_STENCIL_OP_KEEP;
+            pipelineDescriptor.depthStencilState.front.compareOp         = VkCompareOp::VK_COMPARE_OP_ALWAYS;
+            pipelineDescriptor.depthStencilState.front.compareMask       = 0;
+            pipelineDescriptor.depthStencilState.front.writeMask         = 0;
+            pipelineDescriptor.depthStencilState.front.reference         = 0;
+            pipelineDescriptor.depthStencilState.back                    = pipelineDescriptor.depthStencilState.front;
+            pipelineDescriptor.depthStencilState.depthBoundsTestEnable   = VK_TRUE;
+            pipelineDescriptor.depthStencilState.minDepthBounds          = 0.0f;
+            pipelineDescriptor.depthStencilState.maxDepthBounds          = 1.0f;
+
+            for(auto const &[stageKey, stage] : signature.stages)
             {
                 if(EShaderStage::Vertex == stageKey)
                 {
@@ -793,7 +836,21 @@ namespace engine
                 }
             }
 
-            Vector<SMaterialSet> sets;
+            std::vector<VkDescriptorSetLayoutCreateInfo> descriptorSets {};
+            descriptorSets.resize(signature.layoutInfo.setCount);
+            pipelineDescriptor.descriptorSetLayoutBindings.resize(signature.layoutInfo.setCount);
+
+            for(uint32_t k=0; k<descriptorSets.size(); ++k)
+            {
+                VkDescriptorSetLayoutCreateInfo &info = descriptorSets[k];
+
+                info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+                info.pNext        = nullptr;
+                info.flags        = 0;
+                info.bindingCount = signature.layoutInfo.setBindingCount[k];
+
+                pipelineDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
+            }
 
             for(SSubpassInput const &input : signature.subpassInputs)
             {
@@ -811,6 +868,14 @@ namespace engine
                 colorBlendAttachmentState.alphaBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
 
                 pipelineDescriptor.colorBlendAttachmentStates.push_back(colorBlendAttachmentState);
+
+                VkDescriptorSetLayoutBinding layoutBinding {};
+                layoutBinding.binding            = input.binding;
+                layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+                layoutBinding.stageFlags         = 0; // TODO!
+                layoutBinding.descriptorCount    = 1;
+                layoutBinding.pImmutableSamplers = nullptr;
+                pipelineDescriptor.descriptorSetLayoutBindings[input.set][input.binding] = layoutBinding;
             }
 
             VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo {};
@@ -828,7 +893,8 @@ namespace engine
 
             for(SUniformBuffer const &uniformBuffer : signature.uniformBuffers)
             {
-                // Fill up...
+
+
                 while(sets.size() < uniformBuffer.set)
                 {
                     sets.push_back({});
@@ -853,10 +919,6 @@ namespace engine
             {
 
             }
-
-            CPipelineDeclaration::SDescriptor pipelineDescriptor {};
-            pipelineDescriptor.name     = "";
-            pipelineDescriptor.material = material;
 
             CPipeline::CCreationRequest request(pipelineDescriptor, {}, {});
 

@@ -106,6 +106,28 @@ namespace shader_precompiler
 
         SMaterialSignature materialExtracted {};
 
+        //
+        // As we process elements below, which affect sets and bindings, store some information
+        // on them.
+        //
+        SMaterialLayoutInfo layoutInfo {};
+        layoutInfo.setCount        = 0;
+        layoutInfo.setBindingCount = {};
+
+        auto const updateLayoutInfoFn = [&layoutInfo] (uint32_t const &setIndex, uint32_t const &bindingIndex) -> void
+        {
+            if(layoutInfo.setCount <= setIndex)
+            {
+                layoutInfo.setCount = (setIndex + 1);
+                layoutInfo.setBindingCount.resize(layoutInfo.setCount);
+            }
+
+            if(layoutInfo.setBindingCount[setIndex] <= bindingIndex)
+            {
+                layoutInfo.setBindingCount[setIndex] = (bindingIndex + 1);
+            }
+        };
+
         auto const reflectType = [] (spirv_cross::SPIRType const &aType) -> SMaterialType
         {
             std::string           const  typeName       = determineSPIRVTypeName(aType);
@@ -246,6 +268,8 @@ namespace shader_precompiler
                 uint32_t const set             = compiler.get_decoration(subPassInput.id, spv::DecorationDescriptorSet);
                 uint32_t const binding         = compiler.get_decoration(subPassInput.id, spv::DecorationBinding);
 
+                updateLayoutInfoFn(set, binding);
+
                 SSubpassInput stageSubpassInputExtracted{};
                 stageSubpassInputExtracted.name            = subPassInput.name;
                 stageSubpassInputExtracted.attachmentIndex = attachmentIndex;
@@ -337,6 +361,8 @@ namespace shader_precompiler
                 uint32_t const set      = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
                 uint32_t const binding  = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
 
+                updateLayoutInfoFn(set, binding);
+
                 spirv_cross::SPIRType const &type       = compiler.get_type(uniformBuffer.base_type_id);
                 size_t                const  bufferSize = compiler.get_declared_struct_size(type);
 
@@ -407,6 +433,8 @@ namespace shader_precompiler
                 uint32_t const set      = compiler.get_decoration(sampledImage.id, spv::DecorationDescriptorSet);
                 uint32_t const binding  = compiler.get_decoration(sampledImage.id, spv::DecorationBinding);
 
+                updateLayoutInfoFn(set, binding);
+
                 SSampledImage image{};
                 image.name    = sampledImage.name;
                 image.set     = set;
@@ -431,6 +459,8 @@ namespace shader_precompiler
         };
 
         std::for_each(aUnit.elements.begin(), aUnit.elements.end(), reflect);
+
+        materialExtracted.layoutInfo = layoutInfo;
 
         return { ( EResult::Success == static_cast<EResult>(result) ), materialExtracted };
     }
