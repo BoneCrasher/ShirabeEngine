@@ -862,17 +862,17 @@ namespace engine
                                                                 VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
                 colorBlendAttachmentState.srcColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
                 colorBlendAttachmentState.dstColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-                colorBlendAttachmentState.colorBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+                colorBlendAttachmentState.colorBlendOp        = VkBlendOp    ::VK_BLEND_OP_ADD;
                 colorBlendAttachmentState.srcAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;
                 colorBlendAttachmentState.dstAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO;
-                colorBlendAttachmentState.alphaBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+                colorBlendAttachmentState.alphaBlendOp        = VkBlendOp    ::VK_BLEND_OP_ADD;
 
                 pipelineDescriptor.colorBlendAttachmentStates.push_back(colorBlendAttachmentState);
 
                 VkDescriptorSetLayoutBinding layoutBinding {};
                 layoutBinding.binding            = input.binding;
                 layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-                layoutBinding.stageFlags         = 0; // TODO!
+                layoutBinding.stageFlags         = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; // Subpass inputs are only accessibly in fragment shaders.
                 layoutBinding.descriptorCount    = 1;
                 layoutBinding.pImmutableSamplers = nullptr;
                 pipelineDescriptor.descriptorSetLayoutBindings[input.set][input.binding] = layoutBinding;
@@ -893,36 +893,32 @@ namespace engine
 
             for(SUniformBuffer const &uniformBuffer : signature.uniformBuffers)
             {
-
-
-                while(sets.size() < uniformBuffer.set)
-                {
-                    sets.push_back({});
-                }
-
-                SMaterialSet             &set      = sets[uniformBuffer.set];
-                Vector<SMaterialBinding> &bindings = set.bindings;
-
-                while(bindings.size() < uniformBuffer.binding)
-                {
-                    bindings.push_back({});
-                }
-
-                SMaterialBinding &binding = bindings[uniformBuffer.binding];
-
-                // bindings[uniformBuffer.binding].descriptorType  = ;
-                // bindings[uniformBuffer.binding].descriptorCount = ;
-                // bindings[uniformBuffer.binding].stageFlags      = ;
+                VkDescriptorSetLayoutBinding layoutBinding {};
+                layoutBinding.binding            = uniformBuffer.binding;
+                layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                layoutBinding.stageFlags         = uniformBuffer.stageBinding.value();
+                layoutBinding.descriptorCount    = 1;
+                layoutBinding.pImmutableSamplers = nullptr;
+                pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
             }
 
             for(SSampledImage const &sampledImage : signature.sampledImages)
             {
-
+                VkDescriptorSetLayoutBinding layoutBinding {};
+                layoutBinding.binding            = sampledImage.binding;
+                layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                layoutBinding.stageFlags         = sampledImage.stageBinding.value();
+                layoutBinding.descriptorCount    = 1;
+                layoutBinding.pImmutableSamplers = nullptr;
+                pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set][sampledImage.binding] = layoutBinding;
             }
 
             CPipeline::CCreationRequest request(pipelineDescriptor, {}, {});
 
-            return EEngineStatus::Ok;
+            CEngineResult<> status = mResourceManager->createResource<CPipeline>(request, aMaterial.readableName, false);
+            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create pipeline.");
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 

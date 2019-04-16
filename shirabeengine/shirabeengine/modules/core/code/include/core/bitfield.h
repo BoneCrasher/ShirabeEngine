@@ -130,11 +130,25 @@ namespace engine
             CBitField<TEnum> operator|(TEnum const&aValue);
 
             /**
+             * @brief operator |
+             * @param aOther
+             * @return
+             */
+            CBitField<TEnum> operator|(CBitField<TEnum> const &aOther);
+
+            /**
              * @brief operator &
              * @param aValue
              * @return
              */
             CBitField<TEnum> operator&(TEnum const&aValue);
+
+            /**
+             * @brief operator |
+             * @param aOther
+             * @return
+             */
+            CBitField<TEnum> operator&(CBitField<TEnum> const &aOther);
 
         public_methods:
             /**
@@ -144,10 +158,23 @@ namespace engine
             void set(TEnum const&aValue);
 
             /**
+             * @brief set
+             * @param aValue
+             */
+            void set(CBitField<TEnum> const&aValue);
+
+
+            /**
              * @brief unset
              * @param aValue
              */
             void unset(TEnum const&aValue);
+
+            /**
+             * @brief unset
+             * @param aValue
+             */
+            void unset(CBitField<TEnum> const&aValue);
 
             /**
              * @brief check
@@ -272,9 +299,30 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TEnum>
+        void
+        CBitField<TEnum>::set(CBitField<TEnum> const&e)
+        {
+            mCBitField = (mCBitField | e.value());
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
         void CBitField<TEnum>::unset(TEnum const&e)
         {
             mCBitField = (mCBitField ^ (mCBitField & CBitField<TEnum>::getValue(e)));
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
+        void CBitField<TEnum>::unset(CBitField<TEnum> const&e)
+        {
+            mCBitField = (mCBitField ^ (mCBitField & e.value()));
         }
         //<-----------------------------------------------------------------------------
 
@@ -391,9 +439,32 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TEnum>
+        CBitField<TEnum> CBitField<TEnum>::operator|(CBitField<TEnum> const &aValue)
+        {
+            CBitField<TEnum> c(value());
+            c.set(aValue);
+            return c;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
         CBitField<TEnum> CBitField<TEnum>::operator&(TEnum const&aValue)
         {
             CBitField<TEnum> c(value() & CBitField<TEnum>::getValue(aValue));
+            return c;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
+        CBitField<TEnum> CBitField<TEnum>::operator&(CBitField<TEnum> const&aValue)
+        {
+            CBitField<TEnum> c(value() & aValue.value());
             return c;
         }
         //<-----------------------------------------------------------------------------

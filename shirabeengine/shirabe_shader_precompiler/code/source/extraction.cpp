@@ -1,5 +1,6 @@
-﻿#include <filesystem>
+#include <filesystem>
 #include <fstream>
+#include <optional>
 
 #include <spirv_cross/spirv_cross.hpp>
 #include <core/helpers.h>
@@ -94,7 +95,74 @@ namespace shader_precompiler
         default:                                                 return "Unknown";
         }
     }
+    //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    auto checkForDuplicateBoundResource (std::vector<T> const &aSource, T const &aBuffer)
+        -> std::optional<
+               std::reference_wrapper<
+                   std::enable_if_t<std::is_base_of_v<SBoundResource, T>, T>
+               >
+           >
+    {
+        if(aSource.empty())
+        {
+            return {};
+        }
+
+        for(T &aCompareBuffer : aSource)
+        {
+            bool equalName          = false;
+            bool equalSetAndBinding = false;
+            // Make sure that globally, there are no duplicate buffer names.
+            equalName          = ( 0 == aCompareBuffer.name.compare(aBuffer.name) );
+            // Make sure that globally, no buffers have equal sets and bindings.
+            equalSetAndBinding = ( aCompareBuffer.set == aBuffer.set and aCompareBuffer.binding == aBuffer.binding );
+
+            // TODO: Binding overlap check
+
+            // if ( aCompareBuffer.location.equals(aBuffer.location)
+            //      or aCompareBuffer.location.overlapsWith(aBuffer.location) )
+            // {
+            //     // Locations may not overlap.
+            //     goto invalid;
+            // }
+            //
+            // for( auto const &[name, member] : aCompareBuffer.members )
+            // {
+                //
+                // We don't have to check the members itself, since duplicate names inside a
+                // single GLSL file are caught by the glslangValidator and cross-stage duplicate
+                // names are no problem.
+                //
+
+                // bool const containsMember = (aBuffer.members.end() != aBuffer.members.find(name));
+                // if(containsMember)
+                // {
+                //     // Duplicate name in other buffer. Not allowed.
+                //     goto invalid;
+                // }
+
+                // SUniformBufferMember const &otherMember = aBuffer.members.at(name);
+                // if ( member.location.equals(otherMember.location)
+                //      or member.location.overlapsWith(otherMember.location) )
+                // {
+                //     // Locations may not overlap.
+                //     goto invalid;
+                // }
+            // }
+
+            if(equalName and equalSetAndBinding)
+            {
+                return { aCompareBuffer }; // Return the identified duplicate buffer...
+            }
+        }
+
+        return {};
+    };
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
@@ -291,67 +359,7 @@ namespace shader_precompiler
                             binding);
             }
 
-            auto const checkForInvalidUBO = [&materialExtracted] (SUniformBuffer const &aBuffer) -> bool
-            {
-                if(materialExtracted.uniformBuffers.empty())
-                {
-                    goto valid;
-                }
 
-                for(SUniformBuffer const &aCompareBuffer : materialExtracted.uniformBuffers)
-                {
-                    // Make sure that globally, there are no duplicate buffer names.
-                    if( 0 == aCompareBuffer.name.compare(aBuffer.name) )
-                    {
-                        goto invalid;
-                    }
-
-                    // Make sure that globally, no buffers have equal sets and bindings.
-                    if( aCompareBuffer.set == aBuffer.set
-                        and aCompareBuffer.binding == aBuffer.binding )
-                    {
-                        goto invalid;
-                    }
-
-                    // if ( aCompareBuffer.location.equals(aBuffer.location)
-                    //      or aCompareBuffer.location.overlapsWith(aBuffer.location) )
-                    // {
-                    //     // Locations may not overlap.
-                    //     goto invalid;
-                    // }
-                    //
-                    // for( auto const &[name, member] : aCompareBuffer.members )
-                    // {
-                        //
-                        // We don't have to check the members itself, since duplicate names inside a
-                        // single GLSL file are caught by the glslangValidator and cross-stage duplicate
-                        // names are no problem.
-                        //
-
-                        // bool const containsMember = (aBuffer.members.end() != aBuffer.members.find(name));
-                        // if(containsMember)
-                        // {
-                        //     // Duplicate name in other buffer. Not allowed.
-                        //     goto invalid;
-                        // }
-
-                        // SUniformBufferMember const &otherMember = aBuffer.members.at(name);
-                        // if ( member.location.equals(otherMember.location)
-                        //      or member.location.overlapsWith(otherMember.location) )
-                        // {
-                        //     // Locations may not overlap.
-                        //     goto invalid;
-                        // }
-                    // }
-                }
-
-                goto valid;
-
-                invalid:
-                return true;
-                valid:
-                return false;
-            };
 
             //
             // Read UBOs
@@ -373,6 +381,7 @@ namespace shader_precompiler
                 uniformBufferExtracted.location.offset  = 0;
                 uniformBufferExtracted.location.length  = bufferSize;
                 uniformBufferExtracted.location.padding = 0;
+                uniformBufferExtracted.stageBinding.set(stageExtracted.stage);
 
                 CLog::Debug(logTag(),
                             "\nUniformBuffer: "
@@ -416,10 +425,11 @@ namespace shader_precompiler
                 // separate_samplers
                 // separate_images
 
-                bool const valid = not checkForInvalidUBO(uniformBufferExtracted);
-                if(not valid)
+                auto possiblyDuplicateBufferOrEmpty = checkForDuplicateBoundResource(materialExtracted.uniformBuffers, uniformBufferExtracted);
+                if(possiblyDuplicateBufferOrEmpty.has_value())
                 {
-                    CLog::Warning(logTag(), "Uniform buffer '%0' invalid. Ignoring.", uniformBufferExtracted.name);
+                    possiblyDuplicateBufferOrEmpty->get().stageBinding.set(uniformBufferExtracted.stageBinding); // Append the additional stage binding.
+                    CLog::Warning(logTag(), "Uniform buffer '%0' already added. Adjusting...", uniformBufferExtracted.name);
                 }
                 else
                 {
@@ -439,6 +449,19 @@ namespace shader_precompiler
                 image.name    = sampledImage.name;
                 image.set     = set;
                 image.binding = binding;
+                image.stageBinding.set(stageExtracted.stage);
+
+                auto possiblyDuplicateImageOrEmpty = checkForDuplicateBoundResource(materialExtracted.sampledImages, image);
+                if(possiblyDuplicateImageOrEmpty.has_value())
+                {
+                    possiblyDuplicateImageOrEmpty->get().stageBinding.set(image.stageBinding); // Append the additional stage binding.
+                    CLog::Warning(logTag(), "Sampled image '%0' already added. Adjusting...", image.name);
+                }
+                else
+                {
+                    materialExtracted.sampledImages.push_back(image);
+                }
+
                 materialExtracted.sampledImages.push_back(image);
 
                 CLog::Debug(logTag(),

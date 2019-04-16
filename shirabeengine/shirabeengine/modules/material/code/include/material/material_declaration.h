@@ -12,6 +12,7 @@
 #include <base/stl_container_helpers.h>
 #include <platform/platform.h>
 #include <core/enginestatus.h>
+#include <core/bitfield.h>
 #include <core/serialization/serialization.h>
 #include <asset/assettypes.h>
 
@@ -249,11 +250,19 @@ namespace engine
         };
 
         /**
+         * A named resource is any resource with a name assigned.
+         */
+        struct SNamedResource
+        {
+            std::string name;
+        };
+
+        /**
          * Describes a shader stage input by it's name and explicit location.
          */
         struct SStageInput
+            : public SNamedResource
         {
-            std::string   name;
             uint32_t      location;
             SMaterialType type;
         };
@@ -262,21 +271,29 @@ namespace engine
          * Describes a shader stage input by it's name and explicit location.
          */
         struct SStageOutput
+            : public SNamedResource
         {
-            std::string   name;
             uint32_t      location;
             SMaterialType type;
+        };
+
+        /**
+         * A bound resource is any resource, which is part of a set and has an assigned binding.
+         */
+        struct SBoundResource
+            : public SNamedResource
+        {
+            uint32_t set;
+            uint32_t binding;
         };
 
         /**
          * Describes a fragment shader subpass input. Will be empty for all other shader types.
          */
         struct SSubpassInput
+            : SBoundResource
         {
-            std::string name;
-            uint32_t    attachmentIndex;
-            uint32_t    set;
-            uint32_t    binding;
+            uint32_t attachmentIndex;
         };
 
         /**
@@ -334,23 +351,20 @@ namespace engine
          * as a collection of buffer members.
          */
         struct SUniformBuffer
+            : public SBoundResource
         {
         public_members:
-            std::string              name;
-            SBufferLocation          location;
-            uint64_t                 set;
-            uint64_t                 binding;
-            UniformBufferMemberMap_t members;
+            SBufferLocation               location;
+            core::CBitField<EShaderStage> stageBinding;
+            UniformBufferMemberMap_t      members;
 
         public_constructors:
             SUniformBuffer() = default;
 
             SHIRABE_INLINE
             SUniformBuffer(SUniformBuffer const &aOther)
-                : name    (aOther.name    )
+                : SBoundResource (aOther)
                 , location(aOther.location)
-                , set     (aOther.set     )
-                , binding (aOther.binding )
                 , members (aOther.members )
             {}
 
@@ -371,10 +385,9 @@ namespace engine
          * Describes a sampled image in a GLSL shader, as well as its set and binding.
          */
         struct SSampledImage
+            : public SBoundResource
         {
-            std::string name;
-            uint32_t    set;
-            uint32_t    binding;
+            core::CBitField<uint32_t> stageBinding;
         };
 
         /**

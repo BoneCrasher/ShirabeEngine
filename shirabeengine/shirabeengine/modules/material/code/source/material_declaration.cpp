@@ -151,14 +151,14 @@ namespace engine
             // Write layout info
             //
             aSerializer.beginObject("layoutInfo");
-            aSerializer.writeValue("setCount", layoutInfo.setCount);
+            aSerializer.writeValue ("setCount", layoutInfo.setCount);
             aSerializer.beginObject("setBindingCounts");
             for(uint32_t k=0; k<layoutInfo.setBindingCount.size(); ++k)
             {
                 aSerializer.writeValue(CString::format("%0", k), layoutInfo.setBindingCount[k]);
             }
-            aSerializer.endObject();
-            aSerializer.endObject();
+            aSerializer.endObject(); // setBindingCounts
+            aSerializer.endObject(); // layoutInfo
 
             //
             // Serialize subpass input
@@ -171,10 +171,10 @@ namespace engine
                 aSerializer.writeValue("attachmentIndex", aSubpassInput.attachmentIndex);
                 aSerializer.writeValue("set",             aSubpassInput.set);
                 aSerializer.writeValue("binding",         aSubpassInput.binding);
-                aSerializer.endObject();
+                aSerializer.endObject(); // aSubpassInput.name
             };
             std::for_each(this->subpassInputs.begin(), this->subpassInputs.end(), iterateSubpassInputs);
-            aSerializer.endArray();
+            aSerializer.endArray(); // subpassInputs
 
             //
             // Serialize uniform buffers
@@ -201,15 +201,15 @@ namespace engine
                     aSerializer.writeValue("offset",  aValue.location.offset);
                     aSerializer.writeValue("size",    aValue.location.length);
                     aSerializer.writeValue("padding", aValue.location.padding);
-                    aSerializer.endObject();
+                    aSerializer.endObject(); // aKey
                 };
                 std::for_each(aBuffer.members.begin(), aBuffer.members.end(), iterate);
-                aSerializer.endArray();
+                aSerializer.endArray(); // members
 
-                aSerializer.endObject();
+                aSerializer.endObject(); // aBuffer.Name
             };
             std::for_each(this->uniformBuffers.begin(), this->uniformBuffers.end(), iterateUniformBuffers);
-            aSerializer.endArray();
+            aSerializer.endArray(); // uniformBuffers
 
             //
             // Serialize sampled images
@@ -221,10 +221,10 @@ namespace engine
                 aSerializer.writeValue("name",    aSampledImage.name);
                 aSerializer.writeValue("set",     aSampledImage.set);
                 aSerializer.writeValue("binding", aSampledImage.binding);
-                aSerializer.endObject();
+                aSerializer.endObject(); // aSampledImage.name
             };
             std::for_each(this->sampledImages.begin(), this->sampledImages.end(), iterateSampledImages);
-            aSerializer.endArray();
+            aSerializer.endArray(); // sampledImages
 
             //
             // Loop through stages
@@ -305,7 +305,7 @@ namespace engine
             // Read layout info
             //
             aDeserializer.beginObject("layoutInfo");
-            aDeserializer.readValue("setCount", layoutInfo.setCount);
+            aDeserializer.readValue  ("setCount", layoutInfo.setCount);
             aDeserializer.beginObject("setBindingCounts");
 
             layoutInfo.setBindingCount.resize(layoutInfo.setCount);
