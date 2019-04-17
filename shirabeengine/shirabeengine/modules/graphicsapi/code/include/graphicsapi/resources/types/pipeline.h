@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
 #include <base/declaration.h>
 #include <math/geometric/rect.h>

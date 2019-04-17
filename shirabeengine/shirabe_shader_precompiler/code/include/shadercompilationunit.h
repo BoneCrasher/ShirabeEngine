@@ -15,11 +15,11 @@ namespace shader_precompiler
      */
     struct SShaderCompilationElement
     {
-        std::string  fileName;
-        std::string  outputPath;
-        std::string  contents;
-        EShaderStage stage;
-        char         padding[4]; // Explicit alignment padding.
+        std::string             fileName;
+        std::string             outputPath;
+        std::string             contents;
+        VkPipelineStageFlagBits stage;
+        char                    padding[4]; // Explicit alignment padding.
 
     public_constructors:
         /**
@@ -34,10 +34,10 @@ namespace shader_precompiler
          * @param aContents
          * @param aStage
          */
-        SShaderCompilationElement(std::string  const &aFileName,
-                                  std::string  const &aOutputPath,
-                                  std::string  const &aContents,
-                                  EShaderStage const aStage);
+        SShaderCompilationElement(std::string             const &aFileName,
+                                  std::string             const &aOutputPath,
+                                  std::string             const &aContents,
+                                  VkPipelineStageFlagBits const aStage);
 
         /**
          * @brief SShaderCompilationElement
@@ -112,10 +112,10 @@ namespace shader_precompiler
          * @param aStage
          * @return
          */
-        EResult addElement(std::string  const &aFileName,
-                           std::string  const &aOutputPath,
-                           std::string  const &aContents,
-                           EShaderStage const  aStage);
+        EResult addElement(std::string             const &aFileName,
+                           std::string             const &aOutputPath,
+                           std::string             const &aContents,
+                           VkPipelineStageFlagBits const  aStage);
 
         /**
          * @brief addElement

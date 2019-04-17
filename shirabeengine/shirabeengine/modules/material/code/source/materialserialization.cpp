@@ -7,33 +7,33 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EShaderStage stageFromString(std::string const &aString)
+        VkPipelineStageFlagBits stageFromString(std::string const &aString)
         {
-            if(0 == aString.compare("vertex"))             return EShaderStage::Vertex;
-            if(0 == aString.compare("tess_control_point")) return EShaderStage::TesselationControlPoint;
-            if(0 == aString.compare("tess_evaluation"))    return EShaderStage::TesselationEvaluation;
-            if(0 == aString.compare("geometry"))           return EShaderStage::Geometry;
-            if(0 == aString.compare("fragment"))           return EShaderStage::Fragment;
-            if(0 == aString.compare("compute"))            return EShaderStage::Compute;
+            if(0 == aString.compare("vertex"))             return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                 ;
+            if(0 == aString.compare("tess_control_point")) return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT   ;
+            if(0 == aString.compare("tess_evaluation"))    return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
+            if(0 == aString.compare("geometry"))           return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT               ;
+            if(0 == aString.compare("fragment"))           return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT               ;
+            if(0 == aString.compare("compute"))            return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT                ;
 
-            return EShaderStage::NotApplicable;
+            return VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        std::string const stageToString(EShaderStage const &aStage)
+        std::string const stageToString(VkPipelineStageFlagBits const &aStage)
         {
             switch(aStage)
             {
-            case EShaderStage::Vertex:                  return "vertex";
-            case EShaderStage::TesselationControlPoint: return "tess_control_point";
-            case EShaderStage::TesselationEvaluation:   return "tess_evaluation";
-            case EShaderStage::Geometry:                return "geometry";
-            case EShaderStage::Fragment:                return "fragment";
-            case EShaderStage::Compute:                 return "compute";
-            default:                                    return "unknown";
+            case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                 : return "vertex";
+            case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT   : return "tess_control_point";
+            case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT: return "tess_evaluation";
+            case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT               : return "geometry";
+            case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT               : return "fragment";
+            case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT                : return "compute";
+            default:                                                                            return "unknown";
             }
         }
         //<-----------------------------------------------------------------------------

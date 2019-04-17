@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <cstring>
 
+#include <vulkan/vulkan.h>
+
 #include <base/declaration.h>
 #include <base/stl_container_helpers.h>
 #include <platform/platform.h>
@@ -63,7 +65,7 @@ namespace engine
                 : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>
         {
-            static std::unordered_map<EShaderStage, SMaterialIndexStage> const sEmptyMap;
+            static std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const sEmptyMap;
 
         public_constructors:
             SHIRABE_INLINE
@@ -125,11 +127,11 @@ namespace engine
             }
 
         public_members:
-            uint64_t                                              uid;
-            std::string                                           name;
-            std::filesystem::path                                 signatureFilename;
-            std::filesystem::path                                 baseConfigurationFilename;
-            std::unordered_map<EShaderStage, SMaterialIndexStage> stages;
+            uint64_t                                                         uid;
+            std::string                                                      name;
+            std::filesystem::path                                            signatureFilename;
+            std::filesystem::path                                            baseConfigurationFilename;
+            std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> stages;
 
         public_methods:
             /**
@@ -291,7 +293,7 @@ namespace engine
          * Describes a fragment shader subpass input. Will be empty for all other shader types.
          */
         struct SSubpassInput
-            : SBoundResource
+            : public SBoundResource
         {
             uint32_t attachmentIndex;
         };
@@ -354,16 +356,16 @@ namespace engine
             : public SBoundResource
         {
         public_members:
-            SBufferLocation               location;
-            core::CBitField<EShaderStage> stageBinding;
-            UniformBufferMemberMap_t      members;
+            SBufferLocation                          location;
+            core::CBitField<VkPipelineStageFlagBits> stageBinding;
+            UniformBufferMemberMap_t                 members;
 
         public_constructors:
             SUniformBuffer() = default;
 
             SHIRABE_INLINE
             SUniformBuffer(SUniformBuffer const &aOther)
-                : SBoundResource (aOther)
+                : SBoundResource(aOther)
                 , location(aOther.location)
                 , members (aOther.members )
             {}
@@ -387,7 +389,7 @@ namespace engine
         struct SSampledImage
             : public SBoundResource
         {
-            core::CBitField<uint32_t> stageBinding;
+            core::CBitField<VkPipelineStageFlagBits> stageBinding;
         };
 
         /**
@@ -396,7 +398,7 @@ namespace engine
         struct SMaterialStage
         {
         public_members:
-            EShaderStage                stage;
+            VkPipelineStageFlagBits     stage;
             std::string                 stageName;
             std::string                 filename;
             std::vector<SStageInput>    inputs;
@@ -426,7 +428,7 @@ namespace engine
                 return (*this);
             }
         };
-        using StageMap_t = std::unordered_map<EShaderStage, SMaterialStage>;
+        using StageMap_t = std::unordered_map<VkPipelineStageFlagBits, SMaterialStage>;
 
         /**
          * This struct stores basic layout structural information
@@ -506,12 +508,12 @@ namespace engine
             }
 
         public_methods:
-            SHIRABE_INLINE bool hasVertexStage()          const { return stages.end() != stages.find(EShaderStage::Vertex);                  }
-            SHIRABE_INLINE bool hasTessControlStage()     const { return stages.end() != stages.find(EShaderStage::TesselationControlPoint); }
-            SHIRABE_INLINE bool hasTessEvalutationStage() const { return stages.end() != stages.find(EShaderStage::TesselationEvaluation);   }
-            SHIRABE_INLINE bool hasGeometryStage()        const { return stages.end() != stages.find(EShaderStage::Geometry);                }
-            SHIRABE_INLINE bool hasFragmentStage()        const { return stages.end() != stages.find(EShaderStage::Fragment);                }
-            SHIRABE_INLINE bool hasComputeStage()         const { return stages.end() != stages.find(EShaderStage::Compute);                 }
+            SHIRABE_INLINE bool hasVertexStage()          const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT);                  }
+            SHIRABE_INLINE bool hasTessControlStage()     const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT);    }
+            SHIRABE_INLINE bool hasTessEvalutationStage() const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT); }
+            SHIRABE_INLINE bool hasGeometryStage()        const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT);                }
+            SHIRABE_INLINE bool hasFragmentStage()        const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);                }
+            SHIRABE_INLINE bool hasComputeStage()         const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);                 }
 
             /**
              * @brief acceptSerializer

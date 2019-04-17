@@ -799,7 +799,7 @@ namespace engine
 
             for(auto const &[stageKey, stage] : signature.stages)
             {
-                if(EShaderStage::Vertex == stageKey)
+                if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT == stageKey)
                 {
                     for(uint32_t k=0; k<stage.inputs.size(); ++k)
                     {
@@ -827,7 +827,7 @@ namespace engine
                     }
                 }
 
-                if(EShaderStage::Fragment == stageKey)
+                if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
                 {
                     for(SStageOutput const &output : stage.outputs)
                     {

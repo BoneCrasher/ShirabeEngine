@@ -8,14 +8,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        std::unordered_map<EShaderStage, SMaterialIndexStage> const SMaterialMasterIndex::sEmptyMap =
+        std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const SMaterialMasterIndex::sEmptyMap =
         {
-            { EShaderStage::Vertex,                  {} },
-            { EShaderStage::TesselationControlPoint, {} },
-            { EShaderStage::TesselationEvaluation,   {} },
-            { EShaderStage::Geometry,                {} },
-            { EShaderStage::Fragment,                {} },
-            { EShaderStage::Compute,                 {} }
+            { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                  , {} },
+            { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT    , {} },
+            { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT , {} },
+            { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT                , {} },
+            { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT                , {} },
+            { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT                 , {} }
         };
         //<-----------------------------------------------------------------------------
 
@@ -67,13 +67,13 @@ namespace engine
 
             aDeserializer.beginObject("stages");
 
-            std::vector<EShaderStage> stageList = { EShaderStage::Vertex,
-                                                    EShaderStage::TesselationControlPoint,
-                                                    EShaderStage::TesselationEvaluation,
-                                                    EShaderStage::Geometry,
-                                                    EShaderStage::Fragment,
-                                                    EShaderStage::Compute
-                                                  };
+            std::vector<VkPipelineStageFlagBits> stageList = { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT
+                                                             };
 
             for(auto const stage : stageList)
             {
@@ -230,7 +230,7 @@ namespace engine
             // Loop through stages
             //
             aSerializer.beginArray("stages");
-            auto const iterateStages = [&] (std::pair<EShaderStage, SMaterialStage> const &aStage) -> void
+            auto const iterateStages = [&] (std::pair<VkPipelineStageFlagBits, SMaterialStage> const &aStage) -> void
             {
                 auto const writeType = [&] (SMaterialType const &aType) -> void
                 {
@@ -246,8 +246,8 @@ namespace engine
                     aSerializer.endObject();
                 };
 
-                EShaderStage   const key   = aStage.first;
-                SMaterialStage const stage = aStage.second;
+                VkPipelineStageFlagBits const key   = aStage.first;
+                SMaterialStage          const stage = aStage.second;
 
                 SHIRABE_UNUSED(key);
 

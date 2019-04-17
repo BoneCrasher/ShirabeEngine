@@ -11,17 +11,17 @@ namespace shader_precompiler
         : fileName({})
         , outputPath({})
         , contents({})
-        , stage(EShaderStage::NotApplicable)
+        , stage(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM)
     {}
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    SShaderCompilationElement::SShaderCompilationElement(std::string  const &aFileName,
-                                                         std::string  const &aOutputPath,
-                                                         std::string  const &aContents,
-                                                         EShaderStage const aStage)
+    SShaderCompilationElement::SShaderCompilationElement(std::string            const &aFileName,
+                                                         std::string            const &aOutputPath,
+                                                         std::string            const &aContents,
+                                                         VkPipelineStageFlagBits const aStage)
         : fileName(aFileName)
         , outputPath(aOutputPath)
         , contents(aContents)
@@ -95,10 +95,10 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EResult SShaderCompilationUnit::addElement(std::string  const &aFileName,
-                                               std::string  const &aOutputPath,
-                                               std::string  const &aContents,
-                                               EShaderStage const  aStage)
+    EResult SShaderCompilationUnit::addElement(std::string             const &aFileName,
+                                               std::string             const &aOutputPath,
+                                               std::string             const &aContents,
+                                               VkPipelineStageFlagBits const  aStage)
     {
         if(aFileName.empty() || aOutputPath.empty() || aContents.empty())
         {

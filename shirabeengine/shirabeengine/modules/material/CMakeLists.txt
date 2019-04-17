@@ -16,6 +16,7 @@ set(
         SHIRABEMODULELOG
         SHIRABEMODULEPLATFORM
         SHIRABEMODULEBASE
+        VULKANHEADERS
         JSON)
 
 include(project_setup)

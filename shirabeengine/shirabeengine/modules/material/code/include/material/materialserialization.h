@@ -29,7 +29,7 @@ namespace engine
          * @param aString
          * @return
          */
-        EShaderStage stageFromString(std::string const &aString);
+        VkPipelineStageFlagBits stageFromString(std::string const &aString);
 
         /**
          * Read an EShaderStage value and convert it to its string representation.
@@ -37,7 +37,7 @@ namespace engine
          * @param aStage
          * @return
          */
-        std::string const stageToString(EShaderStage const &aStage);
+        std::string const stageToString(VkPipelineStageFlagBits const &aStage);
 
         /**
          * The IFrameGraphSerializer interface describes the basic requiremets

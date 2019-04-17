@@ -364,10 +364,10 @@ private_methods:
      * @param aFileName See brief.
      * @return          A tuple containing the language and stage information.
      */
-    std::tuple<EShadingLanguage, EShaderStage> const compileTargetFromShaderFilename(std::string const &aFileName)
+    std::tuple<EShadingLanguage, VkPipelineStageFlagBits> const compileTargetFromShaderFilename(std::string const &aFileName)
     {
-        EShaderStage     stage    = {};
-        EShadingLanguage language = EShadingLanguage::Unknown;
+        VkPipelineStageFlagBits stage    = {};
+        EShadingLanguage        language = EShadingLanguage::Unknown;
 
         // Possible filename variants:
         // 1. <basename>.<stage>.<language_unified_ext> ; e.g. awesomeShader.vert.glsl
@@ -412,7 +412,7 @@ private_methods:
         {
             // Invalid
             usage();
-            return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
+            return { EShadingLanguage::Unknown, VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM };
         }
 
         // Determine language
@@ -436,32 +436,32 @@ private_methods:
         if(EShadingLanguage::Unknown == language)
         {
             CLog::Error(logTag(), CString::format("Invalid extension '%0'. Cannot derive language.", stageName));
-            return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
+            return { EShadingLanguage::Unknown, VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM };
         }
 
         // Determine stage
-        stage = mapValue<std::string, EShaderStage>(stageName, {{ "vert", EShaderStage::Vertex                  },
-                                                                { "tesc", EShaderStage::TesselationControlPoint },
-                                                                { "tese", EShaderStage::TesselationEvaluation   },
-                                                                { "geom", EShaderStage::Geometry                },
-                                                                { "frag", EShaderStage::Fragment                },
-                                                                { "comp", EShaderStage::Compute                 },
-                                                        #ifdef NV_EXTENSIONS
-                                                                { "rgen",  EShaderStage::NVRayGen                },
-                                                                { "rint",  EShaderStage::NVIntersect             },
-                                                                { "rahit", EShaderStage::NVAnyHit                },
-                                                                { "rchit", EShaderStage::NVClosestHit            },
-                                                                { "rmiss", EShaderStage::NVMiss                  },
-                                                                { "rcall", EShaderStage::NVCallable              },
-                                                                { "mesh",  EShaderStage::NVMesh                  },
-                                                                { "task",  EShaderStage::NVTask                  },
-                                                        #endif
+        stage = mapValue<std::string, VkPipelineStageFlagBits>(stageName, {{ "vert", VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                  },
+                                                                           { "tesc", VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT    },
+                                                                           { "tese", VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT },
+                                                                           { "geom", VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT                },
+                                                                           { "frag", VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT                },
+                                                                           { "comp", VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT                 },
+                                                                   #ifdef NV_EXTENSIONS
+                                                                           { "rgen",  EShaderStage::NVRayGen                },
+                                                                           { "rint",  EShaderStage::NVIntersect             },
+                                                                           { "rahit", EShaderStage::NVAnyHit                },
+                                                                           { "rchit", EShaderStage::NVClosestHit            },
+                                                                           { "rmiss", EShaderStage::NVMiss                  },
+                                                                           { "rcall", EShaderStage::NVCallable              },
+                                                                           { "mesh",  EShaderStage::NVMesh                  },
+                                                                           { "task",  EShaderStage::NVTask                  },
+                                                                   #endif
                                                                                                                   });
 
-        if(EShaderStage::NotApplicable == stage)
+        if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM == stage)
         {
             CLog::Error(logTag(), CString::format("Invalid file extension '%0'. Cannot map to stage.", stageName));
-            return { EShadingLanguage::Unknown, EShaderStage::NotApplicable };
+            return { EShadingLanguage::Unknown, stage };
         }
 
         return { language, stage };
@@ -475,10 +475,12 @@ private_methods:
      * @param aStage
      * @return              See brief.
      */
-    std::string const getOutputFilename(std::string      const &aFileBaseName,
-                                        EShadingLanguage const &aLanguage,
-                                        EShaderStage     const &aStage) const
+    std::string const getOutputFilename(std::string             const &aFileBaseName,
+                                        EShadingLanguage        const &aLanguage,
+                                        VkPipelineStageFlagBits const &aStage) const
     {
+        SHIRABE_UNUSED(aStage);
+
         std::string extension{};
 
     //     static std::unordered_map<EShaderStage, std::string> glslStageAssignment =

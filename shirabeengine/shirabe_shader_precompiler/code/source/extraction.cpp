@@ -49,17 +49,17 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    static std::string const determineStageName(EShaderStage const &aStage)
+    static std::string const determineStageName(VkPipelineStageFlagBits const &aStage)
     {
         switch(aStage)
         {
-        case EShaderStage::Vertex:                  return "vertex";
-        case EShaderStage::TesselationControlPoint: return "tesselation_controlpoint";
-        case EShaderStage::TesselationEvaluation:   return "tesselation_evaluation";
-        case EShaderStage::Geometry:                return "geometry";
-        case EShaderStage::Fragment:                return "fragment";
-        case EShaderStage::Compute:                 return "compute";
-        default:                                    return "unknown";
+        case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT:                  return "vertex";
+        case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT:    return "tesselation_controlpoint";
+        case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT: return "tesselation_evaluation";
+        case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT:                return "geometry";
+        case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT:                return "fragment";
+        case VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT:                 return "compute";
+        default:                                                                            return "unknown";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace shader_precompiler
     //<
     //<-----------------------------------------------------------------------------
     template <typename T>
-    auto checkForDuplicateBoundResource (std::vector<T> const &aSource, T const &aBuffer)
+    auto checkForDuplicateBoundResource (std::vector<T> &aSource, T const &aBuffer)
         -> std::optional<
                std::reference_wrapper<
                    std::enable_if_t<std::is_base_of_v<SBoundResource, T>, T>

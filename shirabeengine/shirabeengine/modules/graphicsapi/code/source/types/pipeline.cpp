@@ -10,8 +10,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CPipelineDeclaration::SDescriptor::SDescriptor()
             : name("")
+            , viewPort({})
+            , scissor({})
+            , inputAssemblyState({})
+            , vertexInputBindings({})
+            , vertexInputAttributes({})
+            , rasterizerState({})
+            , multiSampler({})
+            , depthStencilState({})
+            , colorBlendAttachmentStates({})
+            , colorBlendState({})
             , pipelineLayout({})
-            , pipeline({})
+            , descriptorSetLayoutCreateInfos({})
+            , descriptorSetLayoutBindings({})
         {}
         //<-----------------------------------------------------------------------------
 
