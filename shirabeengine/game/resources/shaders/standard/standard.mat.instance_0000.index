@@ -1,0 +1,6 @@
+{
+    "uid"                   :  0,
+    "name"                  : "StandardInstance0000",
+    "masterIndexFilename"   : "standard.mat.index",
+    "configurationFilename" : "standard.mat.instance_0000.config"
+}

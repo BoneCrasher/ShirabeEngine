@@ -61,6 +61,31 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
+    std::vector<signed char> readFileBytes(std::string const &aFileName)
+    {
+        bool const fileExists = std::filesystem::exists(aFileName);
+        if(not fileExists)
+        {
+            return {};
+        }
+
+        std::ifstream inputFileStream(aFileName);
+        bool const inputStreamOk = inputFileStream.operator bool();
+        if(not inputStreamOk)
+        {
+            return {};
+        }
+
+        std::vector<signed char> inputData((std::istreambuf_iterator<char>(inputFileStream)),
+                                            std::istreambuf_iterator<char>());
+
+        return inputData;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
     CEngineResult<> writeFile(std::string const &aFilename, std::string const &aData)
     {
         std::ofstream output;

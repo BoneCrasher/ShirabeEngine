@@ -24,6 +24,13 @@ namespace engine {
         CDataBuffer(CDataBuffer const &aOther);
         CDataBuffer(CDataBuffer      &&aOther);
 
+        /**
+         * @brief CDataBuffer
+         * @param data
+         * @param size
+         */
+        CDataBuffer( std::vector<T> &&aData, uint64_t const aSize);
+
     public_methods:
         /**
          * @brief data
@@ -51,14 +58,6 @@ namespace engine {
         {
             return mSize;
         }
-
-    private_constructors:
-        /**
-         * @brief CDataBuffer
-         * @param data
-         * @param size
-         */
-        CDataBuffer( std::vector<T> &&aData, uint64_t const aSize);
 
     private_members:
         std::vector<T> mData;

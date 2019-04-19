@@ -40,4 +40,3 @@ add_dependencies(shirabe_shader_precompiler INSTALL_graphicsapi)
 add_dependencies(shirabe_shader_precompiler INSTALL_material)
 
 install(DIRECTORY ${SHIRABE_WORKSPACE_ROOT_DIR}/tools DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin USE_SOURCE_PERMISSIONS)
-install(DIRECTORY ${SHIRABE_PROJECT_RES_DIR}          DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin USE_SOURCE_PERMISSIONS)

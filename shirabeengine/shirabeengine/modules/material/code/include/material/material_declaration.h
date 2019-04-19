@@ -475,6 +475,7 @@ namespace engine
                 , engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>()
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>()
                 , name          ({})
+                , layoutInfo    ({})
                 , stages        ({})
                 , uniformBuffers({})
                 , sampledImages ({})
@@ -487,6 +488,7 @@ namespace engine
                 , engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>()
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>()
                 , name          (aOther.name)
+                , layoutInfo    (aOther.layoutInfo)
                 , stages        (aOther.stages)
                 , uniformBuffers(aOther.uniformBuffers)
                 , sampledImages (aOther.sampledImages)
@@ -499,6 +501,7 @@ namespace engine
                 asset::CAssetReference::operator=(aOther);
 
                 name           = aOther.name;
+                layoutInfo     = aOther.layoutInfo;
                 stages         = aOther.stages;
                 uniformBuffers = aOther.uniformBuffers;
                 sampledImages  = aOther.sampledImages;

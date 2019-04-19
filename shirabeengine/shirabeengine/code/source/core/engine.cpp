@@ -1,4 +1,7 @@
+#include <filesystem>
+
 #include <asset/assetindex.h>
+#include <asset/filesystemassetdatasource.h>
 #include <core/enginestatus.h>
 #include <resources/core/resourcemanagerbase.h>
 #include <resources/core/resourceproxyfactory.h>
@@ -275,7 +278,10 @@ namespace engine
 
             CAssetStorage::AssetRegistry_t assetIndex ={}; // AssetIndex::loadIndexById("");
 
-            CStdUniquePtr_t<IAssetDataSource> assetDataSource = nullptr;
+            std::filesystem::path const root          = std::filesystem::current_path();
+            std::filesystem::path const resourcesPath = root/"data/resources";
+
+            CStdUniquePtr_t<IAssetDataSource> assetDataSource = makeCStdUniquePtr<CFileSystemAssetDataSource>(resourcesPath);
             CStdSharedPtr_t<CAssetStorage>    assetStorage    = makeCStdSharedPtr<CAssetStorage>(std::move(assetDataSource));
             mAssetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
