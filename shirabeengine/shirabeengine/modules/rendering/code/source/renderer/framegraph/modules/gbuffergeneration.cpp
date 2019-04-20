@@ -116,6 +116,21 @@ namespace engine
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
+                for(SRenderableResources const &renderableResources : aPassData.importData.renderables)
+                {
+                    auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(renderableResources.materialResource);
+                    if(CheckEngineError(result) || nullptr == materialPointer)
+                    {
+                        CLog::Error(logTag(), "Failed to fetch material for id %0", renderableResources.materialResource);
+                        continue;
+                    }
+
+                    aRenderContext->loadMaterialAsset  (*materialPointer);
+                    aRenderContext->bindMaterial       (*materialPointer);
+                    aRenderContext->unbindMaterial     (*materialPointer);
+                    aRenderContext->unloadMaterialAsset(*materialPointer);
+                }
+
                 return { EEngineStatus::Ok };
             };
 

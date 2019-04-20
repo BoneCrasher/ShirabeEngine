@@ -666,6 +666,8 @@ namespace engine
             SHIRABE_INLINE RefIndex_t                      const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get();         }
             SHIRABE_INLINE RefIndex_t                      const &renderablesLists()    const { return CFrameGraphResourcesRef<SFrameGraphRenderableList>::get();     }
             SHIRABE_INLINE RefIndex_t                      const &renderableListViews() const { return CFrameGraphResourcesRef<SFrameGraphRenderableListView>::get(); }
+            SHIRABE_INLINE RefIndex_t                      const &meshes()              const { return CFrameGraphResourcesRef<SFrameGraphMesh>::get();               }
+            SHIRABE_INLINE RefIndex_t                      const &materials()           const { return CFrameGraphResourcesRef<SFrameGraphMaterial>::get();           }
 
         protected_members:
             Index_t                         mResources;

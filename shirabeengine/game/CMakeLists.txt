@@ -50,6 +50,7 @@ add_dependencies(shirabe_shader_precompiler_execute INSTALL_shirabe_shader_preco
 
 add_dependencies(game shirabe_shader_precompiler_execute)
 add_dependencies(game shirabe_shader_precompiler)
+add_dependencies(game INSTALL_shirabeengine)
 add_dependencies(game INSTALL_platform)
 add_dependencies(game INSTALL_base)
 add_dependencies(game INSTALL_os)
@@ -64,4 +65,3 @@ add_dependencies(game INSTALL_rendering)
 add_dependencies(game INSTALL_material)
 add_dependencies(game INSTALL_vulkan_integration)
 add_dependencies(game INSTALL_asset)
-add_dependencies(game INSTALL_shirabeengine)

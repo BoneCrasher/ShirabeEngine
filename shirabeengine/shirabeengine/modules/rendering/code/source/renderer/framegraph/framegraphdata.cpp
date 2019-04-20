@@ -413,6 +413,16 @@ namespace engine
                     CFrameGraphResourcesRef<SFrameGraphRenderableListView>::insert(id);
                 }
 
+                for(RefIndex_t::value_type const &id : aOther.meshes())
+                {
+                    CFrameGraphResourcesRef<SFrameGraphMesh>::insert(id);
+                }
+
+                for(RefIndex_t::value_type const &id : aOther.materials())
+                {
+                    CFrameGraphResourcesRef<SFrameGraphMaterial>::insert(id);
+                }
+
                 mAttachements = aOther.attachements();
 
                 return true;
