@@ -19,7 +19,7 @@ namespace engine
         class  CAssetIndex
         {
         public:
-            SHIRABE_TEST_EXPORT static CAssetRegistry<SAsset> loadIndexById(std::string const &aIndexId);
+            SHIRABE_TEST_EXPORT static CAssetRegistry<SAsset> loadIndexById(std::filesystem::path const &aIndexPath);
             // static AssetRegistry<Asset> loadIndexFromServer(std::string const&filename);
         };
 

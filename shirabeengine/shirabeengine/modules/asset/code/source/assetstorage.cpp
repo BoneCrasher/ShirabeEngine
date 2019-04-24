@@ -29,10 +29,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void CAssetStorage::readIndex(AssetRegistry_t const &aIndex)
         {
-            for(AssetRegistry_t::value_type const &assignment : aIndex)
+            for(auto const &[id, asset] : aIndex)
             {
                 // Any debug ops?
-                mAssetIndex.addAsset(assignment.first, assignment.second);
+                mAssetIndex.addAsset(id, asset);
             }
         }
         //<-----------------------------------------------------------------------------

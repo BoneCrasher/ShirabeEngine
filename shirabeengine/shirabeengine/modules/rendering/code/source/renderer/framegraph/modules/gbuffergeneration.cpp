@@ -36,6 +36,9 @@ namespace engine
                 SState state;
             };
 
+            // ----------------------------------------------------------------------------------
+            // Setup
+            // ----------------------------------------------------------------------------------
             auto const setup = [&] (
                     CPassBuilder &aBuilder,
                     SPassData    &aOutPassData)
@@ -106,6 +109,9 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
+            // ----------------------------------------------------------------------------------
+            // Execution
+            // ----------------------------------------------------------------------------------
             auto const execute = [=] (
                     SPassData                                 const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
@@ -134,6 +140,9 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
+            // ----------------------------------------------------------------------------------
+            // Spawn the pass
+            // ----------------------------------------------------------------------------------
             auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
             if(not passFetch.successful())
             {

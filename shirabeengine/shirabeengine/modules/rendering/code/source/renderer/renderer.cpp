@@ -152,9 +152,9 @@ namespace engine
             graphBuilder.setRenderToBackBuffer(true);
 
             RenderableList renderableCollection ={
-                { "Cube",    0, 0 },
-                { "Sphere",  0, 0 },
-                { "Pyramid", 0, 0 }
+                { "Cube",    0, 7 },
+                { "Sphere",  0, 7 },
+                { "Pyramid", 0, 7 }
             };
             SFrameGraphRenderableList renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);

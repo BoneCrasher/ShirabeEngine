@@ -38,18 +38,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CAssetRegistry<SAsset> CAssetIndex::loadIndexById(std::string const&indexId)
+        CAssetRegistry<SAsset> CAssetIndex::loadIndexById(std::filesystem::path const &aIndexPath)
         {
             namespace fs  = std::experimental::filesystem;
 
             CAssetRegistry<SAsset> reg = {};
 
-            std::string const filename = CString::format("./assets/%0.assetindex.xml", indexId);
-
             xml::CXMLDocument          file  = {};
             xml::EXMLDocumentOpenState state = xml::EXMLDocumentOpenState::FILE_OK;
 
-            state = file.openFile(filename);
+            state = file.openFile(aIndexPath);
             switch(state)
             {
             case xml::EXMLDocumentOpenState::FILE_NOT_FOUND:

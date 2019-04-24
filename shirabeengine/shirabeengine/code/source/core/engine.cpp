@@ -276,14 +276,15 @@ namespace engine
             // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
             //
 
-            CAssetStorage::AssetRegistry_t assetIndex ={}; // AssetIndex::loadIndexById("");
 
             std::filesystem::path const root          = std::filesystem::current_path();
             std::filesystem::path const resourcesPath = root/"data/resources";
 
+            CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/"game.assetindex.xml");
+
             CStdUniquePtr_t<IAssetDataSource> assetDataSource = makeCStdUniquePtr<CFileSystemAssetDataSource>(resourcesPath);
             CStdSharedPtr_t<CAssetStorage>    assetStorage    = makeCStdSharedPtr<CAssetStorage>(std::move(assetDataSource));
-            mAssetStorage->readIndex(assetIndex);
+            assetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
             materialLoader = makeCStdSharedPtr<material::CMaterialLoader>(assetStorage);
