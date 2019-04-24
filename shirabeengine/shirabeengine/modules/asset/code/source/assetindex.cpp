@@ -20,6 +20,7 @@ namespace engine
          * @param aOutRegistry Filled up registry output handle
          */
         void __readAssets(
+                std::filesystem::path  const &aSourceDir,
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry);
         /**
@@ -30,6 +31,7 @@ namespace engine
          * @param aOutRegistry Filled up registry output handle
          */
         void __readAsset(
+                std::filesystem::path  const &aSourceDir,
                 xmlNodePtr             const &aAsset,
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry);
@@ -41,6 +43,8 @@ namespace engine
         CAssetRegistry<SAsset> CAssetIndex::loadIndexById(std::filesystem::path const &aIndexPath)
         {
             namespace fs  = std::experimental::filesystem;
+
+            std::filesystem::path const parent = aIndexPath.parent_path();
 
             CAssetRegistry<SAsset> reg = {};
 
@@ -55,7 +59,7 @@ namespace engine
             case xml::EXMLDocumentOpenState::FILE_EMPTY:
                 break;
             case xml::EXMLDocumentOpenState::FILE_OK:
-                __readAssets(file, reg);
+                __readAssets(parent, file, reg);
                 break;
             }
 
@@ -67,6 +71,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         void __readAssets(
+                std::filesystem::path  const &aSourceDir,
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry)
         {
@@ -76,7 +81,7 @@ namespace engine
             for(uint32_t k=0; k<assets->nodeNr; ++k)
             {
                 xmlNodePtr const asset = assets->nodeTab[k];
-                __readAsset(asset, aFile, aOutRegistry);
+                __readAsset(aSourceDir, asset, aFile, aOutRegistry);
             }
         }
         //<-----------------------------------------------------------------------------
@@ -85,6 +90,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         void __readAsset(
+                std::filesystem::path  const &aSourceDir,
                 xmlNodePtr             const &aAsset,
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry)
@@ -100,7 +106,7 @@ namespace engine
             a.parent  = from_string<AssetId_t>(parent);
             a.type    = from_string<EAssetType>(type);
             a.subtype = from_string<EAssetSubtype>(type);
-            a.uri     = uri;
+            a.uri     = aSourceDir/uri;
 
             aOutRegistry.addAsset(a.id, a);
         }

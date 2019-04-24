@@ -12,10 +12,8 @@ namespace engine
 
         if(0 == aInput.compare("Mesh"))
             return EAssetType::Mesh;
-        if(0 == aInput.compare("MaterialMaster"))
-            return EAssetType::MaterialMaster;
-        if(0 == aInput.compare("MaterialInstance"))
-            return EAssetType::MaterialInstance;
+        if(0 == aInput.compare("Material"))
+            return EAssetType::Material;
         if(0 == aInput.compare("Texture"))
             return EAssetType::Texture;
         if(0 == aInput.compare("Buffer"))

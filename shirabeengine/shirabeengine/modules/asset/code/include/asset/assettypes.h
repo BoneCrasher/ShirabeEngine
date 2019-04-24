@@ -31,8 +31,7 @@ namespace engine
         {
             Undefined        = 0,
             Mesh                ,
-            MaterialMaster      ,
-            MaterialInstance    ,
+            Material            ,
             Texture             ,
             Buffer              ,
         };
