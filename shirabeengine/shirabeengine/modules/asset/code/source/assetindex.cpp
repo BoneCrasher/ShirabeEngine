@@ -101,12 +101,16 @@ namespace engine
             std::string const subtype = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"subtype"));
             std::string const uri     = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"uri"));
 
+            std::filesystem::path uriPath     = std::filesystem::path(uri).lexically_normal();
+            std::filesystem::path composedURI = aSourceDir.lexically_normal();
+            composedURI /= uriPath;
+
             SAsset a = {};
             a.id      = from_string<AssetId_t>(aid);
             a.parent  = from_string<AssetId_t>(parent);
             a.type    = from_string<EAssetType>(type);
             a.subtype = from_string<EAssetSubtype>(type);
-            a.uri     = aSourceDir/uri;
+            a.uri     = composedURI;
 
             aOutRegistry.addAsset(a.id, a);
         }
