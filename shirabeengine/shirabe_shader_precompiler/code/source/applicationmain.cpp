@@ -43,28 +43,34 @@ void usage()
     using namespace engine;
 
     std::string const usageMessage =
-            "Usage:                                                                           \n"
-            "  ./shirabe_shader_precompiler <options>                                         \n"
-            "                                                                                 \n"
-            "Options:                                                                         \n"
-            "  --verbose                                                                      \n"
-            "      Values: true or false                                                      \n"
-            "      Effect: Enables verbose output while doing the job.                        \n"
-            "  --debug                                                                        \n"
-            "      Effect: Enable debug output.                                               \n"
-            "  --optimize                                                                     \n"
-            "      Effect: Optimize the shader.                                               \n"
-            "  --recursive_scan                                                               \n"
-            "      Effect: If any of the paths in the -i option is a directory, include       \n"
-            "              all subdirectories in the input file search.                       \n"
-            "  -o=<path>                                                                      \n"
-            "      Effect: Specifies the directory to save the compilation result to.         \n"
-            "  -i=<comma-separated list of file- and directory-paths>                         \n"
-            "      Effect: Specifies the list of files and directories to source from.        \n"
-            "                                                                                 \n"
-            " Example:                                                                        \n"
-            "   ./shirabe_shader_precompiler --verbose --debug -o=./spv_output -i=./spv_input \n"
-            "                                                                                 \n";
+            "Usage:                                                                                                  \n"
+            "  ./shirabe_shader_precompiler <options>                                                                \n"
+            "                                                                                                        \n"
+            "Options:                                                                                                \n"
+            "  --verbose                                                                                             \n"
+            "      Values: true or false                                                                             \n"
+            "      Effect: Enables verbose output while doing the job.                                               \n"
+            "  --debug                                                                                               \n"
+            "      Effect: Enable debug output.                                                                      \n"
+            "  --optimize                                                                                            \n"
+            "      Effect: Optimize the shader.                                                                      \n"
+            "  --recursive_scan                                                                                      \n"
+            "      Effect: If any of the paths in the -i option is a directory, include                              \n"
+            "              all subdirectories in the input file search.                                              \n"
+            "  -om=<dirpath>                                                                                         \n"
+            "      Effect: Specifies the path of a directory where all generated modules should be stored            \n"
+            "  -oi=<filepath>                                                                                        \n"
+            "      Effect: Specifies the path of the index to write out.                                             \n"
+            "  -os=<filepath>                                                                                        \n"
+            "      Effect: Specifies the path of the generated signagure to write out.                               \n"
+            "  -oc=<filepath>                                                                                        \n"
+            "      Effect: Specifies the path of the generated configuration to write out.                           \n"
+            "  -i=<filename to index file>                                                                           \n"
+            "      Effect: Specifies the input index filename.                                                       \n"
+            "                                                                                                        \n"
+            " Example:                                                                                               \n"
+            "   ./shirabe_shader_precompiler --verbose --debug -om=<path> -oi=<path> -os=<path> -oc=<path> -i=<path> \n"
+            "                                                                                                        \n";
 
     CLog::Warning(shader_precompiler::logTag(), usageMessage);
 
@@ -108,11 +114,11 @@ private_structs:
      */
     struct SConfiguration
     {
-        std::string                             indexFilename;
         SMaterialMasterIndex                    indexFile;
         std::vector<std::string>                includePaths;
         std::vector<std::string>                inputPaths;
-        std::string                             outputPath;
+        std::filesystem::path                   moduleOutputPath;
+        std::filesystem::path                   indexOutputFile;
         std::filesystem::path                   signatureOutputFile;
         std::filesystem::path                   configOutputFile;
         core::CBitField<CPrecompiler::EOptions> options;
@@ -137,11 +143,14 @@ public_methods:
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
-        core::CBitField<EOptions> options      = {};
-        std::string               dataFile     = {};
-        std::vector<std::string>  includePaths = {};
-        std::string               indexFile    = {};
-        std::string               outputPath   = {};
+        core::CBitField<EOptions> options                 = {};
+        std::string               dataFile                = {};
+        std::vector<std::string>  includePaths            = {};
+        std::filesystem::path     inputIndexPath          = {};
+        std::filesystem::path     outputModulePath        = {};
+        std::filesystem::path     outputIndexPath         = {};
+        std::filesystem::path     outputSignaturePath     = {};
+        std::filesystem::path     outputConfigurationPath = {};
 
         //
         // Process all options provided to the application.
@@ -183,8 +192,11 @@ public_methods:
                 { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
                 { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
                 { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
-                { "-o",               [&] () { outputPath = referencableValue;                             return true; }},
-                { "-i",               [&] () { indexFile  = referencableValue;                             return true; }},
+                { "-om",              [&] () { outputModulePath        = referencableValue;                return true; }},
+                { "-oi",              [&] () { outputIndexPath         = referencableValue;                return true; }},
+                { "-os",              [&] () { outputSignaturePath     = referencableValue;                return true; }},
+                { "-oc",              [&] () { outputConfigurationPath = referencableValue;                return true; }},
+                { "-i",               [&] () { inputIndexPath          = referencableValue;                return true; }},
             };
 
             auto const fn = mapValue<std::string, std::function<bool()>>(option, std::move(handlers));
@@ -200,26 +212,45 @@ public_methods:
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
         // Make sure the output config is correct.
-        std::filesystem::path const outputPathAbsolute = (std::filesystem::current_path() / outputPath).lexically_normal();
+        std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / outputModulePath)       .lexically_normal();
+        std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / outputIndexPath)        .lexically_normal();
+        std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / outputSignaturePath)    .lexically_normal();
+        std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / outputConfigurationPath).lexically_normal();
 
-        bool const outputPathExists = std::filesystem::exists(outputPathAbsolute);
-        if(not outputPathExists)
+        auto const checkPathExists = [] (std::filesystem::path const &aPath) -> void
         {
-            try
+            std::filesystem::path path = aPath;
+
+            bool const outputPathExists = std::filesystem::exists(path);
+            if(not outputPathExists)
             {
-                bool const created = std::filesystem::create_directories(outputPathAbsolute);
-                if(not created)
+                bool const outputPathIsFile = not std::filesystem::is_directory(path);
+                if(outputPathIsFile)
                 {
-                    CLog::Error(logTag(), "Can't create directory '%0'", outputPathAbsolute);
+                    path = aPath.parent_path();
+                }
+
+                try
+                {
+                    bool const created = std::filesystem::create_directories(path);
+                    if(not created)
+                    {
+                        CLog::Error(logTag(), "Can't create directory '%0'", path);
+                    }
+                }
+                catch(std::filesystem::filesystem_error fserr)
+                {
+                    CLog::Error(logTag(), "Cant create directory '%0'. Error: %1", path, fserr.what());
                 }
             }
-            catch(std::filesystem::filesystem_error fserr)
-            {
-                CLog::Error(logTag(), "Cant create directory '%0'. Error: %1", outputPathAbsolute, fserr.what());
-            }
-        }
+        };
 
-        std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/indexFile).lexically_normal();
+        checkPathExists(outputModulePathAbsolute);
+        checkPathExists(outputIndexPathAbsolute);
+        checkPathExists(outputSignaturePathAbsolute);
+        checkPathExists(outputConfigurationPathAbsolute);
+
+        std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/inputIndexPath).lexically_normal();
         std::filesystem::path const indexFileParentPath = (std::filesystem::current_path()/indexFilePath.parent_path()).lexically_normal();
         std::filesystem::path const indexFileBaseName   = indexFilePath.stem();
 
@@ -249,22 +280,15 @@ public_methods:
             }
         }
 
-        std::filesystem::path const indexOutputFileName     = indexFileBaseName.string() + ".index";
-        std::filesystem::path const signatureOutputFileName = indexFileBaseName.string() + ".signature";
-        std::filesystem::path const configOutputFileName    = indexFileBaseName.string() + ".config";
-        std::filesystem::path const indexOutputFilePath     = std::filesystem::path(outputPathAbsolute)/indexOutputFileName;
-        std::filesystem::path const signatureOutputFilePath = std::filesystem::path(outputPathAbsolute)/signatureOutputFileName;
-        std::filesystem::path const configOutputFilePath    = std::filesystem::path(outputPathAbsolute)/configOutputFileName;
-
         SConfiguration config {};
         config.options             = options;
-        config.indexFilename       = indexOutputFilePath;
         config.indexFile           = index;
         config.inputPaths          = inputFiles;
         config.includePaths        = includePaths;
-        config.outputPath          = outputPath;
-        config.signatureOutputFile = signatureOutputFilePath;
-        config.configOutputFile    = configOutputFilePath;
+        config.indexOutputFile     = outputIndexPath        .lexically_normal();
+        config.moduleOutputPath    = outputModulePath       .lexically_normal();
+        config.signatureOutputFile = outputSignaturePath    .lexically_normal();
+        config.configOutputFile    = outputConfigurationPath.lexically_normal();
 
         config.indexFile.signatureFilename         = config.signatureOutputFile;
         config.indexFile.baseConfigurationFilename = config.configOutputFile;
@@ -316,7 +340,7 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(mConfig.indexFilename, serializedData);
+        writeFile(mConfig.indexOutputFile, serializedData);
 
         CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
         if(not signatureSerializationResult.successful())
@@ -327,7 +351,7 @@ public_methods:
 
         writeFile(mConfig.signatureOutputFile, serializedData);
 
-        CMaterialConfig config = CMaterialConfig::fromMaterialDesc(extractionResult.data());
+        CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data());
         CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);
         if(not configSerializationResult.successful())
         {
@@ -594,7 +618,7 @@ private_methods:
             }
 
             std::string           const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
-            std::filesystem::path const outputPath = std::filesystem::path(mConfig.outputPath) / outputName;
+            std::filesystem::path const outputPath = std::filesystem::path(mConfig.moduleOutputPath) / outputName;
 
             SShaderCompilationElement element {};
             element.fileName   = aFilename;
@@ -602,7 +626,7 @@ private_methods:
             element.stage      = stage;
             element.outputPath = outputPath;
 
-            mConfig.indexFile.stages[stage].spvModuleFilename = outputPath.filename().lexically_normal();
+            mConfig.indexFile.stages[stage].spvModuleFilename = outputPath.lexically_normal();
 
             return element;
         };
