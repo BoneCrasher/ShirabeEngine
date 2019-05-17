@@ -5,10 +5,15 @@
 #include <string>
 #include <filesystem>
 
+#include <cryptopp/crc.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
+
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <graphicsapi/resources/types/texture.h>
 #include "asset/asseterror.h"
+
 
 namespace engine
 {
@@ -17,7 +22,7 @@ namespace engine
         /**
          * UniqueId type to identify assets.
          */
-        using AssetId_t = uint64_t;
+        using AssetId_t = uint32_t;
 
         constexpr AssetId_t operator "" _uid( unsigned long long aUnit )
         {
@@ -62,6 +67,14 @@ namespace engine
             EAssetSubtype         subtype;
             std::filesystem::path uri;
         };
+
+        /**
+         * Generate CRC32-Uid from the asset URI.
+         *
+         * @param aPath
+         * @return
+         */
+        static AssetId_t assetIdFromUri(std::filesystem::path const &aUri);
 
         /**
          * The STextureAsset struct describes any kind of engine texture asset

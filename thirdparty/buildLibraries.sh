@@ -140,7 +140,7 @@ function read_arguments
             -l|--libraries)
                 # Verify, that the library names provided are available, before committing.
                 local libraries_requested=${2}
-                
+                                
                 local library
                 for library in "${libraries_requested[@]}";
                 do
@@ -292,7 +292,9 @@ fi
 
 read_arguments $@
 
-if [ DEBUG = 1 ]; then
+printf "Debug: ${DEBUG}\n"
+
+if [ "${DEBUG}" = "1" ]; then
     printf "\nSelected libraries:"
     for library in " ${LIBRARIES[@]}"
     do 

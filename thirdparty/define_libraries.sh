@@ -16,6 +16,7 @@ LIBRARIES=(                             \
            spirv_effcee                 \
            spirv_re2                    \
            spirv_gtest                  \
+           cryptopp                     \
            vulkan_headers               \
            vulkan_sdk                   \
            vulkan_sdk_validation_layers \

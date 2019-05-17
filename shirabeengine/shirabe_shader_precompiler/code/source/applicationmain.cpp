@@ -211,6 +211,24 @@ public_methods:
         };
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
+        auto const checkExtensionIsValid = [] (std::filesystem::path const &aPath, std::filesystem::path const &aExtension) -> bool
+        {
+            bool const isFile           = not std::filesystem::is_directory(aPath);
+            bool const isExtensionValid = isFile && (aExtension == aPath.extension());
+
+            return isExtensionValid;
+        };
+
+        bool outputFileConfigValid = true;
+        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputIndexPath,         "index");
+        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputSignaturePath,     "signature");
+        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputConfigurationPath, "config");
+
+        if(not outputFileConfigValid)
+        {
+            CLog::Error(logTag(), "Output file configuration is invalid. One or more output file's filenames do have invalid suffixes.");
+        }
+
         // Make sure the output config is correct.
         std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / outputModulePath)       .lexically_normal();
         std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / outputIndexPath)        .lexically_normal();

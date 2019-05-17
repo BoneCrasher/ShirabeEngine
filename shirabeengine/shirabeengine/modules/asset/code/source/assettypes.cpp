@@ -1,7 +1,34 @@
 #include "asset/assettypes.h"
 
+#include <cryptopp/crc.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
+
 namespace engine
 {
+    namespace asset
+    {
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        AssetId_t assetIdFromUri(std::filesystem::path const &aUri)
+        {
+            std::string const source = static_cast<std::string>(aUri);
+            uint32_t          hash   = 0u;
+
+            CryptoPP::CRC32 crc {};
+
+            auto const sink    = new CryptoPP::ArraySink(reinterpret_cast<CryptoPP::byte*>(&hash), sizeof(hash));
+            auto const encoder = new CryptoPP::HexEncoder(sink);
+            auto const filter  = new CryptoPP::HashFilter(crc, encoder);
+
+            CryptoPP::StringSource(source, true, filter);
+
+            return hash;
+        }
+        //<-----------------------------------------------------------------------------
+    }
+
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------

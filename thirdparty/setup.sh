@@ -21,6 +21,7 @@ REPOSITORIES[spirv_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
 REPOSITORIES[spirv_effcee]="git@github.com:google/effcee.git"
 REPOSITORIES[spirv_re2]="git@github.com:google/re2.git"
 REPOSITORIES[spirv_gtest]="git@github.com:google/googletest.git"
+REPOSITORIES[cryptopp]="git@github.com:weidai11/cryptopp.git"
 REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
 REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
 REPOSITORIES[vulkan_sdk_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
@@ -41,6 +42,7 @@ TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/spirv_tools/external/spirv-hea
 TARGET_DIRECTORIES[spirv_effcee]="${SOURCES_DIR}/spirv_tools/external/effcee"
 TARGET_DIRECTORIES[spirv_re2]="${SOURCES_DIR}/spirv_tools/external/re2"
 TARGET_DIRECTORIES[spirv_gtest]="${SOURCES_DIR}/spirv_tools/external/googletest"
+TARGET_DIRECTORIES[cryptopp]="${SOURCES_DIR}/cryptopp"
 TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
 TARGET_DIRECTORIES[vulkan_sdk]="${SOURCES_DIR}/vulkan_sdk"
 TARGET_DIRECTORIES[vulkan_sdk_validation_layers]="${SOURCES_DIR}/vulkan_sdk_validation_layers"
@@ -147,6 +149,7 @@ function setup_tools
     setup_one asio
     setup_one stb
     setup_one assimp
+    setup_one cryptopp
 }
 
 function setup_vulkan

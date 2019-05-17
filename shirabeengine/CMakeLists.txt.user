@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.7.0, 2019-04-17T05:40:48. -->
+<!-- Written by QtCreator 4.7.0, 2019-05-16T17:32:32. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -465,7 +465,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./data/input/resources/shaders/include -o=./data/resources/shaders/standard -i=./data/input/resources/shaders/standard/standard.mat.index
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./data/input/resources/shaders/include -om=./data/output/resources/shaders/standard -oi=./data/output/resources/shaders/standard/standard.mat.index -os=./data/output/resources/shaders/standard/standard.mat.signature -oc=./data/output/resources/shaders/standard/standard.mat.config -i=./data/input/resources/shaders/standard/standard.mat.index
 </value>
     <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
@@ -834,9 +834,10 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./data/input/resources/shaders/include -om=./data/output/resources/shaders/standard -oi=./data/output/resources/shaders/standard/standard.mat.index -os=./data/output/resources/shaders/standard/standard.mat.signature -oc=./data/output/resources/shaders/standard/standard.mat.config -i=./data/input/resources/shaders/standard/standard.mat.index
+</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default"></value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/dotti/workspaces/shirabeengine/shirabeengine/_deploy/linux32/debug/bin</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">shirabe_shader_precompiler</value>
@@ -892,7 +893,7 @@
     </valuelist>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default"></value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/dotti/workspaces/shirabeengine/shirabeengine/_deploy/linux32/debug/bin</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">game</value>

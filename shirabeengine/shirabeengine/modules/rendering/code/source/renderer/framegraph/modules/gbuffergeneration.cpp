@@ -44,6 +44,7 @@ namespace engine
                     SPassData    &aOutPassData)
                     -> CEngineResult<>
             {
+                // Default extents.
                 uint32_t width  = 1920;
                 uint32_t height = 1080;
 

@@ -35,11 +35,12 @@ formatPlatformConfigName(
 
 LogStatus(MESSAGES "precompiler binary name: ${SHIRABE_SHADER_PRECOMPILER_BINARY_NAME}")
 
+# Make sure that all shaders are compiled first!
 set(SHIRABE_SHADER_PRECOMPILE_COMMAND
             "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/${SHIRABE_SHADER_PRECOMPILER_BINARY_NAME}")
 
 set(SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS
-    --verbose --debug --optimize -I=./data/input/resources/shaders/include -o=./data/resources/shaders/standard -i=./data/input/resources/shaders/standard/standard.mat.index)
+    --verbose --debug --optimize -I=./data/input/resources/shaders/include -o=./data/output/resources/shaders/standard -i=./data/input/resources/shaders/standard/standard.mat.index)
 
 add_custom_target(shirabe_shader_precompiler_execute
                   VERBATIM
