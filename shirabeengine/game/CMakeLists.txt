@@ -18,8 +18,23 @@ set(
 
 include(project_setup)
 
-file(COPY ${SHIRABE_WORKSPACE_ROOT_DIR}/tools DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin            USE_SOURCE_PERMISSIONS)
-file(COPY ${SHIRABE_PROJECT_RES_DIR}          DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input USE_SOURCE_PERMISSIONS)
+add_custom_target(shirabe_game_precopy
+                  VERBATIM
+                  COMMAND           cp -rf ${SHIRABE_WORKSPACE_ROOT_DIR}/tools ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
+                  WORKING_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
+                  COMMENT           "Precompiling shaders")
+
+add_custom_target(shirabe_game_copy_resources
+                  VERBATIM
+                  COMMAND           cp -rf . ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources
+                  WORKING_DIRECTORY ${SHIRABE_PROJECT_RES_DIR}
+                  COMMENT           "Copying resources")
+
+add_custom_target(shirabe_game_process_resources
+                  VERBATIM
+                  COMMAND           ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/tools/shirabe_process_resources.sh -r ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/
+                  WORKING_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
+                  COMMENT           "Processing resources")
 
 # Before adding the game project, hook in preprocessing tools
 
@@ -40,29 +55,47 @@ set(SHIRABE_SHADER_PRECOMPILE_COMMAND
             "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/${SHIRABE_SHADER_PRECOMPILER_BINARY_NAME}")
 
 set(SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS
-    --verbose --debug --optimize -I=./data/input/resources/shaders/include -o=./data/output/resources/shaders/standard -i=./data/input/resources/shaders/standard/standard.mat.index)
+    --verbose
+    --debug
+    --optimize
+    -I=./data/input/resources/shaders/include
+    -om=./data/output/resources/shaders/standard
+    -oi=./data/output/resources/shaders/standard/standard.mat.index
+    -os=./data/output/resources/shaders/standard/standard.mat.signature
+    -oc=./data/output/resources/shaders/standard/standard.mat.config
+    -i=./data/input/resources/shaders/standard/standard.mat.index
+    )
 
-add_custom_target(shirabe_shader_precompiler_execute
-                  VERBATIM
-                  COMMAND           ${SHIRABE_SHADER_PRECOMPILE_COMMAND} ${SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS}
-                  WORKING_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
-                  COMMENT "Precompiling shaders")
-add_dependencies(shirabe_shader_precompiler_execute INSTALL_shirabe_shader_precompiler)
+# add_custom_target(shirabe_shader_precompiler_execute
+#                   VERBATIM
+#                   COMMAND           ${SHIRABE_SHADER_PRECOMPILE_COMMAND} ${SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS}
+#                   WORKING_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
+#                   COMMENT           "Precompiling shaders")
 
-add_dependencies(game shirabe_shader_precompiler_execute)
-add_dependencies(game shirabe_shader_precompiler)
-add_dependencies(game INSTALL_shirabeengine)
-add_dependencies(game INSTALL_platform)
-add_dependencies(game INSTALL_base)
-add_dependencies(game INSTALL_os)
-add_dependencies(game INSTALL_log)
-add_dependencies(game INSTALL_math)
-add_dependencies(game INSTALL_core)
-add_dependencies(game INSTALL_utility)
-add_dependencies(game INSTALL_wsi)
-add_dependencies(game INSTALL_resources)
-add_dependencies(game INSTALL_graphicsapi)
-add_dependencies(game INSTALL_rendering)
-add_dependencies(game INSTALL_material)
-add_dependencies(game INSTALL_vulkan_integration)
-add_dependencies(game INSTALL_asset)
+set(USE_RESOURCE_PROCESSING ON)
+
+add_dependencies(shirabe_game_precopy           shirabe_shader_precompiler)
+add_dependencies(shirabe_game_copy_resources    shirabe_game_precopy)
+
+if(USE_RESOURCE_PROCESSING)
+    add_dependencies(shirabe_game_process_resources shirabe_game_copy_resources)
+    add_dependencies(game                           shirabe_game_process_resources)
+else()
+    add_dependencies(game                           shirabe_game_copy_resources)
+endif()
+
+add_dependencies(game                           INSTALL_shirabeengine)
+add_dependencies(game                           INSTALL_platform)
+add_dependencies(game                           INSTALL_base)
+add_dependencies(game                           INSTALL_os)
+add_dependencies(game                           INSTALL_log)
+add_dependencies(game                           INSTALL_math)
+add_dependencies(game                           INSTALL_core)
+add_dependencies(game                           INSTALL_utility)
+add_dependencies(game                           INSTALL_wsi)
+add_dependencies(game                           INSTALL_resources)
+add_dependencies(game                           INSTALL_graphicsapi)
+add_dependencies(game                           INSTALL_rendering)
+add_dependencies(game                           INSTALL_material)
+add_dependencies(game                           INSTALL_vulkan_integration)
+add_dependencies(game                           INSTALL_asset)
