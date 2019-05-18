@@ -5,10 +5,6 @@
 #include <string>
 #include <filesystem>
 
-#include <cryptopp/crc.h>
-#include <cryptopp/filters.h>
-#include <cryptopp/hex.h>
-
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <graphicsapi/resources/types/texture.h>
@@ -74,7 +70,7 @@ namespace engine
          * @param aPath
          * @return
          */
-        static AssetId_t assetIdFromUri(std::filesystem::path const &aUri);
+        AssetId_t assetIdFromUri(std::filesystem::path const &aUri);
 
         /**
          * The STextureAsset struct describes any kind of engine texture asset

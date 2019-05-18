@@ -25,7 +25,7 @@ function(linkLibrary)
 		# -l
 		append_parentscope(
 			SHIRABE_PROJECT_LIBRARY_TARGETS
-			libcryptopp
+                        cryptopp
 			)
 	endif()
 endfunction(linkLibrary)

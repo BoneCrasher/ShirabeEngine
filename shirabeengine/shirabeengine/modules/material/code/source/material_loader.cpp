@@ -132,13 +132,13 @@ namespace engine
             SMaterialMasterIndex const &masterIndex = masterIndexFetch.data();
 
             // Fetch signature
-            CEngineResult<SAsset> signatureAssetFetch  = aAssetStorage->assetFromUri(masterIndex.signatureFilename);
+            CEngineResult<SAsset> signatureAssetFetch  = aAssetStorage->loadAsset(masterIndex.signatureAssetUid);
             if(not signatureAssetFetch.successful())
             {
                 return { false, {}, {}, {}, {} };
             }
 
-            CEngineResult<SAsset> baseConfigAssetFetch = aAssetStorage->assetFromUri(masterIndex.baseConfigurationFilename);
+            CEngineResult<SAsset> baseConfigAssetFetch = aAssetStorage->loadAsset(masterIndex.configurationAssetUid);
             if(not baseConfigAssetFetch.successful())
             {
                 return { false, {}, {}, {}, {} };
@@ -220,7 +220,7 @@ namespace engine
             if(processInstance)
             {
                 // Fetch instance configuration override
-                CEngineResult<SAsset> configAssetFetch = mStorage->assetFromUri(masterIndex.signatureFilename);
+                CEngineResult<SAsset> configAssetFetch = mStorage->loadAsset(masterIndex.signatureAssetUid);
                 if(not configAssetFetch.successful())
                 {
                     return { configAssetFetch.result() };

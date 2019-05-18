@@ -21,6 +21,7 @@ set(
         SHIRABEMODULEPLATFORM
         SPIRVCROSS
         SPIRVTOOLS
+        CRYPTOPP
         GLSLANG
         JSON
         XML2

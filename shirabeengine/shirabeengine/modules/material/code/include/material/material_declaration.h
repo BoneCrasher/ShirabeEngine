@@ -53,7 +53,7 @@ namespace engine
         struct SMaterialIndexStage
         {
             std::filesystem::path glslSourceFilename;
-            std::filesystem::path spvModuleFilename;
+            asset::AssetId_t      spvModuleAssetId;
         };
 
         /**
@@ -72,44 +72,44 @@ namespace engine
             SMaterialMasterIndex()
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
-                , uid                      (0 )
-                , name                     ({})
-                , signatureFilename        (  )
-                , baseConfigurationFilename(  )
-                , stages                   (sEmptyMap)
+                , uid                  (0 )
+                , name                 ({})
+                , signatureAssetUid    (0 )
+                , configurationAssetUid(0 )
+                , stages               (sEmptyMap)
             {}
 
             SHIRABE_INLINE
             SMaterialMasterIndex(SMaterialMasterIndex const &aOther)
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
-                , uid                      (aOther.uid                      )
-                , name                     (aOther.name                     )
-                , signatureFilename        (aOther.signatureFilename        )
-                , baseConfigurationFilename(aOther.baseConfigurationFilename)
-                , stages                   (aOther.stages                   )
+                , uid                  (aOther.uid                  )
+                , name                 (aOther.name                 )
+                , signatureAssetUid    (aOther.signatureAssetUid    )
+                , configurationAssetUid(aOther.configurationAssetUid)
+                , stages               (aOther.stages               )
             {}
 
             SHIRABE_INLINE
             SMaterialMasterIndex(SMaterialMasterIndex &&aOther)
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
-                , uid                      (std::move(aOther.uid                        ))
-                , name                     (std::move(aOther.name                       ))
-                , signatureFilename        (std::move(aOther.signatureFilename          ))
-                , baseConfigurationFilename(std::move(aOther.baseConfigurationFilename  ))
-                , stages                   (std::move(aOther.stages                     ))
+                , uid                  (std::move(aOther.uid                  ))
+                , name                 (std::move(aOther.name                 ))
+                , signatureAssetUid    (std::move(aOther.signatureAssetUid    ))
+                , configurationAssetUid(std::move(aOther.configurationAssetUid))
+                , stages               (std::move(aOther.stages               ))
             {}
 
         public_operators:
             SHIRABE_INLINE
             SMaterialMasterIndex &operator=(SMaterialMasterIndex const &aOther)
             {
-                uid                       = aOther.uid;
-                name                      = aOther.name;
-                signatureFilename         = aOther.signatureFilename;
-                baseConfigurationFilename = aOther.baseConfigurationFilename;
-                stages                    = aOther.stages;
+                uid                   = aOther.uid;
+                name                  = aOther.name;
+                signatureAssetUid     = aOther.signatureAssetUid;
+                configurationAssetUid = aOther.configurationAssetUid;
+                stages                = aOther.stages;
 
                 return (*this);
             }
@@ -117,11 +117,11 @@ namespace engine
             SHIRABE_INLINE
             SMaterialMasterIndex &operator=(SMaterialMasterIndex &&aOther)
             {
-                uid                       = std::move(aOther.uid);
-                name                      = std::move(aOther.name);
-                signatureFilename         = std::move(aOther.signatureFilename);
-                baseConfigurationFilename = std::move(aOther.baseConfigurationFilename);
-                stages                    = std::move(aOther.stages);
+                uid                   = std::move(aOther.uid);
+                name                  = std::move(aOther.name);
+                signatureAssetUid     = std::move(aOther.signatureAssetUid);
+                configurationAssetUid = std::move(aOther.configurationAssetUid);
+                stages                = std::move(aOther.stages);
 
                 return (*this);
             }
@@ -129,8 +129,8 @@ namespace engine
         public_members:
             uint64_t                                                         uid;
             std::string                                                      name;
-            std::filesystem::path                                            signatureFilename;
-            std::filesystem::path                                            baseConfigurationFilename;
+            asset::AssetId_t                                                 signatureAssetUid;
+            asset::AssetId_t                                                 configurationAssetUid;
             std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> stages;
 
         public_methods:

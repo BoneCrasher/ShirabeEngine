@@ -28,8 +28,8 @@ namespace engine
 
             aSerializer.writeValue("uid",                       uid);
             aSerializer.writeValue("name",                      name);
-            aSerializer.writeValue("signatureFilename",         signatureFilename);
-            aSerializer.writeValue("baseConfigurationFilename", baseConfigurationFilename);
+            aSerializer.writeValue("signatureFilename",         signatureAssetUid);
+            aSerializer.writeValue("baseConfigurationFilename", configurationAssetUid);
             aSerializer.beginObject("stages");
 
             for(auto const &[stage, stageFileReferences] : stages)
@@ -37,7 +37,7 @@ namespace engine
                 std::string const stageName = serialization::stageToString(stage);
                 aSerializer.beginObject(stageName);
                 aSerializer.writeValue("glslSourceFilename", stageFileReferences.glslSourceFilename);
-                aSerializer.writeValue("spvModuleFilename",  stageFileReferences.spvModuleFilename);
+                aSerializer.writeValue("spvModuleFilename",  stageFileReferences.spvModuleAssetId);
                 aSerializer.endObject();
             }
 
@@ -56,14 +56,8 @@ namespace engine
         {
             aDeserializer.readValue("uid",                       uid);
             aDeserializer.readValue("name",                      name);
-
-            std::string signatureFilenameString         {};
-            std::string baseConfigurationFilenameString {};
-            aDeserializer.readValue("signatureFilename",         signatureFilenameString);
-            aDeserializer.readValue("baseConfigurationFilename", baseConfigurationFilenameString);
-
-            signatureFilename         = signatureFilenameString;
-            baseConfigurationFilename = baseConfigurationFilenameString;
+            aDeserializer.readValue("signatureFilename",         signatureAssetUid);
+            aDeserializer.readValue("baseConfigurationFilename", configurationAssetUid);
 
             aDeserializer.beginObject("stages");
 
@@ -79,20 +73,20 @@ namespace engine
             {
                 std::string const stageName         = serialization::stageToString(stage);
                 std::string       glslFilename      = std::string();
-                std::string       spvModuleFilename = std::string();
+                asset::AssetId_t  spvModuleAssetId  = 0;
 
                 bool const couldBeginObject = aDeserializer.beginObject(stageName);
                 if(not couldBeginObject)
                 {
-                    stages[stage] = { "", "" };
+                    stages[stage] = { "", 0 };
                     continue;
                 }
 
                 aDeserializer.readValue("glslSourceFilename", glslFilename);
-                aDeserializer.readValue("spvModuleFilename",  spvModuleFilename);
+                aDeserializer.readValue("spvModuleFilename",  spvModuleAssetId);
                 aDeserializer.endObject();
 
-                stages[stage] = { glslFilename, spvModuleFilename };
+                stages[stage] = { glslFilename, spvModuleAssetId };
             }
 
             aDeserializer.endObject();

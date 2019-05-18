@@ -64,6 +64,7 @@ set(
         SHIRABEMODULEPLATFORM   
         VULKANSDK
         XLIB
+        CRYPTOPP
         STBI
         FXGLTF
         JSON

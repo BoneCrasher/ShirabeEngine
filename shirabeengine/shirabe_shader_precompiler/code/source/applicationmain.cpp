@@ -213,16 +213,18 @@ public_methods:
 
         auto const checkExtensionIsValid = [] (std::filesystem::path const &aPath, std::filesystem::path const &aExtension) -> bool
         {
+            std::filesystem::path const &extension = aPath.extension();
+
             bool const isFile           = not std::filesystem::is_directory(aPath);
-            bool const isExtensionValid = isFile && (aExtension == aPath.extension());
+            bool const isExtensionValid = isFile && (aExtension == extension);
 
             return isExtensionValid;
         };
 
         bool outputFileConfigValid = true;
-        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputIndexPath,         "index");
-        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputSignaturePath,     "signature");
-        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputConfigurationPath, "config");
+        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputIndexPath,         ".index");
+        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputSignaturePath,     ".signature");
+        outputFileConfigValid = outputFileConfigValid && checkExtensionIsValid(outputConfigurationPath, ".config");
 
         if(not outputFileConfigValid)
         {
@@ -308,8 +310,8 @@ public_methods:
         config.signatureOutputFile = outputSignaturePath    .lexically_normal();
         config.configOutputFile    = outputConfigurationPath.lexically_normal();
 
-        config.indexFile.signatureFilename         = config.signatureOutputFile;
-        config.indexFile.baseConfigurationFilename = config.configOutputFile;
+        config.indexFile.signatureAssetUid     = asset::assetIdFromUri(config.signatureOutputFile);
+        config.indexFile.configurationAssetUid = asset::assetIdFromUri(config.configOutputFile);
 
         mConfig = config;
 
@@ -644,7 +646,7 @@ private_methods:
             element.stage      = stage;
             element.outputPath = outputPath;
 
-            mConfig.indexFile.stages[stage].spvModuleFilename = outputPath.lexically_normal();
+            mConfig.indexFile.stages[stage].spvModuleAssetId = asset::assetIdFromUri(outputPath.lexically_normal());
 
             return element;
         };

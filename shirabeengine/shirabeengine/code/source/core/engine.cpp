@@ -278,7 +278,7 @@ namespace engine
 
 
             std::filesystem::path const root          = std::filesystem::current_path();
-            std::filesystem::path const resourcesPath = root/"data/resources";
+            std::filesystem::path const resourcesPath = root/"data/output/resources";
 
             CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/"game.assetindex.xml");
 
