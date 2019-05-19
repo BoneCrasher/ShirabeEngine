@@ -221,7 +221,7 @@ namespace engine
         };
 
         SRendererConfiguration rendererConfiguration = {};
-        rendererConfiguration.enableVSync             = true;
+        rendererConfiguration.enableVSync             = false;
         rendererConfiguration.frustum                 = CVector4D_t({ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f });
         rendererConfiguration.preferredBackBufferSize = CVector2D<uint32_t>({ windowWidth, windowHeight });
         rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
@@ -278,7 +278,7 @@ namespace engine
 
 
             std::filesystem::path const root          = std::filesystem::current_path();
-            std::filesystem::path const resourcesPath = root/"data/output/resources";
+            std::filesystem::path const resourcesPath = root/"data/output";
 
             CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/"game.assetindex.xml");
 

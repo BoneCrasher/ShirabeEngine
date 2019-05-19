@@ -65,15 +65,19 @@ void usage()
             "  --recursive_scan                                                                                      \n"
             "      Effect: If any of the paths in the -i option is a directory, include                              \n"
             "              all subdirectories in the input file search.                                              \n"
+            "  -od=<dirpath>                                                                                         \n"
+            "      Effect: Specifies the path of a directory where all output files should be stored relatively      \n"
             "  -om=<dirpath>                                                                                         \n"
-            "      Effect: Specifies the path of a directory where all generated modules should be stored            \n"
+            "      Effect: Specifies the path of a directory where all module files should be stored                 \n"
             "  -oi=<filepath>                                                                                        \n"
             "      Effect: Specifies the path of the index to write out.                                             \n"
             "  -os=<filepath>                                                                                        \n"
             "      Effect: Specifies the path of the generated signagure to write out.                               \n"
             "  -oc=<filepath>                                                                                        \n"
             "      Effect: Specifies the path of the generated configuration to write out.                           \n"
-            "  -i=<filename to index file>                                                                           \n"
+            "  -id=<filepath>                                                                                        \n"
+            "      Effect: Specifies the path from which all files are searched for relatively.                      \n"
+            "  -i =<filename to index file>                                                                          \n"
             "      Effect: Specifies the input index filename.                                                       \n"
             "                                                                                                        \n"
             " Example:                                                                                               \n"
@@ -123,6 +127,8 @@ private_structs:
     struct SConfiguration
     {
         SMaterialMasterIndex                    indexFile;
+        std::filesystem::path                   inputPath;
+        std::filesystem::path                   outputPath;
         std::vector<std::string>                includePaths;
         std::vector<std::string>                inputPaths;
         std::filesystem::path                   moduleOutputPath;
@@ -155,6 +161,8 @@ public_methods:
         std::string               dataFile                = {};
         std::vector<std::string>  includePaths            = {};
         std::filesystem::path     inputIndexPath          = {};
+        std::filesystem::path     inputPath               = {};
+        std::filesystem::path     outputPath              = {};
         std::filesystem::path     outputModulePath        = {};
         std::filesystem::path     outputIndexPath         = {};
         std::filesystem::path     outputSignaturePath     = {};
@@ -200,10 +208,12 @@ public_methods:
                 { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
                 { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
                 { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
+                { "-od",              [&] () { outputPath              = referencableValue;                return true; }},
                 { "-om",              [&] () { outputModulePath        = referencableValue;                return true; }},
                 { "-oi",              [&] () { outputIndexPath         = referencableValue;                return true; }},
                 { "-os",              [&] () { outputSignaturePath     = referencableValue;                return true; }},
                 { "-oc",              [&] () { outputConfigurationPath = referencableValue;                return true; }},
+                { "-id",              [&] () { inputPath               = referencableValue;                return true; }},
                 { "-i",               [&] () { inputIndexPath          = referencableValue;                return true; }},
             };
 
@@ -240,6 +250,8 @@ public_methods:
         }
 
         // Make sure the output config is correct.
+        std::filesystem::path const inputPathAbsolute               = (std::filesystem::current_path() / inputPath)              .lexically_normal();
+        std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / outputPath)             .lexically_normal();
         std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / outputModulePath)       .lexically_normal();
         std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / outputIndexPath)        .lexically_normal();
         std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / outputSignaturePath)    .lexically_normal();
@@ -249,11 +261,11 @@ public_methods:
         {
             std::filesystem::path path = aPath;
 
-            bool const outputPathExists = std::filesystem::exists(path);
-            if(not outputPathExists)
+            bool const pathExists = std::filesystem::exists(path);
+            if(not pathExists)
             {
-                bool const outputPathIsFile = not std::filesystem::is_directory(path);
-                if(outputPathIsFile)
+                bool const pathIsFile = not std::filesystem::is_directory(path);
+                if(pathIsFile)
                 {
                     path = aPath.parent_path();
                 }
@@ -273,13 +285,14 @@ public_methods:
             }
         };
 
+        checkPathExists(outputPath);
         checkPathExists(outputModulePathAbsolute);
         checkPathExists(outputIndexPathAbsolute);
         checkPathExists(outputSignaturePathAbsolute);
         checkPathExists(outputConfigurationPathAbsolute);
 
-        std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/inputIndexPath).lexically_normal();
-        std::filesystem::path const indexFileParentPath = (std::filesystem::current_path()/indexFilePath.parent_path()).lexically_normal();
+        std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/inputPath/inputIndexPath).lexically_normal();
+        std::filesystem::path const indexFileParentPath = (std::filesystem::current_path()/inputPath/indexFilePath.parent_path()).lexically_normal();
         std::filesystem::path const indexFileBaseName   = indexFilePath.stem();
 
         std::string const indexFileContents = readFile(indexFilePath);
@@ -304,17 +317,19 @@ public_methods:
         {
             if(not pathReferences.glslSourceFilename.empty())
             {
-                inputFiles.push_back(std::filesystem::current_path()/indexFileParentPath/pathReferences.glslSourceFilename);
+                inputFiles.push_back(std::filesystem::current_path()/inputPath/indexFileParentPath/pathReferences.glslSourceFilename);
             }
         }
 
         SConfiguration config {};
         config.options             = options;
+        config.inputPath           = inputPath              .lexically_normal();
+        config.outputPath          = outputPath             .lexically_normal();
         config.indexFile           = index;
         config.inputPaths          = inputFiles;
         config.includePaths        = includePaths;
-        config.indexOutputFile     = outputIndexPath        .lexically_normal();
         config.moduleOutputPath    = outputModulePath       .lexically_normal();
+        config.indexOutputFile     = outputIndexPath        .lexically_normal();
         config.signatureOutputFile = outputSignaturePath    .lexically_normal();
         config.configOutputFile    = outputConfigurationPath.lexically_normal();
 
@@ -388,6 +403,11 @@ public_methods:
         }
 
         writeFile(mConfig.configOutputFile, serializedData);
+
+        //
+        // Copy dependencies
+        //
+
 
         // CStdSharedPtr_t<CMaterialDeserializer::IResult> result1 = nullptr;
         //
@@ -646,7 +666,7 @@ private_methods:
             }
 
             std::string           const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
-            std::filesystem::path const outputPath = std::filesystem::path(mConfig.moduleOutputPath) / outputName;
+            std::filesystem::path const outputPath = std::filesystem::path(mConfig.outputPath) / mConfig.moduleOutputPath / outputName;
 
             SShaderCompilationElement element {};
             element.fileName   = aFilename;

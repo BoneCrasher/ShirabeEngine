@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.7.0, 2019-05-16T17:32:32. -->
+<!-- Written by QtCreator 4.7.0, 2019-05-19T13:39:50. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -465,7 +465,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./data/input/resources/shaders/include -om=./data/output/resources/shaders/standard -oi=./data/output/resources/shaders/standard/standard.mat.index -os=./data/output/resources/shaders/standard/standard.mat.signature -oc=./data/output/resources/shaders/standard/standard.mat.config -i=./data/input/resources/shaders/standard/standard.mat.index
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./shaders/include -id=./data/input/resources -od=./data/output/resources -oi=./shaders/standard/standard.mat.index -os=./shaders/standard/standard.mat.signature -oc=./shaders/standard/standard.mat.config -i=./shaders/standard/standard.mat.index
 </value>
     <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
@@ -834,7 +834,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./data/input/resources/shaders/include -om=./data/output/resources/shaders/standard -oi=./data/output/resources/shaders/standard/standard.mat.index -os=./data/output/resources/shaders/standard/standard.mat.signature -oc=./data/output/resources/shaders/standard/standard.mat.config -i=./data/input/resources/shaders/standard/standard.mat.index
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">--verbose --debug --optimize -I=./resources/shaders/include -id=./data/input -od=./data/output -oi=./resources/shaders/standard/standard.mat.index -os=./resources/shaders/standard/standard.mat.signature -oc=./resources/shaders/standard/standard.mat.config -i=./resources/shaders/standard/standard.mat.index
 </value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/dotti/workspaces/shirabeengine/shirabeengine/_deploy/linux32/debug/bin</value>

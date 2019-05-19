@@ -58,6 +58,9 @@ function read_arguments
 
 read_arguments $@
 
+#
+# Process all materials
+#
 ${THIS}/${PRECOMPILER_PATH}                                               \
     --verbose                                                             \
     --debug                                                               \
@@ -68,3 +71,8 @@ ${THIS}/${PRECOMPILER_PATH}                                               \
     -os=./data/output/resources/shaders/standard/standard.mat.signature   \
     -oc=./data/output/resources/shaders/standard/standard.mat.config      \
     -i=./data/input/resources/shaders/standard/standard.mat.index         
+    
+# 
+# Copy all non-generated files
+#
+cp -f ${THIS}/data/input/resources/game.assetindex.xml ${THIS}/data/output/resources

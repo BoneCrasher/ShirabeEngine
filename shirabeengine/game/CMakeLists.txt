@@ -26,13 +26,13 @@ add_custom_target(shirabe_game_precopy
 
 add_custom_target(shirabe_game_copy_resources
                   VERBATIM
-                  COMMAND           cp -rf . ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources
+                  COMMAND           mkdir -p ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources && cp -rf . ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources
                   WORKING_DIRECTORY ${SHIRABE_PROJECT_RES_DIR}
                   COMMENT           "Copying resources")
 
 add_custom_target(shirabe_game_process_resources
                   VERBATIM
-                  COMMAND           ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/tools/shirabe_process_resources.sh -r ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/
+                  COMMAND           ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/tools/shirabe_process_resources.sh -r ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources
                   WORKING_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
                   COMMENT           "Processing resources")
 
