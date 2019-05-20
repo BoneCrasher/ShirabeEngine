@@ -104,8 +104,8 @@ namespace engine
 
             aSerializer.writeValue("uid",                   uid);
             aSerializer.writeValue("name",                  name);
-            aSerializer.writeValue("masterIndexFilename",   masterIndexFilename);
-            aSerializer.writeValue("configurationFilename", configurationFilename);
+            aSerializer.writeValue("masterIndexFilename",   masterIndexAssetId);
+            aSerializer.writeValue("configurationFilename", configurationAssetId);
 
             aSerializer.endObject();
 
@@ -121,14 +121,8 @@ namespace engine
             aDeserializer.readValue("uid",  uid);
             aDeserializer.readValue("name", name);
 
-            std::string masterIndexFilenameString {};
-            aDeserializer.readValue("masterIndexFilename", masterIndexFilenameString);
-
-            std::string configurationFilenameString {};
-            aDeserializer.readValue("configurationFilename", configurationFilenameString);
-
-            masterIndexFilename   = masterIndexFilenameString;
-            configurationFilename = configurationFilenameString;
+            aDeserializer.readValue("masterIndexFilename",   masterIndexAssetId);
+            aDeserializer.readValue("configurationFilename", configurationAssetId);
 
             return true;
         }

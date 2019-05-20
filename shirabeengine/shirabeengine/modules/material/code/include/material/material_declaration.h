@@ -165,40 +165,40 @@ namespace engine
             SMaterialInstanceIndex()
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
-                , uid                  (0 )
-                , name                 ({})
-                , masterIndexFilename  (  )
-                , configurationFilename(  )
+                , uid                 (0 )
+                , name                ({})
+                , masterIndexAssetId  (0 )
+                , configurationAssetId(0 )
             {}
 
             SHIRABE_INLINE
             SMaterialInstanceIndex(SMaterialInstanceIndex const &aOther)
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
-                , uid                  (aOther.uid                  )
-                , name                 (aOther.name                 )
-                , masterIndexFilename  (aOther.masterIndexFilename  )
-                , configurationFilename(aOther.configurationFilename)
+                , uid                 (aOther.uid                 )
+                , name                (aOther.name                )
+                , masterIndexAssetId  (aOther.masterIndexAssetId  )
+                , configurationAssetId(aOther.configurationAssetId)
             {}
 
             SHIRABE_INLINE
             SMaterialInstanceIndex(SMaterialInstanceIndex &&aOther)
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
-                , uid                  (std::move(aOther.uid                    ))
-                , name                 (std::move(aOther.name                   ))
-                , masterIndexFilename  (std::move(aOther.masterIndexFilename    ))
-                , configurationFilename(std::move(aOther.configurationFilename  ))
+                , uid                 (std::move(aOther.uid                   ))
+                , name                (std::move(aOther.name                  ))
+                , masterIndexAssetId  (std::move(aOther.masterIndexAssetId    ))
+                , configurationAssetId(std::move(aOther.configurationAssetId  ))
             {}
 
         public_operators:
             SHIRABE_INLINE
             SMaterialInstanceIndex &operator=(SMaterialInstanceIndex const &aOther)
             {
-                uid                   = aOther.uid;
-                name                  = aOther.name;
-                masterIndexFilename   = aOther.masterIndexFilename;
-                configurationFilename = aOther.configurationFilename;
+                uid                  = aOther.uid;
+                name                 = aOther.name;
+                masterIndexAssetId   = aOther.masterIndexAssetId;
+                configurationAssetId = aOther.configurationAssetId;
 
                 return (*this);
             }
@@ -206,19 +206,19 @@ namespace engine
             SHIRABE_INLINE
             SMaterialInstanceIndex &operator=(SMaterialInstanceIndex &&aOther)
             {
-                uid                   = std::move(aOther.uid);
-                name                  = std::move(aOther.name);
-                masterIndexFilename   = std::move(aOther.masterIndexFilename);
-                configurationFilename = std::move(aOther.configurationFilename);
+                uid                  = std::move(aOther.uid);
+                name                 = std::move(aOther.name);
+                masterIndexAssetId   = std::move(aOther.masterIndexAssetId);
+                configurationAssetId = std::move(aOther.configurationAssetId);
 
                 return (*this);
             }
 
         public_members:
-            uint64_t              uid;
-            std::string           name;
-            std::filesystem::path masterIndexFilename;
-            std::filesystem::path configurationFilename;
+            uint64_t         uid;
+            std::string      name;
+            asset::AssetId_t masterIndexAssetId;
+            asset::AssetId_t configurationAssetId;
 
         public_methods:
             /**

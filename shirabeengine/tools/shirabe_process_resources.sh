@@ -75,4 +75,6 @@ ${THIS}/${PRECOMPILER_PATH}                                               \
 # 
 # Copy all non-generated files
 #
-cp -f ${THIS}/data/input/resources/game.assetindex.xml ${THIS}/data/output/resources
+cp -f ${THIS}/data/input/resources/game.assetindex.xml                                ${THIS}/data/output/resources
+cp -f ${THIS}/data/input/resources/shaders/standard/standard.mat.instance_0000.index  ${THIS}/data/output/resources/shaders/standard
+cp -f ${THIS}/data/input/resources/shaders/standard/standard.mat.instance_0000.config ${THIS}/data/output/resources/shaders/standard
