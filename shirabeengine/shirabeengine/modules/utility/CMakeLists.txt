@@ -15,6 +15,7 @@ set(
         SHIRABEMODULELOG
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
+        CRYPTOPP
         JSON
         XML2)
 

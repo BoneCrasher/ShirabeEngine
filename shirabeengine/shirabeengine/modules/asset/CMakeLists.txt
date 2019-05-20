@@ -19,8 +19,7 @@ set(
         FXGLTF                  
         JSON
         XML2
-        ZLIB
-        CRYPTOPP)
+        ZLIB)
 
 include(project_setup)
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <Index>
   <!-- <Asset aid="1" parent_aid="0" type="Mesh"     uri="sphere.mesh"                       /> //-->
-  <Asset aid="2255095060" parent_aid="0"           type="Material" subtype="Master"    uri="./shaders/standard/standard.mat.index"                />
-  <Asset aid="715702375"  parent_aid="2255095060"  type="Material" subtype="Signature" uri="./shaders/standard/standard.mat.signature"            />
-  <Asset aid="3524616162" parent_aid="715702375"   type="Material" subtype="Config"    uri="./shaders/standard/standard.mat.config"               />
-  <Asset aid="3770791062" parent_aid="715702375"   type="Material" subtype="SPVModule" uri="./shaders/standard/standard.vert.glsl.spv"            />
-  <Asset aid="60143038"   parent_aid="715702375"   type="Material" subtype="SPVModule" uri="./shaders/standard/standard.frag.glsl.spv"            />
-  <Asset aid="1864756445" parent_aid="2255095060"  type="Material" subtype="Instance"  uri="./shaders/standard/standard.mat.instance_0000.index"  />
-  <Asset aid="809789983 " parent_aid="1864756445"  type="Material" subtype="Config"    uri="./shaders/standard/standard.mat.instance_0000.config" />
+  <Asset aid="4239441334"  parent_aid="0"           type="Material" subtype="Master"    uri="./shaders/standard/standard.mat.index"                />
+  <Asset aid="3615719880"  parent_aid="4239441334"  type="Material" subtype="Signature" uri="./shaders/standard/standard.mat.signature"            />
+  <Asset aid="175091735"   parent_aid="3615719880"  type="Material" subtype="Config"    uri="./shaders/standard/standard.mat.config"               />
+  <Asset aid="653801243"   parent_aid="3615719880"  type="Material" subtype="SPVModule" uri="./shaders/standard/standard.vert.glsl.spv"            />
+  <Asset aid="2931965228"  parent_aid="3615719880"  type="Material" subtype="SPVModule" uri="./shaders/standard/standard.frag.glsl.spv"            />
+  <Asset aid="4199346586"  parent_aid="4239441334"  type="Material" subtype="Instance"  uri="./shaders/standard/standard.mat.instance_0000.index"  />
+  <Asset aid="3280404478 " parent_aid="4199346586"  type="Material" subtype="Config"    uri="./shaders/standard/standard.mat.instance_0000.config" />
   <!-- <Asset aid="4" parent_aid="0" type="Texture"  uri="sphere_default_diffuse.texture"    /> //-->
   <!-- <Asset aid="5" parent_aid="0" type="Texture"  uri="sphere_default_spec_gloss.texture" /> //-->
   <!-- <Asset aid="6" parent_aid="0" type="Texture"  uri="sphere_default_normal.texture"     /> //-->

@@ -129,8 +129,8 @@ private_structs:
         SMaterialMasterIndex                    indexFile;
         std::filesystem::path                   inputPath;
         std::filesystem::path                   outputPath;
-        std::vector<std::string>                includePaths;
-        std::vector<std::string>                inputPaths;
+        std::vector<std::filesystem::path>      includePaths;
+        std::vector<std::filesystem::path>      inputPaths;
         std::filesystem::path                   moduleOutputPath;
         std::filesystem::path                   indexOutputFile;
         std::filesystem::path                   signatureOutputFile;
@@ -157,16 +157,16 @@ public_methods:
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
-        core::CBitField<EOptions> options                 = {};
-        std::string               dataFile                = {};
-        std::vector<std::string>  includePaths            = {};
-        std::filesystem::path     inputIndexPath          = {};
-        std::filesystem::path     inputPath               = {};
-        std::filesystem::path     outputPath              = {};
-        std::filesystem::path     outputModulePath        = {};
-        std::filesystem::path     outputIndexPath         = {};
-        std::filesystem::path     outputSignaturePath     = {};
-        std::filesystem::path     outputConfigurationPath = {};
+        core::CBitField<EOptions>          options                 = {};
+        std::string                        dataFile                = {};
+        std::vector<std::filesystem::path> includePaths            = {};
+        std::filesystem::path              inputIndexPath          = {};
+        std::filesystem::path              inputPath               = {};
+        std::filesystem::path              outputPath              = {};
+        std::filesystem::path              outputModulePath        = {};
+        std::filesystem::path              outputIndexPath         = {};
+        std::filesystem::path              outputSignaturePath     = {};
+        std::filesystem::path              outputConfigurationPath = {};
 
         //
         // Process all options provided to the application.
@@ -250,12 +250,12 @@ public_methods:
         }
 
         // Make sure the output config is correct.
-        std::filesystem::path const inputPathAbsolute               = (std::filesystem::current_path() / inputPath)              .lexically_normal();
-        std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / outputPath)             .lexically_normal();
-        std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / outputModulePath)       .lexically_normal();
-        std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / outputIndexPath)        .lexically_normal();
-        std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / outputSignaturePath)    .lexically_normal();
-        std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / outputConfigurationPath).lexically_normal();
+        std::filesystem::path const inputPathAbsolute               = (std::filesystem::current_path() / inputPath)                           .lexically_normal();
+        std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / outputPath)                          .lexically_normal();
+        std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / outputPath / outputModulePath)       .lexically_normal();
+        std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / outputPath / outputIndexPath)        .lexically_normal();
+        std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / outputPath / outputSignaturePath)    .lexically_normal();
+        std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / outputPath / outputConfigurationPath).lexically_normal();
 
         auto const checkPathExists = [] (std::filesystem::path const &aPath) -> void
         {
@@ -291,6 +291,14 @@ public_methods:
         checkPathExists(outputSignaturePathAbsolute);
         checkPathExists(outputConfigurationPathAbsolute);
 
+        //
+        // Make sure to properly prepend the include paths
+        //
+        for(auto &includePath : includePaths)
+        {
+            includePath = std::filesystem::current_path()/inputPath/includePath;
+        }
+
         std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/inputPath/inputIndexPath).lexically_normal();
         std::filesystem::path const indexFileParentPath = (std::filesystem::current_path()/inputPath/indexFilePath.parent_path()).lexically_normal();
         std::filesystem::path const indexFileBaseName   = indexFilePath.stem();
@@ -303,13 +311,13 @@ public_methods:
         CResult<CStdSharedPtr_t<serialization::IDeserializer<SMaterialMasterIndex>::IResult>> serialization = indexDeserializer->deserialize(indexFileContents);
         if(not serialization.successful())
         {
-            CLog::Error(logTag(), "Could not serialize material index file.");
+            CLog::Error(logTag(), "Could not deserialize material index file.");
             return false;
         }
 
         indexDeserializer->deinitialize();
 
-        std::vector<std::string> inputFiles;
+        std::vector<std::filesystem::path> inputFiles;
 
         SMaterialMasterIndex index = serialization.data()->asT().data();
 
@@ -333,8 +341,8 @@ public_methods:
         config.signatureOutputFile = outputSignaturePath    .lexically_normal();
         config.configOutputFile    = outputConfigurationPath.lexically_normal();
 
-        config.indexFile.signatureAssetUid     = asset::assetIdFromUri(config.signatureOutputFile);
-        config.indexFile.configurationAssetUid = asset::assetIdFromUri(config.configOutputFile);
+        config.indexFile.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
+        config.indexFile.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
 
         mConfig = config;
 
@@ -383,7 +391,7 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(mConfig.indexOutputFile, serializedData);
+        writeFile(std::filesystem::current_path()/mConfig.outputPath/mConfig.indexOutputFile, serializedData);
 
         CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
         if(not signatureSerializationResult.successful())
@@ -392,7 +400,7 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(mConfig.signatureOutputFile, serializedData);
+        writeFile(std::filesystem::current_path()/mConfig.outputPath/mConfig.signatureOutputFile, serializedData);
 
         CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data());
         CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);
@@ -402,7 +410,7 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(mConfig.configOutputFile, serializedData);
+        writeFile(std::filesystem::current_path()/mConfig.outputPath/mConfig.configOutputFile, serializedData);
 
         //
         // Copy dependencies
@@ -632,7 +640,7 @@ private_methods:
      * @param aOptions
      * @return
      */
-    CResult<SShaderCompilationUnit> generateCompilationUnit(std::vector<std::string> const &aFilenames)
+    CResult<SShaderCompilationUnit> generateCompilationUnit(std::vector<std::filesystem::path> const &aFilenames)
     {
         EShaderCompiler  compiler = EShaderCompiler::Unknown;
         EShadingLanguage language = EShadingLanguage::Unknown;
@@ -666,7 +674,7 @@ private_methods:
             }
 
             std::string           const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
-            std::filesystem::path const outputPath = std::filesystem::path(mConfig.outputPath) / mConfig.moduleOutputPath / outputName;
+            std::filesystem::path const outputPath = std::filesystem::current_path() / mConfig.outputPath / mConfig.moduleOutputPath / outputName;
 
             SShaderCompilationElement element {};
             element.fileName   = aFilename;
@@ -716,7 +724,7 @@ private_methods:
             CEngineResult<std::string> const commandResult = executeCmd(command);
 
             bool const compilationError = (std::string::npos != commandResult.data().find("compilation error")
-                                          or std::string::npos != commandResult.data().find("not found"));
+                                           or std::string::npos != commandResult.data().find("not found"));
             if(compilationError || not commandResult.successful())
             {
                 CLog::Error(logTag(), commandResult.data());

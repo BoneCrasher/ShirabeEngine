@@ -12,6 +12,7 @@ project(shirabedevelopment)
 add_subdirectory(shirabeengine)
 add_subdirectory(shirabe_shader_precompiler)
 # add_subdirectory(enginetest)
+add_subdirectory(crc32generator)
 add_subdirectory(game)
 
 add_dependencies(shirabe_shader_precompiler INSTALL_shirabeengine)

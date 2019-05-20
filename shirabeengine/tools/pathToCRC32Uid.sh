@@ -1,8 +1,10 @@
 #!/bin/bash
 
+THIS=$(pwd -P)
+
 function convertOne
 {
-    crc32 <(echo $1) | tr a-z A-Z | xargs echo "ibase=16; " | bc
+    crc32 <(echo $1) | tr a-z A-Z | xargs echo "ibase=16;" | bc
 }
 
 FILES=(
@@ -16,5 +18,6 @@ FILES=(
       )   
       
 for lFile in ${FILES[@]}; do
-    convertOne ${lFile}
+    # convertOne ${lFile}
+    /home/dotti/workspaces/shirabeengine/shirabeengine/_deploy/linux64/debug/bin/crc32generator_x64d -i=${lFile}
 done;

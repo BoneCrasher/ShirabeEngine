@@ -61,17 +61,17 @@ read_arguments $@
 #
 # Process all materials
 #
-${THIS}/${PRECOMPILER_PATH}                                               \
-    --verbose                                                             \
-    --debug                                                               \
-    --optimize                                                            \
-    -I=./data/input/resources/shaders/include                             \
-    -om=./data/output/resources/shaders/standard                          \
-    -oi=./data/output/resources/shaders/standard/standard.mat.index       \
-    -os=./data/output/resources/shaders/standard/standard.mat.signature   \
-    -oc=./data/output/resources/shaders/standard/standard.mat.config      \
-    -i=./data/input/resources/shaders/standard/standard.mat.index         
-    
+./${PRECOMPILER_PATH}                              \
+    --verbose --debug --optimize                   \
+    -I=./shaders/include                           \
+    -id=./data/input/resources                     \
+    -od=./data/output/resources                    \
+    -om=./shaders/standard                         \
+    -oi=./shaders/standard/standard.mat.index      \
+    -os=./shaders/standard/standard.mat.signature  \
+    -oc=./shaders/standard/standard.mat.config     \
+    -i=./shaders/standard/standard.mat.index
+                                                       
 # 
 # Copy all non-generated files
 #

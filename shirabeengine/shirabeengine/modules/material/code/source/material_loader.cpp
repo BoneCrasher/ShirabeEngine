@@ -114,13 +114,7 @@ namespace engine
                                 Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>       &aMasterMaterialIndex,
                                 asset::AssetID_t                                        const &aMasterMaterialAssetId) -> std::tuple<bool, std::string, SMaterialMasterIndex, SMaterialSignature, CMaterialConfig>
         {
-            bool const masterAlreadyLoaded = (aMasterMaterialIndex.end() != aMasterMaterialIndex.find(aMasterMaterialAssetId));
-            if(not masterAlreadyLoaded)
-            {
-                return { false, {}, {}, {}, {} };
-            }
-
-            AssetID_t                       masterIndexId      = 0; // Needs to be here, since it will be shared across both case-blocks.
+            AssetID_t                       masterIndexId      = aMasterMaterialAssetId; // Needs to be here, since it will be shared across both case-blocks.
             CResult<SMaterialMasterIndex>   masterIndexFetch   = {};
 
             masterIndexFetch = readMaterialMasterIndexFile(aLogTag, aAssetStorage.get(), masterIndexId);
@@ -186,7 +180,6 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Fetch indices
             //--------------------------------------------------------------------------------------------------------------------
-            bool processInstance = false;
 
             AssetID_t                       masterIndexId      = 0; // Needs to be here, since it will be shared across both case-blocks.
             CResult<SMaterialInstanceIndex> instanceIndexFetch = {};
@@ -217,10 +210,11 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // If we process an instance...
             //--------------------------------------------------------------------------------------------------------------------
+            bool processInstance = true;
             if(processInstance)
             {
                 // Fetch instance configuration override
-                CEngineResult<SAsset> configAssetFetch = mStorage->loadAsset(masterIndex.signatureAssetUid);
+                CEngineResult<SAsset> configAssetFetch = mStorage->loadAsset(masterIndex.configurationAssetUid);
                 if(not configAssetFetch.successful())
                 {
                     return { configAssetFetch.result() };
