@@ -126,6 +126,81 @@ namespace engine
         }
     }
 
+    template <typename TResult>
+    static bool IsEngineError(TResult const &aPotentialErrorValue)
+    {
+        if constexpr(std::is_same_v<TResult, EEngineStatus>)
+        {
+            return CheckEngineError(aPotentialErrorValue);
+        }
+        else if constexpr(std::is_same_v<TResult, bool>)
+        {
+            return aPotentialErrorValue;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    template <typename TResult>
+    static void PrintEngineError(TResult     const &aPotentialErrorValue,
+                                 std::string const &aLogTag,
+                                 std::string const &aFormat)
+    {
+        if constexpr(std::is_same_v<TResult, EEngineStatus>)
+        {
+            EngineStatusPrintOnError(aPotentialErrorValue, aLogTag, aFormat);
+        }
+        else if constexpr(std::is_same_v<TResult, bool>)
+        {
+            EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, aFormat);
+        }
+    }
+
+    template <typename TResult, typename... TArgs>
+    static void PrintEngineError(TResult     const &aPotentialErrorValue,
+                                 std::string const &aLogTag,
+                                 std::string const &aFormat,
+                                 TArgs         &&...aArgs)
+    {
+        if constexpr(std::is_same_v<TResult, EEngineStatus>)
+        {
+            EngineStatusPrintOnError(aPotentialErrorValue, aLogTag, CString::format(aFormat, std::forward<TArgs>(aArgs)...));
+        }
+        else if constexpr(std::is_same_v<TResult, bool>)
+        {
+            EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, CString::format(aFormat, std::forward<TArgs>(aArgs)...));
+        }
+    }
+
+    template <typename TResult>
+    static EEngineStatus ConvertError(TResult const &aPotentialErrorValue)
+    {
+        if constexpr(std::is_same_v<TResult, EEngineStatus>)
+        {
+            return aPotentialErrorValue;
+        }
+        else
+        {
+            return EEngineStatus::Error;
+        }
+    }
+
+    #define SHIRABE_RETURN_RESULT_ON_ERROR(status) \
+            if(IsEngineError(status))              \
+            {                                      \
+                                                   \
+                return ConvertError(status);       \
+            }
+
+    #define SHIRABE_RETURN_VALUE_ON_ERROR(status, value) \
+            if(IsEngineError(status))                    \
+            {                                            \
+                                                         \
+                return value;                            \
+            }
+
     /**
      * The CEngineResult class is a SResult implementation to return result tuples of
      * result type EEngineStatus.

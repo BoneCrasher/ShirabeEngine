@@ -26,6 +26,7 @@ namespace engine
     SHIRABE_LIBRARY_EXPORT class CString
     {
         public_static_functions:
+
         /**
          * Format a string based on 'aFormat' with a variadic number of arbitrarily typed arguments.
          *
@@ -35,8 +36,8 @@ namespace engine
          */
         template <typename... TArgs>
         static std::string format(
-                std::string const&aFormat,
-                TArgs        &&...aArguments);
+                std::string const &aFormat,
+                TArgs         &&...aArguments);
 
         /**
          * Convert an 8-bit char array to a 16-bit string.
@@ -163,7 +164,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     template <typename... TArgs>
     std::string CString::format(
-            const std::string     &aFormat,
+            std::string     const &aFormat,
             TArgs             &&...aArgs)
     {
         std::array<std::string, sizeof...(aArgs)> formattedArguments{};
@@ -228,6 +229,7 @@ namespace engine
 
             return stream.str();
         }
+
     }
     //<-----------------------------------------------------------------------------
 

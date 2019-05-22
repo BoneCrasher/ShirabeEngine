@@ -361,17 +361,34 @@ namespace std
         using type = TResult;
     };
 
-    // template <std::size_t N, typename TResult, typename TData>
-    // struct tuple_element<N, engine::AResult<TResult, TData>>
-    // {
-    //     using type = decltype(std::declval<engine::AResult<TResult, TData>>().get<N>());
-    // };
-    //
-    // template <std::size_t N, typename TResult>
-    // struct tuple_element<N, engine::AResult<TResult, void>>
-    // {
-    //     using type = decltype(std::declval<engine::AResult<TResult, void>>().get<N>());
-    // };
+    template <typename TData>
+    struct tuple_size<engine::CResult<TData>>
+        : std::integral_constant<std::size_t, 2>
+    {};
+
+    template <>
+    struct tuple_size<engine::CResult<void>>
+        : std::integral_constant<std::size_t, 1>
+    {};
+
+    template <typename TData>
+    struct tuple_element<0, engine::CResult<TData>>
+    {
+        using type = bool;
+    };
+
+    template <typename TData>
+    struct tuple_element<1, engine::CResult<TData>>
+    {
+        using type = TData;
+    };
+
+    template <>
+    struct tuple_element<0, engine::CResult<void>>
+    {
+        using type = bool;
+    };
+
 }
 
 #endif // RESULT_H
