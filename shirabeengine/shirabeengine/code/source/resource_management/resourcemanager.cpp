@@ -7,6 +7,7 @@ namespace engine
     using engine::gfxapi::CTextureView;
     using engine::gfxapi::CRenderPass;
     using engine::gfxapi::CFrameBuffer;
+    using engine::gfxapi::CPipeline;
 
     //<-----------------------------------------------------------------------------
     //
@@ -28,133 +29,39 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineResult<> CResourceManager::initialize()
     {
+        CResourceManagerBase *resourceManager = static_cast<CResourceManagerBase *>(this);
+
         bool success = true;
 
-        success = success &&
-                addCreator<CTexture>(std::bind(
-                                 &CResourceManager::createResourceImpl<CTexture>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3)).successful();
-        success = success &&
-                addCreator<CTextureView>(std::bind(
-                                 &CResourceManager::createResourceImpl<CTextureView>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3)).successful();
+        success = success && addCreator   <CTexture>    (resourceManager);
+        success = success && addLoader    <CTexture>    (resourceManager);
+        success = success && addUpdater   <CTexture>    (resourceManager);
+        success = success && addUnloader  <CTexture>    (resourceManager);
+        success = success && addDestructor<CTexture>    (resourceManager);
 
-        success = success &&
-                addCreator<CRenderPass>(std::bind(
-                                 &CResourceManager::createResourceImpl<CRenderPass>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3)).successful();
+        success = success && addCreator   <CTextureView>(resourceManager);
+        success = success && addLoader    <CTextureView>(resourceManager);
+        success = success && addUnloader  <CTextureView>(resourceManager);
+        success = success && addDestructor<CTextureView>(resourceManager);
 
-        success = success &&
-                addCreator<CFrameBuffer>(std::bind(
-                                 &CResourceManager::createResourceImpl<CFrameBuffer>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3)).successful();
+        success = success && addCreator   <CRenderPass> (resourceManager);
+        success = success && addLoader    <CRenderPass> (resourceManager);
+        success = success && addUnloader  <CRenderPass> (resourceManager);
+        success = success && addDestructor<CRenderPass> (resourceManager);
 
-        success = success &&
-                addLoader<CTexture>(std::bind(
-                                 &CResourceManager::loadResourceImpl<CTexture>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
+        success = success && addCreator   <CFrameBuffer>(resourceManager);
+        success = success && addLoader    <CFrameBuffer>(resourceManager);
+        success = success && addUnloader  <CFrameBuffer>(resourceManager);
+        success = success && addDestructor<CFrameBuffer>(resourceManager);
 
-        success = success &&
-                addLoader<CTextureView>(std::bind(
-                                 &CResourceManager::loadResourceImpl<CTextureView>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
+        success = success && addCreator   <CPipeline>   (resourceManager);
+        success = success && addLoader    <CPipeline>   (resourceManager);
+        success = success && addUnloader  <CPipeline>   (resourceManager);
+        success = success && addDestructor<CPipeline>   (resourceManager);
 
-        success = success &&
-                addLoader<CRenderPass>(std::bind(
-                                 &CResourceManager::loadResourceImpl<CRenderPass>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addLoader<CFrameBuffer>(std::bind(
-                                 &CResourceManager::loadResourceImpl<CFrameBuffer>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addUpdater<CTexture>(std::bind(
-                                 &CResourceManager::updateResourceImpl<CTexture>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1,
-                                 std::placeholders::_2)).successful();
-
-        success = success &&
-                addUpdater<CTextureView>(std::bind(
-                                 &CResourceManager::updateResourceImpl<CTextureView>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1,
-                                 std::placeholders::_2)).successful();
-
-        success = success &&
-                addUnloader<CTexture>(std::bind(
-                                 &CResourceManager::unloadResourceImpl<CTexture>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addUnloader<CTextureView>(std::bind(
-                                 &CResourceManager::unloadResourceImpl<CTextureView>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addUnloader<CRenderPass>(std::bind(
-                                 &CResourceManager::unloadResourceImpl<CRenderPass>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addUnloader<CFrameBuffer>(std::bind(
-                                 &CResourceManager::unloadResourceImpl<CFrameBuffer>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addDestructor<CTexture>(std::bind(
-                                 &CResourceManager::destroyResourceImpl<CTexture>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addDestructor<CTextureView>(std::bind(
-                                 &CResourceManager::destroyResourceImpl<CTextureView>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addDestructor<CRenderPass>(std::bind(
-                                 &CResourceManager::destroyResourceImpl<CRenderPass>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        success = success &&
-                addDestructor<CFrameBuffer>(std::bind(
-                                 &CResourceManager::destroyResourceImpl<CFrameBuffer>,
-                                 static_cast<CResourceManagerBase *>(this),
-                                 std::placeholders::_1)).successful();
-
-        if(not success)
-        {
-            return EEngineStatus::Error;
-        }
-        else
-        {
-            return EEngineStatus::Ok;
-        }
+        return (not success)
+                ? EEngineStatus::ResourceManager_Setup_Failed
+                : EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
 

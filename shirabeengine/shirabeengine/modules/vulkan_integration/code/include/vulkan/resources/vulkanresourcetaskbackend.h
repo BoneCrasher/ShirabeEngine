@@ -18,15 +18,16 @@ namespace engine
         using namespace engine::resources;
         using namespace engine::gfxapi;
 
-        #define VkTypes 	\
-            VkSwapchainKHR, \
-            VkRenderPass,   \
-            VkFrameBuffer,  \
-            VkImage,        \
-            VkBuffer,       \
-            VkImageView,    \
-            VkBufferView,   \
-            VkShaderModule
+        #define VkTypes 	        \
+                   VkSwapchainKHR   \
+                   , VkRenderPass   \
+                   , VkFrameBuffer  \
+                   , VkImage        \
+                   , VkBuffer       \
+                   , VkImageView    \
+                   , VkBufferView   \
+                   , VkShaderModule \
+                   , VkPipeline
     }
 
     #define SHIRABE_DECLARE_TASK_BUILDER_MODULE(type)                          \
@@ -86,6 +87,7 @@ namespace engine
             //DeclareTaskBuilderModule(BufferView);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(RenderPass);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(FrameBuffer);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(Pipeline);
 
         private_members:
             CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;

@@ -52,6 +52,65 @@ namespace engine
          * @return EEngineStatus::Ok on success. An error code otherwise.
          */
         CEngineResult<> deinitialize();
+
+    private_methods:
+        template <typename TType>
+        auto addCreator(CResourceManagerBase *aResourceManager) -> bool
+        {
+            return CResourceManagerBase::addCreator<TType>
+                   (
+                        std::bind(&CResourceManager::createResourceImpl<TType>
+                                  , aResourceManager
+                                  , std::placeholders::_1
+                                  , std::placeholders::_2
+                                  , std::placeholders::_3)
+                   ).successful();
+        }
+
+        template <typename TType>
+        auto addLoader(CResourceManagerBase *aResourceManager) -> bool
+        {
+            return CResourceManagerBase::addLoader<TType>
+                   (
+                        std::bind(&CResourceManager::loadResourceImpl<TType>
+                                  , aResourceManager
+                                  , std::placeholders::_1)
+                   ).successful();
+        }
+
+        template <typename TType>
+        auto addUpdater(CResourceManagerBase *aResourceManager) -> bool
+        {
+            return CResourceManagerBase::addUpdater<TType>
+                   (
+                        std::bind(&CResourceManager::updateResourceImpl<TType>
+                                  , aResourceManager
+                                  , std::placeholders::_1
+                                  , std::placeholders::_2)
+                   ).successful();
+        }
+
+        template <typename TType>
+        auto addUnloader(CResourceManagerBase *aResourceManager) -> bool
+        {
+            return CResourceManagerBase::addUnloader<TType>
+                   (
+                        std::bind(&CResourceManager::unloadResourceImpl<TType>
+                                  , aResourceManager
+                                  , std::placeholders::_1)
+                   ).successful();
+        }
+
+        template <typename TType>
+        auto addDestructor(CResourceManagerBase *aResourceManager) -> bool
+        {
+            return CResourceManagerBase::addDestructor<TType>
+                   (
+                        std::bind(&CResourceManager::destroyResourceImpl<TType>
+                                  , aResourceManager
+                                  , std::placeholders::_1)
+                   ).successful();
+        }
     };
 }
 
