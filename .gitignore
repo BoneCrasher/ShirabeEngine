@@ -6,6 +6,7 @@
 # Build directories
 _build
 _deploy
+_documentation
 build
 deploy
 /.gradle
@@ -24,3 +25,6 @@ modules_back
 integrate
 
 .*
+
+# Specific directories
+shirabeengine/doxygen/m.css
