@@ -60,6 +60,7 @@ namespace engine
             SHIRABE_IMPLEMENT_TASKS_FOR(TextureView);
             SHIRABE_IMPLEMENT_TASKS_FOR(RenderPass);
             SHIRABE_IMPLEMENT_TASKS_FOR(FrameBuffer);
+            SHIRABE_IMPLEMENT_TASKS_FOR(Pipeline);
 
             return { EEngineStatus::Ok };
         }

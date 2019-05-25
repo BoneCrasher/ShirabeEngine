@@ -310,10 +310,11 @@ namespace engine
             resourceBackend->initialize();
 
             mProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
-            mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>    ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CRenderPass> (EResourceSubType::RENDER_PASS,  SSpawnProxy<CRenderPass>::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CRenderPass> (EResourceSubType::RENDER_PASS,  SSpawnProxy<CRenderPass> ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CFrameBuffer>(EResourceSubType::FRAME_BUFFER, SSpawnProxy<CFrameBuffer>::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CPipeline>   (EResourceSubType::PIPELINE,     SSpawnProxy<CPipeline>   ::forGFXAPIBackend(resourceBackend));
 
             CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
             mResourceManager = manager;            

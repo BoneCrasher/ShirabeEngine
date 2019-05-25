@@ -500,6 +500,8 @@ namespace engine
                                 EEngineStatus::Error,
                                 logTag(),
                                 "Failed to create proxy for resource.");
+
+                    return EEngineStatus::Error;
                 }
 
                 CEngineResult<> storage = storeResourceProxy(aResourceId, AnyProxy(proxy));
@@ -509,6 +511,8 @@ namespace engine
                                 EEngineStatus::ResourceManager_ProxyCreationFailed,
                                 logTag(),
                                 "Failed to store resource proxy.");
+
+                    return EEngineStatus::Error;
                 }
             }
 
