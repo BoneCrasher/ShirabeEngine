@@ -389,6 +389,7 @@ namespace engine
 
             public_members:
                 std::string                                            name;
+                uint32_t                                               subpass;
                 VkViewport                                             viewPort;
                 VkRect2D                                               scissor;
                 VkPipelineInputAssemblyStateCreateInfo                 inputAssemblyState;
@@ -420,10 +421,19 @@ namespace engine
                  */
                 CCreationRequest(
                         SDescriptor            const &aDescriptor,
+                        PublicResourceId_t     const &aRenderPassHandle,
                         PublicResourceIdList_t const &aTextureViewHandles,
                         PublicResourceIdList_t const &aBufferViewHandles);
 
             public_methods:
+                /**
+                 * Return the resource handle to the render pass this pipeline
+                 * should be created against.
+                 *
+                 * @return See brief
+                 */
+                PublicResourceId_t const &renderPassHandle() const;
+
                 /**
                  * Return the list of associated texture view handles to be bound.
                  *
@@ -446,6 +456,8 @@ namespace engine
                 std::string toString() const;
 
             private_members:
+
+                PublicResourceId_t     mRenderPassHandle;
                 PublicResourceIdList_t mTextureViewHandles;
                 PublicResourceIdList_t mBufferViewHandles;
             };

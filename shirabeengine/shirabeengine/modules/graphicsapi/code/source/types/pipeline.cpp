@@ -44,12 +44,23 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CPipelineDeclaration::CCreationRequest::CCreationRequest(
                 SDescriptor            const &aDescriptor,
+                PublicResourceId_t     const &aRenderPassHandle,
                 PublicResourceIdList_t const &aTextureViewHandles,
                 PublicResourceIdList_t const &aBufferViewHandles)
             : CBaseDeclaration::CCreationRequestBase<SDescriptor>(aDescriptor)
-            , mTextureViewHandles(aTextureViewHandles)
-            , mBufferViewHandles (aBufferViewHandles)
+            , mRenderPassHandle  ( aRenderPassHandle   )
+            , mTextureViewHandles( aTextureViewHandles )
+            , mBufferViewHandles ( aBufferViewHandles  )
         {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        PublicResourceId_t const &CPipelineDeclaration::CCreationRequest::renderPassHandle() const
+        {
+            return mRenderPassHandle;
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 #ifndef __SHIRABE_VULKAN_TEXTURE_RESOURCE_H__
 #define __SHIRABE_VULKAN_TEXTURE_RESOURCE_H__
 
+#include <vector>
+
 #include <vulkan/vulkan.h>
 
 #include <base/declaration.h>
@@ -16,7 +18,8 @@ namespace engine
         struct SVulkanPipelineResource
         {
         public_members:
-            VkPipeline pipeline;
+            VkPipeline                  pipeline;
+            std::vector<VkShaderModule> shaderModules;
         };
     }
 }

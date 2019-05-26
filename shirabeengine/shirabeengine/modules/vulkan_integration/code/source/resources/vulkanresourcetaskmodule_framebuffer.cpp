@@ -57,7 +57,7 @@ namespace engine
                     CStdSharedPtr_t<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(textureViewPrivateHandle);
                     if(not textureView)
                     {
-                        CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                        CLog::Error(logTag(), "Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
                         return { EEngineStatus::Error };
                     }
 

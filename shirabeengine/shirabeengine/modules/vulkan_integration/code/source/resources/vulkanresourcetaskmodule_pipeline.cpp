@@ -1,8 +1,10 @@
 #include <graphicsapi/resources/types/pipeline.h>
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
+
 #include "vulkan/vulkandevicecapabilities.h"
 #include "vulkan/resources/vulkanresourcetaskbackend.h"
 #include "vulkan/resources/types/vulkanpipelineresource.h"
+#include "vulkan/resources/types/vulkanrenderpassresource.h"
 
 namespace engine
 {
@@ -22,11 +24,77 @@ namespace engine
 
             CPipeline::SDescriptor const &desc = aRequest.resourceDescriptor();
 
-            // Setup the stuff here...
-
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
-            {
-                SVulkanPipelineResource *textureResource = new SVulkanPipelineResource();
+            {                
+                PublicResourceId_t     const &renderPassHandle   = aRequest.renderPassHandle();
+                PublicResourceIdList_t const &textureViewHandles = aRequest.textureViewHandles();
+
+                CStdSharedPtr_t<void> renderPassPrivateHandle = aDependencies.at(renderPassHandle);
+                if(not renderPassPrivateHandle)
+                {
+                    CLog::Error(logTag(), "Failed to create frame buffer due to missing dependency.");
+                    return { EEngineStatus::DXDevice_CreateRTV_Failed };
+                }
+
+                CStdSharedPtr_t<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(renderPassPrivateHandle);
+                if(not renderPass)
+                {
+                    CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
+                    return { EEngineStatus::Error };
+                }
+
+                // Create the shader modules here...
+                // IMPORTANT: The task backend receives access to the asset system to not have the raw data stored in the descriptors and requests...
+
+                VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo {};
+                vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+                vertexInputStateCreateInfo.pNext                           = nullptr;
+                vertexInputStateCreateInfo.flags                           = 0;
+                vertexInputStateCreateInfo.vertexAttributeDescriptionCount = desc.vertexInputAttributes.size();
+                vertexInputStateCreateInfo.pVertexAttributeDescriptions    = desc.vertexInputAttributes.data();
+                vertexInputStateCreateInfo.vertexBindingDescriptionCount   = desc.vertexInputBindings  .size();
+                vertexInputStateCreateInfo.pVertexBindingDescriptions      = desc.vertexInputBindings  .data();
+
+                VkPipelineViewportStateCreateInfo viewPortStateCreateInfo {};
+                viewPortStateCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+                viewPortStateCreateInfo.pNext          = nullptr;
+                viewPortStateCreateInfo.flags          = 0;
+                viewPortStateCreateInfo.viewportCount  = 1;
+                viewPortStateCreateInfo.pViewports     = &(desc.viewPort);
+                viewPortStateCreateInfo.scissorCount   = 0;
+                viewPortStateCreateInfo.pScissors      = nullptr;
+
+                VkGraphicsPipelineCreateInfo pipelineCreateInfo {};
+                pipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+                pipelineCreateInfo.pNext               = nullptr;
+                pipelineCreateInfo.flags               = 0;
+                pipelineCreateInfo.pVertexInputState   = &(vertexInputStateCreateInfo);
+                pipelineCreateInfo.pInputAssemblyState = &(desc.inputAssemblyState);
+                pipelineCreateInfo.pViewportState      = &(viewPortStateCreateInfo);
+                pipelineCreateInfo.pRasterizationState = &(desc.rasterizerState);
+                pipelineCreateInfo.pMultisampleState   = &(desc.multiSampler);
+                pipelineCreateInfo.pDepthStencilState  = &(desc.depthStencilState);
+                pipelineCreateInfo.pColorBlendState    = &(desc.colorBlendState);
+                pipelineCreateInfo.pDynamicState       = nullptr;
+                pipelineCreateInfo.pTessellationState  = nullptr;
+                pipelineCreateInfo.layout              = ?; // TODO: Derive from signature
+                pipelineCreateInfo.renderPass          = renderPass->handle;
+                pipelineCreateInfo.subpass             = desc.subpass;
+                pipelineCreateInfo.stageCount          = ?; // TODO: Derive from master index
+                pipelineCreateInfo.pStages             = ?; // TODO: Derive from master index
+
+                VkPipeline pipeline = VK_NULL_HANDLE;
+
+                VkDevice const device = mVulkanEnvironment->getState().selectedLogicalDevice;
+                VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    CLog::Error(logTag(), "Failed to create pipeline. Result %0", result);
+                    return { EEngineStatus::Error };
+                }
+
+                SVulkanPipelineResource *resource = new SVulkanPipelineResource();
+                resource->pipeline = pipeline;
 
                 auto const deleter = [] (SVulkanPipelineResource const *p)
                 {
@@ -38,7 +106,7 @@ namespace engine
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = desc.name;
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanPipelineResource>(textureResource, deleter);
+                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanPipelineResource>(resource, deleter);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -90,7 +158,13 @@ namespace engine
                     return { EEngineStatus::Error };
                 }
 
-                // Destory stuff here...
+                VkDevice const &device = mVulkanEnvironment->getState().selectedLogicalDevice;
+                for(auto const &module : pipeline->shaderModules)
+                {
+                    vkDestroyShaderModule(device, module, nullptr);
+                }
+
+                vkDestroyPipeline(device, pipeline->pipeline,    nullptr);
 
                 SGFXAPIResourceHandleAssignment assignment = aAssignment;
                 assignment.internalResourceHandle = nullptr;
