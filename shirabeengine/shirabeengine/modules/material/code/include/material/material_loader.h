@@ -16,6 +16,7 @@ namespace engine
     namespace material
     {
         class CMaterialMaster;
+
         class CMaterialInstance;
 
         /**
@@ -26,11 +27,12 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CMaterialLoader);
 
         public_constructors:
+
             /**
              * @brief CMaterialLoader
              * @param aAssetStorage
              */
-            CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> aAssetStorage);
+            CMaterialLoader(CStdSharedPtr_t <asset::IAssetStorage> aAssetStorage);
 
         public_methods:
 
@@ -42,14 +44,14 @@ namespace engine
              * @param aBaseMaterialAssetId
              * @return
              */
-            CEngineResult<CStdSharedPtr_t<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
+            CEngineResult <CStdSharedPtr_t<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
 
             /**
              * @brief loadMaterial
              * @param aMaterialId
              * @return
              */
-            CEngineResult<CStdSharedPtr_t<CMaterialInstance>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
+            CEngineResult <CStdSharedPtr_t<CMaterialInstance>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
 
             /**
              * @brief destroyMaterialInstance
@@ -61,9 +63,9 @@ namespace engine
         private_methods:
 
         private_members:
-            CStdSharedPtr_t<asset::IAssetStorage>                     mStorage;
-            Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>   mInstantiatedMaterialMasters;
-            Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialInstance>> mInstantiatedMaterialInstances;
+            CStdSharedPtr_t <asset::IAssetStorage>                     mStorage;
+            Map <asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>   mInstantiatedMaterialMasters;
+            Map <asset::AssetID_t, CStdSharedPtr_t<CMaterialInstance>> mInstantiatedMaterialInstances;
         };
 
     }

@@ -37,7 +37,10 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            CStdSharedPtr_t<CFrameGraphRenderContext> context = CStdSharedPtr_t<CFrameGraphRenderContext>(new CFrameGraphRenderContext(aAssetStorage, aMaterialLoader, aResourceManager, aRenderer));
+            auto context = makeCStdSharedPtr<CFrameGraphRenderContext>(aAssetStorage
+                                                                       , aMaterialLoader
+                                                                       , aResourceManager
+                                                                       , aRenderer);
             if(not context)
             {
                 CLog::Error(logTag(), "Failed to create render context from renderer and resourcemanager.");
@@ -834,6 +837,27 @@ namespace engine
 
                     }
                 }
+
+                std::filesystem::path const &stageSpirVFilename = stage.filename;
+                bool                  const  isEmptyFilename    = stageSpirVFilename.empty();
+                if(not isEmptyFilename)
+                {
+                    asset::AssetID_t const assetUid = asset::assetIdFromUri(stageSpirVFilename);
+
+                    auto const [result, buffer] = mAssetStorage->loadAssetData(assetUid);
+                    if(CheckEngineError(result))
+                    {
+                        CLog::Error(logTag(), "Failed to load shader module asset data. Result: %0", result);
+                        continue;
+                    }
+
+                    VkShaderModuleCreateInfo shaderModuleCreateInfo {};
+                    shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+                    shaderModuleCreateInfo.pNext    = nullptr;
+                    shaderModuleCreateInfo.flags    = 0;
+                    shaderModuleCreateInfo.pCode    = nullptr;
+                    shaderModuleCreateInfo.codeSize = 0;
+                }
             }
 
             std::vector<VkDescriptorSetLayoutCreateInfo> descriptorSets {};
@@ -913,7 +937,14 @@ namespace engine
                 pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set][sampledImage.binding] = layoutBinding;
             }
 
-            CPipeline::CCreationRequest request(pipelineDescriptor, {}, {});
+            PublicResourceId_t     const renderPassHandle   = {};
+            PublicResourceIdList_t const textureViewHandles = {};
+            PublicResourceIdList_t const bufferViewHandles  = {};
+
+            CPipeline::CCreationRequest request(pipelineDescriptor
+                                                , renderPassHandle
+                                                , textureViewHandles
+                                                , bufferViewHandles);
 
             CEngineResult<> status = mResourceManager->createResource<CPipeline>(request, aMaterial.readableName, false);
             EngineStatusPrintOnError(status.result(), logTag(), "Failed to create pipeline.");

@@ -426,7 +426,7 @@ namespace engine
             CEngineResult<> render(SFrameGraphMesh     const &aMesh,
                                    SFrameGraphMaterial const &aMaterial);
 
-        private_constructors:
+        public_constructors:
             /**
              * Create a new framegraph render context.
              *

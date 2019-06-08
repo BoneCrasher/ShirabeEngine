@@ -161,6 +161,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId)
+        {
+            return { EEngineStatus::OK };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
