@@ -170,6 +170,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CMaterialLoader::destroyMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
+        {
+            return { EEngineStatus::Ok };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
