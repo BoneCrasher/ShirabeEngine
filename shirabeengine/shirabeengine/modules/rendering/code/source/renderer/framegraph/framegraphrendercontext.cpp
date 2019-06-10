@@ -61,10 +61,10 @@ namespace engine
                 CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
                 CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
                 CStdSharedPtr_t<IRenderContext>       aRenderer)
-            : mAssetStorage(aAssetStorage)
-            , mMaterialLoader(aMaterialLoader)
-            , mResourceManager(aResourceManager)
-            , mGraphicsAPIRenderContext(aRenderer)
+            : mAssetStorage            (std::move(aAssetStorage   ))
+            , mMaterialLoader          (std::move(aMaterialLoader ))
+            , mResourceManager         (std::move(aResourceManager))
+            , mGraphicsAPIRenderContext(std::move(aRenderer       ))
         {}
         //<-----------------------------------------------------------------------------
 
@@ -830,7 +830,7 @@ namespace engine
                     }
                 }
 
-                if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
+                if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT == stageKey)
                 {
                     for(SStageOutput const &output : stage.outputs)
                     {
@@ -838,25 +838,28 @@ namespace engine
                     }
                 }
 
+                //
+                // Derive data accessors for shader module creation from master material
+                //
                 std::filesystem::path const &stageSpirVFilename = stage.filename;
                 bool                  const  isEmptyFilename    = stageSpirVFilename.empty();
                 if(not isEmptyFilename)
                 {
-                    asset::AssetID_t const assetUid = asset::assetIdFromUri(stageSpirVFilename);
-
-                    auto const [result, buffer] = mAssetStorage->loadAssetData(assetUid);
-                    if(CheckEngineError(result))
+                    DataSourceAccessor_t dataAccessor = [&] () -> ByteBuffer
                     {
-                        CLog::Error(logTag(), "Failed to load shader module asset data. Result: %0", result);
-                        continue;
-                    }
+                        asset::AssetID_t const assetUid = asset::assetIdFromUri(stageSpirVFilename);
 
-                    VkShaderModuleCreateInfo shaderModuleCreateInfo {};
-                    shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-                    shaderModuleCreateInfo.pNext    = nullptr;
-                    shaderModuleCreateInfo.flags    = 0;
-                    shaderModuleCreateInfo.pCode    = nullptr;
-                    shaderModuleCreateInfo.codeSize = 0;
+                        auto const [result, buffer] = mAssetStorage->loadAssetData(assetUid);
+                        if(CheckEngineError(result))
+                        {
+                            CLog::Error(logTag(), "Failed to load shader module asset data. Result: %0", result);
+                            return {};
+                        }
+
+                        return buffer;
+                    };
+
+                    pipelineDescriptor.shaderStages[stageKey] = dataAccessor;
                 }
             }
 

@@ -1,3 +1,6 @@
+#include <filesystem>
+#include <fstream>
+
 #include <graphicsapi/resources/types/pipeline.h>
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
 
@@ -25,7 +28,9 @@ namespace engine
             CPipeline::SDescriptor const &desc = aRequest.resourceDescriptor();
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
-            {                
+            {
+                VkDevice const device = mVulkanEnvironment->getState().selectedLogicalDevice;
+
                 PublicResourceId_t     const &renderPassHandle   = aRequest.renderPassHandle();
                 PublicResourceIdList_t const &textureViewHandles = aRequest.textureViewHandles();
 
@@ -64,6 +69,45 @@ namespace engine
                 viewPortStateCreateInfo.scissorCount   = 0;
                 viewPortStateCreateInfo.pScissors      = nullptr;
 
+                std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+
+                for(auto const &[stage, dataAccessor] : desc.shaderStages)
+                {
+                    if(not dataAccessor)
+                    {
+                        // If we don't have any data to access, then don't create a shader module.
+                        continue;
+                    }
+
+                    ByteBuffer const data = dataAccessor();
+
+                    VkShaderModuleCreateInfo shaderModuleCreateInfo {};
+                    shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+                    shaderModuleCreateInfo.pNext    = nullptr;
+                    shaderModuleCreateInfo.flags    = 0;
+                    shaderModuleCreateInfo.pCode    = reinterpret_cast<uint32_t const*>(data.data()); // The asset system only loads regular 8 byte buffers.
+                    shaderModuleCreateInfo.codeSize = data.size();
+
+                    VkShaderModule vkShaderModule = VK_NULL_HANDLE;
+                    VkResult const moduleCreationResult = vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &vkShaderModule);
+                    if(VkResult::VK_SUCCESS != moduleCreationResult)
+                    {
+                        CLog::Error(logTag(), "Failed to create shader module for stage %0", stage);
+                        continue;
+                    }
+
+                    VkPipelineShaderStageCreateInfo shaderStageCreateInfo {};
+                    shaderStageCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+                    shaderStageCreateInfo.pNext               = nullptr;
+                    shaderStageCreateInfo.flags               = 0;
+                    shaderStageCreateInfo.pName               = "...";
+                    shaderStageCreateInfo.stage               = (VkShaderStageFlagBits) stage;
+                    shaderStageCreateInfo.module              = vkShaderModule;
+                    shaderStageCreateInfo.pSpecializationInfo = nullptr;
+
+                    shaderStages.push_back(shaderStageCreateInfo);
+                }
+
                 VkGraphicsPipelineCreateInfo pipelineCreateInfo {};
                 pipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
                 pipelineCreateInfo.pNext               = nullptr;
@@ -77,15 +121,14 @@ namespace engine
                 pipelineCreateInfo.pColorBlendState    = &(desc.colorBlendState);
                 pipelineCreateInfo.pDynamicState       = nullptr;
                 pipelineCreateInfo.pTessellationState  = nullptr;
-                pipelineCreateInfo.layout              = ?; // TODO: Derive from signature
+                pipelineCreateInfo.layout              = nullptr; // TODO: Derive from signature
                 pipelineCreateInfo.renderPass          = renderPass->handle;
                 pipelineCreateInfo.subpass             = desc.subpass;
-                pipelineCreateInfo.stageCount          = ?; // TODO: Derive from master index
-                pipelineCreateInfo.pStages             = ?; // TODO: Derive from master index
+                pipelineCreateInfo.stageCount          = shaderStages.size();
+                pipelineCreateInfo.pStages             = shaderStages.data();
 
                 VkPipeline pipeline = VK_NULL_HANDLE;
 
-                VkDevice const device = mVulkanEnvironment->getState().selectedLogicalDevice;
                 VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
                 if(VkResult::VK_SUCCESS != result)
                 {
@@ -98,10 +141,7 @@ namespace engine
 
                 auto const deleter = [] (SVulkanPipelineResource const *p)
                 {
-                    if(p)
-                    {
-                        delete p;
-                    }
+                    delete p;
                 };
 
                 SGFXAPIResourceHandleAssignment assignment ={ };

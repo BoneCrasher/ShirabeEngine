@@ -165,7 +165,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId)
         {
-            return { EEngineStatus::OK };
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 

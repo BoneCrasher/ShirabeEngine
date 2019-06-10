@@ -126,6 +126,8 @@ namespace engine {
      *
      */
     using ByteBuffer = CDataBuffer<int8_t>;
+
+    using DataSourceAccessor_t = std::function<ByteBuffer()>;
 }
 
 #endif
