@@ -9,7 +9,8 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CPipelineDeclaration::SDescriptor::SDescriptor()
-            : name("")
+            : SDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::PIPELINE>()
+            , name("")
             , viewPort({})
             , scissor({})
             , inputAssemblyState({})
@@ -24,6 +25,9 @@ namespace engine
             , descriptorSetLayoutCreateInfos({})
             , descriptorSetLayoutBindings({})
         {}
+
+        
+
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

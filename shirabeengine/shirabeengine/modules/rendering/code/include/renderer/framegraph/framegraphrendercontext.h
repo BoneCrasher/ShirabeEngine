@@ -386,9 +386,10 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial);
+             CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial,
+                                               PublicResourceId_t  const &aRenderPassHandle);
 
-            /**
+             /**
              * Unload a material asset from the graphics API.
              *
              * @param aResourceId The material asset resource id.
@@ -476,6 +477,10 @@ namespace engine
             CStdSharedPtr_t<IRenderContext>       mGraphicsAPIRenderContext;
 
             Map<std::string, Vector<PublicResourceId_t>> mResourceMap;
+
+            PublicResourceId_t mCurrentFrameBufferHandle;
+            PublicResourceId_t mCurrentRenderPassHandle;
+            uint32_t           mCurrentSubpass;
         };
 
     }

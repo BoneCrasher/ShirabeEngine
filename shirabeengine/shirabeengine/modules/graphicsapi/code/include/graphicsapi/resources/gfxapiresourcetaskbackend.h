@@ -59,7 +59,7 @@ namespace engine
         /**
          * Describes the structure of a collection of resolved resource dependencies.
          */
-        using ResolvedDependencyCollection_t = Map<PublicResourceId_t, CStdSharedPtr_t<void>>;
+        using ResolvedDependencyCollection_t = std::unordered_map<PublicResourceId_t, CStdSharedPtr_t<void>>;
 
         /**
          * The CGFXAPIResourceTaskBackendModule describes the basic interface for task creator modules.

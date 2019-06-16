@@ -30,8 +30,25 @@ namespace engine
         struct SDescriptorImplBase
         {
         public_static_constants:
-            static const constexpr EResourceType    sResourceType    = TResourceType;
-            static const constexpr EResourceSubType sResourceSubtype = TResourceSubtype;
+            static const constexpr EResourceType    sResourceType   =TResourceType;
+            static const constexpr EResourceSubType sResourceSubtype=TResourceSubtype;
+
+        public_constructors:
+
+            SHIRABE_INLINE SDescriptorImplBase()
+                    : name({})
+                      , dependencies({})
+            {}
+
+            SHIRABE_INLINE SDescriptorImplBase(SDescriptorImplBase const &aOther)
+                : name(aOther.name)
+                , dependencies(aOther.dependencies)
+            {}
+
+            SHIRABE_INLINE SDescriptorImplBase(SDescriptorImplBase &&aOther)
+                : name(std::move(aOther.name))
+                , dependencies(std::move(aOther.dependencies))
+            {}
 
         public_methods:
             /**

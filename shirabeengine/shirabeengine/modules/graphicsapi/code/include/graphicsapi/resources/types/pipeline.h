@@ -55,26 +55,27 @@ namespace engine
                 std::string toString() const;
 
             public_members:
-                std::string                                               name;
-                uint32_t                                                  subpass;
-                VkViewport                                                viewPort;
-                VkRect2D                                                  scissor;
+                std::string                                                  name;
+                VkViewport                                                   viewPort;
+                VkRect2D                                                     scissor;
 
-                VkPipelineInputAssemblyStateCreateInfo                    inputAssemblyState;
-                std::vector<VkVertexInputBindingDescription>              vertexInputBindings;
-                std::vector<VkVertexInputAttributeDescription>            vertexInputAttributes;
+                VkPipelineInputAssemblyStateCreateInfo                       inputAssemblyState;
+                std::vector<VkVertexInputBindingDescription>                 vertexInputBindings;
+                std::vector<VkVertexInputAttributeDescription>               vertexInputAttributes;
 
-                VkPipelineRasterizationStateCreateInfo                    rasterizerState;
-                VkPipelineMultisampleStateCreateInfo                      multiSampler;
-                VkPipelineDepthStencilStateCreateInfo                     depthStencilState;
-                std::vector<VkPipelineColorBlendAttachmentState>          colorBlendAttachmentStates;
-                VkPipelineColorBlendStateCreateInfo                       colorBlendState;
+                VkPipelineRasterizationStateCreateInfo                       rasterizerState;
+                VkPipelineMultisampleStateCreateInfo                         multiSampler;
+                VkPipelineDepthStencilStateCreateInfo                        depthStencilState;
+                std::vector<VkPipelineColorBlendAttachmentState>             colorBlendAttachmentStates;
+                VkPipelineColorBlendStateCreateInfo                          colorBlendState;
 
-                VkPipelineLayoutCreateInfo                                pipelineLayout;
-                std::vector<VkDescriptorSetLayoutCreateInfo>              descriptorSetLayoutCreateInfos;
-                std::vector<std::vector<VkDescriptorSetLayoutBinding>>    descriptorSetLayoutBindings;
+                VkPipelineLayoutCreateInfo                                   pipelineLayout;
+                std::vector<VkDescriptorSetLayoutCreateInfo>                 descriptorSetLayoutCreateInfos;
+                std::vector<std::vector<VkDescriptorSetLayoutBinding>>       descriptorSetLayoutBindings;
 
                 std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
+
+                uint32_t                                                     subpass;
             };
 
             /**

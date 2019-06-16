@@ -65,6 +65,9 @@ namespace engine
             , mMaterialLoader          (std::move(aMaterialLoader ))
             , mResourceManager         (std::move(aResourceManager))
             , mGraphicsAPIRenderContext(std::move(aRenderer       ))
+            , mCurrentFrameBufferHandle({})
+            , mCurrentRenderPassHandle ({})
+            , mCurrentSubpass          (0)
         {}
         //<-----------------------------------------------------------------------------
 
@@ -109,7 +112,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::beginPass()
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->beginSubpass();
+            EEngineStatus const status = mGraphicsAPIRenderContext->beginSubpass();
+            if(CheckEngineError(status))
+            {
+                // ...
+            }
 
             return status;
         }
@@ -120,7 +127,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::endPass()
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->endSubpass();
+            EEngineStatus const status = mGraphicsAPIRenderContext->endSubpass();
+            if(CheckEngineError(status))
+            {
+                // ...
+            }
+
+            ++mCurrentSubpass;
 
             return status;
         }
@@ -395,8 +408,16 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                                std::string const &aRenderPassId)
         {
-            return mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
-        }
+            EEngineStatus const status=mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+            if( not CheckEngineError(status))
+            {
+                // TODO: Implication of string -> PublicResourceId_t. Will break, once the underlying type
+                //       of the PublicResourceId_t changes.
+                mCurrentFrameBufferHandle = aFrameBufferId;
+                mCurrentRenderPassHandle  = aRenderPassId;
+                mCurrentSubpass           = 0; // Reset!
+            }
+        };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -405,6 +426,10 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                                  std::string const &aRenderPassId)
         {
+            mCurrentFrameBufferHandle = {};
+            mCurrentRenderPassHandle  = {};
+            mCurrentSubpass           = 0;
+
             return mGraphicsAPIRenderContext->unbindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
         }
         //<-----------------------------------------------------------------------------
@@ -737,7 +762,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
+        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial   const &aMaterial
+                                                                    , PublicResourceId_t  const &aRenderPassHandle)
         {
             auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
             if(CheckEngineError(result))
@@ -940,9 +966,13 @@ namespace engine
                 pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set][sampledImage.binding] = layoutBinding;
             }
 
-            PublicResourceId_t     const renderPassHandle   = {};
+            pipelineDescriptor.subpass = mCurrentSubpass;
+
+            PublicResourceId_t     const renderPassHandle   = mCurrentRenderPassHandle;
             PublicResourceIdList_t const textureViewHandles = {};
             PublicResourceIdList_t const bufferViewHandles  = {};
+
+            pipelineDescriptor.dependencies.push_back(renderPassHandle); // Remarks to myself: You are stupid...
 
             CPipeline::CCreationRequest request(pipelineDescriptor
                                                 , renderPassHandle

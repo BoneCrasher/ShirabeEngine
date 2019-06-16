@@ -132,7 +132,7 @@ namespace engine
                         continue;
                     }
 
-                    aRenderContext->loadMaterialAsset  (*materialPointer);
+                    aRenderContext->loadMaterialAsset  (*materialPointer, "");
                     aRenderContext->bindMaterial       (*materialPointer);
                     aRenderContext->unbindMaterial     (*materialPointer);
                     aRenderContext->unloadMaterialAsset(*materialPointer);

@@ -21,8 +21,6 @@ namespace engine
                 ResolvedDependencyCollection_t const &aDependencies,
                 ResourceTaskFn_t                     &aOutTask)
         {
-            SHIRABE_UNUSED(aDependencies);
-
             EEngineStatus status = EEngineStatus::Ok;
 
             CPipeline::SDescriptor const &desc = aRequest.resourceDescriptor();

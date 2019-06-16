@@ -382,7 +382,8 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial) = 0;
+             virtual CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial,
+                                                       PublicResourceId_t  const &aRenderPassHandle) = 0;
 
             /**
              * Unload a material asset from the graphics API.

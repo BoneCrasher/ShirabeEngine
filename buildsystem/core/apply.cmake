@@ -348,6 +348,7 @@ if(NOT SHIRABE_HEADER_ONLY)
     )
 endif()
 
+
 LogStatus(MESSAGES "Appending preprocessor definitions:")
 foreach(DEFINE ${SHIRABE_PROJECT_DEFINITIONS})
     LogStatus(MESSAGES "-> ${DEFINE}")

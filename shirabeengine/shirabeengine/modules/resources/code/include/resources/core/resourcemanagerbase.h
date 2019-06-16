@@ -550,7 +550,7 @@ namespace engine
             typename TResource::SDescriptor      const &desc    = creator.resourceDescriptor();
 
             PublicResourceIdList_t dependencies = desc.dependencies;
-            if(!dependencies.empty())
+            if(not dependencies.empty())
             {
                 for(PublicResourceId_t const &dependencyId : dependencies)
                 {
