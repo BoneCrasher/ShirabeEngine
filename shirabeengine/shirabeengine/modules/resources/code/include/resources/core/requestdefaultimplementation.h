@@ -16,7 +16,7 @@ namespace engine
         /**
          * Container-Class around base request default implementations.
          */
-        class CBaseDeclaration
+        class SHIRABE_TEST_EXPORT CBaseDeclaration
         {
         public:
             /**
@@ -79,7 +79,7 @@ namespace engine
              * Base implementation for any request, which is based on a previously created resource,
              * encapsulating a public resource id.
              */
-            class CExistingResourceRequestBase
+            class SHIRABE_TEST_EXPORT CExistingResourceRequestBase
             {
             public_constructors:
                 /**
@@ -109,7 +109,7 @@ namespace engine
             /**
              * Base request for any resource update operation.
              */
-            class CUpdateRequestBase
+            class SHIRABE_TEST_EXPORT CUpdateRequestBase
                     : public CExistingResourceRequestBase
             {
             public_constructors:
@@ -126,7 +126,7 @@ namespace engine
             /**
              * Base request for any resource descrution operation.
              */
-            class CDestructionRequestBase
+            class SHIRABE_TEST_EXPORT CDestructionRequestBase
                     : public CExistingResourceRequestBase
             {
             public_constructors:
@@ -143,7 +143,7 @@ namespace engine
             /**
              * Base request for any resource query operation.
              */
-            class CQueryBase
+            class SHIRABE_TEST_EXPORT CQueryBase
                     : public CExistingResourceRequestBase
             {
             public:

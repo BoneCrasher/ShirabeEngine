@@ -867,11 +867,11 @@ namespace engine
                 //
                 // Derive data accessors for shader module creation from master material
                 //
-                std::filesystem::path const &stageSpirVFilename = stage.filename;
+                std::filesystem::path const  stageSpirVFilename = stage.filename;
                 bool                  const  isEmptyFilename    = stageSpirVFilename.empty();
                 if(not isEmptyFilename)
                 {
-                    DataSourceAccessor_t dataAccessor = [&] () -> ByteBuffer
+                    DataSourceAccessor_t dataAccessor = [=] () -> ByteBuffer
                     {
                         asset::AssetID_t const assetUid = asset::assetIdFromUri(stageSpirVFilename);
 

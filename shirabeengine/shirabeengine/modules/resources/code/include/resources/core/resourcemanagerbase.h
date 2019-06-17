@@ -14,6 +14,7 @@
 #include "resources/core/iresourceproxy.h"
 #include "resources/core/resourcepool.h"
 #include "resources/core/resourceproxyfactory.h"
+#include "resources/core/resourcedomaintransfer.h" // Descriptor classes
 
 namespace engine
 {
@@ -562,6 +563,7 @@ namespace engine
                     }
 
                     CStdSharedPtr_t<IResourceProxyBase> base = baseProxyCast(dependencyProxyFetch.data());
+
                     if(not (ELoadState::LOADED == base->loadState()))
                     {
                         while(ELoadState::LOADING == base->loadState())
