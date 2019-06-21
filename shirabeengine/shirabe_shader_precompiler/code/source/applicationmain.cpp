@@ -677,12 +677,14 @@ private_methods:
             std::filesystem::path const outputPath = std::filesystem::current_path() / mConfig.outputPath / mConfig.moduleOutputPath / outputName;
 
             SShaderCompilationElement element {};
-            element.fileName   = aFilename;
-            element.contents   = shaderString;
-            element.stage      = stage;
-            element.outputPath = outputPath;
+            element.fileName           = aFilename;
+            element.contents           = shaderString;
+            element.stage              = stage;
+            element.outputPathAbsolute = outputPath;
+            element.outputPathRelative = "./" + std::string(mConfig.moduleOutputPath / outputName);
 
-            mConfig.indexFile.stages[stage].spvModuleAssetId = asset::assetIdFromUri(outputPath.lexically_normal());
+            std::string const path = element.outputPathRelative;
+            mConfig.indexFile.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
 
             return element;
         };
@@ -743,7 +745,7 @@ private_methods:
         {
             auto const compile = [&] (SShaderCompilationElement const &aElement) -> void
             {
-                std::string const outputFile = aElement.outputPath;
+                std::string const outputFile = aElement.outputPathAbsolute;
                 std::string const inputFile  = aElement.fileName;
 
                 once(inputFile, outputFile);
@@ -754,7 +756,7 @@ private_methods:
         }
         else
         {
-            std::string const outputFiles = aUnit.elements.at(0).outputPath;
+            std::string const outputFiles = aUnit.elements.at(0).outputPathAbsolute;
             std::string       inputFiles  = "";
 
             auto const append = [&inputFiles] (SShaderCompilationElement const &aElement)
@@ -764,7 +766,7 @@ private_methods:
             std::for_each(aUnit.elements.begin(), aUnit.elements.end(), append);
 
             once(inputFiles, outputFiles);
-            aUnit.outputFiles.push_back(aUnit.elements.at(0).outputPath);
+            aUnit.outputFiles.push_back(aUnit.elements.at(0).outputPathAbsolute);
         }
 
         return static_cast<EResult>(result);

@@ -119,7 +119,7 @@ namespace engine
                 pipelineCreateInfo.pColorBlendState    = &(desc.colorBlendState);
                 pipelineCreateInfo.pDynamicState       = nullptr;
                 pipelineCreateInfo.pTessellationState  = nullptr;
-                pipelineCreateInfo.layout              = nullptr; // TODO: Derive from signature
+                pipelineCreateInfo.layout              = nullptr; // TODO: Derive from signature // CRASH here!!!
                 pipelineCreateInfo.renderPass          = renderPass->handle;
                 pipelineCreateInfo.subpass             = desc.subpass;
                 pipelineCreateInfo.stageCount          = shaderStages.size();

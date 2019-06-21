@@ -9,7 +9,8 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     SShaderCompilationElement::SShaderCompilationElement()
         : fileName({})
-        , outputPath({})
+        , outputPathAbsolute({})
+        , outputPathRelative({})
         , contents({})
         , stage(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM)
     {}
@@ -19,11 +20,13 @@ namespace shader_precompiler
     //<
     //<-----------------------------------------------------------------------------
     SShaderCompilationElement::SShaderCompilationElement(std::string            const &aFileName,
-                                                         std::string            const &aOutputPath,
+                                                         std::string            const &aOutputPathAbsolute,
+                                                         std::string            const &aOutputPathRelative,
                                                          std::string            const &aContents,
                                                          VkPipelineStageFlagBits const aStage)
         : fileName(aFileName)
-        , outputPath(aOutputPath)
+        , outputPathAbsolute(aOutputPathAbsolute)
+        , outputPathRelative(aOutputPathRelative)
         , contents(aContents)
         , stage(aStage)
     {}
@@ -34,7 +37,8 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     SShaderCompilationElement::SShaderCompilationElement(SShaderCompilationElement const &aOther)
         : fileName(aOther.fileName)
-        , outputPath(aOther.outputPath)
+        , outputPathAbsolute(aOther.outputPathAbsolute)
+        , outputPathRelative(aOther.outputPathRelative)
         , contents(aOther.contents)
         , stage(aOther.stage)
     {}
@@ -45,7 +49,8 @@ namespace shader_precompiler
     //<-----------------------------------------------------------------------------
     SShaderCompilationElement::SShaderCompilationElement(SShaderCompilationElement &&aOther)
         : fileName(std::move(aOther.fileName))
-        , outputPath(std::move(aOther.outputPath))
+        , outputPathAbsolute(std::move(aOther.outputPathAbsolute))
+        , outputPathRelative(std::move(aOther.outputPathRelative))
         , contents(std::move(aOther.contents))
         , stage(aOther.stage)
     {}
@@ -96,17 +101,20 @@ namespace shader_precompiler
     //<
     //<-----------------------------------------------------------------------------
     EResult SShaderCompilationUnit::addElement(std::string             const &aFileName,
-                                               std::string             const &aOutputPath,
+                                               std::string             const &aOutputPathAbsolute,
+                                               std::string             const &aOutputPathRelative,
                                                std::string             const &aContents,
                                                VkPipelineStageFlagBits const  aStage)
     {
-        if(aFileName.empty() || aOutputPath.empty() || aContents.empty())
+        if(aFileName.empty() || aOutputPathAbsolute.empty() || aOutputPathRelative.empty() || aContents.empty())
         {
             CLog::Error(logTag(), CString::format("Invalid input for file %0:\n%1", aFileName, aContents));
             return EResult::InputInvalid;
         }
 
-        addElement({ aFileName, aOutputPath, aContents, aStage });
+        addElement({ aFileName, aOutputPathAbsolute, aOutputPathRelative, aContents, aStage });
+
+        return EResult::Success;
     }
     //<-----------------------------------------------------------------------------
 
@@ -116,6 +124,8 @@ namespace shader_precompiler
     EResult SShaderCompilationUnit::addElement(SShaderCompilationElement const &aOther)
     {
         elements.push_back(aOther);
+
+        return EResult::Success;
     }
     //<-----------------------------------------------------------------------------
 }

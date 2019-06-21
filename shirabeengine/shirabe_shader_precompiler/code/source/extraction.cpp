@@ -246,9 +246,9 @@ namespace shader_precompiler
             SMaterialStage stageExtracted {};
             stageExtracted.stage     = aElement.stage;
             stageExtracted.stageName = determineStageName(aElement.stage);
-            stageExtracted.filename  = aElement.fileName;
+            stageExtracted.filename  = aElement.outputPathRelative;
 
-            std::string           const inputFile   = aElement.outputPath;
+            std::string           const inputFile   = aElement.outputPathAbsolute;
             std::vector<uint32_t> const spirvSource = readSpirVFile(inputFile);
 
             spirv_cross::Compiler compiler(std::move(spirvSource));
