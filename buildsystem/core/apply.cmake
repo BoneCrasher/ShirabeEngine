@@ -93,10 +93,10 @@ if((SHIRABE_BUILD_SHAREDLIB OR SHIRABE_BUILD_APPLICATION) AND SHIRABE_PROJECT_LI
     set(SHIRABE_TRANSFORMED_CXXFLAGS "${SHIRABE_TRANSFORMED_CXXFLAGS} -fkeep-static-functions")
 
     foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_MODULES})
-        set(SHIRABE_TRANSFORMED_CXXFLAGS "${SHIRABE_TRANSFORMED_CXXFLAGS} -Wl,--whole-archive ${MODULE}")
+       # set(SHIRABE_TRANSFORMED_CXXFLAGS "${SHIRABE_TRANSFORMED_CXXFLAGS} -Wl,--whole-archive ${MODULE}")
     endforeach()
 
-    set(SHIRABE_TRANSFORMED_CXXFLAGS "${SHIRABE_TRANSFORMED_CXXFLAGS} -Wl,--no-whole-archive")
+    # set(SHIRABE_TRANSFORMED_CXXFLAGS "${SHIRABE_TRANSFORMED_CXXFLAGS} -Wl,--no-whole-archive")
 
     if(SHIRABE_BUILD_SHAREDLIB)
         set(SHIRABE_TRANSFORMED_CXXFLAGS "${SHIRABE_TRANSFORMED_CXXFLAGS} -Wl,-fPIC")
@@ -422,6 +422,18 @@ LogStatus(MESSAGES " ")
 #-----------------------------------------------------------------------------------------
 # Set -l flags
 #-----------------------------------------------------------------------------------------
+
+# Important: --whole-archive statements first, as they are solution internal dependencies 
+#            usually and might be dependent on the ~LIBRARY_TARGETS
+if(SHIRABE_PROJECT_LIBRARY_MODULES AND NOT SHIRABE_HEADER_ONLY)
+    foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_MODULES})
+       target_link_libraries(
+           ${SHIRABE_MODULE_NAME}
+           -Wl,--whole-archive ${MODULE} -Wl,--no-whole-archive
+       )
+    endforeach()
+endif()
+
 if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
 
     LogStatus(MESSAGES "Appending library targets:")

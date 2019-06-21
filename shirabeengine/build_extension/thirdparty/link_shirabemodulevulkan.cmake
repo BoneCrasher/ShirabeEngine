@@ -33,7 +33,7 @@ function(linkLibrary)
                     SHIRABE_PROJECT_LIBRARY_TARGETS
                     ${BINARY_NAME}
                     )
-        else()
+    else()
             append_parentscope(
                     SHIRABE_PROJECT_LIBRARY_MODULES
                     ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a

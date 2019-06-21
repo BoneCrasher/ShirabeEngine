@@ -13,9 +13,9 @@ namespace engine
     {
         uint32_t crc32FromString(std::string const &aInput)
         {
-            std::string const source  = aInput;
-            std::string       hashStr = "";
-            uint32_t          hash    = 0u;
+            std::string const &source  = aInput;
+            std::string        hashStr = "";
+            uint32_t           hash    = 0u;
 
             CryptoPP::CRC32 crc {};
 
