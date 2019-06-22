@@ -106,6 +106,47 @@ namespace engine
                     shaderStages.push_back(shaderStageCreateInfo);
                 }
 
+                std::vector<VkDescriptorSetLayout> setLayouts {};
+                for(uint32_t k=0; k<desc.descriptorSetLayoutCreateInfos.size(); ++k)
+                {
+                    std::vector<VkDescriptorSetLayoutBinding> bindings = desc.descriptorSetLayoutBindings[k];
+                    VkDescriptorSetLayoutCreateInfo           info     = desc.descriptorSetLayoutCreateInfos[k];
+
+                    info.pBindings    = bindings.data();
+                    info.bindingCount = bindings.size();
+
+                    VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
+                    {
+                        VkResult const result = vkCreateDescriptorSetLayout(device, &info, nullptr, &vkDescriptorSetLayout);
+                        if(VkResult::VK_SUCCESS != result)
+                        {
+                            CLog::Error(logTag(), "Failed to create pipeline descriptor set layout. Result %0", result);
+                            return {EEngineStatus::Error};
+                        }
+
+                        setLayouts.push_back(vkDescriptorSetLayout);
+                    }
+                }
+
+                VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo {};
+                pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+                pipelineLayoutCreateInfo.pNext                  = nullptr;
+                pipelineLayoutCreateInfo.flags                  = 0;
+                pipelineLayoutCreateInfo.pPushConstantRanges    = nullptr;
+                pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
+                pipelineLayoutCreateInfo.pSetLayouts            = setLayouts.data();
+                pipelineLayoutCreateInfo.setLayoutCount         = setLayouts.size();
+
+                VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
+                {
+                    VkResult const result = vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &vkPipelineLayout);
+                    if( VkResult::VK_SUCCESS!=result )
+                    {
+                        CLog::Error(logTag(), "Failed to create pipeline layout. Result %0", result);
+                        return {EEngineStatus::Error};
+                    }
+                }
+
                 VkGraphicsPipelineCreateInfo pipelineCreateInfo {};
                 pipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
                 pipelineCreateInfo.pNext               = nullptr;
@@ -119,19 +160,20 @@ namespace engine
                 pipelineCreateInfo.pColorBlendState    = &(desc.colorBlendState);
                 pipelineCreateInfo.pDynamicState       = nullptr;
                 pipelineCreateInfo.pTessellationState  = nullptr;
-                pipelineCreateInfo.layout              = nullptr; // TODO: Derive from signature // CRASH here!!!
+                pipelineCreateInfo.layout              = vkPipelineLayout;
                 pipelineCreateInfo.renderPass          = renderPass->handle;
                 pipelineCreateInfo.subpass             = desc.subpass;
                 pipelineCreateInfo.stageCount          = shaderStages.size();
                 pipelineCreateInfo.pStages             = shaderStages.data();
 
                 VkPipeline pipeline = VK_NULL_HANDLE;
-
-                VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
-                if(VkResult::VK_SUCCESS != result)
                 {
-                    CLog::Error(logTag(), "Failed to create pipeline. Result %0", result);
-                    return { EEngineStatus::Error };
+                    VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
+                    if( VkResult::VK_SUCCESS!=result )
+                    {
+                        CLog::Error(logTag(), "Failed to create pipeline. Result %0", result);
+                        return {EEngineStatus::Error};
+                    }
                 }
 
                 SVulkanPipelineResource *resource = new SVulkanPipelineResource();

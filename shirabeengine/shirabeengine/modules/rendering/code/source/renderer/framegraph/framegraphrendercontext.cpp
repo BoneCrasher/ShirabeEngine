@@ -905,6 +905,8 @@ namespace engine
                 pipelineDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
             }
 
+            pipelineDescriptor.descriptorSetLayoutCreateInfos = descriptorSets;
+
             for(SSubpassInput const &input : signature.subpassInputs)
             {
                 VkPipelineColorBlendAttachmentState colorBlendAttachmentState {};
