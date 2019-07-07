@@ -50,6 +50,16 @@ namespace engine {
             return mData.data();
         }
 
+        inline std::vector<T> const &dataVector() const
+        {
+            return mData;
+        }
+
+        inline std::vector<T> &mutableDataVector()
+        {
+            return mData;
+        }
+
         /**
          * @brief size
          * @return

@@ -6,6 +6,7 @@
 
 #include <material/material_loader.h>
 #include <material/material_declaration.h>
+#include <material/materialserialization.h>
 
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
@@ -836,18 +837,18 @@ namespace engine
 
                         VkVertexInputBindingDescription binding;
                         binding.binding   = k;
-                        binding.stride    = input.type.byteSize;
+                        binding.stride    = input.type.arrayStride;
                         binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
                         VkVertexInputAttributeDescription attribute;
                         attribute.binding  = k;
                         attribute.location = k;
                         attribute.offset   = 0;
-                        attribute.format   = (2 == binding.stride)
+                        attribute.format   = (8 == binding.stride)
                                                   ? VkFormat::VK_FORMAT_R32G32_SFLOAT
-                                                  : (3 == binding.stride)
+                                                  : (12 == binding.stride)
                                                          ? VkFormat::VK_FORMAT_R32G32B32_SFLOAT
-                                                         : (4 == binding.stride)
+                                                         : (16 == binding.stride)
                                                                 ? VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT
                                                                 : VkFormat::VK_FORMAT_UNDEFINED;
 
@@ -927,7 +928,7 @@ namespace engine
                 VkDescriptorSetLayoutBinding layoutBinding {};
                 layoutBinding.binding            = input.binding;
                 layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-                layoutBinding.stageFlags         = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; // Subpass inputs are only accessibly in fragment shaders.
+                layoutBinding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT; // Subpass inputs are only accessibly in fragment shaders.
                 layoutBinding.descriptorCount    = 1;
                 layoutBinding.pImmutableSamplers = nullptr;
                 pipelineDescriptor.descriptorSetLayoutBindings[input.set][input.binding] = layoutBinding;
@@ -951,7 +952,7 @@ namespace engine
                 VkDescriptorSetLayoutBinding layoutBinding {};
                 layoutBinding.binding            = uniformBuffer.binding;
                 layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                layoutBinding.stageFlags         = uniformBuffer.stageBinding.value();
+                layoutBinding.stageFlags         = serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
                 layoutBinding.descriptorCount    = 1;
                 layoutBinding.pImmutableSamplers = nullptr;
                 pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
@@ -962,7 +963,7 @@ namespace engine
                 VkDescriptorSetLayoutBinding layoutBinding {};
                 layoutBinding.binding            = sampledImage.binding;
                 layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                layoutBinding.stageFlags         = sampledImage.stageBinding.value();
+                layoutBinding.stageFlags         = serialization::shaderStageFromPipelineStage(sampledImage.stageBinding.value());
                 layoutBinding.descriptorCount    = 1;
                 layoutBinding.pImmutableSamplers = nullptr;
                 pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set][sampledImage.binding] = layoutBinding;

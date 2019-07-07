@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include <functional>
 #include <set>
 
@@ -134,6 +136,8 @@ namespace engine
                         "[%0][%1(%2)]@'%3' -> (%4) in layer %5:\n%6",
                         aFlags, aObjType, (void*)aObj, aLocation, aCode, aLayerPrefix, aMsg);
             CLog::Debug(Debug::logTag(), message);
+
+            raise(SIGTRAP); // Trap execution here within GDB... __builtin_trap() would cause SIGKILL, not appreciated...
 
             return VK_FALSE;
         }

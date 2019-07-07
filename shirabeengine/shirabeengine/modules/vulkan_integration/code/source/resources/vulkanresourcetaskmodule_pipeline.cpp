@@ -8,6 +8,7 @@
 #include "vulkan/resources/vulkanresourcetaskbackend.h"
 #include "vulkan/resources/types/vulkanpipelineresource.h"
 #include "vulkan/resources/types/vulkanrenderpassresource.h"
+#include "../../../../material/code/include/material/materialserialization.h"
 
 namespace engine
 {
@@ -79,12 +80,26 @@ namespace engine
 
                     ByteBuffer const data = dataAccessor();
 
+                    // We need to convert from a regular 8-bit data buffer to uint32 words of SPIR-V.
+                    // TODO: Refactor the asset system to permit loading 32-bit buffers...
+                    std::vector<signed char> const &srcData      = data.dataVector();
+                    uint32_t const                  srcDataSize  = srcData.size();
+
+                    std::vector<uint32_t> convData {};
+                    convData.resize( srcDataSize / 4 );
+
+                    for(uint32_t k=0; k<srcDataSize; k += 4)
+                    {
+                        uint32_t const value = *reinterpret_cast<uint32_t const*>( srcData.data() + k );
+                        convData[ k / 4 ] = value;
+                    }
+
                     VkShaderModuleCreateInfo shaderModuleCreateInfo {};
                     shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
                     shaderModuleCreateInfo.pNext    = nullptr;
                     shaderModuleCreateInfo.flags    = 0;
-                    shaderModuleCreateInfo.pCode    = reinterpret_cast<uint32_t const*>(data.data()); // The asset system only loads regular 8 byte buffers.
-                    shaderModuleCreateInfo.codeSize = data.size();
+                    shaderModuleCreateInfo.pCode    = convData.data();
+                    shaderModuleCreateInfo.codeSize = srcData.size();
 
                     VkShaderModule vkShaderModule = VK_NULL_HANDLE;
                     VkResult const moduleCreationResult = vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &vkShaderModule);
@@ -98,8 +113,8 @@ namespace engine
                     shaderStageCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
                     shaderStageCreateInfo.pNext               = nullptr;
                     shaderStageCreateInfo.flags               = 0;
-                    shaderStageCreateInfo.pName               = "...";
-                    shaderStageCreateInfo.stage               = (VkShaderStageFlagBits) stage;
+                    shaderStageCreateInfo.pName               = "main";
+                    shaderStageCreateInfo.stage               = serialization::shaderStageFromPipelineStage(stage);
                     shaderStageCreateInfo.module              = vkShaderModule;
                     shaderStageCreateInfo.pSpecializationInfo = nullptr;
 

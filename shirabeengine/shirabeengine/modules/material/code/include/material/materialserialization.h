@@ -11,7 +11,7 @@
 #include <core/enginetypehelper.h>
 #include <core/serialization/serialization.h>
 
-#include "material/material_declaration.h"
+#include "material_declaration.h"
 
 namespace engine
 {
@@ -38,6 +38,14 @@ namespace engine
          * @return
          */
         std::string const stageToString(VkPipelineStageFlagBits const &aStage);
+
+        /**
+         * Convert pipeline stage flags to shader stage flags
+         *
+         * @param aFlags Source flags
+         * @return       Target flags
+         */
+        VkShaderStageFlagBits const shaderStageFromPipelineStage(VkPipelineStageFlags const &aFlags);
 
         /**
          * The IFrameGraphSerializer interface describes the basic requiremets

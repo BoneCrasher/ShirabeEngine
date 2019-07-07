@@ -425,7 +425,7 @@ namespace engine
                 aDeserializer.beginObject(aIndex);
                 aDeserializer.readValue("name",     aStage.stageName);
                 aDeserializer.readValue("filename", aStage.filename);
-                // TODO: Determine stage from stage-key or sth.
+                aStage.stage = serialization::stageFromString(aStage.stageName);
 
                 uint32_t inputCount = 0;
                 aDeserializer.beginArray("inputs", inputCount);
