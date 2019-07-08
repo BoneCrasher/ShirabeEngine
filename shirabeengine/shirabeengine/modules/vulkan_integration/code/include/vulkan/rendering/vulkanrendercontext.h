@@ -135,6 +135,24 @@ namespace engine
             EEngineStatus present();
 
             /**
+             * Bind a pipeline instance  in the GPU.
+             *
+             * @param aPipelineUID The uid of the pipeline instance to bind.
+             * @return             EEngineStatus::Ok, if successful.
+             * @return             EEngineStatus::Error, if failed.
+             */
+            EEngineStatus bindPipeline(PublicResourceId_t const &aPipelineUID);
+
+            /**
+             * Unbind a pipeline instance from the GPU.
+             *
+             * @param aPipelineUID The uid of the pipeline instance to unbind.
+             * @return             EEngineStatus::Ok, if successful.
+             * @return             EEngineStatus::Error, if failed.
+             */
+            EEngineStatus unbindPipeline(PublicResourceId_t const &aPipelineUID);
+
+            /**
              * Bind a resource to the pipeline.
              *
              * @param aResourceId The id of the resourcer to bind.

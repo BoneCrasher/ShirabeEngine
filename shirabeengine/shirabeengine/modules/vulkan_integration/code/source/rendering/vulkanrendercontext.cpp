@@ -2,6 +2,7 @@
 #include "vulkan/resources/types/vulkantextureresource.h"
 #include "vulkan/resources/types/vulkanframebufferresource.h"
 #include "vulkan/resources/types/vulkanrenderpassresource.h"
+#include "vulkan/resources/types/vulkanpipelineresource.h"
 
 #include <thread>
 #include <base/string.h>
@@ -331,11 +332,11 @@ namespace engine
             }
             while(VkResult::VK_SUCCESS != result);
 
-            if(VkResult::VK_SUCCESS != result)
-            {
-                CLog::Error(logTag(), CString::format("AquireNextImageKHR failed with VkResult: %0", result));
-                throw CVulkanError("Failed to execute 'vkAcquireNextImageKHR'.", result);
-            }
+            // if(VkResult::VK_SUCCESS != result)
+            // {
+            //    CLog::Error(logTag(), CString::format("AquireNextImageKHR failed with VkResult: %0", result));
+            //    throw CVulkanError("Failed to execute 'vkAcquireNextImageKHR'.", result);
+            // }
 
             vkState.swapChain.currentSwapChainImageIndex = nextImageIndex;
 
@@ -410,6 +411,43 @@ namespace engine
             {
                 throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
             }
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::bindPipeline(const engine::resources::PublicResourceId_t &aPipelineUID)
+        {
+            CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
+
+            VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+
+            CEngineResult<CStdSharedPtr_t<SVulkanPipelineResource>> fetch = mGraphicsAPIResourceBackend->getResource<SVulkanPipelineResource>(aPipelineUID);
+            if(not fetch.successful())
+            {
+                CLog::Error(logTag(), "Failed to fetch pipeline '%0'.", aPipelineUID);
+                return fetch.result();
+            }
+
+            SVulkanPipelineResource const &pipelineResource = *(fetch.data());
+
+            vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineResource.pipeline);
+
+            vkCmdDraw(vkCommandBuffer, 3, 1, 0, 0); // Single triangle for now.
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::unbindPipeline(const engine::resources::PublicResourceId_t &aPipelineUID)
+        {
+            SHIRABE_UNUSED(aPipelineUID);
 
             return EEngineStatus::Ok;
         }

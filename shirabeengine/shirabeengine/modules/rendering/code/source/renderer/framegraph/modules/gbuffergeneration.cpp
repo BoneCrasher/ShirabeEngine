@@ -132,10 +132,9 @@ namespace engine
                         continue;
                     }
 
-                    aRenderContext->loadMaterialAsset  (*materialPointer, "");
-                    aRenderContext->bindMaterial       (*materialPointer);
-                    aRenderContext->unbindMaterial     (*materialPointer);
-                    aRenderContext->unloadMaterialAsset(*materialPointer);
+                    SFrameGraphMesh const mesh {}; // TODO
+
+                    aRenderContext->render(mesh, *materialPointer);
                 }
 
                 return { EEngineStatus::Ok };

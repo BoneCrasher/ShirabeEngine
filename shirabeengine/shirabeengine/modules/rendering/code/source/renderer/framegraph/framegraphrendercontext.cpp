@@ -969,6 +969,15 @@ namespace engine
                 pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set][sampledImage.binding] = layoutBinding;
             }
 
+            VkViewport viewPort = {};
+            viewPort.x        = 0.0;
+            viewPort.y        = 0.0;
+            viewPort.width    = 1920.0;
+            viewPort.height   = 1080.0;
+            viewPort.minDepth = 0.05;
+            viewPort.maxDepth = 1.0;
+            pipelineDescriptor.viewPort = viewPort;
+
             pipelineDescriptor.subpass = mCurrentSubpass;
 
             PublicResourceId_t     const renderPassHandle   = mCurrentRenderPassHandle;
@@ -976,6 +985,7 @@ namespace engine
             PublicResourceIdList_t const bufferViewHandles  = {};
 
             pipelineDescriptor.dependencies.push_back(renderPassHandle); // Remarks to myself: You are stupid...
+            pipelineDescriptor.name = aMaterial.readableName;
 
             CPipeline::CCreationRequest request(pipelineDescriptor
                                                 , renderPassHandle
@@ -1004,8 +1014,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)
         {
-            SHIRABE_UNUSED(aMaterial);
-            return EEngineStatus::Ok;
+            auto const result = mGraphicsAPIRenderContext->bindPipeline(aMaterial.readableName);
+            return result;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1025,12 +1035,13 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::render(SFrameGraphMesh     const &aMesh,
                                                          SFrameGraphMaterial const &aMaterial)
         {
+            SHIRABE_UNUSED(aMesh);
 
-            //
-            // Traverse signature and derive pipeline configuration UNLESS a pipeline was
-            // created already for the given material instance.
-            //
+            loadMaterialAsset  (aMaterial, "");
+            bindMaterial       (aMaterial);
 
+            unbindMaterial     (aMaterial);
+            unloadMaterialAsset(aMaterial);
 
             return EEngineStatus::Ok;
         }

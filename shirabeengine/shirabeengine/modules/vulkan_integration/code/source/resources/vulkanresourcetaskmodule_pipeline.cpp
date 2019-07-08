@@ -54,10 +54,10 @@ namespace engine
                 vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
                 vertexInputStateCreateInfo.pNext                           = nullptr;
                 vertexInputStateCreateInfo.flags                           = 0;
-                vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(desc.vertexInputAttributes.size());
-                vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast<uint32_t>(desc.vertexInputBindings  .size());
-                vertexInputStateCreateInfo.pVertexAttributeDescriptions    = desc.vertexInputAttributes.data();
-                vertexInputStateCreateInfo.pVertexBindingDescriptions      = desc.vertexInputBindings  .data();
+                vertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0; // static_cast<uint32_t>(desc.vertexInputAttributes.size());
+                vertexInputStateCreateInfo.vertexBindingDescriptionCount   = 0; // static_cast<uint32_t>(desc.vertexInputBindings  .size());
+                vertexInputStateCreateInfo.pVertexAttributeDescriptions    = nullptr; // desc.vertexInputAttributes.data();
+                vertexInputStateCreateInfo.pVertexBindingDescriptions      = nullptr; // desc.vertexInputBindings  .data();
 
                 VkPipelineViewportStateCreateInfo viewPortStateCreateInfo {};
                 viewPortStateCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

@@ -137,7 +137,10 @@ namespace engine
                         aFlags, aObjType, (void*)aObj, aLocation, aCode, aLayerPrefix, aMsg);
             CLog::Debug(Debug::logTag(), message);
 
-            raise(SIGTRAP); // Trap execution here within GDB... __builtin_trap() would cause SIGKILL, not appreciated...
+            if( VkDebugReportFlagBitsEXT::VK_DEBUG_REPORT_ERROR_BIT_EXT == (aFlags & VkDebugReportFlagBitsEXT::VK_DEBUG_REPORT_ERROR_BIT_EXT) )
+            {
+                // raise(SIGTRAP); // Trap execution here within GDB on error... __builtin_trap() would cause SIGKILL, not appreciated...
+            }
 
             return VK_FALSE;
         }

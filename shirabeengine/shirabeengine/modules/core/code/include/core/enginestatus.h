@@ -155,7 +155,10 @@ namespace engine
         }
         else if constexpr(std::is_same_v<TResult, bool>)
         {
-            EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, aFormat);
+            if(aPotentialErrorValue)
+            {
+                EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, aFormat);
+            }
         }
     }
 
@@ -171,7 +174,10 @@ namespace engine
         }
         else if constexpr(std::is_same_v<TResult, bool>)
         {
-            EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, CString::format(aFormat, std::forward<TArgs>(aArgs)...));
+            if(aPotentialErrorValue)
+            {
+                EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, CString::format(aFormat, std::forward<TArgs>(aArgs)...));
+            }
         }
     }
 
