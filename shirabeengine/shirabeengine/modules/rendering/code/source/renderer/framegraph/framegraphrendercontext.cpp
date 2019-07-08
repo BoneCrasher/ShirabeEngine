@@ -787,11 +787,11 @@ namespace engine
             pipelineDescriptor.rasterizerState.sType                     = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
             pipelineDescriptor.rasterizerState.pNext                     = nullptr;
             pipelineDescriptor.rasterizerState.flags                     = 0;
-            pipelineDescriptor.rasterizerState.cullMode                  = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
+            pipelineDescriptor.rasterizerState.cullMode                  = VkCullModeFlagBits::VK_CULL_MODE_NONE;
             pipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
             pipelineDescriptor.rasterizerState.polygonMode               = VkPolygonMode::VK_POLYGON_MODE_FILL;
             pipelineDescriptor.rasterizerState.lineWidth                 = 1.0f;
-            pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_TRUE;
+            pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_FALSE;
             pipelineDescriptor.rasterizerState.depthClampEnable          = VK_FALSE;
             pipelineDescriptor.rasterizerState.depthBiasEnable           = VK_FALSE;
             pipelineDescriptor.rasterizerState.depthBiasSlopeFactor      = 0.0f;
@@ -811,8 +811,8 @@ namespace engine
             pipelineDescriptor.depthStencilState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
             pipelineDescriptor.depthStencilState.pNext                   = nullptr;
             pipelineDescriptor.depthStencilState.flags                   = 0;
-            pipelineDescriptor.depthStencilState.depthTestEnable         = VK_TRUE;
-            pipelineDescriptor.depthStencilState.depthWriteEnable        = VK_TRUE;
+            pipelineDescriptor.depthStencilState.depthTestEnable         = VK_FALSE;
+            pipelineDescriptor.depthStencilState.depthWriteEnable        = VK_FALSE;
             pipelineDescriptor.depthStencilState.depthCompareOp          = VkCompareOp::VK_COMPARE_OP_LESS;
             pipelineDescriptor.depthStencilState.stencilTestEnable       = VK_FALSE;
             pipelineDescriptor.depthStencilState.front.passOp            = VkStencilOp::VK_STENCIL_OP_KEEP;
@@ -823,7 +823,7 @@ namespace engine
             pipelineDescriptor.depthStencilState.front.writeMask         = 0;
             pipelineDescriptor.depthStencilState.front.reference         = 0;
             pipelineDescriptor.depthStencilState.back                    = pipelineDescriptor.depthStencilState.front;
-            pipelineDescriptor.depthStencilState.depthBoundsTestEnable   = VK_TRUE;
+            pipelineDescriptor.depthStencilState.depthBoundsTestEnable   = VK_FALSE;
             pipelineDescriptor.depthStencilState.minDepthBounds          = 0.0f;
             pipelineDescriptor.depthStencilState.maxDepthBounds          = 1.0f;
 
@@ -974,7 +974,7 @@ namespace engine
             viewPort.y        = 0.0;
             viewPort.width    = 1920.0;
             viewPort.height   = 1080.0;
-            viewPort.minDepth = 0.05;
+            viewPort.minDepth = 0.0;
             viewPort.maxDepth = 1.0;
             pipelineDescriptor.viewPort = viewPort;
 

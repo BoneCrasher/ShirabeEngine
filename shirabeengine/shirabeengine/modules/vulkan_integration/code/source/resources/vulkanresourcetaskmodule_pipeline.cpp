@@ -59,14 +59,18 @@ namespace engine
                 vertexInputStateCreateInfo.pVertexAttributeDescriptions    = nullptr; // desc.vertexInputAttributes.data();
                 vertexInputStateCreateInfo.pVertexBindingDescriptions      = nullptr; // desc.vertexInputBindings  .data();
 
+                VkRect2D scissor {};
+                scissor.offset = { 0, 0 };
+                scissor.extent = { (uint32_t)desc.viewPort.width, (uint32_t)desc.viewPort.height };
+
                 VkPipelineViewportStateCreateInfo viewPortStateCreateInfo {};
                 viewPortStateCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
                 viewPortStateCreateInfo.pNext          = nullptr;
                 viewPortStateCreateInfo.flags          = 0;
                 viewPortStateCreateInfo.viewportCount  = 1;
                 viewPortStateCreateInfo.pViewports     = &(desc.viewPort);
-                viewPortStateCreateInfo.scissorCount   = 0;
-                viewPortStateCreateInfo.pScissors      = nullptr;
+                viewPortStateCreateInfo.scissorCount   = 1;
+                viewPortStateCreateInfo.pScissors      = &(scissor);
 
                 std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
 
