@@ -46,6 +46,13 @@ namespace engine
         case FrameGraphFormat_t::R8G8B8A8_UNORM:           return "R8G8B8A8_UNORM";
         case FrameGraphFormat_t::R8G8B8A8_UNORM_SRGB:      return "R8G8B8A8_UNORM_SRGB";
         case FrameGraphFormat_t::R8G8B8A8_FLOAT:           return "R8G8B8A8_FLOAT";
+        case FrameGraphFormat_t::B8G8R8A8_TYPELESS:        return "B8G8R8A8_TYPELESS";
+        case FrameGraphFormat_t::B8G8R8A8_SINT:            return "B8G8R8A8_SINT";
+        case FrameGraphFormat_t::B8G8R8A8_UINT:            return "B8G8R8A8_UINT";
+        case FrameGraphFormat_t::B8G8R8A8_SNORM:           return "B8G8R8A8_SNORM";
+        case FrameGraphFormat_t::B8G8R8A8_UNORM:           return "B8G8R8A8_UNORM";
+        case FrameGraphFormat_t::B8G8R8A8_UNORM_SRGB:      return "B8G8R8A8_UNORM_SRGB";
+        case FrameGraphFormat_t::B8G8R8A8_FLOAT:           return "B8G8R8A8_FLOAT";
         case FrameGraphFormat_t::R16_TYPELESS:             return "R16_TYPELESS";
         case FrameGraphFormat_t::R16_SINT:                 return "R16_SINT";
         case FrameGraphFormat_t::R16_UINT:                 return "R16_UINT";

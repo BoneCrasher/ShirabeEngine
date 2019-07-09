@@ -317,9 +317,9 @@ namespace engine
 
                     // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
                     SAttachmentDescription attachmentDesc = {};
-                    attachmentDesc.loadOp         = EAttachmentLoadOp::DONT_CARE;
+                    attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
                     attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
-                    attachmentDesc.storeOp        = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
                     attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                     attachmentDesc.format         = textureView.format;
                     attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
@@ -859,10 +859,41 @@ namespace engine
 
                 if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT == stageKey)
                 {
-                    for(SStageOutput const &output : stage.outputs)
-                    {
+                    std::vector<VkPipelineColorBlendAttachmentState> outputs {};
+                    outputs.resize(stage.outputs.size());
 
+                    for(auto const &output : stage.outputs)
+                    {
+                        VkPipelineColorBlendAttachmentState colorBlendAttachmentState{};
+                        colorBlendAttachmentState.blendEnable        =VK_TRUE;
+                        colorBlendAttachmentState.colorWriteMask     =VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT|
+                                                                      VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT|
+                                                                      VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT|
+                                                                      VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
+                        colorBlendAttachmentState.srcColorBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ONE;  // VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
+                        colorBlendAttachmentState.dstColorBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ZERO; // VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                        colorBlendAttachmentState.colorBlendOp       =VkBlendOp::VK_BLEND_OP_ADD;
+                        colorBlendAttachmentState.srcAlphaBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ONE;
+                        colorBlendAttachmentState.dstAlphaBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ZERO;
+                        colorBlendAttachmentState.alphaBlendOp       =VkBlendOp::VK_BLEND_OP_ADD;
+
+                        outputs[output.location] = colorBlendAttachmentState;
                     }
+
+                    pipelineDescriptor.colorBlendAttachmentStates = outputs;
+
+                    VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo {};
+                    colorBlendCreateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+                    colorBlendCreateInfo.pNext             = nullptr;
+                    colorBlendCreateInfo.flags             = 0;
+                    colorBlendCreateInfo.logicOpEnable     = VK_FALSE;
+                    colorBlendCreateInfo.logicOp           = VK_LOGIC_OP_COPY;
+                    colorBlendCreateInfo.blendConstants[0] = 0.0f;
+                    colorBlendCreateInfo.blendConstants[1] = 1.0f;
+                    colorBlendCreateInfo.blendConstants[2] = 2.0f;
+                    colorBlendCreateInfo.blendConstants[3] = 3.0f;
+
+                    pipelineDescriptor.colorBlendState = colorBlendCreateInfo;
                 }
 
                 //
@@ -910,21 +941,6 @@ namespace engine
 
             for(SSubpassInput const &input : signature.subpassInputs)
             {
-                VkPipelineColorBlendAttachmentState colorBlendAttachmentState {};
-                colorBlendAttachmentState.blendEnable         = VK_TRUE;
-                colorBlendAttachmentState.colorWriteMask      = VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT |
-                                                                VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT |
-                                                                VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT |
-                                                                VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
-                colorBlendAttachmentState.srcColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
-                colorBlendAttachmentState.dstColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-                colorBlendAttachmentState.colorBlendOp        = VkBlendOp    ::VK_BLEND_OP_ADD;
-                colorBlendAttachmentState.srcAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;
-                colorBlendAttachmentState.dstAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO;
-                colorBlendAttachmentState.alphaBlendOp        = VkBlendOp    ::VK_BLEND_OP_ADD;
-
-                pipelineDescriptor.colorBlendAttachmentStates.push_back(colorBlendAttachmentState);
-
                 VkDescriptorSetLayoutBinding layoutBinding {};
                 layoutBinding.binding            = input.binding;
                 layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
@@ -934,20 +950,7 @@ namespace engine
                 pipelineDescriptor.descriptorSetLayoutBindings[input.set][input.binding] = layoutBinding;
             }
 
-            VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo {};
-            colorBlendCreateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-            colorBlendCreateInfo.pNext             = nullptr;
-            colorBlendCreateInfo.flags             = 0;
-            colorBlendCreateInfo.logicOpEnable     = VK_FALSE;
-            colorBlendCreateInfo.logicOp           = VK_LOGIC_OP_COPY;
-            colorBlendCreateInfo.blendConstants[0] = 0.0f;
-            colorBlendCreateInfo.blendConstants[1] = 0.0f;
-            colorBlendCreateInfo.blendConstants[2] = 0.0f;
-            colorBlendCreateInfo.blendConstants[3] = 0.0f;
-
-            pipelineDescriptor.colorBlendState = colorBlendCreateInfo;
-
-            for(SUniformBuffer const &uniformBuffer : signature.uniformBuffers)
+             for(SUniformBuffer const &uniformBuffer : signature.uniformBuffers)
             {
                 VkDescriptorSetLayoutBinding layoutBinding {};
                 layoutBinding.binding            = uniformBuffer.binding;

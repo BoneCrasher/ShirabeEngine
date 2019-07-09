@@ -166,6 +166,10 @@ namespace engine
                     }
                 }
 
+                VkPipelineColorBlendStateCreateInfo colorBlending = desc.colorBlendState;
+                colorBlending.pAttachments    = desc.colorBlendAttachmentStates.data();
+                colorBlending.attachmentCount = desc.colorBlendAttachmentStates.size();
+
                 VkGraphicsPipelineCreateInfo pipelineCreateInfo {};
                 pipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
                 pipelineCreateInfo.pNext               = nullptr;
@@ -176,7 +180,7 @@ namespace engine
                 pipelineCreateInfo.pRasterizationState = &(desc.rasterizerState);
                 pipelineCreateInfo.pMultisampleState   = &(desc.multiSampler);
                 pipelineCreateInfo.pDepthStencilState  = &(desc.depthStencilState);
-                pipelineCreateInfo.pColorBlendState    = &(desc.colorBlendState);
+                pipelineCreateInfo.pColorBlendState    = &(colorBlending);
                 pipelineCreateInfo.pDynamicState       = nullptr;
                 pipelineCreateInfo.pTessellationState  = nullptr;
                 pipelineCreateInfo.layout              = vkPipelineLayout;

@@ -62,7 +62,7 @@ namespace engine
                 gbufferDesc.width          = width;
                 gbufferDesc.height         = height;
                 gbufferDesc.depth          = 1;
-                gbufferDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
+                gbufferDesc.format         = FrameGraphFormat_t::B8G8R8A8_UNORM;
                 gbufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
                 gbufferDesc.arraySize      = 4;
                 gbufferDesc.mipLevels      = 1;

@@ -37,7 +37,7 @@ namespace engine
             /**
              * The SDescriptor struct provides all necessary information about a texture view.
              */
-            struct SHIRABE_TEST_EXPORT SDescriptor
+            class SHIRABE_TEST_EXPORT SDescriptor
                     : public SDescriptorImplBase<EResourceType::GAPI_COMPONENT, EResourceSubType::PIPELINE>
             {
             public_constructors:

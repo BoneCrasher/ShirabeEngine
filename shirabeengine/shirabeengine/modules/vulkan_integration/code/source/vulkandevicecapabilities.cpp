@@ -27,6 +27,11 @@ namespace engine
             case EFormat::R8G8B8A8_SNORM:           return VkFormat::VK_FORMAT_R8G8B8A8_SNORM;
             case EFormat::R8G8B8A8_UINT:            return VkFormat::VK_FORMAT_R8G8B8A8_UINT;
             case EFormat::R8G8B8A8_SINT:            return VkFormat::VK_FORMAT_R8G8B8A8_SINT;
+            case EFormat::B8G8R8A8_UNORM:           return VkFormat::VK_FORMAT_B8G8R8A8_UNORM;
+            case EFormat::B8G8R8A8_UNORM_SRGB:      return VkFormat::VK_FORMAT_B8G8R8A8_SRGB;
+            case EFormat::B8G8R8A8_SNORM:           return VkFormat::VK_FORMAT_B8G8R8A8_SNORM;
+            case EFormat::B8G8R8A8_UINT:            return VkFormat::VK_FORMAT_B8G8R8A8_UINT;
+            case EFormat::B8G8R8A8_SINT:            return VkFormat::VK_FORMAT_B8G8R8A8_SINT;
             case EFormat::D24_UNORM_S8_UINT:        return VkFormat::VK_FORMAT_D24_UNORM_S8_UINT;
             case EFormat::D32_FLOAT:                return VkFormat::VK_FORMAT_D32_SFLOAT;
             case EFormat::R32_FLOAT:                return VkFormat::VK_FORMAT_R32_SFLOAT;

@@ -58,4 +58,10 @@ void main()
         gl_Position = vec4(-0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
         break;
     }
+
+    shader_output.vertex_position = gl_Position.xyz;
+    shader_output.vertex_normal   = vec3(1.0, 0.0,  0.0);
+    shader_output.vertex_tangent  = vec3(0.0, 0.0, -1.0);
+    shader_output.vertex_texcoord = vec2(gl_Position.xy);
+
 }

@@ -58,7 +58,7 @@ namespace engine
                 compositingBufferDesc.width          = gbufferTexture.width;
                 compositingBufferDesc.height         = gbufferTexture.height;
                 compositingBufferDesc.depth          = 1;
-                compositingBufferDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
+                compositingBufferDesc.format         = FrameGraphFormat_t::B8G8R8A8_UNORM;
                 compositingBufferDesc.mipLevels      = 1;
                 compositingBufferDesc.arraySize      = 1;
                 compositingBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
