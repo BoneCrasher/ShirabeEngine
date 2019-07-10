@@ -8,6 +8,8 @@
 #include <graphicsapi/resources/types/textureview.h>
 #include <graphicsapi/resources/types/renderpass.h>
 #include <graphicsapi/resources/types/framebuffer.h>
+#include <graphicsapi/resources/types/pipeline.h>
+#include <graphicsapi/resources/types/mesh.h>
 #include "vulkan/vulkanimport.h"
 #include "vulkan/vulkanenvironment.h"
 
@@ -27,7 +29,8 @@ namespace engine
                    , VkImageView    \
                    , VkBufferView   \
                    , VkShaderModule \
-                   , VkPipeline
+                   , VkPipeline     \
+                   , Vk
     }
 
     #define SHIRABE_DECLARE_TASK_BUILDER_MODULE(type)                          \
@@ -88,6 +91,7 @@ namespace engine
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(RenderPass);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(FrameBuffer);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(Pipeline);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(Mesh);
 
         private_members:
             CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;

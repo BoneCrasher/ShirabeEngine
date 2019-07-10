@@ -9,6 +9,7 @@ LIBRARIES=(                             \
            asio                         \
            stb                          \
            assimp                       \
+           fxgltf                       \
            glslang                      \
            spirv_cross                  \
            spirv_tools                  \
@@ -22,6 +23,7 @@ LIBRARIES=(                             \
            vulkan_sdk_validation_layers \
           )
 
+DEPENDENCIES_fxgltf=(nlohmann_json)
 DEPENDENCIES_libxml2=( zlib )
 DEPENDENCIES_libxslt=( zlib libxml2 )
 DEPENDENCIES_vulkan_sdk=( googletest vulkan_headers )

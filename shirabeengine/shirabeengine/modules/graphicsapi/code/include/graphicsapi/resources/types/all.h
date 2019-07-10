@@ -34,7 +34,8 @@ namespace engine
             SwapChain,                            \
             SwapChainBuffer,                      \
             FrameBuffer,                          \
-            RenderPass
+            RenderPass                            \
+            Mesh
                 // ConstantBuffer,     \
                 // ObjectBuffer,       \
                 // StructuredBuffer,   \

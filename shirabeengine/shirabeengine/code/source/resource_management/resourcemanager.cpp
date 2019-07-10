@@ -8,6 +8,7 @@ namespace engine
     using engine::gfxapi::CRenderPass;
     using engine::gfxapi::CFrameBuffer;
     using engine::gfxapi::CPipeline;
+    using engine::gfxapi::CMesh;
 
     //<-----------------------------------------------------------------------------
     //
@@ -58,6 +59,11 @@ namespace engine
         success = success && addLoader    <CPipeline>   (resourceManager);
         success = success && addUnloader  <CPipeline>   (resourceManager);
         success = success && addDestructor<CPipeline>   (resourceManager);
+
+        success = success && addCreator   <CMesh>       (resourceManager);
+        success = success && addLoader    <CMesh>       (resourceManager);
+        success = success && addUnloader  <CMesh>       (resourceManager);
+        success = success && addDestructor<CMesh>       (resourceManager);
 
         return (not success)
                 ? EEngineStatus::ResourceManager_Setup_Failed

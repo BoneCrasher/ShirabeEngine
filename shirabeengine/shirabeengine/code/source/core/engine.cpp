@@ -315,6 +315,7 @@ namespace engine
             mProxyFactory->addCreator<CRenderPass> (EResourceSubType::RENDER_PASS,  SSpawnProxy<CRenderPass> ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CFrameBuffer>(EResourceSubType::FRAME_BUFFER, SSpawnProxy<CFrameBuffer>::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CPipeline>   (EResourceSubType::PIPELINE,     SSpawnProxy<CPipeline>   ::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CMesh>       (EResourceSubType::MESH_STATIC,  SSpawnProxy<CMesh>       ::forGFXAPIBackend(resourceBackend));
 
             CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
             mResourceManager = manager;            

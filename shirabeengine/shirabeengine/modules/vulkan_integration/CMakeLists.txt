@@ -18,6 +18,7 @@ set(
         SHIRABEMODULELOG        
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
+        FXGLTF
         VULKANSDK
         XLIB
         JSON

@@ -14,6 +14,7 @@ REPOSITORIES[googletest]="git@github.com:google/googletest.git"
 REPOSITORIES[asio]="git@github.com:chriskohlhoff/asio.git"
 REPOSITORIES[stb]="git@github.com:nothings/stb.git"
 REPOSITORIES[assimp]="git@github.com:assimp/assimp.git"
+REPOSITORIES[fxgltf]="git@github.com:jessey-git/fx-gltf.git"
 REPOSITORIES[glslang]="git@github.com:KhronosGroup/glslang.git"
 REPOSITORIES[spirv_cross]="git@github.com:KhronosGroup/SPIRV-Cross.git"
 REPOSITORIES[spirv_tools]="git@github.com:KhronosGroup/SPIRV-Tools.git"
@@ -35,6 +36,7 @@ TARGET_DIRECTORIES[nlohmann_json]="${SOURCES_DIR}/nlohmann_json"
 TARGET_DIRECTORIES[asio]="${SOURCES_DIR}/asio"
 TARGET_DIRECTORIES[stb]="${SOURCES_DIR}/stb"
 TARGET_DIRECTORIES[assimp]="${SOURCES_DIR}/assimp"
+TARGET_DIRECTORIES[fxgltf]="${SOURCES_DIR}/fxgltf"
 TARGET_DIRECTORIES[glslang]="${SOURCES_DIR}/glslang"
 TARGET_DIRECTORIES[spirv_cross]="${SOURCES_DIR}/spirv_cross"
 TARGET_DIRECTORIES[spirv_tools]="${SOURCES_DIR}/spirv_tools"
@@ -149,6 +151,7 @@ function setup_tools
     setup_one asio
     setup_one stb
     setup_one assimp
+    setup_one fxgltf
     setup_one cryptopp
 }
 
