@@ -1,5 +1,5 @@
 #include <string>
-#include <istream
+#include <istream>
 #include <fx/gltf.h>
 #include <graphicsapi/resources/types/mesh.h>
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
@@ -25,9 +25,9 @@ namespace engine
                     stream >> json;
                 }
 
-                return fx::gltf::detail::Create(json, { detail::GetDocumentRootPath(documentFilePath), readQuotas });
+                return fx::gltf::detail::Create(json, { });
             }
-            catch (invalid_gltf_document &)
+            catch (fx::gltf::invalid_gltf_document &)
             {
                 throw;
             }
@@ -37,7 +37,7 @@ namespace engine
             }
             catch (...)
             {
-                std::throw_with_nested(invalid_gltf_document("Invalid glTF document. See nested exception for details."));
+                std::throw_with_nested(fx::gltf::invalid_gltf_document("Invalid glTF document. See nested exception for details."));
             }
         }
         //<-----------------------------------------------------------------------------
@@ -355,19 +355,26 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanTextureResource> texture = std::static_pointer_cast<SVulkanTextureResource>(aAssignment.internalResourceHandle);
-                if(nullptr == texture)
+                CStdSharedPtr_t<SVulkanMeshResource> mesh = std::static_pointer_cast<SVulkanMeshResource>(aAssignment.internalResourceHandle);
+                if(nullptr == mesh)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for texture destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
                     return { EEngineStatus::Error };
                 }
 
-                VkImage        vkImage         = texture->handle;
-                VkDeviceMemory vkDeviceMemory  = texture->attachedMemory;
-                VkDevice       vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
+                VkDevice vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
 
-                vkFreeMemory(vkLogicalDevice, vkDeviceMemory, nullptr);
-                vkDestroyImage(vkLogicalDevice, vkImage, nullptr);
+                vkFreeMemory(vkLogicalDevice, mesh->indexBufferMemory, nullptr);
+                vkDestroyBuffer(vkLogicalDevice, mesh->indexBuffer, nullptr);
+
+                for(auto const &memory : mesh->vertexBufferMemory)
+                {
+                    vkFreeMemory(vkLogicalDevice, memory, nullptr);
+                }
+                for(auto const &buffer : mesh->vertexBuffer)
+                {
+                    vkDestroyBuffer(vkLogicalDevice, buffer, nullptr);
+                }
 
                 SGFXAPIResourceHandleAssignment assignment = aAssignment;
                 assignment.internalResourceHandle = nullptr;

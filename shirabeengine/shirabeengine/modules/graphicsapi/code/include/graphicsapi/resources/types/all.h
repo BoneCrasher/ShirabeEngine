@@ -18,6 +18,7 @@
 #include "renderpass.h"
 #include "framebuffer.h"
 #include "pipeline.h"
+#include "mesh.h"
 
 namespace engine
 {
