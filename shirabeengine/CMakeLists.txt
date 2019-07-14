@@ -10,13 +10,13 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 project(shirabedevelopment)
 
 add_subdirectory(shirabeengine)
-add_subdirectory(shirabe_shader_precompiler)
+add_subdirectory(shirabe_resource_compiler)
 # add_subdirectory(enginetest)
 add_subdirectory(crc32generator)
 add_subdirectory(game)
 
-add_dependencies(shirabe_shader_precompiler INSTALL_shirabeengine)
+add_dependencies(shirabe_resource_compiler INSTALL_shirabeengine)
 # add_dependencies(enginetest                 INSTALL_shirabeengine)
 add_dependencies(game                       INSTALL_shirabeengine)
-add_dependencies(game                       INSTALL_shirabe_shader_precompiler)
+add_dependencies(game                       INSTALL_shirabe_resource_compiler)
         

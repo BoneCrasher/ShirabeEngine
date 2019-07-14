@@ -1,5 +1,5 @@
-#ifndef   _SHIRABE_SHADERPRECOMP_EXTRACTION_H_
-#define   _SHIRABE_SHADERPRECOMP_EXTRACTION_H_
+#ifndef   _SHIRABE_RESOURCECOMP_EXTRACTION_H_
+#define   _SHIRABE_RESOURCECOMP_EXTRACTION_H_
 
 #include <vector>
 #include <string>
@@ -7,7 +7,7 @@
 
 #include "shadercompilationunit.h"
 
-namespace shader_precompiler
+namespace resource_compiler
 {
     /**
      * Read a uint32_t word SPIR-V file into a vector<uint32_t>.

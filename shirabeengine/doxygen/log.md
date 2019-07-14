@@ -2631,7 +2631,7 @@ Generating docs for compound BaseOutsideANamespace...
 Generating docs for compound Brief...
 Generating docs for compound CDirectoryStackFileIncluder...
 Generating docs for compound Class...
-Generating docs for compound CPrecompiler...
+Generating docs for compound CCompiler...
 Generating docs for compound Crazy...
 Generating docs for compound Derived...
 Generating docs for compound DerivedOutsideANamespace...
@@ -3788,15 +3788,15 @@ Generating XML output for class test::test_blog::Collap/home/dotti/workspaces/sh
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/platformtime.h:81: warning: argument 'buffer' of command @param is not found in the argument list of engine::CPlatformTime< T >::getConversionConstant(T &aBuffer) const=0
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/platformtime.h:87: warning: The following parameters of engine::CPlatformTime::getConversionConstant(T &aBuffer) const=0 are not documented:
   parameter 'aBuffer'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:637: warning: argument 'aFilename' of command @param is not found in the argument list of CPrecompiler::generateCompilationUnit(std::vector< std::filesystem::path > const &aFilenames)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:637: warning: argument 'aOptions' of command @param is not found in the argument list of CPrecompiler::generateCompilationUnit(std::vector< std::filesystem::path > const &aFilenames)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:643: warning: The following parameters of CPrecompiler::generateCompilationUnit(std::vector< std::filesystem::path > const &aFilenames) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:637: warning: argument 'aFilename' of command @param is not found in the argument list of CCompiler::generateCompilationUnit(std::vector< std::filesystem::path > const &aFilenames)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:637: warning: argument 'aOptions' of command @param is not found in the argument list of CCompiler::generateCompilationUnit(std::vector< std::filesystem::path > const &aFilenames)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:643: warning: The following parameters of CCompiler::generateCompilationUnit(std::vector< std::filesystem::path > const &aFilenames) are not documented:
   parameter 'aFilenames'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:708: warning: The following parameters of CPrecompiler::runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually=false) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:708: warning: The following parameters of CCompiler::runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually=false) are not documented:
   parameter 'aConfiguration'
   parameter 'aCompileStagesIndividually'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:811: warning: argument 'aMaterial' of command @param is not found in the argument list of CPrecompiler::serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:817: warning: The following parameters of CPrecompiler::serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:811: warning: argument 'aMaterial' of command @param is not found in the argument list of CCompiler::serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/source/applicationmain.cpp:817: warning: The following parameters of CCompiler::serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData) are not documented:
   parameter 'aMaterialIndex'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/requestdefaultimplementation.h:151: warning: argument 'inPublicResourceId' of command @param is not found in the argument list of engine::resources::CBaseDeclaration::CQueryBase::CQueryBase(PublicResourceId_t const &aPublicResourceId)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/requestdefaultimplementation.h:154: warning: The following parameters of engine::resources::CBaseDeclaration::CQueryBase::CQueryBase(PublicResourceId_t const &aPublicResourceId) are not documented:
@@ -3841,7 +3841,7 @@ Generating XML output for class engine::CPassKey
 Generating XML output for class engine::gfxapi::CPipeline
 Generating XML output for class engine::gfxapi::CPipelineDeclaration
 Generating XML output for class engine::CPlatformTime
-Generating XML output for class CPrecompiler
+Generating XML output for class CCompiler
 Generating XML output for class engine::math::CQuaternion
 Generating XML output for class engine::resources::CBaseDeclaration::CQueryBase
 Generating XML output for class engine::CRange

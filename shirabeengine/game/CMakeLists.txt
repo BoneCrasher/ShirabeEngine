@@ -24,9 +24,10 @@ add_custom_target(shirabe_game_precopy
                   WORKING_DIRECTORY ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin
                   COMMENT           "Precompiling shaders")
 
+SET(SHIRABE_PROJECT_RESOURCE_CP_DEST_DIR ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources)
 add_custom_target(shirabe_game_copy_resources
                   VERBATIM
-                  COMMAND           mkdir -p ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources && cp -rf . ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/data/input/resources
+                  COMMAND           rm -rf ${SHIRABE_PROJECT_RESOURCE_CP_DEST_DIR} && mkdir -p ${SHIRABE_PROJECT_RESOURCE_CP_DEST_DIR} && cp -rf . ${SHIRABE_PROJECT_RESOURCE_CP_DEST_DIR}
                   WORKING_DIRECTORY ${SHIRABE_PROJECT_RES_DIR}
                   COMMENT           "Copying resources")
 
@@ -38,8 +39,8 @@ add_custom_target(shirabe_game_process_resources
 
 # Before adding the game project, hook in preprocessing tools
 
-set(SHIRABE_SHADER_PRECOMPILER_BINARY_INPUT_NAME shirabe_shader_precompiler)
-set(SHIRABE_SHADER_PRECOMPILER_BINARY_NAME       shirabe_shader_precompiler)
+set(SHIRABE_SHADER_PRECOMPILER_BINARY_INPUT_NAME shirabe_resource_compiler)
+set(SHIRABE_SHADER_PRECOMPILER_BINARY_NAME       shirabe_resource_compiler)
 formatPlatformConfigName(
     ${SHIRABE_SHADER_PRECOMPILER_BINARY_INPUT_NAME}
     SHIRABE_ADDRESSMODEL_64BIT
@@ -51,21 +52,21 @@ formatPlatformConfigName(
 LogStatus(MESSAGES "precompiler binary name: ${SHIRABE_SHADER_PRECOMPILER_BINARY_NAME}")
 
 # Make sure that all shaders are compiled first!
-set(SHIRABE_SHADER_PRECOMPILE_COMMAND
-            "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/${SHIRABE_SHADER_PRECOMPILER_BINARY_NAME}")
-
-set(SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS
-    --verbose
-    --debug
-    --optimize
-    -I=./data/input/resources/shaders/include
-    -om=./data/output/resources/shaders/standard
-    -oi=./data/output/resources/shaders/standard/standard.mat.index
-    -os=./data/output/resources/shaders/standard/standard.mat.signature
-    -oc=./data/output/resources/shaders/standard/standard.mat.config
-    -i=./data/input/resources/shaders/standard/standard.mat.index
-    )
-
+# set(SHIRABE_SHADER_PRECOMPILE_COMMAND
+#             "${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin/${SHIRABE_SHADER_PRECOMPILER_BINARY_NAME}")
+#
+# set(SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS
+#     --verbose
+#     --debug
+#     --optimize
+#     -I=./data/input/resources/shaders/include
+#     -om=./data/output/resources/shaders/standard
+#     -oi=./data/output/resources/shaders/standard/standard.mat.index
+#     -os=./data/output/resources/shaders/standard/standard.mat.signature
+#     -oc=./data/output/resources/shaders/standard/standard.mat.config
+#     -i=./data/input/resources/shaders/standard/standard.mat.index
+#     )
+#
 # add_custom_target(shirabe_shader_precompiler_execute
 #                   VERBATIM
 #                   COMMAND           ${SHIRABE_SHADER_PRECOMPILE_COMMAND} ${SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS}
@@ -74,7 +75,7 @@ set(SHIRABE_SHADER_PRECOMPILE_COMMAND_ARGS
 
 set(USE_RESOURCE_PROCESSING ON)
 
-add_dependencies(shirabe_game_precopy           shirabe_shader_precompiler)
+add_dependencies(shirabe_game_precopy           INSTALL_shirabe_resource_compiler)
 add_dependencies(shirabe_game_copy_resources    shirabe_game_precopy)
 
 if(USE_RESOURCE_PROCESSING)

@@ -34,7 +34,7 @@
 #include "extraction.h"
 
 using namespace engine;
-using namespace shader_precompiler;
+using namespace resource_compiler;
 
 //<-----------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ void usage()
 
     std::string const usageMessage =
             "Usage:                                                                                                  \n"
-            "  ./shirabe_shader_precompiler <options>                                                                \n"
+            "  ./shirabe_resource_compiler <options>                                                                 \n"
             "                                                                                                        \n"
             "Options:                                                                                                \n"
             "  --verbose                                                                                             \n"
@@ -65,26 +65,15 @@ void usage()
             "  --recursive_scan                                                                                      \n"
             "      Effect: If any of the paths in the -i option is a directory, include                              \n"
             "              all subdirectories in the input file search.                                              \n"
-            "  -od=<dirpath>                                                                                         \n"
+            "  -o=<dirpath>                                                                                          \n"
             "      Effect: Specifies the path of a directory where all output files should be stored relatively      \n"
-            "  -om=<dirpath>                                                                                         \n"
-            "      Effect: Specifies the path of a directory where all module files should be stored                 \n"
-            "  -oi=<filepath>                                                                                        \n"
+            "  -i=<filepath>                                                                                         \n"
             "      Effect: Specifies the path of the index to write out.                                             \n"
-            "  -os=<filepath>                                                                                        \n"
-            "      Effect: Specifies the path of the generated signagure to write out.                               \n"
-            "  -oc=<filepath>                                                                                        \n"
-            "      Effect: Specifies the path of the generated configuration to write out.                           \n"
-            "  -id=<filepath>                                                                                        \n"
-            "      Effect: Specifies the path from which all files are searched for relatively.                      \n"
-            "  -i =<filename to index file>                                                                          \n"
-            "      Effect: Specifies the input index filename.                                                       \n"
             "                                                                                                        \n"
             " Example:                                                                                               \n"
-            "   ./shirabe_shader_precompiler --verbose --debug -om=<path> -oi=<path> -os=<path> -oc=<path> -i=<path> \n"
             "                                                                                                        \n";
 
-    CLog::Warning(shader_precompiler::logTag(), usageMessage);
+    CLog::Warning(resource_compiler::logTag(), usageMessage);
 
     ::exit(EnumValueOf(EResult::WrongUsage));
 }
@@ -97,9 +86,9 @@ void usage()
 /**
  * @brief The CPrecompiler class
  */
-class CPrecompiler
+class CCompiler
 {
-    SHIRABE_DECLARE_LOG_TAG(CPrecompiler);
+    SHIRABE_DECLARE_LOG_TAG(CCompiler);
 
 public_enums:
     /**
@@ -126,26 +115,29 @@ private_structs:
      */
     struct SConfiguration
     {
-        SMaterialMasterIndex                    indexFile;
-        std::filesystem::path                   inputPath;
-        std::filesystem::path                   outputPath;
-        std::vector<std::filesystem::path>      includePaths;
-        std::vector<std::filesystem::path>      inputPaths;
-        std::filesystem::path                   moduleOutputPath;
-        std::filesystem::path                   indexOutputFile;
-        std::filesystem::path                   signatureOutputFile;
-        std::filesystem::path                   configOutputFile;
-        core::CBitField<CPrecompiler::EOptions> options;
+        std::filesystem::path                inputPath;
+        std::filesystem::path                outputPath;
+        std::vector<std::filesystem::path>   includePaths;
+        std::vector<std::filesystem::path>   filesToProcess;
+        core::CBitField<CCompiler::EOptions> options;
+
+        // SMaterialMasterIndex                    indexFile;
+        // std::filesystem::path                   inputPath;
+        // std::filesystem::path                   outputPath;
+        // std::vector<std::filesystem::path>      includePaths;
+        // std::vector<std::filesystem::path>      inputPaths;
+        // std::filesystem::path                   moduleOutputPath;
+        // std::filesystem::path                   indexOutputFile;
+        // std::filesystem::path                   signatureOutputFile;
+        // std::filesystem::path                   configOutputFile;
     };
 
 public_methods:
-
 
     CResult<EResult> initialize()
     {
         return EResult::Success;
     }
-
 
     /**
      * @brief ProcessArguments
@@ -157,16 +149,21 @@ public_methods:
     {
         std::vector<std::string> usableArguments(aArgV + 1, aArgV + aArgC);
 
-        core::CBitField<EOptions>          options                 = {};
-        std::string                        dataFile                = {};
-        std::vector<std::filesystem::path> includePaths            = {};
-        std::filesystem::path              inputIndexPath          = {};
-        std::filesystem::path              inputPath               = {};
-        std::filesystem::path              outputPath              = {};
-        std::filesystem::path              outputModulePath        = {};
-        std::filesystem::path              outputIndexPath         = {};
-        std::filesystem::path              outputSignaturePath     = {};
-        std::filesystem::path              outputConfigurationPath = {};
+        core::CBitField<EOptions>          options        = {};
+        std::vector<std::filesystem::path> includePaths   = {};
+        std::vector<std::filesystem::path> filesToProcess = {};
+        std::filesystem::path              inputPath      = {};
+        std::filesystem::path              outputPath     = {};
+
+        // std::string                        dataFile                = {};
+        // std::vector<std::filesystem::path> includePaths            = {};
+        // std::filesystem::path              inputIndexPath          = {};
+        // std::filesystem::path              inputPath               = {};
+        // std::filesystem::path              outputPath              = {};
+        // std::filesystem::path              outputModulePath        = {};
+        // std::filesystem::path              outputIndexPath         = {};
+        // std::filesystem::path              outputSignaturePath     = {};
+        // std::filesystem::path              outputConfigurationPath = {};
 
         //
         // Process all options provided to the application.
@@ -203,18 +200,18 @@ public_methods:
 
             std::unordered_map<std::string, std::function<bool()>> handlers =
             {
-                { "--verbose",        [&] () { options.set(CPrecompiler::EOptions::VerboseOutput);         return true; }},
-                { "--debug",          [&] () { options.set(CPrecompiler::EOptions::DebugMode);             return true; }},
-                { "--optimize",       [&] () { options.set(CPrecompiler::EOptions::OptimizationEnabled);   return true; }},
-                { "--recursive_scan", [&] () { options.set(CPrecompiler::EOptions::RecursiveScan);         return true; }},
-                { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
-                { "-od",              [&] () { outputPath              = referencableValue;                return true; }},
-                { "-om",              [&] () { outputModulePath        = referencableValue;                return true; }},
-                { "-oi",              [&] () { outputIndexPath         = referencableValue;                return true; }},
-                { "-os",              [&] () { outputSignaturePath     = referencableValue;                return true; }},
-                { "-oc",              [&] () { outputConfigurationPath = referencableValue;                return true; }},
-                { "-id",              [&] () { inputPath               = referencableValue;                return true; }},
-                { "-i",               [&] () { inputIndexPath          = referencableValue;                return true; }},
+                { "--verbose",        [&] () { options.set(CCompiler::EOptions::VerboseOutput);         return true; }},
+                { "--debug",          [&] () { options.set(CCompiler::EOptions::DebugMode);             return true; }},
+                { "--optimize",       [&] () { options.set(CCompiler::EOptions::OptimizationEnabled);   return true; }},
+                { "--recursive_scan", [&] () { options.set(CCompiler::EOptions::RecursiveScan);         return true; }},
+                // { "-I",               [&] () { includePaths.push_back(referencableValue);                  return true; }},
+                { "-i" ,              [&] () { inputPath  = referencableValue;                          return true; }},
+                { "-o",               [&] () { outputPath = referencableValue;                          return true; }},
+                // { "-om",              [&] () { outputModulePath        = referencableValue;                return true; }},
+                // { "-oi",              [&] () { outputIndexPath         = referencableValue;                return true; }},
+                // { "-os",              [&] () { outputSignaturePath     = referencableValue;                return true; }},
+                // { "-oc",              [&] () { outputConfigurationPath = referencableValue;                return true; }},
+                // { "-i",               [&] () { inputIndexPath          = referencableValue;                return true; }},
             };
 
             auto const fn = mapValue<std::string, std::function<bool()>>(option, std::move(handlers));
@@ -229,6 +226,87 @@ public_methods:
         };
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
+        std::filesystem::path const inputPathAbs = (std::filesystem::current_path() / inputPath).lexically_normal();
+        bool const inputDirectoryExists = std::filesystem::exists(inputPathAbs);
+        if(not inputDirectoryExists)
+        {
+            return false;
+        }
+
+        std::filesystem::path const outputPathAbs = (std::filesystem::current_path() / outputPath).lexically_normal();
+        bool const outputDirectoryExists = std::filesystem::exists(outputPathAbs);
+        if(not outputDirectoryExists)
+        {
+            std::filesystem::create_directories(outputPathAbs);
+        }
+
+        auto const dirIterator = std::filesystem::recursive_directory_iterator(inputPathAbs);
+        for(auto const &file : dirIterator)
+        {
+            // We can't process directories, can we?
+            bool const isDirectory = std::filesystem::is_directory(file);
+            if(isDirectory)
+            {
+                continue;
+            }
+
+            std::filesystem::path const extension = file.path().extension();
+
+            // We only accept files with extension
+            bool const extensionIsEmpty = ("" == extension.string());
+            if(extensionIsEmpty)
+            {
+                continue;
+            }
+
+            // Check for supported extensions
+            std::vector<std::filesystem::path> validExtensions =
+                                                       {
+                                                              ".material"
+                                                            , ".materialinstance"
+                                                            , ".gltf"
+                                                       };
+            if(validExtensions.end() == std::find(validExtensions.begin(), validExtensions.end(), extension))
+            {
+                continue;
+            }
+
+            std::filesystem::path const relativePath = std::filesystem::relative(file.path().lexically_normal());
+            filesToProcess.push_back(relativePath);
+        }
+
+        //
+        // Make sure to properly prepend the include paths
+        //
+        includePaths.push_back(std::filesystem::path("materials/include"));
+        for(auto &includePath : includePaths)
+        {
+            includePath = std::filesystem::current_path()/inputPath/includePath;
+        }
+
+        SConfiguration config {};
+        config.options             = options;
+        config.inputPath           = inputPath .lexically_normal();
+        config.outputPath          = outputPath.lexically_normal();
+        config.includePaths        = includePaths;
+        config.filesToProcess      = filesToProcess;
+        // config.indexFile           = index;
+        // config.inputPaths          = inputFiles;
+        // config.moduleOutputPath    = outputModulePath       .lexically_normal();
+        // config.indexOutputFile     = outputIndexPath        .lexically_normal();
+        // config.signatureOutputFile = outputSignaturePath    .lexically_normal();
+        // config.configOutputFile    = outputConfigurationPath.lexically_normal();
+//
+        // config.indexFile.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
+        // config.indexFile.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
+
+        mConfig = config;
+
+        return EResult::Success;
+    }
+/*
+    static void foo()
+    {
         auto const checkExtensionIsValid = [] (std::filesystem::path const &aPath, std::filesystem::path const &aExtension) -> bool
         {
             std::filesystem::path const &extension = aPath.extension();
@@ -291,13 +369,6 @@ public_methods:
         checkPathExists(outputSignaturePathAbsolute);
         checkPathExists(outputConfigurationPathAbsolute);
 
-        //
-        // Make sure to properly prepend the include paths
-        //
-        for(auto &includePath : includePaths)
-        {
-            includePath = std::filesystem::current_path()/inputPath/includePath;
-        }
 
         std::filesystem::path const indexFilePath       = (std::filesystem::current_path()/inputPath/inputIndexPath).lexically_normal();
         std::filesystem::path const indexFileParentPath = (std::filesystem::current_path()/inputPath/indexFilePath.parent_path()).lexically_normal();
@@ -328,44 +399,89 @@ public_methods:
                 inputFiles.push_back(std::filesystem::current_path()/inputPath/indexFileParentPath/pathReferences.glslSourceFilename);
             }
         }
-
-        SConfiguration config {};
-        config.options             = options;
-        config.inputPath           = inputPath              .lexically_normal();
-        config.outputPath          = outputPath             .lexically_normal();
-        config.indexFile           = index;
-        config.inputPaths          = inputFiles;
-        config.includePaths        = includePaths;
-        config.moduleOutputPath    = outputModulePath       .lexically_normal();
-        config.indexOutputFile     = outputIndexPath        .lexically_normal();
-        config.signatureOutputFile = outputSignaturePath    .lexically_normal();
-        config.configOutputFile    = outputConfigurationPath.lexically_normal();
-
-        config.indexFile.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
-        config.indexFile.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
-
-        mConfig = config;
-
-        return EResult::Success;
     }
-
-    /**
-     * Run the shader precompiler on the identified input items.
-     *
-     * @return EResult::Success      if successful.
-     * @return EResult::InputInvalid on error.
-     */
-    CResult<EResult> run()
+*/
+    CResult<EResult> processMaterial(std::filesystem::path const &aMaterialFile)
     {
+        std::filesystem::path const &materialPathAbs  = std::filesystem::current_path() / aMaterialFile;
+        std::filesystem::path const &parentPath       = std::filesystem::relative(aMaterialFile, mConfig.inputPath).parent_path();
+        std::filesystem::path const &materialID       = aMaterialFile.stem();
+
+        // Make sure the output config is correct.
+        std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / mConfig.outputPath / parentPath)               .lexically_normal();
+        std::filesystem::path const outputModulePathAbsolute        = (outputPathAbsolute / "modules")                                                  .lexically_normal();
+        std::filesystem::path const outputIndexPathAbsolute         = (outputPathAbsolute / (std::filesystem::path(materialID.string() + ".instance"))) .lexically_normal();
+        std::filesystem::path const outputSignaturePathAbsolute     = (outputPathAbsolute / (std::filesystem::path(materialID.string() + ".signature"))).lexically_normal();
+        std::filesystem::path const outputConfigurationPathAbsolute = (outputPathAbsolute / (std::filesystem::path(materialID.string() + ".config")))   .lexically_normal();
+
+        auto const checkPathExists = [] (std::filesystem::path const &aPath) -> void
+        {
+            std::filesystem::path path = aPath;
+
+            bool const pathExists = std::filesystem::exists(path);
+            if(not pathExists)
+            {
+                bool const pathIsFile = not std::filesystem::is_directory(path);
+                if(pathIsFile)
+                {
+                    path = aPath.parent_path();
+                }
+
+                try
+                {
+                    bool const created = std::filesystem::create_directories(path);
+                    if(not created)
+                    {
+                        CLog::Error(logTag(), "Can't create directory '%0'", path);
+                    }
+                }
+                catch(std::filesystem::filesystem_error fserr)
+                {
+                    CLog::Error(logTag(), "Cant create directory '%0'. Error: %1", path, fserr.what());
+                }
+            }
+        };
+
+        checkPathExists(outputPathAbsolute);
+        checkPathExists(outputModulePathAbsolute);
+        checkPathExists(outputIndexPathAbsolute);
+        checkPathExists(outputSignaturePathAbsolute);
+        checkPathExists(outputConfigurationPathAbsolute);
+
+        std::string const indexFileContents = readFile(materialPathAbs);
+
+        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
+        indexDeserializer->initialize();
+
+        auto [success, index] = indexDeserializer->deserialize(indexFileContents);
+        if(not success)
+        {
+            CLog::Error(logTag(), "Could not deserialize material index file.");
+            return false;
+        }
+
+        indexDeserializer->deinitialize();
+
+        std::vector<std::filesystem::path> inputFiles {};
+
+        // TODO: Refactor this disgusting result access and the polymorphism...
+        SMaterialMasterIndex indexData = *static_cast<SMaterialMasterIndex const *>(&(index->asT().data()));
+
+        for(auto const &[stage, pathReferences] : indexData.stages)
+        {
+            if(not pathReferences.glslSourceFilename.empty())
+            {
+                inputFiles.push_back(mConfig.inputPath / parentPath / pathReferences.glslSourceFilename);
+            }
+        }
+
         // Determine compilation items and config.
-        CResult<SShaderCompilationUnit> const unitGeneration = generateCompilationUnit(mConfig.inputPaths);
-        if(not unitGeneration.successful())
+        auto [generationSuccessful, unit] = generateCompilationUnit(inputFiles, outputModulePathAbsolute, indexData);
+        if(not generationSuccessful)
         {
             CLog::Error(logTag(), "Failed to derive shader compilation units and configuration");
             return EResult::InputInvalid;
         }
-
-        SShaderCompilationUnit unit = unitGeneration.data();
 
         CResult<EResult> const glslangResult = runGlslang(mConfig, unit, true);
         if(not glslangResult.successful())
@@ -384,14 +500,14 @@ public_methods:
         std::string serializedData = {};
 
         // Rewrite index
-        CResult<EResult> const indexSerializationResult = serializeMaterialIndex(mConfig.indexFile, serializedData);
+        CResult<EResult> const indexSerializationResult = serializeMaterialIndex(indexData, serializedData);
         if(not indexSerializationResult.successful())
         {
             CLog::Error(logTag(), "Failed to serialize index data.");
             return EResult::SerializationFailed;
         }
 
-        writeFile(std::filesystem::current_path()/mConfig.outputPath/mConfig.indexOutputFile, serializedData);
+        writeFile(outputIndexPathAbsolute, serializedData);
 
         CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
         if(not signatureSerializationResult.successful())
@@ -400,7 +516,7 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(std::filesystem::current_path()/mConfig.outputPath/mConfig.signatureOutputFile, serializedData);
+        writeFile(outputSignaturePathAbsolute, serializedData);
 
         CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data());
         CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);
@@ -410,23 +526,41 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(std::filesystem::current_path()/mConfig.outputPath/mConfig.configOutputFile, serializedData);
+        writeFile(outputConfigurationPathAbsolute, serializedData);
 
-        //
-        // Copy dependencies
-        //
+        return EResult::Success;
+    }
 
+    /**
+     * Run the shader precompiler on the identified input items.
+     *
+     * @return EResult::Success      if successful.
+     * @return EResult::InputInvalid on error.
+     */
+    CResult<EResult> run()
+    {
+        for(auto const &file : mConfig.filesToProcess)
+        {
+            std::filesystem::path const extension = file.extension();
+            if(".material" == extension)
+            {
+                auto const &[result, code] = processMaterial(file);
+                if(EResult::Success != code)
+                {
+                    CLog::Error(logTag(), "Failed to process material file w/ name %0", file.string());
+                    continue;
+                }
+            }
+            else if(".gltf" == extension)
+            {
 
-        // CStdSharedPtr_t<CMaterialDeserializer::IResult> result1 = nullptr;
-        //
-        // CStdUniquePtr_t<IMaterialDeserializer> deserializer = makeCStdUniquePtr<CMaterialDeserializer>();
-        // bool const initialized1   = deserializer->initialize();
-        // bool const deserialized    = deserializer->deserialize(str, result1);
-        //
-        // CStdSharedPtr_t<SMaterial> mat{};
-        // bool const fetched1 = result1->asT(mat);
-        //
-        // bool const deinitialized1 = deserializer->deinitialize();
+            }
+            else
+            {
+                continue; // ...
+            }
+        }
+
 
         return EResult::Success;
     }
@@ -640,12 +774,14 @@ private_methods:
      * @param aOptions
      * @return
      */
-    CResult<SShaderCompilationUnit> generateCompilationUnit(std::vector<std::filesystem::path> const &aFilenames)
+    CResult<SShaderCompilationUnit> generateCompilationUnit(  std::vector<std::filesystem::path> const &aFilenames
+                                                            , std::filesystem::path              const &aModuleOutputPath
+                                                            , SMaterialMasterIndex                     &aInOutIndex)
     {
         EShaderCompiler  compiler = EShaderCompiler::Unknown;
         EShadingLanguage language = EShadingLanguage::Unknown;
 
-        auto const deriveElement = [&compiler, this] (std::string const &aFilename) -> SShaderCompilationElement
+        auto const deriveElement = [&, this] (std::string const &aFilename) -> SShaderCompilationElement
         {
             std::string shaderString = readFile(aFilename);
             if(shaderString.empty())
@@ -674,17 +810,17 @@ private_methods:
             }
 
             std::string           const outputName = getOutputFilename(std::filesystem::path(aFilename).stem(), language, stage);
-            std::filesystem::path const outputPath = std::filesystem::current_path() / mConfig.outputPath / mConfig.moduleOutputPath / outputName;
+            std::filesystem::path const outputPath = (aModuleOutputPath / outputName);
 
             SShaderCompilationElement element {};
             element.fileName           = aFilename;
             element.contents           = shaderString;
             element.stage              = stage;
             element.outputPathAbsolute = outputPath;
-            element.outputPathRelative = "./" + std::string(mConfig.moduleOutputPath / outputName);
+            element.outputPathRelative = std::filesystem::relative(outputPath, (std::filesystem::current_path() / mConfig.outputPath));
 
             std::string const path = element.outputPathRelative;
-            mConfig.indexFile.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
+            aInOutIndex.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
 
             return element;
         };
@@ -818,7 +954,7 @@ private_methods:
      */
     CResult<EResult> serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData)
     {
-        using namespace shader_precompiler::serialization;
+        using namespace resource_compiler::serialization;
 
         CStdUniquePtr_t<IJSONSerializer<SMaterialMasterIndex>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialMasterIndex>>();
         bool const initialized = serializer->initialize();
@@ -857,7 +993,7 @@ private_methods:
      */
     CResult<EResult> serializeMaterialSignature(SMaterialSignature const &aMaterial, std::string &aOutSerializedData)
     {
-        using namespace shader_precompiler::serialization;
+        using namespace resource_compiler::serialization;
 
         CStdUniquePtr_t<IJSONSerializer<SMaterialSignature>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialSignature>>();
         bool const initialized = serializer->initialize();
@@ -895,7 +1031,7 @@ private_methods:
      */
     CResult<EResult> serializeMaterialConfig(CMaterialConfig const &aMaterialConfig, std::string &aOutSerializedData)
     {
-        using namespace shader_precompiler::serialization;
+        using namespace resource_compiler::serialization;
 
         CStdUniquePtr_t<IJSONSerializer<CMaterialConfig>> serializer = makeCStdUniquePtr<CJSONSerializer<CMaterialConfig>>();
         bool const initialized = serializer->initialize();
@@ -957,7 +1093,7 @@ int main(int aArgC, char **aArgV)
         std::filesystem::path exec_dir = std::filesystem::current_path();
         CLog::Error(logTag(), exec_dir);
 
-        std::shared_ptr<CPrecompiler> precompiler = std::make_shared<CPrecompiler>();
+        std::shared_ptr<CCompiler> precompiler = std::make_shared<CCompiler>();
 
         // Read all shader-files and convert them to spirv.
         // Then go for SPIRV-cross, perform reflection and generate headers

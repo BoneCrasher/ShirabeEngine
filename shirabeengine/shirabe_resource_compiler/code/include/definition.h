@@ -1,5 +1,5 @@
-#ifndef   _SHIRABE_SHADERPRECOMP_DEFINITION_H_
-#define   _SHIRABE_SHADERPRECOMP_DEFINITION_H_
+#ifndef   _SHIRABE_RESOURCECOMP_DEFINITION_H_
+#define   _SHIRABE_RESOURCECOMP_DEFINITION_H_
 
 #include <string>
 #include <vector>
@@ -14,7 +14,7 @@ static constexpr bool const OPTIMIZATION_ENABLED = true;
 static constexpr bool const OPTIMIZATION_ENABLED = false;
 #endif
 
-namespace shader_precompiler
+namespace resource_compiler
 {
     SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
 

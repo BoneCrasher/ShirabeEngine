@@ -3,7 +3,7 @@
 THIS=$(pwd -P)
 
 RESOURCES_ROOT_DIR="."
-PRECOMPILER_PATH="shirabe_shader_precompiler_x64d"
+PRECOMPILER_PATH="shirabe_resource_compiler_x64d"
 
 function usage
 {
@@ -63,14 +63,8 @@ read_arguments $@
 #
 ./${PRECOMPILER_PATH}                              \
     --verbose --debug --optimize                   \
-    -I=./shaders/include                           \
-    -id=./data/input/resources                     \
-    -od=./data/output/resources                    \
-    -om=./shaders/standard                         \
-    -oi=./shaders/standard/standard.mat.index      \
-    -os=./shaders/standard/standard.mat.signature  \
-    -oc=./shaders/standard/standard.mat.config     \
-    -i=./shaders/standard/standard.mat.index
+    -i=./data/input/resources                      \
+    -o=./data/output/resources                  
                                                        
 # 
 # Copy all non-generated files

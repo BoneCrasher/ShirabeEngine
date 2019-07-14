@@ -6,7 +6,7 @@
 #include <core/helpers.h>
 #include "extraction.h"
 
-namespace shader_precompiler
+namespace resource_compiler
 {
     //<-----------------------------------------------------------------------------
     //

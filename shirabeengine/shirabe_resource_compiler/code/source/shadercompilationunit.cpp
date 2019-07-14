@@ -1,6 +1,6 @@
 #include "shadercompilationunit.h"
 
-namespace shader_precompiler
+namespace resource_compiler
 {
     using serialization::IJSONSerializer;
 

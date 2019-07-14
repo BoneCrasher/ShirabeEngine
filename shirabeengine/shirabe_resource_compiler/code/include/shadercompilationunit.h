@@ -1,12 +1,12 @@
-#ifndef _SHIRABE_SHADERPRECOMP_COMPILATIONUNIT_H_
-#define _SHIRABE_SHADERPRECOMP_COMPILATIONUNIT_H_
+#ifndef _SHIRABE_RESOURCECOMP_COMPILATIONUNIT_H_
+#define _SHIRABE_RESOURCECOMP_COMPILATIONUNIT_H_
 
 #include <core/serialization/serialization.h>
 #include <material/material_declaration.h>
 
 #include "definition.h"
 
-namespace shader_precompiler
+namespace resource_compiler
 {
     using namespace engine::material;
 
