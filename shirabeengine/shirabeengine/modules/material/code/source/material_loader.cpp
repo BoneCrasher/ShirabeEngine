@@ -181,7 +181,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
+        CEngineResult<CStdSharedPtr_t<CMaterialMaster>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
         {
             CEngineResult<ByteBuffer> data = {};
 
@@ -194,40 +194,40 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            auto const [instanceIndexAssetFetchResult, instanceIndexAsset] = mStorage->loadAsset(instanceIndexAssetId);
-            {
-                PrintEngineError(instanceIndexAssetFetchResult, logTag(), "Couldn't fetch material instance index asset.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(instanceIndexAssetFetchResult);
-            }
+            // auto const [instanceIndexAssetFetchResult, instanceIndexAsset] = mStorage->loadAsset(instanceIndexAssetId);
+            // {
+            //     PrintEngineError(instanceIndexAssetFetchResult, logTag(), "Couldn't fetch material instance index asset.");
+            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceIndexAssetFetchResult);
+            // }
 
-            auto const [instanceIndexFetchResult, instanceIndex] = readMaterialInstanceIndexFile(logTag(), mStorage.get(), instanceIndexAssetId);
-            {
-                PrintEngineError(instanceIndexFetchResult, logTag(), "Couldn't fetch material instance index for ID %0", instanceIndexAssetId);
-                SHIRABE_RETURN_RESULT_ON_ERROR(instanceIndexFetchResult);
-            }
-
-            auto const [instanceConfigAssetFetchResult, instanceConfigAsset] = mStorage->loadAsset(instanceIndex.configurationAssetId);
-            {
-                PrintEngineError(instanceConfigAssetFetchResult, logTag(), "Couldn't fetch instance config asset for ID %0.", instanceIndex.configurationAssetId);
-                SHIRABE_RETURN_RESULT_ON_ERROR(instanceConfigAssetFetchResult);
-            }
-
-            auto [instanceConfigFetchResult, instanceConfig] = readMaterialConfig(logTag(), mStorage.get(), instanceConfigAsset.id);
-            {
-                PrintEngineError(instanceConfigFetchResult, logTag(), "Couldn't fetch instance config for ID %0.", instanceConfigAsset.id);
-                SHIRABE_RETURN_RESULT_ON_ERROR(instanceConfigFetchResult);
-            }
-
-            std::string const  instanceName = instanceIndex.name;
+            // auto const [instanceIndexFetchResult, instanceIndex] = readMaterialInstanceIndexFile(logTag(), mStorage.get(), instanceIndexAssetId);
+            // {
+            //     PrintEngineError(instanceIndexFetchResult, logTag(), "Couldn't fetch material instance index for ID %0", instanceIndexAssetId);
+            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceIndexFetchResult);
+            // }
+//
+            // auto const [instanceConfigAssetFetchResult, instanceConfigAsset] = mStorage->loadAsset(instanceIndex.configurationAssetId);
+            // {
+            //     PrintEngineError(instanceConfigAssetFetchResult, logTag(), "Couldn't fetch instance config asset for ID %0.", instanceIndex.configurationAssetId);
+            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceConfigAssetFetchResult);
+            // }
+//
+            // auto [instanceConfigFetchResult, instanceConfig] = readMaterialConfig(logTag(), mStorage.get(), instanceConfigAsset.id);
+            // {
+            //     PrintEngineError(instanceConfigFetchResult, logTag(), "Couldn't fetch instance config for ID %0.", instanceConfigAsset.id);
+            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceConfigFetchResult);
+            // }
+//
+            // std::string const  instanceName = instanceIndex.name;
 
             //--------------------------------------------------------------------------------------------------------------------
             // Fetch master data
             //--------------------------------------------------------------------------------------------------------------------
-            AssetID_t masterIndexId = instanceIndexAsset.parent;
-            if(0_uid == masterIndexId)
-            {
-                return { EEngineStatus::Error };
-            }
+            AssetID_t masterIndexId = aMaterialInstanceAssetId; // instanceIndexAsset.parent;
+            // if(0_uid == masterIndexId)
+            // {
+            //     return { EEngineStatus::Error };
+            // }
 
             auto [successful, masterName, masterIndex, masterSignature, masterConfig] = loadMasterMaterial(logTag(), mStorage, mInstantiatedMaterialMasters, masterIndexId);
             {
@@ -238,18 +238,18 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Override instance with master config.
             //--------------------------------------------------------------------------------------------------------------------
-            instanceConfig.override(masterConfig);
+            // instanceConfig.override(masterConfig);
 
             //--------------------------------------------------------------------------------------------------------------------
             // Create Material instance
             //--------------------------------------------------------------------------------------------------------------------
-            CStdSharedPtr_t<CMaterialMaster>   master   = makeCStdSharedPtr<CMaterialMaster>  (masterIndexId,        masterName,   std::move(masterSignature), std::move(masterConfig));
-            CStdSharedPtr_t<CMaterialInstance> instance = makeCStdSharedPtr<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
+            CStdSharedPtr_t<CMaterialMaster> master = makeCStdSharedPtr<CMaterialMaster>  (masterIndexId, masterName,   std::move(masterSignature), std::move(masterConfig));
+            // CStdSharedPtr_t<CMaterialInstance> instance = makeCStdSharedPtr<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
 
             mInstantiatedMaterialMasters  [master->getAssetId()]   = master;
-            mInstantiatedMaterialInstances[instance->getAssetId()] = instance;
+            // mInstantiatedMaterialInstances[instance->getAssetId()] = instance;
 
-            return { EEngineStatus::Ok, instance };
+            return { EEngineStatus::Ok, master };
         }
         //<-----------------------------------------------------------------------------
 

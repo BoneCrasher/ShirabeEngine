@@ -61,4 +61,43 @@ namespace engine
         return EAssetSubtype::Undefined;
     }
     //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <>
+    std::string to_string<asset::EAssetType>(asset::EAssetType const &aInput)
+    {
+        using namespace asset;
+
+        switch(aInput)
+        {
+            case EAssetType::Mesh:     return "Mesh";
+            case EAssetType::Material: return "Material";
+            case EAssetType::Texture:  return "Texture";
+            case EAssetType::Buffer:   return "Buffer";
+            default:                   return "Invalid";
+        }
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <>
+    std::string to_string<asset::EAssetSubtype>(asset::EAssetSubtype const &aInput)
+    {
+        using namespace asset;
+
+        switch(aInput)
+        {
+            case EAssetSubtype::Master:    return "Master";
+            case EAssetSubtype::Signature: return "Signature";
+            case EAssetSubtype::Config:    return "Config";
+            case EAssetSubtype::SPVModule: return "SPVModule";
+            case EAssetSubtype::Instance:  return "Instance";
+            default:                       return "Invalid";
+        }
+    }
+    //<-----------------------------------------------------------------------------
 }

@@ -13,6 +13,7 @@
 #include <memory>
 #include <thread>
 #include <functional>
+#include <sstream>
 
 #include <platform/platform.h>
 
@@ -408,11 +409,16 @@ public_methods:
         std::filesystem::path const &materialID       = aMaterialFile.stem();
 
         // Make sure the output config is correct.
-        std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / mConfig.outputPath / parentPath)               .lexically_normal();
-        std::filesystem::path const outputModulePathAbsolute        = (outputPathAbsolute / "modules")                                                  .lexically_normal();
-        std::filesystem::path const outputIndexPathAbsolute         = (outputPathAbsolute / (std::filesystem::path(materialID.string() + ".instance"))) .lexically_normal();
-        std::filesystem::path const outputSignaturePathAbsolute     = (outputPathAbsolute / (std::filesystem::path(materialID.string() + ".signature"))).lexically_normal();
-        std::filesystem::path const outputConfigurationPathAbsolute = (outputPathAbsolute / (std::filesystem::path(materialID.string() + ".config")))   .lexically_normal();
+        std::filesystem::path const outputPath                      = ( parentPath)                                                              .lexically_normal();
+        std::filesystem::path const outputModulePath                = ( parentPath / "modules")                                                  .lexically_normal();
+        std::filesystem::path const outputIndexPath                 = ( parentPath / (std::filesystem::path(materialID.string() + ".instance"))) .lexically_normal();
+        std::filesystem::path const outputSignaturePath             = ( parentPath / (std::filesystem::path(materialID.string() + ".signature"))).lexically_normal();
+        std::filesystem::path const outputConfigurationPath         = ( parentPath / (std::filesystem::path(materialID.string() + ".config")))   .lexically_normal();
+        std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / mConfig.outputPath / outputPath             ).lexically_normal();
+        std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / mConfig.outputPath / outputModulePath       ).lexically_normal();
+        std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / mConfig.outputPath / outputIndexPath        ).lexically_normal();
+        std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / mConfig.outputPath / outputSignaturePath    ).lexically_normal();
+        std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / mConfig.outputPath / outputConfigurationPath).lexically_normal();
 
         auto const checkPathExists = [] (std::filesystem::path const &aPath) -> void
         {
@@ -464,8 +470,9 @@ public_methods:
 
         std::vector<std::filesystem::path> inputFiles {};
 
-        // TODO: Refactor this disgusting result access and the polymorphism...
         SMaterialMasterIndex indexData = *static_cast<SMaterialMasterIndex const *>(&(index->asT().data()));
+        indexData.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
+        indexData.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
 
         for(auto const &[stage, pathReferences] : indexData.stages)
         {
@@ -551,6 +558,15 @@ public_methods:
                     continue;
                 }
             }
+            else if(".materialinstance" == extension)
+            {
+                // auto const &[result, code] = processMaterialInstance(file);
+                // if(EResult::Success != code)
+                // {
+                //     CLog::Error(logTag(), "Failed to process material instance w/ name %0", file.string());
+                //     continue;
+                // }
+            }
             else if(".gltf" == extension)
             {
 
@@ -561,6 +577,62 @@ public_methods:
             }
         }
 
+        // Regenerate asset index...
+        std::vector<asset::SAsset> processedAssets {};
+        auto const processedFilesIterator = std::filesystem::recursive_directory_iterator(mConfig.outputPath);
+        for(auto const &file : processedFilesIterator)
+        {
+            std::filesystem::path const filePath  = file.path();
+            std::filesystem::path const extension = filePath.extension();
+
+            asset::SAsset a {};
+
+            if(".instance" == extension)
+            {
+                a.type    = asset::EAssetType::Material;
+                a.subtype = asset::EAssetSubtype::Instance;
+                a.uri = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id  = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".signature" == extension)
+            {
+                a.type    = asset::EAssetType::Material;
+                a.subtype = asset::EAssetSubtype::Signature;
+                a.uri = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id  = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".config" == extension)
+            {
+                a.type    = asset::EAssetType::Material;
+                a.subtype = asset::EAssetSubtype::Config;
+                a.uri = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id  = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".spv" == extension)
+            {
+                a.type    = asset::EAssetType::Material;
+                a.subtype = asset::EAssetSubtype::SPVModule;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+        }
+
+        std::stringstream ss;
+        ss << "<Index>\n";
+        for(auto const &a : processedAssets)
+        {
+            ss << CString::format("<Asset aid=\"%0\" parent_aid=\"0\" type=\"%1\" subtype=\"%2\" uri=\"%3\"></Asset>\n"
+                                  , a.id
+                                  , to_string<asset::EAssetType>(a.type)
+                                  , to_string<asset::EAssetSubtype>(a.subtype)
+                                  , a.uri.string());
+        }
+        ss << "</Index>";
+        writeFile(mConfig.outputPath / "game.assetindex.xml", ss.str());
 
         return EResult::Success;
     }

@@ -51,7 +51,7 @@ namespace engine
              * @param aMaterialId
              * @return
              */
-            CEngineResult <CStdSharedPtr_t<CMaterialInstance>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
+            CEngineResult <CStdSharedPtr_t<CMaterialMaster>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
 
             /**
              * @brief destroyMaterialInstance

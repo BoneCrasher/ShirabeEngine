@@ -772,7 +772,7 @@ namespace engine
                 return { result };
             }
 
-            CStdSharedPtr_t<CMaterialMaster> const &master    = instance->master();
+            CStdSharedPtr_t<CMaterialMaster> const &master    = instance; // instance->master();
             SMaterialSignature               const &signature = master  ->signature();
             CMaterialConfig                  const &config    = instance->config();
 
