@@ -47,11 +47,8 @@ namespace engine
             SHADER_PS             = 305,
             SHADER_CS             = 306,
             SHADER_FX             = 307, // Effects11 .fx-file
-            BUFFER_CONSTANT       = 401,
-            BUFFER_TEXTURE        = 402,
-            BUFFER_STRUCTURED     = 403,
-            BUFFER_VERTEX         = 404,
-            BUFFER_INDEX          = 405,
+            BUFFER                = 401,
+            BUFFERVIEW            = 406,
             DEVICE                = 501,
             DEVICE_CONTEXT        = 502,
             SWAP_CHAIN            = 503,

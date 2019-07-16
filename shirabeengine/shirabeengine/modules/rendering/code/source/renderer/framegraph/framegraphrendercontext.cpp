@@ -1,5 +1,9 @@
 #include <assert.h>
 
+#include <graphicsapi/resources/types/buffer.h>
+#include <graphicsapi/resources/types/bufferview.h>
+#include <graphicsapi/resources/types/texture.h.h>
+#include <graphicsapi/resources/types/textureview.h.h>
 #include <graphicsapi/resources/types/renderpass.h>
 #include <graphicsapi/resources/types/framebuffer.h>
 #include <graphicsapi/resources/types/pipeline.h>
@@ -651,26 +655,40 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::createBuffer(
-                FrameGraphResourceId_t const &aResourceId,
-                SFrameGraphResource    const &aResource,
-                SFrameGraphBuffer      const &aBuffer)
+        CEngineResult<> CFrameGraphRenderContext::createBuffer(SFrameGraphBuffer const &aBuffer)
         {
-            SHIRABE_UNUSED(aResourceId);
-            SHIRABE_UNUSED(aResource);
-            SHIRABE_UNUSED(aBuffer);
+            CBuffer::SDescriptor desc = { };
+            desc.name = aBuffer.readableName;
 
-            return EEngineStatus::Ok;
+            VkBufferCreateInfo &createInfo = desc.createInfo;
+            createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            createInfo.pNext                 = nullptr;
+            createInfo.flags                 = 0;
+            createInfo.usage                 = aBuffer.bufferUsage;
+            createInfo.size                  = aBuffer.sizeInBytes;
+            // Determined in backend
+            // createInfo.sharingMode           = ...;
+            // createInfo.queueFamilyIndexCount = ...;
+            // createInfo.pQueueFamilyIndices   = ...;
+
+            CBuffer::CCreationRequest const request(desc);
+
+            CEngineResult<> status = mResourceManager->createResource<CBuffer>(request, aBuffer.readableName, false);
+            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create buffer.");
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::destroyBuffer(FrameGraphResourceId_t const &aResourceId)
+        CEngineResult<> CFrameGraphRenderContext::destroyBuffer(SFrameGraphBuffer const &aBuffer)
         {
-            SHIRABE_UNUSED(aResourceId);
-            return EEngineStatus::Ok;
+            CEngineResult<> status = EEngineStatus::Ok;
+            status = mResourceManager->destroyResource<CBuffer>(aBuffer.readableName);
+
+            return status;
         }
         //<-----------------------------------------------------------------------------
 
@@ -678,14 +696,36 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::createBufferView(
-                FrameGraphResourceId_t const &aResourceId,
-                SFrameGraphResource    const &aResource,
+                SFrameGraphBuffer      const &aBuffer,
                 SFrameGraphBufferView  const &aBufferView)
         {
-            SHIRABE_UNUSED(aResourceId);
-            SHIRABE_UNUSED(aResource);
+            CBufferView::SDescriptor desc = { };
+            desc.name = aBuffer.readableName;
+
+            VkBufferViewCreateInfo &createInfo = desc.createInfo;
+            createInfo.sType  = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+            createInfo.pNext  = nullptr;
+            createInfo.flags  = 0;
+            // createInfo.offset = "...";
+            // createInfo.buffer = "...";
+            // createInfo.format = "...";
+            // createInfo.range  = "...";
+
+            CBufferView::CCreationRequest const request(desc, aBuffer.readableName);
+
+            CEngineResult<> status = mResourceManager->createResource<CBufferView>(request, aBufferView.readableName, false);
+            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create buffer view.");
+
+            return status;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::bindBufferView(SFrameGraphBufferView  const &aBufferView)
+        {
             SHIRABE_UNUSED(aBufferView);
-
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -693,9 +733,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t  const &aResourceId)
+        CEngineResult<> CFrameGraphRenderContext::unbindBufferView(SFrameGraphBufferView const &aBufferView)
         {
-            SHIRABE_UNUSED(aResourceId);
+            SHIRABE_UNUSED(aBufferView);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -703,19 +743,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId)
+        CEngineResult<> CFrameGraphRenderContext::destroyBufferView(SFrameGraphBufferView const &aBufferView)
         {
-            SHIRABE_UNUSED(aResourceId);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::destroyBufferView(FrameGraphResourceId_t const &aResourceId)
-        {
-            SHIRABE_UNUSED(aResourceId);
+            SHIRABE_UNUSED(aBufferView);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -959,6 +989,8 @@ namespace engine
                 layoutBinding.descriptorCount    = 1;
                 layoutBinding.pImmutableSamplers = nullptr;
                 pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
+
+                // TODO: Arrays?
             }
 
             for(SSampledImage const &sampledImage : signature.sampledImages)

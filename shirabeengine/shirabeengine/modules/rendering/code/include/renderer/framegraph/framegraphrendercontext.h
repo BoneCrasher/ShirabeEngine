@@ -63,14 +63,14 @@ namespace engine
              *
              * @return EEngineStatus::Ok, if successful.
              */
-            CEngineResult<> beginPass();
+            CEngineResult<> beginPass() override;
 
             /**
              * End a pass.
              *
              * @return EEngineStatus::Ok, if successful.
              */
-            CEngineResult<> endPass();
+            CEngineResult<> endPass() override;
 
             /**
              * Copy the content of one image to another.
@@ -81,7 +81,7 @@ namespace engine
              * @return             EEngineStatus::Error otherwise.
              */
             CEngineResult<> copyImage(SFrameGraphTexture const &aSourceTexture,
-                                      SFrameGraphTexture const &aTargetTexture);
+                                      SFrameGraphTexture const &aTargetTexture) override;
 
             /**
              * Copy the content of an image to the backbuffer.
@@ -90,7 +90,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId);
+            CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId) override;
 
             /**
              * Bind a swapchain, if any, for further framegraph operations.
@@ -99,7 +99,7 @@ namespace engine
              * @return                    EEngineStatus::Ok if successful.
              * @return                    EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindSwapChain(std::string const &aSwapChainId);
+            CEngineResult<> bindSwapChain(std::string const &aSwapChainId) override;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
@@ -107,7 +107,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            CEngineResult<> present();
+            CEngineResult<> present() override;
 
             /**
              * Put the internal command buffer into recording state.
@@ -115,7 +115,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            CEngineResult<> beginCommandBuffer();
+            CEngineResult<> beginCommandBuffer() override;
 
             /**
              * Put the internal command buffer into non-recording state.
@@ -123,7 +123,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            CEngineResult<> commitCommandBuffer();
+            CEngineResult<> commitCommandBuffer() override;
 
             /**
              * Create a framebuffer and render pass including subpasses for the provided attachment info.
@@ -139,7 +139,7 @@ namespace engine
                     std::string                     const &aFrameBufferId,
                     std::string                     const &aRenderPassId,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
-                    CFrameGraphMutableResources     const &aFrameGraphResources);
+                    CFrameGraphMutableResources     const &aFrameGraphResources) override;
 
             /**
              * Bind the framebuffer and render pass in the command buffer.
@@ -151,7 +151,7 @@ namespace engine
              * @return               EEngineStatus::Error otherwise.
              */
             CEngineResult<> bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                         std::string const &aRenderPassId);
+                                                         std::string const &aRenderPassId) override;
 
             /**
              * Unbind the framebuffer and render pass in the command buffer.
@@ -163,7 +163,7 @@ namespace engine
              * @return               EEngineStatus::Error otherwise.
              */
             CEngineResult<> unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                           std::string const &aRenderPassId);
+                                                           std::string const &aRenderPassId) override;
 
             /**
              * Destroy the frame buffer and render pass identified by the arguments' UIDs.
@@ -175,7 +175,7 @@ namespace engine
              */
             CEngineResult<> destroyFrameBufferAndRenderPass(
                     std::string                     const &aFrameBufferId,
-                    std::string                     const &aRenderPassId);
+                    std::string                     const &aRenderPassId) override;
 
             /**
              * Load a texture asset using the asset manager into the graphics API.
@@ -184,7 +184,7 @@ namespace engine
              * @return          EEngineStatus::Ok if successful.
              * @return          EEngineStatus::Error otherwise.
              */
-            CEngineResult<> loadTextureAsset(AssetId_t const &aAssetUID);
+            CEngineResult<> loadTextureAsset(AssetId_t const &aAssetUID) override;
 
             /**
              * Unload a texture asset from the graphics API.
@@ -193,7 +193,7 @@ namespace engine
              * @return          EEngineStatus::Ok if successful.
              * @return          EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unloadTextureAsset(AssetId_t const &aAssetUID);
+            CEngineResult<> unloadTextureAsset(AssetId_t const &aAssetUID) override;
 
             /**
              * Import a texture for use with framegraph render operations.
@@ -202,7 +202,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            CEngineResult<> importTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> importTexture(SFrameGraphTexture const &aTexture) override;
 
             /**
              * Create a texture in the graphics API for use within render operations.
@@ -211,7 +211,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            CEngineResult<> createTexture(SFrameGraphTexture const &texture);
+            CEngineResult<> createTexture(SFrameGraphTexture const &texture) override;
 
             /**
              * Destroy a texture in the system.
@@ -220,7 +220,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            CEngineResult<> destroyTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> destroyTexture(SFrameGraphTexture const &aTexture) override;
 
             /**
              * Create a texture view for a precreated texture for use within render operations.
@@ -232,7 +232,7 @@ namespace engine
              */
             CEngineResult<> createTextureView(
                     SFrameGraphTexture     const &aTexture,
-                    SFrameGraphTextureView const &aView);
+                    SFrameGraphTextureView const &aView) override;
 
             /**
              * Bind a texture view to the graphics API.
@@ -241,7 +241,7 @@ namespace engine
              * @return      EEngineStatus::Ok if successful.
              * @return      EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindTextureView(SFrameGraphTextureView  const&aView);
+            CEngineResult<> bindTextureView(SFrameGraphTextureView  const&aView) override;
 
             /**
              * Unbind a texture view from the graphics API.
@@ -250,7 +250,7 @@ namespace engine
              * @return      EEngineStatus::Ok if successful.
              * @return      EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unbindTextureView( SFrameGraphTextureView const &aView);
+            CEngineResult<> unbindTextureView( SFrameGraphTextureView const &aView) override;
 
             /**
              * Destroy a texture view in the system.
@@ -259,7 +259,7 @@ namespace engine
              * @return      EEngineStatus::Ok if successful.
              * @return      EEngineStatus::Error otherwise.
              */
-            CEngineResult<> destroyTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> destroyTextureView(SFrameGraphTextureView const &aView) override;
 
             /**
              * Create a buffer in the system.
@@ -270,10 +270,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> createBuffer(
-                    FrameGraphResourceId_t const&aResourceId,
-                    SFrameGraphResource    const&aResource,
-                    SFrameGraphBuffer      const&aBuffer);
+            CEngineResult<> createBuffer(SFrameGraphBuffer const &aBuffer) override;
 
             /**
              * Load a buffer asset using the asset manager into the graphics API.
@@ -282,7 +279,7 @@ namespace engine
              * @return          EEngineStatus::Ok if successful.
              * @return          EEngineStatus::Error otherwise.
              */
-            CEngineResult<> loadBufferAsset(AssetId_t  const &aAssetUID);
+            CEngineResult<> loadBufferAsset(AssetId_t  const &aAssetUID) override;
 
             /**
              * Unload a texture asset from the graphics API.
@@ -291,7 +288,7 @@ namespace engine
              * @return          EEngineStatus::Ok if successful.
              * @return          EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unloadBufferAsset(AssetId_t const &aAssetUID);
+            CEngineResult<> unloadBufferAsset(AssetId_t const &aAssetUID) override;
 
             /**
              * Destroy a buffer in the system.
@@ -300,7 +297,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> destroyBuffer(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> destroyBuffer(SFrameGraphBuffer const &aBuffer) override;
 
             /**
              * Create a buffer view in the system.
@@ -312,9 +309,8 @@ namespace engine
              * @return            EEngineStatus::Error otherwise.
              */
             CEngineResult<> createBufferView(
-                    FrameGraphResourceId_t const&aResourceId,
-                    SFrameGraphResource    const&aResource,
-                    SFrameGraphBufferView  const&aBufferView);
+                    SFrameGraphBuffer      const &aBuffer,
+                    SFrameGraphBufferView  const &aBufferView) override;
 
             /**
              * Bind a buffer view to the graphics API.
@@ -323,7 +319,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> bindBufferView(SFrameGraphBufferView const &aResourceId) override;
 
             /**
              * Unbind a buffer view from the graphics API.
@@ -332,7 +328,7 @@ namespace engine
              * @return          EEngineStatus::Ok if successful.
              * @return          EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unbindBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> unbindBufferView(SFrameGraphBufferView const &aResourceId) override;
 
             /**
              * Destroy a buffer view in the system.
@@ -341,7 +337,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> destroyBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> destroyBufferView(SFrameGraphBufferView const &aResourceId) override;
 
             /**
              * Load a mesh asset using the asset manager into the graphics API.
@@ -350,7 +346,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> loadMeshAsset(SFrameGraphMesh const &aMesh);
+            CEngineResult<> loadMeshAsset(SFrameGraphMesh const &aMesh) override;
 
             /**
              * Unload a mesh asset from the graphics API.
@@ -359,7 +355,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unloadMeshAsset(SFrameGraphMesh const &aMesh);
+            CEngineResult<> unloadMeshAsset(SFrameGraphMesh const &aMesh) override;
 
             /**
              * Bind a mesh asset using the asset manager into the graphics API.
@@ -368,7 +364,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindMesh(SFrameGraphMesh const &aMesh);
+            CEngineResult<> bindMesh(SFrameGraphMesh const &aMesh) override;
 
             /**
              * Unbind a mesh asset from the graphics API.
@@ -377,7 +373,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unbindMesh(SFrameGraphMesh const &aMesh);
+            CEngineResult<> unbindMesh(SFrameGraphMesh const &aMesh) override;
 
             /**
              * Load a material asset using the asset manager into the graphics API.
@@ -387,7 +383,7 @@ namespace engine
              * @return            EEngineStatus::Error otherwise.
              */
              CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial,
-                                               PublicResourceId_t  const &aRenderPassHandle);
+                                               PublicResourceId_t  const &aRenderPassHandle) override;
 
              /**
              * Unload a material asset from the graphics API.
@@ -396,7 +392,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unloadMaterialAsset(SFrameGraphMaterial const &aMaterial);
+            CEngineResult<> unloadMaterialAsset(SFrameGraphMaterial const &aMaterial) override;
 
             /**
              * Bind a material asset using the asset manager into the graphics API.
@@ -405,7 +401,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindMaterial(SFrameGraphMaterial const &aMaterial);
+            CEngineResult<> bindMaterial(SFrameGraphMaterial const &aMaterial) override;
 
             /**
              * Unbind a material asset from the graphics API.
@@ -414,7 +410,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unbindMaterial(SFrameGraphMaterial const &aMaterial);
+            CEngineResult<> unbindMaterial(SFrameGraphMaterial const &aMaterial) override;
 
             /**
              * Render a renderable entity using the graphicsAPI.
@@ -425,7 +421,7 @@ namespace engine
              * @return          EEngineStatus::Error otherwise.
              */
             CEngineResult<> render(SFrameGraphMesh     const &aMesh,
-                                   SFrameGraphMaterial const &aMaterial);
+                                   SFrameGraphMaterial const &aMaterial) override;
 
         public_constructors:
             /**

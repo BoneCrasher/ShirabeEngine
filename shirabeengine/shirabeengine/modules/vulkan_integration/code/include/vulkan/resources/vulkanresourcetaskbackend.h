@@ -86,6 +86,8 @@ namespace engine
         private_methods:
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(Texture);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(TextureView);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(Buffer);
+            SHIRABE_DECLARE_TASK_BUILDER_MODULE(BufferView);
             //DeclareTaskBuilderModule(Buffer);
             //DeclareTaskBuilderModule(BufferView);
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(RenderPass);

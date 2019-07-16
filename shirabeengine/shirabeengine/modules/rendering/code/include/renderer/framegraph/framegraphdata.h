@@ -18,6 +18,7 @@
 #include <graphicsapi/resources/types/texture.h>
 #include <graphicsapi/resources/types/textureview.h>
 #include <math/geometric/rect.h>
+#include <vulkan/vulkan.h>
 #include "renderer/renderertypes.h"
 
 namespace engine
@@ -263,8 +264,8 @@ namespace engine
             SFrameGraphBuffer();
 
         public_members:
-            uint32_t elementSize;
-            uint32_t elementCount;
+            VkBufferUsageFlags bufferUsage;
+            std::size_t        sizeInBytes;
         };
 
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphBuffer, SFrameGraphBuffer);

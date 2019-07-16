@@ -23,6 +23,7 @@ set(
         SPIRVTOOLS
         CRYPTOPP
         GLSLANG
+        FXGLTF
         JSON
         XML2
         ZLIB)

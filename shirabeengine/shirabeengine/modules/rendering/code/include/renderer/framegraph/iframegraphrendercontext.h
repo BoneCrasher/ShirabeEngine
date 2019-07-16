@@ -260,16 +260,11 @@ namespace engine
             /**
              * Create a buffer in the system.
              *
-             * @param aResourceId
-             * @param aResource
              * @param aBuffer
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> createBuffer(
-                    FrameGraphResourceId_t const &aResourceId,
-                    SFrameGraphResource    const &aResource,
-                    SFrameGraphBuffer      const &aBuffer) = 0;
+            virtual CEngineResult<> createBuffer(SFrameGraphBuffer const &aBuffer) = 0;
 
             /**
              * Load a buffer asset using the asset manager into the graphics API.
@@ -296,20 +291,18 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> destroyBuffer(FrameGraphResourceId_t const &aResourceId) = 0;
+            virtual CEngineResult<> destroyBuffer(SFrameGraphBuffer const &aBuffer) = 0;
 
             /**
              * Create a buffer view in the system.
              *
-             * @param aResourceId
-             * @param aResource
+             * @param aBuffer
              * @param aBufferView
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> createBufferView(
-                    FrameGraphResourceId_t const &aResourceId,
-                    SFrameGraphResource    const &aResource,
+                    SFrameGraphBuffer      const &aBuffer,
                     SFrameGraphBufferView  const &aBufferView) = 0;
 
             /**
@@ -319,7 +312,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> bindBufferView(FrameGraphResourceId_t const &aResourceId) = 0;
+            virtual CEngineResult<> bindBufferView(SFrameGraphBufferView const &aBufferView) = 0;
 
             /**
              * Unbind a buffer view from the graphics API.
@@ -328,7 +321,7 @@ namespace engine
              * @return          EEngineStatus::Ok if successful.
              * @return          EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> unbindBufferView(FrameGraphResourceId_t  const &aResource) = 0;
+            virtual CEngineResult<> unbindBufferView(SFrameGraphBufferView  const &aBufferView) = 0;
 
             /**
              * Destroy a buffer view in the system.
@@ -337,7 +330,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> destroyBufferView(FrameGraphResourceId_t const &aResourceId) = 0;
+            virtual CEngineResult<> destroyBufferView(SFrameGraphBufferView const &aBufferView) = 0;
 
             /**
              * Load a mesh asset using the asset manager into the graphics API.

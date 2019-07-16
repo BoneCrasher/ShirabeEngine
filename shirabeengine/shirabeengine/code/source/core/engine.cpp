@@ -312,6 +312,8 @@ namespace engine
             mProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
             mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>    ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CBuffer>     (EResourceSubType::BUFFER,       SSpawnProxy<CBuffer>     ::forGFXAPIBackend(resourceBackend));
+            mProxyFactory->addCreator<CBufferView> (EResourceSubType::BUFFERVIEW,   SSpawnProxy<CBufferView> ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CRenderPass> (EResourceSubType::RENDER_PASS,  SSpawnProxy<CRenderPass> ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CFrameBuffer>(EResourceSubType::FRAME_BUFFER, SSpawnProxy<CFrameBuffer>::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CPipeline>   (EResourceSubType::PIPELINE,     SSpawnProxy<CPipeline>   ::forGFXAPIBackend(resourceBackend));

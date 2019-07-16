@@ -18,8 +18,10 @@ namespace engine
         struct SVulkanPipelineResource
         {
         public_members:
-            VkPipeline                  pipeline;
-            std::vector<VkShaderModule> shaderModules;
+            VkPipeline                   pipeline;
+            std::vector<VkShaderModule>  shaderModules;
+            VkDescriptorPool             descriptorPool;
+            std::vector<VkDescriptorSet> descriptorSets;
         };
     }
 }

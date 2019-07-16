@@ -73,6 +73,7 @@ namespace engine
                 viewPortStateCreateInfo.pScissors      = &(scissor);
 
                 std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+                std::vector<VkShaderModule>                  vkShaderModules;
 
                 for(auto const &[stage, dataAccessor] : desc.shaderStages)
                 {
@@ -112,6 +113,7 @@ namespace engine
                         CLog::Error(logTag(), "Failed to create shader module for stage %0", stage);
                         continue;
                     }
+                    vkShaderModules.push_back(vkShaderModule);
 
                     VkPipelineShaderStageCreateInfo shaderStageCreateInfo {};
                     shaderStageCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -125,7 +127,9 @@ namespace engine
                     shaderStages.push_back(shaderStageCreateInfo);
                 }
 
-                std::vector<VkDescriptorSetLayout> setLayouts {};
+                std::unordered_map<VkDescriptorType, uint32_t> typesAndSizes {};
+                std::vector<VkDescriptorSetLayout>             setLayouts    {};
+
                 for(uint32_t k=0; k<desc.descriptorSetLayoutCreateInfos.size(); ++k)
                 {
                     std::vector<VkDescriptorSetLayoutBinding> bindings = desc.descriptorSetLayoutBindings[k];
@@ -144,6 +148,62 @@ namespace engine
                         }
 
                         setLayouts.push_back(vkDescriptorSetLayout);
+                    }
+
+                    for(auto const &binding : bindings)
+                    {
+                        typesAndSizes[binding.descriptorType] += binding.descriptorCount;
+                    }
+                }
+
+                std::vector<VkDescriptorPoolSize> poolSizes {};
+                auto const addPoolSizeFn = [&poolSizes] (VkDescriptorType const &aType, std::size_t const &aSize)
+                {
+                    VkDescriptorPoolSize poolSize = {};
+                    poolSize.type            = aType;
+                    poolSize.descriptorCount = static_cast<uint32_t>(aSize);
+
+                    poolSizes.push_back(poolSize);
+                };
+
+                for(auto const &[type, size] : typesAndSizes)
+                {
+                    addPoolSizeFn(type, size);
+                }
+
+                VkDescriptorPoolCreateInfo vkDescriptorPoolCreateInfo = {};
+                vkDescriptorPoolCreateInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+                vkDescriptorPoolCreateInfo.pNext         = nullptr;
+                vkDescriptorPoolCreateInfo.flags         = 0;
+                vkDescriptorPoolCreateInfo.maxSets       = desc.descriptorSetLayoutCreateInfos.size();
+                vkDescriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
+                vkDescriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
+
+                VkDescriptorPool vkDescriptorPool = VK_NULL_HANDLE;
+                {
+                    VkResult const result = vkCreateDescriptorPool(device, &vkDescriptorPoolCreateInfo, nullptr, &vkDescriptorPool);
+                    if(VkResult::VK_SUCCESS != result)
+                    {
+                        CLog::Error(logTag(), "Could not create descriptor pool.");
+                        return { EEngineStatus::Error };
+                    }
+                }
+
+                VkDescriptorSetAllocateInfo vkDescriptorSetAllocateInfo = {};
+                vkDescriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+                vkDescriptorSetAllocateInfo.pNext              = nullptr;
+                vkDescriptorSetAllocateInfo.descriptorPool     = vkDescriptorPool;
+                vkDescriptorSetAllocateInfo.descriptorSetCount = setLayouts.size();
+                vkDescriptorSetAllocateInfo.pSetLayouts        = setLayouts.data();
+
+                std::vector<VkDescriptorSet> vkDescriptorSets {};
+                vkDescriptorSets.resize(setLayouts.size());
+                {
+                    VkResult const result = vkAllocateDescriptorSets(device, &vkDescriptorSetAllocateInfo, vkDescriptorSets.data());
+                    if(VkResult::VK_SUCCESS != result)
+                    {
+                        CLog::Error(logTag(), "Could not create descriptor sets.");
+                        return { EEngineStatus::Error };
                     }
                 }
 
@@ -200,16 +260,14 @@ namespace engine
                 }
 
                 SVulkanPipelineResource *resource = new SVulkanPipelineResource();
-                resource->pipeline = pipeline;
-
-                auto const deleter = [] (SVulkanPipelineResource const *p)
-                {
-                    delete p;
-                };
+                resource->pipeline       = pipeline;
+                resource->shaderModules  = vkShaderModules;
+                resource->descriptorPool = vkDescriptorPool;
+                resource->descriptorSets = vkDescriptorSets;
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = desc.name;
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanPipelineResource>(resource, deleter);
+                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanPipelineResource>(resource);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -262,6 +320,16 @@ namespace engine
                 }
 
                 VkDevice const &device = mVulkanEnvironment->getState().selectedLogicalDevice;
+
+                vkFreeDescriptorSets(device
+                                     , pipeline->descriptorPool
+                                     , pipeline->descriptorSets.size()
+                                     , pipeline->descriptorSets.data());
+
+                vkDestroyDescriptorPool(device
+                                        , pipeline->descriptorPool
+                                        , nullptr);
+
                 for(auto const &module : pipeline->shaderModules)
                 {
                     vkDestroyShaderModule(device, module, nullptr);
