@@ -447,8 +447,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::unbindPipeline(const engine::resources::PublicResourceId_t &aPipelineUID)
         {
-            SHIRABE_UNUSED(aPipelineUID);
-
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------

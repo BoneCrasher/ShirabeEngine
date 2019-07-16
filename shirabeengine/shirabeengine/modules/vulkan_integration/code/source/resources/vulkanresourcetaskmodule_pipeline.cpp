@@ -197,8 +197,9 @@ namespace engine
                 vkDescriptorSetAllocateInfo.pSetLayouts        = setLayouts.data();
 
                 std::vector<VkDescriptorSet> vkDescriptorSets {};
-                vkDescriptorSets.resize(setLayouts.size());
                 {
+                    vkDescriptorSets.resize(setLayouts.size());
+
                     VkResult const result = vkAllocateDescriptorSets(device, &vkDescriptorSetAllocateInfo, vkDescriptorSets.data());
                     if(VkResult::VK_SUCCESS != result)
                     {

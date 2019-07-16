@@ -276,11 +276,11 @@ namespace engine
                 //
                 // All descriptor resources need to be created and pushed to the GPU up front
                 //
-                for(auto const &bufferId : mResourceData.buffers())
-                {
-                    auto const &bufferResource = mResourceData.getMutable<SFrameGraphBuffer>(bufferId).data();
-                    aRenderContext->createBuffer(*bufferResource);
-                }
+                // for(auto const &bufferId : mResourceData.buffers())
+                // {
+                //     auto const &bufferResource = mResourceData.getMutable<SFrameGraphBuffer>(bufferId).data();
+                //     aRenderContext->createBuffer(*bufferResource);
+                // }
             }
 
             // In any case...

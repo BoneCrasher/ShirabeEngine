@@ -321,13 +321,13 @@ namespace engine
 
                     // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
                     SAttachmentDescription attachmentDesc = {};
-                    attachmentDesc.loadOp         = EAttachmentLoadOp::LOAD;
                     attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
                     attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
-                    attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
-                    attachmentDesc.format         = textureView.format;
                     attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                     attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
+                    attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::DONT_CARE : EAttachmentLoadOp::LOAD;
+                    attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
+                    attachmentDesc.format         = textureView.format;
 
                     renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
 
@@ -1037,16 +1037,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)
-        {
-            SHIRABE_UNUSED(aMaterial);
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)
         {
             auto const result = mGraphicsAPIRenderContext->bindPipeline(aMaterial.readableName);
@@ -1059,7 +1049,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
         {
-            SHIRABE_UNUSED(aMaterial);
+            auto const result = mGraphicsAPIRenderContext->unbindPipeline(aMaterial.readableName);
+            return result;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)
+        {
+            // CEngineResult<> status = mResourceManager->destroyResource<CPipeline>(aMaterial.readableName);
+            // EngineStatusPrintOnError(status.result(), logTag(), "Failed to destroy pipeline.");
+            // return status;
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
