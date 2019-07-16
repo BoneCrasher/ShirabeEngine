@@ -279,7 +279,7 @@ namespace engine
                 for(auto const &bufferId : mResourceData.buffers())
                 {
                     auto const &bufferResource = mResourceData.getMutable<SFrameGraphBuffer>(bufferId).data();
-                    aRenderContext->createBuffer(bufferResource->resourceId, *bufferResource);
+                    aRenderContext->createBuffer(*bufferResource);
                 }
             }
 

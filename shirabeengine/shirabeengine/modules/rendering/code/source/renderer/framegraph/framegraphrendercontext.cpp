@@ -2,8 +2,8 @@
 
 #include <graphicsapi/resources/types/buffer.h>
 #include <graphicsapi/resources/types/bufferview.h>
-#include <graphicsapi/resources/types/texture.h.h>
-#include <graphicsapi/resources/types/textureview.h.h>
+#include <graphicsapi/resources/types/texture.h>
+#include <graphicsapi/resources/types/textureview.h>
 #include <graphicsapi/resources/types/renderpass.h>
 #include <graphicsapi/resources/types/framebuffer.h>
 #include <graphicsapi/resources/types/pipeline.h>

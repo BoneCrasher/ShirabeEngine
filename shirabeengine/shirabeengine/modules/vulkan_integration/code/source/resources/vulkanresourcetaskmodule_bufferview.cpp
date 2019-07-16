@@ -25,7 +25,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                PublicResourceId_t const &subjacentResourceHandle = aRequest.under();
+                PublicResourceId_t const &subjacentResourceHandle = aRequest.underlyingBufferHandle();
                 CStdSharedPtr_t<void>     privateDependencyHandle = aDepencies.at(subjacentResourceHandle);
                 if(not privateDependencyHandle)
                 {

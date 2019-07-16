@@ -100,6 +100,7 @@ namespace engine
             case EFrameGraphResourceUsage::BufferResource : return "BufferResource";
             case EFrameGraphResourceUsage::BufferTarget   : return "BufferTarget";
             case EFrameGraphResourceUsage::Unused         : return "Unused";
+            default                                       : return "Unknown";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -136,8 +137,9 @@ namespace engine
     {
         switch(aState)
         {
-        case EFrameGraphResourceInitState::Undefined: return "Undefined";
-        case EFrameGraphResourceInitState::Clear:     return "Clear";
+            default:
+            case EFrameGraphResourceInitState::Undefined: return "Undefined";
+            case EFrameGraphResourceInitState::Clear:     return "Clear";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -213,8 +215,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         SFrameGraphBuffer::SFrameGraphBuffer()
             : SFrameGraphResource()
-            , elementSize(0)
-            , elementCount(0)
+            , bufferUsage(VkBufferUsageFlagBits::VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM)
+            , sizeInBytes(0)
         {}
         //<-----------------------------------------------------------------------------
 
