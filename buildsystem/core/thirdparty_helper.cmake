@@ -218,7 +218,8 @@ function(link)
             OS_LIBRARY_DIRECTORIES
                 /usr/lib
             OS_LIBRARY_LINK_TARGETS
-                stdc++_pic
+                stdc++
+                m
                 dl)
     else()
         message(STATUS "Unknown platform" " ")

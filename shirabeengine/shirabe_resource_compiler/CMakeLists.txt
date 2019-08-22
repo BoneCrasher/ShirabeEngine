@@ -21,6 +21,7 @@ set(
         SHIRABEMODULEPLATFORM
         SPIRVCROSS
         SPIRVTOOLS
+        VULKANHEADERS
         CRYPTOPP
         GLSLANG
         FXGLTF

@@ -256,7 +256,7 @@ namespace resource_compiler
             //
             // Handle entry points
             //
-            std::vector<spirv_cross::EntryPoint> entryPoints = compiler.get_entry_points_and_stages();
+            spirv_cross::SmallVector<spirv_cross::EntryPoint> entryPoints = compiler.get_entry_points_and_stages();
             auto const reflectEntryPoints = [&] (spirv_cross::EntryPoint const &aEntryPoint) -> void
             {
                 SHIRABE_UNUSED(aEntryPoint);

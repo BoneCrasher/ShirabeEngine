@@ -173,7 +173,7 @@ function setup_vulkan
     # mv vulkan_sdk _deploy
 
     setup_one vulkan_headers
-    setup_one vulkan
+    setup_one vulkan_sdk
     setup_one vulkan_sdk_validation_layers
 }
 
