@@ -360,7 +360,7 @@ namespace engine
                     bool const supportsBlockCompressedFmt = vkPhysicalDeviceFeatures.textureCompressionBC;
 
                     bool const allFeaturesSupported = (
-                                isDiscreteGPU              &&
+                                // isDiscreteGPU              &&
                                 supportsGeometryShaders    &&
                                 supportsTesselationShaders &&
                                 supportsLogicalBlendOps    &&
@@ -368,7 +368,7 @@ namespace engine
                                 supportsAnisotropicSampler &&
                                 supportsBlockCompressedFmt);
 
-                    if(!allFeaturesSupported)
+                    if(not allFeaturesSupported)
                     {
                         continue;
                     }
