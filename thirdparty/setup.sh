@@ -16,12 +16,13 @@ REPOSITORIES[stb]="git@github.com:nothings/stb.git"
 REPOSITORIES[assimp]="git@github.com:assimp/assimp.git"
 REPOSITORIES[fxgltf]="git@github.com:jessey-git/fx-gltf.git"
 REPOSITORIES[glslang]="git@github.com:KhronosGroup/glslang.git"
+REPOSITORIES[spirv_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
 REPOSITORIES[spirv_cross]="git@github.com:KhronosGroup/SPIRV-Cross.git"
 REPOSITORIES[spirv_tools]="git@github.com:KhronosGroup/SPIRV-Tools.git"
-REPOSITORIES[spirv_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
-REPOSITORIES[spirv_effcee]="git@github.com:google/effcee.git"
-REPOSITORIES[spirv_re2]="git@github.com:google/re2.git"
-REPOSITORIES[spirv_gtest]="git@github.com:google/googletest.git"
+REPOSITORIES[spirv_tools_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git"
+REPOSITORIES[spirv_tools_effcee]="git@github.com:google/effcee.git"
+REPOSITORIES[spirv_tools_re2]="git@github.com:google/re2.git"
+REPOSITORIES[spirv_tools_gtest]="git@github.com:google/googletest.git"
 REPOSITORIES[cryptopp]="git@github.com:weidai11/cryptopp.git"
 REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
 REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
@@ -38,12 +39,13 @@ TARGET_DIRECTORIES[stb]="${SOURCES_DIR}/stb"
 TARGET_DIRECTORIES[assimp]="${SOURCES_DIR}/assimp"
 TARGET_DIRECTORIES[fxgltf]="${SOURCES_DIR}/fxgltf"
 TARGET_DIRECTORIES[glslang]="${SOURCES_DIR}/glslang"
+TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/spirv_headers"
 TARGET_DIRECTORIES[spirv_cross]="${SOURCES_DIR}/spirv_cross"
 TARGET_DIRECTORIES[spirv_tools]="${SOURCES_DIR}/spirv_tools"
-TARGET_DIRECTORIES[spirv_headers]="${SOURCES_DIR}/spirv_tools/external/spirv-headers"
-TARGET_DIRECTORIES[spirv_effcee]="${SOURCES_DIR}/spirv_tools/external/effcee"
-TARGET_DIRECTORIES[spirv_re2]="${SOURCES_DIR}/spirv_tools/external/re2"
-TARGET_DIRECTORIES[spirv_gtest]="${SOURCES_DIR}/spirv_tools/external/googletest"
+TARGET_DIRECTORIES[spirv_tools_headers]="${SOURCES_DIR}/spirv_tools/external/spirv-headers"
+TARGET_DIRECTORIES[spirv_tools_effcee]="${SOURCES_DIR}/spirv_tools/external/effcee"
+TARGET_DIRECTORIES[spirv_tools_re2]="${SOURCES_DIR}/spirv_tools/external/re2"
+TARGET_DIRECTORIES[spirv_tools_gtest]="${SOURCES_DIR}/spirv_tools/external/googletest"
 TARGET_DIRECTORIES[cryptopp]="${SOURCES_DIR}/cryptopp"
 TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
 TARGET_DIRECTORIES[vulkan_sdk]="${SOURCES_DIR}/vulkan_sdk"
@@ -126,14 +128,15 @@ function setup_spirv_tools
 
     mkdir -p ${SOURCES_DIR}/SPIRV-Tools/external
 
-    setup_one spirv_headers
-    setup_one spirv_effcee
-    setup_one spirv_re2
-    setup_one spirv_gtest
+    setup_one spirv_tools_headers
+    setup_one spirv_tools_effcee
+    setup_one spirv_tools_re2
+    setup_one spirv_tools_gtest
 }
 
 function setup_spirv_cross
 {
+    setup_one spirv_headers
     setup_one spirv_cross
 }
 

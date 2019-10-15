@@ -34,7 +34,6 @@ buildOne ()
         -DBUILD_WSI_WAYLAND_SUPPORT=OFF                   \
         -DVulkanHeaders_INCLUDE_DIR=${vulkan_headers_dir} \
         -DGLSLANG_INSTALL_DIR=${glslang_dir}              \
-        -DSPIRV_TOOLS_BINARY_ROOT=${spirv_tools_bin}      \
         -DSPIRV_TOOLS_INCLUDE_DIR=${spirv_tools_inc}      \
         -DSPIRV_TOOLS_LIB=${spirv_tools_lib}              \
         -DSPIRV_TOOLS_OPT_BINARY_ROOT=${spirv_tools_bin}  \

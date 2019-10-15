@@ -205,7 +205,13 @@ function build
         local dependency_name="DEPENDENCIES_${library}[@]"
         local librariesToBuild=
 
-        if [ ! -z ${!dependency_name-} ]; then
+        local dependency_libraries=${!dependency_name-}
+
+        if [ -n "${dependency_libraries}" ]; then
+            echo ${dependency_libraries[@]}
+        fi
+        
+        if [ -n "${dependency_libraries}" ]; then
             local dependencies=${!dependency_name} #Indirect expansion
             librariesToBuild=( ${dependencies[@]} ${library} )
         else

@@ -11,12 +11,13 @@ LIBRARIES=(                             \
            assimp                       \
            fxgltf                       \
            glslang                      \
+           spirv_headers                \
            spirv_cross                  \
            spirv_tools                  \
-           spirv_headers                \
-           spirv_effcee                 \
-           spirv_re2                    \
-           spirv_gtest                  \
+           spirv_tools_headers          \
+           spirv_tools_effcee           \
+           spirv_tools_re2              \
+           spirv_tools_gtest            \
            cryptopp                     \
            vulkan_headers               \
            vulkan_sdk                   \
