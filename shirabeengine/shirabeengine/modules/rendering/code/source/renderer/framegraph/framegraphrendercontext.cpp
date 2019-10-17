@@ -498,7 +498,7 @@ namespace engine
         {
             CTexture::SDescriptor desc = {};
             desc.name        = aTexture.readableName;
-            desc.textureInfo = aTexture;
+            desc.textureInfo = static_cast<STextureInfo>(aTexture);
             // Always set those...
             desc.gpuBinding.set(EBufferBinding::CopySource);
             desc.gpuBinding.set(EBufferBinding::CopyTarget);
@@ -563,7 +563,7 @@ namespace engine
             CTextureView::SDescriptor desc = { };
             desc.name             = aView.readableName;
             desc.textureFormat    = aView.format;
-            desc.subjacentTexture = aTexture;
+            desc.subjacentTexture = static_cast<STextureInfo>(aTexture);
             desc.arraySlices      = aView.arraySliceRange;
             desc.mipMapSlices     = aView.mipSliceRange;
             desc.dependencies.push_back(aTexture.readableName);
@@ -796,6 +796,8 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial   const &aMaterial
                                                                     , PublicResourceId_t  const &aRenderPassHandle)
         {
+            SHIRABE_UNUSED(aRenderPassHandle);
+
             auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
             if(CheckEngineError(result))
             {
@@ -861,7 +863,7 @@ namespace engine
             {
                 if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT == stageKey)
                 {
-                    for(uint32_t k=0; k<stage.inputs.size(); ++k)
+                    for(std::size_t k=0; k<stage.inputs.size(); ++k)
                     {
                         SStageInput const &input = stage.inputs.at(k);
 
@@ -895,17 +897,17 @@ namespace engine
                     for(auto const &output : stage.outputs)
                     {
                         VkPipelineColorBlendAttachmentState colorBlendAttachmentState{};
-                        colorBlendAttachmentState.blendEnable        =VK_TRUE;
-                        colorBlendAttachmentState.colorWriteMask     =VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT|
-                                                                      VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT|
-                                                                      VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT|
-                                                                      VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
-                        colorBlendAttachmentState.srcColorBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ONE;  // VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
-                        colorBlendAttachmentState.dstColorBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ZERO; // VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-                        colorBlendAttachmentState.colorBlendOp       =VkBlendOp::VK_BLEND_OP_ADD;
-                        colorBlendAttachmentState.srcAlphaBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ONE;
-                        colorBlendAttachmentState.dstAlphaBlendFactor=VkBlendFactor::VK_BLEND_FACTOR_ZERO;
-                        colorBlendAttachmentState.alphaBlendOp       =VkBlendOp::VK_BLEND_OP_ADD;
+                        colorBlendAttachmentState.blendEnable         = VK_TRUE;
+                        colorBlendAttachmentState.colorWriteMask      = VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT|
+                                                                        VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT|
+                                                                        VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT|
+                                                                        VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
+                        colorBlendAttachmentState.srcColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;  // VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
+                        colorBlendAttachmentState.dstColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO; // VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                        colorBlendAttachmentState.colorBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+                        colorBlendAttachmentState.srcAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;
+                        colorBlendAttachmentState.dstAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO;
+                        colorBlendAttachmentState.alphaBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
 
                         outputs[output.location] = colorBlendAttachmentState;
                     }
@@ -955,7 +957,7 @@ namespace engine
             descriptorSets.resize(signature.layoutInfo.setCount);
             pipelineDescriptor.descriptorSetLayoutBindings.resize(signature.layoutInfo.setCount);
 
-            for(uint32_t k=0; k<descriptorSets.size(); ++k)
+            for(std::size_t k=0; k<descriptorSets.size(); ++k)
             {
                 VkDescriptorSetLayoutCreateInfo &info = descriptorSets[k];
 

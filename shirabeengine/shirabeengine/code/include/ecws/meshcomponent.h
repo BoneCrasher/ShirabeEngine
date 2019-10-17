@@ -1,18 +1,18 @@
-#ifndef __SHIRABE_MESHCOMPONENT_H__
-#define __SHIRABE_MESHCOMPONENT_H__
+#ifndef __SHIRABE_COMPONENT_MESH_H__
+#define __SHIRABE_COMPONENT_MESH_H__
 
-#include "ECWS/IComponent.h"
+#include "icomponent.h"
 
 namespace engine {
 
-	class MeshComponent 
+	class CMeshComponent
 		: public IComponent
 	{
 	public:
-		MeshComponent();
-		~MeshComponent();
+		CMeshComponent();
+		~CMeshComponent() override;
 
-		EEngineStatus update(const Timer& timer);
+		EEngineStatus update(CTimer const &aTimer) override;
 	};
 
 }

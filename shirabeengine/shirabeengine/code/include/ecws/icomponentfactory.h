@@ -3,6 +3,7 @@
 
 #include <core/enginetypehelper.h>
 #include "ecws/icomponent.h"
+#include "ecws/ecomponenttype.h"
 
 namespace engine
 {
@@ -15,7 +16,8 @@ namespace engine
         SHIRABE_DECLARE_INTERFACE(IComponentFactory);
 
     public_api:
-        virtual CStdSharedPtr_t<IComponent> createComponent(/* id */) const = 0;
+        [[nodiscard]]
+        virtual CStdSharedPtr_t<IComponent> createComponent(EComponentType const &aComponentType) const = 0;
 
     };
 }
