@@ -12,6 +12,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        CStdSharedPtr_t<IResourceObjectPrivate> CResourceManager::asPrivate(CStdSharedPtr_t<IResourceObject> const &aObject)
+        {
+            return std::static_pointer_cast<IResourceObjectPrivate>(aObject);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CResourceManager::discardResource(ResourceId_t const &aResourceId)
         {
             auto iterator = std::find(mResourceObjects.begin(), mResourceObjects.end(), aResourceId);

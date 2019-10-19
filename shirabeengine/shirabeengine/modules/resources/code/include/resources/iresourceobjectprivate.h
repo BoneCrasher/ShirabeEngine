@@ -9,12 +9,16 @@
 
 #include <core/enginestatus.h>
 
+class CResourceManager;
+
 namespace engine
 {
     namespace resources
     {
         class [[nodiscard]] SHIRABE_LIBRARY_EXPORT IResourceObjectPrivate
         {
+            friend class CResourceManager;
+
             SHIRABE_DECLARE_INTERFACE(IResourceObjectPrivate);
 
         public_api:

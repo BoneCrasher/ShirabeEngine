@@ -34,6 +34,9 @@ namespace engine {
 
             CEngineResult<> discardResource(ResourceId_t const &aResourceId);
 
+        private_static_functions:
+            static CStdSharedPtr_t<IResourceObjectPrivate> asPrivate(CStdSharedPtr_t<IResourceObject> const &aObject);
+
         private_methods:
             bool storeResourceObject(ResourceId_t                        const &aId
                                      , CStdSharedPtr_t <IResourceObject> const &aObject);

@@ -18,6 +18,8 @@ namespace engine
         class [[nodiscard]] SHIRABE_LIBRARY_EXPORT IResourceObject
                 : private IResourceObjectPrivate
         {
+            friend class CResourceManager;
+
             SHIRABE_DECLARE_INTERFACE(IResourceObject);
 
         public_api:
