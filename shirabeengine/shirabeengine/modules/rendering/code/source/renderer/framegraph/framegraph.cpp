@@ -307,7 +307,7 @@ namespace engine
                     break;
                 }
 
-                if( copy.size() > 1) // Implicit last pass '0' and effective last pass --> 2 passes
+                if(1 < copy.size()) // Implicit last pass '0' and effective last pass --> 2 passes
                 {
                     aRenderContext->endPass();
                 }

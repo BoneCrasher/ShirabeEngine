@@ -20,6 +20,7 @@ namespace engine
 {
     namespace resources
     {
+        
         //static class CMapHelper
         //{
         template <typename K, typename V>
