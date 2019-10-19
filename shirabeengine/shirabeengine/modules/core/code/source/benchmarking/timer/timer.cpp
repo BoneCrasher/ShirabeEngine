@@ -34,7 +34,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    void CTimer::setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> aTimeInterface)
+    void CTimer::setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> const &aTimeInterface)
     {
         SHIRABE_ASSERT_TEXT(nullptr != aTimeInterface, "The provided time interface is nullptr.");
 
@@ -90,7 +90,9 @@ namespace engine
 
                 result = EEngineStatus::Timer_PlatformTimestampFetchFailed;
 			} else
+            {
                 mCurrent = mInitial = static_cast<uint64_t>(initial.tv_sec * 1000000000) + initial.tv_nsec;
+                }
 		}
 
         mFrames       = 0;

@@ -81,7 +81,7 @@ namespace engine
              * @return
              */
             friend std::basic_ostream<char> operator<<(
-                    std::basic_ostream<char>                             &aStream,
+                    std::basic_ostream<char>                              &aStream,
                     CMeasurementChunk<ParameterType_t, ValueType_t> const &aChunk)
             {
                 return (aStream << aChunk.parameter() << ": " << aChunk.value());
@@ -95,7 +95,7 @@ namespace engine
              * @return
              */
             friend std::basic_ostream<wchar_t> operator<<(
-                    std::basic_ostream<wchar_t>                          &aStream,
+                    std::basic_ostream<wchar_t>                           &aStream,
                     CMeasurementChunk<ParameterType_t, ValueType_t> const &aChunk)
             {
                 return (aStream << aChunk.parameter() << L": " << aChunk.value());

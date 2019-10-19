@@ -1,5 +1,5 @@
-#ifndef CALLBACKTIMER_H
-#define CALLBACKTIMER_H
+#ifndef __SHIRABE_ENGINE_CALLBACKTIMER_H__
+#define __SHIRABE_ENGINE_CALLBACKTIMER_H__
 
 #include <time.h>
 #include <ctime>
@@ -121,4 +121,4 @@ namespace engine
 
 }
 
-#endif // CALLBACKTIMER_H
+#endif // __SHIRABE_ENGINE_CALLBACKTIMER_H__

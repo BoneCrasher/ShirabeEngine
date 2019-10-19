@@ -67,7 +67,7 @@ namespace engine
          * @return  Valid conversion factor from seconds to @unit.
 		 *          1.0 if the requested target unit is not supported.
          */
-        double getConversionMask(ETimeUnit aUnit = ETimeUnit::Seconds);
+        double getConversionMask(ETimeUnit const &aUnit = ETimeUnit::Seconds);
 
         /**
          * Fetch the current platform implementation timestamp to perform all necessary computations.
@@ -128,13 +128,12 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
 	template <typename T>
-    double CPlatformTime<T>::getConversionMask(ETimeUnit unit)
+    double CPlatformTime<T>::getConversionMask(ETimeUnit const &aUnit)
     {
-        ConversionFactorMap_t::iterator it = mConversionFactors.find(unit);
-        if (it != mConversionFactors.end())
-			return it->second;
-		else
-			return 1.0;
+        ConversionFactorMap_t::iterator it = mConversionFactors.find(aUnit);
+        return (mConversionFactors.end() != it)
+                    ? it->second
+                    : 1.0;
 	};
     //<-----------------------------------------------------------------------------
 }

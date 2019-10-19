@@ -126,7 +126,7 @@ namespace engine
          *
          * @param aTimeInterface
          */
-        void setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> aTimeInterface);
+        void setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> const &aTimeInterface);
 
     private_members:
         CStdSharedPtr_t<InternalTimeType_t> mTimeInterface;

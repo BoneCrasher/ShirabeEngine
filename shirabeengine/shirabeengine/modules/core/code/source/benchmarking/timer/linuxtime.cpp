@@ -95,8 +95,6 @@ namespace engine
 #endif
 			result = EEngineStatus::Time_Win32__QueryPerformanceCounterFailed;
 		}
-		else
-			result = EEngineStatus::Ok;
 
 		return result;
 	};

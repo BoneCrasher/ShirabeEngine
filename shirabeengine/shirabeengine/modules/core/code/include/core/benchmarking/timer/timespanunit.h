@@ -8,10 +8,10 @@ namespace engine {
     private:
         enum {
             SUBSECONDS = 1,
-            SECONDS = 2,
-            MINUTES = 4,
-            HOURS = 8,
-            DAYS = 16
+            SECONDS    = 2,
+            MINUTES    = 4,
+            HOURS      = 8,
+            DAYS      = 16
         };
 
     public:
@@ -35,8 +35,8 @@ namespace engine {
             return { ETimespanUnit::DAYS, "Days" };
         }
 
-        static ETimespanUnit fromValue(int value) {
-            switch(value) {
+        static ETimespanUnit fromValue(int const aValue) {
+            switch(aValue) {
             default:
             case ETimespanUnit::SUBSECONDS:
                 return SubsecondsUnit();
@@ -60,11 +60,11 @@ namespace engine {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function" // Deactivated since these functions are not used by all static-lib-linkers and might cause those warnings depending on where it's linked.
-    static bool operator<(ETimespanUnit l, ETimespanUnit r) { return l.m_value < r.m_value; }
-    static bool operator>(ETimespanUnit l, ETimespanUnit r) { return l.m_value > r.m_value; }
-    static bool operator==(ETimespanUnit l, ETimespanUnit r) { return l.m_value == r.m_value; }
-    static bool operator<=(ETimespanUnit l, ETimespanUnit r) { return l < r || l == r; }
-    static bool operator>=(ETimespanUnit l, ETimespanUnit r) { return l > r || l == r; }
+    static bool operator< (ETimespanUnit const &aLhs, ETimespanUnit const &aRhs) { return aLhs.m_value < aRhs.m_value; }
+    static bool operator> (ETimespanUnit const &aLhs, ETimespanUnit const &aRhs) { return aLhs.m_value > aRhs.m_value; }
+    static bool operator==(ETimespanUnit const &aLhs, ETimespanUnit const &aRhs) { return aLhs.m_value == aRhs.m_value; }
+    static bool operator<=(ETimespanUnit const &aLhs, ETimespanUnit const &aRhs) { return aLhs < aRhs || aLhs == aRhs; }
+    static bool operator>=(ETimespanUnit const &aLhs, ETimespanUnit const &aRhs) { return aLhs > aRhs || aLhs == aRhs; }
 #pragma GCC diagnostic pop
 
 }

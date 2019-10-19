@@ -35,11 +35,11 @@ namespace engine
             return CEngineResult<>(EEngineStatus::Error);
         }
 
-        mRunning.store(true);
-        mPause.store(false);
+        mRunning  .store(true);
+        mPause    .store(false);
         mInterrupt.store(false);
 
-        if(!mTimerThread)
+        if(nullptr == mTimerThread)
         {
             mTimerThread
                     = CStdSharedPtr_t<std::thread>(
@@ -70,7 +70,7 @@ namespace engine
         // Do not pause a not running timer.
         // Do not interfere if the timer is currently being interrupted.
         if(mBlockWhileRunning
-                || !mRunning.load()
+                || false == mRunning.load()
                 || mInterrupt.load())
         {
             return CEngineResult<>(EEngineStatus::Error);
@@ -86,7 +86,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineResult<> CCallbackTimer::resume()
     {
-        if(!mRunning.load()) // Implicit run feature.
+        if(false == mRunning.load()) // Implicit run feature.
             run();
         else
         {
@@ -110,7 +110,7 @@ namespace engine
     CEngineResult<> CCallbackTimer::stop()
     {
         // Do not pause a not running timer.
-        if(!mRunning.load())
+        if(false == mRunning.load())
         {
             return CEngineResult<>(EEngineStatus::Ok);
         }
@@ -166,7 +166,7 @@ namespace engine
             }
         }
 
-        mRunning.store(false);
+        mRunning  .store(false);
         mInterrupt.store(false); // Will stop next frame!
 
         return CEngineResult<>(EEngineStatus::Ok);
