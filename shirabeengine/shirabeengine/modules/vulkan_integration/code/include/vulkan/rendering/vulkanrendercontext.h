@@ -31,8 +31,8 @@ namespace engine
              * @return                            True, if successful. False otherwise.
              */
             bool initialize(
-                    CStdSharedPtr_t<CVulkanEnvironment>             const &aVulkanEnvironment,
-                    CStdSharedPtr_t<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend);
+                    Shared<CVulkanEnvironment>             const &aVulkanEnvironment,
+                    Shared<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend);
 
             /**
              * Destroy and run...
@@ -177,8 +177,8 @@ namespace engine
             EEngineStatus render(SRenderable const &aRenderable);
 
         private_members:
-            CStdSharedPtr_t<CVulkanEnvironment>             mVulkanEnvironment;
-            CStdSharedPtr_t<gfxapi::CGFXAPIResourceBackend> mGraphicsAPIResourceBackend;
+            Shared<CVulkanEnvironment>             mVulkanEnvironment;
+            Shared<gfxapi::CGFXAPIResourceBackend> mGraphicsAPIResourceBackend;
         };
     }
 }

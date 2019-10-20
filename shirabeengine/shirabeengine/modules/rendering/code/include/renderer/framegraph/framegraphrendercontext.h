@@ -48,11 +48,11 @@ namespace engine
              * @param aRenderer        Render context which maps down to the currently selected graphics API
              * @return                 A pointer to the newly created instance or nullptr on error.
              */
-            static CEngineResult<CStdSharedPtr_t<CFrameGraphRenderContext>> create(
-                    CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
-                    CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
-                    CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
-                    CStdSharedPtr_t<IRenderContext>       aRenderer);
+            static CEngineResult<Shared<CFrameGraphRenderContext>> create(
+                    Shared<IAssetStorage>        aAssetStorage,
+                    Shared<CMaterialLoader>      aMaterialLoader,
+                    Shared<CResourceManagerBase> aResourceManager,
+                    Shared<IRenderContext>       aRenderer);
 
             //
             // IFrameGraphRenderContext implementation
@@ -432,10 +432,10 @@ namespace engine
              * @param aRenderer        Render context which maps down to the currently selected graphics API
              */
             CFrameGraphRenderContext(
-                    CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
-                    CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
-                    CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
-                    CStdSharedPtr_t<IRenderContext>       aRenderer);
+                    Shared<IAssetStorage>        aAssetStorage,
+                    Shared<CMaterialLoader>      aMaterialLoader,
+                    Shared<CResourceManagerBase> aResourceManager,
+                    Shared<IRenderContext>       aRenderer);
 
         private_methods:
             /**
@@ -467,16 +467,17 @@ namespace engine
             CEngineResult<> removeMappedInternalResourceIds(std::string const &aName);
 
         private_members:
-            CStdSharedPtr_t<IAssetStorage>        mAssetStorage;
-            CStdSharedPtr_t<CMaterialLoader>      mMaterialLoader;
-            CStdSharedPtr_t<CResourceManagerBase> mResourceManager;
-            CStdSharedPtr_t<IRenderContext>       mGraphicsAPIRenderContext;
+            Shared<IAssetStorage>        mAssetStorage;
+            Shared<CMaterialLoader>      mMaterialLoader;
+            Shared<CResourceManagerBase> mResourceManager;
+            Shared<IRenderContext>       mGraphicsAPIRenderContext;
 
             Map<std::string, Vector<PublicResourceId_t>> mResourceMap;
 
             PublicResourceId_t mCurrentFrameBufferHandle;
             PublicResourceId_t mCurrentRenderPassHandle;
             uint32_t           mCurrentSubpass;
+
         };
 
     }

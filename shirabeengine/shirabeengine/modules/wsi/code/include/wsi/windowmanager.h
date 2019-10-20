@@ -57,7 +57,7 @@ namespace engine
              */
             EWindowManagerError initialize(
                     os::SApplicationEnvironment     const &aApplicationEnvironment,
-                    CStdSharedPtr_t<IWindowFactory> const &aFactory);
+                    Shared<IWindowFactory> const &aFactory);
 
             /**
              * Deinitialize the window manager.
@@ -79,7 +79,7 @@ namespace engine
              * @param aInitialBounds The initial bounds of the new window.
              * @return               A pointer to the new window if successful. nullptr otherwise.
              */
-            CStdSharedPtr_t<IWindow> createWindow(std::string const &aName, CRect const &aInitialBounds);
+            Shared<IWindow> createWindow(std::string const &aName, CRect const &aInitialBounds);
 
             /**
              * Try to find a window by name.
@@ -87,7 +87,7 @@ namespace engine
              * @param aName The name of the window to find.
              * @return      A pointer to the window if successful. nullptr otherwise.
              */
-            CStdSharedPtr_t<IWindow> getWindowByName(std::string const &aName);
+            Shared<IWindow> getWindowByName(std::string const &aName);
 
             /**
              * Try to find a window by handle.
@@ -95,12 +95,12 @@ namespace engine
              * @param aHandle The handle of the window to find.
              * @return        A pointer to the window if successful. nullptr otherwise.
              */
-            CStdSharedPtr_t<IWindow> getWindowByHandle(wsi::CWindowHandleWrapper::Handle_t const &aHandle);
+            Shared<IWindow> getWindowByHandle(wsi::CWindowHandleWrapper::Handle_t const &aHandle);
 
         private_members:
             IWindowList                     mWindows;
-            CStdSharedPtr_t<CWSIDisplay>    mDisplay;
-            CStdSharedPtr_t<IWindowFactory> mWindowFactory;
+            Shared<CWSIDisplay>    mDisplay;
+            Shared<IWindowFactory> mWindowFactory;
         };
 
         #define CheckWindowManagerError(status) \

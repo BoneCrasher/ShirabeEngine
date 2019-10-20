@@ -36,7 +36,7 @@ namespace engine
              * @param aCallback The callback listener to hook in.
              * @return          EEngineStatus::Ok if successful. An error code otherwise.
              */
-            EEngineStatus registerCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback);
+            EEngineStatus registerCallback(Shared<IWindow::IEventCallback> aCallback);
 
             /**
              * Register a new event callback handler for this window.
@@ -44,7 +44,7 @@ namespace engine
              * @param aCallback The callback listener to hook in.
              * @return          EEngineStatus::Ok if successful. An error code otherwise.
              */
-            EEngineStatus unregisterCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback);
+            EEngineStatus unregisterCallback(Shared<IWindow::IEventCallback> aCallback);
 
             /**
              * Return the current list of registered callbacks.
@@ -62,7 +62,7 @@ namespace engine
              *
              * @param aWindow The window which resumed operation.
              */
-            SHIRABE_INLINE void onResume(CStdSharedPtr_t<IWindow> const &aWindow)
+            SHIRABE_INLINE void onResume(Shared<IWindow> const &aWindow)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onResume, aWindow);
             }
@@ -73,7 +73,7 @@ namespace engine
              *
              * @param aWindow The window which was shown.
              */
-            SHIRABE_INLINE void onShow(CStdSharedPtr_t<IWindow> const &aWindow)
+            SHIRABE_INLINE void onShow(Shared<IWindow> const &aWindow)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onShow, aWindow);
             }
@@ -86,7 +86,7 @@ namespace engine
              *                   systems coordinate origin.
              */
             SHIRABE_INLINE void onBoundsChanged(
-                    CStdSharedPtr_t<IWindow> const &aWindow,
+                    Shared<IWindow> const &aWindow,
                     CRect                    const &aBounds)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onBoundsChanged, aWindow, aBounds);
@@ -98,7 +98,7 @@ namespace engine
              *
              * @param aWindow The window which was hidden.
              */
-            SHIRABE_INLINE void onHide(CStdSharedPtr_t<IWindow> const &aWindow)
+            SHIRABE_INLINE void onHide(Shared<IWindow> const &aWindow)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onHide, aWindow);
             }
@@ -109,7 +109,7 @@ namespace engine
              *
              * @param aWindow The paused window.
              */
-            SHIRABE_INLINE void onPause(CStdSharedPtr_t<IWindow> const &aWindow)
+            SHIRABE_INLINE void onPause(Shared<IWindow> const &aWindow)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onPause, aWindow);
             }
@@ -119,7 +119,7 @@ namespace engine
              *
              * @param aWindow The window to be closed.
              */
-            SHIRABE_INLINE void onClose(CStdSharedPtr_t<IWindow> const &aWindow)
+            SHIRABE_INLINE void onClose(Shared<IWindow> const &aWindow)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onClose, aWindow);
             }
@@ -129,7 +129,7 @@ namespace engine
              *
              * @param aWindow The window to be destroyed.
              */
-            SHIRABE_INLINE void onDestroy(CStdSharedPtr_t<IWindow> const &aWindow)
+            SHIRABE_INLINE void onDestroy(Shared<IWindow> const &aWindow)
             {
                 notifyIteratively(mEventCallbacks, &IWindow::IEventCallback::onDestroy, aWindow);
             }
@@ -162,7 +162,7 @@ namespace engine
             {
                 std::lock_guard<std::mutex> guard(mEventCallbackMutex);
 
-                for(CStdSharedPtr_t<IWindow::IEventCallback> const &callback : aCollection)
+                for(Shared<IWindow::IEventCallback> const &callback : aCollection)
                 {
                     NotificationCallback_t<TFnReturn, TFnArgs...> const bound = bindMethod(*callback.get(), aFunction);
                     if(bound)

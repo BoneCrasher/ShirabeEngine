@@ -24,7 +24,7 @@ namespace engine
              * @param aInitialBounds Bounding rectangle of the window to create.
              * @return               A pointer to IWindow if successful or nullptr.
              */
-            virtual CStdSharedPtr_t<IWindow> createWindow(
+            virtual Shared<IWindow> createWindow(
                     std::string const &aName,
                     CRect       const &aInitialBounds) = 0;
         };

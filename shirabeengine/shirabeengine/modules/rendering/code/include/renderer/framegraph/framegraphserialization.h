@@ -135,7 +135,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            bool serialize(CGraph const &aSource, CStdSharedPtr_t<IResult> &aOutResult);
+            bool serialize(CGraph const &aSource, Shared<IResult> &aOutResult);
 
             /**
              * Serialize the graph itself. This is the main entry point of serialization.

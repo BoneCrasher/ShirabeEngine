@@ -14,7 +14,7 @@ namespace engine
 
         //<-----------------------------------------------------------------------------
         //;---------------------------------------------------------
-        CMaterialLoader::CMaterialLoader(CStdSharedPtr_t<asset::IAssetStorage> aAssetStorage)
+        CMaterialLoader::CMaterialLoader(Shared<asset::IAssetStorage> aAssetStorage)
             : mStorage(aAssetStorage)
         {
             assert(nullptr != aAssetStorage);
@@ -112,8 +112,8 @@ namespace engine
 
         static
         auto loadMasterMaterial(std::string                                             const &aLogTag,
-                                CStdSharedPtr_t<asset::IAssetStorage>                         &aAssetStorage,
-                                Map<asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>       &aMasterMaterialIndex,
+                                Shared<asset::IAssetStorage>                         &aAssetStorage,
+                                Map<asset::AssetID_t, Shared<CMaterialMaster>>       &aMasterMaterialIndex,
                                 asset::AssetID_t                                        const &aMasterMaterialAssetId)
             -> MasterMaterialReturn_t
         {
@@ -163,7 +163,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<CStdSharedPtr_t<CMaterialInstance>> CMaterialLoader::createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId)
+        CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId)
         {
             return { EEngineStatus::Ok };
         }
@@ -181,7 +181,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<CStdSharedPtr_t<CMaterialMaster>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
+        CEngineResult<Shared<CMaterialMaster>> CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
         {
             CEngineResult<ByteBuffer> data = {};
 
@@ -243,8 +243,8 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Create Material instance
             //--------------------------------------------------------------------------------------------------------------------
-            CStdSharedPtr_t<CMaterialMaster> master = makeCStdSharedPtr<CMaterialMaster>  (masterIndexId, masterName,   std::move(masterSignature), std::move(masterConfig));
-            // CStdSharedPtr_t<CMaterialInstance> instance = makeCStdSharedPtr<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
+            Shared<CMaterialMaster> master = makeShared<CMaterialMaster>  (masterIndexId, masterName,   std::move(masterSignature), std::move(masterConfig));
+            // Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
 
             mInstantiatedMaterialMasters  [master->getAssetId()]   = master;
             // mInstantiatedMaterialInstances[instance->getAssetId()] = instance;

@@ -49,10 +49,10 @@ namespace Engine {
         : public GFXAPIResourceTaskBackend
       {
       public:
-        DX11ResourceTaskBackend(CStdSharedPtr_t<DX11Environment> const& device);
+        DX11ResourceTaskBackend(Shared<DX11Environment> const& device);
 
       private:
-        CStdSharedPtr_t<DX11Environment> m_dx11Environment;
+        Shared<DX11Environment> m_dx11Environment;
       };
 
     }

@@ -51,55 +51,55 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const
+        Unique<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const
         {
             SHIRABE_UNUSED(aPassKey);
 
-            return CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
+            return Unique<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey)
+        Unique<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey)
         {
             SHIRABE_UNUSED(aPassKey);
 
-            return CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this));
+            return Unique<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CPassBuilder> &&aPassKey) const
+        Unique<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CPassBuilder> &&aPassKey) const
         {
             SHIRABE_UNUSED(aPassKey);
 
-            return CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
+            return Unique<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey)
+        Unique<CPassBase::CMutableAccessor> CPassBase::getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey)
         {
             SHIRABE_UNUSED(aPassKey);
 
-            return CStdUniquePtr_t<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this));
+            return Unique<CPassBase::CMutableAccessor>(new CPassBase::CMutableAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraph> &&aPassKey) const
+        Unique<CPassBase::CAccessor> CPassBase::getAccessor(CPassKey<CGraph> &&aPassKey) const
         {
             SHIRABE_UNUSED(aPassKey);
 
-            return CStdUniquePtr_t<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
+            return Unique<CPassBase::CAccessor>(new CPassBase::CAccessor(this));
         }
         //<-----------------------------------------------------------------------------
 

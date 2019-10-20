@@ -14,7 +14,7 @@ namespace Engine {
 		virtual EEngineStatus initialize()   = 0;
 		virtual EEngineStatus deinitialize() = 0;
 
-		using InternalDevicePtr = CStdSharedPtr_t<ID3D11Device>;
+		using InternalDevicePtr = Shared<ID3D11Device>;
 		virtual InternalDevicePtr& internalDevice() = 0;
 
 		DeclareInterfaceEnd(IDXDevice);

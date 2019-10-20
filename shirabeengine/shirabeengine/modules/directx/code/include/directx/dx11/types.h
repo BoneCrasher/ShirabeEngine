@@ -97,11 +97,11 @@ namespace Engine {
 			DeclareDxType(EResourceType::GAPI_STATE,     EResourceSubType::BLEND_STATE,           ID3D11BlendState);
 
       template <typename T>
-      static CStdSharedPtr_t<T> MakeDxSharedPointer(T *pInRaw) {
+      static Shared<T> MakeDxSharedPointer(T *pInRaw) {
         if(!pInRaw)
           return nullptr;
 
-        return CStdSharedPtr_t<T>(pInRaw, DxResourceDeleter<T>());
+        return Shared<T>(pInRaw, DxResourceDeleter<T>());
       }
 
 		}

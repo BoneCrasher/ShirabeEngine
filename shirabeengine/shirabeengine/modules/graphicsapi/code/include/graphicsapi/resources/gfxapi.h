@@ -43,7 +43,7 @@ namespace engine
              */
             SHIRABE_INLINE SGFXAPIResourceHandleAssignment(
                     PublicResourceId_t    const &aPublicResourceHandle,
-                    CStdSharedPtr_t<void> const &aInternalResourceHandle)
+                    Shared<void> const &aInternalResourceHandle)
                 : publicResourceHandle(aPublicResourceHandle)
                 , internalResourceHandle(aInternalResourceHandle)
             {}
@@ -61,7 +61,7 @@ namespace engine
 
         public_members:
             PublicResourceId_t    publicResourceHandle;
-            CStdSharedPtr_t<void> internalResourceHandle;
+            Shared<void> internalResourceHandle;
         };
     }
 }

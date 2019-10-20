@@ -110,14 +110,14 @@ namespace engine
         std::atomic<bool>            mRunning;
         std::atomic<bool>            mPause;
         std::atomic<bool>            mInterrupt;
-        CStdSharedPtr_t<std::thread> mTimerThread;
+        Shared<std::thread> mTimerThread;
         std::function<void()>        mTimerCallbackFunction;
     };
 
     /**
      *
      */
-    using CallbackTimerPtr = CStdSharedPtr_t<CCallbackTimer>;
+    using CallbackTimerPtr = Shared<CCallbackTimer>;
 
 }
 

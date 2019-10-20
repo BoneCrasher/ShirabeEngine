@@ -2,13 +2,12 @@
 // Created by dotti on 19.10.19.
 //
 
-#ifndef __SHIRABEDEVELOPMENT_CRESOURCEOBJECT_H__
-#define __SHIRABEDEVELOPMENT_CRESOURCEOBJECT_H__
+#ifndef __SHIRABEDEVELOPMENT_APRIVATERESOURCEOBJECT_H__
+#define __SHIRABEDEVELOPMENT_APRIVATERESOURCEOBJECT_H__
 
 #include <platform/platform.h>
 
 #include "resources/iresourceobjectprivate.h"
-#include "resources/iresourceobject.h"
 
 class CResourceManager; // Declared/defined in resources/cresourcemanager.h
 
@@ -20,33 +19,34 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        class [[nodiscard]] SHIRABE_LIBRARY_EXPORT CResourceObject
-            : public IResourceObject
+        class
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT APrivateResourceObject
+            : public IResourceObjectPrivate
         {
             friend class CResourceManager;
 
         public_constructors:
-            explicit CResourceObject(TDescription const &aDescription);
+            explicit APrivateResourceObject(TDescription const &aDescription);
 
         public_destructors:
-            ~CResourceObject() override = default;
+            ~APrivateResourceObject() override = default;
 
         public_api:
             // IResourceObject
-            CEngineResult<> bind()     override;
-            CEngineResult<> unbind()   override;
-            CEngineResult<> transfer() override;
+            CEngineResult<> create()  override;
+            CEngineResult<> load()    override;
+            CEngineResult<> unload()  override;
+            CEngineResult<> destroy() override;
 
         private_api:
-            Shared<IResourceObjectPrivate> getPrivateObject() override;
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
             { return mDescription; }
 
         private_members:
-            TDescription                   const mDescription;
-            Shared<IResourceObjectPrivate>       mPrivateObject;
+            TDescription const mDescription;
         };
 
         //<-----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        CResourceObject<TDescriptor>::CResourceObject(const TDescriptor &aDescription)
+        APrivateResourceObject<TDescriptor>::APrivateResourceObject(const TDescriptor &aDescription)
             : mDescription(aDescription)
         { }
         //<-----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        CEngineResult<> CResourceObject<TDescriptor>::bind()
+        CEngineResult<> APrivateResourceObject<TDescriptor>::create()
         {
             return { EEngineStatus::Ok };
         }
@@ -74,7 +74,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        CEngineResult<> CResourceObject<TDescriptor>::unbind()
+        CEngineResult<> APrivateResourceObject<TDescriptor>::load()
         {
             return { EEngineStatus::Ok };
         }
@@ -84,7 +84,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        CEngineResult<> CResourceObject<TDescriptor>::transfer()
+        CEngineResult<> APrivateResourceObject<TDescriptor>::unload()
         {
             return { EEngineStatus::Ok };
         }
@@ -94,12 +94,12 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        Shared<IResourceObjectPrivate> CResourceObject<TDescriptor>::getPrivateObject()
+        CEngineResult<> APrivateResourceObject<TDescriptor>::destroy()
         {
-            return mPrivateObject;
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
     }
 }
 
-#endif //__SHIRABEDEVELOPMENT_CRESOURCEOBJECT_H__
+#endif //__SHIRABEDEVELOPMENT_APRIVATERESOURCEOBJECT_H__

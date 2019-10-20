@@ -7,7 +7,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CResourceManagerBase::CResourceManagerBase(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory)
+        CResourceManagerBase::CResourceManagerBase(Shared<CResourceProxyFactory> const &aProxyFactory)
             : mProxyFactory(aProxyFactory)
         {}
         //<-----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CResourceManagerBase::proxyLoad(CStdSharedPtr_t<IResourceProxyBase> aProxy, PublicResourceIdList_t const &aDependencies)
+        CEngineResult<> CResourceManagerBase::proxyLoad(Shared<IResourceProxyBase> aProxy, PublicResourceIdList_t const &aDependencies)
         {
             CEngineResult<> const loadOp = aProxy->loadSync(aDependencies);
             std::string     const msg    = "Failed to load underlying resource of resource proxy.";
@@ -72,7 +72,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CResourceManagerBase::proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy)
+        CEngineResult<> CResourceManagerBase::proxyUnload(Shared<IResourceProxyBase> &aProxy)
         {
             CEngineResult<> const unloadOp = aProxy->unloadSync();
 

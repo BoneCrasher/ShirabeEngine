@@ -56,9 +56,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<CSwapChainBuffer> CSwapChainBuffer::create(CSwapChainBuffer::SDescriptor const &aDescriptor)
+        Shared<CSwapChainBuffer> CSwapChainBuffer::create(CSwapChainBuffer::SDescriptor const &aDescriptor)
         {
-             CStdSharedPtr_t<CSwapChainBuffer> buffer = makeCStdSharedPtr<CSwapChainBuffer>(aDescriptor);
+             Shared<CSwapChainBuffer> buffer = makeShared<CSwapChainBuffer>(aDescriptor);
              return buffer;
         }
         //<-----------------------------------------------------------------------------
@@ -112,16 +112,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<CSwapChain>
+        Shared<CSwapChain>
         CSwapChain::create(CSwapChain::SDescriptor const &desc) {
-            return CStdSharedPtr_t<CSwapChain>(new CSwapChain(desc));
+            return Shared<CSwapChain>(new CSwapChain(desc));
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<CTextureView> const CSwapChain::getBackBufferRenderTargetView(uint32_t const &aIndex)
+        Shared<CTextureView> const CSwapChain::getBackBufferRenderTargetView(uint32_t const &aIndex)
         {
             if(aIndex < 0 || aIndex >= mBackBufferRenderTargetViews.size())
                 return nullptr;
@@ -133,9 +133,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<CTextureView> const CSwapChain::getCurrentBackBufferRenderTargetView()
+        Shared<CTextureView> const CSwapChain::getCurrentBackBufferRenderTargetView()
         {
-            CStdSharedPtr_t<CTextureView> view = getBackBufferRenderTargetView(mCurrentBackBufferIndex);
+            Shared<CTextureView> view = getBackBufferRenderTargetView(mCurrentBackBufferIndex);
             return view;
         }
         //<-----------------------------------------------------------------------------

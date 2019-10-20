@@ -48,20 +48,20 @@ namespace engine
 
             virtual operator std::string()    const = 0;
 
-            virtual CStdUniquePtr_t<IJSONNode> operator=(int8_t   const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(int16_t  const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(int32_t  const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(int64_t  const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(uint8_t  const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(uint16_t const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(uint32_t const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(uint64_t const& value) = 0;
+            virtual Unique<IJSONNode> operator=(int8_t   const& value) = 0;
+            virtual Unique<IJSONNode> operator=(int16_t  const& value) = 0;
+            virtual Unique<IJSONNode> operator=(int32_t  const& value) = 0;
+            virtual Unique<IJSONNode> operator=(int64_t  const& value) = 0;
+            virtual Unique<IJSONNode> operator=(uint8_t  const& value) = 0;
+            virtual Unique<IJSONNode> operator=(uint16_t const& value) = 0;
+            virtual Unique<IJSONNode> operator=(uint32_t const& value) = 0;
+            virtual Unique<IJSONNode> operator=(uint64_t const& value) = 0;
 
-            virtual CStdUniquePtr_t<IJSONNode> operator=(float  const& value) = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(double const& value) = 0;
+            virtual Unique<IJSONNode> operator=(float  const& value) = 0;
+            virtual Unique<IJSONNode> operator=(double const& value) = 0;
 
-            virtual CStdUniquePtr_t<IJSONNode> operator=(uint8_t const* value)     = 0;
-            virtual CStdUniquePtr_t<IJSONNode> operator=(std::string const& value) = 0;
+            virtual Unique<IJSONNode> operator=(uint8_t const* value)     = 0;
+            virtual Unique<IJSONNode> operator=(std::string const& value) = 0;
         };
 
         /**
@@ -88,24 +88,24 @@ namespace engine
 
             bool focusedObjectContainsChild(std::string const&key);
 
-            CStdUniquePtr_t<IJSONNode> focusChild(std::string const&key);
-            CStdUniquePtr_t<IJSONNode> focusParent();
+            Unique<IJSONNode> focusChild(std::string const&key);
+            Unique<IJSONNode> focusParent();
 
-            CStdUniquePtr_t<IJSONNode> operator[](std::string const&key);
+            Unique<IJSONNode> operator[](std::string const&key);
 
         private:
             struct JSONState {
-                CStdUniquePtr_t<std::istream, std::function<void(std::istream*)>> stream;
+                Unique<std::istream, std::function<void(std::istream*)>> stream;
                 nlohmann::json                                     jsonRoot;
                 std::stack<std::reference_wrapper<nlohmann::json>> jsonPathStack;
             };
 
-            CStdUniquePtr_t<JSONState>&       jsonState();
-            CStdUniquePtr_t<JSONState> const& jsonState() const;
+            Unique<JSONState>&       jsonState();
+            Unique<JSONState> const& jsonState() const;
 
             JSONDocumentOpenState openImpl();
 
-            CStdUniquePtr_t<JSONState> mJSONState;
+            Unique<JSONState> mJSONState;
         };
 
     }

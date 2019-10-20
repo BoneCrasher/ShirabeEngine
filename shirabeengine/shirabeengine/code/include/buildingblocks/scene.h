@@ -49,7 +49,7 @@ namespace engine
         CEngineResult<> update();
 
     private_members:
-        CStdSharedPtr_t<IComponentFactory> mComponentFactory;
+        Shared<IComponentFactory> mComponentFactory;
 
         CTimer  mTimer;
         CCamera mPrimaryCamera;

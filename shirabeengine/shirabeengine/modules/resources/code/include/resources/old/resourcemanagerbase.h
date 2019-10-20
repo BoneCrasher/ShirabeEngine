@@ -201,7 +201,7 @@ namespace engine
              *
              * @param aProxyFactory A point to a resource factory.
              */
-            CResourceManagerBase(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory);
+            CResourceManagerBase(Shared<CResourceProxyFactory> const &aProxyFactory);
 
         protected_methods:
             /**
@@ -324,7 +324,7 @@ namespace engine
              * @return              EEngineStatus::Ok, if successful. Any error code otherwise.
              */
             CEngineResult<> proxyLoad(
-                    CStdSharedPtr_t<IResourceProxyBase>        aProxy,
+                    Shared<IResourceProxyBase>        aProxy,
                     PublicResourceIdList_t              const &aDependencies);
 
             /**
@@ -333,7 +333,7 @@ namespace engine
              * @param aProxy The resource tree root proxy object.
              * @return       EEngineStatus::Ok, if successful. Any error code otherwise.
              */
-            CEngineResult<> proxyUnload(CStdSharedPtr_t<IResourceProxyBase> &aProxy);
+            CEngineResult<> proxyUnload(Shared<IResourceProxyBase> &aProxy);
 
             /**
              * Return the resource proxy for a provided resource id.
@@ -370,7 +370,7 @@ namespace engine
 
         private_members:
             random::RandomState                               mUIDGenerator;
-            CStdSharedPtr_t<CResourceProxyFactory>            mProxyFactory;
+            Shared<CResourceProxyFactory>            mProxyFactory;
             IndexedResourcePool<PublicResourceId_t, AnyProxy> mResources;            
 
             Map<std::type_index, Any_t> mCreatorFunctions;
@@ -495,7 +495,7 @@ namespace engine
             CEngineResult<AnyProxy> resourceProxyFetch = getResourceProxy(aResourceId);
             if(not resourceProxyFetch.successful())
             {
-                CStdSharedPtr_t<IResourceProxy<TResource>> proxy = mProxyFactory->create<TResource>(EProxyType::Dynamic, aRequest);
+                Shared<IResourceProxy<TResource>> proxy = mProxyFactory->create<TResource>(EProxyType::Dynamic, aRequest);
                 if(not proxy)
                 {
                     EngineStatusPrintOnError(
@@ -541,8 +541,8 @@ namespace engine
                 EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Cannot find resource proxy.");
             }
 
-            CStdSharedPtr_t<IResourceProxyBase>           baseProxy    = baseProxyCast(resourceProxyFetch.data());
-            CStdSharedPtr_t<CGenericProxyBase<TResource>> genericProxy = genericProxyBaseCast<TResource>(resourceProxyFetch.data());
+            Shared<IResourceProxyBase>           baseProxy    = baseProxyCast(resourceProxyFetch.data());
+            Shared<CGenericProxyBase<TResource>> genericProxy = genericProxyBaseCast<TResource>(resourceProxyFetch.data());
             if(not genericProxy)
             {
                 EngineStatusPrintOnError(EEngineStatus::Error, logTag(), "Proxy is not a GenericResourceProxy");
@@ -563,7 +563,7 @@ namespace engine
                         continue;
                     }
 
-                    CStdSharedPtr_t<IResourceProxyBase> base = baseProxyCast(dependencyProxyFetch.data());
+                    Shared<IResourceProxyBase> base = baseProxyCast(dependencyProxyFetch.data());
 
                     if(not (ELoadState::LOADED == base->loadState()))
                     {
@@ -632,7 +632,7 @@ namespace engine
                 return resourceProxyFetch.result();
             }
 
-            CStdSharedPtr_t<IResourceProxyBase> &base = baseProxyCast(resourceProxyFetch.data());
+            Shared<IResourceProxyBase> &base = baseProxyCast(resourceProxyFetch.data());
 
             // TODO: Unload all dependers if available...
             CEngineResult<> const status = proxyUnload(base);

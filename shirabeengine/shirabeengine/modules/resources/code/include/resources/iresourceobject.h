@@ -15,8 +15,9 @@ namespace engine
 {
     namespace resources
     {
-        class [[nodiscard]] SHIRABE_LIBRARY_EXPORT IResourceObject
-                : private IResourceObjectPrivate
+        class
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT IResourceObject
         {
             friend class CResourceManager;
 
@@ -26,6 +27,9 @@ namespace engine
             virtual CEngineResult<> bind()     = 0;
             virtual CEngineResult<> unbind()   = 0;
             virtual CEngineResult<> transfer() = 0;
+
+        private_api:
+            virtual Shared<IResourceObjectPrivate> getPrivateObject() = 0;
         };
 
     }

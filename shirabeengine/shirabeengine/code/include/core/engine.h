@@ -44,7 +44,7 @@ namespace engine
          * @brief CEngineInstance
          * @param aEnvironment
          */
-        CEngineInstance(CStdSharedPtr_t<os::SApplicationEnvironment> const &aEnvironment);
+        CEngineInstance(Shared<os::SApplicationEnvironment> const &aEnvironment);
 
     public_destructors:
         /**
@@ -73,23 +73,23 @@ namespace engine
 
     private_members:
         // Application
-        CStdSharedPtr_t<os::SApplicationEnvironment> mApplicationEnvironment;
+        Shared<os::SApplicationEnvironment> mApplicationEnvironment;
 
         // Timing
         CTimer                                 mTimer;
 
         // WSI
-        CStdSharedPtr_t<CWindowManager>        mWindowManager;
-        CStdSharedPtr_t<IWindow>               mMainWindow;
+        Shared<CWindowManager>        mWindowManager;
+        Shared<IWindow>               mMainWindow;
 
         // Assets & Resources
-        CStdSharedPtr_t<CAssetStorage>         mAssetStorage;
-        CStdSharedPtr_t<CResourceProxyFactory> mProxyFactory;
-        CStdSharedPtr_t<CResourceManagerBase>  mResourceManager;
+        Shared<CAssetStorage>         mAssetStorage;
+        Shared<CResourceProxyFactory> mProxyFactory;
+        Shared<CResourceManagerBase>  mResourceManager;
 
         // Rendering
-        CStdSharedPtr_t<CVulkanEnvironment>    mVulkanEnvironment;
-        CStdSharedPtr_t<IRenderer>             mRenderer;
+        Shared<CVulkanEnvironment>    mVulkanEnvironment;
+        Shared<IRenderer>             mRenderer;
 
         // Internals
         CScene mScene;

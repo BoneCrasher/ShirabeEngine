@@ -256,7 +256,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::execute(CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext)
+        CEngineResult<> CGraph::execute(Shared<IFrameGraphRenderContext> &aRenderContext)
         {
             assert(aRenderContext != nullptr);
 
@@ -297,8 +297,8 @@ namespace engine
                 aRenderContext->beginPass();
 
                 PassUID_t                             const passUID  = copy.top();
-                CStdSharedPtr_t<CPassBase>            const pass     = mPasses.at(passUID);
-                CStdUniquePtr_t<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
+                Shared<CPassBase>            const pass     = mPasses.at(passUID);
+                Unique<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
 
                 CEngineResult<> executed = pass->execute(mResourceData, aRenderContext);
                 if(not executed.successful())
@@ -319,14 +319,14 @@ namespace engine
             {
                 aRenderContext->unbindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> sourceResourceFetch = mResourceData.get<SFrameGraphTextureView>(mOutputTextureResourceId);
+                CEngineResult<Shared<SFrameGraphTextureView>> sourceResourceFetch = mResourceData.get<SFrameGraphTextureView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture view."));
                     return {sourceResourceFetch.result()};
                 }
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>> parentResourceFetch = mResourceData.get<SFrameGraphTexture>(sourceResourceFetch.data()->subjacentResource);
+                CEngineResult<Shared<SFrameGraphTexture>> parentResourceFetch = mResourceData.get<SFrameGraphTexture>(sourceResourceFetch.data()->subjacentResource);
                 if(not parentResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));
@@ -361,7 +361,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
                 FrameGraphResourceIdList                  const &aResourceIds)
         {
             CEngineResult<> initialization { EEngineStatus::Ok };
@@ -369,15 +369,15 @@ namespace engine
 
             for(FrameGraphResourceId_t const&id : aResourceIds)
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> subjacentFetch;
+                CEngineResult<Shared<SFrameGraphResource>> subjacentFetch;
 
-                CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
-                CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
-                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
+                Shared<SFrameGraphResource>    subjacent   = nullptr;
+                Shared<SFrameGraphTexture>     texture     = nullptr;
+                Shared<SFrameGraphTextureView> textureView = nullptr;
 
                 FrameGraphResourceIdList::const_iterator it = mInstantiatedResources.end();
 
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
+                Shared<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
@@ -461,12 +461,12 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeRenderPassAndFrameBuffer(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
                 std::string                               const &aRenderPassId,
                 std::string                               const &aFrameBufferId)
         {
-            std::vector<CStdSharedPtr_t<SFrameGraphTexture>>     textureReferences{};
-            std::vector<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewReferences{};
+            std::vector<Shared<SFrameGraphTexture>>     textureReferences{};
+            std::vector<Shared<SFrameGraphTextureView>> textureViewReferences{};
 
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
             FrameGraphResourceIdList        const &attachmentResourceIds = attachments  .getAttachementResourceIds();
@@ -490,7 +490,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeRenderPassAndFrameBuffer(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
                 std::string                               const &aRenderPassId,
                 std::string                               const &aFrameBufferId)
         {
@@ -511,16 +511,16 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::bindResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
                 FrameGraphResourceIdList                  const &aResourceIds)
         {
             CEngineResult<> binding = EEngineStatus::Ok;
 
             for(FrameGraphResourceId_t const &id : aResourceIds)
             {
-                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
+                Shared<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
+                Shared<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
@@ -548,16 +548,16 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::unbindResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
                 FrameGraphResourceIdList                  const &aResourceIds)
         {
             CEngineResult<> unbinding = EEngineStatus::Ok;
 
             for(FrameGraphResourceId_t const &id : aResourceIds)
             {
-                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
+                Shared<SFrameGraphTextureView> textureView = nullptr;
 
-                CStdSharedPtr_t<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
+                Shared<SFrameGraphResource> const resource = mResourceData.get<SFrameGraphResource>(id).data();
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
@@ -584,7 +584,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeResources(
-                CStdSharedPtr_t<IFrameGraphRenderContext>      &aRenderContext,
+                Shared<IFrameGraphRenderContext>      &aRenderContext,
                 FrameGraphResourceIdList                  const&aResourceIds)
         {
             SHIRABE_UNUSED(aRenderContext);
@@ -597,10 +597,10 @@ namespace engine
 
                 CEngineResult<> deinitialized = { EEngineStatus::Ok };
 
-                CStdSharedPtr_t<SFrameGraphResource>    resource    = mResourceData.getMutable<SFrameGraphResource>(aId).data();
-                CStdSharedPtr_t<SFrameGraphResource>    subjacent   = nullptr;
-                CStdSharedPtr_t<SFrameGraphTexture>     texture     = nullptr;
-                CStdSharedPtr_t<SFrameGraphTextureView> textureView = nullptr;
+                Shared<SFrameGraphResource>    resource    = mResourceData.getMutable<SFrameGraphResource>(aId).data();
+                Shared<SFrameGraphResource>    subjacent   = nullptr;
+                Shared<SFrameGraphTexture>     texture     = nullptr;
+                Shared<SFrameGraphTextureView> textureView = nullptr;
 
                 switch(resource->type)
                 {
@@ -633,7 +633,7 @@ namespace engine
 
                     if(resource->referenceCount == 0)
                     {
-                        CEngineResult<CStdSharedPtr_t<SFrameGraphResource> const> subjacentFetch = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
+                        CEngineResult<Shared<SFrameGraphResource> const> subjacentFetch = mResourceData.get<SFrameGraphResource>(resource->subjacentResource);
                         if(not subjacentFetch.successful())
                         {
                             EngineStatusPrintOnError(subjacentFetch.result(), logTag(), "Failed to fetch subjacent resource.");
@@ -694,8 +694,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTexture(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture)
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<SFrameGraphTexture>       const &aTexture)
         {
             CEngineResult<> initialization = EEngineStatus::Ok;
 
@@ -714,9 +714,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTextureView(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
-                CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView)
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<SFrameGraphTexture>       const &aTexture,
+                Shared<SFrameGraphTextureView>   const &aTextureView)
         {
             bool const isForwardedOrAccepted =
                     ((aTextureView->mode.check(EFrameGraphViewAccessMode::Forward)) ||
@@ -737,9 +737,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeTextureView(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
-                CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView)
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<SFrameGraphTexture>       const &aTexture,
+                Shared<SFrameGraphTextureView>   const &aTextureView)
         {
             SHIRABE_UNUSED(aTexture);
 
@@ -762,8 +762,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeTexture(
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture)
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
+                Shared<SFrameGraphTexture>       const &aTexture)
         {
             SHIRABE_UNUSED(aRenderContext);
 
@@ -791,7 +791,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::addPass(CStdSharedPtr_t<CPassBase> const &aPass)
+        CEngineResult<> CGraph::addPass(Shared<CPassBase> const &aPass)
         {
             if(mPasses.end() != mPasses.find(aPass->passUID()))
             {

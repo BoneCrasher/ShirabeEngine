@@ -106,12 +106,12 @@ namespace engine
 
   //  SwapChainBuffer::Descriptor const&desc = request.resourceDescriptor();
 
-  //  CStdSharedPtr_t<void> privateDependencyHandle = resolvedDependencies.at(request.swapChainId());
+  //  Shared<void> privateDependencyHandle = resolvedDependencies.at(request.swapChainId());
   //  if(!privateDependencyHandle) {
   //    HandleEngineStatusError(EEngineStatus::DXDevice_CreateSwapChainBuffer_Failed, "Failed to create SRV due to missing dependency.");
   //  }
 
-  //  CStdSharedPtr_t<IDXGISwapChain> swapChain = std::static_pointer_cast<IDXGISwapChain>(privateDependencyHandle);
+  //  Shared<IDXGISwapChain> swapChain = std::static_pointer_cast<IDXGISwapChain>(privateDependencyHandle);
 
   //  DXGI_SWAP_CHAIN_DESC  swapChainDescriptor ={};
   //  ID3D11Texture2D      *backBufferUnmanaged = nullptr;

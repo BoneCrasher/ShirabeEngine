@@ -56,9 +56,11 @@
 #define private_methods             private
 #define private_constants           private
 #define private_members             private
+#define private_api                 private
 
 #define SHIRABE_INLINE    inline
 #define SHIRABE_UNUSED(x) (void)(x)
+#define SHIRABE_EXPLICIT_DISCARD(x) { [[maybe_unused]] auto __impl_v = x; }
 
 #define SHIRABE_DEBUG_BREAK __builtin_trap()
 

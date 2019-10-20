@@ -13,7 +13,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CPassBuilder::CPassBuilder(
                 PassUID_t                   const &aPassUID,
-                CStdSharedPtr_t<CPassBase>         aPass,
+                Shared<CPassBase>         aPass,
                 CFrameGraphMutableResources       &aOutResourceData)
             : mPassUID             (aPassUID                         )
             , mPass                (aPass                            )
@@ -81,7 +81,7 @@ namespace engine
         {
             for(FrameGraphResourceId_t const &viewId : mResourceData.textureViews())
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> viewFetch = mResourceData.get<SFrameGraphTextureView>(viewId);
+                CEngineResult<Shared<SFrameGraphTextureView> const> viewFetch = mResourceData.get<SFrameGraphTextureView>(viewId);
                 if(not viewFetch.successful())
                 {
                     continue;
@@ -122,7 +122,7 @@ namespace engine
 
             if(EFrameGraphResourceType::TextureView == aSourceResource.type)
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.subjacentResource);
+                CEngineResult<Shared<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.subjacentResource);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(not subjacentFetch.successful())
                 {
@@ -131,7 +131,7 @@ namespace engine
                 }
 #endif
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> parentFetch = aResourceData.get<SFrameGraphTextureView>(aSourceResource.resourceId);
+                CEngineResult<Shared<SFrameGraphTextureView> const> parentFetch = aResourceData.get<SFrameGraphTextureView>(aSourceResource.resourceId);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(not parentFetch.successful())
                 {
@@ -166,7 +166,7 @@ namespace engine
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
             else // Texture
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.resourceId);
+                CEngineResult<Shared<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.resourceId);
                 if(not subjacentFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Subjacent resource handle w/ id %0 is empty.", aSourceResource.subjacentResource));
@@ -315,7 +315,7 @@ namespace engine
                 {
                     FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
 
-                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
                     if(not viewFetch.successful())
                     {
                         return { viewFetch.result() };
@@ -339,7 +339,7 @@ namespace engine
                 view.type               = EFrameGraphResourceType::TextureView;
                 view.mode.set(mode);
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
+                CEngineResult<Shared<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
                 if(not subjacentFetch.successful())
                 {
                     return { subjacentFetch.result() };
@@ -381,7 +381,7 @@ namespace engine
             EFrameGraphViewPurpose     const source = EFrameGraphViewPurpose::Undefined;
 
             // TODO: Naming correct? SHouldn't it be parent resource?
-            CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> const &subjacentTargetFetch = mResourceData.get<SFrameGraphTextureView>(aSubjacentTargetResource.resourceId);
+            CEngineResult<Shared<SFrameGraphTextureView> const> const &subjacentTargetFetch = mResourceData.get<SFrameGraphTextureView>(aSubjacentTargetResource.resourceId);
             if(not subjacentTargetFetch.successful())
             {
                 return { subjacentTargetFetch.result() };
@@ -424,7 +424,7 @@ namespace engine
                 {
                     FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
 
-                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
                     if(not viewFetch.successful())
                     {
                         return { viewFetch.result() };
@@ -448,7 +448,7 @@ namespace engine
                 view.type               = EFrameGraphResourceType::TextureView;
                 view.mode.set(mode);
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
+                CEngineResult<Shared<SFrameGraphResource>> const &subjacentFetch = mResourceData.getMutable<SFrameGraphResource>(subjacentResourceId);
                 if(not subjacentFetch.successful())
                 {
                     return { subjacentFetch.result() };
@@ -538,7 +538,7 @@ namespace engine
                 {
                     FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
 
-                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
+                    CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = mResourceData.getMutable<SFrameGraphTextureView>(duplicateViewId);
                     if(not viewFetch.successful())
                     {
                         return { viewFetch.result() };
@@ -748,7 +748,7 @@ namespace engine
             // The whole operation setup is based on first come first serve.
             for(RefIndex_t::value_type const &viewRef : aResourceViews)
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> const &viewFetch = aResources.get<SFrameGraphTextureView>(viewRef);
+                CEngineResult<Shared<SFrameGraphTextureView> const> const &viewFetch = aResources.get<SFrameGraphTextureView>(viewRef);
                 if(not viewFetch.successful())
                 {
                     return { viewFetch.result(), false };
@@ -807,7 +807,7 @@ namespace engine
             // The whole operation setup is based on first come first serve.
             for(RefIndex_t::value_type const &viewRef : aResourceViews)
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> const &viewFetch = aResources.get<SFrameGraphTextureView>(viewRef);
+                CEngineResult<Shared<SFrameGraphTextureView> const> const &viewFetch = aResources.get<SFrameGraphTextureView>(viewRef);
                 if(not viewFetch.successful())
                 {
 

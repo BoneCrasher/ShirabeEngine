@@ -49,7 +49,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CMockFrameGraphRenderContext::CMockFrameGraphRenderContext(CStdSharedPtr_t<IRenderContext> aRenderer)
+        CMockFrameGraphRenderContext::CMockFrameGraphRenderContext(Shared<IRenderContext> aRenderer)
             : mRenderer(aRenderer)
         {}
         //<-----------------------------------------------------------------------------
@@ -57,12 +57,12 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IFrameGraphRenderContext> CMockFrameGraphRenderContext::fromRenderer(CStdSharedPtr_t<IRenderContext> aRenderer)
+        Shared<IFrameGraphRenderContext> CMockFrameGraphRenderContext::fromRenderer(Shared<IRenderContext> aRenderer)
         {
             assert(nullptr != aRenderer);
 
-            CStdSharedPtr_t<FrameGraph::IFrameGraphRenderContext> context =
-                    CStdSharedPtr_t<CMockFrameGraphRenderContext>(new CMockFrameGraphRenderContext(aRenderer));
+            Shared<FrameGraph::IFrameGraphRenderContext> context =
+                    Shared<CMockFrameGraphRenderContext>(new CMockFrameGraphRenderContext(aRenderer));
             if(!context)
             {
                 CLog::Error(logTag(), "Failed to create render context from renderer.");
@@ -371,7 +371,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -396,7 +396,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -421,7 +421,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -445,7 +445,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -470,7 +470,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -495,7 +495,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -520,7 +520,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 
@@ -544,7 +544,7 @@ namespace Test
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
-                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeCStdSharedPtr<int>());
+                assignment.internalResourceHandle = std::static_pointer_cast<void>(makeShared<int>());
                 return assignment;
             };
 

@@ -11,7 +11,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            CX11WindowFactory::CX11WindowFactory(CStdSharedPtr_t<CX11Display> const &aDisplay)
+            CX11WindowFactory::CX11WindowFactory(Shared<CX11Display> const &aDisplay)
                 : mX11Display(aDisplay)
             {}
             //<-----------------------------------------------------------------------------
@@ -27,11 +27,11 @@ namespace engine
             //<
             //<-----------------------------------------------------------------------------
 
-            CStdSharedPtr_t<IWindow> CX11WindowFactory::createWindow(
+            Shared<IWindow> CX11WindowFactory::createWindow(
                     std::string const &aName,
                     CRect       const &aInitialBounds)
             {
-                CStdSharedPtr_t<IWindow> window = nullptr;
+                Shared<IWindow> window = nullptr;
 
                 Display *const  display = reinterpret_cast<Display *const>(mX11Display->displayHandle());
                 uint64_t const &screen  = mX11Display->primaryScreenIndex();
@@ -50,7 +50,7 @@ namespace engine
                 {
                     Window const x11Window = XCreateWindow(display, XRootWindow(display, screen), x, y, w, h, 1, d, InputOutput, visual, CWBackPixel, &attributes);
 
-                    window = makeCStdSharedPtr<CX11Window>(display, x11Window, aName, aInitialBounds);
+                    window = makeShared<CX11Window>(display, x11Window, aName, aInitialBounds);
                 }
                 catch(...)
                 {

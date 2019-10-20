@@ -549,7 +549,7 @@ namespace engine
         /**
          * Describes a list of framegraph resources.
          */
-        using Index_t = Vector<CStdSharedPtr_t<SFrameGraphResource>>;
+        using Index_t = Vector<Shared<SFrameGraphResource>>;
 
         /**
          * Describes a list of resource ids to index into a list of resources.
@@ -634,7 +634,7 @@ namespace engine
             template <typename T>
             CEngineResult
             <
-                CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>> const
+                Shared<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>> const
             >
             get(FrameGraphResourceId_t const &aResourceId) const
             {
@@ -646,7 +646,7 @@ namespace engine
                 }
 #endif
 
-                CStdSharedPtr_t<SFrameGraphResource> resource = mResources.at(aResourceId);
+                Shared<SFrameGraphResource> resource = mResources.at(aResourceId);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(nullptr == resource)
                 {
@@ -655,7 +655,7 @@ namespace engine
                 }
 #endif
 
-                CStdSharedPtr_t<T> ptr = std::static_pointer_cast<T>(resource);
+                Shared<T> ptr = std::static_pointer_cast<T>(resource);
                 return { EEngineStatus::Ok, ptr };
             }
 
@@ -691,7 +691,7 @@ namespace engine
             template <typename T> // with T : FrameGraphResource
             typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T> &spawnResource()
             {
-                CStdSharedPtr_t<T> ptr = std::make_shared<T>();
+                Shared<T> ptr = std::make_shared<T>();
                 ptr->resourceId = mResources.size();
 
                 mResources.push_back(ptr);
@@ -711,16 +711,16 @@ namespace engine
              */
             template <typename T> // with T : FrameGraphResource
             CEngineResult<
-                CStdSharedPtr_t<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>>
+                Shared<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>>
             >
             getMutable(FrameGraphResourceId_t const &aResourceId)
             {
-                CEngineResult<CStdSharedPtr_t<T> const> fetch  = static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId);
-                CEngineResult<CStdSharedPtr_t<T>>       result = { EEngineStatus::Ok };
+                CEngineResult<Shared<T> const> fetch  = static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId);
+                CEngineResult<Shared<T>>       result = { EEngineStatus::Ok };
                 if(not fetch.resultEquals(EEngineStatus::ResourceError_NotFound))
                 {
-                   CStdSharedPtr_t<T> ptr = std::const_pointer_cast<T>(fetch.data());
-                   result = CEngineResult<CStdSharedPtr_t<T>>(EEngineStatus::Ok, ptr);
+                   Shared<T> ptr = std::const_pointer_cast<T>(fetch.data());
+                   result = CEngineResult<Shared<T>>(EEngineStatus::Ok, ptr);
                 }
 
                 return result;

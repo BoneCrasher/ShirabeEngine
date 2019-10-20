@@ -181,14 +181,14 @@ namespace engine
                  * @param aCallback The callback listener to hook in.
                  * @return          EEngineStatus::Ok if successful. An error code otherwise.
                  */
-                EEngineStatus registerCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback);
+                EEngineStatus registerCallback(Shared<IWindow::IEventCallback> aCallback);
                 /**
                  * Register a new event callback handler for this window.
                  *
                  * @param aCallback The callback listener to hook in.
                  * @return          EEngineStatus::Ok if successful. An error code otherwise.
                  */
-                EEngineStatus unregisterCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback);
+                EEngineStatus unregisterCallback(Shared<IWindow::IEventCallback> aCallback);
 
                 /**
                  * Invoked, when a window was created and assigned a screen handle.
@@ -248,7 +248,7 @@ namespace engine
                         XEvent  const &aEvent);
 
             private_members:
-                CStdSharedPtr_t<CWindowManager> mWindowManager;
+                Shared<CWindowManager> mWindowManager;
                 Display                        *mDisplay;
                 std::string                     mName;
                 CRect                           mBounds;

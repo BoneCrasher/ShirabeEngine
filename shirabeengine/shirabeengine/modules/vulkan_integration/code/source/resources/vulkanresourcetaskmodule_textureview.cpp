@@ -59,14 +59,14 @@ namespace engine
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 PublicResourceId_t const &underlyingTextureHandle = aRequest.underlyingTextureHandle();
-                CStdSharedPtr_t<void>     privateDependencyHandle = aDepencies.at(underlyingTextureHandle);
+                Shared<void>     privateDependencyHandle = aDepencies.at(underlyingTextureHandle);
                 if(not privateDependencyHandle)
                 {
                     CLog::Error(logTag(), "Failed to create TextureView due to missing dependency.");
                     return { EEngineStatus::DXDevice_CreateRTV_Failed };
                 }
 
-                CStdSharedPtr_t<SVulkanTextureResource> texture = std::static_pointer_cast<SVulkanTextureResource>(privateDependencyHandle);
+                Shared<SVulkanTextureResource> texture = std::static_pointer_cast<SVulkanTextureResource>(privateDependencyHandle);
                 if(not texture)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for texture destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
@@ -116,7 +116,7 @@ namespace engine
                 };
 
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanTextureViewResource>(textureViewResource, textureViewDeleter);
+                assignment.internalResourceHandle = Shared<SVulkanTextureViewResource>(textureViewResource, textureViewDeleter);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -161,7 +161,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(aAssignment.internalResourceHandle);
+                Shared<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(aAssignment.internalResourceHandle);
                 if(nullptr == textureView)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for texture view destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));

@@ -78,14 +78,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool CFrameGraphGraphVizSerializer::serialize(
                 CGraph                   const &aSource,
-                CStdSharedPtr_t<IResult>       &aOutResult)
+                Shared<IResult>       &aOutResult)
         {
-            CStdSharedPtr_t<CFrameGraphSerializationResult> result = nullptr;
+            Shared<CFrameGraphSerializationResult> result = nullptr;
 
             bool const serialized = serializeGraph(aSource);
             if(serialized)
             {
-                result = makeCStdSharedPtr<CFrameGraphSerializationResult>(mStream.str());
+                result = makeShared<CFrameGraphSerializationResult>(mStream.str());
                 mStream.str(std::string());
             }
 
@@ -100,7 +100,7 @@ namespace engine
         {
 
 
-            CStdUniquePtr_t<CGraph::CAccessor> accessor = aGraph.getAccessor(CPassKey<CFrameGraphGraphVizSerializer>());
+            Unique<CGraph::CAccessor> accessor = aGraph.getAccessor(CPassKey<CFrameGraphGraphVizSerializer>());
 
             CFrameGraphResources const &resources = accessor->resourceData();
 
@@ -178,7 +178,7 @@ namespace engine
                 {
                     mStream << CString::format("\n  subgraph pass%0 {\n", sourceUID);
 
-                    CStdSharedPtr_t<CPassBase> sourcePass = aGraph.passes().at(sourceUID);
+                    Shared<CPassBase> sourcePass = aGraph.passes().at(sourceUID);
 
                     sourcePass->acceptSerializer(*this);
 

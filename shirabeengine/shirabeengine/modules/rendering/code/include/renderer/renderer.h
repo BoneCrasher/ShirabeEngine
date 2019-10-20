@@ -36,10 +36,10 @@ namespace engine
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             EEngineStatus initialize(
-                    CStdSharedPtr_t<SApplicationEnvironment>  const &aApplicationEnvironment,
-                    CStdSharedPtr_t<wsi::CWSIDisplay>         const &aDisplay,
+                    Shared<SApplicationEnvironment>  const &aApplicationEnvironment,
+                    Shared<wsi::CWSIDisplay>         const &aDisplay,
                     SRendererConfiguration                    const &aConfiguration,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aFrameGraphRenderContext) ;
+                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext) ;
 
             /**
              * Deinitialize and clear the renderer.
@@ -84,9 +84,9 @@ namespace engine
 
         private_members:
             SRendererConfiguration                    mConfiguration;
-            CStdSharedPtr_t<SApplicationEnvironment>  mAppEnvironment;
-            CStdSharedPtr_t<wsi::CWSIDisplay>         mDisplay;
-            CStdSharedPtr_t<IFrameGraphRenderContext> mFrameGraphRenderContext;
+            Shared<SApplicationEnvironment>  mAppEnvironment;
+            Shared<wsi::CWSIDisplay>         mDisplay;
+            Shared<IFrameGraphRenderContext> mFrameGraphRenderContext;
             std::atomic<bool>                         mPaused;
 
         };

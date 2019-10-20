@@ -22,7 +22,7 @@ namespace engine
 
             template <typename TResource>
             using CreatorFn_t  = std::function<
-                                        CStdSharedPtr_t<IResourceProxy<TResource>>(
+                                        Shared<IResourceProxy<TResource>>(
                                             EProxyType                           const&,
                                             typename TResource::CCreationRequest const&)>;
 
@@ -36,7 +36,7 @@ namespace engine
              * @return
              */
             template <typename TResource>
-            CStdSharedPtr_t<IResourceProxy<TResource>> create(
+            Shared<IResourceProxy<TResource>> create(
                     EProxyType                           const &aProxyType,
                     typename TResource::CCreationRequest const &aCreationRequest);
 
@@ -62,7 +62,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        CStdSharedPtr_t<IResourceProxy<TResource>>
+        Shared<IResourceProxy<TResource>>
         CResourceProxyFactory::create(
                 EProxyType                           const &aProxyType,
                 typename TResource::CCreationRequest const &aCreationRequest)
@@ -75,7 +75,7 @@ namespace engine
             Any_t                  const &anyCreator = m_creators.at(type);
             CreatorFn_t<TResource> const &creator    = std::any_cast<CreatorFn_t<TResource>>(anyCreator);
 
-            CStdSharedPtr_t<IResourceProxy<TResource>> const proxy = creator(aProxyType, aCreationRequest);
+            Shared<IResourceProxy<TResource>> const proxy = creator(aProxyType, aCreationRequest);
             if(!proxy)
                 throw std::runtime_error("Cannot create proxy.");
 

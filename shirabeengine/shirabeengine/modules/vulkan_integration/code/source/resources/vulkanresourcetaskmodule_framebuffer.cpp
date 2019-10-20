@@ -29,14 +29,14 @@ namespace engine
                 PublicResourceId_t     const &renderPassHandle   = aRequest.renderPassHandle();
                 PublicResourceIdList_t const &textureViewHandles = aRequest.textureViewHandles();
 
-                CStdSharedPtr_t<void> renderPassPrivateHandle = aDependencies.at(renderPassHandle);
+                Shared<void> renderPassPrivateHandle = aDependencies.at(renderPassHandle);
                 if(not renderPassPrivateHandle)
                 {
                     CLog::Error(logTag(), "Failed to create frame buffer due to missing dependency.");
                     return { EEngineStatus::DXDevice_CreateRTV_Failed };
                 }
 
-                CStdSharedPtr_t<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(renderPassPrivateHandle);
+                Shared<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(renderPassPrivateHandle);
                 if(not renderPass)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
@@ -47,14 +47,14 @@ namespace engine
 
                 for(PublicResourceId_t const &id : textureViewHandles)
                 {
-                    CStdSharedPtr_t<void> textureViewPrivateHandle = aDependencies.at(id);
+                    Shared<void> textureViewPrivateHandle = aDependencies.at(id);
                     if(not textureViewPrivateHandle)
                     {
                         CLog::Error(logTag(), "Failed to create frame buffer due to missing dependency.");
                         return { EEngineStatus::DXDevice_CreateRTV_Failed };
                     }
 
-                    CStdSharedPtr_t<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(textureViewPrivateHandle);
+                    Shared<SVulkanTextureViewResource> textureView = std::static_pointer_cast<SVulkanTextureViewResource>(textureViewPrivateHandle);
                     if(not textureView)
                     {
                         CLog::Error(logTag(), "Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE);
@@ -98,7 +98,7 @@ namespace engine
                 };
 
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanFrameBufferResource>(frameBufferResource, frameBufferDeleter);
+                assignment.internalResourceHandle = Shared<SVulkanFrameBufferResource>(frameBufferResource, frameBufferDeleter);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -143,7 +143,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanFrameBufferResource> frameBuffer = std::static_pointer_cast<SVulkanFrameBufferResource>(aAssignment.internalResourceHandle);
+                Shared<SVulkanFrameBufferResource> frameBuffer = std::static_pointer_cast<SVulkanFrameBufferResource>(aAssignment.internalResourceHandle);
                 if(not frameBuffer)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer destruction.", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));

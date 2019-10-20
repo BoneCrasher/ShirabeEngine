@@ -127,7 +127,7 @@ namespace engine
              * @param aPassKey Pass-Key instance creatable by CGraphBuilder instances only.
              * @return         See brief.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const;
+            Unique<CAccessor> getAccessor(CPassKey<CGraphBuilder> &&aPassKey) const;
 
             /**
              * Return an accessor to CGraphBuilder instances.
@@ -135,7 +135,7 @@ namespace engine
              * @param aPassKey Pass-Key instance creatable by CGraphBuilder instances only.
              * @return         See brief.
              */
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey);
+            Unique<CMutableAccessor> getMutableAccessor(CPassKey<CGraphBuilder> &&aPassKey);
 
             /**
              * Return an accessor to PassBuilder instances.
@@ -143,7 +143,7 @@ namespace engine
              * @param aPassKey Pass-Key instance creatable by PassBuilder instances only.
              * @return         See brief.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CPassBuilder> &&aPassKey) const;
+            Unique<CAccessor> getAccessor(CPassKey<CPassBuilder> &&aPassKey) const;
 
             /**
              * Return an accessor to PassBuilder instances.
@@ -151,7 +151,7 @@ namespace engine
              * @param aPassKey Pass-Key instance creatable by PassBuilder instances only.
              * @return         See brief.
              */
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey);
+            Unique<CMutableAccessor> getMutableAccessor(CPassKey<CPassBuilder> &&aPassKey);
 
             /**
              * Return an accessor to CGraph instances.
@@ -159,7 +159,7 @@ namespace engine
              * @param aPassKey Pass-Key instance creatable by CGraph instances only.
              * @return         See brief.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CGraph> &&aPassKey) const;
+            Unique<CAccessor> getAccessor(CPassKey<CGraph> &&aPassKey) const;
 
             /**
              * Return the UID assigned to this pass.
@@ -212,7 +212,7 @@ namespace engine
              */
             virtual CEngineResult<> execute(
                     CFrameGraphResources                      const &aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aContext) = 0;
+                    Shared<IFrameGraphRenderContext>       &aContext) = 0;
 
         private_methods:
             /**
@@ -229,8 +229,8 @@ namespace engine
             FrameGraphResourceIdList mResourceReferences;
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<CPassBase>, CPassBase);
-        SHIRABE_DECLARE_MAP_OF_TYPES(PassUID_t, CStdSharedPtr_t<CPassBase>, Pass);
+        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CPassBase>, CPassBase);
+        SHIRABE_DECLARE_MAP_OF_TYPES(PassUID_t, Shared<CPassBase>, Pass);
 
         /**
          * The CallbackPass is a pass implementation, which accepts callbacks for setup and execute,
@@ -248,7 +248,7 @@ namespace engine
 
         public_typedefs:
             using SetupCallback_t = std::function<CEngineResult<>(CPassBuilder&, TPassData&)>;
-            using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&, CFrameGraphResources const&, CStdSharedPtr_t<IFrameGraphRenderContext>&)>;
+            using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&, CFrameGraphResources const&, Shared<IFrameGraphRenderContext>&)>;
 
         public_constructors:
             /**
@@ -283,7 +283,7 @@ namespace engine
              */
             CEngineResult<> execute(
                     CFrameGraphResources                      const &aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aContext);
+                    Shared<IFrameGraphRenderContext>       &aContext);
 
             /**
              * Return the pass data struct associated with this callback pass.
@@ -346,7 +346,7 @@ namespace engine
         template <typename TPassData>
         CEngineResult<> CallbackPass<TPassData>::execute(
                 CFrameGraphResources                      const &aFrameGraphResources,
-                CStdSharedPtr_t<IFrameGraphRenderContext>       &aContext)
+                Shared<IFrameGraphRenderContext>       &aContext)
         {
             try
             {

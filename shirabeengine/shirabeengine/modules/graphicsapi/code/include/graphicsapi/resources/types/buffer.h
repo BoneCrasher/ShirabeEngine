@@ -33,6 +33,9 @@ namespace engine
             SHIRABE_LIBRARY_EXPORT CBufferResource
             : public CResourceObject<SBufferDescription>
         {
+        public_typedefs:
+            using SDescriptor = SBufferDescription;
+
         public_constructors:
             using CResourceObject<SBufferDescription>::CResourceObject;
 

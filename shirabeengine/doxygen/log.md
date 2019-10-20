@@ -1394,17 +1394,17 @@ Possible candidates:
   engine::CCallbackTimer::CCallbackTimer(CCallbackTimer &&)=delete
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:10: warning: no matching file member found for 
-CStdSharedPtr_t< ITimespan > engine::operator+(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
+Shared< ITimespan > engine::operator+(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
- 'static CStdSharedPtr_t< ITimespan > operator+(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 221 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static Shared< ITimespan > operator+(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 221 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'CField< T, TByteSize, TN, TStride >::ClassType_t operator+(typename CField< T, TByteSize, TN, TStride > ::ClassType_t const &aLHS, typename CField< T, TByteSize, TN, TStride > ::ClassType_t const &aRHS)' at line 447 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h
  'static CQuaternion operator+(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)' at line 296 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/quaternion.h
  'CVector< T, N, TDerived > operator+(CVector< T, N, TDerived > const &aLHS, CVector< T, N, TDerived > const &aRHS)' at line 793 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/vector.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:21: warning: no matching file member found for 
-CStdSharedPtr_t< ITimespan > engine::operator-(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
+Shared< ITimespan > engine::operator-(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
- 'static CStdSharedPtr_t< ITimespan > operator-(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 232 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static Shared< ITimespan > operator-(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 232 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'CField< T, TByteSize, TN, TStride >::ClassType_t operator-(typename CField< T, TByteSize, TN, TStride > ::ClassType_t const &aLHS, typename CField< T, TByteSize, TN, TStride > ::ClassType_t const &aRHS)' at line 471 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h
  'static CQuaternion operator-(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)' at line 315 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/quaternion.h
  'CVector< T, N, TDerived > operator-(CVector< T, N, TDerived > const &aLHS, CVector< T, N, TDerived > const &aRHS)' at line 824 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/vector.h
@@ -1413,32 +1413,32 @@ Possible candidates:
 bool engine::operator==(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
  'static bool operator==(CRange const &aLHS, CRange const &aRHS)' at line 50 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/basictypes.h
- 'static bool operator==(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 243 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static bool operator==(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 243 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'static bool operator==(ETimespanUnit l, ETimespanUnit r)' at line 65 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/timespanunit.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:43: warning: no matching file member found for 
 bool engine::operator<(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
- 'static bool operator<(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 254 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static bool operator<(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 254 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'static bool operator<(ETimespanUnit l, ETimespanUnit r)' at line 63 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/timespanunit.h
  'SHIRABE_TEST_EXPORT bool operator<(SFrameGraphResource const &aLHS, SFrameGraphResource const &aRHS)' at line 236 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:54: warning: no matching file member found for 
 bool engine::operator>(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
- 'static bool operator>(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 265 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static bool operator>(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 265 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'static bool operator>(ETimespanUnit l, ETimespanUnit r)' at line 64 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/timespanunit.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:65: warning: no matching file member found for 
 bool engine::operator>=(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
- 'static bool operator>=(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 276 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static bool operator>=(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 276 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'static bool operator>=(ETimespanUnit l, ETimespanUnit r)' at line 67 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/timespanunit.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:76: warning: no matching file member found for 
 bool engine::operator<=(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
 Possible candidates:
- 'static bool operator<=(CStdSharedPtr_t< ITimespan > const &aLHS, CStdSharedPtr_t< ITimespan > const &aRHS)' at line 286 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
+ 'static bool operator<=(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 286 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'static bool operator<=(ETimespanUnit l, ETimespanUnit r)' at line 66 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/timespanunit.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/linuxtime.cpp:10: warning: documented symbol `engine::CLinuxTime::CLinuxTime' was not declared or defined.
@@ -1549,16 +1549,16 @@ Possible candidates:
   engine::gfxapi::CSwapChainBufferDeclaration::CCreationRequest::CCreationRequest(SDescriptor const &desc)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:59: warning: no matching class member found for 
-  CStdSharedPtr_t< CSwapChainBuffer > engine::gfxapi::CSwapChainBuffer::create(CSwapChainBuffer::SDescriptor const &aDescriptor)
+  Shared< CSwapChainBuffer > engine::gfxapi::CSwapChainBuffer::create(CSwapChainBuffer::SDescriptor const &aDescriptor)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:69: warning: documented symbol `engine::gfxapi::CSwapChainBuffer::CSwapChainBuffer' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:78: warning: no uniquely matching class member found for 
   std::string engine::gfxapi::CSwapChainDeclaration::SDescriptor::toString() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:116: warning: no matching class member found for 
-  CStdSharedPtr_t< CSwapChain > engine::gfxapi::CSwapChain::create(CSwapChain::SDescriptor const &desc)
+  Shared< CSwapChain > engine::gfxapi::CSwapChain::create(CSwapChain::SDescriptor const &desc)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:124: warning: documented symbol `CStdSharedPtr_t< CTextureView > const engine::gfxapi::CSwapChain::getBackBufferRenderTargetView' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:124: warning: documented symbol `Shared< CTextureView > const engine::gfxapi::CSwapChain::getBackBufferRenderTargetView' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/swapchain.cpp:146: warning: documented symbol `engine::gfxapi::CSwapChain::CSwapChain' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/texture.cpp:10: warning: documented symbol `engine::gfxapi::STextureInfo::STextureInfo' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/texture.cpp:24: warning: documented symbol `void engine::gfxapi::STextureInfo::assignTextureInfoParameters' was not declared or defined.
@@ -1765,7 +1765,7 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:61: warning: documented symbol `engine::framegraph::CGraphBuilder::CGraphBuilder' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:94: warning: documented symbol `FrameGraphResourceId_t engine::framegraph::CGraphBuilder::generatePassUID' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:130: warning: no uniquely matching class member found for 
-  CEngineResult engine::framegraph::CGraphBuilder::initialize(CStdSharedPtr_t< SApplicationEnvironment > const &aApplicationEnvironment, CStdSharedPtr_t< wsi::CWSIDisplay > const &aDisplay)
+  CEngineResult engine::framegraph::CGraphBuilder::initialize(Shared< SApplicationEnvironment > const &aApplicationEnvironment, Shared< wsi::CWSIDisplay > const &aDisplay)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp:14: warning: documented symbol `CEngineResult< CFrameGraphModule< SCompositingModuleTag_t >::SExportData > engine::framegraph::CFrameGraphModule< SCompositingModuleTag_t >::addDefaultCompositingPass' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp:14: warning: documented symbol `CEngineResult< CFrameGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData > engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >::addGBufferGenerationPass' was not declared or defined.
@@ -1776,10 +1776,10 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:27: warning: documented symbol `engine::framegraph::CPassBase::CMutableAccessor::CMutableAccessor' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:36: warning: documented symbol `FrameGraphResourceIdList & engine::framegraph::CPassBase::CMutableAccessor::mutableResourceReferences' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:54: warning: no matching class member found for 
-  CStdUniquePtr_t< CPassBase::CAccessor > engine::framegraph::CPassBase::getAccessor(engine::CPassKey< engine::framegraph::CGraphBuilder > &&aPassKey) const
+  Unique< CPassBase::CAccessor > engine::framegraph::CPassBase::getAccessor(engine::CPassKey< engine::framegraph::CGraphBuilder > &&aPassKey) const
 Possible candidates:
-  CStdUniquePtr_t< CAccessor > engine::framegraph::CPassBase::getAccessor(CPassKey< CPassBuilder > &&aPassKey) const
-  CStdUniquePtr_t< CAccessor > engine::framegraph::CPassBase::getAccessor(CPassKey< CGraph > &&aPassKey) const
+  Unique< CAccessor > engine::framegraph::CPassBase::getAccessor(CPassKey< CPassBuilder > &&aPassKey) const
+  Unique< CAccessor > engine::framegraph::CPassBase::getAccessor(CPassKey< CGraph > &&aPassKey) const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:109: warning: no matching class member found for 
   engine::framegraph::CPassBase::CPassBase(PassUID_t const &aPassUID, std::string const &aPassName)
@@ -1793,7 +1793,7 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp:19: warning: documented symbol `engine::rendering::CRenderer::CRenderer' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp:31: warning: documented symbol `engine::rendering::CRenderer::~CRenderer' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp:39: warning: no uniquely matching class member found for 
-  EEngineStatus engine::rendering::CRenderer::initialize(CStdSharedPtr_t< SApplicationEnvironment > const &aApplicationEnvironment, CStdSharedPtr_t< wsi::CWSIDisplay > const &aDisplay, SRendererConfiguration const &aConfiguration, CStdSharedPtr_t< IFrameGraphRenderContext > &aFrameGraphRenderContext)
+  EEngineStatus engine::rendering::CRenderer::initialize(Shared< SApplicationEnvironment > const &aApplicationEnvironment, Shared< wsi::CWSIDisplay > const &aDisplay, SRendererConfiguration const &aConfiguration, Shared< IFrameGraphRenderContext > &aFrameGraphRenderContext)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:707: warning: no matching class member found for 
   template < TResource >
@@ -1802,7 +1802,7 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcepool.h:112: warning: documented symbol `CEngineResult engine::resources::IndexedResourcePool< TIndex, TValue >::addResource' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourceproxyfactory.h:66: warning: no matching class member found for 
   template < TResource >
-  CStdSharedPtr_t< IResourceProxy< TResource > > engine::resources::CResourceProxyFactory::create(EProxyType const &aProxyType, typename TResource::CCreationRequest const &aCreationRequest)
+  Shared< IResourceProxy< TResource > > engine::resources::CResourceProxyFactory::create(EProxyType const &aProxyType, typename TResource::CCreationRequest const &aCreationRequest)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcedatasource.cpp:26: warning: documented symbol `ByteBuffer engine::resources::CResourceDataSource::getData' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:10: warning: documented symbol `engine::resources::CResourceManagerBase::CResourceManagerBase' was not declared or defined.
@@ -1821,7 +1821,7 @@ Possible candidates:
   bool engine::documents::CXMLDocument::LibXml2State::empty() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp:16: warning: no uniquely matching class member found for 
-  bool engine::vulkan::CVulkanRenderContext::initialize(CStdSharedPtr_t< CVulkanEnvironment > const &aVulkanEnvironment, CStdSharedPtr_t< gfxapi::CGFXAPIResourceBackend > const &aGraphicsAPIResourceBackend)
+  bool engine::vulkan::CVulkanRenderContext::initialize(Shared< CVulkanEnvironment > const &aVulkanEnvironment, Shared< gfxapi::CGFXAPIResourceBackend > const &aGraphicsAPIResourceBackend)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/vulkan_integration/code/source/resources/vulkanresourcetaskbackend.cpp:10: warning: documented symbol `engine::vulkan::CVulkanResourceTaskBackend::CVulkanResourceTaskBackend' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/vulkan_integration/code/source/resources/vulkanresourcetaskbackend.cpp:57: warning: no uniquely matching class member found for 
@@ -1843,17 +1843,17 @@ Possible candidates:
   EEngineStatus engine::vulkan::CVulkanEnvironment::initialize(SApplicationEnvironment const &aApplicationEnvironment)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/vulkan_integration/code/source/wsi/x11surface.cpp:10: warning: no matching class member found for 
-  CEngineResult< VkSurfaceKHR > engine::vulkan::CX11VulkanSurface::create(CStdSharedPtr_t< CVulkanEnvironment > const &aVulkanEnvironment, CStdSharedPtr_t< CX11Display > const &aDisplay, CStdSharedPtr_t< CX11Window > const &aWindow)
+  CEngineResult< VkSurfaceKHR > engine::vulkan::CX11VulkanSurface::create(Shared< CVulkanEnvironment > const &aVulkanEnvironment, Shared< CX11Display > const &aDisplay, Shared< CX11Window > const &aWindow)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/iwindoweventcallbackadapter.cpp:36: warning: documented symbol `engine::wsi::CWindowEventCallbackAdapter::CWindowEventCallbackAdapter' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/iwindoweventcallbackadapter.cpp:44: warning: documented symbol `engine::wsi::CWindowEventCallbackAdapter::~CWindowEventCallbackAdapter' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/iwindoweventcallbackadapter.cpp:55: warning: no uniquely matching class member found for 
-  EEngineStatus engine::wsi::CWindowEventCallbackAdapter::registerCallback(CStdSharedPtr_t< IWindow::IEventCallback > aCallback)
+  EEngineStatus engine::wsi::CWindowEventCallbackAdapter::registerCallback(Shared< IWindow::IEventCallback > aCallback)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/windowmanager.cpp:24: warning: documented symbol `engine::wsi::CWindowManager::CWindowManager' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/windowmanager.cpp:35: warning: documented symbol `engine::wsi::CWindowManager::~CWindowManager' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/windowmanager.cpp:52: warning: no uniquely matching class member found for 
-  CWindowManager::EWindowManagerError engine::wsi::CWindowManager::initialize(os::SApplicationEnvironment const &aApplicationEnvironment, CStdSharedPtr_t< IWindowFactory > const &aFactory)
+  CWindowManager::EWindowManagerError engine::wsi::CWindowManager::initialize(os::SApplicationEnvironment const &aApplicationEnvironment, Shared< IWindowFactory > const &aFactory)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/windows/windowswindow.cpp:8: warning: documented symbol `engine::wsi::Windows::WindowsWindow::WindowsWindow' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/windows/windowswindow.cpp:20: warning: documented symbol `engine::wsi::Windows::WindowsWindow::~WindowsWindow' was not declared or defined.
@@ -1925,7 +1925,7 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/x11/x11windowfactory.cpp:14: warning: documented symbol `engine::wsi::x11::CX11WindowFactory::CX11WindowFactory' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/x11/x11windowfactory.cpp:22: warning: documented symbol `engine::wsi::x11::CX11WindowFactory::~CX11WindowFactory' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/x11/x11windowfactory.cpp:30: warning: no uniquely matching class member found for 
-  CStdSharedPtr_t< IWindow > engine::wsi::x11::CX11WindowFactory::createWindow(std::string const &aName, CRect const &aInitialBounds)
+  Shared< IWindow > engine::wsi::x11::CX11WindowFactory::createWindow(std::string const &aName, CRect const &aInitialBounds)
 
 1/x11windowfactory.h...
 Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/source/iwindoweventcallbackadapter.cpp...
@@ -3547,7 +3547,7 @@ Generating XML output for class engine:/home/dotti/workspaces/shirabeengine/shir
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h:129: warning: argument 'aOther' of command @param is not found in the argument list of engine::math::CField< T, TByteSize, TN, TStride >::operator-=(ClassType_t const &aRight)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h:133: warning: The following parameters of engine::math::CField::operator-=(ClassType_t const &aRight) are not documented:
   parameter 'aRight'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:51: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::create(CStdSharedPtr_t< IAssetStorage > aAssetStorage, CStdSharedPtr_t< CMaterialLoader > aMaterialLoader, CStdSharedPtr_t< CResourceManagerBase > aResourceManager, CStdSharedPtr_t< IRenderContext > aRenderer) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:51: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::create(Shared< IAssetStorage > aAssetStorage, Shared< CMaterialLoader > aMaterialLoader, Shared< CResourceManagerBase > aResourceManager, Shared< IRenderContext > aRenderer) are not documented:
   parameter 'aMaterialLoader'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:76: warning: argument 'aSourceImage' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceTexture, SFrameGraphTexture const &aTargetTexture)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:76: warning: argument 'aTargetImage' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceTexture, SFrameGraphTexture const &aTargetTexture)
@@ -3590,48 +3590,48 @@ Generating XML output for class engine:/home/dotti/workspaces/shirabeengine/shir
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:410: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:416: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial) are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/gfxapiresourcebackend.h:144: warning: The following parameters of engine::gfxapi::CGFXAPIResourceBackend::registerResource(PublicResourceId_t const &aId, CStdSharedPtr_t< void > const &aResource, EImportStorageMode const &aImportStorageMode=EImportStorageMode::NoOverwrite) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/gfxapiresourcebackend.h:144: warning: The following parameters of engine::gfxapi::CGFXAPIResourceBackend::registerResource(PublicResourceId_t const &aId, Shared< void > const &aResource, EImportStorageMode const &aImportStorageMode=EImportStorageMode::NoOverwrite) are not documented:
   parameter 'aImportStorageMode'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/gfxapiresourcetaskbackend.h:248: warning: The following parameters of engine::gfxapi::CGFXAPIResourceTaskBackend::queryTask(typename TResource::CQuery const &aRequest, SGFXAPIResourceHandleAssignment const &aAssignment, ResourceTaskFn_t &aOutTask) are not documented:
   parameter 'aOutTask'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:257: warning: The following parameters of engine::framegraph::CGraph::bindResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:257: warning: The following parameters of engine::framegraph::CGraph::bindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
   parameter 'aRenderContext'
   parameter 'aResourceIds'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:268: warning: The following parameters of engine::framegraph::CGraph::unbindResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:268: warning: The following parameters of engine::framegraph::CGraph::unbindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
   parameter 'aRenderContext'
   parameter 'aResourceIds'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:292: warning: The following parameters of engine::framegraph::CGraph::deinitializeResources(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:292: warning: The following parameters of engine::framegraph::CGraph::deinitializeResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
   parameter 'aRenderContext'
   parameter 'aResourceIds'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:297: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTexture(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:303: warning: The following parameters of engine::framegraph::CGraph::initializeTexture(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:297: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:303: warning: The following parameters of engine::framegraph::CGraph::initializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:308: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTextureView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture, CStdSharedPtr_t< SFrameGraphTextureView > const &aTextureView)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:315: warning: The following parameters of engine::framegraph::CGraph::initializeTextureView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture, CStdSharedPtr_t< SFrameGraphTextureView > const &aTextureView) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:308: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:315: warning: The following parameters of engine::framegraph::CGraph::initializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:320: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBuffer(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:325: warning: The following parameters of engine::framegraph::CGraph::initializeBuffer(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:320: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:325: warning: The following parameters of engine::framegraph::CGraph::initializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:329: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBufferView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:333: warning: The following parameters of engine::framegraph::CGraph::initializeBufferView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:329: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:333: warning: The following parameters of engine::framegraph::CGraph::initializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:337: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTexture(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:343: warning: The following parameters of engine::framegraph::CGraph::deinitializeTexture(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:337: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:343: warning: The following parameters of engine::framegraph::CGraph::deinitializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:348: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTextureView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture, CStdSharedPtr_t< SFrameGraphTextureView > const &aTextureView)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:355: warning: The following parameters of engine::framegraph::CGraph::deinitializeTextureView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext, CStdSharedPtr_t< SFrameGraphTexture > const &aTexture, CStdSharedPtr_t< SFrameGraphTextureView > const &aTextureView) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:348: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:355: warning: The following parameters of engine::framegraph::CGraph::deinitializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:361: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBufferView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:366: warning: The following parameters of engine::framegraph::CGraph::deinitializeBufferView(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:361: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:366: warning: The following parameters of engine::framegraph::CGraph::deinitializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:369: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBuffer(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:374: warning: The following parameters of engine::framegraph::CGraph::deinitializeBuffer(CStdSharedPtr_t< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:369: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:374: warning: The following parameters of engine::framegraph::CGraph::deinitializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h:171: warning: argument 'readableIdentifier' of command @param is not found in the argument list of engine::framegraph::CGraphBuilder::registerRenderables(std::string const &aReadableIdentifier, rendering::RenderableList const &aRenderables)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h:171: warning: argument 'renderables' of command @param is not found in the argument list of engine::framegraph::CGraphBuilder::registerRenderables(std::string const &aReadableIdentifier, rendering::RenderableList const &aRenderables)
@@ -3877,29 +3877,29 @@ Generating XML output for class engine::gfxapi::CSwapChain
 Generating XML output for class engine::gfxapi::CSwapChainBuffer
 Generating XML output for class engine::gfxapi::CSwapChainBufferDeclaration
 Generating XML output for class engine::gfxapi::CSwapChainDeclaration
-Generating XML output for class engine::CTestDumm/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:548: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator+(CStdSharedPtr_t< ITimespan > &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:553: warning: The following parameters of engine::CTimespan::operator+(CStdSharedPtr_t< ITimespan > &aOther) are not documented:
+Generating XML output for class engine::CTestDumm/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:548: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator+(Shared< ITimespan > &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:553: warning: The following parameters of engine::CTimespan::operator+(Shared< ITimespan > &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:560: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator-(CStdSharedPtr_t< ITimespan > &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:565: warning: The following parameters of engine::CTimespan::operator-(CStdSharedPtr_t< ITimespan > &aOther) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:560: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator-(Shared< ITimespan > &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:565: warning: The following parameters of engine::CTimespan::operator-(Shared< ITimespan > &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:572: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator==(CStdSharedPtr_t< ITimespan > &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:577: warning: The following parameters of engine::CTimespan::operator==(CStdSharedPtr_t< ITimespan > &aOther) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:572: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator==(Shared< ITimespan > &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:577: warning: The following parameters of engine::CTimespan::operator==(Shared< ITimespan > &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:584: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator>(CStdSharedPtr_t< ITimespan > &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:589: warning: The following parameters of engine::CTimespan::operator>(CStdSharedPtr_t< ITimespan > &aOther) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:584: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator>(Shared< ITimespan > &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:589: warning: The following parameters of engine::CTimespan::operator>(Shared< ITimespan > &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:596: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator<(CStdSharedPtr_t< ITimespan > &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:601: warning: The following parameters of engine::CTimespan::operator<(CStdSharedPtr_t< ITimespan > &aOther) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:596: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::operator<(Shared< ITimespan > &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:601: warning: The following parameters of engine::CTimespan::operator<(Shared< ITimespan > &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:661: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::add(CStdSharedPtr_t< ITimespan > &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:665: warning: The following parameters of engine::CTimespan::add(CStdSharedPtr_t< ITimespan > &aOther) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:661: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::add(Shared< ITimespan > &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:665: warning: The following parameters of engine::CTimespan::add(Shared< ITimespan > &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:671: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::sub(CStdSharedPtr_t< ITimespan > const &aOther)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:675: warning: The following parameters of engine::CTimespan::sub(CStdSharedPtr_t< ITimespan > const &aOther) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:671: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::sub(Shared< ITimespan > const &aOther)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:675: warning: The following parameters of engine::CTimespan::sub(Shared< ITimespan > const &aOther) are not documented:
   parameter 'aOther'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:681: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::compareImpl(CStdSharedPtr_t< ITimespan > &aOther) const
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:685: warning: The following parameters of engine::CTimespan::compareImpl(CStdSharedPtr_t< ITimespan > &aOther) const are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:681: warning: argument 'aaOther' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::compareImpl(Shared< ITimespan > &aOther) const
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:685: warning: The following parameters of engine::CTimespan::compareImpl(Shared< ITimespan > &aOther) const are not documented:
   parameter 'aOther'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:711: warning: argument 'from' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::UnitConversionFactor(eTimespanUnit const &aFrom, eTimespanUnit const &aTo)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h:711: warning: argument 'to' of command @param is not found in the argument list of engine::CTimespan< iSubsecondUnits >::UnitConversionFactor(eTimespanUnit const &aFrom, eTimespanUnit const &aTo)
@@ -3910,8 +3910,8 @@ Generating XML output for class engine::CTestDumm/home/dotti/workspaces/shirabee
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/buildingblocks/transform.h:89: warning: The following parameters of engine::CTransform::resetRotation(CQuaternion const &aQuaternionRotation=CQuaternion(1, 0, 0, 0)) are not documented:
   parameter 'aQuaternionRotation'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/vulkan_integration/code/include/vulkan/vulkanenvironment.h:243: warning: argument 'aApplicationEnvironment' of command @param is not found in the argument list of engine::vulkan::CVulkanEnvironment::determinePhysicalDevices()
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/include/wsi/iwindoweventcallbackadapter.h:82: warning: argument 'aNewBounds' of command @param is not found in the argument list of engine::wsi::CWindowEventCallbackAdapter::onBoundsChanged(CStdSharedPtr_t< IWindow > const &aWindow, CRect const &aBounds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/include/wsi/iwindoweventcallbackadapter.h:88: warning: The following parameters of engine::wsi::CWindowEventCallbackAdapter::onBoundsChanged(CStdSharedPtr_t< IWindow > const &aWindow, CRect const &aBounds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/include/wsi/iwindoweventcallbackadapter.h:82: warning: argument 'aNewBounds' of command @param is not found in the argument list of engine::wsi::CWindowEventCallbackAdapter::onBoundsChanged(Shared< IWindow > const &aWindow, CRect const &aBounds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/wsi/code/include/wsi/iwindoweventcallbackadapter.h:88: warning: The following parameters of engine::wsi::CWindowEventCallbackAdapter::onBoundsChanged(Shared< IWindow > const &aWindow, CRect const &aBounds) are not documented:
   parameter 'aBounds'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/glslang_port/worklist.h:59: warning: argument 's' of command @param is not found in the argument list of glslang_wrapper::CWorkItem::CWorkItem(std::string const &aItemName)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/glslang_port/worklist.h:62: warning: The following parameters of glslang_wrapper::CWorkItem::CWorkItem(std::string const &aItemName) are not documented:

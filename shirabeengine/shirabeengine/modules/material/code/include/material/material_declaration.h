@@ -1042,7 +1042,7 @@ namespace engine
                 CMaterialInstance(asset::AssetId_t                 const &aAssetUID,
                                   std::string                      const &aName,
                                   CMaterialConfig                       &&aConfig,
-                                  CStdSharedPtr_t<CMaterialMaster> const &aMaster)
+                                  Shared<CMaterialMaster> const &aMaster)
                     : asset::CAssetReference (aAssetUID)
                     , mName                  (aName                )
                     , mConfiguration         (std::move(aConfig)   )
@@ -1107,7 +1107,7 @@ namespace engine
                 }
 
                 SHIRABE_INLINE
-                CStdSharedPtr_t<CMaterialMaster> const &master() const
+                Shared<CMaterialMaster> const &master() const
                 {
                     return mMasterReference;
                 }
@@ -1115,7 +1115,7 @@ namespace engine
         private_members:
             std::string                      mName;
             CMaterialConfig                  mConfiguration;
-            CStdSharedPtr_t<CMaterialMaster> mMasterReference;
+            Shared<CMaterialMaster> mMasterReference;
         };
 
 

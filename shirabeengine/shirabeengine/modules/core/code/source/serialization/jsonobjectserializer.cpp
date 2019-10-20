@@ -11,7 +11,7 @@ namespace sr {
     using namespace sr::documents;
 
     /**********************************************************************************************//**
-     * \fn  template <typename TCollection> static bool serializeCollection( CStdSharedPtr_t<IObjectSerializer> &serializer, std::string const&name, TCollection const&collection)
+     * \fn  template <typename TCollection> static bool serializeCollection( Shared<IObjectSerializer> &serializer, std::string const&name, TCollection const&collection)
      *
      * \brief Serialize collection
      *
@@ -24,7 +24,7 @@ namespace sr {
      **************************************************************************************************/
     template <typename TCollection>
     static bool serializeCollection(
-      CStdSharedPtr_t<IObjectSerializer>      &serializer,
+      Shared<IObjectSerializer>      &serializer,
       std::string            const&name,
       TCollection            const&collection)
     {
@@ -36,7 +36,7 @@ namespace sr {
     }
 
     /**********************************************************************************************//**
-     * \fn  bool XMLSerializer::serializeObject(CStdSharedPtr_t<Object> const&object)
+     * \fn  bool XMLSerializer::serializeObject(Shared<Object> const&object)
      *
      * \brief Serialize object
      *
@@ -44,8 +44,8 @@ namespace sr {
      *
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
-    bool JSONSerializer::serializeObject(CStdSharedPtr_t<Object> const&object) {
-      CStdSharedPtr_t<IObjectSerializer> serializer = SharedFromThis<IObjectSerializer>(this);
+    bool JSONSerializer::serializeObject(Shared<Object> const&object) {
+      Shared<IObjectSerializer> serializer = SharedFromThis<IObjectSerializer>(this);
 
       //
       // Serialize an object at this point, applying the subsequent format:
@@ -69,7 +69,7 @@ namespace sr {
     }
 
     /**********************************************************************************************//**
-     * \fn  bool XMLSerializer::serializeProperty(CStdSharedPtr_t<Object> const&property)
+     * \fn  bool XMLSerializer::serializeProperty(Shared<Object> const&property)
      *
      * \brief Serialize property
      *
@@ -77,12 +77,12 @@ namespace sr {
      *
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
-    bool JSONSerializer::serializeProperty(CStdSharedPtr_t<Object> const&property) {
+    bool JSONSerializer::serializeProperty(Shared<Object> const&property) {
       return true;
     }
 
     /**********************************************************************************************//**
-     * \fn  bool XMLSerializer::deserializeObject(CStdSharedPtr_t<Object> &object)
+     * \fn  bool XMLSerializer::deserializeObject(Shared<Object> &object)
      *
      * \brief Deserialize object/
      *
@@ -90,12 +90,12 @@ namespace sr {
      *
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
-    bool JSONSerializer::deserializeObject(CStdSharedPtr_t<Object> &object) {
+    bool JSONSerializer::deserializeObject(Shared<Object> &object) {
       return true;
     }
 
     /**********************************************************************************************//**
-     * \fn  bool XMLSerializer::deserializeProperty(CStdSharedPtr_t<Object> &property)
+     * \fn  bool XMLSerializer::deserializeProperty(Shared<Object> &property)
      *
      * \brief Deserialize property
      *
@@ -103,7 +103,7 @@ namespace sr {
      *
      * \return  True if it succeeds, false if it fails.
      **************************************************************************************************/
-    bool JSONSerializer::deserializeProperty(CStdSharedPtr_t<Object> &property) {
+    bool JSONSerializer::deserializeProperty(Shared<Object> &property) {
       return true;
     }
 

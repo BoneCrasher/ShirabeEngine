@@ -72,7 +72,7 @@ namespace engine
              */
             CPassBuilder(
                     PassUID_t                   const &aPassUID,
-                    CStdSharedPtr_t<CPassBase>         aPass,
+                    Shared<CPassBase>         aPass,
                     CFrameGraphMutableResources       &aOutResourceData);
 
         public_methods:
@@ -308,7 +308,7 @@ namespace engine
 
         private_members:
             PassUID_t                        mPassUID;
-            CStdSharedPtr_t<CPassBase>       mPass;
+            Shared<CPassBase>       mPass;
             CFrameGraphMutableResources     &mResourceData;
             SFrameGraphAttachmentCollection &mAttachmentCollection;
         };

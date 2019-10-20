@@ -36,7 +36,7 @@ namespace engine
         {
             if(!mWindows.empty())
             {
-                for(CStdSharedPtr_t<IWindow> const &window : mWindows)
+                for(Shared<IWindow> const &window : mWindows)
                 {
                     CLog::Warning(logTag(), CString::format("Pending, non-finalized window instance found with name '%0'", window->name()));
                 }
@@ -51,7 +51,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CWindowManager::EWindowManagerError CWindowManager::initialize(
                 os::SApplicationEnvironment     const &aApplicationEnvironment,
-                CStdSharedPtr_t<IWindowFactory> const &aFactory)
+                Shared<IWindowFactory> const &aFactory)
         {
             mWindowFactory = aFactory;
 
@@ -81,7 +81,7 @@ namespace engine
         {
             EWindowManagerError error = EWindowManagerError::Ok;
 
-            for(CStdSharedPtr_t<IWindow> const &window : mWindows)
+            for(Shared<IWindow> const &window : mWindows)
             {
                 if(CheckEngineError(window->update()))
                 {
@@ -99,11 +99,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IWindow> CWindowManager::createWindow(
+        Shared<IWindow> CWindowManager::createWindow(
                 std::string const &aName,
                 CRect       const &aInitialBounds)
         {
-            CStdSharedPtr_t<IWindow> window = mWindowFactory->createWindow(aName, aInitialBounds);
+            Shared<IWindow> window = mWindowFactory->createWindow(aName, aInitialBounds);
             if(!window)
             {
                 CLog::Warning(logTag(), CString::format("Failed to create window '%0' with bounds x/y/w/h --> %1/%2/%3/%4",
@@ -122,9 +122,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IWindow> CWindowManager::getWindowByName(std::string const &aName)
+        Shared<IWindow> CWindowManager::getWindowByName(std::string const &aName)
         {
-            for(CStdSharedPtr_t<IWindow> const &window : mWindows)
+            for(Shared<IWindow> const &window : mWindows)
             {
                 if(window->name().compare(aName) == 0)
                 {
@@ -139,9 +139,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IWindow> CWindowManager::getWindowByHandle(wsi::CWindowHandleWrapper::Handle_t const &aHandle)
+        Shared<IWindow> CWindowManager::getWindowByHandle(wsi::CWindowHandleWrapper::Handle_t const &aHandle)
         {
-            auto const predicate = [&] (CStdSharedPtr_t<IWindow> const &aCompare) -> bool
+            auto const predicate = [&] (Shared<IWindow> const &aCompare) -> bool
             {
                 return aCompare->handle() == aHandle;
             };

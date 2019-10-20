@@ -34,7 +34,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    void CTimer::setTimeInterface(CStdSharedPtr_t<InternalTimeType_t> const &aTimeInterface)
+    void CTimer::setTimeInterface(Shared<InternalTimeType_t> const &aTimeInterface)
     {
         SHIRABE_ASSERT_TEXT(nullptr != aTimeInterface, "The provided time interface is nullptr.");
 
@@ -49,7 +49,7 @@ namespace engine
     {
 		EEngineStatus result = EEngineStatus::Ok;
 
-        CStdSharedPtr_t<InternalTimeType_t> timeInterface =makeCStdSharedPtr<InternalTimeType_t>();
+        Shared<InternalTimeType_t> timeInterface =makeShared<InternalTimeType_t>();
         setTimeInterface(timeInterface);
 
         if (!mTimeInterface)

@@ -379,10 +379,10 @@ public_methods:
 
         std::string const indexFileContents = readFile(indexFilePath);
 
-        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
+        Shared<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeShared<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
         indexDeserializer->initialize();
 
-        CResult<CStdSharedPtr_t<serialization::IDeserializer<SMaterialMasterIndex>::IResult>> serialization = indexDeserializer->deserialize(indexFileContents);
+        CResult<Shared<serialization::IDeserializer<SMaterialMasterIndex>::IResult>> serialization = indexDeserializer->deserialize(indexFileContents);
         if(not serialization.successful())
         {
             CLog::Error(logTag(), "Could not deserialize material index file.");
@@ -458,7 +458,7 @@ public_methods:
 
         std::string const indexFileContents = readFile(materialPathAbs);
 
-        CStdSharedPtr_t<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeCStdSharedPtr<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
+        Shared<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeShared<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
         indexDeserializer->initialize();
 
         auto [success, index] = indexDeserializer->deserialize(indexFileContents);
@@ -1289,13 +1289,13 @@ private_methods:
     {
         using namespace resource_compiler::serialization;
 
-        CStdUniquePtr_t<IJSONSerializer<SMaterialMasterIndex>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialMasterIndex>>();
+        Unique<IJSONSerializer<SMaterialMasterIndex>> serializer = makeUnique<CJSONSerializer<SMaterialMasterIndex>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterialMasterIndex>::IResult>> const serialization = serializer->serialize(aMaterialIndex);
+        CResult<Shared<serialization::ISerializer<SMaterialMasterIndex>::IResult>> const serialization = serializer->serialize(aMaterialIndex);
         if(not serialization.successful())
         {
             return EResult::SerializationFailed;
@@ -1328,13 +1328,13 @@ private_methods:
     {
         using namespace resource_compiler::serialization;
 
-        CStdUniquePtr_t<IJSONSerializer<SMaterialSignature>> serializer = makeCStdUniquePtr<CJSONSerializer<SMaterialSignature>>();
+        Unique<IJSONSerializer<SMaterialSignature>> serializer = makeUnique<CJSONSerializer<SMaterialSignature>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        CResult<CStdSharedPtr_t<serialization::ISerializer<SMaterialSignature>::IResult>> const serialization = serializer->serialize(aMaterial);
+        CResult<Shared<serialization::ISerializer<SMaterialSignature>::IResult>> const serialization = serializer->serialize(aMaterial);
         if(not serialization.successful())
         {
             return EResult::SerializationFailed;
@@ -1366,13 +1366,13 @@ private_methods:
     {
         using namespace resource_compiler::serialization;
 
-        CStdUniquePtr_t<IJSONSerializer<CMaterialConfig>> serializer = makeCStdUniquePtr<CJSONSerializer<CMaterialConfig>>();
+        Unique<IJSONSerializer<CMaterialConfig>> serializer = makeUnique<CJSONSerializer<CMaterialConfig>>();
         bool const initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        CResult<CStdSharedPtr_t<serialization::ISerializer<CMaterialConfig>::IResult>> const serialization = serializer->serialize(aMaterialConfig);
+        CResult<Shared<serialization::ISerializer<CMaterialConfig>::IResult>> const serialization = serializer->serialize(aMaterialConfig);
         if(not serialization.successful())
         {
             return EResult::SerializationFailed;

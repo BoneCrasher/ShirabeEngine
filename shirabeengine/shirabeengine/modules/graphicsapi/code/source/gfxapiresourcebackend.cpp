@@ -57,7 +57,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGFXAPIResourceBackend::registerResource(
                 PublicResourceId_t    const &aId,
-                CStdSharedPtr_t<void> const &aResource,
+                Shared<void> const &aResource,
                 EImportStorageMode    const &aImportStorageMode)
         {
             bool const alreadyRegistered = (mStorage.end() != mStorage.find(aId));
@@ -97,7 +97,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGFXAPIResourceBackend::setResourceTaskBackend(CStdSharedPtr_t<ResourceTaskBackend_t> const &aBackend)
+        CEngineResult<> CGFXAPIResourceBackend::setResourceTaskBackend(Shared<ResourceTaskBackend_t> const &aBackend)
         {
             if(nullptr == aBackend)
             {

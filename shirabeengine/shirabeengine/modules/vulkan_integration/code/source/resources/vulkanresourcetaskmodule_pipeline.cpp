@@ -33,14 +33,14 @@ namespace engine
                 PublicResourceId_t     const &renderPassHandle   = aRequest.renderPassHandle();
                 PublicResourceIdList_t const &textureViewHandles = aRequest.textureViewHandles();
 
-                CStdSharedPtr_t<void> renderPassPrivateHandle = aDependencies.at(renderPassHandle);
+                Shared<void> renderPassPrivateHandle = aDependencies.at(renderPassHandle);
                 if(not renderPassPrivateHandle)
                 {
                     CLog::Error(logTag(), "Failed to create frame buffer due to missing dependency.");
                     return { EEngineStatus::DXDevice_CreateRTV_Failed };
                 }
 
-                CStdSharedPtr_t<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(renderPassPrivateHandle);
+                Shared<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(renderPassPrivateHandle);
                 if(not renderPass)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for frame buffer creation. %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
@@ -268,7 +268,7 @@ namespace engine
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = desc.name;
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanPipelineResource>(resource);
+                assignment.internalResourceHandle = Shared<SVulkanPipelineResource>(resource);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -313,7 +313,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanPipelineResource> pipeline = std::static_pointer_cast<SVulkanPipelineResource>(aAssignment.internalResourceHandle);
+                Shared<SVulkanPipelineResource> pipeline = std::static_pointer_cast<SVulkanPipelineResource>(aAssignment.internalResourceHandle);
                 if(nullptr == pipeline)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for pipeline destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));

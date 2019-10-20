@@ -56,8 +56,8 @@ namespace engine
              * @return                        True, if successful. False otherwise.
              */
             CEngineResult<> initialize(
-                    CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
-                    CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay);
+                    Shared<SApplicationEnvironment> const &aApplicationEnvironment,
+                    Shared<wsi::CWSIDisplay>        const &aDisplay);
 
             /**
              * Clear all state and shutdown...
@@ -100,21 +100,21 @@ namespace engine
              *
              * @return Pointer to the internal resource UID generator.
              */
-            CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> resourceUIDGenerator();
+            Shared<IUIDGenerator<FrameGraphResourceId_t>> resourceUIDGenerator();
 
             /**
              * Return the application environment pointer used by the builder.
              *
              * @return A pionter to the registered application environment.
              */
-            CStdSharedPtr_t<SApplicationEnvironment> &applicationEnvironment();
+            Shared<SApplicationEnvironment> &applicationEnvironment();
 
             /**
              * Return the display pointer attached to this graph builder.
              *
              * @return See brief.
              */
-            CStdSharedPtr_t<wsi::CWSIDisplay> const &display();
+            Shared<wsi::CWSIDisplay> const &display();
 
             /**
              * Return all current resources stored in the builder.
@@ -142,7 +142,7 @@ namespace engine
                     typename    TPass,
                     typename... TPassCreationArgs
                     >
-            CEngineResult<CStdSharedPtr_t<TPass>> spawnPass(
+            CEngineResult<Shared<TPass>> spawnPass(
                     std::string       const &aName,
                     TPassCreationArgs  &&... aArgs);
 
@@ -186,7 +186,7 @@ namespace engine
              *
              * @return A pointer to a compiled and executable CGraph instance.
              */
-            CEngineResult<CStdUniquePtr_t<CGraph>> compile();
+            CEngineResult<Unique<CGraph>> compile();
 
         private_methods:
             /**
@@ -201,7 +201,7 @@ namespace engine
              *
              * @return See brief.
              */
-            CStdUniquePtr_t<CGraph> &graph();
+            Unique<CGraph> &graph();
 
             /**
              * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
@@ -233,7 +233,7 @@ EST_EXPORT CGraphBuilder
              * @param aPass The pass to collect.
              * @return      True, if successful. False, otherwise.
              */
-            CEngineResult<> collectPass(CStdSharedPtr_t<CPassBase> aPass);
+            CEngineResult<> collectPass(Shared<CPassBase> aPass);
 
             /**
              * Perform a topological depth first sort of the graph,
@@ -318,11 +318,11 @@ EST_EXPORT CGraphBuilder
             bool                                                   mRenderToBackBuffer;
             FrameGraphResourceId_t                                 mOutputResourceId;
 
-            CStdSharedPtr_t<SApplicationEnvironment>               mApplicationEnvironment;
-            CStdSharedPtr_t<wsi::CWSIDisplay>                      mDisplay;
+            Shared<SApplicationEnvironment>               mApplicationEnvironment;
+            Shared<wsi::CWSIDisplay>                      mDisplay;
 
-            CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;
-            CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
+            Shared<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;
+            Shared<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
             Map<std::string, PublicResourceId_t>                   mImportedResources;
 
             PassMap                                                mPasses;
@@ -331,7 +331,7 @@ EST_EXPORT CGraphBuilder
 
             AdjacencyListMap_t<PassUID_t>                          mPassAdjacency;
 
-            CStdUniquePtr_t<CGraph>                                mFrameGraph;
+            Unique<CGraph>                                mFrameGraph;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             AdjacencyListMap_t<FrameGraphResourceId_t>             mResourceAdjacency;
@@ -348,7 +348,7 @@ EST_EXPORT CGraphBuilder
                 typename    TPass,
                 typename... TPassCreationArgs
                 >
-        CEngineResult<CStdSharedPtr_t<TPass>> CGraphBuilder::spawnPass(
+        CEngineResult<Shared<TPass>> CGraphBuilder::spawnPass(
                 std::string       const &aName,
                 TPassCreationArgs &&...  aArgs)
         {
@@ -360,18 +360,18 @@ EST_EXPORT CGraphBuilder
 
             try
             {
-                CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
+                Unique<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
                 PassUID_t const uid = generatePassUID();
 
-                CEngineResult<CStdSharedPtr_t<TPass>> passCreation = accessor->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
+                CEngineResult<Shared<TPass>> passCreation = accessor->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
                 if(not passCreation.successful())
                 {
                     CLog::Error(logTag(), "No pass instance created.");
                     return { EEngineStatus::Error };
                 }
 
-                CStdSharedPtr_t<TPass> &pass = passCreation.data();
+                Shared<TPass> &pass = passCreation.data();
 
                 // Link the pass providing the import and export resources for the passes from the variadic argument list.
                 CPassBuilder passBuilder(uid, pass, mResourceData);

@@ -25,11 +25,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<CStdSharedPtr_t<CFrameGraphRenderContext>> CFrameGraphRenderContext::create(
-                CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
-                CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
-                CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
-                CStdSharedPtr_t<IRenderContext>       aRenderer)
+        CEngineResult<Shared<CFrameGraphRenderContext>> CFrameGraphRenderContext::create(
+                Shared<IAssetStorage>        aAssetStorage,
+                Shared<CMaterialLoader>      aMaterialLoader,
+                Shared<CResourceManagerBase> aResourceManager,
+                Shared<IRenderContext>       aRenderer)
         {
             bool const inputInvalid =
                     nullptr == aAssetStorage    or
@@ -42,7 +42,7 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            auto context = makeCStdSharedPtr<CFrameGraphRenderContext>(aAssetStorage
+            auto context = makeShared<CFrameGraphRenderContext>(aAssetStorage
                                                                        , aMaterialLoader
                                                                        , aResourceManager
                                                                        , aRenderer);
@@ -62,10 +62,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CFrameGraphRenderContext::CFrameGraphRenderContext(
-                CStdSharedPtr_t<IAssetStorage>        aAssetStorage,
-                CStdSharedPtr_t<CMaterialLoader>      aMaterialLoader,
-                CStdSharedPtr_t<CResourceManagerBase> aResourceManager,
-                CStdSharedPtr_t<IRenderContext>       aRenderer)
+                Shared<IAssetStorage>        aAssetStorage,
+                Shared<CMaterialLoader>      aMaterialLoader,
+                Shared<CResourceManagerBase> aResourceManager,
+                Shared<IRenderContext>       aRenderer)
             : mAssetStorage            (std::move(aAssetStorage   ))
             , mMaterialLoader          (std::move(aMaterialLoader ))
             , mResourceManager         (std::move(aResourceManager))
@@ -271,7 +271,7 @@ namespace engine
                 {
                     FrameGraphResourceId_t const &resourceId = attachmentResources.at(index);
 
-                    CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                    CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
                     if(not textureViewFetch.successful())
                     {
                         CLog::Error(logTag(), CString::format("Fetching texture view w/ id %1 failed.", resourceId));
@@ -280,7 +280,7 @@ namespace engine
 
                     SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
 
-                    CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(textureView.subjacentResource);
+                    CEngineResult<Shared<SFrameGraphTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(textureView.subjacentResource);
                     if(not textureFetch.successful())
                     {
                         CLog::Error(logTag(), CString::format("Fetching texture w/ id %1 failed.", textureView.subjacentResource));
@@ -804,7 +804,7 @@ namespace engine
                 return { result };
             }
 
-            CStdSharedPtr_t<CMaterialMaster> const &master    = instance; // instance->master();
+            Shared<CMaterialMaster> const &master    = instance; // instance->master();
             SMaterialSignature               const &signature = master  ->signature();
             CMaterialConfig                  const &config    = instance->config();
 

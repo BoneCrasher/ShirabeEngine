@@ -259,7 +259,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            CResult<CStdSharedPtr_t<typename IJSONSerializer<T>::IResult>> serialize(T const &aInput);
+            CResult<Shared<typename IJSONSerializer<T>::IResult>> serialize(T const &aInput);
 
             /**
              * Begin a JSON array, to which the upcoming objects will be added.
@@ -373,7 +373,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CResult<CStdSharedPtr_t<typename IJSONSerializer<T>::IResult>> CJSONSerializer<T>::serialize(T const &aInput)
+        CResult<Shared<typename IJSONSerializer<T>::IResult>> CJSONSerializer<T>::serialize(T const &aInput)
         {
             IJSONSerializer<T> &serializer = *this;
 
@@ -381,7 +381,7 @@ namespace engine
             if(successful)
             {
                 nlohmann::json &serializedData = mRoot; // For debug...
-                CStdSharedPtr_t<CSerializationResult> result = makeCStdSharedPtr<CSerializationResult>(serializedData);
+                Shared<CSerializationResult> result = makeShared<CSerializationResult>(serializedData);
 
                 return { std::move(result) };
             }
@@ -725,7 +725,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> deserialize(std::string const &aSource);
+            CResult<Shared<typename IJSONDeserializer<T>::IResult>> deserialize(std::string const &aSource);
 
             /*!
              * Serialize an instance of type SShaderCompilationUnit into whichever internal representation and
@@ -736,7 +736,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> deserialize(std::vector<uint8_t> const &aSource);
+            CResult<Shared<typename IJSONDeserializer<T>::IResult>> deserialize(std::vector<uint8_t> const &aSource);
 
             /**
              * Begin a JSON array, to which the upcoming objects will be added.
@@ -858,7 +858,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> CJSONDeserializer<T>::deserialize(std::string const &aSource)
+        CResult<Shared<typename IJSONDeserializer<T>::IResult>> CJSONDeserializer<T>::deserialize(std::string const &aSource)
         {
             nlohmann::json json = nlohmann::json::parse(aSource);
             mRoot = json;
@@ -871,7 +871,7 @@ namespace engine
             bool const successful = data.acceptDeserializer(deserializer);
             if(successful)
             {
-                auto result = makeCStdSharedPtr<CDeserializationResult>(data);
+                auto result = makeShared<CDeserializationResult>(data);
 
                 return { std::move(result) };
             }
@@ -884,7 +884,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CResult<CStdSharedPtr_t<typename IJSONDeserializer<T>::IResult>> CJSONDeserializer<T>::deserialize(std::vector<uint8_t> const &aSource)
+        CResult<Shared<typename IJSONDeserializer<T>::IResult>> CJSONDeserializer<T>::deserialize(std::vector<uint8_t> const &aSource)
         {
             nlohmann::json json = nlohmann::json::from_msgpack(aSource);
             mRoot = json;
@@ -897,7 +897,7 @@ namespace engine
             bool const successful = data.acceptDeserializer(deserializer);
             if(successful)
             {
-                auto result = makeCStdSharedPtr<CDeserializationResult>(data);
+                auto result = makeShared<CDeserializationResult>(data);
 
                 return { std::move(result) };
             }

@@ -92,7 +92,7 @@ namespace engine
             auto const execute = [=] (
                     SPassData                                 const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext)
+                    Shared<IFrameGraphRenderContext>      &aContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aPassData);
@@ -111,7 +111,7 @@ namespace engine
             }
             else
             {
-                CStdSharedPtr_t<CallbackPass<SPassData>> pass = passFetch.data();
+                Shared<CallbackPass<SPassData>> pass = passFetch.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };

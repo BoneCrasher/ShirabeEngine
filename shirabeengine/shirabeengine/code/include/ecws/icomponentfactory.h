@@ -17,7 +17,7 @@ namespace engine
 
     public_api:
         [[nodiscard]]
-        virtual CStdSharedPtr_t<IComponent> createComponent(EComponentType const &aComponentType) const = 0;
+        virtual Shared<IComponent> createComponent(EComponentType const &aComponentType) const = 0;
 
     };
 }

@@ -60,7 +60,7 @@ namespace engine
         /**
          * Declares a shared pointer to base class for polymorphic type erasure storage.
          */
-        using AnyProxy = CStdSharedPtr_t<IResourceProxyBase>;
+        using AnyProxy = Shared<IResourceProxyBase>;
 
         /**
          * Permits storage of a list of any proxy.
@@ -93,7 +93,7 @@ namespace engine
          * @param aProxy The proxy container to extract from.
          * @return       Returns the IResourceProxyBase pointer for the AnyProxy or nullptr.
          */
-        static CStdSharedPtr_t<IResourceProxyBase> &baseProxyCast(AnyProxy &aProxy)
+        static Shared<IResourceProxyBase> &baseProxyCast(AnyProxy &aProxy)
         {
             return aProxy;
         }
@@ -104,7 +104,7 @@ namespace engine
          * @param aProxy The proxy container to extract from.
          * @return       Returns the IResourceProxyBase pointer for the AnyProxy or nullptr.
          */
-        static CStdSharedPtr_t<IResourceProxyBase> const &baseProxyCast(AnyProxy const &aProxy)
+        static Shared<IResourceProxyBase> const &baseProxyCast(AnyProxy const &aProxy)
         {
             return aProxy;
         }
@@ -115,9 +115,9 @@ namespace engine
          * @param aProxy The proxy container to extract from.
          */
         template <typename TResource>
-        static CStdSharedPtr_t<IResourceProxy<TResource>> proxyCast(AnyProxy& aProxy)
+        static Shared<IResourceProxy<TResource>> proxyCast(AnyProxy& aProxy)
         {
-            CStdSharedPtr_t<IResourceProxy<TResource>> &tmp = std::static_pointer_cast<IResourceProxy<TResource>>(aProxy);
+            Shared<IResourceProxy<TResource>> &tmp = std::static_pointer_cast<IResourceProxy<TResource>>(aProxy);
             return tmp;
         }
 
@@ -127,9 +127,9 @@ namespace engine
          * @param aProxy The proxy container to extract from.
          */
         template <typename TResource>
-        static CStdSharedPtr_t<IResourceProxy<TResource>> const &proxyCast(AnyProxy const &aProxy)
+        static Shared<IResourceProxy<TResource>> const &proxyCast(AnyProxy const &aProxy)
         {
-            CStdSharedPtr_t<IResourceProxy<TResource>> const &tmp = std::static_pointer_cast<IResourceProxy<TResource>>(aProxy);
+            Shared<IResourceProxy<TResource>> const &tmp = std::static_pointer_cast<IResourceProxy<TResource>>(aProxy);
             return tmp;
         }
 
@@ -224,9 +224,9 @@ namespace engine
          * @returns      A generic proxy with underlying type TResource or nullptr.
          */
         template <typename TResource>
-        static CStdSharedPtr_t<CGenericProxyBase<TResource>> genericProxyBaseCast(AnyProxy const &aProxy)
+        static Shared<CGenericProxyBase<TResource>> genericProxyBaseCast(AnyProxy const &aProxy)
         {
-            CStdSharedPtr_t<CGenericProxyBase<TResource>> const temporary = std::static_pointer_cast<CGenericProxyBase<TResource>>(aProxy);
+            Shared<CGenericProxyBase<TResource>> const temporary = std::static_pointer_cast<CGenericProxyBase<TResource>>(aProxy);
             return temporary;
         }
 

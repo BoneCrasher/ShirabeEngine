@@ -6,8 +6,8 @@
 #define __SHIRABEDEVELOPMENT_CRESOURCEMANAGER_H__
 
 #include <platform/platform.h>
-#include "resources/iresourceobjectprivate.h"
 #include "resources/iresourceobject.h"
+#include "resources/aresourceobjectfactory.h"
 
 namespace engine {
     namespace resources
@@ -20,7 +20,7 @@ namespace engine {
             SHIRABE_LIBRARY_EXPORT CResourceManager
         {
         public_constructors:
-            CResourceManager() = default;
+            explicit CResourceManager(Unique<CResourceObjectFactory> aPrivateResourceObjectFactory);
 
         public_destructors:
             ~CResourceManager() = default;
@@ -28,37 +28,46 @@ namespace engine {
         public_methods:
             template <typename TResource>
             requires std::is_base_of_v<IResourceObject, TResource>
-            CEngineResult<CStdSharedPtr_t<IResourceObject>> useResource(
+            CEngineResult<Shared<IResourceObject>> useResource(
                     ResourceId_t                      const &aResourceId
                     , typename TResource::SDescriptor const &aDescriptor);
 
             CEngineResult<> discardResource(ResourceId_t const &aResourceId);
 
         private_static_functions:
-            static CStdSharedPtr_t<IResourceObjectPrivate> asPrivate(CStdSharedPtr_t<IResourceObject> const &aObject);
+            static Shared<IResourceObjectPrivate> asPrivate(Shared<IResourceObject> const &aObject);
 
         private_methods:
             bool storeResourceObject(ResourceId_t                        const &aId
-                                     , CStdSharedPtr_t <IResourceObject> const &aObject);
+                                     , Shared <IResourceObject> const &aObject);
 
             void removeResourceObject(ResourceId_t const &aId);
 
         private_members:
-            std::unordered_map<ResourceId_t, CStdSharedPtr_t<IResourceObject>> mResourceObjects;
+            Unique<CResourceObjectFactory>                            mPrivateResourceObjectFactory;
+            std::unordered_map<ResourceId_t, Shared<IResourceObject>> mResourceObjects;
         };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        CResourceManager::CResourceManager(Unique<CResourceObjectFactory> aPrivateResourceObjectFactory)
+            : mPrivateResourceObjectFactory(std::move(aPrivateResourceObjectFactory))
+        { }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         template <typename TResource>
-        CEngineResult<CStdSharedPtr_t<IResourceObject>> CResourceManager::useResource(
+        CEngineResult<Shared<IResourceObject>> CResourceManager::useResource(
                 engine::resources::ResourceId_t   const &aResourceId
                 , typename TResource::SDescriptor const &aDescriptor)
         {
-            CEngineResult<CStdSharedPtr_t<IResourceObject>> result = { EEngineStatus::Error, nullptr };
+            CEngineResult<Shared<IResourceObject>> result = { EEngineStatus::Error, nullptr };
 
-            CStdSharedPtr_t<TResource> resource = makeCStdSharedPtr<TResource>(std::forward(aDescriptor));
+            Shared<TResource> resource = makeShared<TResource>(std::forward(aDescriptor));
             resource->create();
 
             storeResourceObject(aResourceId, resource);

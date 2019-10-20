@@ -137,7 +137,7 @@ namespace engine
          * @param aOther
          * @return
          */
-        virtual int32_t compare(CStdSharedPtr_t<ITimespan> const& aOther) const = 0;
+        virtual int32_t compare(Shared<ITimespan> const& aOther) const = 0;
 
     public_operators:
         /**
@@ -146,8 +146,8 @@ namespace engine
          * @param aOther
          * @return
          */
-        virtual CStdSharedPtr_t<ITimespan> operator+(
-                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
+        virtual Shared<ITimespan> operator+(
+                Shared<ITimespan> const &aOther) = 0;
 
         /**
          * Subtract one timespan from this instance.
@@ -155,8 +155,8 @@ namespace engine
          * @param aOther
          * @return
          */
-        virtual CStdSharedPtr_t<ITimespan> operator-(
-                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
+        virtual Shared<ITimespan> operator-(
+                Shared<ITimespan> const &aOther) = 0;
 
         /**
          * Compare this timespan with anaOther for equality.
@@ -165,7 +165,7 @@ namespace engine
          * @return
          */
         virtual bool operator ==(
-                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
+                Shared<ITimespan> const &aOther) = 0;
 
         /**
          * Test whether this timespan is located earlier in the timeline.
@@ -174,7 +174,7 @@ namespace engine
          * @return
          */
         virtual bool operator <(
-                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
+                Shared<ITimespan> const &aOther) = 0;
 
         /**
          * Test whether this timespan is located later in the timeline.
@@ -183,7 +183,7 @@ namespace engine
          * @return
          */
         virtual bool operator >(
-                CStdSharedPtr_t<ITimespan> const &aOther) = 0;
+                Shared<ITimespan> const &aOther) = 0;
 
         /**
          * Returns the number of elements inside a subsecond unit.
@@ -218,9 +218,9 @@ namespace engine
      * @param aRHS
      * @return
      */
-    static CStdSharedPtr_t<ITimespan> operator+(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+    static Shared<ITimespan> operator+(
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
 
     /**
      * Subtract one timespan from another and return the result as a copy.
@@ -229,9 +229,9 @@ namespace engine
      * @param aRHS
      * @return
      */
-    static CStdSharedPtr_t<ITimespan> operator-(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+    static Shared<ITimespan> operator-(
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
 
     /**
      * Compare two timespan instances for equality.
@@ -241,8 +241,8 @@ namespace engine
      * @return
      */
     static bool operator ==(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
 
     /**
      * Test, whether aLHS is located earlier in the timeline than aRHS.
@@ -252,8 +252,8 @@ namespace engine
      * @return
      */
     static bool operator <(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
 
     /**
      * Test, whether aLHS is located later in the timeline than aRHS.
@@ -263,8 +263,8 @@ namespace engine
      * @return
      */
     static bool operator >(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
 
     /**
      * Test, whether aLHS is located later in the timeline than aRHS or at the same time point.
@@ -274,8 +274,8 @@ namespace engine
      * @return
      */
     static bool operator >= (
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
 
     /**
      * Test, whether aLHS is located earlier in the timeline than aRHS or at the same time point.
@@ -284,8 +284,8 @@ namespace engine
      * @return
      */
     static bool operator <= (
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS);
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS);
     //<-----------------------------------------------------------------------------
 #pragma GCC diagnostic pop
 
@@ -316,9 +316,9 @@ namespace engine
         class CFactory
         {
         public_static_functions:
-            static CStdSharedPtr_t<CTimespan<iSubsecondUnits>> create(intmax_t units)
+            static Shared<CTimespan<iSubsecondUnits>> create(intmax_t units)
             {
-                return makeCStdSharedPtr<CTimespan<iSubsecondUnits>>(units);
+                return makeShared<CTimespan<iSubsecondUnits>>(units);
             }
         };
 
@@ -539,7 +539,7 @@ namespace engine
          * @param aOther
          * @return
          */
-        int32_t compare(CStdSharedPtr_t<ITimespan> const &aOther) const
+        int32_t compare(Shared<ITimespan> const &aOther) const
         {
             return compareImpl(aOther);
         }
@@ -550,8 +550,8 @@ namespace engine
          * @param aaOther
          * @return
          */
-        CStdSharedPtr_t<ITimespan> operator+(
-                CStdSharedPtr_t<ITimespan> &aOther)
+        Shared<ITimespan> operator+(
+                Shared<ITimespan> &aOther)
         {
             return add(aOther);
         }
@@ -562,8 +562,8 @@ namespace engine
          * @param aaOther
          * @return
          */
-        CStdSharedPtr_t<ITimespan> operator-(
-                CStdSharedPtr_t<ITimespan> &aOther)
+        Shared<ITimespan> operator-(
+                Shared<ITimespan> &aOther)
         {
             return sub(aOther);
         }
@@ -575,7 +575,7 @@ namespace engine
          * @return
          */
         bool operator ==(
-                CStdSharedPtr_t<ITimespan> &aOther)
+                Shared<ITimespan> &aOther)
         {
             return compare(aOther) == 0;
         }
@@ -587,7 +587,7 @@ namespace engine
          * @return        True, if the other instance is located earlier in the timeline.
          */
         bool operator>(
-                CStdSharedPtr_t<ITimespan> &aOther)
+                Shared<ITimespan> &aOther)
         {
             return compare(aOther) > 0;
         }
@@ -599,7 +599,7 @@ namespace engine
          * @return        True, if the other instance is located later in the timeline.
          */
         bool operator<(
-                CStdSharedPtr_t<ITimespan> &aOther)
+                Shared<ITimespan> &aOther)
         {
             return compare(aOther) < 0;
         }
@@ -662,7 +662,7 @@ namespace engine
          * @param aaOther
          * @return
          */
-        CStdSharedPtr_t<CTimespan<iSubsecondUnits>> add(CStdSharedPtr_t<ITimespan> &aOther)
+        Shared<CTimespan<iSubsecondUnits>> add(Shared<ITimespan> &aOther)
         {
             return CFactory::create((totalSeconds() + aOther->totalSeconds()) * iSubsecondUnits);
         }
@@ -672,7 +672,7 @@ namespace engine
          * @param aaOther
          * @return
          */
-        CStdSharedPtr_t<CTimespan<iSubsecondUnits>> sub(CStdSharedPtr_t<ITimespan> const &aOther)
+        Shared<CTimespan<iSubsecondUnits>> sub(Shared<ITimespan> const &aOther)
         {
             return CFactory::create((totalSeconds() - aOther->totalSeconds()) * iSubsecondUnits);
         }
@@ -682,7 +682,7 @@ namespace engine
          * @param aaOther
          * @return
          */
-        int32_t compareImpl(CStdSharedPtr_t<ITimespan> &aOther) const
+        int32_t compareImpl(Shared<ITimespan> &aOther) const
         {
             double const diff = (this->totalSeconds() - aOther->totalSeconds());
 
@@ -733,7 +733,7 @@ namespace engine
      * @return
      */
     template <int32_t iSubseconds>
-    static CStdSharedPtr_t<ITimespan> MakeTimespanPtr(intmax_t aUnits)
+    static Shared<ITimespan> MakeTimespanPtr(intmax_t aUnits)
     {
         return std::make_shared<CTimespan<iSubseconds>>(aUnits);
     }
@@ -744,7 +744,7 @@ namespace engine
      * @return
      */
     template <int32_t iSubseconds>
-    static CStdSharedPtr_t<CTimespan<iSubseconds>> FromTimeString(std::string aTimeString)
+    static Shared<CTimespan<iSubseconds>> FromTimeString(std::string aTimeString)
     {
         std::stringstream timestream(aTimeString);
         int32_t HH, mm, ss, mss;
@@ -769,7 +769,7 @@ namespace engine
         sstrss  >> ss;
         sstrmss >> mss;
 
-        return makeCStdSharedPtr<CTimespan<iSubseconds>>(0, HH, mm, ss, mss);
+        return makeShared<CTimespan<iSubseconds>>(0, HH, mm, ss, mss);
     }
 
     /**
@@ -778,7 +778,7 @@ namespace engine
      * @param aPrecision
      * @return
      */
-    static std::string ToTimeString(CStdSharedPtr_t<ITimespan> aTimespan, int32_t aPrecision = 3)
+    static std::string ToTimeString(Shared<ITimespan> aTimespan, int32_t aPrecision = 3)
     {
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(2) << aTimespan->hours()   << ":";

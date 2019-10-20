@@ -19,7 +19,7 @@ namespace engine {
 		EEngineStatus update(CTimer const &aTimer) override;
 
 	private_members:
-	    CStdSharedPtr_t<material::CMaterialInstance> mMaterialInstance;
+	    Shared<material::CMaterialInstance> mMaterialInstance;
 	};
 
 }

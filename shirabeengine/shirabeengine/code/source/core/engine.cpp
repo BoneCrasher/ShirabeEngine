@@ -40,40 +40,40 @@ namespace engine
         SHIRABE_DECLARE_LOG_TAG("TestDummy")
 
         public_methods:
-            void onResume(CStdSharedPtr_t<IWindow> const &)
+            void onResume(Shared<IWindow> const &)
         {
             //Log::Status(logTag(), "OnResume");
         }
 
-        void onShow(CStdSharedPtr_t<IWindow> const &)
+        void onShow(Shared<IWindow> const &)
         {
             //Log::Status(logTag(), "onShow");
         }
 
         void onBoundsChanged(
-                CStdSharedPtr_t<IWindow> const &,
+                Shared<IWindow> const &,
                 CRect                    const &)
         {
             //Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
         }
 
-        void onHide(CStdSharedPtr_t<IWindow> const &)
+        void onHide(Shared<IWindow> const &)
         {
             //Log::Status(logTag(), "onHide");
         }
 
-        void onPause(CStdSharedPtr_t<IWindow> const &)
+        void onPause(Shared<IWindow> const &)
         {
             //Log::Status(logTag(), "onPause");
         }
 
-        void onClose(CStdSharedPtr_t<IWindow> const &)
+        void onClose(Shared<IWindow> const &)
         {
             // Log::Status(logTag(), "onClose");
             // PostQuitMessage(0);
         }
 
-        void onDestroy(CStdSharedPtr_t<IWindow> const &)
+        void onDestroy(Shared<IWindow> const &)
         {
 
         }
@@ -83,7 +83,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineInstance::CEngineInstance(CStdSharedPtr_t<os::SApplicationEnvironment> const &aEnvironment)
+    CEngineInstance::CEngineInstance(Shared<os::SApplicationEnvironment> const &aEnvironment)
         : mApplicationEnvironment(aEnvironment)
         , mWindowManager    (nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
         , mMainWindow       (nullptr)
@@ -124,15 +124,15 @@ namespace engine
          * @param aBackend The backend to create a proxy for.
          * @return         A valid creation functor for a proxy of type TResource.
          */
-        static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(CStdSharedPtr_t<CGFXAPIResourceBackend> aBackend)
+        static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(Shared<CGFXAPIResourceBackend> aBackend)
         {
             auto const creator = [=]() -> CResourceProxyFactory::CreatorFn_t<TResource>
             {
                 return
                         [=](resources::EProxyType const &aType, typename TResource::CCreationRequest const &aRequest)
-                        -> CStdSharedPtr_t<IResourceProxy<TResource>>
+                        -> Shared<IResourceProxy<TResource>>
                 {
-                    return makeCStdSharedPtr<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
+                    return makeShared<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
                 };
             };
 
@@ -148,11 +148,11 @@ namespace engine
     {
         EEngineStatus status = EEngineStatus::Ok;
 
-        CStdSharedPtr_t<CGFXAPIResourceBackend> resourceBackend = nullptr;
-        CStdSharedPtr_t<CWSIDisplay>            display         = nullptr;
+        Shared<CGFXAPIResourceBackend> resourceBackend = nullptr;
+        Shared<CWSIDisplay>            display         = nullptr;
 
 #if defined SHIRABE_PLATFORM_LINUX
-        CStdSharedPtr_t<x11::CX11Display> x11Display = makeCStdSharedPtr<x11::CX11Display>();
+        Shared<x11::CX11Display> x11Display = makeShared<x11::CX11Display>();
         display = x11Display;
 #elif defined SHIRABE_PLATFORM_WINDOWS
 #endif
@@ -172,15 +172,15 @@ namespace engine
         {
             CEngineResult<> result = { EEngineStatus::Ok };
 
-            CStdSharedPtr_t<IWindowFactory> factory = nullptr;
+            Shared<IWindowFactory> factory = nullptr;
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
-            factory = makeCStdSharedPtr<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
+            factory = makeShared<WSI::Windows::WindowsWindowFactory>((HINSTANCE)aApplicationEnvironment.instanceHandle);
 #elif defined SHIRABE_PLATFORM_LINUX
-            factory = makeCStdSharedPtr<x11::CX11WindowFactory>(x11Display);
+            factory = makeShared<x11::CX11WindowFactory>(x11Display);
 #endif // SHIRABE_PLATFORM_WINDOWS
 
-            mWindowManager = makeCStdSharedPtr<CWindowManager>();
+            mWindowManager = makeShared<CWindowManager>();
 
             CWindowManager::EWindowManagerError windowManagerError = mWindowManager->initialize(*mApplicationEnvironment, factory);
             if(nullptr == mWindowManager && not CheckWindowManagerError(windowManagerError))
@@ -214,7 +214,7 @@ namespace engine
                 return { status };
             }
 
-            CStdSharedPtr_t<IWindow::IEventCallback> dummy = makeCStdSharedPtr<CTestDummy>();
+            Shared<IWindow::IEventCallback> dummy = makeShared<CTestDummy>();
             mMainWindow->registerCallback(dummy);
 
             return { EEngineStatus::Ok };
@@ -227,13 +227,13 @@ namespace engine
         rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
         rendererConfiguration.requestFullscreen       = false;
 
-        CStdSharedPtr_t<material::CMaterialLoader> materialLoader = nullptr;
+        Shared<material::CMaterialLoader> materialLoader = nullptr;
 
         auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
         {
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                mVulkanEnvironment = makeCStdSharedPtr<CVulkanEnvironment>();
+                mVulkanEnvironment = makeShared<CVulkanEnvironment>();
                 EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
 
                 if(CheckEngineError(status))
@@ -282,14 +282,14 @@ namespace engine
 
             CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/"game.assetindex.xml");
 
-            CStdUniquePtr_t<IAssetDataSource> assetDataSource = makeCStdUniquePtr<CFileSystemAssetDataSource>(resourcesPath);
-            CStdSharedPtr_t<CAssetStorage>    assetStorage    = makeCStdSharedPtr<CAssetStorage>(std::move(assetDataSource));
+            CStdUniquePtr_t<IAssetDataSource> assetDataSource = makeUnique<CFileSystemAssetDataSource>(resourcesPath);
+            Shared<CAssetStorage>    assetStorage    = makeShared<CAssetStorage>(std::move(assetDataSource));
             assetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
-            materialLoader = makeCStdSharedPtr<material::CMaterialLoader>(assetStorage);
+            materialLoader = makeShared<material::CMaterialLoader>(assetStorage);
 
-            CStdSharedPtr_t<CGFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
+            Shared<CGFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
 
             // The graphics API resource backend is static and does not have to be replaced.
             // On switching the graphics API the task backend (also containing the effective API handles),
@@ -299,17 +299,17 @@ namespace engine
             // The reset of the taskbackend should thus occur through the resource backend.
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                CStdSharedPtr_t<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeCStdSharedPtr<CVulkanResourceTaskBackend>(mVulkanEnvironment);
+                Shared<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeShared<CVulkanResourceTaskBackend>(mVulkanEnvironment);
                 vkResourceTaskBackend->initialize();
 
                 resourceTaskBackend = vkResourceTaskBackend;
             }
 
-            resourceBackend = makeCStdSharedPtr<CGFXAPIResourceBackend>();
+            resourceBackend = makeShared<CGFXAPIResourceBackend>();
             resourceBackend->setResourceTaskBackend(resourceTaskBackend);
             resourceBackend->initialize();
 
-            mProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
+            mProxyFactory = makeShared<CResourceProxyFactory>();
             mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>    ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CBuffer>     (EResourceSubType::BUFFER,       SSpawnProxy<CBuffer>     ::forGFXAPIBackend(resourceBackend));
@@ -319,7 +319,7 @@ namespace engine
             mProxyFactory->addCreator<CPipeline>   (EResourceSubType::PIPELINE,     SSpawnProxy<CPipeline>   ::forGFXAPIBackend(resourceBackend));
             mProxyFactory->addCreator<CMesh>       (EResourceSubType::MESH_STATIC,  SSpawnProxy<CMesh>       ::forGFXAPIBackend(resourceBackend));
 
-            CStdSharedPtr_t<CResourceManagerBase> manager = makeCStdSharedPtr<CResourceManager>(mProxyFactory);
+            Shared<CResourceManagerBase> manager = makeShared<CResourceManager>(mProxyFactory);
             mResourceManager = manager;            
             mResourceManager->initialize();
 
@@ -332,18 +332,18 @@ namespace engine
             using engine::framegraph::CFrameGraphRenderContext;
 
             // How to decouple?
-            CStdSharedPtr_t<IRenderContext> gfxApiRenderContext = nullptr;
+            Shared<IRenderContext> gfxApiRenderContext = nullptr;
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                CStdSharedPtr_t<CVulkanRenderContext> vulkanRenderContext = makeCStdSharedPtr<CVulkanRenderContext>();
+                Shared<CVulkanRenderContext> vulkanRenderContext = makeShared<CVulkanRenderContext>();
                 vulkanRenderContext->initialize(mVulkanEnvironment, resourceBackend);
 
                 gfxApiRenderContext = vulkanRenderContext;
             }
 
-            CEngineResult<CStdSharedPtr_t<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, materialLoader, mResourceManager, gfxApiRenderContext);
+            CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, materialLoader, mResourceManager, gfxApiRenderContext);
 
-            mRenderer = makeCStdSharedPtr<CRenderer>();
+            mRenderer = makeShared<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
             if(false == CheckEngineError(status))
             {

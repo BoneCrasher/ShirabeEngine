@@ -33,9 +33,9 @@ namespace engine
              * @throw CVulkanError       An instance of CVulkanError containing an error message and VkResult code.
              */
             static CEngineResult<VkSurfaceKHR> create(
-                    CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment,
-                    CStdSharedPtr_t<CX11Display>        const &aDisplay,
-                    CStdSharedPtr_t<CX11Window>         const &aWindow);
+                    Shared<CVulkanEnvironment> const &aVulkanEnvironment,
+                    Shared<CX11Display>        const &aDisplay,
+                    Shared<CX11Window>         const &aWindow);
 
         private_constructors:
             CX11VulkanSurface() = delete;

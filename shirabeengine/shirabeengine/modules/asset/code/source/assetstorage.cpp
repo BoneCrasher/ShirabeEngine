@@ -17,7 +17,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CAssetStorage::CAssetStorage(CStdUniquePtr_t<IAssetDataSource> &&aAssetDataSource)
+        CAssetStorage::CAssetStorage(Unique<IAssetDataSource> &&aAssetDataSource)
             : IAssetStorage()
             , mAssetIndex()
             , mAssetDataSource(std::move(aAssetDataSource))

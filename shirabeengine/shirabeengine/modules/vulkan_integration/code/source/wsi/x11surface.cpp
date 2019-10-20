@@ -8,9 +8,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CEngineResult<VkSurfaceKHR> CX11VulkanSurface::create(
-                CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment,
-                CStdSharedPtr_t<CX11Display>        const &aDisplay,
-                CStdSharedPtr_t<CX11Window>         const &aWindow)
+                Shared<CVulkanEnvironment> const &aVulkanEnvironment,
+                Shared<CX11Display>        const &aDisplay,
+                Shared<CX11Window>         const &aWindow)
         {
             Display      *x11Display = reinterpret_cast<Display*>(aDisplay->displayHandle());
             Window const  x11Window  = aWindow->handle();

@@ -32,7 +32,7 @@ namespace engine
              * @brief CMaterialLoader
              * @param aAssetStorage
              */
-            CMaterialLoader(CStdSharedPtr_t <asset::IAssetStorage> aAssetStorage);
+            CMaterialLoader(Shared <asset::IAssetStorage> aAssetStorage);
 
         public_methods:
 
@@ -44,14 +44,14 @@ namespace engine
              * @param aBaseMaterialAssetId
              * @return
              */
-            CEngineResult <CStdSharedPtr_t<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
+            CEngineResult <Shared<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
 
             /**
              * @brief loadMaterial
              * @param aMaterialId
              * @return
              */
-            CEngineResult <CStdSharedPtr_t<CMaterialMaster>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
+            CEngineResult <Shared<CMaterialMaster>> loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
 
             /**
              * @brief destroyMaterialInstance
@@ -63,9 +63,9 @@ namespace engine
         private_methods:
 
         private_members:
-            CStdSharedPtr_t <asset::IAssetStorage>                     mStorage;
-            Map <asset::AssetID_t, CStdSharedPtr_t<CMaterialMaster>>   mInstantiatedMaterialMasters;
-            Map <asset::AssetID_t, CStdSharedPtr_t<CMaterialInstance>> mInstantiatedMaterialInstances;
+            Shared <asset::IAssetStorage>                     mStorage;
+            Map <asset::AssetID_t, Shared<CMaterialMaster>>   mInstantiatedMaterialMasters;
+            Map <asset::AssetID_t, Shared<CMaterialInstance>> mInstantiatedMaterialInstances;
         };
 
     }

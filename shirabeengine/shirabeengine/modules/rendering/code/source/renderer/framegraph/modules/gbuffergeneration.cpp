@@ -48,10 +48,10 @@ namespace engine
                 uint32_t width  = 1920;
                 uint32_t height = 1080;
 
-                CStdSharedPtr_t<SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
+                Shared<SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
                 if(environment)
                 {
-                    CStdSharedPtr_t<wsi::CWSIDisplay> const &display = aGraphBuilder.display();
+                    Shared<wsi::CWSIDisplay> const &display = aGraphBuilder.display();
 
                     SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
                     width  = displayDesc.bounds.size.x();
@@ -116,7 +116,7 @@ namespace engine
             auto const execute = [=] (
                     SPassData                                 const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aRenderContext)
+                    Shared<IFrameGraphRenderContext>      &aRenderContext)
                     -> CEngineResult<>
             {
                 using namespace engine::rendering;
@@ -150,7 +150,7 @@ namespace engine
             }
             else
             {
-                CStdSharedPtr_t<CallbackPass<SPassData>> pass = passFetch.data();
+                Shared<CallbackPass<SPassData>> pass = passFetch.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };

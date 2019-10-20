@@ -270,7 +270,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            EEngineStatus CX11Window::registerCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+            EEngineStatus CX11Window::registerCallback(Shared<IWindow::IEventCallback> aCallback)
             {
                 return mCallbackAdapter.registerCallback(aCallback);
             }
@@ -279,7 +279,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            EEngineStatus CX11Window::unregisterCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+            EEngineStatus CX11Window::unregisterCallback(Shared<IWindow::IEventCallback> aCallback)
             {
                 return mCallbackAdapter.unregisterCallback(aCallback);
             }

@@ -7,9 +7,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CStdSharedPtr_t<ITimespan> operator+(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+    Shared<ITimespan> operator+(
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator +(aRHS);
     }
@@ -18,9 +18,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CStdSharedPtr_t<ITimespan> operator-(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+    Shared<ITimespan> operator-(
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator -(aRHS);
     }
@@ -30,8 +30,8 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     bool operator ==(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator ==(aRHS);
     }
@@ -41,8 +41,8 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     bool operator <(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator <(aRHS);
     }
@@ -52,8 +52,8 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     bool operator >(
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator >(aRHS);
     }
@@ -63,8 +63,8 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     bool operator >= (
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator >(aRHS) || aLHS->operator ==(aRHS);
     }
@@ -74,8 +74,8 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     bool operator <= (
-            CStdSharedPtr_t<ITimespan> const &aLHS,
-            CStdSharedPtr_t<ITimespan> const &aRHS)
+            Shared<ITimespan> const &aLHS,
+            Shared<ITimespan> const &aRHS)
     {
         return aLHS->operator <(aRHS) || aLHS->operator ==(aRHS);
     }

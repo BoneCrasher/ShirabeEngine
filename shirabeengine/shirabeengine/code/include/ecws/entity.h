@@ -47,7 +47,7 @@ namespace engine
          * @param aComponent The component to add to the entity instance.
          * @return           EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus addComponent(CStdSharedPtr_t<IComponent> const &aComponent);
+        EEngineStatus addComponent(Shared<IComponent> const &aComponent);
 
         /**
          * Remove a component from the internal component collection.
@@ -55,7 +55,7 @@ namespace engine
          * @param aComponent The component to add to the entity instance.
          * @return           EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus removeComponent(CStdSharedPtr_t<IComponent> const &aComponent);
+        EEngineStatus removeComponent(Shared<IComponent> const &aComponent);
 
         /**
          * Check, wether a specific component type is available in the internal component collection.
@@ -71,7 +71,7 @@ namespace engine
          * @tparam TComponent The type of component to enumerate.
          */
         template <typename TComponent>
-        const Vector<CStdSharedPtr_t<TComponent>> getComponentsOfType();
+        const Vector<Shared<TComponent>> getComponentsOfType();
 
     private_members:
         std::string    mName;
@@ -91,7 +91,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <typename TComponent>
-    const Vector<CStdSharedPtr_t<TComponent>> CEntity::getComponentsOfType()
+    const Vector<Shared<TComponent>> CEntity::getComponentsOfType()
     {
         return {};
     }
@@ -100,7 +100,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<CEntity>, Entity);
+    SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CEntity>, Entity);
     //<-----------------------------------------------------------------------------
 }
 

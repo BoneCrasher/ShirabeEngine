@@ -38,7 +38,7 @@ namespace engine
                  *
                  * @param aWindow The window which resumed operation.
                  */
-                virtual void onResume(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+                virtual void onResume(Shared<IWindow> const &aWindow) = 0;
 
                 /**
                  * Invoked, when the window is shown in the operating system window manager, i.e. takes part
@@ -46,7 +46,7 @@ namespace engine
                  *
                  * @param aWindow The window which was shown.
                  */
-                virtual void onShow(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+                virtual void onShow(Shared<IWindow> const &aWindow) = 0;
 
                 /**
                  * Invoked, when the window is moved or resized.
@@ -56,7 +56,7 @@ namespace engine
                  *                   systems coordinate origin.
                  */
                 virtual void onBoundsChanged(
-                        CStdSharedPtr_t<IWindow> const &aWindow,
+                        Shared<IWindow> const &aWindow,
                         CRect                    const &aNewBounds) = 0;
 
                 /**
@@ -65,7 +65,7 @@ namespace engine
                  *
                  * @param aWindow The window which was hidden.
                  */
-                virtual void onHide(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+                virtual void onHide(Shared<IWindow> const &aWindow) = 0;
 
                 /**
                  * Invoked, when the window pauses operation, i.e. does not more receive and/or handle messages from the
@@ -73,25 +73,25 @@ namespace engine
                  *
                  * @param aWindow The paused window.
                  */
-                virtual void onPause(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+                virtual void onPause(Shared<IWindow> const &aWindow) = 0;
 
                 /**
                  * Invoked, just before a window is closed to perform any kind of shutdown and cleanup operations.
                  *
                  * @param aWindow The window to be closed.
                  */
-                virtual void onClose(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+                virtual void onClose(Shared<IWindow> const &aWindow) = 0;
 
                 /**
                  * Invoked, just before a window instance is destroyed.
                  *
                  * @param aWindow The window to be destroyed.
                  */
-                virtual void onDestroy(CStdSharedPtr_t<IWindow> const &aWindow) = 0;
+                virtual void onDestroy(Shared<IWindow> const &aWindow) = 0;
             };
 
         public_typedefs:
-            SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<IEventCallback>, IEventCallback); // IEventCallbackList
+            SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IEventCallback>, IEventCallback); // IEventCallbackList
 
 
         public_api:
@@ -158,7 +158,7 @@ namespace engine
              * @param aCallback The callback listener to hook in.
              * @return          EEngineStatus::Ok if successful. An error code otherwise.
              */
-            virtual EEngineStatus registerCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback) = 0;
+            virtual EEngineStatus registerCallback(Shared<IWindow::IEventCallback> aCallback) = 0;
 
             /**
              * Register a new event callback handler for this window.
@@ -166,10 +166,10 @@ namespace engine
              * @param aCallback The callback listener to hook in.
              * @return          EEngineStatus::Ok if successful. An error code otherwise.
              */
-            virtual EEngineStatus unregisterCallback(CStdSharedPtr_t<IWindow::IEventCallback> aCallback) = 0;
+            virtual EEngineStatus unregisterCallback(Shared<IWindow::IEventCallback> aCallback) = 0;
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<IWindow>, IWindow);
+        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IWindow>, IWindow);
 
     }
 }

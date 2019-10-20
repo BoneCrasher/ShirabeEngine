@@ -37,10 +37,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         EEngineStatus CRenderer::initialize(
-                CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
-                CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay,
+                Shared<SApplicationEnvironment> const &aApplicationEnvironment,
+                Shared<wsi::CWSIDisplay>        const &aDisplay,
                 SRendererConfiguration                   const &aConfiguration,
-                CStdSharedPtr_t<IFrameGraphRenderContext>      &aFrameGraphRenderContext)
+                Shared<IFrameGraphRenderContext>      &aFrameGraphRenderContext)
         {
             assert(nullptr != aApplicationEnvironment);
             assert(nullptr != aDisplay);
@@ -226,14 +226,14 @@ namespace engine
             // graphBuilder.createPassDependency(sCompositingPassID, sPresentPassID);
 
             // Compile the whole thing :)
-            CEngineResult<CStdUniquePtr_t<engine::framegraph::CGraph>> compilation = graphBuilder.compile();
+            CEngineResult<Unique<engine::framegraph::CGraph>> compilation = graphBuilder.compile();
             if(not compilation.successful())
             {
                 CLog::Error(logTag(), "Failed to compile the framegraph.");
                 return EEngineStatus::Ok;
             }
 
-            CStdUniquePtr_t<engine::framegraph::CGraph> frameGraph = std::move(compilation.data());
+            Unique<engine::framegraph::CGraph> frameGraph = std::move(compilation.data());
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             static bool serializedOnce = false;
@@ -241,13 +241,13 @@ namespace engine
             {
                 serializedOnce = true;
 
-                CStdSharedPtr_t<CFrameGraphGraphVizSerializer::IResult> result     = nullptr;
-                CStdSharedPtr_t<CFrameGraphGraphVizSerializer>          serializer = std::make_shared<CFrameGraphGraphVizSerializer>();
+                Shared<CFrameGraphGraphVizSerializer::IResult> result     = nullptr;
+                Shared<CFrameGraphGraphVizSerializer>          serializer = std::make_shared<CFrameGraphGraphVizSerializer>();
                 bool const initialized  = serializer->initialize();
                 bool const serialized   = serializer->serialize(*frameGraph, result);
 
 
-                CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
+                Shared<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
                         std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
 
                 std::string serializedData {};

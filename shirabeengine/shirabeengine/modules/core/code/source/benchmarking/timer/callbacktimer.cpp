@@ -42,7 +42,7 @@ namespace engine
         if(nullptr == mTimerThread)
         {
             mTimerThread
-                    = CStdSharedPtr_t<std::thread>(
+                    = Shared<std::thread>(
                           new std::thread(&CCallbackTimer::exec, this),
                           [] (std::thread *p) { if(p) { if(p->joinable()) p->join(); delete p; } }
                       );

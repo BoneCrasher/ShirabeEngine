@@ -30,7 +30,7 @@ namespace engine
          *
          * @param aProxyFactory A point to a resource factory.
          */
-        CResourceManager(CStdSharedPtr_t<CResourceProxyFactory> const &aProxyFactory);
+        CResourceManager(Shared<CResourceProxyFactory> const &aProxyFactory);
 
     public_destructors:
         /**

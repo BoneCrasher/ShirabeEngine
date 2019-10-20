@@ -82,7 +82,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IUIDGenerator<FrameGraphResourceId_t>> CGraphBuilder::resourceUIDGenerator()
+        Shared<IUIDGenerator<FrameGraphResourceId_t>> CGraphBuilder::resourceUIDGenerator()
         {
             return mResourceUIDGenerator;
         }
@@ -100,7 +100,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdUniquePtr_t<CGraph> &CGraphBuilder::graph()
+        Unique<CGraph> &CGraphBuilder::graph()
         {
             return mFrameGraph;
         }
@@ -109,7 +109,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<SApplicationEnvironment> &CGraphBuilder::applicationEnvironment()
+        Shared<SApplicationEnvironment> &CGraphBuilder::applicationEnvironment()
         {
             return mApplicationEnvironment;
         }
@@ -118,7 +118,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<wsi::CWSIDisplay> const &CGraphBuilder::display()
+        Shared<wsi::CWSIDisplay> const &CGraphBuilder::display()
         {
             return mDisplay;
         }
@@ -128,8 +128,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraphBuilder::initialize(
-                CStdSharedPtr_t<SApplicationEnvironment> const &aApplicationEnvironment,
-                CStdSharedPtr_t<wsi::CWSIDisplay>        const &aDisplay)
+                Shared<SApplicationEnvironment> const &aApplicationEnvironment,
+                Shared<wsi::CWSIDisplay>        const &aDisplay)
         {
             bool const inputInvalid =
                     nullptr == aApplicationEnvironment or
@@ -142,7 +142,7 @@ namespace engine
 
             applicationEnvironment() = aApplicationEnvironment;
             mDisplay                 = aDisplay;
-            graph()                  = makeCStdUniquePtr<CGraph>();
+            graph()                  = makeUnique<CGraph>();
 
             // TODO: We add a dummy pass for the algorithm to work... Need to fix that up
             auto const pseudoSetup = [] (CPassBuilder const &, bool &) -> CEngineResult<>
@@ -153,7 +153,7 @@ namespace engine
             auto const pseudoExec  = [] (
                     bool                                      const &,
                     CFrameGraphResources                      const &,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &) -> CEngineResult<>
+                    Shared<IFrameGraphRenderContext>       &) -> CEngineResult<>
             {
                 return { EEngineStatus::Ok };
             };
@@ -253,7 +253,7 @@ namespace engine
 
                 mResources.push_back(resource.resourceId);
 
-                CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(CPassKey<CGraphBuilder>());
+                Unique<CPassBase::CMutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(CPassKey<CGraphBuilder>());
                 accessor->mutableResourceReferences().push_back(resource.resourceId);
 
                 return resource;
@@ -298,9 +298,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<CStdUniquePtr_t<CGraph>> CGraphBuilder::compile()
+        CEngineResult<Unique<CGraph>> CGraphBuilder::compile()
         {
-            CStdUniquePtr_t<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
+            Unique<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             // First (No-Op, automatically performed on call to 'setPassDependency(...)':
             //   Evaluate explicit pass dependencies without resource flow.
@@ -394,20 +394,20 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraphBuilder::collectPass(CStdSharedPtr_t<CPassBase> aPass)
+        CEngineResult<> CGraphBuilder::collectPass(Shared<CPassBase> aPass)
         {
             if(nullptr == aPass)
             {
                 return { EEngineStatus::Error };
             }
 
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
 
             FrameGraphResourceIdList const resources = accessor->mutableResourceReferences();
 
             for(FrameGraphResourceId_t const &resourceId : resources)
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphResource>> resourceFetch = mResourceData.getMutable<SFrameGraphResource>(resourceId);
+                CEngineResult<Shared<SFrameGraphResource>> resourceFetch = mResourceData.getMutable<SFrameGraphResource>(resourceId);
                 if(not resourceFetch.successful())
                 {
                     CLog::Error(logTag(), "Could not fetch pass data.");
@@ -439,7 +439,7 @@ namespace engine
                     // Avoid internal references for passes!
                     // If the edge from pass k to pass k+1 was not added yet.
                     // Create edge: Parent-->Source
-                    CEngineResult<CStdSharedPtr_t<SFrameGraphResource> const> parentResourceFetch = mResourceData.get<SFrameGraphResource>(resource.parentResource);
+                    CEngineResult<Shared<SFrameGraphResource> const> parentResourceFetch = mResourceData.get<SFrameGraphResource>(resource.parentResource);
                     if(not parentResourceFetch.successful())
                     {
                         CLog::Error(logTag(), "Could not fetch pass data.");
@@ -477,8 +477,8 @@ namespace engine
 
                     if(EFrameGraphResourceType::TextureView == resource.type)
                     {
-                        CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>>     textureFetch     = mResourceData.getMutable<SFrameGraphTexture>    (resource.subjacentResource);
-                        CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> textureViewFetch = mResourceData.getMutable<SFrameGraphTextureView>(resource.resourceId);
+                        CEngineResult<Shared<SFrameGraphTexture>>     textureFetch     = mResourceData.getMutable<SFrameGraphTexture>    (resource.subjacentResource);
+                        CEngineResult<Shared<SFrameGraphTextureView>> textureViewFetch = mResourceData.getMutable<SFrameGraphTextureView>(resource.resourceId);
 
                         if(not (textureFetch.successful() and textureViewFetch.successful()))
                         {
@@ -540,7 +540,7 @@ namespace engine
 
             for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())
             {
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView> const> textureViewFetch = mResourceData.get<SFrameGraphTextureView>(textureViewRef);
+                CEngineResult<Shared<SFrameGraphTextureView> const> textureViewFetch = mResourceData.get<SFrameGraphTextureView>(textureViewRef);
                 if(not textureViewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to get texture view to validate.");
@@ -554,7 +554,7 @@ namespace engine
 
                 FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture> const> subjacentFetch = mResourceData.get<SFrameGraphTexture>(subjacentResourceId);
+                CEngineResult<Shared<SFrameGraphTexture> const> subjacentFetch = mResourceData.get<SFrameGraphTexture>(subjacentResourceId);
                 if(not textureViewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to get subjacent texture to validate.");

@@ -68,7 +68,7 @@ namespace Test
         {
             SHIRABE_DECLARE_LOG_TAG(CMockFrameGraphRenderContext);
         public:
-            static CStdSharedPtr_t<IFrameGraphRenderContext> fromRenderer(CStdSharedPtr_t<IRenderContext> renderer);
+            static Shared<IFrameGraphRenderContext> fromRenderer(Shared<IRenderContext> renderer);
 
             CEngineResult<> importTexture(SFrameGraphTexture const &aTexture);
 
@@ -123,9 +123,9 @@ namespace Test
             CEngineResult<> render(SRenderable const&renderable);
 
         private:
-            CMockFrameGraphRenderContext(CStdSharedPtr_t<IRenderContext> aRenderer);
+            CMockFrameGraphRenderContext(Shared<IRenderContext> aRenderer);
 
-            CStdSharedPtr_t<IRenderContext> mRenderer;
+            Shared<IRenderContext> mRenderer;
         };
 
 #define SHIRABE_DECLARE_MOCK_TASK_BUILDER_MODULE(type)                         \

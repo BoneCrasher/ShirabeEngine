@@ -132,7 +132,7 @@ namespace engine
                 };
 
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanRenderPassResource>(renderPassResource, renderPassDeleter);
+                assignment.internalResourceHandle = Shared<SVulkanRenderPassResource>(renderPassResource, renderPassDeleter);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -177,7 +177,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(aAssignment.internalResourceHandle);
+                Shared<SVulkanRenderPassResource> renderPass = std::static_pointer_cast<SVulkanRenderPassResource>(aAssignment.internalResourceHandle);
                 if(nullptr == renderPass)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for render pass destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));

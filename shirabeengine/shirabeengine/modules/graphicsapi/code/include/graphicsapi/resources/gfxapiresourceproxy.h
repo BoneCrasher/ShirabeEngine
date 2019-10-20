@@ -43,7 +43,7 @@ namespace engine
             CGFXAPIResourceProxy(
                     EProxyType                              const &aProxyType,
                     typename TResource::CCreationRequest    const &aRequest,
-                    CStdSharedPtr_t<CGFXAPIResourceBackend> const &aResourceBackend)
+                    Shared<CGFXAPIResourceBackend> const &aResourceBackend)
                 : CResourceBackendProxy<CGFXAPIResourceBackend, TResource>(aProxyType, aResourceBackend, aRequest)
                 , mDestructionRequest("")
             { }
@@ -99,9 +99,9 @@ namespace engine
          * @return           A valid GFXAPIResourceProxy instance or nullptr on error.
          */
         template <typename TResource>
-        static CStdSharedPtr_t<CGFXAPIResourceProxy<TResource>> GFXAPIProxyCast(AnyProxy const &aProxy)
+        static Shared<CGFXAPIResourceProxy<TResource>> GFXAPIProxyCast(AnyProxy const &aProxy)
         {
-            CStdSharedPtr_t<CGFXAPIResourceProxy<TResource>> const temp = std::static_pointer_cast<CGFXAPIResourceProxy<TResource>>(aProxy);
+            Shared<CGFXAPIResourceProxy<TResource>> const temp = std::static_pointer_cast<CGFXAPIResourceProxy<TResource>>(aProxy);
             return temp;
         }
         //<-----------------------------------------------------------------------------

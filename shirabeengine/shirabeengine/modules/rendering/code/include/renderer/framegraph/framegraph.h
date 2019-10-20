@@ -117,7 +117,7 @@ namespace engine
                         typename    TPass,
                         typename... TPassCreationArgs
                         >
-                CEngineResult<CStdSharedPtr_t<TPass>> createPass(
+                CEngineResult<Shared<TPass>> createPass(
                         PassUID_t         const      &uid,
                         std::string       const      &name,
                         TPassCreationArgs       &&...args);
@@ -138,7 +138,7 @@ namespace engine
              * @param aKey PassKey creatable only by GraphBuilder instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<class CGraphBuilder> &&aKey) const
+            Unique<CAccessor> getAccessor(CPassKey<class CGraphBuilder> &&aKey) const
             {
                 SHIRABE_UNUSED(aKey);
 
@@ -151,7 +151,7 @@ namespace engine
              * @param aKey PassKey creatable only by GraphBuilder instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<class CGraphBuilder> &&aKey)
+            Unique<CMutableAccessor> getMutableAccessor(CPassKey<class CGraphBuilder> &&aKey)
             {
                 SHIRABE_UNUSED(aKey);
 
@@ -165,7 +165,7 @@ namespace engine
              * @param aKey PassKey creatable only by graphvizserializer instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CAccessor> getAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey) const
+            Unique<CAccessor> getAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey) const
             {
                 return std::move(std::make_unique<CAccessor>(this));
             }
@@ -176,7 +176,7 @@ namespace engine
              * @param aKey PassKey creatable only by graphvizserializer instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            CStdUniquePtr_t<CMutableAccessor> getMutableAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey)
+            Unique<CMutableAccessor> getMutableAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey)
             {
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
@@ -187,7 +187,7 @@ namespace engine
              *
              * @return True, if successfully executed. False otherwise.
              */
-            CEngineResult<> execute(CStdSharedPtr_t<IFrameGraphRenderContext>&);
+            CEngineResult<> execute(Shared<IFrameGraphRenderContext>&);
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
@@ -231,7 +231,7 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeResources(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
                     FrameGraphResourceIdList                  const &aResourceIds);
 
             /**
@@ -243,7 +243,7 @@ namespace engine
              * @return               True, if successful. False, otherwise.
              */
             CEngineResult<> initializeRenderPassAndFrameBuffer(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
                     std::string                               const &aRenderPassId,
                     std::string                               const &aFrameBufferId);
 
@@ -255,7 +255,7 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> bindResources(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
                     FrameGraphResourceIdList                  const &aResourceIds);
 
             /**
@@ -266,7 +266,7 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> unbindResources(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
                     FrameGraphResourceIdList                  const &aResourceIds);
 
             /**
@@ -278,7 +278,7 @@ namespace engine
              * @return               True, if successful. False, otherwise.
              */
             CEngineResult<> deinitializeRenderPassAndFrameBuffer(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
                     std::string                               const &aRenderPassId,
                     std::string                               const &aFrameBufferId);
 
@@ -290,7 +290,7 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeResources(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aRenderContext,
+                    Shared<IFrameGraphRenderContext>      &aRenderContext,
                     FrameGraphResourceIdList                  const&aResourceIds);
 
             /**
@@ -301,8 +301,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeTexture(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                    CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture);
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<SFrameGraphTexture>       const &aTexture);
 
             /**
              * Initialize a texture view for execution.
@@ -313,9 +313,9 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeTextureView(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                    CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
-                    CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView);
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<SFrameGraphTexture>       const &aTexture,
+                    Shared<SFrameGraphTextureView>   const &aTextureView);
             /**
              * Initialize a buffer for execution.
              *
@@ -323,7 +323,7 @@ namespace engine
              * @return
              */
             CEngineResult<> initializeBuffer(
-                    CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext);
+                    Shared<IFrameGraphRenderContext> &aRenderContext);
 
             /**
              * Initialize a buffer view for execution
@@ -331,7 +331,7 @@ namespace engine
              * @return
              */
             CEngineResult<> initializeBufferView(
-                    CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext);
+                    Shared<IFrameGraphRenderContext> &aRenderContext);
 
             /**
              * Deinitialize a texture for execution.
@@ -341,8 +341,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeTexture(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                    CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture);
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<SFrameGraphTexture>       const &aTexture);
 
             /**
              * Deinitialize a texture view for execution.
@@ -353,9 +353,9 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeTextureView(
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aRenderContext,
-                    CStdSharedPtr_t<SFrameGraphTexture>       const &aTexture,
-                    CStdSharedPtr_t<SFrameGraphTextureView>   const &aTextureView);
+                    Shared<IFrameGraphRenderContext>       &aRenderContext,
+                    Shared<SFrameGraphTexture>       const &aTexture,
+                    Shared<SFrameGraphTextureView>   const &aTextureView);
 
             /**
              * Deinitialize a buffer view for execution.
@@ -364,7 +364,7 @@ namespace engine
              * @return
              */
             CEngineResult<> deinitializeBufferView(
-                    CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext);
+                    Shared<IFrameGraphRenderContext> &aRenderContext);
             /**
              * Deinitialize a buffer view for execution.
              *
@@ -372,7 +372,7 @@ namespace engine
              * @return
              */
             CEngineResult<> deinitializeBuffer(
-                    CStdSharedPtr_t<IFrameGraphRenderContext> &aRenderContext);
+                    Shared<IFrameGraphRenderContext> &aRenderContext);
 
             /**
              * Add a new pass to this graph.
@@ -380,7 +380,7 @@ namespace engine
              * @param aPass The pass to add.
              * @return      True, if successfully added. False otherwise.
              */
-            CEngineResult<> addPass(CStdSharedPtr_t<CPassBase> const &aPass);
+            CEngineResult<> addPass(Shared<CPassBase> const &aPass);
 
             /**
              * Create a new pass of type TPass with TPassCreationArgs and set it up.
@@ -395,13 +395,13 @@ namespace engine
                 typename    TPass,
                 typename... TPassCreationArgs
             >
-            CEngineResult<CStdSharedPtr_t<TPass>> createPass(
+            CEngineResult<Shared<TPass>> createPass(
                     PassUID_t         const &aUID,
                     std::string       const &aName,
                     TPassCreationArgs       &&...aArgs);
 
         private_members:
-            CStdSharedPtr_t<CResourceManagerBase> mResourceManager;
+            Shared<CResourceManagerBase> mResourceManager;
 
             PassMap                               mPasses;
             AdjacencyListMap_t<PassUID_t>         mPassAdjacency;
@@ -430,12 +430,12 @@ namespace engine
                 typename   TPass,
                 typename... TPassCreationArgs
                 >
-        CEngineResult<CStdSharedPtr_t<TPass>> CGraph::CMutableAccessor::createPass(
+        CEngineResult<Shared<TPass>> CGraph::CMutableAccessor::createPass(
                 PassUID_t         const &aUID,
                 std::string       const &aName,
                 TPassCreationArgs       &&...aArgs)
         {
-            CEngineResult<CStdSharedPtr_t<TPass>> pass = mGraph->createPass<TPass, TPassCreationArgs...>(aUID, aName, std::forward<TPassCreationArgs>(aArgs)...);
+            CEngineResult<Shared<TPass>> pass = mGraph->createPass<TPass, TPassCreationArgs...>(aUID, aName, std::forward<TPassCreationArgs>(aArgs)...);
             return pass;
         }
         //<-----------------------------------------------------------------------------
@@ -447,12 +447,12 @@ namespace engine
                 typename    TPass,
                 typename... TPassCreationArgs
                 >
-        CEngineResult<CStdSharedPtr_t<TPass>> CGraph::createPass(
+        CEngineResult<Shared<TPass>> CGraph::createPass(
                 PassUID_t         const &aUID,
                 std::string       const &aName,
                 TPassCreationArgs       &&...aArgs)
         {
-            CStdSharedPtr_t<TPass> pass = makeCStdSharedPtr<TPass>(aUID, aName, std::forward<TPassCreationArgs>(aArgs)...);
+            Shared<TPass> pass = makeShared<TPass>(aUID, aName, std::forward<TPassCreationArgs>(aArgs)...);
             if(!pass)
             {
                 CLog::WTF(logTag(), "Failed to create pass.");

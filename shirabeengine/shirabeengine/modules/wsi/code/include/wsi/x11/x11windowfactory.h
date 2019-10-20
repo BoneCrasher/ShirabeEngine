@@ -26,7 +26,7 @@ namespace engine
                  *
                  * @param aDisplay The x11 display to attach to.
                  */
-                CX11WindowFactory(CStdSharedPtr_t<CX11Display> const &aDisplay);
+                CX11WindowFactory(Shared<CX11Display> const &aDisplay);
 
             public_destructors:
                 /**
@@ -42,12 +42,12 @@ namespace engine
                  * @param aInitialBounds The initial bounds of the new window.
                  * @return               A pointer to a new x11 window or nullptr on error.
                  */
-                CStdSharedPtr_t<IWindow> createWindow(
+                Shared<IWindow> createWindow(
                         std::string const &aName,
                         CRect       const &aInitialBounds);
 
             private_members:
-                CStdSharedPtr_t<CWSIDisplay> mX11Display;
+                Shared<CWSIDisplay> mX11Display;
             };
 
         }

@@ -26,13 +26,13 @@ namespace engine
      *
      */
     template <typename T>
-    using CStdSharedPtr_t = std::shared_ptr<T>;
+    using Shared = std::shared_ptr<T>;
 
     /**
      *
      */
     template <typename T>
-    using CStdUniquePtr_t = std::unique_ptr<T>;
+    using Unique = std::unique_ptr<T>;
 
     /**
      *
@@ -41,12 +41,12 @@ namespace engine
     using CStdWeakPtr_t = std::weak_ptr<T>;
 
     /**
-     * @brief makeCStdSharedPtr
+     * @brief makeShared
      * @param aArgs
      * @return
      */
     template <typename TUnderlyingType, typename ... TArgs>
-    static CStdSharedPtr_t<TUnderlyingType> makeCStdSharedPtr(TArgs&&... aArgs)
+    static Shared<TUnderlyingType> makeShared(TArgs&&... aArgs)
     {
         return std::make_shared<TUnderlyingType>(std::forward<TArgs>(aArgs)...);
     }
@@ -58,17 +58,17 @@ namespace engine
     using CStdSharedPtrDeleterFn_t = std::function<void(T*)>;
 
     /**
-     * @brief makeCStdSharedPtrCustomDeleter
+     * @brief makeSharedCustomDeleter
      * @param aInstance
      * @param aDeleter
      * @return
      */
     template <typename T, typename TDeleter>
-    static CStdSharedPtr_t<T> makeCStdSharedPtrCustomDeleter(
+    static Shared<T> makeSharedCustomDeleter(
             T          *aInstance,
             TDeleter    aDeleter)
     {
-        return CStdSharedPtr_t<T>(aInstance, aDeleter);
+        return Shared<T>(aInstance, aDeleter);
     }
 
     /**
@@ -76,7 +76,7 @@ namespace engine
      * @param instance
      * @return
      */
-    template <typename T, typename TPtr = CStdSharedPtr_t<T>>
+    template <typename T, typename TPtr = Shared<T>>
     static inline TPtr makeCStdSharedFromThis(T* instance)
     {
         return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
@@ -94,12 +94,12 @@ namespace engine
     }
 
     /**
-     * @brief makeCStdUniquePtr
+     * @brief makeUnique
      * @param aArgs
      * @return
      */
     template <typename TUnderlyingType, typename ... TArgs>
-    static CStdUniquePtr_t<TUnderlyingType> makeCStdUniquePtr(TArgs&&... aArgs)
+    static Unique<TUnderlyingType> makeUnique(TArgs&&... aArgs)
     {
         return std::make_unique<TUnderlyingType>(std::forward<TArgs>(aArgs)...);
     }

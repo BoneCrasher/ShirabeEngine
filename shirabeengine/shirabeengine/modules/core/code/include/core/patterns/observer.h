@@ -45,7 +45,7 @@ namespace engine
         /*!
          * Type-Alias to declare a valid observer instance as a shared pointer to IObserver<T>.
          */
-        using ObserverPtr_t = CStdSharedPtr_t<IObserver<TArgs...>>;
+        using ObserverPtr_t = Shared<IObserver<TArgs...>>;
 
     public_methods:
         bool observe(ObserverPtr_t aObserver);

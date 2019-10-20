@@ -18,7 +18,7 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IGAPIResourceAdapter);
 		
         public_api:
-            virtual CStdSharedPtr_t<TResource> const getGAPIResource() const = 0;
+            virtual Shared<TResource> const getGAPIResource() const = 0;
 
             virtual EEngineStatus releaseGAPIResource() = 0;
 
@@ -28,7 +28,7 @@ namespace engine
          * Convenience: Declare a list of IGAPIResourceAdapter<TResource> to IGAPIResourceAdapterList
          */
 		template <typename TResource>
-        SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<IGAPIResourceAdapter<TResource>>, IGAPIResourceAdapter);
+        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IGAPIResourceAdapter<TResource>>, IGAPIResourceAdapter);
 	}
 }
 

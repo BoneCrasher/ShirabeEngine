@@ -38,7 +38,7 @@ namespace engine
         virtual EEngineStatus update(CTimer const &aTimer) = 0;
     };
 
-    SHIRABE_DECLARE_LIST_OF_TYPE(CStdSharedPtr_t<IComponent>, IComponent);
+    SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IComponent>, IComponent);
 
 }
 

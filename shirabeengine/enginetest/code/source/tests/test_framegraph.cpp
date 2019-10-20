@@ -95,15 +95,15 @@ namespace Test
              * @param aBackend The backend to create a proxy for.
              * @return         A valid creation functor for a proxy of type TResource.
              */
-            static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(CStdSharedPtr_t<CGFXAPIResourceBackend> aBackend)
+            static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(Shared<CGFXAPIResourceBackend> aBackend)
             {
                 auto const creator = [=]() -> CResourceProxyFactory::CreatorFn_t<TResource>
                 {
                     return
                             [=](resources::EProxyType const &aType, typename TResource::CCreationRequest const &aRequest)
-                            -> CStdSharedPtr_t<IResourceProxy<TResource>>
+                            -> Shared<IResourceProxy<TResource>>
                     {
-                        return makeCStdSharedPtr<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
+                        return makeShared<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
                     };
                 };
 
@@ -125,15 +125,15 @@ namespace Test
 
             namespace asset = engine::asset;
 
-            CStdSharedPtr_t<os::SApplicationEnvironment> appEnvironment = makeCStdSharedPtr<os::SApplicationEnvironment>();
+            Shared<os::SApplicationEnvironment> appEnvironment = makeShared<os::SApplicationEnvironment>();
             // appEnvironment->osDisplays = os::SOSDisplay::GetDisplays();
 
             //
             // DISPLAY
             //
-            CStdSharedPtr_t<CWSIDisplay> display = nullptr;
+            Shared<CWSIDisplay> display = nullptr;
 #if defined SHIRABE_PLATFORM_LINUX
-            display = makeCStdSharedPtr<x11::CX11Display>();
+            display = makeShared<x11::CX11Display>();
 #elif defined SHIRABE_PLATFORM_WINDOWS
 #endif
             EEngineStatus status = display->initialize();
@@ -143,23 +143,23 @@ namespace Test
             //
             asset::CAssetRegistry<asset::SAsset> registry = asset::CAssetIndex::loadIndexById("Default");
 
-            CStdSharedPtr_t<asset::CAssetStorage> assetStorage = makeCStdSharedPtr<asset::CAssetStorage>();
+            Shared<asset::CAssetStorage> assetStorage = makeShared<asset::CAssetStorage>();
             assetStorage->readIndex(registry);
 
             //
             // RESOURCE MANAGEMENT
             //
-            CStdSharedPtr_t<CGFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = makeCStdSharedPtr<CMockGFXAPIResourceTaskBackend>();
+            Shared<CGFXAPIResourceBackend::ResourceTaskBackend_t> gfxApiResourceTaskBackend = makeShared<CMockGFXAPIResourceTaskBackend>();
             gfxApiResourceTaskBackend->initialize();
 
-            CStdSharedPtr_t<CGFXAPIResourceBackend> gfxApiResourceBackend = makeCStdSharedPtr<CGFXAPIResourceBackend>();
+            Shared<CGFXAPIResourceBackend> gfxApiResourceBackend = makeShared<CGFXAPIResourceBackend>();
             gfxApiResourceBackend->setResourceTaskBackend(gfxApiResourceTaskBackend);
 
-            CStdSharedPtr_t<CResourceProxyFactory> resourceProxyFactory = makeCStdSharedPtr<CResourceProxyFactory>();
+            Shared<CResourceProxyFactory> resourceProxyFactory = makeShared<CResourceProxyFactory>();
             resourceProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>::forGFXAPIBackend(gfxApiResourceBackend));
             resourceProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(gfxApiResourceBackend));
 
-            CStdSharedPtr_t<CResourceManagerBase>  proxyResourceManager = makeCStdSharedPtr<CResourceManager>(resourceProxyFactory);
+            Shared<CResourceManagerBase>  proxyResourceManager = makeShared<CResourceManager>(resourceProxyFactory);
             proxyResourceManager->initialize();
             gfxApiResourceBackend->initialize();
 
@@ -167,10 +167,10 @@ namespace Test
             // RENDERING
             //
             SRendererConfiguration rendererConfiguration{};
-            CStdSharedPtr_t<IRenderContext> renderer = makeCStdSharedPtr<CMockRenderContext>();
+            Shared<IRenderContext> renderer = makeShared<CMockRenderContext>();
             // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
             //
-            CStdSharedPtr_t<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer).data();
+            Shared<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer).data();
 
             SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
 
@@ -233,16 +233,16 @@ namespace Test
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer).data();
 
-            CEngineResult<CStdUniquePtr_t<engine::framegraph::CGraph>> frameGraph = graphBuilder.compile();
+            CEngineResult<Unique<engine::framegraph::CGraph>> frameGraph = graphBuilder.compile();
 
-            // CStdSharedPtr_t<IFrameGraphSerializer> serializer = makeCStdSharedPtr<CFrameGraphGraphVizSerializer>();
+            // Shared<IFrameGraphSerializer> serializer = makeShared<CFrameGraphGraphVizSerializer>();
             // serializer->initialize();
 
-            // CStdSharedPtr_t<ISerializer<CGraph>::IResult> result = nullptr;
+            // Shared<ISerializer<CGraph>::IResult> result = nullptr;
             //
             // bool const serialized = serializer->serialize(*frameGraph, result);
             //
-            // CStdSharedPtr_t<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
+            // Shared<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
             //         std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
             //
             // std::string serializedData {};

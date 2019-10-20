@@ -26,7 +26,7 @@ int main(int aArgc, char **aArgv)
 
     CLog::Status(Main::logTag(), "Shirabe Engine Game");
 
-    CStdSharedPtr_t<os::SApplicationEnvironment> appEnvironment = makeCStdSharedPtr<os::SApplicationEnvironment>();
+    Shared<os::SApplicationEnvironment> appEnvironment = makeShared<os::SApplicationEnvironment>();
 #if defined SHIRABE_PLATFORM_WINDOWS
     appEnvironment->instanceHandle         = hInstance;
     appEnvironment->previousInstanceHandle = hPrevInstance;
@@ -36,7 +36,7 @@ int main(int aArgc, char **aArgv)
     // TODO: Configuation
     // EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);
 
-    CStdSharedPtr_t<CEngineInstance> engine     = makeCStdSharedPtr<CEngineInstance>(appEnvironment/*, engineConfiguration*/);
+    Shared<CEngineInstance> engine     = makeShared<CEngineInstance>(appEnvironment/*, engineConfiguration*/);
     CEngineResult<>                  engineInit = engine->initialize();
     if(not engineInit.successful())
     {

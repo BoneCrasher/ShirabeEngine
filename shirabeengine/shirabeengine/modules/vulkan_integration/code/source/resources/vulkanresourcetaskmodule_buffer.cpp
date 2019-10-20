@@ -84,7 +84,7 @@ namespace engine
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = desc.name;
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanBufferResource>(textureResource);
+                assignment.internalResourceHandle = Shared<SVulkanBufferResource>(textureResource);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -129,7 +129,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanBufferResource> texture = std::static_pointer_cast<SVulkanBufferResource>(aAssignment.internalResourceHandle);
+                Shared<SVulkanBufferResource> texture = std::static_pointer_cast<SVulkanBufferResource>(aAssignment.internalResourceHandle);
                 if(nullptr == texture)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for buffer destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));

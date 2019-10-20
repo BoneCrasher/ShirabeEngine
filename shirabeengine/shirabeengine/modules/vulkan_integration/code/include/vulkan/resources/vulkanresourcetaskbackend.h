@@ -70,7 +70,7 @@ namespace engine
              *
              * @param aVulkanEnvironment The vulkan environment to attach the backend to.
              */
-            CVulkanResourceTaskBackend(CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment);
+            CVulkanResourceTaskBackend(Shared<CVulkanEnvironment> const &aVulkanEnvironment);
 
         public_methods:
             /**
@@ -96,7 +96,7 @@ namespace engine
             SHIRABE_DECLARE_TASK_BUILDER_MODULE(Mesh);
 
         private_members:
-            CStdSharedPtr_t<CVulkanEnvironment> mVulkanEnvironment;
+            Shared<CVulkanEnvironment> mVulkanEnvironment;
         };
 
 

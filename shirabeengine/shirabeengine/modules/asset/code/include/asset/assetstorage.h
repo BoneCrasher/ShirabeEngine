@@ -80,7 +80,7 @@ namespace engine
             using AssetRegistry_t = CAssetRegistry<SAsset>;
 
         public_constructors:
-            CAssetStorage(CStdUniquePtr_t<IAssetDataSource> &&aAssetDataSource);
+            CAssetStorage(Unique<IAssetDataSource> &&aAssetDataSource);
 
         public_methods:
             /**
@@ -137,7 +137,7 @@ namespace engine
 
         private_members:
             AssetRegistry_t                   mAssetIndex;
-            CStdUniquePtr_t<IAssetDataSource> mAssetDataSource;
+            Unique<IAssetDataSource> mAssetDataSource;
         };        
 
     }

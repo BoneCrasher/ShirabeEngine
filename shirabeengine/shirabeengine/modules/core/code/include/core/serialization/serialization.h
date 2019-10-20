@@ -122,7 +122,7 @@ namespace engine
              *                   it in various output formats.
              * @return
              */
-            virtual CResult<CStdSharedPtr_t<IResult>> serialize(T const&aSource) = 0;
+            virtual CResult<Shared<IResult>> serialize(T const&aSource) = 0;
         };
 
         /*!
@@ -173,7 +173,7 @@ namespace engine
              * @param aOutResult Result-Instance containing the deserialization result.
              * @return           True if successful, false otherwise.
              */
-            virtual CResult<CStdSharedPtr_t<IResult>> deserialize(std::string const &aSource) = 0;
+            virtual CResult<Shared<IResult>> deserialize(std::string const &aSource) = 0;
 
             /*!
              * Accept a byte buffer input of serialized data and invoke the deserialization process,
@@ -183,7 +183,7 @@ namespace engine
              * @param aOutResult Result-Instance containing the deserialization result.
              * @return           True if successful, false otherwise.
              */
-            virtual CResult<CStdSharedPtr_t<IResult>> deserialize(std::vector<uint8_t> const &aSource) = 0;
+            virtual CResult<Shared<IResult>> deserialize(std::vector<uint8_t> const &aSource) = 0;
         };
     }
 }

@@ -25,12 +25,12 @@ namespace Engine {
         DX11Renderer();
         ~DX11Renderer();
 
-        void setDX11Environment(CStdSharedPtr_t<DX11Environment> const&pDx11Environment);
+        void setDX11Environment(Shared<DX11Environment> const&pDx11Environment);
 
         EEngineStatus initialize(
           ApplicationEnvironment const &environment,
           RendererConfiguration  const &configuration,
-          CStdSharedPtr_t<ResourceManager>   const &resourceManager);
+          Shared<ResourceManager>   const &resourceManager);
 
 
         EEngineStatus deinitialize();
@@ -44,9 +44,9 @@ namespace Engine {
 
       private:
         RendererConfiguration m_config;
-        CStdSharedPtr_t<ResourceManager>  m_resourceManager;
+        Shared<ResourceManager>  m_resourceManager;
 
-        CStdSharedPtr_t<DX11Environment> m_dx11Environment;
+        Shared<DX11Environment> m_dx11Environment;
 
         PublicResourceId_t
           mSwapChainId,

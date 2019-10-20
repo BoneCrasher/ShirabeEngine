@@ -7,7 +7,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CVulkanResourceTaskBackend::CVulkanResourceTaskBackend(CStdSharedPtr_t<CVulkanEnvironment> const &aVulkanEnvironment)
+        CVulkanResourceTaskBackend::CVulkanResourceTaskBackend(Shared<CVulkanEnvironment> const &aVulkanEnvironment)
             : CGFXAPIResourceTaskBackend()
             , mVulkanEnvironment(aVulkanEnvironment)
         {

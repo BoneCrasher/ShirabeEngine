@@ -15,8 +15,8 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------        
         bool CVulkanRenderContext::initialize(
-                CStdSharedPtr_t<CVulkanEnvironment>             const &aVulkanEnvironment,
-                CStdSharedPtr_t<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend)
+                Shared<CVulkanEnvironment>             const &aVulkanEnvironment,
+                Shared<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend)
         {
             assert(nullptr != aVulkanEnvironment);
             assert(nullptr != aGraphicsAPIResourceBackend);
@@ -78,7 +78,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::copyToBackBuffer(PublicResourceId_t const &aSourceImageId)
         {
-            CEngineResult<CStdSharedPtr_t<SVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
+            CEngineResult<Shared<SVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
             if(not resourceFetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch copy source image '%0'.", aSourceImageId);
@@ -224,14 +224,14 @@ namespace engine
         EEngineStatus CVulkanRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                          std::string const &aRenderPassId)
         {
-            CEngineResult<CStdSharedPtr_t<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
+            CEngineResult<Shared<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
             if(not frameBufferFetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch frame buffer '%0'.", aFrameBufferId);
                 return frameBufferFetch.result();
             }
 
-            CEngineResult<CStdSharedPtr_t<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
+            CEngineResult<Shared<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
             if(not renderPassFetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch render pass '%0'.", aRenderPassId);
@@ -270,14 +270,14 @@ namespace engine
             SHIRABE_UNUSED(aFrameBufferId);
             SHIRABE_UNUSED(aRenderPassId);
 
-            // CEngineResult<CStdSharedPtr_t<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
+            // CEngineResult<Shared<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
             // if(not frameBufferFetch.successful())
             // {
             //     CLog::Error(logTag(), "Failed to fetch frame buffer '%0'.", aFrameBufferId);
             //     return frameBufferFetch.result();
             // }
             //
-            // CEngineResult<CStdSharedPtr_t<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
+            // CEngineResult<Shared<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
             // if(not renderPassFetch.successful())
             // {
             //     CLog::Error(logTag(), "Failed to fetch render pass '%0'.", aRenderPassId);
@@ -341,7 +341,7 @@ namespace engine
             vkState.swapChain.currentSwapChainImageIndex = nextImageIndex;
 
             VkImage               &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
-            CStdSharedPtr_t<void>  resource = CStdSharedPtr_t<void>(static_cast<void*>(&image), [] (void*) {});
+            Shared<void>  resource = Shared<void>(static_cast<void*>(&image), [] (void*) {});
 
             CEngineResult<> registration =
                     mGraphicsAPIResourceBackend->registerResource(
@@ -425,7 +425,7 @@ namespace engine
 
             VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
-            CEngineResult<CStdSharedPtr_t<SVulkanPipelineResource>> fetch = mGraphicsAPIResourceBackend->getResource<SVulkanPipelineResource>(aPipelineUID);
+            CEngineResult<Shared<SVulkanPipelineResource>> fetch = mGraphicsAPIResourceBackend->getResource<SVulkanPipelineResource>(aPipelineUID);
             if(not fetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch pipeline '%0'.", aPipelineUID);

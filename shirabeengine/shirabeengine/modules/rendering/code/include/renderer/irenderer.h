@@ -39,10 +39,10 @@ namespace engine
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             virtual EEngineStatus initialize(
-                    CStdSharedPtr_t<SApplicationEnvironment>  const &aApplicationEnvironment,
-                    CStdSharedPtr_t<wsi::CWSIDisplay>         const &aDisplay,
+                    Shared<SApplicationEnvironment>  const &aApplicationEnvironment,
+                    Shared<wsi::CWSIDisplay>         const &aDisplay,
                     SRendererConfiguration                    const &aConfiguration,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>       &aFrameGraphRenderContext) = 0;
+                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext) = 0;
 
             /**
              * Deinitialize and clear the renderer.

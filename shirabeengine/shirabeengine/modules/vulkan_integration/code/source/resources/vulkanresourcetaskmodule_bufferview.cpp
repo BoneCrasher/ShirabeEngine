@@ -26,14 +26,14 @@ namespace engine
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
                 PublicResourceId_t const &subjacentResourceHandle = aRequest.underlyingBufferHandle();
-                CStdSharedPtr_t<void>     privateDependencyHandle = aDepencies.at(subjacentResourceHandle);
+                Shared<void>     privateDependencyHandle = aDepencies.at(subjacentResourceHandle);
                 if(not privateDependencyHandle)
                 {
                     CLog::Error(logTag(), "Failed to create BufferView due to missing dependency.");
                     return { EEngineStatus::DXDevice_CreateRTV_Failed };
                 }
 
-                CStdSharedPtr_t<SVulkanBufferResource> buffer = std::static_pointer_cast<SVulkanBufferResource>(privateDependencyHandle);
+                Shared<SVulkanBufferResource> buffer = std::static_pointer_cast<SVulkanBufferResource>(privateDependencyHandle);
                 if(not buffer)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for buffer creatopm. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));
@@ -58,7 +58,7 @@ namespace engine
                 SGFXAPIResourceHandleAssignment assignment ={ };
 
                 assignment.publicResourceHandle   = desc.name; // Just abuse the pointer target address of the handle...
-                assignment.internalResourceHandle = CStdSharedPtr_t<SVulkanBufferViewResource>(resource);
+                assignment.internalResourceHandle = Shared<SVulkanBufferViewResource>(resource);
 
                 return { EEngineStatus::Ok, assignment };
             };
@@ -103,7 +103,7 @@ namespace engine
 
             aOutTask = [=] () -> CEngineResult<SGFXAPIResourceHandleAssignment>
             {
-                CStdSharedPtr_t<SVulkanBufferViewResource> bufferView = std::static_pointer_cast<SVulkanBufferViewResource>(aAssignment.internalResourceHandle);
+                Shared<SVulkanBufferViewResource> bufferView = std::static_pointer_cast<SVulkanBufferViewResource>(aAssignment.internalResourceHandle);
                 if(nullptr == bufferView)
                 {
                     CLog::Error(logTag(), CString::format("Invalid internal data provided for buffer view destruction. Vulkan error: %0", VkResult::VK_ERROR_INVALID_EXTERNAL_HANDLE));

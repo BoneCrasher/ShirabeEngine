@@ -12,7 +12,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CStdSharedPtr_t<IResourceObjectPrivate> CResourceManager::asPrivate(CStdSharedPtr_t<IResourceObject> const &aObject)
+        Shared<IResourceObjectPrivate> CResourceManager::asPrivate(Shared<IResourceObject> const &aObject)
         {
             return std::static_pointer_cast<IResourceObjectPrivate>(aObject);
         }
@@ -26,6 +26,13 @@ namespace engine
             auto iterator = std::find(mResourceObjects.begin(), mResourceObjects.end(), aResourceId);
             if(mResourceObjects.end() != iterator)
             {
+                Shared <IResourceObject>       p = mResourceObjects[aResourceId];
+                Shared<IResourceObjectPrivate> q = p->getPrivateObject();
+
+                SHIRABE_EXPLICIT_DISCARD(p->unbind());
+                SHIRABE_EXPLICIT_DISCARD(q->unload());
+                SHIRABE_EXPLICIT_DISCARD(q->destroy());
+
                 removeResourceObject(aResourceId);
             }
 
@@ -37,7 +44,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         bool CResourceManager::storeResourceObject(ResourceId_t                        const &aId
-                                                   , CStdSharedPtr_t <IResourceObject> const &aObject)
+                                                   , Shared <IResourceObject> const &aObject)
         {
             bool const hasObjectForId = (mResourceObjects.end() != std::find(mResourceObjects.begin(), mResourceObjects.end(), aId));
             if(false == hasObjectForId)

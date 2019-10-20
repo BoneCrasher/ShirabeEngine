@@ -120,7 +120,7 @@ namespace engine
                     typename TResource::CCreationRequest const &aRequest,
                     PublicResourceIdList_t               const &aDependencies,
                     ETaskSynchronization                 const &aSyncMode,
-                    CStdSharedPtr_t<IAsyncLoadCallback>  const &aCallback);
+                    Shared<IAsyncLoadCallback>  const &aCallback);
 
             /**
              * Unload a specific resource specified by its destruction request.
@@ -143,7 +143,7 @@ namespace engine
              */
             CEngineResult<> registerResource(
                     PublicResourceId_t    const &aId,
-                    CStdSharedPtr_t<void> const &aResource,
+                    Shared<void> const &aResource,
                     EImportStorageMode    const &aImportStorageMode = EImportStorageMode::NoOverwrite);
 
             /**
@@ -154,7 +154,7 @@ namespace engine
              * @return    EEngineStatus::NotFound, if the resource was not available.
              */
             template <typename T>
-            CEngineResult<CStdSharedPtr_t<T>> const getResource(PublicResourceId_t const &aId);
+            CEngineResult<Shared<T>> const getResource(PublicResourceId_t const &aId);
 
             /**
              * Register a resource task backend used for creating specific op-tasks based
@@ -162,7 +162,7 @@ namespace engine
              *
              * @param aBackend The backend pointer. Musn't be nullptr.
              */
-            CEngineResult<> setResourceTaskBackend(CStdSharedPtr_t<ResourceTaskBackend_t> const &aBackend);
+            CEngineResult<> setResourceTaskBackend(Shared<ResourceTaskBackend_t> const &aBackend);
 
         private_methods:
             /**
@@ -211,7 +211,7 @@ namespace engine
                     std::future<ResourceTaskFn_t::result_type> &aOutSharedFuture);
 
         private_members:
-            CStdSharedPtr_t<ResourceTaskBackend_t>                       mResourceTaskBackend;
+            Shared<ResourceTaskBackend_t>                       mResourceTaskBackend;
             ResolvedDependencyCollection_t                               mStorage;
             threading::CLooper<ResourceTaskFn_t::result_type>            mResourceThread;
             threading::CLooper<ResourceTaskFn_t::result_type>::CHandler &mResourceThreadHandler;
@@ -222,7 +222,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CEngineResult<CStdSharedPtr_t<T>> const CGFXAPIResourceBackend::getResource(PublicResourceId_t const &aId)
+        CEngineResult<Shared<T>> const CGFXAPIResourceBackend::getResource(PublicResourceId_t const &aId)
         {
             // Check, whether the resource is available.
             bool const contained = (mStorage.end() != mStorage.find(aId));
@@ -233,8 +233,8 @@ namespace engine
             }
 
             // Check, whether the resoruce is of correct type.
-            CStdSharedPtr_t<void> resource = mStorage.at(aId);
-            CStdSharedPtr_t<T>    result   = std::static_pointer_cast<T>(resource);
+            Shared<void> resource = mStorage.at(aId);
+            Shared<T>    result   = std::static_pointer_cast<T>(resource);
             if(nullptr == result)
             {
                 CLog::Error(logTag(), "Resource '%0' not of expected type.", aId);
@@ -253,7 +253,7 @@ namespace engine
                 typename TResource::CCreationRequest const &aRequest,
                 PublicResourceIdList_t               const &aDependencies,
                 ETaskSynchronization                 const &aSyncMode,
-                CStdSharedPtr_t<IAsyncLoadCallback>  const &aCallback)
+                Shared<IAsyncLoadCallback>  const &aCallback)
         {
             SHIRABE_UNUSED(aCallback);
 
@@ -335,7 +335,7 @@ namespace engine
             CEngineResult<> unloadOp = EEngineStatus::Ok;
             try
             {
-                CStdSharedPtr_t<void> resource = mStorage[aRequest.publicResourceId()];
+                Shared<void> resource = mStorage[aRequest.publicResourceId()];
                 unloadOp = unloadImpl<TResource>(
                             aRequest,
                             {

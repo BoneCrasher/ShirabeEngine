@@ -19,7 +19,7 @@ namespace engine
              */
             static bool checkContainsCallbackPtr(
                     IWindow::IEventCallbackList                 const &aCollection,
-                    CStdSharedPtr_t<IWindow::IEventCallback>    const &aElement,
+                    Shared<IWindow::IEventCallback>    const &aElement,
                     IWindow::IEventCallbackList::const_iterator       &aOutIterator)
             {
                 aOutIterator = std::find(aCollection.begin(), aCollection.end(), aElement);
@@ -53,7 +53,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         EEngineStatus CWindowEventCallbackAdapter::registerCallback(
-                CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+                Shared<IWindow::IEventCallback> aCallback)
         {
             if(!aCallback)
             {
@@ -84,7 +84,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         EEngineStatus CWindowEventCallbackAdapter::unregisterCallback(
-                CStdSharedPtr_t<IWindow::IEventCallback> aCallback)
+                Shared<IWindow::IEventCallback> aCallback)
         {
             if(!aCallback)
             {

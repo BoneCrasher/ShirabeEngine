@@ -85,7 +85,7 @@ namespace engine
             auto const execute = [=] (
                     SPrePassData                              const &aPassData,
                     CFrameGraphResources                      const &aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>
+                    Shared<IFrameGraphRenderContext>
                     &aContext)
                     -> CEngineResult<>
             {
@@ -105,7 +105,7 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
-            CEngineResult<CStdSharedPtr_t<CallbackPass<SPrePassData>>> passFetch = aGraphBuilder.spawnPass<CallbackPass<SPrePassData>>(aPassName, setup, execute);
+            CEngineResult<Shared<CallbackPass<SPrePassData>>> passFetch = aGraphBuilder.spawnPass<CallbackPass<SPrePassData>>(aPassName, setup, execute);
             if(not passFetch.successful())
             {
                 return { EEngineStatus::Error };
@@ -165,7 +165,7 @@ namespace engine
             auto const execute = [=] (
                     SPresentPassData                          const&aPassData,
                     CFrameGraphResources                      const&aFrameGraphResources,
-                    CStdSharedPtr_t<IFrameGraphRenderContext>      &aContext)
+                    Shared<IFrameGraphRenderContext>      &aContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aPassData);
@@ -180,7 +180,7 @@ namespace engine
 
 
                 // Important: The whole copyToBackBuffer-stuff may not be called from within a render pass.
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(aPassData.importData.finalOutputId);
+                CEngineResult<Shared<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(aPassData.importData.finalOutputId);
                 if(not viewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch source image texture view resource.");
@@ -188,7 +188,7 @@ namespace engine
 
                 SFrameGraphTextureView const &view = *viewFetch.data();
 
-                CEngineResult<CStdSharedPtr_t<SFrameGraphTexture>> const textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(view.subjacentResource);
+                CEngineResult<Shared<SFrameGraphTexture>> const textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(view.subjacentResource);
                 if(not textureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch source image texture resource.");
@@ -204,14 +204,14 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
-            CEngineResult<CStdSharedPtr_t<CallbackPass<SPresentPassData>>> spawn = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>(aPassName, setup, execute);
+            CEngineResult<Shared<CallbackPass<SPresentPassData>>> spawn = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>(aPassName, setup, execute);
             if(not spawn.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                CStdSharedPtr_t<CallbackPass<SPresentPassData>> pass = spawn.data();
+                Shared<CallbackPass<SPresentPassData>> pass = spawn.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };

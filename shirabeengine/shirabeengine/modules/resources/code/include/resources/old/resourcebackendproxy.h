@@ -35,7 +35,7 @@ namespace engine
              */
             CResourceBackendProxy(
                     EProxyType                           const &aProxyType,
-                    CStdSharedPtr_t<TBackend>            const &aResourceBackend,
+                    Shared<TBackend>            const &aResourceBackend,
                     typename TResource::CCreationRequest const &aRequest)
                 : CGenericProxyBase<TResource>(aProxyType, aRequest)
                 , m_backend(aResourceBackend)
@@ -47,13 +47,13 @@ namespace engine
              *
              * @return See brief.
              */
-            CStdSharedPtr_t<TBackend> resourceBackend()
+            Shared<TBackend> resourceBackend()
             {
                 return m_backend;
             }
 
         private_members:
-            CStdSharedPtr_t<TBackend> m_backend;
+            Shared<TBackend> m_backend;
         };
     }
 }
