@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_RENDERER_TYPES_H__
 #define __SHIRABE_RENDERER_TYPES_H__
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include <core/basictypes.h>

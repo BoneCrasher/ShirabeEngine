@@ -3,7 +3,6 @@
 
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
-#include <graphicsapi/resources/types/texture.h>
 
 #include "asset/iassetdatasource.h"
 #include "asset/asseterror.h"

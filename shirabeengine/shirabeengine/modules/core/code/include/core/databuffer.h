@@ -2,7 +2,7 @@
 #define __SHIRABE_CORE_DATABUFFER_H__
 
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 #include <base/declaration.h>
 
 namespace engine {

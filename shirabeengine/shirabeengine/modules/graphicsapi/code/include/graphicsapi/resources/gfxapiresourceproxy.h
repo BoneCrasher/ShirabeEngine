@@ -4,12 +4,11 @@
 #include <type_traits>
 #include <typeinfo>
 #include <optional>
-#include <stdint.h>
+#include <cstdint>
 
 #include <core/enginetypehelper.h>
 #include <core/enginestatus.h>
 #include <base/string.h>
-#include <resources/core/resourcebackendproxy.h>
 
 #include "graphicsapi/resources/gfxapi.h"
 #include "graphicsapi/resources/gfxapiresourcebackend.h"

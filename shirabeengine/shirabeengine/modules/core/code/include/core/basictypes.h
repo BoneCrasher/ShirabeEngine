@@ -4,7 +4,7 @@
 #include <array>
 #include <math.h>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 #include <platform/platform.h>
 #include <math/geometric/rect.h>

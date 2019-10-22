@@ -9,7 +9,6 @@
 #include <core/enginetypehelper.h>
 #include <core/random.h>
 #include <core/uid.h>
-#include <resources/core/resourcedomaintransfer.h>
 #include "renderer/framegraph/framegraphdata.h"
 
 namespace engine

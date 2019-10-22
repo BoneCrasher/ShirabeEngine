@@ -2,7 +2,7 @@
 #define __SHIRABE_GRAPHICSAPI_TYPES_MESH_H__
 
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 
 #include <vulkan/vulkan.h>
 

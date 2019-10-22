@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <optional>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <vector>
 

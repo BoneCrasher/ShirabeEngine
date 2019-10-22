@@ -5,6 +5,7 @@
 #ifndef SHIRABEDEVELOPMENT_RESOURCETYPES_H
 #define SHIRABEDEVELOPMENT_RESOURCETYPES_H
 
+#include <vector>
 #include <vulkan/vulkan.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
@@ -20,8 +21,9 @@ namespace engine
         {
             std::string                       name;
             VkBufferCreateInfo                createInfo;
-            std::vector<DataSourceAccessor_t> initialData;
+            std::vector<DataSourceAccessor_t> initialData; // Important: Just an accessor. Resource data is not in memory here.
         };
+
 
     }
 }

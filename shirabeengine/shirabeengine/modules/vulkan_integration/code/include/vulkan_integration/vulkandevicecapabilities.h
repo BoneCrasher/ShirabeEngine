@@ -8,7 +8,6 @@
 #include <core/enginetypehelper.h>
 #include <core/bitfield.h>
 #include <log/log.h>
-#include <graphicsapi/resources/types/definition.h>
 
 namespace engine
 {

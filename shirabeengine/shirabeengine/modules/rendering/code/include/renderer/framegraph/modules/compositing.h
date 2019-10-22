@@ -2,8 +2,6 @@
 #define __SHIRABE_FRAMEGRAPH_MODULE_COMPOSITING_H__
 
 #include <log/log.h>
-#include <resources/core/resourcemanagerbase.h>
-#include <graphicsapi/resources/types/all.h>
 #include "renderer/framegraph/graphbuilder.h"
 #include "renderer/framegraph/passbuilder.h"
 #include "renderer/framegraph/modules/module.h"

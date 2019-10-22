@@ -4,12 +4,11 @@
 #include <assert.h>
 #include <string>
 #include <functional>
-#include <stdint.h>
+#include <cstdint>
 
 #include <core/enginetypehelper.h>
 #include <core/passkey.h>
 #include <os/applicationenvironment.h>
-#include <resources/core/resourcedomaintransfer.h>
 
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphdata.h"

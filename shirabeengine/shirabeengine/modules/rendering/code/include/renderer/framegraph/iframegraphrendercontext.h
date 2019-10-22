@@ -4,7 +4,6 @@
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <asset/assetstorage.h>
-#include <resources/core/resourcemanagerbase.h>
 #include "renderer/renderertypes.h"
 #include "renderer/framegraph/framegraphdata.h"
 
@@ -20,7 +19,6 @@ namespace engine
         using engine::asset::AssetId_t;
         using engine::asset::IAssetStorage;
         using namespace engine::resources;
-        using namespace engine::gfxapi;
         using namespace engine::rendering;
 
         /**
@@ -376,7 +374,7 @@ namespace engine
              * @return            EEngineStatus::Error otherwise.
              */
              virtual CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial,
-                                                       PublicResourceId_t  const &aRenderPassHandle) = 0;
+                                                       std::string         const &aRenderPassHandle) = 0;
 
             /**
              * Unload a material asset from the graphics API.

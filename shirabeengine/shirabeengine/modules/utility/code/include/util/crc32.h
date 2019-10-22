@@ -2,7 +2,7 @@
 #define __SHIRABE_CRC32_H__
 
 #include <string>
-#include <stdint.h>
+#include <cstdint>
 
 namespace engine
 {

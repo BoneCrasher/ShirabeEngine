@@ -3,15 +3,8 @@
 
 #include <map>
 
-#include <graphicsapi/resources/gfxapiresourcetaskbackend.h>
-#include <graphicsapi/resources/types/texture.h>
-#include <graphicsapi/resources/types/textureview.h>
-#include <graphicsapi/resources/types/renderpass.h>
-#include <graphicsapi/resources/types/framebuffer.h>
-#include <graphicsapi/resources/types/pipeline.h>
-#include <graphicsapi/resources/types/mesh.h>
-#include "vulkan/vulkanimport.h"
-#include "vulkan/vulkanenvironment.h"
+#include "vulkan_integration/vulkanimport.h"
+#include "vulkan_integration/vulkanenvironment.h"
 
 namespace engine
 {

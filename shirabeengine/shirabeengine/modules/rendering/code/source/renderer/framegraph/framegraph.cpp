@@ -1,5 +1,4 @@
-#include <resources/core/resourcemanagerbase.h>
-#include <graphicsapi/resources/types/all.h>
+#include <resources/resourcetypes.h>
 
 #include "renderer/framegraph/framegraph.h"
 

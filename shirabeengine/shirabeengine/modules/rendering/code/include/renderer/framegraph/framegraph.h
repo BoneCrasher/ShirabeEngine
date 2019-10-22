@@ -8,7 +8,6 @@
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <core/passkey.h>
-#include <resources/core/resourcedomaintransfer.h>
 #include "renderer/framegraph/framegraphserialization.h"
 #include "renderer/framegraph/pass.h"
 #include "renderer/framegraph/framegraphdata.h"

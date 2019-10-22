@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_SHIRABE_MATH_MATRIX_OPS_H__
 #define __SHIRABE_SHIRABE_MATH_MATRIX_OPS_H__
 
-#include <stdint.h>
+#include <cstdint>
 #include <exception>
 #include <stdexcept>
 
@@ -508,7 +508,7 @@ namespace engine
                 char     parity = 1;
                 uint64_t row    = 0;
 
-				// Gauß-Elimination Algorithm
+				// Gauï¿½-Elimination Algorithm
 				//
 				// Basically there are 3 operations performed:
 				// -> S: Skalar multiplication of row i with factor a
@@ -517,7 +517,7 @@ namespace engine
 				//
 				// Since the algorithm is forward progressive and processes 
 				// column by column, the precedence order T -> S -> R can be 
-				// used to sufficiently apply the gauß algorithm without 
+				// used to sufficiently apply the gauï¿½ algorithm without 
 				// redundancies!
 				// The S-operation is optional depending on if pivotization is
                 // required or not. If not, only the NRows below the non-normalized

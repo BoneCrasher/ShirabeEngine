@@ -9,12 +9,12 @@
 
 #include <core/enginestatus.h>
 
-#include "resources/iresourceobjectprivate.h"
-
 namespace engine
 {
     namespace resources
     {
+        class IResourceObjectPrivate;
+
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT IResourceObject

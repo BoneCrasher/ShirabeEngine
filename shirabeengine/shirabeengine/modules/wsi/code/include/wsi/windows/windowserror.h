@@ -2,7 +2,7 @@
 #define __SHIRABE_WINDOWS_ERROR_H__
 
 #include <string>
-#include <stdint.h>
+#include <cstdint>
 #include <Windows.h>
 
 #include <base/string.h>

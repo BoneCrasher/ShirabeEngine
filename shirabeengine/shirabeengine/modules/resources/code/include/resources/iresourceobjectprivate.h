@@ -6,8 +6,8 @@
 #define __SHIRABEDEVELOPMENT_IRESOURCEOBJECTPRIVATE_H__
 
 #include <platform/platform.h>
-
 #include <core/enginestatus.h>
+#include "resources/iresourceobject.h"
 
 class CResourceManager;
 
@@ -15,7 +15,10 @@ namespace engine
 {
     namespace resources
     {
-        class [[nodiscard]] SHIRABE_LIBRARY_EXPORT IResourceObjectPrivate
+        class
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT IResourceObjectPrivate
+            : public IResourceObject // Inherits signature of bind, unbind and transfer
         {
             friend class CResourceManager;
 

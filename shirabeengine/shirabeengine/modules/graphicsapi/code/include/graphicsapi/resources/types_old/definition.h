@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_RESOURCES_DEFINITION_H__
 #define __SHIRABE_RESOURCES_DEFINITION_H__
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace engine {
     namespace resources {

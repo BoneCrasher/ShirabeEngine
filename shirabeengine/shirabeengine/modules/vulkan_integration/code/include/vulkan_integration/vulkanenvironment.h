@@ -7,10 +7,9 @@
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
 #include <math/geometric/rect.h>
-#include <graphicsapi/resources/types/definition.h>
 #include <wsi/windowhandlewrapper.h>
 #include <wsi/windowhandlewrapper.h>
-#include "vulkan/vulkanimport.h"
+#include "vulkan_integration/vulkanimport.h"
 
 namespace engine
 {

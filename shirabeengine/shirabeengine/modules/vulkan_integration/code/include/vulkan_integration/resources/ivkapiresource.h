@@ -6,13 +6,16 @@
 #define SHIRABEDEVELOPMENT_IVKAPIRESOURCE_H
 
 #include <core/enginetypehelper.h>
-#include "vulkan/resources/ivkglobalcontext.h"
+#include "vulkan_integration/resources/ivkglobalcontext.h"
 
 namespace engine
 {
     namespace vulkan
     {
-
+        /**
+         * Declares an interface to a vulkan global context used to bind API resources
+         * to the necessary data of the current vulkan environment.
+         */
         class SHIRABE_TEST_EXPORT IVkApiResource
         {
             SHIRABE_DECLARE_INTERFACE(IVkApiResource);

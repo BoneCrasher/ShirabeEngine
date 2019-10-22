@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_COMPONENT_TYPE__
 #define __SHIRABE_COMPONENT_TYPE__
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace engine
 {

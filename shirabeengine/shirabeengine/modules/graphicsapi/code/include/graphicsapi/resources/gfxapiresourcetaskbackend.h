@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <optional>
-#include <stdint.h>
+#include <cstdint>
 #include <functional>
 #include <future>
 #include <assert.h>
@@ -20,7 +20,6 @@
 #include <core/patterns/observer.h>
 #include <core/threading/looper.h>
 
-#include <resources/core/resourcedomaintransfer.h>
 #include "graphicsapi/resources/gfxapi.h"
 #include "graphicsapi/resources/types/all.h"
 

@@ -1,6 +1,7 @@
 #ifndef __SHIRABE_ASSET_REGISTRY_H__
 #define __SHIRABE_ASSET_REGISTRY_H__
 
+#include <core/enginestatus.h>
 #include "assettypes.h"
 
 namespace engine

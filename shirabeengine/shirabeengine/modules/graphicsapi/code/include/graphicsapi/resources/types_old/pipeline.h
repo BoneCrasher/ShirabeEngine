@@ -2,7 +2,7 @@
 #define __SHIRABE_GRAPHICSAPI_TYPES_PIPELINE_H__
 
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 
 #include <vulkan/vulkan.h>
 

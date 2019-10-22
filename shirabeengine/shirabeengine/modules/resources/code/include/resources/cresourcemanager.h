@@ -27,7 +27,7 @@ namespace engine {
 
         public_methods:
             template <typename TResource>
-            requires std::is_base_of_v<IResourceObject, TResource>
+            //requires std::is_base_of_v<IResourceObject, TResource>
             CEngineResult<Shared<IResourceObject>> useResource(
                     ResourceId_t                      const &aResourceId
                     , typename TResource::SDescriptor const &aDescriptor);
@@ -67,7 +67,8 @@ namespace engine {
         {
             CEngineResult<Shared<IResourceObject>> result = { EEngineStatus::Error, nullptr };
 
-            Shared<TResource> resource = makeShared<TResource>(std::forward(aDescriptor));
+            Shared<TResource>              resource        = makeShared<TResource>(std::forward(aDescriptor));
+            Unique<IResourceObjectPrivate> privateResource = mPrivateResourceObjectFactory->create(aDescriptor);
             resource->create();
 
             storeResourceObject(aResourceId, resource);

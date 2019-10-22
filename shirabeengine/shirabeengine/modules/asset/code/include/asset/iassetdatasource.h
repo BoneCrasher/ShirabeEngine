@@ -2,6 +2,8 @@
 #define __SHIRABE_ASSET_IASSETDATASOURCE_H__
 
 #include <core/enginetypehelper.h>
+#include <core/enginestatus.h>
+
 #include "assettypes.h"
 
 namespace engine

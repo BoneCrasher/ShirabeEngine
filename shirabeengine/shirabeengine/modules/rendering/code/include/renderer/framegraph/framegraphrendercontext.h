@@ -4,7 +4,6 @@
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <asset/assetstorage.h>
-#include <resources/core/resourcemanagerbase.h>
 
 #include "renderer/irendercontext.h"
 #include "renderer/renderertypes.h"
@@ -29,7 +28,6 @@ namespace engine
         using engine::asset::IAssetStorage;
         using engine::material::CMaterialLoader;
         using namespace engine::resources;
-        using namespace engine::gfxapi;
         using namespace engine::rendering;
         /**
          * Default implementation of IFrameGraphRenderContext.

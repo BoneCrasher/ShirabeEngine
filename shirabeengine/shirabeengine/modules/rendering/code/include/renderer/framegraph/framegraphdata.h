@@ -1,22 +1,19 @@
 #ifndef __SHIRABE_FRAMEGRAPH_FRAMEGRAPHDATA_H__
 #define __SHIRABE_FRAMEGRAPH_FRAMEGRAPHDATA_H__
 
-#include <stdint.h>
+#include <cstdint>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
 #include <variant>
 #include <memory>
-#include <string.h>
+#include <cstring>
 
 // #include <better-enums/enum.h>
 
 #include <platform/platform.h>
 #include <core/bitfield.h>
 #include <core/basictypes.h>
-#include <graphicsapi/resources/types/definition.h>
-#include <graphicsapi/resources/types/texture.h>
-#include <graphicsapi/resources/types/textureview.h>
 #include <math/geometric/rect.h>
 #include <vulkan/vulkan.h>
 #include "renderer/renderertypes.h"
@@ -56,7 +53,7 @@ namespace engine
         /**
          * Values that represent texture and buffer formats
          */
-        using FrameGraphFormat_t = engine::resources::EFormat;
+        using FrameGraphFormat_t = VkFormat;
 
         /**
          * Checks, whether two formats are compatible.
@@ -201,7 +198,7 @@ namespace engine
             /**
              * Extract the resource id via implicit conversion.
              */
-            SHIRABE_INLINE operator FrameGraphResourceId_t()
+            explicit SHIRABE_INLINE operator FrameGraphResourceId_t()
             {
                 return resourceId;
             }
@@ -209,7 +206,7 @@ namespace engine
             /**
              * Extract the resource id via implicit conversion in const context.
              */
-            SHIRABE_INLINE operator FrameGraphResourceId_t const() const
+            explicit SHIRABE_INLINE operator FrameGraphResourceId_t const() const
             {
                 return resourceId;
             }
@@ -297,7 +294,7 @@ namespace engine
          */
         struct SHIRABE_TEST_EXPORT SFrameGraphTexture
                 : public SFrameGraphResource
-                , public gfxapi::STextureInfo
+                , public asset::STextureInfo
         {
         public_constructors:
             /**
@@ -321,6 +318,7 @@ namespace engine
              *
              * @return True if valid. False otherwise.
              */
+             [[nodiscard]]
             virtual bool validate() const;
 
         public_members:
@@ -364,7 +362,7 @@ namespace engine
         public_constructors:
             SFrameGraphAttachmentCollection() = default;
 
-            SHIRABE_INLINE SFrameGraphAttachmentCollection(SFrameGraphAttachmentCollection const &aOther)
+            explicit SHIRABE_INLINE SFrameGraphAttachmentCollection(SFrameGraphAttachmentCollection const &aOther)
                 : mAttachmentResourceIds(aOther.mAttachmentResourceIds)
                 , mColorAttachments(aOther.mColorAttachments)
                 , mDepthAttachments(aOther.mDepthAttachments)

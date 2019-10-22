@@ -12,7 +12,6 @@
 #include <core/enginetypehelper.h>
 #include <core/random.h>
 #include <core/uid.h>
-#include <resources/core/resourcedomaintransfer.h>
 #include <wsi/display.h>
 #include "renderer/framegraph/framegraph.h"
 #include "renderer/framegraph/pass.h"

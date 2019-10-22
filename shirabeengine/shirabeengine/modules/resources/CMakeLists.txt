@@ -5,6 +5,24 @@ include(project_default_template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
 
+set(SHIRABE_EXCLUDED_HEADERS
+        resources/code/include/resources/old/eresourcetype.h
+        resources/code/include/resources/old/iresource.h
+        resources/code/include/resources/old/iresourceproxy.h
+        resources/code/include/resources/old/requestdefaultimplementation.h
+        resources/code/include/resources/old/resourcebackendproxy.h
+        resources/code/include/resources/old/resourcedatasource.h
+        resources/code/include/resources/old/resourcedomaintransfer.h
+        resources/code/include/resources/old/resourcemanagerbase.h
+        resources/code/include/resources/old/resourcepool.h
+        resources/code/include/resources/old/resourceproxyfactory.h
+        resources/code/include/resources/old/resourcetraits.h
+)
+
+set(SHIRABE_EXCLUDED_SOURCES
+        old/resourcedatasource.cpp
+        old/resourcemanagerbase.cpp)
+
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULECORE     

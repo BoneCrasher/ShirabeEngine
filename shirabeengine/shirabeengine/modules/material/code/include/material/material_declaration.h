@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string>
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 #include <filesystem>
 #include <cstring>
 
@@ -989,7 +989,7 @@ namespace engine
                 }
 
                 SHIRABE_INLINE
-                CMaterialMaster &operator=(CMaterialMaster &&aOther)
+                CMaterialMaster &operator=(CMaterialMaster &&aOther) noexcept
                 {
                     asset::CAssetReference::operator=(aOther.getAssetId());
 

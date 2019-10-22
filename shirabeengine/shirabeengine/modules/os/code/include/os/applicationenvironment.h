@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_OS_APPLICATIONENVIRONMENT_H__
 #define __SHIRABE_OS_APPLICATIONENVIRONMENT_H__
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <core/enginetypehelper.h>
 #include "os/osdisplay.h"

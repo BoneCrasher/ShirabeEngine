@@ -6,7 +6,7 @@
 #define SHIRABEDEVELOPMENT_IVKAPIGLOBALCONTEXT_H
 
 #include <core/enginetypehelper.h>
-#include "vulkan/resources/ivkframecontext.h"
+#include "vulkan_integration/resources/ivkframecontext.h"
 
 namespace engine
 {

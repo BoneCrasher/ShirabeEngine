@@ -4,7 +4,6 @@
 #include <core/basictypes.h>
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
-#include <resources/core/resourcemanagerbase.h>
 #include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"
@@ -49,8 +48,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error on any error.
              */
-            virtual EEngineStatus copyImage(PublicResourceId_t const &aSourceImageId,
-                                            PublicResourceId_t const &aTargetImageId) = 0;
+            virtual EEngineStatus copyImage(std::string const &aSourceImageId,
+                                            std::string const &aTargetImageId) = 0;
 
             /**
              * Copy one image to the current backbuffer.
@@ -59,7 +58,7 @@ namespace engine
              * @param aImageId
              * @return
              */
-            virtual EEngineStatus copyToBackBuffer(PublicResourceId_t const &aImageId) = 0;
+            virtual EEngineStatus copyToBackBuffer(std::string const &aImageId) = 0;
 
             /**
              * Put the current internal command buffer into recording mode.
@@ -107,7 +106,7 @@ namespace engine
              * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
              * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId) = 0;
+            virtual EEngineStatus bindSwapChain(std::string const &aSwapChainResourceId) = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
@@ -123,7 +122,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            virtual EEngineStatus bindPipeline(PublicResourceId_t const &aPipelineUID) = 0;
+            virtual EEngineStatus bindPipeline(std::string const &aPipelineUID) = 0;
 
             /**
              * Unbind a pipeline instance from the GPU.
@@ -132,7 +131,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            virtual EEngineStatus unbindPipeline(PublicResourceId_t const &aPipelineUID) = 0;
+            virtual EEngineStatus unbindPipeline(std::string const &aPipelineUID) = 0;
 
             /**
              * Bind a resource to the pipeline of the respective graphics API used.
@@ -140,14 +139,14 @@ namespace engine
              * @param aResourceUID The UID of the resource to be bound.
              * @return             EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus bindResource(PublicResourceId_t const &aResourceUID)   = 0;
+            virtual EEngineStatus bindResource(std::string const &aResourceUID)   = 0;
             /**
              * Unbind a resource from the pipeline of the respective graphics API used.
              *
              * @param aResourceUID The UID of the resource to be bound.
              * @return             EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus unbindResource(PublicResourceId_t const &aResourceUID) = 0;
+            virtual EEngineStatus unbindResource(std::string const &aResourceUID) = 0;
 
             /**
              * Render a renderable entity using the pipeline of the respective graphics API used.

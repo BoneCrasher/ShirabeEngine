@@ -64,7 +64,7 @@ namespace engine
             {
                 std::type_info const &typeInfo = typeid(T);
 
-                mCreators[typeInfo] = std::move(aCreator);
+                mCreators[typeInfo.name()] = std::move(aCreator);
             };
 
         private_methods:
@@ -73,14 +73,14 @@ namespace engine
             {
                 std::type_info const &typeInfo = typeid(T);
 
-                auto entry = std::find(mCreators.begin(), mCreators.end(), typeInfo);
+                auto entry = std::find(mCreators.begin(), mCreators.end(), typeInfo.name());
                 if(mCreators.end() == entry)
                 {
                     return nullptr;
                 }
 
                 Unique<IResourceObjectPrivate>            result      = nullptr;
-                Unique<IResourceObjectCreatorBase> const &creatorBase = mCreators[typeInfo];
+                Unique<IResourceObjectCreatorBase> const &creatorBase = mCreators[typeInfo.name()];
 
                 auto creator = static_cast<CResourceObjectCreator<T> const *const>(creatorBase.get());
                 if(nullptr != creator)
@@ -91,7 +91,7 @@ namespace engine
             }
 
         private_members:
-            std::unordered_map<std::type_info, Unique<IResourceObjectCreatorBase>> mCreators;
+            std::unordered_map<char const*, Unique<IResourceObjectCreatorBase>> mCreators;
         };
 
     }

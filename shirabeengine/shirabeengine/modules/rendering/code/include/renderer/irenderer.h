@@ -4,7 +4,6 @@
 #include <core/basictypes.h>
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
-#include <resources/core/resourcemanagerbase.h>
 #include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"

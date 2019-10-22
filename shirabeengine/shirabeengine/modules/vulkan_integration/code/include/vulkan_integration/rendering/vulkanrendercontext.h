@@ -4,8 +4,7 @@
 #include <log/log.h>
 #include <renderer/irendercontext.h>
 #include <renderer/renderertypes.h>
-#include <graphicsapi/resources/gfxapiresourcebackend.h>
-#include "vulkan/vulkanenvironment.h"
+#include "vulkan_integration/vulkanenvironment.h"
 
 namespace engine
 {

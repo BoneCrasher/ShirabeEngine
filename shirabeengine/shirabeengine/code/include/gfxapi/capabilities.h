@@ -5,7 +5,6 @@
 #include <core/enginestatus.h>
 #include <core/enginetypehelper.h>
 #include <log/log.h>
-#include <graphicsapi/definitions.h>
 
 namespace engine
 {

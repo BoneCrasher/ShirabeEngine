@@ -2,6 +2,7 @@
 // Created by dotti on 19.10.19.
 //
 
+#include <unordered_map>
 #include "resources/cresourcemanager.h"
 
 namespace engine
@@ -23,7 +24,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CResourceManager::discardResource(ResourceId_t const &aResourceId)
         {
-            auto iterator = std::find(mResourceObjects.begin(), mResourceObjects.end(), aResourceId);
+            auto iterator = mResourceObjects.find(aResourceId);
             if(mResourceObjects.end() != iterator)
             {
                 Shared <IResourceObject>       p = mResourceObjects[aResourceId];
@@ -43,10 +44,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        bool CResourceManager::storeResourceObject(ResourceId_t                        const &aId
+        bool CResourceManager::storeResourceObject(ResourceId_t               const &aId
                                                    , Shared <IResourceObject> const &aObject)
         {
-            bool const hasObjectForId = (mResourceObjects.end() != std::find(mResourceObjects.begin(), mResourceObjects.end(), aId));
+            bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find( aId));
             if(false == hasObjectForId)
             {
                 mResourceObjects[aId] = aObject;
@@ -61,7 +62,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void CResourceManager::removeResourceObject(ResourceId_t const &aId)
         {
-            bool const hasObjectForId = (mResourceObjects.end() != std::find(mResourceObjects.begin(), mResourceObjects.end(), aId));
+            bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find(aId));
             if(hasObjectForId)
             {
                 mResourceObjects.erase(aId);

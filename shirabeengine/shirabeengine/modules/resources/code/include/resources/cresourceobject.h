@@ -7,7 +7,6 @@
 
 #include <platform/platform.h>
 
-#include "resources/iresourceobjectprivate.h"
 #include "resources/iresourceobject.h"
 
 class CResourceManager; // Declared/defined in resources/cresourcemanager.h

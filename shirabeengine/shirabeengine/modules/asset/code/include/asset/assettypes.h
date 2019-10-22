@@ -1,15 +1,16 @@
 #ifndef __SHIRABE_ASSET_TYPES_H__
 #define __SHIRABE_ASSET_TYPES_H__
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <filesystem>
 
+#include <core/basictypes.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
-#include <graphicsapi/resources/types/texture.h>
+#include <resources/resourcetypes.h>
+#include <vulkan/vulkan.hpp>
 #include "asset/asseterror.h"
-
 
 namespace engine
 {
@@ -72,6 +73,45 @@ namespace engine
          */
         AssetId_t assetIdFromUri(std::filesystem::path const &aUri);
 
+
+        /**
+         * The SMultisapmling struct describes multisampling properties for various gfxapi
+         * related components in the system.
+         */
+        struct SMultisapmling
+        {
+        public_members:
+            uint8_t
+                    size,
+                    quality;
+        };
+
+        /**
+         * The STextureInfo struct describes general texture attributes.
+         */
+        struct SHIRABE_TEST_EXPORT STextureInfo
+        {
+        public_constructors:
+            STextureInfo();
+
+        public_methods:
+            void assignTextureInfoParameters(STextureInfo const&other);
+
+        public_members:
+            uint32_t
+                    width,  // 0 - Undefined
+                    height, // At least 1
+                    depth;  // At least 1
+            VkFormat
+                    format;
+            uint16_t
+                    arraySize; // At least 1 (basically everything is a vector...)
+            uint16_t
+                    mipLevels;
+            SMultisapmling
+                    multisampling;
+        };
+
         /**
          * The STextureAsset struct describes any kind of engine texture asset
          * including texture information.
@@ -79,8 +119,8 @@ namespace engine
         struct STextureAsset
         {
         public_members:
-            std::string          name;
-            gfxapi::STextureInfo textureInfo;
+            std::string  name;
+            STextureInfo textureInfo;
         };
 
         /**
@@ -111,14 +151,22 @@ namespace engine
         {
         public_constructors:
             SHIRABE_INLINE
-            CAssetReference(AssetId_t const &aAssetId)
+            explicit CAssetReference(AssetId_t const &aAssetId)
                 : mAssetId(aAssetId)
             {}
 
+            [[nodiscard]]
             SHIRABE_INLINE
             AssetId_t const &getAssetId() const
             {
                 return mAssetId;
+            }
+
+            SHIRABE_INLINE
+            CAssetReference& operator=(AssetId_t const &aId)
+            {
+                mAssetId = aId;
+                return (*this);
             }
 
         private_members:
