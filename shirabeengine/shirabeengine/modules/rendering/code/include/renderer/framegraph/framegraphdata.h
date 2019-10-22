@@ -346,11 +346,11 @@ namespace engine
             SFrameGraphTextureView();
 
         public_members:
-            CRange                               arraySliceRange;
-            CRange                               mipSliceRange;
-            FrameGraphFormat_t                   format;
+            CRange                              arraySliceRange;
+            CRange                              mipSliceRange;
+            FrameGraphFormat_t                  format;
             CBitField<EFrameGraphViewAccessMode> mode;
-            EFrameGraphViewPurpose                source;
+            EFrameGraphViewPurpose               source;
         };
 
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTextureView, SFrameGraphTextureView);

@@ -322,7 +322,7 @@ EST_EXPORT CGraphBuilder
 
             Shared<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;
             Shared<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
-            Map<std::string, PublicResourceId_t>                   mImportedResources;
+            Map<std::string, std::string>                 mImportedResources;
 
             PassMap                                                mPasses;
             FrameGraphResourceIdList                               mResources;

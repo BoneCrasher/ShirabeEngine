@@ -38,7 +38,7 @@ namespace engine
             resource.readableName        = aName;
             resource.type                = EFrameGraphResourceType::Texture;
 
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
             accessor->registerResource(resource.resourceId);
 
             return { EEngineStatus::Ok, resource };
