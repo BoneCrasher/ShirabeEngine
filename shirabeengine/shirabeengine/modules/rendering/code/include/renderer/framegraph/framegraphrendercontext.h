@@ -12,6 +12,11 @@
 
 namespace engine
 {
+    namespace resources
+    {
+        class CResourceManager;
+    }
+
     namespace material
     {
         class CMaterialLoader;
@@ -47,10 +52,10 @@ namespace engine
              * @return                 A pointer to the newly created instance or nullptr on error.
              */
             static CEngineResult<Shared<CFrameGraphRenderContext>> create(
-                    Shared<IAssetStorage>        aAssetStorage,
-                    Shared<CMaterialLoader>      aMaterialLoader,
-                    Shared<CResourceManagerBase> aResourceManager,
-                    Shared<IRenderContext>       aRenderer);
+                    Shared<IAssetStorage>    aAssetStorage,
+                    Shared<CMaterialLoader>  aMaterialLoader,
+                    Shared<CResourceManager> aResourceManager,
+                    Shared<IRenderContext>   aRenderer);
 
             //
             // IFrameGraphRenderContext implementation
@@ -381,7 +386,7 @@ namespace engine
              * @return            EEngineStatus::Error otherwise.
              */
              CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial,
-                                               PublicResourceId_t  const &aRenderPassHandle) override;
+                                               std::string  const &aRenderPassHandle) override;
 
              /**
              * Unload a material asset from the graphics API.
@@ -430,10 +435,10 @@ namespace engine
              * @param aRenderer        Render context which maps down to the currently selected graphics API
              */
             CFrameGraphRenderContext(
-                    Shared<IAssetStorage>        aAssetStorage,
-                    Shared<CMaterialLoader>      aMaterialLoader,
-                    Shared<CResourceManagerBase> aResourceManager,
-                    Shared<IRenderContext>       aRenderer);
+                    Shared<IAssetStorage>    aAssetStorage,
+                    Shared<CMaterialLoader>  aMaterialLoader,
+                    Shared<CResourceManager> aResourceManager,
+                    Shared<IRenderContext>   aRenderer);
 
         private_methods:
             /**
@@ -444,8 +449,8 @@ namespace engine
              * @param aResourceId The resource manager resource id for the resource.
              */
             CEngineResult<> mapFrameGraphToInternalResource(
-                    std::string        const &aName,
-                    PublicResourceId_t const &aResourceId);
+                    std::string const &aName,
+                    std::string const &aResourceId);
 
 
             /**
@@ -454,7 +459,7 @@ namespace engine
              * @param aName Name of the resource.
              * @return      A list of resource manager resource id's for the given framegraph resource.
              */
-            CEngineResult<Vector<PublicResourceId_t>> getMappedInternalResourceIds(std::string const &aName) const;
+            CEngineResult<Vector<std::string>> getMappedInternalResourceIds(std::string const &aName) const;
 
 
             /**
@@ -465,16 +470,16 @@ namespace engine
             CEngineResult<> removeMappedInternalResourceIds(std::string const &aName);
 
         private_members:
-            Shared<IAssetStorage>        mAssetStorage;
-            Shared<CMaterialLoader>      mMaterialLoader;
-            Shared<CResourceManagerBase> mResourceManager;
-            Shared<IRenderContext>       mGraphicsAPIRenderContext;
+            Shared<IAssetStorage>    mAssetStorage;
+            Shared<CMaterialLoader>  mMaterialLoader;
+            Shared<CResourceManager> mResourceManager;
+            Shared<IRenderContext>   mGraphicsAPIRenderContext;
 
-            Map<std::string, Vector<PublicResourceId_t>> mResourceMap;
+            Map<std::string, Vector<std::string>> mResourceMap;
 
-            PublicResourceId_t mCurrentFrameBufferHandle;
-            PublicResourceId_t mCurrentRenderPassHandle;
-            uint32_t           mCurrentSubpass;
+            std::string mCurrentFrameBufferHandle;
+            std::string mCurrentRenderPassHandle;
+            uint32_t    mCurrentSubpass;
 
         };
 

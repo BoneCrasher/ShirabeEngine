@@ -3,6 +3,7 @@
 #include <material/material_loader.h>
 #include <material/material_declaration.h>
 #include <material/materialserialization.h>
+#include <resources/cresourcemanager.h>
 
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
@@ -18,10 +19,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CEngineResult<Shared<CFrameGraphRenderContext>> CFrameGraphRenderContext::create(
-                Shared<IAssetStorage>        aAssetStorage,
-                Shared<CMaterialLoader>      aMaterialLoader,
-                Shared<CResourceManagerBase> aResourceManager,
-                Shared<IRenderContext>       aRenderer)
+                Shared<IAssetStorage>    aAssetStorage,
+                Shared<CMaterialLoader>  aMaterialLoader,
+                Shared<CResourceManager> aResourceManager,
+                Shared<IRenderContext>   aRenderer)
         {
             bool const inputInvalid =
                     nullptr == aAssetStorage    or
@@ -54,10 +55,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CFrameGraphRenderContext::CFrameGraphRenderContext(
-                Shared<IAssetStorage>        aAssetStorage,
-                Shared<CMaterialLoader>      aMaterialLoader,
-                Shared<CResourceManagerBase> aResourceManager,
-                Shared<IRenderContext>       aRenderer)
+                Shared<IAssetStorage>    aAssetStorage,
+                Shared<CMaterialLoader>  aMaterialLoader,
+                Shared<CResourceManager> aResourceManager,
+                Shared<IRenderContext>   aRenderer)
             : mAssetStorage            (std::move(aAssetStorage   ))
             , mMaterialLoader          (std::move(aMaterialLoader ))
             , mResourceManager         (std::move(aResourceManager))
@@ -72,8 +73,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::mapFrameGraphToInternalResource(
-                std::string        const &aName,
-                PublicResourceId_t const &aResourceId)
+                std::string const &aName,
+                std::string const &aResourceId)
         {
             mResourceMap[aName].push_back(aResourceId);
             return { EEngineStatus::Ok };
@@ -83,7 +84,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<Vector<PublicResourceId_t>> CFrameGraphRenderContext::getMappedInternalResourceIds(std::string const &aName) const
+        CEngineResult<Vector<std::string>> CFrameGraphRenderContext::getMappedInternalResourceIds(std::string const &aName) const
         {
             if(mResourceMap.end() != mResourceMap.find(aName))
             {
@@ -408,8 +409,8 @@ namespace engine
             EEngineStatus const status=mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
             if( not CheckEngineError(status))
             {
-                // TODO: Implication of string -> PublicResourceId_t. Will break, once the underlying type
-                //       of the PublicResourceId_t changes.
+                // TODO: Implication of string -> std::string. Will break, once the underlying type
+                //       of the std::string changes.
                 mCurrentFrameBufferHandle = aFrameBufferId;
                 mCurrentRenderPassHandle  = aRenderPassId;
                 mCurrentSubpass           = 0; // Reset!
@@ -475,7 +476,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
-            PublicResourceId_t const pid = "";
+            std::string const pid = "";
 
             mapFrameGraphToInternalResource(aTexture.readableName, pid);
 
@@ -576,10 +577,10 @@ namespace engine
         {
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
-            CEngineResult<Vector<PublicResourceId_t>> const &subjacentResourcesFetch = getMappedInternalResourceIds(aView.readableName);
+            CEngineResult<Vector<std::string>> const &subjacentResourcesFetch = getMappedInternalResourceIds(aView.readableName);
             if(subjacentResourcesFetch.successful())
             {
-                for(PublicResourceId_t const &pid : subjacentResourcesFetch.data())
+                for(std::string const &pid : subjacentResourcesFetch.data())
                 {
                     mGraphicsAPIRenderContext->bindResource(pid);
                 }
@@ -596,11 +597,11 @@ namespace engine
         {
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
-            CEngineResult<Vector<PublicResourceId_t>> subjacentResourcesFetch = getMappedInternalResourceIds(aView.readableName);
+            CEngineResult<Vector<std::string>> subjacentResourcesFetch = getMappedInternalResourceIds(aView.readableName);
 
             if(subjacentResourcesFetch.successful())
             {
-                for(PublicResourceId_t const &pid : subjacentResourcesFetch.data())
+                for(std::string const &pid : subjacentResourcesFetch.data())
                 {
                     mGraphicsAPIRenderContext->unbindResource(pid);
                 }
@@ -786,7 +787,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial   const &aMaterial
-                                                                    , PublicResourceId_t  const &aRenderPassHandle)
+                                                                    , std::string  const &aRenderPassHandle)
         {
             SHIRABE_UNUSED(aRenderPassHandle);
 
@@ -1009,7 +1010,7 @@ namespace engine
 
             pipelineDescriptor.subpass = mCurrentSubpass;
 
-            PublicResourceId_t     const renderPassHandle   = mCurrentRenderPassHandle;
+            std::string     const renderPassHandle   = mCurrentRenderPassHandle;
             PublicResourceIdList_t const textureViewHandles = {};
             PublicResourceIdList_t const bufferViewHandles  = {};
 

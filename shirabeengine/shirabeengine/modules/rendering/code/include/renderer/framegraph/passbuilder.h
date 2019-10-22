@@ -298,8 +298,8 @@ namespace engine
         private_methods:
             CEngineResult<SFrameGraphResource> useTexture(
                     SFrameGraphResource          const &aSubjacentTargetResource,
-                    EFrameGraphViewPurpose        const &aSourceOrTarget,
-                    EFormat                      const &aRequiredFormat,
+                    EFrameGraphViewPurpose       const &aSourceOrTarget,
+                    VkFormat                     const &aRequiredFormat,
                     CRange                       const &aArraySliceRange,
                     CRange                       const &aMipSliceRange,
                     EFrameGraphViewAccessMode    const &aMode,

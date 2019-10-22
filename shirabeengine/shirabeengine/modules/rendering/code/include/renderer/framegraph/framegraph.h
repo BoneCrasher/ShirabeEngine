@@ -400,7 +400,7 @@ namespace engine
                     TPassCreationArgs       &&...aArgs);
 
         private_members:
-            Shared<CResourceManagerBase> mResourceManager;
+            Shared<CResourceManager> mResourceManager;
 
             PassMap                               mPasses;
             AdjacencyListMap_t<PassUID_t>         mPassAdjacency;

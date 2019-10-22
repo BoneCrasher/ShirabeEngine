@@ -102,7 +102,7 @@ namespace engine
                     width,  // 0 - Undefined
                     height, // At least 1
                     depth;  // At least 1
-            VkFormat
+            resources::EFormat
                     format;
             uint16_t
                     arraySize; // At least 1 (basically everything is a vector...)

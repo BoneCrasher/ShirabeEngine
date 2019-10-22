@@ -15,6 +15,7 @@ set(
         SHIRABEMODULELOG        
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
+        VULKANHEADERS
         STBI                    
         FXGLTF                  
         JSON

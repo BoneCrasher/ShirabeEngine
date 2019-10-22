@@ -1,4 +1,5 @@
 #include "renderer/framegraph/framegraphdata.h"
+#include <core/basictypes.h>
 
 namespace engine
 {

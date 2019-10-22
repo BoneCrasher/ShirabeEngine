@@ -29,7 +29,8 @@ set(
         SHIRABEMODULEMATH     
         SHIRABEMODULELOG      
         SHIRABEMODULEBASE
-        SHIRABEMODULEPLATFORM 
+        SHIRABEMODULEPLATFORM
+        VULKANHEADERS
         JSON                  
         XML2
         ZLIB)

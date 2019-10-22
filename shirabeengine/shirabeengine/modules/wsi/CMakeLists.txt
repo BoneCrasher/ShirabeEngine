@@ -20,6 +20,7 @@ set(
         SHIRABEMODULELOG        
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
+        VULKANHEADERS
         XLIB
         JSON
         XML2

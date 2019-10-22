@@ -11,11 +11,14 @@
 
 // #include <better-enums/enum.h>
 
+#include <vulkan/vulkan.h>
+
 #include <platform/platform.h>
 #include <core/bitfield.h>
 #include <core/basictypes.h>
+#include <core/enginestatus.h>
+#include <log/log.h>
 #include <math/geometric/rect.h>
-#include <vulkan/vulkan.h>
 #include "renderer/renderertypes.h"
 
 namespace engine
@@ -53,7 +56,7 @@ namespace engine
         /**
          * Values that represent texture and buffer formats
          */
-        using FrameGraphFormat_t = VkFormat;
+        using FrameGraphFormat_t = resources::EFormat;
 
         /**
          * Checks, whether two formats are compatible.

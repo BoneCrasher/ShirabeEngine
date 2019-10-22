@@ -1,10 +1,13 @@
 #include "asset/assettypes.h"
 #include <util/crc32.h>
+#include <resources/resourcetypes.h>
 
 namespace engine
 {
     namespace asset
     {
+        using resources::EFormat;
+
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
@@ -24,7 +27,7 @@ namespace engine
                 : width(0)
                   , height(1)
                   , depth(1)
-                  , format(VkFormat::VK_FORMAT_UNDEFINED)
+                  , format(EFormat::Undefined)
                   , arraySize(1)
                   , mipLevels(1)
                   , multisampling()
