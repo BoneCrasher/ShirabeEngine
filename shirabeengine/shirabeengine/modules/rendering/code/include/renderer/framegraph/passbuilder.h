@@ -80,6 +80,7 @@ namespace engine
              *
              * @return See brief.
              */
+             [[nodiscard]]
             SHIRABE_INLINE PassUID_t const &assignedPassUID() const
             {
                 return mPassUID;
@@ -299,7 +300,7 @@ namespace engine
             CEngineResult<SFrameGraphResource> useTexture(
                     SFrameGraphResource          const &aSubjacentTargetResource,
                     EFrameGraphViewPurpose       const &aSourceOrTarget,
-                    VkFormat                     const &aRequiredFormat,
+                    EFormat                      const &aRequiredFormat,
                     CRange                       const &aArraySliceRange,
                     CRange                       const &aMipSliceRange,
                     EFrameGraphViewAccessMode    const &aMode,

@@ -61,7 +61,7 @@ namespace engine
             resource.type                = EFrameGraphResourceType::Texture;
             resource.isExternalResource  = true;
 
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
             accessor->registerResource(resource.resourceId);
 
             return { EEngineStatus::Ok, resource };
@@ -270,7 +270,7 @@ namespace engine
                 SFrameGraphResource             const &aSubjacentTargetResource,
                 SFrameGraphTextureResourceFlags const &aFlags)
         {
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
             OptionalRef_t<SFrameGraphResource> resource = {};
 
@@ -370,7 +370,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassBuilder::acceptTexture(SFrameGraphResource const &aSubjacentTargetResource)
         {
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
             FrameGraphResourceId_t const subjacentResourceId =
                     (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
@@ -486,7 +486,7 @@ namespace engine
                 EFrameGraphViewAccessMode    const &aMode,
                 EEngineStatus                const &aFailCode)
         {
-            CStdUniquePtr_t<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
 
             FrameGraphResourceId_t const subjacentResourceId =
                     (EFrameGraphResourceType::Texture == aSubjacentTargetResource.type)

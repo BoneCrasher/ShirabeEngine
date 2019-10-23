@@ -125,7 +125,7 @@ namespace engine
 
                 for(SRenderableResources const &renderableResources : aPassData.importData.renderables)
                 {
-                    auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(renderableResources.materialResource);
+                    auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(renderableResources.materialResource.resourceId);
                     if(CheckEngineError(result) || nullptr == materialPointer)
                     {
                         CLog::Error(logTag(), "Failed to fetch material for id %0", renderableResources.materialResource);

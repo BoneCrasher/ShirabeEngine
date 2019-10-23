@@ -244,7 +244,7 @@ namespace engine
 
             // This list will store the readable names of the texture views created upfront, so that the
             // framebuffer can bind to it.
-            PublicResourceIdList_t textureViewIds = {};
+            std::vector<std::string> textureViewIds = {};
 
             // asdfjialkfdaj;klfj;kl fd
             //

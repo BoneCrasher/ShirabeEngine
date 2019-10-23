@@ -8,6 +8,7 @@
 #include <variant>
 #include <memory>
 #include <cstring>
+#include <ostream>
 
 // #include <better-enums/enum.h>
 
@@ -226,6 +227,15 @@ namespace engine
         };
 
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphResource, SFrameGraphResource);
+
+        SHIRABE_TEST_EXPORT
+        SHIRABE_INLINE
+        std::ostream& operator<<(std::ostream &aStream, SFrameGraphResource const &aResource)
+        {
+            aStream << aResource.resourceId;
+
+            return aStream;
+        }
 
         /**
          * Compare two framegraph resources for a less equal relation ship.

@@ -212,7 +212,7 @@ namespace engine
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer).data();
 
-            graphBuilder.setOutputTextureResourceId(compositingExportData.output);
+            graphBuilder.setOutputTextureResourceId(compositingExportData.output.resourceId);
 
             // Present
             // CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
