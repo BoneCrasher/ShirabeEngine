@@ -18,7 +18,7 @@ namespace engine
     {
         using engine::asset::AssetId_t;
         using engine::asset::IAssetStorage;
-        using namespace engine::resources;
+        // using namespace engine::resources;
         using namespace engine::rendering;
 
         /**

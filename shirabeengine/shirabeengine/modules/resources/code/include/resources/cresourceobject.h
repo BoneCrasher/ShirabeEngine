@@ -19,7 +19,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        class [[nodiscard]] SHIRABE_LIBRARY_EXPORT CResourceObject
+        class
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT CResourceObject
             : public IResourceObject
         {
             friend class CResourceManager;

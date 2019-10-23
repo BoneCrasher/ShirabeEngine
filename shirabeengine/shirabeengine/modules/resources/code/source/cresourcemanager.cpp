@@ -13,9 +13,26 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        CResourceManager::CResourceManager(Unique<CResourceObjectFactory> aPrivateResourceObjectFactory)
+                : mPrivateResourceObjectFactory(std::move(aPrivateResourceObjectFactory))
+        { }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         Shared<IResourceObjectPrivate> CResourceManager::asPrivate(Shared<IResourceObject> const &aObject)
         {
             return std::static_pointer_cast<IResourceObjectPrivate>(aObject);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<Shared<IResourceObject>> CResourceManager::useAssetResource(engine::asset::AssetId_t const &aAssetResourceId)
+        {
+            return { EEngineStatus::Ok, nullptr };
         }
         //<-----------------------------------------------------------------------------
 
@@ -27,7 +44,9 @@ namespace engine
             auto iterator = mResourceObjects.find(aResourceId);
             if(mResourceObjects.end() != iterator)
             {
-                Shared <IResourceObject>       p = mResourceObjects[aResourceId];
+                mResourceTree.remove(aResourceId);
+
+                Shared<IResourceObject>       p = mResourceObjects[aResourceId];
                 Shared<IResourceObjectPrivate> q = p->getPrivateObject();
 
                 SHIRABE_EXPLICIT_DISCARD(p->unbind());

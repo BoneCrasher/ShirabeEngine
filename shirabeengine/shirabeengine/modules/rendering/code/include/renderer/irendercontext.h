@@ -13,7 +13,7 @@ namespace engine
     namespace rendering
     {
         using namespace os;
-        using namespace engine::resources;
+        // using namespace engine::resources;
 
         /**
          * The IRenderContext interface describes rendering operations supported in

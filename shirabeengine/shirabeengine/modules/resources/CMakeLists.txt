@@ -11,7 +11,6 @@ set(SHIRABE_EXCLUDED_HEADERS
         resources/code/include/resources/old/iresourceproxy.h
         resources/code/include/resources/old/requestdefaultimplementation.h
         resources/code/include/resources/old/resourcebackendproxy.h
-        resources/code/include/resources/old/resourcedatasource.h
         resources/code/include/resources/old/resourcedomaintransfer.h
         resources/code/include/resources/old/resourcemanagerbase.h
         resources/code/include/resources/old/resourcepool.h
@@ -25,6 +24,8 @@ set(SHIRABE_EXCLUDED_SOURCES
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
+        SHIRABEMODULEASSET
+        SHIRABEMODULEGRAPHICSAPI
         SHIRABEMODULECORE     
         SHIRABEMODULEMATH     
         SHIRABEMODULELOG      
@@ -37,6 +38,8 @@ set(
 
 include(project_setup)
 
+add_dependencies(resources INSTALL_asset)
+add_dependencies(resources INSTALL_graphicsapi)
 add_dependencies(resources INSTALL_math)
 add_dependencies(resources INSTALL_log)
 add_dependencies(resources INSTALL_core)

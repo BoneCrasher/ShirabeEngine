@@ -52,10 +52,10 @@ namespace engine
              * @return                 A pointer to the newly created instance or nullptr on error.
              */
             static CEngineResult<Shared<CFrameGraphRenderContext>> create(
-                    Shared<IAssetStorage>    aAssetStorage,
-                    Shared<CMaterialLoader>  aMaterialLoader,
-                    Shared<CResourceManager> aResourceManager,
-                    Shared<IRenderContext>   aRenderer);
+                    Shared<IAssetStorage>    const &aAssetStorage,
+                    Shared<CMaterialLoader>  const &aMaterialLoader,
+                    Shared<CResourceManager> const &aResourceManager,
+                    Shared<IRenderContext>   const &aRenderer);
 
             //
             // IFrameGraphRenderContext implementation

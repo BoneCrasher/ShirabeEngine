@@ -1,12 +1,12 @@
 #include "asset/assettypes.h"
 #include <util/crc32.h>
-#include <resources/resourcetypes.h>
+#include <graphicsapi/definitions.h>
 
 namespace engine
 {
     namespace asset
     {
-        using resources::EFormat;
+        using namespace graphicsapi;
 
         //<-----------------------------------------------------------------------------
         //

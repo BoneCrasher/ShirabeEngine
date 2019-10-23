@@ -1,9 +1,10 @@
-#include <assert.h>
+#include <cassert>
 
 #include <material/material_loader.h>
 #include <material/material_declaration.h>
 #include <material/materialserialization.h>
 #include <resources/cresourcemanager.h>
+#include <resources/resourcetypes.h>
 
 #include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
@@ -19,10 +20,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CEngineResult<Shared<CFrameGraphRenderContext>> CFrameGraphRenderContext::create(
-                Shared<IAssetStorage>    aAssetStorage,
-                Shared<CMaterialLoader>  aMaterialLoader,
-                Shared<CResourceManager> aResourceManager,
-                Shared<IRenderContext>   aRenderer)
+                Shared<IAssetStorage>    const &aAssetStorage,
+                Shared<CMaterialLoader>  const &aMaterialLoader,
+                Shared<CResourceManager> const &aResourceManager,
+                Shared<IRenderContext>   const &aRenderer)
         {
             bool const inputInvalid =
                     nullptr == aAssetStorage    or
@@ -253,13 +254,12 @@ namespace engine
             //<-----------------------------------------------------------------------------
             // Begin the render pass derivation
             //<-----------------------------------------------------------------------------
-            CRenderPass::SDescriptor renderPassDesc = {};
+            SRenderPassDescription renderPassDesc = {};
             renderPassDesc.name = aRenderPassId;
 
             for(auto const &[passUID, attachmentResourceIndexList] : aAttachmentInfo.getAttachmentPassAssignment())
             {
                 SSubpassDescription subpassDesc = {};
-
                 for(auto const &index : attachmentResourceIndexList)
                 {
                     FrameGraphResourceId_t const &resourceId = attachmentResources.at(index);
@@ -359,9 +359,7 @@ namespace engine
                 renderPassDesc.subpassDescriptions.push_back(subpassDesc);
             }
 
-            CRenderPass::CCreationRequest const renderPassCreationRequest(renderPassDesc);
-
-            CEngineResult<> status = mResourceManager->createResource<CRenderPass>(renderPassCreationRequest, renderPassDesc.name, false);
+            CEngineResult<Shared<IResourceObject>> status =mResourceManager->useDynamicResource(renderPassDesc.name, renderPassDesc);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
             {
                 return { EEngineStatus::Ok };
@@ -369,16 +367,18 @@ namespace engine
             else if(not (EEngineStatus::Ok == status.result()))
             {
                 EngineStatusPrintOnError(status.result(), logTag(), "Failed to create render pass.");
-                return { status };
+                return { status.result() };
             }
 
             // Next: Create FrameBuffer Resource Types in VK Backend
 
-            CFrameBuffer::SDescriptor frameBufferDesc = {};
+            SFrameBufferDescription frameBufferDesc = {};
             frameBufferDesc.name   = aFrameBufferId;
             frameBufferDesc.width  = static_cast<uint32_t>(width);
             frameBufferDesc.height = static_cast<uint32_t>(height);
             frameBufferDesc.layers = static_cast<uint32_t>(layers);
+
+
             frameBufferDesc.dependencies.push_back(renderPassDesc.name);
             frameBufferDesc.dependencies.insert(frameBufferDesc.dependencies.end(), textureViewIds.begin(), textureViewIds.end());
 

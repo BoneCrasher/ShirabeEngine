@@ -7,7 +7,6 @@ set(SHIRABE_TEMPLATE "StaticLib")
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULERESOURCES
         SHIRABEMODULECORE     
         SHIRABEMODULEMATH     
         SHIRABEMODULELOG      
@@ -39,11 +38,10 @@ set(
         graphicsapi/resources/types_old/swapchain.h
         graphicsapi/resources/types_old/texture.h
         graphicsapi/resources/types_old/textureview.h
-        graphicsapi/resources//gfxapi.h
-        graphicsapi/resources//gfxapiresourcebackend.h
-        graphicsapi/resources//gfxapiresourceproxy.h
-        graphicsapi/resources//gfxapiresourcetaskbackend.h
-        graphicsapi/definitions.h
+        graphicsapi/resources/gfxapi.h
+        graphicsapi/resources/gfxapiresourcebackend.h
+        graphicsapi/resources/gfxapiresourceproxy.h
+        graphicsapi/resources/gfxapiresourcetaskbackend.h
 )
 set(
         SHIRABE_EXCLUDED_SOURCES
@@ -63,7 +61,6 @@ set(
 
 include(project_setup)
 
-add_dependencies(graphicsapi INSTALL_resources)
 add_dependencies(graphicsapi INSTALL_base)
 add_dependencies(graphicsapi INSTALL_platform)
 add_dependencies(graphicsapi INSTALL_math)

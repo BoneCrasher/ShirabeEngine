@@ -7,8 +7,7 @@ set(SHIRABE_TEMPLATE "StaticLib")
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEUTILITY    
-        SHIRABEMODULERESOURCES  
+        SHIRABEMODULEUTILITY
         SHIRABEMODULEGRAPHICSAPI
         SHIRABEMODULECORE       
         SHIRABEMODULEMATH       
@@ -29,6 +28,5 @@ add_dependencies(asset INSTALL_base)
 add_dependencies(asset INSTALL_core)
 add_dependencies(asset INSTALL_utility)
 add_dependencies(asset INSTALL_graphicsapi)
-add_dependencies(asset INSTALL_resources)
 add_dependencies(asset INSTALL_math)
 add_dependencies(asset INSTALL_log)

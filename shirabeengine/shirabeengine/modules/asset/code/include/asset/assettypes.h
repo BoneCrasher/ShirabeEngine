@@ -8,14 +8,16 @@
 #include <core/basictypes.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
-#include <resources/resourcetypes.h>
 #include <vulkan/vulkan.hpp>
+#include <graphicsapi/definitions.h>
 #include "asset/asseterror.h"
 
 namespace engine
 {
     namespace asset
     {
+        using namespace graphicsapi;
+
         /**
          * UniqueId type to identify assets.
          */
@@ -102,7 +104,7 @@ namespace engine
                     width,  // 0 - Undefined
                     height, // At least 1
                     depth;  // At least 1
-            resources::EFormat
+            EFormat
                     format;
             uint16_t
                     arraySize; // At least 1 (basically everything is a vector...)

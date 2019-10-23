@@ -9,6 +9,7 @@
 #include <core/enginetypehelper.h>
 #include <core/random.h>
 #include <core/uid.h>
+#include <graphicsapi/definitions.h>
 #include "renderer/framegraph/framegraphdata.h"
 
 namespace engine
@@ -16,7 +17,7 @@ namespace engine
     namespace framegraph
     {
         using engine::core::IUIDGenerator;
-        using namespace engine::resources;
+        using namespace engine::graphicsapi;
 
         class CPassBase;
 

@@ -57,7 +57,7 @@ namespace engine
         /**
          * Values that represent texture and buffer formats
          */
-        using FrameGraphFormat_t = resources::EFormat;
+        using FrameGraphFormat_t = graphicsapi::EFormat;
 
         /**
          * Checks, whether two formats are compatible.
