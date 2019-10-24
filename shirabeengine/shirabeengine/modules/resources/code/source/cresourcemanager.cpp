@@ -46,7 +46,7 @@ namespace engine
             {
                 mResourceTree.remove(aResourceId);
 
-                Shared<IResourceObject>       p = mResourceObjects[aResourceId];
+                Shared<IResourceObject>        p = mResourceObjects[aResourceId];
                 Shared<IResourceObjectPrivate> q = p->getPrivateObject();
 
                 SHIRABE_EXPLICIT_DISCARD(p->unbind());

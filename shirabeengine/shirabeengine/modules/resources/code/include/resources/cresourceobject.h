@@ -25,6 +25,8 @@ namespace engine
             : public IResourceObject
         {
             friend class CResourceManager;
+        public_typedefs:
+            using Descriptor_t = TDescription;
 
         public_constructors:
             explicit CResourceObject(TDescription const &aDescription);

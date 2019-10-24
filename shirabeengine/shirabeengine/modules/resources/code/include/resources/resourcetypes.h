@@ -11,6 +11,8 @@
 #include <core/databuffer.h>
 #include <core/bitfield.h>
 #include <graphicsapi/definitions.h>
+#include "resources/cresourceobject.h"
+#include "resources/resourcedescriptions.h"
 #include "resources/resourcedatasource.h"
 
 namespace engine
@@ -21,171 +23,99 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_LIBRARY_EXPORT SBufferDescription
+            SHIRABE_LIBRARY_EXPORT SBuffer
+            : public CResourceObject<SBufferDescription>
         {
-            std::string                       name;
-            VkBufferCreateInfo                createInfo;
-            std::vector<DataSourceAccessor_t> initialData; // Important: Just an accessor. Resource data is not in memory here.
+            using CResourceObject<SBufferDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SBufferViewDescription
+            SHIRABE_LIBRARY_EXPORT SBufferView
+            : public CResourceObject<SBufferViewDescription>
         {
-            std::string            name;
-            VkBufferViewCreateInfo createInfo;
+            using CResourceObject<SBufferViewDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT STextureDescription
+            SHIRABE_LIBRARY_EXPORT STexture
+            : public CResourceObject<STextureDescription>
         {
-        public_members:
-            std::string                      name;
-            STextureInfo                     textureInfo;
-            EResourceUsage                   cpuGpuUsage;
-            core::CBitField<EBufferBinding>  gpuBinding;
-            Vector<CResourceDataSource>      initialData;
+            using CResourceObject<STextureDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT STextureViewDescription
+            SHIRABE_LIBRARY_EXPORT STextureView
+            : public CResourceObject<STextureViewDescription>
         {
-        public_members:
-            std::string   name;
-            STextureInfo  subjacentTexture;
-            EFormat       textureFormat;
-            ArraySlices_t arraySlices;
-            MipSlices_t   mipMapSlices;
-            // TODO: Distinguish binding and read/write mode
+            using CResourceObject<STextureViewDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SDepthStencilStateDescription
+            SHIRABE_LIBRARY_EXPORT SDepthStencilState
+            : public CResourceObject<SDepthStencilStateDescription>
         {
-        public_members:
-            std::string      name;
-            bool             enableDepth;
-            EDepthWriteMask  depthMask;
-            EComparison      depthFunc;
-            bool             enableStencil;
-            uint8_t          stencilReadMask;
-            uint8_t          stencilWriteMask;
-            SStencilCriteria stencilFrontfaceCriteria;
-            SStencilCriteria stencilBackfaceCriteria;
+            using CResourceObject<SDepthStencilStateDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SRasterizerStateDescription
+            SHIRABE_LIBRARY_EXPORT SRasterizerState
+            : public CResourceObject<SRasterizerStateDescription>
         {
-        public_members:
-            std::string name;
-            EFillMode   fillMode;
-            ECullMode   cullMode;
-            bool        antialiasRasterLines;
-            bool        multisamplingEnabled; // Requires respective format
-            bool        scissorEnabled;
-            bool        depthClipEnabled;
-        };
-
-        struct SAttachmentDescription
-        {
-            EFormat            format;
-            EAttachmentLoadOp  loadOp;
-            EAttachmentStoreOp storeOp;
-            EAttachmentLoadOp  stencilLoadOp;
-            EAttachmentStoreOp stencilStoreOp;
-            EImageLayout       initialLayout;
-            EImageLayout       finalLayout;
-        };
-
-        struct SAttachmentReference
-        {
-            uint32_t     attachment;
-            EImageLayout layout;
-        };
-
-        struct SSubpassDescription
-        {
-            std::vector<SAttachmentReference> inputAttachments;
-            std::vector<SAttachmentReference> colorAttachments;
-            std::vector<SAttachmentReference> resolveAttachments;
-            std::vector<SAttachmentReference> depthStencilAttachments;
-            std::vector<uint32_t>             preserveStencilAttachments;
-        };
-
-        struct SHIRABE_TEST_EXPORT SRenderPassDescription
-        {
-        public_members:
-            std::string                         name;
-            std::vector<SAttachmentDescription> attachmentDescriptions;
-            std::vector<SSubpassDescription>    subpassDescriptions;
-        };
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT SFrameBufferDescription
-        {
-
-        public_members:
-            std::string name;
-            uint32_t    width;
-            uint32_t    height;
-            uint32_t    layers;
+            using CResourceObject<SRasterizerStateDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SSwapChainBufferDescription
+            SHIRABE_LIBRARY_EXPORT SSubpass
+            : public CResourceObject<SSubpassDescription>
         {
-            std::string         name;
-            STextureDescription texture;
-            uint32_t            backBufferIndex;
+            using CResourceObject<SSubpassDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SSwapChainDescription
+            SHIRABE_LIBRARY_EXPORT SRenderPass
+            : public CResourceObject<SRenderPassDescription>
         {
-            std::string         name;
-            STextureDescription texture;
-            bool                vsyncEnabled;
-            bool                fullscreen;
-            unsigned int        windowHandle;
-            unsigned int        backBufferCount;
-            unsigned int        refreshRateNumerator;
-            unsigned int        refreshRateDenominator;
+            using CResourceObject<SRenderPassDescription>::CResourceObject;
         };
 
-        class
+        struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SPipelineDescription
+            SHIRABE_LIBRARY_EXPORT SFrameBuffer
+            : public CResourceObject<SFrameBufferDescription>
         {
-            std::string                                                  name;
-            VkViewport                                                   viewPort;
-            VkRect2D                                                     scissor;
-
-            VkPipelineInputAssemblyStateCreateInfo                       inputAssemblyState;
-            std::vector<VkVertexInputBindingDescription>                 vertexInputBindings;
-            std::vector<VkVertexInputAttributeDescription>               vertexInputAttributes;
-
-            VkPipelineRasterizationStateCreateInfo                       rasterizerState;
-            VkPipelineMultisampleStateCreateInfo                         multiSampler;
-            VkPipelineDepthStencilStateCreateInfo                        depthStencilState;
-            std::vector<VkPipelineColorBlendAttachmentState>             colorBlendAttachmentStates;
-            VkPipelineColorBlendStateCreateInfo                          colorBlendState;
-
-            VkPipelineLayoutCreateInfo                                   pipelineLayout;
-            std::vector<VkDescriptorSetLayoutCreateInfo>                 descriptorSetLayoutCreateInfos;
-            std::vector<std::vector<VkDescriptorSetLayoutBinding>>       descriptorSetLayoutBindings;
-
-            std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
-
-            uint32_t                                                     subpass;
+            using CResourceObject<SFrameBufferDescription>::CResourceObject;
         };
 
+        struct
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SSwapChainBuffer
+            : public CResourceObject<SSwapChainBufferDescription>
+        {
+            using CResourceObject<SSwapChainBufferDescription>::CResourceObject;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SSwapChain
+            : public CResourceObject<SSwapChainDescription>
+        {
+            using CResourceObject<SSwapChainDescription>::CResourceObject;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SPipeline
+            : public CResourceObject<SPipelineDescription>
+        {
+            using CResourceObject<SPipelineDescription>::CResourceObject;
+        };
     }
 }
 

@@ -31,12 +31,12 @@ namespace engine {
             ~CResourceManager() = default;
 
         public_methods:
-            template <typename TResourceDescription>
+            template <typename TResource>
             // requires std::is_base_of_v<IResourceObject, TResource>
             CEngineResult<Shared<IResourceObject>> useDynamicResource(
-                      ResourceId_t              const &aResourceId
-                    , TResourceDescription      const &aDescriptor
-                    , std::vector<ResourceId_t>      &&aDependencies);
+                      ResourceId_t                     const &aResourceId
+                    , typename TResource::Descriptor_t const &aDescriptor
+                    , std::vector<ResourceId_t>             &&aDependencies = {});
 
             CEngineResult<Shared<IResourceObject>> useAssetResource(AssetId_t const &aAssetResourceId);
 
@@ -61,11 +61,11 @@ namespace engine {
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TResourceDescription>
+        template <typename TResource>
         CEngineResult<Shared<IResourceObject>> CResourceManager::useDynamicResource(
-                engine::resources::ResourceId_t const &aResourceId
-                , TResourceDescription          const &aDescriptor
-                , std::vector<ResourceId_t>          &&aDependencies)
+                  ResourceId_t                     const &aResourceId
+                , typename TResource::Descriptor_t const &aDescriptor
+                , std::vector<ResourceId_t>             &&aDependencies)
         {
             CEngineResult<Shared<IResourceObject>> result = { EEngineStatus::Error, nullptr };
 
@@ -76,7 +76,7 @@ namespace engine {
                 mResourceTree.connect(aResourceId, dependency);
             }
 
-            Shared<IResourceObject>        resource        = makeShared<CResourceObject<TResourceDescription>>(std::forward(aDescriptor));
+            Shared<IResourceObject>        resource        = makeShared<CResourceObject<typename TResource::Descriptor_t>>(std::forward(aDescriptor));
             Unique<IResourceObjectPrivate> privateResource = mPrivateResourceObjectFactory->create(aDescriptor);
             privateResource->create();
 

@@ -359,15 +359,17 @@ namespace engine
                 renderPassDesc.subpassDescriptions.push_back(subpassDesc);
             }
 
-            CEngineResult<Shared<IResourceObject>> status =mResourceManager->useDynamicResource(renderPassDesc.name, renderPassDesc);
-            if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
             {
-                return { EEngineStatus::Ok };
-            }
-            else if(not (EEngineStatus::Ok == status.result()))
-            {
-                EngineStatusPrintOnError(status.result(), logTag(), "Failed to create render pass.");
-                return { status.result() };
+                CEngineResult<Shared<IResourceObject>> status=mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
+                if( EEngineStatus::ResourceManager_ResourceAlreadyCreated==status.result())
+                {
+                    return {EEngineStatus::Ok};
+                }
+                else if( not(EEngineStatus::Ok==status.result()))
+                {
+                    EngineStatusPrintOnError(status.result(), logTag(), "Failed to create render pass.");
+                    return {status.result()};
+                }
             }
 
             // Next: Create FrameBuffer Resource Types in VK Backend
@@ -378,23 +380,23 @@ namespace engine
             frameBufferDesc.height = static_cast<uint32_t>(height);
             frameBufferDesc.layers = static_cast<uint32_t>(layers);
 
-
-            frameBufferDesc.dependencies.push_back(renderPassDesc.name);
-            frameBufferDesc.dependencies.insert(frameBufferDesc.dependencies.end(), textureViewIds.begin(), textureViewIds.end());
-
-            CFrameBuffer::CCreationRequest const frameBufferCreationRequest(frameBufferDesc, renderPassDesc.name, textureViewIds);
-
-            status = mResourceManager->createResource<CFrameBuffer>(frameBufferCreationRequest, frameBufferDesc.name, false);
-            if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
             {
-                return EEngineStatus::Ok;
-            }
-            else
-            {
-                EngineStatusPrintOnError(status.result(), logTag(), "Failed to create frame buffer.");
+                std::vector<std::string> frameBufferDependencies {};
+                frameBufferDependencies.push_back(renderPassDesc.name);
+                frameBufferDependencies.insert(frameBufferDependencies.end(), textureViewIds.begin(), textureViewIds.end());
+
+                CEngineResult<Shared<IResourceObject>> status = mResourceManager->useDynamicResource<SFrameBuffer>(frameBufferDesc.name, frameBufferDesc, std::move(frameBufferDependencies));
+                if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
+                {
+                    return EEngineStatus::Ok;
+                }
+                else
+                {
+                    EngineStatusPrintOnError(status.result(), logTag(), "Failed to create frame buffer.");
+                }
             }
 
-            return status;
+            return EEngineStatus::Ok;
 
             // return EEngineStatus::Ok;
         }
@@ -439,10 +441,10 @@ namespace engine
                 std::string                     const &aFrameBufferId,
                 std::string                     const &aRenderPassId)
         {
-            CEngineResult<> destruction = mResourceManager->destroyResource<CFrameBuffer>(aFrameBufferId);
+            CEngineResult<> destruction = mResourceManager->discardResource(aFrameBufferId);
             EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy frame buffer.");
 
-            destruction = mResourceManager->destroyResource<CRenderPass>(aRenderPassId);
+            destruction = mResourceManager->discardResource(aRenderPassId);
             EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy render pass.");
 
             return destruction;
