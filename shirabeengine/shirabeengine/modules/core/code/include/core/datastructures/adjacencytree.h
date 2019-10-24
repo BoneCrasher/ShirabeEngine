@@ -96,7 +96,7 @@ namespace engine::datastructures
                 return false;
             }
 
-            for(auto const &[id, references] : aInOutTree)
+            for(auto &[id, references] : aInOutTree)
             {
                 removeListEntryIfAdded(references, aId);
             }
@@ -119,12 +119,12 @@ namespace engine::datastructures
         static bool removeListEntryIfAdded(  List_t<T>       &aInOutList
                                            , T         const &aId)
         {
-            if( not listContainsElementFn(aInOutList))
+            if( not listContainsElementFn(aInOutList, aId))
             {
                 return false;
             }
 
-            aInOutList.erase(aId);
+            aInOutList.erase(std::find(aInOutList.begin(), aInOutList.end(), aId));
         }
 
         static auto printTree(  Tree_t<uint32_t> const &aTree
@@ -155,23 +155,21 @@ namespace engine::datastructures
             std::cout << "\n";
         };
 
-        static auto deriveReverseTree(  Tree_t<uint32_t> const &aForwardTree
-                                      , List_t<uint32_t> const &aForwardRoots
-                                      , uint32_t         const &aParentUid
-                                      , Tree_t<uint32_t>       &aInOutReverseTree
-                                      , List_t<uint32_t>       &aInOutReverseRoots) -> void
+        template <typename T>
+        static auto deriveReverseTree(  Tree_t<T> const &aForwardTree
+                                      , List_t<T> const &aForwardRoots
+                                      , T         const &aParentUid
+                                      , Tree_t<T>       &aInOutReverseTree
+                                      , List_t<T>       &aInOutReverseRoots) -> void
         {
             for( auto const &root : aForwardRoots )
             {
                 insertTreeEntryIfNotAddedFn(aInOutReverseTree, root);
 
-                if( 0 < aParentUid )
-                {
-                    List_t<uint32_t> &reverseChildren = aInOutReverseTree.at(root);
-                    insertListEntryIfNotAddedFn(reverseChildren, aParentUid);
-                }
+                List_t<T> &reverseChildren = aInOutReverseTree.at(root);
+                insertListEntryIfNotAddedFn(reverseChildren, aParentUid);
 
-                List_t<uint32_t> const &children=aForwardTree.at(root);
+                List_t<T> const &children=aForwardTree.at(root);
                 if( not children.empty())
                 {
                     deriveReverseTree(aForwardTree, children, root, aInOutReverseTree, aInOutReverseRoots);
@@ -219,7 +217,7 @@ namespace engine::datastructures
         {
             std::vector<Edge_t> edges {};
 
-            std::function<void(TIdType const&)> traverseForwardFn = null;
+            std::function<void(TIdType const&)> traverseForwardFn = nullptr;
             traverseForwardFn = [&, this] (TIdType const &aId)
             {
                 List_t<TIdType> const children = mForwardTree.at(aId);
@@ -255,7 +253,7 @@ namespace engine::datastructures
 
             std::vector<Edge_t> edges {};
 
-            std::function<void(TIdType const&)> const getParentEdgeFn = null;
+            std::function<void(TIdType const&)> const getParentEdgeFn = nullptr;
             getParentEdgeFn = [&, this] (TIdType const &aCurrentChild)
             {
                 List_t<TIdType> const parents = mReverseTree.at(aCurrentChild);
@@ -369,15 +367,15 @@ namespace engine::datastructures
         }
 
         // Erase every ID, which is referenced (can't be root).
-        for(auto const &[id, references] : mForwardTree)
+        for(auto &[id, references] : mForwardTree)
         {
             for(auto const &aReferenceId : references)
             {
-                mForwardRoots.erase(aReferenceId);
+                mForwardRoots.erase(std::find(mForwardRoots.begin(), mForwardRoots.end(), aReferenceId));
             }
         }
 
-        CAdjacencyTreeHelper::deriveReverseTree(mForwardTree, mForwardRoots, 0, mReverseTree, mReverseRoots);
+        CAdjacencyTreeHelper::deriveReverseTree(mForwardTree, mForwardRoots, TIdType{}, mReverseTree, mReverseRoots);
     }
     //<-----------------------------------------------------------------------------
 }
