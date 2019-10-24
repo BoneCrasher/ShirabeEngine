@@ -417,6 +417,7 @@ namespace engine
                 mCurrentRenderPassHandle  = aRenderPassId;
                 mCurrentSubpass           = 0; // Reset!
             }
+            return status;
         };
         //<-----------------------------------------------------------------------------
 
@@ -491,9 +492,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::createTexture(SFrameGraphTexture const &aTexture)
         {
-            CTexture::SDescriptor desc = {};
+            STextureDescription desc = {};
             desc.name        = aTexture.readableName;
-            desc.textureInfo = static_cast<STextureInfo>(aTexture);
+            desc.textureInfo = static_cast<graphicsapi::STextureInfo>(aTexture);
             // Always set those...
             desc.gpuBinding.set(EBufferBinding::CopySource);
             desc.gpuBinding.set(EBufferBinding::CopyTarget);
@@ -515,21 +516,19 @@ namespace engine
 
             desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 
-            CTexture::CCreationRequest const request(desc);
-
-            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
-
-            CEngineResult<> status = mResourceManager->createResource<CTexture>(request, aTexture.readableName, false);
-            if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
             {
-                return EEngineStatus::Ok;
-            }
-            else
-            {
-                EngineStatusPrintOnError(status.result(), logTag(), "Failed to create texture.");
+                CEngineResult<Shared<IResourceObject>> textureObject = mResourceManager->useDynamicResource<STexture>(desc.name, desc);
+                if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == textureObject.result())
+                {
+                    return EEngineStatus::Ok;
+                }
+                else
+                {
+                    EngineStatusPrintOnError(textureObject.result(), logTag(), "Failed to create texture.");
+                }
             }
 
-            return status;
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -540,7 +539,7 @@ namespace engine
         {
             CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
 
-            CEngineResult<> status = mResourceManager->destroyResource<CTexture>(aTexture.readableName);
+            CEngineResult<> status = mResourceManager->discardResource(aTexture.readableName);
 
             return status;
         }
@@ -555,20 +554,17 @@ namespace engine
         {
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
-            CTextureView::SDescriptor desc = { };
+            STextureViewDescription desc = { };
             desc.name             = aView.readableName;
             desc.textureFormat    = aView.format;
-            desc.subjacentTexture = static_cast<STextureInfo>(aTexture);
+            desc.subjacentTexture = static_cast<graphicsapi::STextureInfo>(aTexture);
             desc.arraySlices      = aView.arraySliceRange;
             desc.mipMapSlices     = aView.mipSliceRange;
-            desc.dependencies.push_back(aTexture.readableName);
 
-            CTextureView::CCreationRequest const request(desc, aTexture.readableName);
+            CEngineResult<Shared<IResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, { aTexture.readableName });
+            EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
 
-            CEngineResult<> status = mResourceManager->createResource<CTextureView>(request, aView.readableName, false);
-            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create texture.");
-
-            return status;
+            return textureViewObject.result();
         }
         //<-----------------------------------------------------------------------------
 

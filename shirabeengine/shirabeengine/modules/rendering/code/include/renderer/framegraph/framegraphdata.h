@@ -307,7 +307,7 @@ namespace engine
          */
         struct SHIRABE_TEST_EXPORT SFrameGraphTexture
                 : public SFrameGraphResource
-                , public asset::STextureInfo
+                , public graphicsapi::STextureInfo
         {
         public_constructors:
             /**

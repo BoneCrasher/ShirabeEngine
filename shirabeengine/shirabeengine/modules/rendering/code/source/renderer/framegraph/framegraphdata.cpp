@@ -249,7 +249,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void SFrameGraphTexture::assignTextureParameters(SFrameGraphTexture const &aOther)
         {
-            this->assignTextureInfoParameters(aOther);
+            graphicsapi::STextureInfo::operator=(aOther); // Use implicitly defined assignment op
 
             initialState   = aOther.initialState;
             permittedUsage = aOther.permittedUsage;
