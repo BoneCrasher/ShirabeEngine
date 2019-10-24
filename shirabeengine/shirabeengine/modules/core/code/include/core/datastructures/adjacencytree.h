@@ -75,13 +75,34 @@ namespace engine::datastructures
         }
 
         template<typename T>
-        static void insertTreeEntryIfNotAddedFn(  Tree_t<T>       &aInOutTree
+        static bool insertTreeEntryIfNotAddedFn(  Tree_t<T>       &aInOutTree
                                                 , T         const &aId)
         {
             if( not treeContainsElementFn(aInOutTree, aId))
             {
                 aInOutTree.insert({aId, {}});
+                return true;
             }
+
+            return false;
+        }
+
+        template <typename T>
+        static bool removeTreeEntryIfAdded(  Tree_t<T>       &aInOutTree
+                                           , T         const &aId)
+        {
+            if( not treeContainsElementFn(aInOutTree, aId))
+            {
+                return false;
+            }
+
+            for(auto const &[id, references] : aInOutTree)
+            {
+                removeListEntryIfAdded(references, aId);
+            }
+
+            aInOutTree.erase(aId);
+            return true;
         }
 
         template<typename T>
@@ -92,6 +113,18 @@ namespace engine::datastructures
             {
                 aInOutList.insert(aInOutList.end(), aId);
             }
+        }
+
+        template <typename T>
+        static bool removeListEntryIfAdded(  List_t<T>       &aInOutList
+                                           , T         const &aId)
+        {
+            if( not listContainsElementFn(aInOutList))
+            {
+                return false;
+            }
+
+            aInOutList.erase(aId);
         }
 
         static auto printTree(  Tree_t<uint32_t> const &aTree
@@ -132,7 +165,7 @@ namespace engine::datastructures
             {
                 insertTreeEntryIfNotAddedFn(aInOutReverseTree, root);
 
-                if( 0<aParentUid )
+                if( 0 < aParentUid )
                 {
                     List_t<uint32_t> &reverseChildren = aInOutReverseTree.at(root);
                     insertListEntryIfNotAddedFn(reverseChildren, aParentUid);
@@ -245,6 +278,8 @@ namespace engine::datastructures
             return edges;
         }
 
+        void regenerateTree();
+
     private_members:
         Tree_t<TIdType> mForwardTree;
         List_t<TIdType> mForwardRoots;
@@ -254,10 +289,96 @@ namespace engine::datastructures
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    bool add       (TIdType const &aId);
-    bool remove    (TIdType const &aId);
-    bool connect   (TIdType const &aSource, TIdType const &aTarget);
-    bool disconnect(TIdType const &aSource, TIdType const &aTarget);
+    template <typename TIdType>
+    bool CAdjacencyTree<TIdType>::add(TIdType const &aId)
+    {
+        CAdjacencyTreeHelper::insertTreeEntryIfNotAddedFn(mForwardTree, aId);
+        regenerateTree();
+        return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    bool CAdjacencyTree<TIdType>::remove(TIdType const &aId)
+    {
+        CAdjacencyTreeHelper::removeTreeEntryIfAdded(mForwardTree, aId);
+        regenerateTree();
+        return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    bool CAdjacencyTree<TIdType>::connect(TIdType const &aSource, TIdType const &aTarget)
+    {
+        if(not CAdjacencyTreeHelper::treeContainsElementFn(mForwardTree, aSource))
+        {
+            return false;
+        }
+
+        if(CAdjacencyTreeHelper::listContainsElementFn(mForwardTree[aSource]))
+        {
+            return false;
+        }
+
+        CAdjacencyTreeHelper::insertListEntryIfNotAddedFn(mForwardTree[aSource], aTarget);
+        return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    bool CAdjacencyTree<TIdType>::disconnect(TIdType const &aSource, TIdType const &aTarget)
+    {
+        if(not CAdjacencyTreeHelper::treeContainsElementFn(mForwardTree, aSource))
+        {
+            return false;
+        }
+
+        if(not CAdjacencyTreeHelper::listContainsElementFn(mForwardTree[aSource]))
+        {
+            return false;
+        }
+
+        CAdjacencyTreeHelper::removeListEntryIfAdded(mForwardTree[aSource], aTarget);
+        return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    void CAdjacencyTree<TIdType>::regenerateTree()
+    {
+        mForwardRoots.clear();
+        mReverseRoots.clear();
+        mReverseTree .clear();
+
+        // Copy all known IDs to the forward root list
+        for(auto const &[id, references] : mForwardTree)
+        {
+            mForwardRoots.push_back(id);
+        }
+
+        // Erase every ID, which is referenced (can't be root).
+        for(auto const &[id, references] : mForwardTree)
+        {
+            for(auto const &aReferenceId : references)
+            {
+                mForwardRoots.erase(aReferenceId);
+            }
+        }
+
+        CAdjacencyTreeHelper::deriveReverseTree(mForwardTree, mForwardRoots, 0, mReverseTree, mReverseRoots);
+    }
     //<-----------------------------------------------------------------------------
 }
 
