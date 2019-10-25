@@ -24,12 +24,12 @@ namespace engine
         public_api:
         };
 
-        template <typename TDescriptor>
+        template <typename TResource>
         class SHIRABE_LIBRARY_EXPORT CResourceObjectCreator
             : public IResourceObjectCreatorBase
         {
         public_typedefs:
-            using Fn_t = std::function<Unique<IResourceObjectPrivate>(TDescriptor const &)>;
+            using Fn_t = std::function<Unique<IResourceObjectPrivate>(typename TResource::Descriptor_t const &)>;
 
         public_constructors:
             explicit CResourceObjectCreator(Fn_t const &aFn)
@@ -37,9 +37,11 @@ namespace engine
             {};
 
         public_methods:
-            Unique<IResourceObjectPrivate> create(TDescriptor const &aDescriptor)
+            Unique<IResourceObjectPrivate> create(typename TResource::Descriptor_t const &aDescriptor)
             {
-                return (nullptr == mFn) ? nullptr : mFn(aDescriptor);
+                return (nullptr == mFn)
+                            ? nullptr
+                            : mFn(aDescriptor);
             }
 
         private_methods:
@@ -69,11 +71,11 @@ namespace engine
 
         private_methods:
             template <typename T>
-            Unique<IResourceObjectPrivate> create(typename T::SDescriptor const &aDescriptor)
+            Unique<IResourceObjectPrivate> create(typename T::Descriptor_t const &aDescriptor)
             {
                 std::type_info const &typeInfo = typeid(T);
 
-                auto entry = std::find(mCreators.begin(), mCreators.end(), typeInfo.name());
+                auto entry = mCreators.find(typeInfo.name());
                 if(mCreators.end() == entry)
                 {
                     return nullptr;
@@ -82,7 +84,7 @@ namespace engine
                 Unique<IResourceObjectPrivate>            result      = nullptr;
                 Unique<IResourceObjectCreatorBase> const &creatorBase = mCreators[typeInfo.name()];
 
-                auto creator = static_cast<CResourceObjectCreator<T> const *const>(creatorBase.get());
+                auto creator = static_cast<CResourceObjectCreator<T> *const>(creatorBase.get());
                 if(nullptr != creator)
                 {
                     result = std::move(creator->create(aDescriptor));

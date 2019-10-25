@@ -360,15 +360,15 @@ namespace engine
             }
 
             {
-                CEngineResult<Shared<IResourceObject>> status=mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
-                if( EEngineStatus::ResourceManager_ResourceAlreadyCreated==status.result())
+                CEngineResult<Shared<IResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
+                if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
                 {
                     return {EEngineStatus::Ok};
                 }
-                else if( not(EEngineStatus::Ok==status.result()))
+                else if( not(EEngineStatus::Ok==renderPassObject.result()))
                 {
-                    EngineStatusPrintOnError(status.result(), logTag(), "Failed to create render pass.");
-                    return {status.result()};
+                    EngineStatusPrintOnError(renderPassObject.result(), logTag(), "Failed to create render pass.");
+                    return {renderPassObject.result()};
                 }
             }
 
@@ -617,7 +617,7 @@ namespace engine
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
             CEngineResult<> status = EEngineStatus::Ok;
-            status = mResourceManager->destroyResource<CTextureView>(aView.readableName);
+            status = mResourceManager->discardResource(aView.readableName);
 
             return status;
         }
@@ -648,7 +648,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::createBuffer(SFrameGraphBuffer const &aBuffer)
         {
-            CBuffer::SDescriptor desc = { };
+            SBufferDescription desc = { };
             desc.name = aBuffer.readableName;
 
             VkBufferCreateInfo &createInfo = desc.createInfo;
@@ -662,12 +662,10 @@ namespace engine
             // createInfo.queueFamilyIndexCount = ...;
             // createInfo.pQueueFamilyIndices   = ...;
 
-            CBuffer::CCreationRequest const request(desc);
+            CEngineResult<Shared<IResourceObject>> bufferObject = mResourceManager->useDynamicResource<SBuffer>(desc.name, desc);
+            EngineStatusPrintOnError(bufferObject.result(), logTag(), "Failed to create buffer.");
 
-            CEngineResult<> status = mResourceManager->createResource<CBuffer>(request, aBuffer.readableName, false);
-            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create buffer.");
-
-            return status;
+            return bufferObject.result();
         }
         //<-----------------------------------------------------------------------------
 
@@ -677,7 +675,7 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::destroyBuffer(SFrameGraphBuffer const &aBuffer)
         {
             CEngineResult<> status = EEngineStatus::Ok;
-            status = mResourceManager->destroyResource<CBuffer>(aBuffer.readableName);
+            status = mResourceManager->discardResource(aBuffer.readableName);
 
             return status;
         }
@@ -690,7 +688,7 @@ namespace engine
                 SFrameGraphBuffer      const &aBuffer,
                 SFrameGraphBufferView  const &aBufferView)
         {
-            CBufferView::SDescriptor desc = { };
+            SBufferViewDescription desc = { };
             desc.name = aBuffer.readableName;
 
             VkBufferViewCreateInfo &createInfo = desc.createInfo;
@@ -702,12 +700,10 @@ namespace engine
             // createInfo.format = "...";
             // createInfo.range  = "...";
 
-            CBufferView::CCreationRequest const request(desc, aBuffer.readableName);
+            CEngineResult<Shared<IResourceObject>> bufferViewObject = mResourceManager->useDynamicResource<SBufferView>(desc.name, desc, { aBuffer.readableName });
+            EngineStatusPrintOnError(bufferViewObject.result(), logTag(), "Failed to create buffer view.");
 
-            CEngineResult<> status = mResourceManager->createResource<CBufferView>(request, aBufferView.readableName, false);
-            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create buffer view.");
-
-            return status;
+            return bufferViewObject.result();
         }
         //<-----------------------------------------------------------------------------
 
@@ -799,7 +795,7 @@ namespace engine
             SMaterialSignature               const &signature = master  ->signature();
             CMaterialConfig                  const &config    = instance->config();
 
-            CPipelineDeclaration::SDescriptor pipelineDescriptor {};
+            SPipelineDescription pipelineDescriptor {};
 
             pipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
             pipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
@@ -1008,22 +1004,27 @@ namespace engine
 
             pipelineDescriptor.subpass = mCurrentSubpass;
 
-            std::string     const renderPassHandle   = mCurrentRenderPassHandle;
-            PublicResourceIdList_t const textureViewHandles = {};
-            PublicResourceIdList_t const bufferViewHandles  = {};
+            std::string              const renderPassHandle   = mCurrentRenderPassHandle;
+            std::vector<std::string> const textureViewHandles = {};
+            std::vector<std::string> const bufferViewHandles  = {};
 
-            pipelineDescriptor.dependencies.push_back(renderPassHandle); // Remarks to myself: You are stupid...
             pipelineDescriptor.name = aMaterial.readableName;
 
-            CPipeline::CCreationRequest request(pipelineDescriptor
-                                                , renderPassHandle
-                                                , textureViewHandles
-                                                , bufferViewHandles);
+            std::vector<std::string> pipelineDependencies {};
+            pipelineDependencies.push_back(renderPassHandle);
+            for(auto const &textureViewHandle : textureViewHandles)
+            {
+                pipelineDependencies.push_back((textureViewHandle));
+            }
+            for(auto const &bufferViewHandle : bufferViewHandles)
+            {
+                pipelineDependencies.push_back(bufferViewHandle);
+            }
 
-            CEngineResult<> status = mResourceManager->createResource<CPipeline>(request, aMaterial.readableName, false);
-            EngineStatusPrintOnError(status.result(), logTag(), "Failed to create pipeline.");
+            CEngineResult<Shared<IResourceObject>> pipelineObject = mResourceManager->useDynamicResource<SPipeline>(pipelineDescriptor.name, pipelineDescriptor, std::move(pipelineDependencies));
+            EngineStatusPrintOnError(pipelineObject.result(), logTag(), "Failed to create pipeline.");
 
-            return status;
+            return pipelineObject.result();
         }
         //<-----------------------------------------------------------------------------
 

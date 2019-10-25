@@ -76,8 +76,8 @@ namespace engine {
                 mResourceTree.connect(aResourceId, dependency);
             }
 
-            Shared<IResourceObject>        resource        = makeShared<CResourceObject<typename TResource::Descriptor_t>>(std::forward(aDescriptor));
-            Unique<IResourceObjectPrivate> privateResource = mPrivateResourceObjectFactory->create(aDescriptor);
+            Shared<IResourceObject>        resource        = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
+            Unique<IResourceObjectPrivate> privateResource = mPrivateResourceObjectFactory->create<TResource>(aDescriptor);
             privateResource->create();
 
             storeResourceObject(aResourceId, resource);

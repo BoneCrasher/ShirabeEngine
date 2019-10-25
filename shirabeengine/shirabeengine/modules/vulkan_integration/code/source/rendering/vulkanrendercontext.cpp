@@ -1,8 +1,8 @@
-#include "vulkan/rendering/vulkanrendercontext.h"
-#include "vulkan/resources/types/vulkantextureresource.h"
-#include "vulkan/resources/types/vulkanframebufferresource.h"
-#include "vulkan/resources/types/vulkanrenderpassresource.h"
-#include "vulkan/resources/types/vulkanpipelineresource.h"
+#include "vulkan_integration/rendering/vulkanrendercontext.h"
+#include "vulkan_integration/resources/types/vulkantextureresource.h"
+#include "vulkan_integration/resources/types/vulkanframebufferresource.h"
+#include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
+#include "vulkan_integration/resources/types/vulkanpipelineresource.h"
 
 #include <thread>
 #include <base/string.h>

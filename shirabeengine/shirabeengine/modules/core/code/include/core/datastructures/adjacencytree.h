@@ -319,7 +319,7 @@ namespace engine::datastructures
             return false;
         }
 
-        if(CAdjacencyTreeHelper::listContainsElementFn(mForwardTree[aSource]))
+        if(CAdjacencyTreeHelper::listContainsElementFn(mForwardTree[aSource], aTarget))
         {
             return false;
         }

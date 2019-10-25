@@ -164,7 +164,7 @@ namespace engine
             unsigned int        refreshRateDenominator;
         };
 
-        class
+        struct
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SPipelineDescription
         {
