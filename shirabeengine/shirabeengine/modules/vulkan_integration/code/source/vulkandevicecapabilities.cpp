@@ -1,7 +1,7 @@
 #include <functional>
 
 #include <graphicsapi/definitions.h>
-#include "vulkan/vulkandevicecapabilities.h"
+#include "vulkan_integration/vulkandevicecapabilities.h"
 
 namespace engine
 {

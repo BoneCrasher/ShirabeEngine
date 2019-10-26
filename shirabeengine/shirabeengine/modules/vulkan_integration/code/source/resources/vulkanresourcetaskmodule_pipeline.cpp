@@ -1,13 +1,12 @@
 #include <filesystem>
 #include <fstream>
 
-#include <graphicsapi/resources/types/pipeline.h>
-#include <graphicsapi/resources/gfxapiresourcebackend.h>
+#include <resources/resourcetypes.h>
 
-#include "vulkan/vulkandevicecapabilities.h"
-#include "vulkan/resources/vulkanresourcetaskbackend.h"
-#include "vulkan/resources/types/vulkanpipelineresource.h"
-#include "vulkan/resources/types/vulkanrenderpassresource.h"
+#include "vulkan_integration/vulkandevicecapabilities.h"
+#include "vulkan_integration/resources/vulkanresourcetaskbackend.h"
+#include "vulkan_integration/resources/types/vulkanpipelineresource.h"
+#include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "../../../../material/code/include/material/materialserialization.h"
 
 namespace engine

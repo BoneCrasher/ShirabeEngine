@@ -2,14 +2,14 @@
 // Created by dottideveloper on 20.10.19.
 //
 
-#include "vulkan/resources/types/vulkanbufferresource.h"
-#include "vulkan/resources/cvulkanprivateresourceobjectfactory.h"
+#include "vulkan_integration/resources/types/vulkanbufferresource.h"
+#include "vulkan_integration/resources/cvulkanprivateresourceobjectfactory.h"
 
 namespace engine
 {
     namespace vulkan
     {
-        using namespace gfxapi;
+        using namespace graphicsapi;
         using namespace resources;
 
         //<-----------------------------------------------------------------------------

@@ -1,10 +1,9 @@
-#include <graphicsapi/resources/types/framebuffer.h>
-#include <graphicsapi/resources/gfxapiresourcebackend.h>
-#include "vulkan/vulkandevicecapabilities.h"
-#include "vulkan/resources/vulkanresourcetaskbackend.h"
-#include "vulkan/resources/types/vulkanrenderpassresource.h"
-#include "vulkan/resources/types/vulkantextureviewresource.h"
-#include "vulkan/resources/types/vulkanframebufferresource.h"
+#include <resources/resourcetypes.h>
+#include "vulkan_integration/vulkandevicecapabilities.h"
+#include "vulkan_integration/resources/vulkanresourcetaskbackend.h"
+#include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
+#include "vulkan_integration/resources/types/vulkantextureviewresource.h"
+#include "vulkan_integration/resources/types/vulkanframebufferresource.h"
 
 #include <vulkan/vulkan.h>
 

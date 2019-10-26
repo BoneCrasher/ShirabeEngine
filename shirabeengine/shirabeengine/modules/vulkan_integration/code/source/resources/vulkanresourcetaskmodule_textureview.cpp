@@ -1,9 +1,9 @@
 #include <graphicsapi/resources/types/textureview.h>
 #include <graphicsapi/resources/gfxapiresourcebackend.h>
-#include "vulkan/vulkandevicecapabilities.h"
-#include "vulkan/resources/vulkanresourcetaskbackend.h"
-#include "vulkan/resources/types/vulkantextureresource.h"
-#include "vulkan/resources/types/vulkantextureviewresource.h"
+#include "vulkan_integration/vulkandevicecapabilities.h"
+#include "vulkan_integration/resources/vulkanresourcetaskbackend.h"
+#include "vulkan_integration/resources/types/vulkantextureresource.h"
+#include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 
 #include <vulkan/vulkan.h>
 

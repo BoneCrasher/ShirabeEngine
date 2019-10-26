@@ -6,7 +6,7 @@
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
 #include <resources/aprivateresourceobject.h>
-#include "vulkan/resources/ivkapiresource.h"
+#include "vulkan_integration/resources/cvkapiresource.h"
 
 namespace engine
 {
@@ -19,10 +19,10 @@ namespace engine
          * with textures inside the vulkan API.
          */
         class CVulkanBufferResource
-            : public APrivateResourceObject<SBufferDescription>
+            : public CVkApiResource<SBufferDescription>
         {
         public_constructors:
-            using APrivateResourceObject<SBufferDescription>::APrivateResourceObject;
+            using CVkApiResource<SBufferDescription>::APrivateResourceObject;
 
         public_methods:
             // CEngineResult<> create()  override;

@@ -7,10 +7,10 @@
 #include <os/applicationenvironment.h>
 #include <base/string.h>
 #include <graphicsapi/resources/types/swapchain.h>
-#include "vulkan/vulkanenvironment.h"
-#include "vulkan/vulkandevicecapabilities.h"
-#include "vulkan/vulkanimport.h"
-#include "vulkan/wsi/x11surface.h"
+#include "vulkan_integration/vulkanenvironment.h"
+#include "vulkan_integration/vulkandevicecapabilities.h"
+#include "vulkan_integration/vulkanimport.h"
+#include "vulkan_integration/wsi/x11surface.h"
 
 namespace engine
 {

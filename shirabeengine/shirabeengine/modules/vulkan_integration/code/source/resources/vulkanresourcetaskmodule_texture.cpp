@@ -1,8 +1,7 @@
-#include <graphicsapi/resources/types/texture.h>
-#include <graphicsapi/resources/gfxapiresourcebackend.h>
-#include "vulkan/vulkandevicecapabilities.h"
-#include "vulkan/resources/vulkanresourcetaskbackend.h"
-#include "vulkan/resources/types/vulkantextureresource.h"
+#include <resources/resourcetypes.h>
+#include "vulkan_integration/vulkandevicecapabilities.h"
+#include "vulkan_integration/resources/vulkanresourcetaskbackend.h"
+#include "vulkan_integration/resources/types/vulkantextureresource.h"
 
 namespace engine
 {
