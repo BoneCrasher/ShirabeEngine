@@ -21,16 +21,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        Shared<IResourceObjectPrivate> CResourceManager::asPrivate(Shared<IResourceObject> const &aObject)
+        Shared<IGpuApiResourceObject> CResourceManager::asPrivate(Shared<ILogicalResourceObject> const &aObject)
         {
-            return std::static_pointer_cast<IResourceObjectPrivate>(aObject);
+            return std::static_pointer_cast<IGpuApiResourceObject>(aObject);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<Shared<IResourceObject>> CResourceManager::useAssetResource(engine::asset::AssetId_t const &aAssetResourceId)
+        CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useAssetResource(engine::asset::AssetId_t const &aAssetResourceId)
         {
             return { EEngineStatus::Ok, nullptr };
         }
@@ -46,8 +46,8 @@ namespace engine
             {
                 mResourceTree.remove(aResourceId);
 
-                Shared<IResourceObject>        p = mResourceObjects[aResourceId];
-                Shared<IResourceObjectPrivate> q = p->getPrivateObject();
+                Shared<ILogicalResourceObject>        p = mResourceObjects[aResourceId];
+                Shared<IGpuApiResourceObject> q = p->getGpuApiResourceInterface();
 
                 SHIRABE_EXPLICIT_DISCARD(p->unbind());
                 SHIRABE_EXPLICIT_DISCARD(q->unload());
@@ -64,7 +64,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         bool CResourceManager::storeResourceObject(ResourceId_t               const &aId
-                                                   , Shared <IResourceObject> const &aObject)
+                                                   , Shared <ILogicalResourceObject> const &aObject)
         {
             bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find( aId));
             if(false == hasObjectForId)

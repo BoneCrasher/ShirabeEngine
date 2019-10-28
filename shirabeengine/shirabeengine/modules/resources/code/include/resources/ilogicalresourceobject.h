@@ -6,22 +6,21 @@
 #define __SHIRABEDEVELOPMENT_IRESOURCEOBJECT_H__
 
 #include <platform/platform.h>
-
 #include <core/enginestatus.h>
 
 namespace engine
 {
     namespace resources
     {
-        class IResourceObjectPrivate;
+        class IGpuApiResourceObject;
 
         class
             [[nodiscard]]
-            SHIRABE_LIBRARY_EXPORT IResourceObject
+            SHIRABE_LIBRARY_EXPORT ILogicalResourceObject
         {
             friend class CResourceManager;
 
-            SHIRABE_DECLARE_INTERFACE(IResourceObject);
+            SHIRABE_DECLARE_INTERFACE(ILogicalResourceObject);
 
         public_api:
             virtual CEngineResult<> bind()     = 0;
@@ -29,7 +28,7 @@ namespace engine
             virtual CEngineResult<> transfer() = 0;
 
         private_api:
-            virtual Shared<IResourceObjectPrivate> getPrivateObject() = 0;
+            virtual Shared<IGpuApiResourceObject> getGpuApiResourceInterface() = 0;
         };
 
     }

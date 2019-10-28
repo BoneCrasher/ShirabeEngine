@@ -360,7 +360,7 @@ namespace engine
             }
 
             {
-                CEngineResult<Shared<IResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
+                CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
                 if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
                 {
                     return {EEngineStatus::Ok};
@@ -385,7 +385,7 @@ namespace engine
                 frameBufferDependencies.push_back(renderPassDesc.name);
                 frameBufferDependencies.insert(frameBufferDependencies.end(), textureViewIds.begin(), textureViewIds.end());
 
-                CEngineResult<Shared<IResourceObject>> status = mResourceManager->useDynamicResource<SFrameBuffer>(frameBufferDesc.name, frameBufferDesc, std::move(frameBufferDependencies));
+                CEngineResult<Shared<ILogicalResourceObject>> status = mResourceManager->useDynamicResource<SFrameBuffer>(frameBufferDesc.name, frameBufferDesc, std::move(frameBufferDependencies));
                 if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
                 {
                     return EEngineStatus::Ok;
@@ -517,7 +517,7 @@ namespace engine
             desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 
             {
-                CEngineResult<Shared<IResourceObject>> textureObject = mResourceManager->useDynamicResource<STexture>(desc.name, desc);
+                CEngineResult<Shared<ILogicalResourceObject>> textureObject = mResourceManager->useDynamicResource<STexture>(desc.name, desc);
                 if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == textureObject.result())
                 {
                     return EEngineStatus::Ok;
@@ -561,7 +561,7 @@ namespace engine
             desc.arraySlices      = aView.arraySliceRange;
             desc.mipMapSlices     = aView.mipSliceRange;
 
-            CEngineResult<Shared<IResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, { aTexture.readableName });
+            CEngineResult<Shared<ILogicalResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, {aTexture.readableName });
             EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
 
             return textureViewObject.result();
@@ -662,7 +662,7 @@ namespace engine
             // createInfo.queueFamilyIndexCount = ...;
             // createInfo.pQueueFamilyIndices   = ...;
 
-            CEngineResult<Shared<IResourceObject>> bufferObject = mResourceManager->useDynamicResource<SBuffer>(desc.name, desc);
+            CEngineResult<Shared<ILogicalResourceObject>> bufferObject = mResourceManager->useDynamicResource<SBuffer>(desc.name, desc);
             EngineStatusPrintOnError(bufferObject.result(), logTag(), "Failed to create buffer.");
 
             return bufferObject.result();
@@ -700,7 +700,7 @@ namespace engine
             // createInfo.format = "...";
             // createInfo.range  = "...";
 
-            CEngineResult<Shared<IResourceObject>> bufferViewObject = mResourceManager->useDynamicResource<SBufferView>(desc.name, desc, { aBuffer.readableName });
+            CEngineResult<Shared<ILogicalResourceObject>> bufferViewObject = mResourceManager->useDynamicResource<SBufferView>(desc.name, desc, {aBuffer.readableName });
             EngineStatusPrintOnError(bufferViewObject.result(), logTag(), "Failed to create buffer view.");
 
             return bufferViewObject.result();
@@ -1021,7 +1021,7 @@ namespace engine
                 pipelineDependencies.push_back(bufferViewHandle);
             }
 
-            CEngineResult<Shared<IResourceObject>> pipelineObject = mResourceManager->useDynamicResource<SPipeline>(pipelineDescriptor.name, pipelineDescriptor, std::move(pipelineDependencies));
+            CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = mResourceManager->useDynamicResource<SPipeline>(pipelineDescriptor.name, pipelineDescriptor, std::move(pipelineDependencies));
             EngineStatusPrintOnError(pipelineObject.result(), logTag(), "Failed to create pipeline.");
 
             return pipelineObject.result();

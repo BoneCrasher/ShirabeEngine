@@ -7,7 +7,7 @@
 
 #include <platform/platform.h>
 
-#include "resources/iresourceobject.h"
+#include "resources/ilogicalresourceobject.h"
 
 class CResourceManager; // Declared/defined in resources/cresourcemanager.h
 
@@ -22,7 +22,7 @@ namespace engine
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT CResourceObject
-            : public IResourceObject
+            : public ILogicalResourceObject
         {
             friend class CResourceManager;
         public_typedefs:
@@ -35,13 +35,13 @@ namespace engine
             ~CResourceObject() override = default;
 
         public_api:
-            // IResourceObject
+            // ILogicalResourceObject
             CEngineResult<> bind()     override;
             CEngineResult<> unbind()   override;
             CEngineResult<> transfer() override;
 
         private_api:
-            Shared<IResourceObjectPrivate> getPrivateObject() override;
+            Shared<IGpuApiResourceObject> getGpuApiResourceInterface() override;
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
@@ -49,7 +49,7 @@ namespace engine
 
         private_members:
             TDescription                   const mDescription;
-            Shared<IResourceObjectPrivate>       mPrivateObject;
+            Shared<IGpuApiResourceObject>       mPrivateObject;
         };
 
         //<-----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        Shared<IResourceObjectPrivate> CResourceObject<TDescriptor>::getPrivateObject()
+        Shared<IGpuApiResourceObject> CResourceObject<TDescriptor>::getGpuApiResourceInterface()
         {
             return mPrivateObject;
         }

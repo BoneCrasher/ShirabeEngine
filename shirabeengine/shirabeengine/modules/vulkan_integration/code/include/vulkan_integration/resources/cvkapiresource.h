@@ -8,7 +8,7 @@
 #include <platform/platform.h>
 #include <base/declaration.h>
 #include <core/enginetypehelper.h>
-#include <resources/aprivateresourceobject.h>
+#include <resources/agpuapiresourceobject.h>
 #include "vulkan_integration/resources/ivkapiresource.h"
 
 namespace engine
@@ -19,14 +19,16 @@ namespace engine
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT CVkApiResource
-            : public resources::APrivateResourceObject<TDescriptor>
+            : public resources::AGpuApiResourceObject<TDescriptor>
             , public IVkApiResource
         {
         public_constructors:
-            using resources::APrivateResourceObject<TDescriptor>::APrivateResourceObject;
+            using resources::AGpuApiResourceObject<TDescriptor>::AGpuApiResourceObject;
 
         public_destructors:
             ~CVkApiResource() override = default;
+
+        public_api:
 
         private_members:
         };

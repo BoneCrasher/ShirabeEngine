@@ -9,7 +9,7 @@
 #include <base/declaration.h>
 #include <core/enginetypehelper.h>
 
-#include "resources/iresourceobjectprivate.h"
+#include "resources/igpuapiresourceobject.h"
 
 namespace engine
 {
@@ -29,7 +29,7 @@ namespace engine
             : public IResourceObjectCreatorBase
         {
         public_typedefs:
-            using Fn_t = std::function<Unique<IResourceObjectPrivate>(typename TResource::Descriptor_t const &)>;
+            using Fn_t = std::function<Unique<IGpuApiResourceObject>(typename TResource::Descriptor_t const &)>;
 
         public_constructors:
             explicit CResourceObjectCreator(Fn_t const &aFn)
@@ -37,7 +37,7 @@ namespace engine
             {};
 
         public_methods:
-            Unique<IResourceObjectPrivate> create(typename TResource::Descriptor_t const &aDescriptor)
+            Unique<IGpuApiResourceObject> create(typename TResource::Descriptor_t const &aDescriptor)
             {
                 return (nullptr == mFn)
                             ? nullptr
@@ -71,7 +71,7 @@ namespace engine
 
         private_methods:
             template <typename T>
-            Unique<IResourceObjectPrivate> create(typename T::Descriptor_t const &aDescriptor)
+            Unique<IGpuApiResourceObject> create(typename T::Descriptor_t const &aDescriptor)
             {
                 std::type_info const &typeInfo = typeid(T);
 
@@ -81,7 +81,7 @@ namespace engine
                     return nullptr;
                 }
 
-                Unique<IResourceObjectPrivate>            result      = nullptr;
+                Unique<IGpuApiResourceObject>            result      = nullptr;
                 Unique<IResourceObjectCreatorBase> const &creatorBase = mCreators[typeInfo.name()];
 
                 auto creator = static_cast<CResourceObjectCreator<T> *const>(creatorBase.get());

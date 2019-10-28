@@ -43,13 +43,13 @@ namespace engine
             ~CBufferResource() final  = default;
 
         public_api:
-            // IResourceObjectPrivate
+            // IGpuApiResourceObject
             CEngineResult<> create()  final;
             CEngineResult<> load()    final;
             CEngineResult<> unload()  final;
             CEngineResult<> destroy() final;
 
-            // IResourceObject
+            // ILogicalResourceObject
             CEngineResult<> bind()     final;
             CEngineResult<> unbind()   final;
             CEngineResult<> transfer() final;
@@ -57,13 +57,13 @@ namespace engine
         private_members:
         };
 
-        // IResourceObjectPrivate
+        // IGpuApiResourceObject
         CEngineResult<> CBufferResource::create()   { return EEngineStatus::Ok; }
         CEngineResult<> CBufferResource::load()     { return EEngineStatus::Ok; }
         CEngineResult<> CBufferResource::unload()   { return EEngineStatus::Ok; }
         CEngineResult<> CBufferResource::destroy()  { return EEngineStatus::Ok; }
 
-        // IResourceObject
+        // ILogicalResourceObject
         CEngineResult<> CBufferResource::bind()     { return EEngineStatus::Ok; }
         CEngineResult<> CBufferResource::unbind()   { return EEngineStatus::Ok; }
         CEngineResult<> CBufferResource::transfer() { return EEngineStatus::Ok; }

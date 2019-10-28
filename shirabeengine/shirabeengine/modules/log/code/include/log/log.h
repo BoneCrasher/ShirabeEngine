@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_LOG_H__
 #define __SHIRABE_LOG_H__
 
-#include <stdio.h>
+#include <cstdio>
 #include <fcntl.h>
 //#include <io.h>
 #include <iostream>

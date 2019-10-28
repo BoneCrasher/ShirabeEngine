@@ -5,7 +5,7 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include <resources/aprivateresourceobject.h>
+#include <resources/agpuapiresourceobject.h>
 #include "vulkan_integration/resources/cvkapiresource.h"
 
 namespace engine
@@ -22,7 +22,7 @@ namespace engine
             : public CVkApiResource<SBufferDescription>
         {
         public_constructors:
-            using CVkApiResource<SBufferDescription>::APrivateResourceObject;
+            using CVkApiResource<SBufferDescription>::AGpuApiResourceObject;
 
         public_methods:
             // CEngineResult<> create()  override;

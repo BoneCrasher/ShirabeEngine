@@ -32,28 +32,28 @@ namespace engine {
 
         public_methods:
             template <typename TResource>
-            // requires std::is_base_of_v<IResourceObject, TResource>
-            CEngineResult<Shared<IResourceObject>> useDynamicResource(
+            // requires std::is_base_of_v<ILogicalResourceObject, TResource>
+            CEngineResult<Shared<ILogicalResourceObject>> useDynamicResource(
                       ResourceId_t                     const &aResourceId
                     , typename TResource::Descriptor_t const &aDescriptor
                     , std::vector<ResourceId_t>             &&aDependencies = {});
 
-            CEngineResult<Shared<IResourceObject>> useAssetResource(AssetId_t const &aAssetResourceId);
+            CEngineResult<Shared<ILogicalResourceObject>> useAssetResource(AssetId_t const &aAssetResourceId);
 
             CEngineResult<> discardResource(ResourceId_t const &aResourceId);
 
         private_static_functions:
-            static Shared<IResourceObjectPrivate> asPrivate(Shared<IResourceObject> const &aObject);
+            static Shared<IGpuApiResourceObject> asPrivate(Shared<ILogicalResourceObject> const &aObject);
 
         private_methods:
             bool storeResourceObject(ResourceId_t               const &aId
-                                     , Shared <IResourceObject> const &aObject);
+                                     , Shared <ILogicalResourceObject> const &aObject);
 
             void removeResourceObject(ResourceId_t const &aId);
 
         private_members:
             Unique<CResourceObjectFactory>                            mPrivateResourceObjectFactory;
-            std::unordered_map<ResourceId_t, Shared<IResourceObject>> mResourceObjects;
+            std::unordered_map<ResourceId_t, Shared<ILogicalResourceObject>> mResourceObjects;
             CAdjacencyTree<ResourceId_t>                              mResourceTree;
         };
         //<-----------------------------------------------------------------------------
@@ -62,12 +62,12 @@ namespace engine {
         //
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        CEngineResult<Shared<IResourceObject>> CResourceManager::useDynamicResource(
+        CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useDynamicResource(
                   ResourceId_t                     const &aResourceId
                 , typename TResource::Descriptor_t const &aDescriptor
                 , std::vector<ResourceId_t>             &&aDependencies)
         {
-            CEngineResult<Shared<IResourceObject>> result = { EEngineStatus::Error, nullptr };
+            CEngineResult<Shared<ILogicalResourceObject>> result = {EEngineStatus::Error, nullptr };
 
             mResourceTree.add(aResourceId);
             for(auto const &dependency : aDependencies)
@@ -76,8 +76,8 @@ namespace engine {
                 mResourceTree.connect(aResourceId, dependency);
             }
 
-            Shared<IResourceObject>        resource        = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
-            Unique<IResourceObjectPrivate> privateResource = mPrivateResourceObjectFactory->create<TResource>(aDescriptor);
+            Shared<ILogicalResourceObject> resource        = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
+            Unique<IGpuApiResourceObject>  privateResource = mPrivateResourceObjectFactory->create<TResource>(aDescriptor);
             privateResource->create();
 
             storeResourceObject(aResourceId, resource);
