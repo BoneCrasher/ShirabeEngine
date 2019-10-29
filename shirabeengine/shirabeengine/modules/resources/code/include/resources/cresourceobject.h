@@ -116,6 +116,12 @@ namespace engine
                         });
             }
 
+            if(mGpuApiInterface)
+            {
+                mGpuApiInterface->observableState().ignore(mStateObserver);
+                mGpuApiInterface = nullptr;
+            }
+
             mGpuApiInterface = std::move(aGpuApiInterface);
             mGpuApiInterface->observableState().observe(mStateObserver);
         }
@@ -127,7 +133,6 @@ namespace engine
         template <typename TDescriptor>
         Unique<IGpuApiResourceObject>& CResourceObject<TDescriptor>::getGpuApiResourceInterface()
         {
-            mGpuApiInterface->observableState().ignore(mStateObserver);
             return mGpuApiInterface;
         }
         //<-----------------------------------------------------------------------------

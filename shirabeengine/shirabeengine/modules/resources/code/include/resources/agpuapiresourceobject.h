@@ -49,11 +49,21 @@ namespace engine
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
-            { return mDescription; }
+            {
+                return mDescription;
+            }
+
+        protected_methods:
+            SHIRABE_INLINE void setResourceState(EGpuApiResourceState const &aState)
+            {
+                mState = aState;
+                observableState().notify(makeSharedFromThis(this), mState);
+            };
 
         private_members:
             TDescription      const mDescription;
-            ObservableState_t       mState;
+            ObservableState_t       mObservableState;
+            EGpuApiResourceState    mState;
         };
 
         //<-----------------------------------------------------------------------------
@@ -64,7 +74,7 @@ namespace engine
         template <typename TDescription>
         AGpuApiResourceObject<TDescription>::AGpuApiResourceObject(const TDescription &aDescription)
             : mDescription(aDescription)
-            , mState      ()
+            , mObservableState      ()
         { }
         //<-----------------------------------------------------------------------------
 
@@ -144,7 +154,7 @@ namespace engine
         template <typename TDescription>
         IGpuApiResourceObject::ObservableState_t& AGpuApiResourceObject<TDescription>::observableState()
         {
-            return mState;
+            return mObservableState;
         }
         //<-----------------------------------------------------------------------------
     }

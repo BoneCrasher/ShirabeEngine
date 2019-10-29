@@ -118,7 +118,7 @@ namespace engine
                 try
                 {
                     mActive.store(true);
-                    mCallbackAdapter.onResume(makeCStdSharedFromThis(this));
+                    mCallbackAdapter.onResume(makeSharedFromThis(this));
 
                     return EEngineStatus::Ok;
                 }
@@ -255,7 +255,7 @@ namespace engine
                 try
                 {
                     mActive.store(false);
-                    mCallbackAdapter.onPause(makeCStdSharedFromThis(this));
+                    mCallbackAdapter.onPause(makeSharedFromThis(this));
 
                     return EEngineStatus::Ok;
                 }
@@ -308,7 +308,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             void CX11Window::onShow()
             {
-                mCallbackAdapter.onShow(makeCStdSharedFromThis(this));
+                mCallbackAdapter.onShow(makeSharedFromThis(this));
             }
             //<-----------------------------------------------------------------------------
 
@@ -317,7 +317,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             void CX11Window::onHide()
             {
-                mCallbackAdapter.onHide(makeCStdSharedFromThis(this));
+                mCallbackAdapter.onHide(makeSharedFromThis(this));
             }
             //<-----------------------------------------------------------------------------
 
@@ -335,7 +335,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             void CX11Window::onClose()
             {
-                mCallbackAdapter.onClose(makeCStdSharedFromThis(this));
+                mCallbackAdapter.onClose(makeSharedFromThis(this));
             }
             //<-----------------------------------------------------------------------------
 
@@ -344,7 +344,7 @@ namespace engine
             //<-----------------------------------------------------------------------------
             void CX11Window::onDestroy()
             {
-                mCallbackAdapter.onDestroy(makeCStdSharedFromThis(this));
+                mCallbackAdapter.onDestroy(makeSharedFromThis(this));
             }
             //<-----------------------------------------------------------------------------
 
@@ -358,7 +358,7 @@ namespace engine
                 mBounds.position.x(aPositionX);
                 mBounds.position.y(aPositionY);
 
-                mCallbackAdapter.onBoundsChanged(makeCStdSharedFromThis(this), mBounds);
+                mCallbackAdapter.onBoundsChanged(makeSharedFromThis(this), mBounds);
             }
             //<-----------------------------------------------------------------------------
 
@@ -372,7 +372,7 @@ namespace engine
                 mBounds.size.x(aWidth);
                 mBounds.size.y(aHeight);
 
-                mCallbackAdapter.onBoundsChanged(makeCStdSharedFromThis(this), mBounds);
+                mCallbackAdapter.onBoundsChanged(makeSharedFromThis(this), mBounds);
             }
             //<-----------------------------------------------------------------------------
         }

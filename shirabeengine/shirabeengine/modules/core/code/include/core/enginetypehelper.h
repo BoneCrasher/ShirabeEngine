@@ -77,7 +77,7 @@ namespace engine
      * @return
      */
     template <typename T, typename TPtr = Shared<T>>
-    static inline TPtr makeCStdSharedFromThis(T* instance)
+    static inline TPtr makeSharedFromThis(T* instance)
     {
         return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
     }

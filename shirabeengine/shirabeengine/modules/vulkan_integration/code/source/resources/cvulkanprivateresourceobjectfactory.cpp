@@ -15,10 +15,23 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        template <typename TLogicalResource, typename TGpuApiResource>
+        static Unique<CResourceObjectCreator<TLogicalResource>> makeCreator()
+        {
+            return makeUnique<CResourceObjectCreator<TLogicalResource>>(
+                    [] (typename TLogicalResource::Descriptor_t const &aDescription)
+                    {
+                        return makeUnique<TGpuApiResource>(aDescription);
+                    });
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         CEngineResult<> CVulkanPrivateResourceObjectFactory::initialize()
         {
-            Unique<IResourceObjectCreatorBase> p = makeUnique<CResourceObjectCreator<CBufferResource::SDescriptor>>(nullptr);
-            setCreatorForType<CVulkanBufferResource>(std::move(p));
+            setCreatorForType<CVulkanBufferResource>(std::move(makeCreator<SBuffer, CVulkanBufferResource>()));
 
             return EEngineStatus::Ok;
         }

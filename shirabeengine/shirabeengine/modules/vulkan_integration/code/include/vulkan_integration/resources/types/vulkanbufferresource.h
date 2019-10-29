@@ -21,14 +21,19 @@ namespace engine
         class CVulkanBufferResource
             : public CVkApiResource<SBufferDescription>
         {
+            SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
+
         public_constructors:
             using CVkApiResource<SBufferDescription>::AGpuApiResourceObject;
 
         public_methods:
-            // CEngineResult<> create()  override;
-            // CEngineResult<> load()    override;
-            // CEngineResult<> unload()  override;
-            // CEngineResult<> destroy() override;
+            CEngineResult<> create()   final;
+            CEngineResult<> load()     final;
+            CEngineResult<> unload()   final;
+            CEngineResult<> destroy()  final;
+            CEngineResult<> bind()     final;
+            CEngineResult<> transfer() final;
+            CEngineResult<> unbind()   final;
 
         public_members:
             VkBuffer       handle;
