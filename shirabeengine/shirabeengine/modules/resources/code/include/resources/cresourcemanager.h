@@ -10,7 +10,7 @@
 #include <asset/assettypes.h>
 #include <core/datastructures/adjacencytree.h>
 #include "resources/cresourceobject.h"
-#include "resources/aresourceobjectfactory.h"
+#include "resources/agpuapiresourceobjectfactory.h"
 
 namespace engine {
     namespace resources
@@ -25,7 +25,7 @@ namespace engine {
             SHIRABE_LIBRARY_EXPORT CResourceManager
         {
         public_constructors:
-            explicit CResourceManager(Unique<CResourceObjectFactory> aPrivateResourceObjectFactory);
+            explicit CResourceManager(Unique<CGpuApiResourceObjectFactory> aPrivateResourceObjectFactory);
 
         public_destructors:
             ~CResourceManager() = default;
@@ -52,7 +52,7 @@ namespace engine {
             void removeResourceObject(ResourceId_t const &aId);
 
         private_members:
-            Unique<CResourceObjectFactory>                            mPrivateResourceObjectFactory;
+            Unique<CGpuApiResourceObjectFactory>                            mGpuApiResourceObjectFactory;
             std::unordered_map<ResourceId_t, Shared<ILogicalResourceObject>> mResourceObjects;
             CAdjacencyTree<ResourceId_t>                              mResourceTree;
         };
@@ -76,9 +76,11 @@ namespace engine {
                 mResourceTree.connect(aResourceId, dependency);
             }
 
-            Shared<ILogicalResourceObject> resource        = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
-            Unique<IGpuApiResourceObject>  privateResource = mPrivateResourceObjectFactory->create<TResource>(aDescriptor);
-            privateResource->create();
+            Shared<ILogicalResourceObject> resource       = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
+            Unique<IGpuApiResourceObject>  gpuApiResource = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
+            resource->bindGpuApiResourceInterface(std::move(gpuApiResource));
+
+            resource->getGpuApiResourceInterface()->create();
 
             storeResourceObject(aResourceId, resource);
 

@@ -28,7 +28,9 @@ namespace engine
             virtual CEngineResult<> transfer() = 0;
 
         private_api:
-            virtual Shared<IGpuApiResourceObject> getGpuApiResourceInterface() = 0;
+            virtual void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) = 0;
+
+            virtual Unique<IGpuApiResourceObject>& getGpuApiResourceInterface() = 0;
         };
 
     }

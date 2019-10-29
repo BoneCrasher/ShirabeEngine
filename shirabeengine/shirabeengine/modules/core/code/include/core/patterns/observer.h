@@ -28,7 +28,7 @@ namespace engine
         SHIRABE_DECLARE_INTERFACE(IObserver)
 
     public_api:
-        virtual void onValueChanged(TArgs &&... aArgs) = 0;
+        virtual void onValueChanged(TArgs... aArgs) = 0;
     };
 
     /*!
@@ -42,6 +42,8 @@ namespace engine
     class CSubject
     {
     public_typedefs:
+        using Observer_t = IObserver<TArgs...>;
+
         /*!
          * Type-Alias to declare a valid observer instance as a shared pointer to IObserver<T>.
          */

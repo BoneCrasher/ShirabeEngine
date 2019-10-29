@@ -5,14 +5,14 @@
 #ifndef __SHIRABEDEVELOPMENT_CVULKANPRIVATERESOURCEOBJECTFACTORY_H__
 #define __SHIRABEDEVELOPMENT_CVULKANPRIVATERESOURCEOBJECTFACTORY_H__
 
-#include <resources/aresourceobjectfactory.h>
+#include <resources/agpuapiresourceobjectfactory.h>
 
 namespace engine
 {
     namespace vulkan
     {
         class SHIRABE_LIBRARY_EXPORT CVulkanPrivateResourceObjectFactory
-            : public resources::CResourceObjectFactory
+            : public resources::CGpuApiResourceObjectFactory
         {
         public_constructors:
             CVulkanPrivateResourceObjectFactory() = default;

@@ -13,8 +13,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CResourceManager::CResourceManager(Unique<CResourceObjectFactory> aPrivateResourceObjectFactory)
-                : mPrivateResourceObjectFactory(std::move(aPrivateResourceObjectFactory))
+        CResourceManager::CResourceManager(Unique<CGpuApiResourceObjectFactory> aPrivateResourceObjectFactory)
+                : mGpuApiResourceObjectFactory(std::move(aPrivateResourceObjectFactory))
         { }
         //<-----------------------------------------------------------------------------
 

@@ -6,8 +6,10 @@
 #define __SHIRABEDEVELOPMENT_CRESOURCEOBJECT_H__
 
 #include <platform/platform.h>
+#include <core/patterns/observer.h>
 
 #include "resources/ilogicalresourceobject.h"
+#include "resources/igpuapiresourceobject.h"
 
 class CResourceManager; // Declared/defined in resources/cresourcemanager.h
 
@@ -41,15 +43,18 @@ namespace engine
             CEngineResult<> transfer() override;
 
         private_api:
-            Shared<IGpuApiResourceObject> getGpuApiResourceInterface() override;
+            void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) final;
+
+            Unique<IGpuApiResourceObject>& getGpuApiResourceInterface() final;
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
             { return mDescription; }
 
         private_members:
-            TDescription                   const mDescription;
-            Shared<IGpuApiResourceObject>       mPrivateObject;
+            TDescription const mDescription;
+            Unique<IGpuApiResourceObject>                           mGpuApiInterface;
+            IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
         };
 
         //<-----------------------------------------------------------------------------
@@ -97,9 +102,33 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        Shared<IGpuApiResourceObject> CResourceObject<TDescriptor>::getGpuApiResourceInterface()
+        void CResourceObject<TDescriptor>::bindGpuApiResourceInterface(
+                engine::Unique<engine::resources::IGpuApiResourceObject> aGpuApiInterface)
         {
-            return mPrivateObject;
+            if(not mStateObserver)
+            {
+                mStateObserver = makeShared<CObserver<Shared<IGpuApiResourceObject>, EGpuApiResourceState>>(
+                        [this] (Shared<IGpuApiResourceObject> &&aSubject, EGpuApiResourceState &&aState)
+                        {
+                            SHIRABE_UNUSED(aSubject);
+
+                            // ... Do stuff.
+                        });
+            }
+
+            mGpuApiInterface = std::move(aGpuApiInterface);
+            mGpuApiInterface->observableState().observe(mStateObserver);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TDescriptor>
+        Unique<IGpuApiResourceObject>& CResourceObject<TDescriptor>::getGpuApiResourceInterface()
+        {
+            mGpuApiInterface->observableState().ignore(mStateObserver);
+            return mGpuApiInterface;
         }
         //<-----------------------------------------------------------------------------
     }

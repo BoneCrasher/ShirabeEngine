@@ -48,17 +48,17 @@ namespace engine
             Fn_t mFn;
         };
 
-        class SHIRABE_LIBRARY_EXPORT CResourceObjectFactory
+        class SHIRABE_LIBRARY_EXPORT CGpuApiResourceObjectFactory
         {
             friend class CResourceManager;
 
         private_typedefs:
 
         public_constructors:
-            CResourceObjectFactory() = default;
+            CGpuApiResourceObjectFactory() = default;
 
         public_destructors:
-            virtual ~CResourceObjectFactory() = default;
+            virtual ~CGpuApiResourceObjectFactory() = default;
 
         protected_methods:
             template <typename T>
