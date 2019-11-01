@@ -22,6 +22,7 @@ LIBRARIES=(                             \
            vulkan_headers               \
            vulkan_sdk                   \
            vulkan_sdk_validation_layers \
+           fmt                          \
           )
 
 DEPENDENCIES_fxgltf=(nlohmann_json)

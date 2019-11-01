@@ -16,6 +16,7 @@ set(
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
         CRYPTOPP
+        FMT
         JSON
         XML2
         ZLIB)

@@ -356,9 +356,9 @@ namespace engine
             SFrameGraphTextureView();
 
         public_members:
-            CRange                              arraySliceRange;
-            CRange                              mipSliceRange;
-            FrameGraphFormat_t                  format;
+            CRange                               arraySliceRange;
+            CRange                               mipSliceRange;
+            FrameGraphFormat_t                   format;
             CBitField<EFrameGraphViewAccessMode> mode;
             EFrameGraphViewPurpose               source;
         };

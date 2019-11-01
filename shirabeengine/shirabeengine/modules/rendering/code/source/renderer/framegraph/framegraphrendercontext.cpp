@@ -780,8 +780,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial   const &aMaterial
-                                                                    , std::string  const &aRenderPassHandle)
+        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial
+                                                                    , std::string       const &aRenderPassHandle)
         {
             SHIRABE_UNUSED(aRenderPassHandle);
 
@@ -792,8 +792,8 @@ namespace engine
             }
 
             Shared<CMaterialMaster> const &master    = instance; // instance->master();
-            SMaterialSignature               const &signature = master  ->signature();
-            CMaterialConfig                  const &config    = instance->config();
+            SMaterialSignature      const &signature = master  ->signature();
+            CMaterialConfig         const &config    = instance->config();
 
             SPipelineDescription pipelineDescriptor {};
 
@@ -1005,8 +1005,8 @@ namespace engine
             pipelineDescriptor.subpass = mCurrentSubpass;
 
             std::string              const renderPassHandle   = mCurrentRenderPassHandle;
-            std::vector<std::string> const textureViewHandles = {};
-            std::vector<std::string> const bufferViewHandles  = {};
+            std::vector<std::string> const textureViewHandles = {}; // All texture view names are immediately based on the texture-names, no further decoration needed.
+            std::vector<std::string> const bufferViewHandles  = {}; // All uniform buffer names are a compounds as <materialname>_<buffername>.
 
             pipelineDescriptor.name = aMaterial.readableName;
 
@@ -1014,11 +1014,11 @@ namespace engine
             pipelineDependencies.push_back(renderPassHandle);
             for(auto const &textureViewHandle : textureViewHandles)
             {
-                pipelineDependencies.push_back((textureViewHandle));
+                pipelineDependencies.push_back(textureViewHandle);
             }
             for(auto const &bufferViewHandle : bufferViewHandles)
             {
-                pipelineDependencies.push_back(bufferViewHandle);
+                pipelineDependencies.push_back(fmt::format("{}_{}", pipelineDescriptor.name, bufferViewHandle));
             }
 
             CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = mResourceManager->useDynamicResource<SPipeline>(pipelineDescriptor.name, pipelineDescriptor, std::move(pipelineDependencies));

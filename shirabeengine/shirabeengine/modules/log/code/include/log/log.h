@@ -10,6 +10,7 @@
 
 #include <platform/platform.h>
 #include <base/declaration.h>
+#include <fmt/format.h>
 #include <base/string.h>
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
@@ -195,7 +196,7 @@ namespace engine
                 std::string     const &aFormat,
                 TArguments       &&...aArguments)
         {
-            std::string const message = CString::format(aFormat, std::forward<TArguments>(aArguments)...);
+            std::string const message = fmt::format(aFormat, std::forward<TArguments>(aArguments)...);
             LogImpl(aLevel, aLogTag, message);
         }
 

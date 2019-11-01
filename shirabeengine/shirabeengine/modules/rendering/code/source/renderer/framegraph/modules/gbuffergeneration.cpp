@@ -51,9 +51,8 @@ namespace engine
                 Shared<SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
                 if(environment)
                 {
-                    Shared<wsi::CWSIDisplay> const &display = aGraphBuilder.display();
-
-                    SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
+                    Shared<wsi::CWSIDisplay> const &display     = aGraphBuilder.display();
+                    SOSDisplayDescriptor     const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
                     width  = displayDesc.bounds.size.x();
                     height = displayDesc.bounds.size.y();
                 }

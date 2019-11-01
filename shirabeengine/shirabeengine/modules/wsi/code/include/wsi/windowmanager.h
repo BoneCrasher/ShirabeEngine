@@ -56,8 +56,8 @@ namespace engine
              * @return                        EWindowManagerError::Ok if successful. An error code otherwise.
              */
             EWindowManagerError initialize(
-                    os::SApplicationEnvironment     const &aApplicationEnvironment,
-                    Shared<IWindowFactory> const &aFactory);
+                    os::SApplicationEnvironment const &aApplicationEnvironment,
+                    Shared<IWindowFactory>      const &aFactory);
 
             /**
              * Deinitialize the window manager.

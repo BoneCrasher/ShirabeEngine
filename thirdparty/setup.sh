@@ -27,6 +27,7 @@ REPOSITORIES[cryptopp]="git@github.com:weidai11/cryptopp.git"
 REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
 REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
 REPOSITORIES[vulkan_sdk_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
+REPOSITORIES[fmt]="git@github.com:fmtlib/fmt.git"
 
 declare -A TARGET_DIRECTORIES
 TARGET_DIRECTORIES[zlib]="${SOURCES_DIR}/zlib"
@@ -50,6 +51,7 @@ TARGET_DIRECTORIES[cryptopp]="${SOURCES_DIR}/cryptopp"
 TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
 TARGET_DIRECTORIES[vulkan_sdk]="${SOURCES_DIR}/vulkan_sdk"
 TARGET_DIRECTORIES[vulkan_sdk_validation_layers]="${SOURCES_DIR}/vulkan_sdk_validation_layers"
+TARGET_DIRECTORIES[fmt]="${SOURCES_DIR}/fmt"
 
 
 CAN_FETCH_BUILD_TOOLS=0
@@ -156,6 +158,7 @@ function setup_tools
     setup_one assimp
     setup_one fxgltf
     setup_one cryptopp
+    setup_one fmt
 }
 
 function setup_vulkan

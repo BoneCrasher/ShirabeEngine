@@ -9,7 +9,8 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
-        JSON                 
+        JSON
+        FMT
         XML2
         ZLIB)
         

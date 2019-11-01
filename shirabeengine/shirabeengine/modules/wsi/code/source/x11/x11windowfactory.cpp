@@ -1,6 +1,6 @@
-#include <base/string.h>
 #include "wsi/x11/x11window.h"
 #include "wsi/x11/x11windowfactory.h"
+#include <base/string.h> // Include below the x11 stuff, as the X11 headers define an index-macro, which conflicts with fmt-code.
 
 namespace engine
 {

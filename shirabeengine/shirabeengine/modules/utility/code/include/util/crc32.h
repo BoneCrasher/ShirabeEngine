@@ -8,7 +8,9 @@ namespace engine
 {
     namespace util
     {
-        uint32_t crc32FromString(std::string const &aInput);
+        using CRC32Id_t = uint32_t;
+
+        CRC32Id_t crc32FromString(std::string const &aInput);
     }
 }
 

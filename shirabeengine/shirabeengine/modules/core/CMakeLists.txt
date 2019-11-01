@@ -15,6 +15,7 @@ set(
         SHIRABEMODULELOG     
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
+        FMT
         JSON                 
         #XML2
         )

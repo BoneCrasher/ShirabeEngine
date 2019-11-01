@@ -16,7 +16,8 @@ set(
         SHIRABEMODULEPLATFORM
         VULKANHEADERS
         STBI                    
-        FXGLTF                  
+        FXGLTF
+        FMT
         JSON
         XML2
         ZLIB)

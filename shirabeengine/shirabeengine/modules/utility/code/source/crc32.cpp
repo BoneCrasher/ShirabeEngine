@@ -11,11 +11,11 @@ namespace engine
 {
     namespace util
     {
-        uint32_t crc32FromString(std::string const &aInput)
+        CRC32Id_t crc32FromString(std::string const &aInput)
         {
             std::string const &source  = aInput;
             std::string        hashStr = "";
-            uint32_t           hash    = 0u;
+            CRC32Id_t          hash    = 0u;
 
             CryptoPP::CRC32 crc {};
 
@@ -24,7 +24,7 @@ namespace engine
             auto const encoder = new CryptoPP::HexEncoder(sink);
             auto const filter  = new CryptoPP::HashFilter(crc, encoder);
 
-            CryptoPP::StringSource(source, true, filter);
+            CryptoPP::StringSource s(source, true, filter);
 
             std::stringstream converter;
             converter << std::hex << hashStr;
