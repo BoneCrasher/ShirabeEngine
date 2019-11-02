@@ -2,7 +2,7 @@
 // Created by dottideveloper on 20.10.19.
 //
 
-#ifndef SHIRABEDEVELOPMENT_CVKAPIRESOURCE_Hinclude "vulkan/
+#ifndef SHIRABEDEVELOPMENT_CVKAPIRESOURCE_H
 #define SHIRABEDEVELOPMENT_CVKAPIRESOURCE_H
 
 #include <platform/platform.h>
@@ -23,14 +23,19 @@ namespace engine
             , public IVkApiResource
         {
         public_constructors:
-            using resources::AGpuApiResourceObject<TDescriptor>::AGpuApiResourceObject;
+            explicit CVkApiResource(  Shared<IVkGlobalContext>        aVkContext
+                                    , TDescriptor              const &aDescription)
+                : resources::AGpuApiResourceObject<TDescriptor>::AGpuApiResourceObject(aDescription)
+                , mVkContext(std::move(aVkContext))
+                , mHandle   (resources::GpuApiHandle_t {})
+            {}
 
         public_destructors:
             ~CVkApiResource() override = default;
 
         public_api:
-            SHIRABE_INLINE
-            resources::GpuApiHandle_t const getHandle() final
+            [[nodiscard]]
+            SHIRABE_INLINE resources::GpuApiHandle_t getHandle() final
             {
                 return mHandle;
             }
@@ -41,7 +46,14 @@ namespace engine
                 mHandle = aHandle;
             };
 
+            [[nodiscard]]
+            SHIRABE_INLINE Shared<IVkGlobalContext> getVkContext() const
+            {
+                return mVkContext;
+            }
+
         private_members:
+            Shared<IVkGlobalContext>  mVkContext;
             resources::GpuApiHandle_t mHandle;
         };
 

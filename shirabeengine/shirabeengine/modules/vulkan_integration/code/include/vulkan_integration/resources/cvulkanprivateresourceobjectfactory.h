@@ -6,6 +6,7 @@
 #define __SHIRABEDEVELOPMENT_CVULKANPRIVATERESOURCEOBJECTFACTORY_H__
 
 #include <resources/agpuapiresourceobjectfactory.h>
+#include "vulkan_integration/resources/ivkglobalcontext.h"
 
 namespace engine
 {
@@ -22,12 +23,13 @@ namespace engine
 
         public_methods:
             [[nodiscard]]
-            CEngineResult<> initialize();
+            CEngineResult<> initialize(Shared<IVkGlobalContext> aVkContext);
 
             [[nodiscard]]
             CEngineResult<> deinitialize();
 
         private_members:
+            Shared<IVkGlobalContext> mVkContext;
         };
     }
 }

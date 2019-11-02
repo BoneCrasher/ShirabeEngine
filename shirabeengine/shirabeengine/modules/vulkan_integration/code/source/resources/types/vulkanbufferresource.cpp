@@ -11,8 +11,12 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferResource::create(CGpiApiDependencyCollection const &aDependencies)
     {
-        VkDevice         const &vkLogicalDevice  = mVulkanEnvironment->getState().selectedLogicalDevice;
-        VkPhysicalDevice const &vkPhysicalDevice = mVulkanEnvironment->getState().supportedPhysicalDevices.at(mVulkanEnvironment->getState().selectedPhysicalDevice).handle;
+        SHIRABE_UNUSED(aDependencies);
+
+        Shared<IVkGlobalContext> vkContext = getVkContext();
+
+        VkDevice         const &vkLogicalDevice  = vkContext->getLogicalDevice();
+        VkPhysicalDevice const &vkPhysicalDevice = vkContext->getPhysicalDevice();
 
         VkBufferCreateInfo createInfo = getDescription().createInfo;
         createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -97,9 +101,9 @@ namespace engine::vulkan
     {
         VkBuffer       vkBuffer        = handle;
         VkDeviceMemory vkDeviceMemory  = attachedMemory;
-        VkDevice       vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
+        VkDevice       vkLogicalDevice = getVkContext()->getLogicalDevice();
 
-        vkFreeMemory(vkLogicalDevice, vkDeviceMemory, nullptr);
+        vkFreeMemory   (vkLogicalDevice, vkDeviceMemory, nullptr);
         vkDestroyBuffer(vkLogicalDevice, vkBuffer, nullptr);
 
         return { EEngineStatus::Ok };

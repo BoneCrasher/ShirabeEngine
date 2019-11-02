@@ -23,7 +23,7 @@ namespace engine::vulkan
 
         VkBufferView vkBufferView = VK_NULL_HANDLE;
 
-        VkResult result = vkCreateBufferView(mVulkanEnvironment->getState().selectedLogicalDevice, &(createInfo), nullptr, &vkBufferView);
+        VkResult result = vkCreateBufferView(getVkContext()->getLogicalDevice(), &(createInfo), nullptr, &vkBufferView);
         if(VkResult::VK_SUCCESS != result)
         {
             CLog::Error(logTag(), CString::format("Failed to create buffer view. Vulkan error: %0", result));

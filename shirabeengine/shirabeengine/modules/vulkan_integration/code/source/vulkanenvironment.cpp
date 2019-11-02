@@ -57,6 +57,13 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
+    CVulkanEnvironment::CVulkanEnvironment()
+    {}
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
     void CVulkanEnvironment::createVulkanInstance(std::string const &aName)
     {
         VkApplicationInfo vkApplicationInfo{ };
@@ -1004,6 +1011,16 @@ namespace engine::vulkan
     VkDevice CVulkanEnvironment::getLogicalDevice()
     {
         return getState().selectedLogicalDevice;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    VkPhysicalDevice CVulkanEnvironment::getPhysicalDevice()
+    {
+        SVulkanState &state = getState();
+        return state.supportedPhysicalDevices.at(state.selectedPhysicalDevice).handle;
     }
     //<-----------------------------------------------------------------------------
 

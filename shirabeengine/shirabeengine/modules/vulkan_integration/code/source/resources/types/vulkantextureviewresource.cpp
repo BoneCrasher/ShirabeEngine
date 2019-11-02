@@ -78,7 +78,7 @@ namespace engine::vulkan
 
         VkImageView vkImageView = VK_NULL_HANDLE;
 
-        VkResult result = vkCreateImageView(mVulkanEnvironment->getState().selectedLogicalDevice, &vkImageViewCreateInfo, nullptr, &vkImageView);
+        VkResult result = vkCreateImageView(getVkContext()->getLogicalDevice(), &vkImageViewCreateInfo, nullptr, &vkImageView);
         if(VkResult::VK_SUCCESS != result)
         {
             CLog::Error(logTag(), CString::format("Failed to create render target view. Vulkan error: %0", result));
@@ -115,7 +115,7 @@ namespace engine::vulkan
     CEngineResult<> CVulkanTextureViewResource::destroy()
     {
         VkImageView vkImageView     = this->handle;
-        VkDevice    vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
+        VkDevice    vkLogicalDevice = getVkContext()->getLogicalDevice();
 
         vkDestroyImageView(vkLogicalDevice, vkImageView, nullptr);
 

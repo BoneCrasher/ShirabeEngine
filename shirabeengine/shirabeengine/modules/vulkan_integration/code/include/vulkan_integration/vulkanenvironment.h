@@ -11,36 +11,6 @@ namespace engine::vulkan
     using engine::graphicsapi::EFormat;
 
     /**
-     * The CVulkanError class defines an std::runtime_error compatible
-     * type to provide any kind of error related to the vulkan API integration.
-     */
-    class CVulkanError
-            : public std::runtime_error
-    {
-    public_constructors:
-        /**
-         * Construct a new vulkan error.
-         *
-         * @param aMessage      Message of the error.
-         * @param aVulkanResult VkResult value of the error.
-         */
-        CVulkanError(
-                std::string const &aMessage,
-                VkResult    const &aVulkanResult);
-
-    public_methods:
-        /**
-         * Return the VkResult value of the error.
-         *
-         * @return See brief.
-         */
-        VkResult vulkanResult() const;
-
-    private_members:
-        VkResult mVkResult;
-    };
-
-    /**
      * The CVulkanEnvironment class encapsulates all vulkan API related
      * base state & information required to use the graphics card and the
      * vulkan API in the engine.
@@ -120,7 +90,8 @@ namespace engine::vulkan
     public_api:
         Shared<IVkFrameContext> getVkCurrentFrameContext() final;
 
-        VkDevice getLogicalDevice() final;
+        VkDevice         getLogicalDevice()  final;
+        VkPhysicalDevice getPhysicalDevice() final;
 
     private_methods:
         /**

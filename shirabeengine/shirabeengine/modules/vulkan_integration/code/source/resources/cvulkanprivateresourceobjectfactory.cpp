@@ -20,12 +20,12 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TLogicalResource, typename TGpuApiResource>
-        static Unique<CResourceObjectCreator<TLogicalResource>> makeCreator()
+        static Unique<CResourceObjectCreator<TLogicalResource>> makeCreator(Shared<IVkGlobalContext> aContext)
         {
             return makeUnique<CResourceObjectCreator<TLogicalResource>>(
-                    [] (typename TLogicalResource::Descriptor_t const &aDescription)
+                    [aContext] (typename TLogicalResource::Descriptor_t const &aDescription)
                     {
-                        return makeUnique<TGpuApiResource>(aDescription);
+                        return makeUnique<TGpuApiResource>(aContext, aDescription);
                     });
         }
         //<-----------------------------------------------------------------------------
@@ -33,13 +33,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CVulkanPrivateResourceObjectFactory::initialize()
+        CEngineResult<> CVulkanPrivateResourceObjectFactory::initialize(Shared<IVkGlobalContext> aVkContext)
         {
+            mVkContext = std::move(aVkContext);
+
             // Register all supported resource types w/ their creator.
-            setCreatorForType<CVulkanBufferResource>     (std::move(makeCreator<SBuffer,      CVulkanBufferResource>()));
-            setCreatorForType<CVulkanBufferViewResource> (std::move(makeCreator<SBufferView,  CVulkanBufferViewResource>()));
-            setCreatorForType<CVulkanTextureResource>    (std::move(makeCreator<STexture,     CVulkanTextureResource>()));
-            setCreatorForType<CVulkanTextureViewResource>(std::move(makeCreator<STextureView, CVulkanTextureViewResource>()));
+            setCreatorForType<CVulkanBufferResource>     (std::move(makeCreator<SBuffer,      CVulkanBufferResource>     (mVkContext)));
+            setCreatorForType<CVulkanBufferViewResource> (std::move(makeCreator<SBufferView,  CVulkanBufferViewResource> (mVkContext)));
+            setCreatorForType<CVulkanTextureResource>    (std::move(makeCreator<STexture,     CVulkanTextureResource>    (mVkContext)));
+            setCreatorForType<CVulkanTextureViewResource>(std::move(makeCreator<STextureView, CVulkanTextureViewResource>(mVkContext)));
 
             return EEngineStatus::Ok;
         }

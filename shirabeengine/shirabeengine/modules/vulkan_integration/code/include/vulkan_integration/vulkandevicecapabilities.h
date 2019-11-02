@@ -7,13 +7,14 @@
 #include <core/enginestatus.h>
 #include <core/enginetypehelper.h>
 #include <core/bitfield.h>
+#include <graphicsapi/definitions.h>
 #include <log/log.h>
 
 namespace engine
 {
     namespace vulkan
     {
-        using engine::resources::EFormat;
+        using engine::graphicsapi::EFormat;
         using engine::core::CBitField;
 
         /**

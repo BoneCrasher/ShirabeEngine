@@ -11,8 +11,10 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::create(CGpiApiDependencyCollection const &aDependencies)
     {
-        VkDevice         const &vkLogicalDevice  = mVulkanEnvironment->getState().selectedLogicalDevice;
-        VkPhysicalDevice const &vkPhysicalDevice = mVulkanEnvironment->getState().supportedPhysicalDevices.at(mVulkanEnvironment->getState().selectedPhysicalDevice).handle;
+        SHIRABE_UNUSED(aDependencies);
+
+        VkDevice         const &vkLogicalDevice  = getVkContext()->getLogicalDevice();
+        VkPhysicalDevice const &vkPhysicalDevice = getVkContext()->getPhysicalDevice();
 
         STextureDescription const desc = getDescription();
 
@@ -155,9 +157,9 @@ namespace engine::vulkan
     {
         VkImage        vkImage         = this->handle;
         VkDeviceMemory vkDeviceMemory  = this->attachedMemory;
-        VkDevice       vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
+        VkDevice       vkLogicalDevice = getVkContext()->getLogicalDevice();
 
-        vkFreeMemory(vkLogicalDevice, vkDeviceMemory, nullptr);
+        vkFreeMemory  (vkLogicalDevice, vkDeviceMemory, nullptr);
         vkDestroyImage(vkLogicalDevice, vkImage, nullptr);
 
         return { EEngineStatus::Ok };
