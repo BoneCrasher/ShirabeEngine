@@ -36,8 +36,11 @@ namespace engine
             CEngineResult<> unbind()   final;
 
         public_members:
-            VkImage        handle;
-            VkDeviceMemory attachedMemory;
+            VkBuffer       stagingBuffer;
+            VkDeviceMemory stagingBufferMemory;
+            VkImage        imageHandle;
+            VkDeviceMemory imageMemory;
+            VkSampler      attachedSampler;
         };
     }
 }

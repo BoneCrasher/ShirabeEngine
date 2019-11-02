@@ -18,6 +18,21 @@ namespace engine::vulkan
 
         STextureDescription const desc = getDescription();
 
+        VkImage        vkImage               = VK_NULL_HANDLE;
+        VkDeviceMemory vkImageMemory         = VK_NULL_HANDLE;
+        VkSampler      vkSampler             = VK_NULL_HANDLE;
+        VkBuffer       vkStagingBuffer       = VK_NULL_HANDLE;
+        VkDeviceMemory vkStagingBufferMemory = VK_NULL_HANDLE;
+
+        VkImageCreateInfo    vkImageCreateInfo                ={ };
+        VkMemoryRequirements vkMemoryRequirements             ={ };
+        VkMemoryAllocateInfo vkImageMemoryAllocateInfo        ={ };
+        VkSamplerCreateInfo  vkSamplerCreateInfo              ={ };
+        VkBufferCreateInfo   vkStagingBufferCreateInfo        = {};
+        VkMemoryAllocateInfo vkStagingBufferMemoryAllocateInfo={ };
+
+        CEngineResult<uint32_t> memoryTypeFetch = { EEngineStatus::Ok };
+
         VkImageType imageType = VkImageType::VK_IMAGE_TYPE_2D;
         if(1 < desc.textureInfo.depth)
         {
@@ -62,7 +77,7 @@ namespace engine::vulkan
         {
             layout = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         }
-        VkImageCreateInfo vkImageCreateInfo ={ };
+
         vkImageCreateInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         vkImageCreateInfo.imageType     = imageType;
         vkImageCreateInfo.extent.width  = desc.textureInfo.width;
@@ -79,56 +94,89 @@ namespace engine::vulkan
         vkImageCreateInfo.flags         = 0;
         vkImageCreateInfo.pNext         = nullptr;
 
-        VkImage vkImage = VK_NULL_HANDLE;
-
         VkResult result = vkCreateImage(vkLogicalDevice, &vkImageCreateInfo, nullptr, &vkImage);
         if(VkResult::VK_SUCCESS != result)
         {
             CLog::Error(logTag(), CString::format("Failed to create texture. Vulkan result: %0", result));
-            return { EEngineStatus::Error };
+            goto fail;
         }
 
-        VkMemoryRequirements vkMemoryRequirements ={ };
         vkGetImageMemoryRequirements(vkLogicalDevice, vkImage, &vkMemoryRequirements);
 
-        VkMemoryAllocateInfo vkMemoryAllocateInfo ={ };
-        vkMemoryAllocateInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        vkMemoryAllocateInfo.allocationSize  = vkMemoryRequirements.size;
+        vkImageMemoryAllocateInfo.sType         = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        vkImageMemoryAllocateInfo.allocationSize= vkMemoryRequirements.size;
 
-        CEngineResult<uint32_t> memoryTypeFetch =
-                                        CVulkanDeviceCapsHelper::determineMemoryType(
-                                                vkPhysicalDevice,
-                                                vkMemoryRequirements.memoryTypeBits,
-                                                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        memoryTypeFetch = CVulkanDeviceCapsHelper::determineMemoryType(
+                                   vkPhysicalDevice,
+                                   vkMemoryRequirements.memoryTypeBits,
+                                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
         if(not memoryTypeFetch.successful())
         {
             CLog::Error(logTag(), "Could not determine memory type index.");
-            return { EEngineStatus::Error };
+            goto fail;
         }
 
-        vkMemoryAllocateInfo.memoryTypeIndex = memoryTypeFetch.data();
+        vkImageMemoryAllocateInfo.memoryTypeIndex= memoryTypeFetch.data();
 
-        VkDeviceMemory vkImageMemory = VK_NULL_HANDLE;
-
-        result = vkAllocateMemory(vkLogicalDevice, &vkMemoryAllocateInfo, nullptr, &vkImageMemory);
+        result = vkAllocateMemory(vkLogicalDevice, &vkImageMemoryAllocateInfo, nullptr, &vkImageMemory);
         if(VkResult::VK_SUCCESS != result)
         {
             CLog::Error(logTag(), CString::format("Failed to allocate image memory on GPU. Vulkan error: %0", result));
-            return { EEngineStatus::Error };
+            goto fail;
         }
 
         result = vkBindImageMemory(vkLogicalDevice, vkImage, vkImageMemory, 0);
         if(VkResult::VK_SUCCESS != result)
         {
             CLog::Error(logTag(), CString::format("Failed to bind image memory on GPU. Vulkan error: %0", result));
-            return { EEngineStatus::Error };
+            goto fail;
         }
 
-        this->handle         = vkImage;
-        this->attachedMemory = vkImageMemory;
+        vkSamplerCreateInfo.sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        vkSamplerCreateInfo.pNext                   = nullptr;
+        vkSamplerCreateInfo.minFilter               = VK_FILTER_LINEAR;
+        vkSamplerCreateInfo.magFilter               = VK_FILTER_LINEAR;
+        vkSamplerCreateInfo.addressModeU            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        vkSamplerCreateInfo.addressModeV            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        vkSamplerCreateInfo.addressModeW            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        vkSamplerCreateInfo.anisotropyEnable        = VK_FALSE;
+        vkSamplerCreateInfo.maxAnisotropy           = 16;
+        vkSamplerCreateInfo.borderColor             = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+        vkSamplerCreateInfo.unnormalizedCoordinates = VK_FALSE; // Make sure we use 0.0 to 1.0 range UVW-Coords.
+        vkSamplerCreateInfo.compareEnable           = VK_FALSE;
+        vkSamplerCreateInfo.compareOp               = VK_COMPARE_OP_ALWAYS;
+        vkSamplerCreateInfo.mipmapMode              = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        vkSamplerCreateInfo.mipLodBias              = 0.0f;
+        vkSamplerCreateInfo.minLod                  = 0.0f;
+        vkSamplerCreateInfo.maxLod                  = 0.0f;
+
+        result = vkCreateSampler(vkLogicalDevice, &vkSamplerCreateInfo, nullptr, &vkSampler);
+        if(VkResult::VK_SUCCESS != result)
+        {
+            CLog::Error(logTag(), CString::format("Failed to allocate image memory on GPU. Vulkan error: %0", result));
+            goto fail;
+        }
+
+        vkStagingBufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        vkStagingBufferCreateInfo.pNext = nullptr;
+        vkStagingBufferCreateInfo....;
+
+        success:
+        this->imageHandle         = vkImage;
+        this->imageMemory         = vkImageMemory;
+        this->attachedSampler     = vkSampler;
+        this->stagingBuffer       = vkStagingBuffer;
+        this->stagingBufferMemory =vkStagingBufferMemory;
 
         return { EEngineStatus::Ok };
+
+        fail:
+        vkDestroyImage  (vkLogicalDevice, vkImage,         nullptr);
+        vkFreeMemory    (vkLogicalDevice, vkImageMemory,   nullptr);
+        vkDestroySampler(vkLogicalDevice, vkSampler,       nullptr);
+        vkDestroyBuffer (vkLogicalDevice, vkStagingBuffer, nullptr);
+        return { EEngineStatus::Error };
     }
     //<-----------------------------------------------------------------------------
 
@@ -137,6 +185,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::load()
     {
+        CResourceDataSource const &dataSource = getDescription().initialData[0];
+        ByteBuffer          const &data       = dataSource.getData();
 
     }
     //<-----------------------------------------------------------------------------
@@ -146,7 +196,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::unload()
     {
-
+        vkDestroyBuffer(getVkContext()->getLogicalDevice(), this->stagingBuffer, nullptr);
     }
     //<-----------------------------------------------------------------------------
 
@@ -155,8 +205,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::destroy()
     {
-        VkImage        vkImage         = this->handle;
-        VkDeviceMemory vkDeviceMemory  = this->attachedMemory;
+        VkImage        vkImage         = this->imageHandle;
+        VkDeviceMemory vkDeviceMemory  = this->imageMemory;
         VkDevice       vkLogicalDevice = getVkContext()->getLogicalDevice();
 
         vkFreeMemory  (vkLogicalDevice, vkDeviceMemory, nullptr);
@@ -171,7 +221,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::bind()
     {
-
+        // Nothing to be done, as the texture is only transferred.
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -180,7 +231,26 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::transfer()
     {
+        Shared<IVkFrameContext> frameContext = getVkContext()->getVkCurrentFrameContext();
 
+        VkBufferImageCopy region {};
+        region.bufferOffset      = 0;
+        region.bufferRowLength   = 0;
+        region.bufferImageHeight = 0;
+
+        region.imageSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.mipLevel       = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount     = 1;
+
+        region.imageOffset = {0, 0, 0};
+        region.imageExtent = { getDescription().textureInfo.width, getDescription().textureInfo.height, 1 };
+
+        vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
+                               , this->stagingBuffer
+                               , this->imageHandle
+                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                               , 1, &region);
     }
     //<-----------------------------------------------------------------------------
 
@@ -189,7 +259,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::unbind()
     {
-
+        // Nothing to do...
+        return {EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 }

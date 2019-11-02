@@ -41,7 +41,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::load()
     {
-
+        // Nothing to be done...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -50,7 +51,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::unload()
     {
-
+        // Nothing to be done...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -73,7 +75,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::bind()
     {
-
+        // Nothing to be done as buffer views are not explicitly bound...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -82,7 +85,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::transfer()
     {
-
+        // Nothing to be done...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -91,7 +95,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::unbind()
     {
-
+        // Nothing to be done as buffer views are not explicitly unbound...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 }

@@ -19,7 +19,6 @@ set(SHIRABE_EXCLUDED_HEADERS
 )
 
 set(SHIRABE_EXCLUDED_SOURCES
-        old/resourcedatasource.cpp
         old/resourcemanagerbase.cpp)
 
 set(

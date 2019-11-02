@@ -41,7 +41,8 @@ namespace engine
              *
              * @return See brief.
              */
-            ByteBuffer getData();
+            [[nodiscard]]
+            ByteBuffer getData() const;
 
         private_members:
             ResourceAccessFn_t mAccessorFunction;

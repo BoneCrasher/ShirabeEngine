@@ -56,8 +56,8 @@ namespace engine::vulkan
                 break;
         }
 
-        VkImage vkImage = textureResource->handle; // TODO
-        // VkDeviceMemory const vkDeviceMemory = texture->attachedMemory; // TODO: Required?
+        VkImage vkImage = textureResource->imageHandle; // TODO
+        // VkDeviceMemory const vkDeviceMemory = texture->imageMemory; // TODO: Required?
 
         VkImageViewCreateInfo vkImageViewCreateInfo ={ };
         vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -96,7 +96,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureViewResource::load()
     {
-
+        // Nothing to be done...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -105,7 +106,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureViewResource::unload()
     {
-
+        // Nothing to be done...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -128,7 +130,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureViewResource::bind()
     {
-
+        // Nothing to be done as texture views are not explicitly bound...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -137,7 +140,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureViewResource::transfer()
     {
-
+        // Nothing to be done...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -146,7 +150,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureViewResource::unbind()
     {
-
+        // Nothing to be done as texture views are not explicitly unbound...
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 }

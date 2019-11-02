@@ -1,4 +1,4 @@
-#include "resources/core/resourcedatasource.h"
+#include "resources/resourcedatasource.h"
 
 namespace engine
 {
@@ -23,7 +23,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        ByteBuffer CResourceDataSource::getData()
+        ByteBuffer CResourceDataSource::getData() const
         {
             if(mAccessorFunction)
                 return mAccessorFunction();
