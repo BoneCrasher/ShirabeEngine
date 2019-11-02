@@ -1,6 +1,7 @@
 //
 // Created by dottideveloper on 29.10.19.
 //
+#include "vulkan_integration/resources/types/vulkanbufferresource.h"
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
 
@@ -31,7 +32,9 @@ namespace engine::vulkan
         VkBufferCreateInfo   vkStagingBufferCreateInfo        = {};
         VkMemoryAllocateInfo vkStagingBufferMemoryAllocateInfo={ };
 
-        CEngineResult<uint32_t> memoryTypeFetch = { EEngineStatus::Ok };
+        CEngineResult<uint32_t>                    memoryTypeFetch       = { EEngineStatus::Ok };
+        CEngineResult<SVulkanBufferCreationResult> stagingBufferCreation = { EEngineStatus::Ok };
+        SVulkanBufferCreationResult                bufferCreationResult  = {};
 
         VkImageType imageType = VkImageType::VK_IMAGE_TYPE_2D;
         if(1 < desc.textureInfo.depth)
@@ -158,24 +161,36 @@ namespace engine::vulkan
             goto fail;
         }
 
-        vkStagingBufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        vkStagingBufferCreateInfo.pNext = nullptr;
-        vkStagingBufferCreateInfo....;
+        stagingBufferCreation = __createVkBuffer(vkPhysicalDevice
+                                                 , vkLogicalDevice
+                                                 , desc.textureInfo.width * desc.textureInfo.height  * 4
+                                                 , VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+                                                 , VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        if(not stagingBufferCreation.successful())
+        {
+            CLog::Error(logTag(), CString::format("Failed to create buffer and allocate memory on GPU. Vulkan error: %0", result));
+            goto fail;
+        }
+
+        bufferCreationResult = stagingBufferCreation.data();
+        vkStagingBuffer       = bufferCreationResult.buffer;
+        vkStagingBufferMemory = bufferCreationResult.attachedMemory;
 
         success:
         this->imageHandle         = vkImage;
         this->imageMemory         = vkImageMemory;
         this->attachedSampler     = vkSampler;
         this->stagingBuffer       = vkStagingBuffer;
-        this->stagingBufferMemory =vkStagingBufferMemory;
+        this->stagingBufferMemory = vkStagingBufferMemory;
 
         return { EEngineStatus::Ok };
 
         fail:
-        vkDestroyImage  (vkLogicalDevice, vkImage,         nullptr);
-        vkFreeMemory    (vkLogicalDevice, vkImageMemory,   nullptr);
-        vkDestroySampler(vkLogicalDevice, vkSampler,       nullptr);
-        vkDestroyBuffer (vkLogicalDevice, vkStagingBuffer, nullptr);
+        vkDestroyImage  (vkLogicalDevice, vkImage,               nullptr);
+        vkFreeMemory    (vkLogicalDevice, vkImageMemory,         nullptr);
+        vkDestroySampler(vkLogicalDevice, vkSampler,             nullptr);
+        vkDestroyBuffer (vkLogicalDevice, vkStagingBuffer,       nullptr);
+        vkFreeMemory    (vkLogicalDevice, vkStagingBufferMemory, nullptr);
         return { EEngineStatus::Error };
     }
     //<-----------------------------------------------------------------------------
