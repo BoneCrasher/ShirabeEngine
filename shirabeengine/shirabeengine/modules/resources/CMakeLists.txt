@@ -32,6 +32,7 @@ set(
         SHIRABEMODULEBASE
         SHIRABEMODULEPLATFORM
         VULKANHEADERS
+        FMT
         JSON                  
         XML2
         ZLIB)

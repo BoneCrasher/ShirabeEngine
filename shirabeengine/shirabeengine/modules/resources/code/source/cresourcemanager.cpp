@@ -30,7 +30,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useAssetResource(engine::asset::AssetId_t const &aAssetResourceId)
+        CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useAssetResource(  ResourceId_t const &aResourceId
+                                                                                         , AssetId_t    const &aAssetResourceId)
         {
             return { EEngineStatus::Ok, nullptr };
         }
@@ -46,8 +47,8 @@ namespace engine
             {
                 mResourceTree.remove(aResourceId);
 
-                Shared<ILogicalResourceObject>        p = mResourceObjects[aResourceId];
-                Shared<IGpuApiResourceObject> q = p->getGpuApiResourceInterface();
+                Shared<ILogicalResourceObject>  p = mResourceObjects[aResourceId];
+                Unique<IGpuApiResourceObject>  &q = p->getGpuApiResourceInterface();
 
                 SHIRABE_EXPLICIT_DISCARD(p->unbind());
                 SHIRABE_EXPLICIT_DISCARD(q->unload());
@@ -86,6 +87,23 @@ namespace engine
             {
                 mResourceObjects.erase(aId);
             }
+
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CGpiApiDependencyCollection CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
+        {
+            CGpiApiDependencyCollection dependencies {};
+            for(auto const &dependencyId : mResourceTree.getAdjacentFor(aId))
+            {
+                Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId);
+                Unique<IGpuApiResourceObject> &gpuapiResource  = logicalResource->getGpuApiResourceInterface();
+                dependencies.add( dependencyId, gpuapiResource );
+            }
+            return dependencies;
         }
         //<-----------------------------------------------------------------------------
 

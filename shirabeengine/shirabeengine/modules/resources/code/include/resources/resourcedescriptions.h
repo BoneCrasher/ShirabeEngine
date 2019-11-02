@@ -11,7 +11,6 @@
 #include <core/databuffer.h>
 #include <core/bitfield.h>
 #include <graphicsapi/definitions.h>
-#include "resources/cresourceobject.h"
 #include "resources/resourcedatasource.h"
 
 namespace engine
@@ -19,6 +18,8 @@ namespace engine
     namespace resources
     {
         using namespace graphicsapi;
+
+        using ResourceId_t = std::string;
 
         struct
             [[nodiscard]]
@@ -34,6 +35,7 @@ namespace engine
             SHIRABE_TEST_EXPORT SBufferViewDescription
         {
             std::string            name;
+            ResourceId_t           bufferId;
             VkBufferViewCreateInfo createInfo;
         };
 
@@ -55,7 +57,8 @@ namespace engine
         {
         public_members:
             std::string   name;
-            STextureInfo  subjacentTexture;
+            ResourceId_t  subjacentTextureId;
+            STextureInfo  subjacentTextureInfo;
             EFormat       textureFormat;
             ArraySlices_t arraySlices;
             MipSlices_t   mipMapSlices;
@@ -189,6 +192,9 @@ namespace engine
             std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
 
             uint32_t                                                     subpass;
+
+            std::vector<ResourceId_t>                                    bufferViewIds;
+            std::vector<ResourceId_t>                                    textureViewIds;
         };
     }
 }

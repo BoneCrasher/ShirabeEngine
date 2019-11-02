@@ -28,7 +28,7 @@ namespace engine
         SHIRABE_DECLARE_INTERFACE(IObserver)
 
     public_api:
-        virtual void onValueChanged(TArgs... aArgs) = 0;
+        virtual void onValueChanged(TArgs&&... aArgs) = 0;
     };
 
     /*!
@@ -134,6 +134,12 @@ namespace engine
     public_constructors:
         SHIRABE_INLINE CObserver(TRefObject const &aRefObject)
             : mRefObject(aRefObject)
+        {}
+
+        SHIRABE_INLINE CObserver(  TRefObject        const &aRefObject
+                                 , HandlerFunction_t const &aHandlerFn)
+                : mRefObject(aRefObject)
+                , mHandlerFn(aHandlerFn)
         {}
 
     public_destructors:

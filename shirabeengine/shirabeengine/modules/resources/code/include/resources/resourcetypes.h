@@ -11,8 +11,8 @@
 #include <core/databuffer.h>
 #include <core/bitfield.h>
 #include <graphicsapi/definitions.h>
-#include "resources/cresourceobject.h"
 #include "resources/resourcedescriptions.h"
+#include "resources/cresourceobject.h"
 #include "resources/resourcedatasource.h"
 
 namespace engine

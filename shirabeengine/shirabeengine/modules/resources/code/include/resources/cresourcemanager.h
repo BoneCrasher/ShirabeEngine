@@ -16,7 +16,6 @@ namespace engine {
     namespace resources
     {
         using asset::AssetId_t ;
-        using ResourceId_t = std::string;
         using datastructures::CAdjacencyTree;
         using datastructures::CAdjacencyTreeHelper;
 
@@ -38,7 +37,8 @@ namespace engine {
                     , typename TResource::Descriptor_t const &aDescriptor
                     , std::vector<ResourceId_t>             &&aDependencies = {});
 
-            CEngineResult<Shared<ILogicalResourceObject>> useAssetResource(AssetId_t const &aAssetResourceId);
+            CEngineResult<Shared<ILogicalResourceObject>> useAssetResource(  ResourceId_t const &aResourceId
+                                                                           , AssetId_t    const &aAssetResourceId);
 
             CEngineResult<> discardResource(ResourceId_t const &aResourceId);
 
@@ -51,10 +51,12 @@ namespace engine {
 
             void removeResourceObject(ResourceId_t const &aId);
 
+            CGpiApiDependencyCollection getGpuApiDependencies(ResourceId_t const &aId);
+
         private_members:
-            Unique<CGpuApiResourceObjectFactory>                            mGpuApiResourceObjectFactory;
+            Unique<CGpuApiResourceObjectFactory>                             mGpuApiResourceObjectFactory;
             std::unordered_map<ResourceId_t, Shared<ILogicalResourceObject>> mResourceObjects;
-            CAdjacencyTree<ResourceId_t>                              mResourceTree;
+            CAdjacencyTree<ResourceId_t>                                     mResourceTree;
         };
         //<-----------------------------------------------------------------------------
 
@@ -72,15 +74,21 @@ namespace engine {
             mResourceTree.add(aResourceId);
             for(auto const &dependency : aDependencies)
             {
-                mResourceTree.add(dependency);
+                mResourceTree.add    (dependency);
                 mResourceTree.connect(aResourceId, dependency);
             }
 
+
+
+            // TODO: Dependency check. Already loaded? Etc...
             Shared<ILogicalResourceObject> resource       = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
             Unique<IGpuApiResourceObject>  gpuApiResource = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
             resource->bindGpuApiResourceInterface(std::move(gpuApiResource));
 
-            resource->getGpuApiResourceInterface()->create();
+            auto dependenciesResolved = getGpuApiDependencies(aResourceId);
+
+            resource->getGpuApiResourceInterface()->create(dependenciesResolved);
+            resource->getGpuApiResourceInterface()->load(); // TODO: Load on demand? Auto-Unload if not accessed?
 
             storeResourceObject(aResourceId, resource);
 

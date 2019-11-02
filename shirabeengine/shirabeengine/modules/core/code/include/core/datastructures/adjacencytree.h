@@ -191,6 +191,8 @@ namespace engine::datastructures
         bool connect   (TIdType const &aSource, TIdType const &aTarget);
         bool disconnect(TIdType const &aSource, TIdType const &aTarget);
 
+        List_t<TIdType> const getAdjacentFor(TIdType const &aId);
+
     private_structs:
         struct Edge_t
         {
@@ -347,6 +349,21 @@ namespace engine::datastructures
 
         CAdjacencyTreeHelper::removeListEntryIfAdded(mForwardTree[aSource], aTarget);
         return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    List_t<TIdType> const CAdjacencyTree<TIdType>::getAdjacentFor(TIdType const &aId)
+    {
+        if(not CAdjacencyTreeHelper::treeContainsElementFn(mForwardTree, aId))
+        {
+            return {};
+        }
+
+        return mForwardTree[aId];
     }
     //<-----------------------------------------------------------------------------
 

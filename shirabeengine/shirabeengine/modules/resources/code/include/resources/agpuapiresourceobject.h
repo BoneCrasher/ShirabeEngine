@@ -34,8 +34,8 @@ namespace engine
             ~AGpuApiResourceObject() override = default;
 
         public_api:
-            // ILogicalResourceObject
-            CEngineResult<> create()  override;
+            // IGpuApiResourceObject
+            CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)  override;
             CEngineResult<> load()    override;
             CEngineResult<> unload()  override;
             CEngineResult<> destroy() override;
@@ -45,7 +45,7 @@ namespace engine
             CEngineResult<> transfer() override;
             CEngineResult<> unbind()   override;
 
-            ObservableState_t& observableState() final;
+            Shared<ObservableState_t> observableState() final;
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
@@ -57,13 +57,13 @@ namespace engine
             SHIRABE_INLINE void setResourceState(EGpuApiResourceState const &aState)
             {
                 mState = aState;
-                observableState().notify(makeSharedFromThis(this), mState);
+                observableState()->notify(makeSharedFromThis(this), mState);
             };
 
         private_members:
-            TDescription      const mDescription;
-            ObservableState_t       mObservableState;
-            EGpuApiResourceState    mState;
+            TDescription         const mDescription;
+            Shared<ObservableState_t>  mObservableState;
+            EGpuApiResourceState       mState;
         };
 
         //<-----------------------------------------------------------------------------
@@ -73,8 +73,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
         AGpuApiResourceObject<TDescription>::AGpuApiResourceObject(const TDescription &aDescription)
-            : mDescription(aDescription)
-            , mObservableState      ()
+            : mDescription    (aDescription)
+            , mObservableState(makeShared<CSubject<EGpuApiResourceState>>())
+            , mState          (EGpuApiResourceState::Unknown)
         { }
         //<-----------------------------------------------------------------------------
 
@@ -82,8 +83,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::create()
+        CEngineResult<> AGpuApiResourceObject<TDescription>::create(CGpiApiDependencyCollection const &aDependencies)
         {
+            SHIRABE_UNUSED(aDependencies);
+
             return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
@@ -152,7 +155,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        IGpuApiResourceObject::ObservableState_t& AGpuApiResourceObject<TDescription>::observableState()
+        Shared<IGpuApiResourceObject::ObservableState_t> AGpuApiResourceObject<TDescription>::observableState()
         {
             return mObservableState;
         }

@@ -11,7 +11,11 @@
 #undef Status
 #endif
 
+#ifdef index
+    #undef index
+#endif
 #include <log/log.h>
+
 #include "wsi/windowhandlewrapper.h"
 #include "wsi/windowmanager.h"
 #include "wsi/iwindow.h"

@@ -27,7 +27,7 @@ namespace engine
             using CVkApiResource<SBufferDescription>::AGpuApiResourceObject;
 
         public_methods:
-            CEngineResult<> create()   final;
+            CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)   final;
             CEngineResult<> load()     final;
             CEngineResult<> unload()   final;
             CEngineResult<> destroy()  final;

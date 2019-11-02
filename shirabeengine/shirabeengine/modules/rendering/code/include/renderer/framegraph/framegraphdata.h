@@ -210,7 +210,7 @@ namespace engine
             /**
              * Extract the resource id via implicit conversion in const context.
              */
-            explicit SHIRABE_INLINE operator FrameGraphResourceId_t const() const
+            SHIRABE_INLINE operator FrameGraphResourceId_t const() const
             {
                 return resourceId;
             }

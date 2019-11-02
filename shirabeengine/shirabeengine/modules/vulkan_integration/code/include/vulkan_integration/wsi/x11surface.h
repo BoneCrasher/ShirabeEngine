@@ -5,8 +5,8 @@
 #include <core/enginetypehelper.h>
 #include <wsi/x11/x11display.h>
 #include <wsi/x11/x11window.h>
-#include <vulkan/vulkanimport.h>
-#include <vulkan/vulkanenvironment.h>
+#include <vulkan_integration/vulkanimport.h>
+#include <vulkan_integration/vulkanenvironment.h>
 
 namespace engine
 {
@@ -37,15 +37,15 @@ namespace engine
                     Shared<CX11Display>        const &aDisplay,
                     Shared<CX11Window>         const &aWindow);
 
-        private_constructors:
+        public_constructors:
             CX11VulkanSurface() = delete;
             CX11VulkanSurface(CX11VulkanSurface const&) = delete;
             CX11VulkanSurface(CX11VulkanSurface &&)     = delete;
 
-        private_destructors:
+        public_destructors:
             ~CX11VulkanSurface() = delete;
 
-         private_operators:
+         public_operators:
             CX11VulkanSurface &operator=(CX11VulkanSurface const&) = delete;
             CX11VulkanSurface &operator=(CX11VulkanSurface &&)     = delete;
         };

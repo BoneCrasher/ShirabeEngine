@@ -69,6 +69,11 @@ namespace engine
                 mCreators[typeInfo.name()] = std::move(aCreator);
             };
 
+            void removeAllCreators()
+            {
+                mCreators.clear();
+            }
+
         private_methods:
             template <typename T>
             Unique<IGpuApiResourceObject> create(typename T::Descriptor_t const &aDescriptor)

@@ -7,6 +7,8 @@
 
 #include <platform/platform.h>
 #include <core/enginestatus.h>
+
+#include "resources/resourcedescriptions.h"
 #include "resources/ilogicalresourceobject.h"
 
 namespace engine
@@ -16,8 +18,24 @@ namespace engine
 
     namespace resources
     {
-        class CResourceManager;
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        class CResourceManager;
+        class CGpiApiDependencyCollection;
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        using GpuApiHandle_t = uint64_t;
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         enum class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT EGpuApiResourceState
@@ -29,7 +47,11 @@ namespace engine
             , Discarded
             , Error
         };
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT IGpuApiResourceObject
@@ -40,17 +62,73 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IGpuApiResourceObject);
 
         public_typedefs:
-            using ObservableState_t = CSubject<Shared<IGpuApiResourceObject>, EGpuApiResourceState>;
+            using ObservableState_t = CSubject<EGpuApiResourceState>;
 
         public_api:
-            virtual CEngineResult<> create()  = 0;
-            virtual CEngineResult<> load()    = 0;
-            virtual CEngineResult<> unload()  = 0;
-            virtual CEngineResult<> destroy() = 0;
+            virtual GpuApiHandle_t const getHandle() = 0;
 
-            virtual ObservableState_t& observableState() = 0;
+            virtual CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies) = 0;
+            virtual CEngineResult<> load()                                                   = 0;
+            virtual CEngineResult<> unload()                                                 = 0;
+            virtual CEngineResult<> destroy()                                                = 0;
+
+            virtual Shared<ObservableState_t> observableState() = 0;
         };
+        //<-----------------------------------------------------------------------------
 
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        class
+            SHIRABE_LIBRARY_EXPORT CGpiApiDependencyCollection
+        {
+        public_constructors:
+            CGpiApiDependencyCollection() = default;
+
+        public_destructors:
+            ~CGpiApiDependencyCollection() = default;
+
+        public_methods:
+            SHIRABE_INLINE
+            bool add(ResourceId_t const &aId, Unique<IGpuApiResourceObject> &aResourceReference)
+            {
+                mDependencies.erase(aId);
+                mDependencies.insert({ aId, aResourceReference });
+
+                return true;
+            };
+
+            SHIRABE_INLINE
+            Unique<IGpuApiResourceObject> const& get(ResourceId_t const &aId) const
+            {
+                static Unique<IGpuApiResourceObject> sNullRef = nullptr;
+
+                if(mDependencies.end() == mDependencies.find(aId))
+                {
+                    return sNullRef;
+                }
+
+                return mDependencies.at(aId);
+            }
+
+            template <typename T>
+            T const *const extract(ResourceId_t const &aId) const
+            {
+                T const *result = nullptr;
+
+                Unique<IGpuApiResourceObject> const &ref = get(aId);
+                if(nullptr != ref)
+                {
+                    result = dynamic_cast<T*>(ref.get());
+                }
+
+                return result;
+            }
+
+        private_members:
+            std::unordered_map<ResourceId_t, Unique<IGpuApiResourceObject>&> mDependencies;
+        };
+        //<-----------------------------------------------------------------------------
     }
 }
 

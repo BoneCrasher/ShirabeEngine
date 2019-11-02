@@ -15,7 +15,7 @@ namespace engine
             Display      *x11Display = reinterpret_cast<Display*>(aDisplay->displayHandle());
             Window const  x11Window  = aWindow->handle();
 
-            CVulkanEnvironment::SVulkanState &state = aVulkanEnvironment->getState();
+            SVulkanState &state = aVulkanEnvironment->getState();
 
             VkXlibSurfaceCreateInfoKHR vkXlibSurfaceCreateInfo{};
             vkXlibSurfaceCreateInfo.sType  = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;

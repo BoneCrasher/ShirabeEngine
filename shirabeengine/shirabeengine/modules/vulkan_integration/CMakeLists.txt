@@ -21,6 +21,7 @@ set(
         VULKANHEADERS
         VULKANSDK
         XLIB
+        FMT
         JSON
         XML2
         ZLIB)

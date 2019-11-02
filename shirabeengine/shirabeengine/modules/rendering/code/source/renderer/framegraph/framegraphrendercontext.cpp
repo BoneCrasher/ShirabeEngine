@@ -555,11 +555,12 @@ namespace engine
             CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
 
             STextureViewDescription desc = { };
-            desc.name             = aView.readableName;
-            desc.textureFormat    = aView.format;
-            desc.subjacentTexture = static_cast<graphicsapi::STextureInfo>(aTexture);
-            desc.arraySlices      = aView.arraySliceRange;
-            desc.mipMapSlices     = aView.mipSliceRange;
+            desc.name                 = aView.readableName;
+            desc.textureFormat        = aView.format;
+            desc.subjacentTextureId   = aTexture.readableName;
+            desc.subjacentTextureInfo = static_cast<graphicsapi::STextureInfo>(aTexture);
+            desc.arraySlices          = aView.arraySliceRange;
+            desc.mipMapSlices         = aView.mipSliceRange;
 
             CEngineResult<Shared<ILogicalResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, {aTexture.readableName });
             EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");

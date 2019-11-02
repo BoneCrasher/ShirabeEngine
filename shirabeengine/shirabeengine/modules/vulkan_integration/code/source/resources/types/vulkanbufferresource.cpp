@@ -9,7 +9,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferResource::create()
+    CEngineResult<> CVulkanBufferResource::create(CGpiApiDependencyCollection const &aDependencies)
     {
         VkDevice         const &vkLogicalDevice  = mVulkanEnvironment->getState().selectedLogicalDevice;
         VkPhysicalDevice const &vkPhysicalDevice = mVulkanEnvironment->getState().supportedPhysicalDevices.at(mVulkanEnvironment->getState().selectedPhysicalDevice).handle;
@@ -68,7 +68,7 @@ namespace engine::vulkan
         this->handle         = buffer;
         this->attachedMemory = memory;
 
-        return { EEngineStatus::Ok, assignment };
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -95,7 +95,14 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferResource::destroy()
     {
+        VkBuffer       vkBuffer        = handle;
+        VkDeviceMemory vkDeviceMemory  = attachedMemory;
+        VkDevice       vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
 
+        vkFreeMemory(vkLogicalDevice, vkDeviceMemory, nullptr);
+        vkDestroyBuffer(vkLogicalDevice, vkBuffer, nullptr);
+
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 

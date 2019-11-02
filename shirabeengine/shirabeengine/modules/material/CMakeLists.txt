@@ -17,6 +17,7 @@ set(
         SHIRABEMODULEPLATFORM
         SHIRABEMODULEBASE
         VULKANHEADERS
+        FMT
         JSON)
 
 include(project_setup)

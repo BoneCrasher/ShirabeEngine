@@ -27,6 +27,7 @@ namespace engine
             : public ILogicalResourceObject
         {
             friend class CResourceManager;
+
         public_typedefs:
             using Descriptor_t = TDescription;
 
@@ -105,25 +106,24 @@ namespace engine
         void CResourceObject<TDescriptor>::bindGpuApiResourceInterface(
                 engine::Unique<engine::resources::IGpuApiResourceObject> aGpuApiInterface)
         {
-            if(not mStateObserver)
-            {
-                mStateObserver = makeShared<CObserver<Shared<IGpuApiResourceObject>, EGpuApiResourceState>>(
-                        [this] (Shared<IGpuApiResourceObject> &&aSubject, EGpuApiResourceState &&aState)
-                        {
-                            SHIRABE_UNUSED(aSubject);
-
-                            // ... Do stuff.
-                        });
-            }
-
             if(mGpuApiInterface)
             {
-                mGpuApiInterface->observableState().ignore(mStateObserver);
+                mGpuApiInterface->observableState()->ignore(mStateObserver);
                 mGpuApiInterface = nullptr;
             }
 
             mGpuApiInterface = std::move(aGpuApiInterface);
-            mGpuApiInterface->observableState().observe(mStateObserver);
+
+            mStateObserver = makeShared<CObserver<Unique<IGpuApiResourceObject>, EGpuApiResourceState>>(
+                    mGpuApiInterface, // Taking the unique pointer by reference is valid at this point, since the ownership won't change anymore...
+                    [this] (Unique<IGpuApiResourceObject> const &aSubject, EGpuApiResourceState &&aState)
+                    {
+                        SHIRABE_UNUSED(aSubject);
+
+                        // ... Do stuff.
+                    });
+
+            mGpuApiInterface->observableState()->observe(mStateObserver);
         }
         //<-----------------------------------------------------------------------------
 
