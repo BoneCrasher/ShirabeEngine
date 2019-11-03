@@ -8,15 +8,16 @@
 #include <X11/Xos.h>
 
 #ifdef Status
-#undef Status
+    #undef Status
 #endif
-
 #ifdef index
     #undef index
 #endif
-
 #ifdef Always
     #undef Always
+#endif
+#ifdef None
+    #undef None
 #endif
 
 #include <log/log.h>

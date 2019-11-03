@@ -47,6 +47,20 @@ namespace engine
 
             Shared<ObservableState_t> observableState() final;
 
+        private_api:
+            SHIRABE_INLINE
+            void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) final
+            {
+                SHIRABE_UNUSED(aGpuApiInterface);
+            };
+
+            SHIRABE_INLINE
+            Unique<IGpuApiResourceObject>& getGpuApiResourceInterface() final
+            {
+                static Unique<IGpuApiResourceObject> sNullRef = nullptr;
+                return sNullRef;
+            };
+
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
             {

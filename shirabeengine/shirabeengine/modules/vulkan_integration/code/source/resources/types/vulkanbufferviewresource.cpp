@@ -62,7 +62,7 @@ namespace engine::vulkan
     CEngineResult<> CVulkanBufferViewResource::destroy()
     {
         VkBufferView vkBufferView    = this->handle;
-        VkDevice     vkLogicalDevice = mVulkanEnvironment->getState().selectedLogicalDevice;
+        VkDevice     vkLogicalDevice = getVkContext()->getLogicalDevice();
 
         vkDestroyBufferView(vkLogicalDevice, vkBufferView, nullptr);
 

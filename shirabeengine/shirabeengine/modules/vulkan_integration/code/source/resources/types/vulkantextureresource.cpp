@@ -203,6 +203,7 @@ namespace engine::vulkan
         CResourceDataSource const &dataSource = getDescription().initialData[0];
         ByteBuffer          const &data       = dataSource.getData();
 
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -212,6 +213,7 @@ namespace engine::vulkan
     CEngineResult<> CVulkanTextureResource::unload()
     {
         vkDestroyBuffer(getVkContext()->getLogicalDevice(), this->stagingBuffer, nullptr);
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 
@@ -261,11 +263,13 @@ namespace engine::vulkan
         region.imageOffset = {0, 0, 0};
         region.imageExtent = { getDescription().textureInfo.width, getDescription().textureInfo.height, 1 };
 
-        vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
-                               , this->stagingBuffer
-                               , this->imageHandle
-                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-                               , 1, &region);
+        // vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
+        //                        , this->stagingBuffer
+        //                        , this->imageHandle
+        //                        , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+        //                        , 1, &region);
+
+        return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 

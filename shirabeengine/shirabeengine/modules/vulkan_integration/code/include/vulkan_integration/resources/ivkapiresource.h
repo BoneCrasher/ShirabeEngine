@@ -21,7 +21,8 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IVkApiResource);
 
         public_api:
-            virtual Shared<IVkGlobalContext> getVkGlobalContext() = 0;
+            [[nodiscard]]
+            virtual Shared<IVkGlobalContext> getVkContext() const = 0;
         };
 
     }

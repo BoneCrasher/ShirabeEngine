@@ -47,7 +47,7 @@ namespace engine
             };
 
             [[nodiscard]]
-            SHIRABE_INLINE Shared<IVkGlobalContext> getVkContext() const
+            SHIRABE_INLINE Shared<IVkGlobalContext> getVkContext() const final
             {
                 return mVkContext;
             }
