@@ -1,7 +1,8 @@
 #ifndef __SHIRABE_VULKAN_BUFFER_RESOURCE_H__
 #define __SHIRABE_VULKAN_BUFFER_RESOURCE_H__
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
@@ -76,7 +77,7 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
 
         public_constructors:
-            using CVkApiResource<SBufferDescription>::AGpuApiResourceObject;
+            using CVkApiResource<SBufferDescription>::CVkApiResource;
 
         public_methods:
             CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)   final;

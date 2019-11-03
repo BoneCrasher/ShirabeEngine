@@ -1,7 +1,8 @@
 #ifndef __SHIRABE_VULKAN_FRAMEBUFFER_RESOURCE_H__
 #define __SHIRABE_VULKAN_FRAMEBUFFER_RESOURCE_H__
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 #include <base/declaration.h>
 

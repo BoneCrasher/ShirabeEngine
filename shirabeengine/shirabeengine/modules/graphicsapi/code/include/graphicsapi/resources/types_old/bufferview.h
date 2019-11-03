@@ -10,7 +10,8 @@
 #include <resources/core/resourcedomaintransfer.h>
 #include <resources/core/resourcetraits.h>
 #include <resources/core/requestdefaultimplementation.h>
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 #include "graphicsapi/definitions.h"
 #include "graphicsapi/resources/gfxapi.h"

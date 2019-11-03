@@ -6,7 +6,9 @@
 #define SHIRABEDEVELOPMENT_RESOURCEDESCRIPTIONS_H
 
 #include <vector>
-#include <vulkan/vulkan.h>
+#include <platform/platform.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <core/bitfield.h>

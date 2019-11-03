@@ -1,13 +1,14 @@
-#include <signal.h>
+#include <csignal>
 
 #include <functional>
 #include <set>
 
 #include <platform/platform.h>
-#include <os/applicationenvironment.h>
 #include <base/string.h>
 #include <graphicsapi/definitions.h>
 #include <resources/resourcetypes.h>
+#include <os/applicationenvironment.h>
+#include "vulkan_integration/vulkanimport.h"
 #include "vulkan_integration/vulkanenvironment.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
 #include "vulkan_integration/wsi/x11surface.h"

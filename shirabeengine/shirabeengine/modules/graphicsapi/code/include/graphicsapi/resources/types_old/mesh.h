@@ -4,7 +4,8 @@
 #include <vector>
 #include <cstdint>
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 #include <base/declaration.h>
 #include <math/geometric/rect.h>

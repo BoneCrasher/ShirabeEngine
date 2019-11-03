@@ -12,7 +12,8 @@
 
 // #include <better-enums/enum.h>
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 #include <platform/platform.h>
 #include <core/bitfield.h>

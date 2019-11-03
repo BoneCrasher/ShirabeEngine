@@ -1,7 +1,8 @@
 #ifndef __SHIRABE_VULKAN_TEXTURE_RESOURCE_H__
 #define __SHIRABE_VULKAN_TEXTURE_RESOURCE_H__
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
@@ -24,7 +25,7 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
 
         public_constructors:
-            using CVkApiResource<STextureDescription>::AGpuApiResourceObject;
+            using CVkApiResource<STextureDescription>::CVkApiResource;
 
         public_methods:
             CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)   final;

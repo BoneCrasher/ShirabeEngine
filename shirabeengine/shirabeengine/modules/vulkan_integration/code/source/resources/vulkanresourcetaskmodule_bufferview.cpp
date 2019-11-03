@@ -4,7 +4,8 @@
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
 #include "vulkan_integration/resources/types/vulkanbufferviewresource.h"
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 namespace engine
 {

@@ -6,7 +6,7 @@
 #define SHIRABEDEVELOPMENT_RESOURCETYPES_H
 
 #include <vector>
-#include <vulkan/vulkan.h>
+#include <platform/platform.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <core/bitfield.h>

@@ -5,7 +5,8 @@
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/resources/types/vulkanframebufferresource.h"
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 namespace engine
 {
