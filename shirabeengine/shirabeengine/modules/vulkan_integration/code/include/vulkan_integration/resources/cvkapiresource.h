@@ -35,7 +35,7 @@ namespace engine
 
         public_api:
             [[nodiscard]]
-            SHIRABE_INLINE resources::GpuApiHandle_t getHandle() final
+            SHIRABE_INLINE resources::GpuApiHandle_t const getHandle() final
             {
                 return mHandle;
             }

@@ -14,7 +14,7 @@ namespace engine
 
         //<-----------------------------------------------------------------------------
         //;---------------------------------------------------------
-        CMaterialLoader::CMaterialLoader(Shared<asset::IAssetStorage> aAssetStorage)
+        CMaterialLoader::CMaterialLoader(Shared<asset::IAssetStorage> const &aAssetStorage)
             : mStorage(aAssetStorage)
         {
             assert(nullptr != aAssetStorage);
@@ -25,7 +25,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CEngineResult<T> readMaterialFile(std::string const &aLogTag, asset::IAssetStorage *aAssetStorage, asset::AssetId_t const &aAssetUID)
+        CEngineResult<T> readMaterialFile(  std::string          const &aLogTag
+                                          , asset::IAssetStorage       *aAssetStorage
+                                          , asset::AssetId_t     const &aAssetUID)
         {
             using namespace serialization;
 
@@ -94,6 +96,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<SMaterialMeta> readMaterialMeta(std::string const &aLogTag, asset::IAssetStorage *aAssetStorage, asset::AssetId_t const &aAssetUID)
+        {
+            return readMaterialFile<SMaterialMeta>(aLogTag, aAssetStorage, aAssetUID);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         AssetID_t getAssetUIDForMaterialID(Map<std::string, AssetID_t> const &aRegistry, std::string const &aMaterialId)
         {
             if(aRegistry.end() == aRegistry.find(aMaterialId))
@@ -108,27 +119,27 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        using MasterMaterialReturn_t = std::tuple<bool, std::string, SMaterialMasterIndex, SMaterialSignature, CMaterialConfig>;
+        using MasterMaterialReturn_t = std::tuple<bool, std::string, SMaterialMeta, SMaterialSignature, CMaterialConfig>;
 
         static
-        auto loadMasterMaterial(std::string                                             const &aLogTag,
+        auto loadMasterMaterial(std::string                                    const &aLogTag,
                                 Shared<asset::IAssetStorage>                         &aAssetStorage,
                                 Map<asset::AssetID_t, Shared<CMaterialMaster>>       &aMasterMaterialIndex,
-                                asset::AssetID_t                                        const &aMasterMaterialAssetId)
+                                asset::AssetID_t                               const &aMasterMaterialAssetId)
             -> MasterMaterialReturn_t
         {
-            AssetID_t                       const masterIndexId    = aMasterMaterialAssetId; // Needs to be here, since it will be shared across both case-blocks.
-            CResult<SMaterialMasterIndex>         masterIndexFetch = {};
+            AssetID_t              const masterIndexId    = aMasterMaterialAssetId; // Needs to be here, since it will be shared across both case-blocks.
+            CResult<SMaterialMeta>       masterIndexFetch = {};
 
             MasterMaterialReturn_t const failureReturnValue = { false, {}, {}, {}, {} };
 
-            auto const [masterIndexFetchResult, masterIndex] = readMaterialMasterIndexFile(aLogTag, aAssetStorage.get(), masterIndexId);
+            auto const [metaDataFetchResult, metaData] = readMaterialMeta(aLogTag, aAssetStorage.get(), masterIndexId);
             {
-                PrintEngineError(masterIndexFetchResult, aLogTag, "Could not fetch master index data.");
-                SHIRABE_RETURN_VALUE_ON_ERROR(masterIndexFetchResult, failureReturnValue);
+                PrintEngineError(metaDataFetchResult, aLogTag, "Could not fetch master meta data.");
+                SHIRABE_RETURN_VALUE_ON_ERROR(metaDataFetchResult, failureReturnValue);
             }
 
-            auto const [signatureAssetFetchResult, signatureAsset] = aAssetStorage->loadAsset(masterIndex.signatureAssetUid);
+            auto const [signatureAssetFetchResult, signatureAsset] = aAssetStorage->loadAsset(metaData.signatureAssetUid);
             {
                 PrintEngineError(signatureAssetFetchResult, aLogTag, "Could not fetch signature asset data.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(signatureAssetFetchResult, failureReturnValue);
@@ -140,7 +151,7 @@ namespace engine
                 SHIRABE_RETURN_VALUE_ON_ERROR(signatureFetchResult, failureReturnValue);
             }
 
-            auto const [configAssetFetchResult, configAsset] = aAssetStorage->loadAsset(masterIndex.configurationAssetUid);
+            auto const [configAssetFetchResult, configAsset] = aAssetStorage->loadAsset(metaData.configurationAssetUid);
             {
                 PrintEngineError(configAssetFetchResult, aLogTag, "Could not fetch configuration asset data.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(configAssetFetchResult, failureReturnValue);
@@ -152,11 +163,11 @@ namespace engine
                 SHIRABE_RETURN_VALUE_ON_ERROR(configFetchResult, failureReturnValue);
             }
 
-            std::string        const  masterName      = masterIndex.name;
+            std::string        const  masterName      = metaData.name;
             SMaterialSignature const &masterSignature = signature;
             CMaterialConfig    const &masterConfig    = config;
 
-            return { true, masterName, masterIndex, masterSignature, masterConfig };
+            return { true, masterName, metaData, masterSignature, masterConfig };
         }
         //<-----------------------------------------------------------------------------
 
@@ -175,6 +186,15 @@ namespace engine
         CEngineResult<> CMaterialLoader::destroyMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
         {
             return { EEngineStatus::Ok };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SMaterialMeta> CMaterialLoader::loadMaterialMeta(engine::asset::AssetID_t const &aMaterialInstanceAssetId)
+        {
+            return readMaterialMeta(logTag(), mStorage.get(), aMaterialInstanceAssetId);
         }
         //<-----------------------------------------------------------------------------
 
@@ -229,7 +249,7 @@ namespace engine
             //     return { EEngineStatus::Error };
             // }
 
-            auto [successful, masterName, masterIndex, masterSignature, masterConfig] = loadMasterMaterial(logTag(), mStorage, mInstantiatedMaterialMasters, masterIndexId);
+            auto [successful, masterName, masterMeta, masterSignature, masterConfig] = loadMasterMaterial(logTag(), mStorage, mInstantiatedMaterialMasters, masterIndexId);
             {
                 PrintEngineError(not successful, logTag(), "Couldn't fetch master material data.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
@@ -243,10 +263,10 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Create Material instance
             //--------------------------------------------------------------------------------------------------------------------
-            Shared<CMaterialMaster> master = makeShared<CMaterialMaster>  (masterIndexId, masterName,   std::move(masterSignature), std::move(masterConfig));
+            Shared<CMaterialMaster> master = makeShared<CMaterialMaster>  (masterIndexId, masterName, std::move(masterSignature), std::move(masterConfig));
             // Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
 
-            mInstantiatedMaterialMasters  [master->getAssetId()]   = master;
+            mInstantiatedMaterialMasters  [master->getAssetId()] = master;
             // mInstantiatedMaterialInstances[instance->getAssetId()] = instance;
 
             return { EEngineStatus::Ok, master };

@@ -52,6 +52,14 @@ namespace engine
             virtual CEngineResult<SAsset > loadAsset(AssetId_t const &aAssetUID) = 0;
 
             /**
+             * Load the meta byte data for a provided asset descriptor.
+             *
+             * @param aAsset The asset descriptor for which meta byte data should be loaded.
+             * @return       A filled byte buffer if successful. False otherwise.
+             */
+            virtual CEngineResult<ByteBuffer> loadAssetMeta(AssetId_t const &aAsset) = 0;
+
+            /**
              * Load the byte data for a provided asset descriptor.
              *
              * @param aAsset The asset descriptor for which byte data should be loaded.
@@ -79,7 +87,7 @@ namespace engine
             using AssetRegistry_t = CAssetRegistry<SAsset>;
 
         public_constructors:
-            CAssetStorage(Unique<IAssetDataSource> &&aAssetDataSource);
+            explicit CAssetStorage(Unique<IAssetDataSource> &&aAssetDataSource);
 
         public_methods:
             /**
@@ -95,7 +103,7 @@ namespace engine
              * @param aUri
              * @return
              */
-            CEngineResult<SAsset> assetFromUri(std::filesystem::path const &aUri);
+            CEngineResult<SAsset> assetFromUri(std::filesystem::path const &aUri) final;
 
             /**
              * @brief createAsset
@@ -107,7 +115,7 @@ namespace engine
             AssetId_t createAsset(EAssetType  const &aAssetType,
                                   std::string const &aAssetDirectory,
                                   std::string const &aAssetFilename,
-                                  ByteBuffer  const &aInitialData);
+                                  ByteBuffer  const &aInitialData) final;
 
             /**
              * Load an asset from the respective asset source.
@@ -115,15 +123,22 @@ namespace engine
              * @param aAssetUID The UID of the asset to load.
              * @return          A valid asset if successful. Empty otherwise.
              */
-            CEngineResult<SAsset > loadAsset(AssetId_t const &aAssetUID);
+            CEngineResult<SAsset > loadAsset(AssetId_t const &aAssetUID) final;
 
+            /**
+             * Load the meta byte data for a provided asset descriptor.
+             *
+             * @param aAsset The asset descriptor for which meta byte data should be loaded.
+             * @return       A filled byte buffer if successful. False otherwise.
+             */
+            CEngineResult<ByteBuffer> loadAssetMeta(AssetId_t const &aAsset) final;
             /**
              * Load the byte data for a provided asset descriptor.
              *
              * @param aAsset The asset descriptor for which byte data should be loaded.
              * @return       A filled byte buffer if successful. False otherwise.
              */
-            CEngineResult<ByteBuffer> loadAssetData(AssetId_t const &aAsset);
+            CEngineResult<ByteBuffer> loadAssetData(AssetId_t const &aAsset) final;
 
             /**
              * Unload this asset and remove it's data from the index.
@@ -132,7 +147,7 @@ namespace engine
              * @param aAssetUID
              * @return
              */
-            CEngineResult<> removeAsset(AssetId_t const &aAssetUID);
+            CEngineResult<> removeAsset(AssetId_t const &aAssetUID) final;
 
         private_members:
             AssetRegistry_t                   mAssetIndex;

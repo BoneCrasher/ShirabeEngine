@@ -55,7 +55,7 @@ namespace engine
             vkMemoryAllocationInfo.allocationSize  = vkBufferMemoryRequirements.size;
             vkMemoryAllocationInfo.memoryTypeIndex = CVulkanDeviceCapsHelper::determineMemoryType(aPhysicalDevice, vkBufferMemoryRequirements.memoryTypeBits, aBufferMemoryProperties).data();
 
-            result = vkAllocateMemory(aLogicalDevice, &vkMemoryAllocationInfo, nullptr, &vkBufferMemory)
+            result = vkAllocateMemory(aLogicalDevice, &vkMemoryAllocationInfo, nullptr, &vkBufferMemory);
             if(VkResult::VK_SUCCESS != result)
             {
                 vkDestroyBuffer(aLogicalDevice, vkBuffer, nullptr);

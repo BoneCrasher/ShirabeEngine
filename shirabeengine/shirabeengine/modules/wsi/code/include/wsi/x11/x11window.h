@@ -14,6 +14,11 @@
 #ifdef index
     #undef index
 #endif
+
+#ifdef Always
+    #undef Always
+#endif
+
 #include <log/log.h>
 
 #include "wsi/windowhandlewrapper.h"

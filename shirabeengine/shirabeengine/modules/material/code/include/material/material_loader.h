@@ -15,6 +15,7 @@ namespace engine
 
     namespace material
     {
+        struct SMaterialMeta;
         class CMaterialMaster;
 
         class CMaterialInstance;
@@ -22,7 +23,7 @@ namespace engine
         /**
          * @brief The CMaterialLoader class
          */
-        class CMaterialLoader
+        class SHIRABE_LIBRARY_EXPORT CMaterialLoader
         {
             SHIRABE_DECLARE_LOG_TAG(CMaterialLoader);
 
@@ -32,7 +33,7 @@ namespace engine
              * @brief CMaterialLoader
              * @param aAssetStorage
              */
-            CMaterialLoader(Shared <asset::IAssetStorage> aAssetStorage);
+            explicit CMaterialLoader(Shared <asset::IAssetStorage> const &aAssetStorage);
 
         public_methods:
 
@@ -45,6 +46,13 @@ namespace engine
              * @return
              */
             CEngineResult <Shared<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
+
+            /**
+             * @brief loadMaterialMeta
+             * @param aMaterialId
+             * @return
+             */
+            CEngineResult <SMaterialMeta> loadMaterialMeta(asset::AssetID_t const &aMaterialInstanceAssetId);
 
             /**
              * @brief loadMaterial

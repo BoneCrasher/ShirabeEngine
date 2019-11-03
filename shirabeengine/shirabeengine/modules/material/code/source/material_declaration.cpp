@@ -28,8 +28,6 @@ namespace engine
 
             aSerializer.writeValue("uid",                       uid);
             aSerializer.writeValue("name",                      name);
-            aSerializer.writeValue("signatureFilename",         signatureAssetUid);
-            aSerializer.writeValue("baseConfigurationFilename", configurationAssetUid);
             aSerializer.beginObject("stages");
 
             for(auto const &[stage, stageFileReferences] : stages)
@@ -37,7 +35,6 @@ namespace engine
                 std::string const stageName = serialization::stageToString(stage);
                 aSerializer.beginObject(stageName);
                 aSerializer.writeValue("glslSourceFilename", stageFileReferences.glslSourceFilename);
-                aSerializer.writeValue("spvModuleFilename",  stageFileReferences.spvModuleAssetId);
                 aSerializer.endObject();
             }
 
@@ -54,10 +51,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer)
         {
-            aDeserializer.readValue("uid",                       uid);
-            aDeserializer.readValue("name",                      name);
-            aDeserializer.readValue("signatureFilename",         signatureAssetUid);
-            aDeserializer.readValue("baseConfigurationFilename", configurationAssetUid);
+            aDeserializer.readValue("uid",          uid);
+            aDeserializer.readValue("name",name);
 
             aDeserializer.beginObject("stages");
 
@@ -78,15 +73,88 @@ namespace engine
                 bool const couldBeginObject = aDeserializer.beginObject(stageName);
                 if(not couldBeginObject)
                 {
-                    stages[stage] = { "", 0 };
+                    stages[stage] = SMaterialIndexStage { "" };
                     continue;
                 }
 
                 aDeserializer.readValue("glslSourceFilename", glslFilename);
+                aDeserializer.endObject();
+
+                stages[stage] = SMaterialIndexStage { glslFilename };
+            }
+
+            aDeserializer.endObject();
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SMaterialMeta::acceptSerializer(serialization::IJSONSerializer<SMaterialMeta> &aSerializer) const
+        {
+            aSerializer.beginObject(name);
+
+            aSerializer.writeValue("uid",                       uid);
+            aSerializer.writeValue("name",                      name);
+            aSerializer.writeValue("signatureFilename",         signatureAssetUid);
+            aSerializer.writeValue("baseConfigurationFilename", configurationAssetUid);
+            aSerializer.beginObject("stages");
+
+            for(auto const &[stage, stageFileReferences] : stages)
+            {
+                std::string const stageName = serialization::stageToString(stage);
+                aSerializer.beginObject(stageName);
+                aSerializer.writeValue("spvModuleFilename",  stageFileReferences.spvModuleAssetId);
+                aSerializer.endObject();
+            }
+
+            aSerializer.endObject();
+
+            aSerializer.endObject();
+
+            return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SMaterialMeta::acceptDeserializer(serialization::IJSONDeserializer<SMaterialMeta> &aDeserializer)
+        {
+            aDeserializer.readValue("uid",                       uid);
+            aDeserializer.readValue("name",                      name);
+            aDeserializer.readValue("signatureFilename",         signatureAssetUid);
+            aDeserializer.readValue("baseConfigurationFilename", configurationAssetUid);
+
+            aDeserializer.beginObject("stages");
+
+            std::vector<VkPipelineStageFlagBits> stageList = { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT
+                                                               , VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT
+            };
+
+            for(auto const stage : stageList)
+            {
+                std::string const stageName         = serialization::stageToString(stage);
+                std::string       glslFilename      = std::string();
+                asset::AssetId_t  spvModuleAssetId  = 0;
+
+                bool const couldBeginObject = aDeserializer.beginObject(stageName);
+                if(not couldBeginObject)
+                {
+                    stages[stage] = SMaterialMetaStage { 0 };
+                    continue;
+                }
+
                 aDeserializer.readValue("spvModuleFilename",  spvModuleAssetId);
                 aDeserializer.endObject();
 
-                stages[stage] = { glslFilename, spvModuleAssetId };
+                stages[stage] = SMaterialMetaStage { spvModuleAssetId };
             }
 
             aDeserializer.endObject();

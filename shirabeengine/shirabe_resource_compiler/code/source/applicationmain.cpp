@@ -203,6 +203,7 @@ public_methods:
 
             std::unordered_map<std::string, std::function<bool()>> handlers =
             {
+                { "--help",           [&] () { usage();                                                    return true; }},
                 { "--verbose",        [&] () { options.set(CCompiler::EOptions::VerboseOutput);         return true; }},
                 { "--debug",          [&] () { options.set(CCompiler::EOptions::DebugMode);             return true; }},
                 { "--optimize",       [&] () { options.set(CCompiler::EOptions::OptimizationEnabled);   return true; }},
@@ -229,6 +230,9 @@ public_methods:
         };
         std::for_each(usableArguments.begin(), usableArguments.end(), processor);
 
+        //
+        // Format the absolute input path used to scan for resources...
+        //
         std::filesystem::path const inputPathAbs = (std::filesystem::current_path() / inputPath).lexically_normal();
         bool const inputDirectoryExists = std::filesystem::exists(inputPathAbs);
         if(not inputDirectoryExists)
@@ -236,6 +240,9 @@ public_methods:
             return false;
         }
 
+        //
+        // Format the absolute output path used to save out resources to...
+        //
         std::filesystem::path const outputPathAbs = (std::filesystem::current_path() / outputPath).lexically_normal();
         bool const outputDirectoryExists = std::filesystem::exists(outputPathAbs);
         if(not outputDirectoryExists)
@@ -243,6 +250,10 @@ public_methods:
             std::filesystem::create_directories(outputPathAbs);
         }
 
+        //
+        // Recursively scan the input path for all files, filter them against a list of valid files and
+        // store their relative paths for processing...
+        //
         auto const dirIterator = std::filesystem::recursive_directory_iterator(inputPathAbs);
         for(auto const &file : dirIterator)
         {
@@ -281,7 +292,7 @@ public_methods:
         //
         // Make sure to properly prepend the include paths
         //
-        includePaths.push_back(std::filesystem::path("materials/include"));
+        includePaths.emplace_back(std::filesystem::path("materials/include"));
         for(auto &includePath : includePaths)
         {
             includePath = std::filesystem::current_path()/inputPath/includePath;
@@ -413,11 +424,13 @@ public_methods:
         // Make sure the output config is correct.
         std::filesystem::path const outputPath                      = ( parentPath)                                                              .lexically_normal();
         std::filesystem::path const outputModulePath                = ( parentPath / "modules")                                                  .lexically_normal();
-        std::filesystem::path const outputIndexPath                 = ( parentPath / (std::filesystem::path(materialID.string() + ".instance"))) .lexically_normal();
-        std::filesystem::path const outputSignaturePath             = ( parentPath / (std::filesystem::path(materialID.string() + ".signature"))).lexically_normal();
-        std::filesystem::path const outputConfigurationPath         = ( parentPath / (std::filesystem::path(materialID.string() + ".config")))   .lexically_normal();
+        std::filesystem::path const outputMetaPath                  = ( parentPath / (std::filesystem::path(materialID.string() + ".material.meta"))).lexically_normal();
+        std::filesystem::path const outputIndexPath                 = ( parentPath / (std::filesystem::path(materialID.string() + ".material")))     .lexically_normal();
+        std::filesystem::path const outputSignaturePath             = ( parentPath / (std::filesystem::path(materialID.string() + ".signature")))    .lexically_normal();
+        std::filesystem::path const outputConfigurationPath         = ( parentPath / (std::filesystem::path(materialID.string() + ".config")))       .lexically_normal();
         std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / mConfig.outputPath / outputPath             ).lexically_normal();
         std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / mConfig.outputPath / outputModulePath       ).lexically_normal();
+        std::filesystem::path const outputMetaPathAbsolute          = (std::filesystem::current_path() / mConfig.outputPath / outputMetaPath         ).lexically_normal();
         std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / mConfig.outputPath / outputIndexPath        ).lexically_normal();
         std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / mConfig.outputPath / outputSignaturePath    ).lexically_normal();
         std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / mConfig.outputPath / outputConfigurationPath).lexically_normal();
@@ -443,7 +456,7 @@ public_methods:
                         CLog::Error(logTag(), "Can't create directory '%0'", path);
                     }
                 }
-                catch(std::filesystem::filesystem_error fserr)
+                catch(std::filesystem::filesystem_error const &fserr)
                 {
                     CLog::Error(logTag(), "Cant create directory '%0'. Error: %1", path, fserr.what());
                 }
@@ -472,9 +485,13 @@ public_methods:
 
         std::vector<std::filesystem::path> inputFiles {};
 
-        SMaterialMasterIndex indexData = *static_cast<SMaterialMasterIndex const *>(&(index->asT().data()));
-        indexData.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
-        indexData.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
+        SMaterialMasterIndex const indexData = *static_cast<SMaterialMasterIndex const *>(&(index->asT().data()));
+
+        SMaterialMeta metaData = {};
+        metaData.uid                   = indexData.uid;
+        metaData.name                  = indexData.name;
+        metaData.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
+        metaData.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
 
         for(auto const &[stage, pathReferences] : indexData.stages)
         {
@@ -485,7 +502,7 @@ public_methods:
         }
 
         // Determine compilation items and config.
-        auto [generationSuccessful, unit] = generateCompilationUnit(inputFiles, outputModulePathAbsolute, indexData);
+        auto [generationSuccessful, unit] = generateCompilationUnit(inputFiles, outputModulePathAbsolute, metaData);
         if(not generationSuccessful)
         {
             CLog::Error(logTag(), "Failed to derive shader compilation units and configuration");
@@ -508,11 +525,11 @@ public_methods:
 
         std::string serializedData = {};
 
-        // Rewrite index
-        CResult<EResult> const indexSerializationResult = serializeMaterialIndex(indexData, serializedData);
-        if(not indexSerializationResult.successful())
+        // Write meta
+        CResult<EResult> const metaSerializationResult = serializeMaterialMeta(metaData, serializedData);
+        if(not metaSerializationResult.successful())
         {
-            CLog::Error(logTag(), "Failed to serialize index data.");
+            CLog::Error(logTag(), "Failed to serialize meta data.");
             return EResult::SerializationFailed;
         }
 
@@ -684,6 +701,7 @@ private_methods:
         uint32_t       dataStride;
         uint32_t       totalSize;
 
+        [[nodiscard]]
         bool hasData() const noexcept
         {
             return (nullptr != data);
@@ -1022,6 +1040,7 @@ private_methods:
      * @param aStage
      * @return              See brief.
      */
+    [[nodiscard]]
     std::string const getOutputFilename(std::string             const &aFileBaseName,
                                         EShadingLanguage        const &aLanguage,
                                         VkPipelineStageFlagBits const &aStage) const
@@ -1109,7 +1128,7 @@ private_methods:
      */
     CResult<SShaderCompilationUnit> generateCompilationUnit(  std::vector<std::filesystem::path> const &aFilenames
                                                             , std::filesystem::path              const &aModuleOutputPath
-                                                            , SMaterialMasterIndex                     &aInOutIndex)
+                                                            , SMaterialMeta                            &aInOutMeta)
     {
         EShaderCompiler  compiler = EShaderCompiler::Unknown;
         EShadingLanguage language = EShadingLanguage::Unknown;
@@ -1153,7 +1172,7 @@ private_methods:
             element.outputPathRelative = std::filesystem::relative(outputPath, (std::filesystem::current_path() / mConfig.outputPath));
 
             std::string const path = element.outputPathRelative;
-            aInOutIndex.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
+            aInOutMeta.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
 
             return element;
         };
@@ -1176,7 +1195,7 @@ private_methods:
      * @return      EResult::Success           if successful.
      * @return      EResult::CompilationFailed on error.
      */
-    CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
+    static CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
     {
         std::string const application = CString::format("%0/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
         std::string       options     = "-v -d -g -Od -V --target-env vulkan1.1";
@@ -1248,7 +1267,7 @@ private_methods:
      * @return                EResult::Success      if successful.
      * @return                EResult::InputInvalid on error.
      */
-    CResult<EResult> runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
+    static CResult<EResult> runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
     {
         std::string const application = CString::format("%0/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path());
         std::string const options     = "";
@@ -1285,7 +1304,7 @@ private_methods:
      * @param aOutSerializedData
      * @return
      */
-    CResult<EResult> serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData)
+    static CResult<EResult> serializeMaterialIndex(SMaterialMasterIndex const &aMaterialIndex, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
 
@@ -1324,7 +1343,46 @@ private_methods:
      * @param aOutSerializedData
      * @return
      */
-    CResult<EResult> serializeMaterialSignature(SMaterialSignature const &aMaterial, std::string &aOutSerializedData)
+    static CResult<EResult> serializeMaterialMeta(SMaterialMeta const &aMaterialMeta, std::string &aOutSerializedData)
+    {
+        using namespace resource_compiler::serialization;
+
+        Unique<IJSONSerializer<SMaterialMeta>> serializer = makeUnique<CJSONSerializer<SMaterialMeta>>();
+        bool const initialized = serializer->initialize();
+        if(false == initialized)
+        {
+            return EResult::SerializationFailed;
+        }
+        CResult<Shared<serialization::ISerializer<SMaterialMeta>::IResult>> const serialization = serializer->serialize(aMaterialMeta);
+        if(not serialization.successful())
+        {
+            return EResult::SerializationFailed;
+        }
+
+        CResult<std::string> data = serialization.data()->asString();
+        aOutSerializedData = data.data();
+
+        bool const deinitialized = serializer->deinitialize();
+        if(false == deinitialized)
+        {
+            return EResult::SerializationFailed;
+        }
+
+        serializer = nullptr;
+
+        CLog::Debug(logTag(), aOutSerializedData);
+
+        return EResult::Success;
+    }
+
+    /**
+     * Accept a SMaterial instance and serialize it to a JSON string.
+     *
+     * @param aMaterial
+     * @param aOutSerializedData
+     * @return
+     */
+    static CResult<EResult> serializeMaterialSignature(SMaterialSignature const &aMaterial, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
 
@@ -1362,7 +1420,7 @@ private_methods:
      * @param aOutSerializedData
      * @return
      */
-    CResult<EResult> serializeMaterialConfig(CMaterialConfig const &aMaterialConfig, std::string &aOutSerializedData)
+    static CResult<EResult> serializeMaterialConfig(CMaterialConfig const &aMaterialConfig, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
 

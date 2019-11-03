@@ -47,13 +47,21 @@ namespace engine
         };
 
         /**
-         * The SMaterialIndexStage struct describes individual module's/stage's file
+         * The SMaterialIndexStage struct describes individual stage's file
          * references.
          */
         struct SMaterialIndexStage
         {
             std::filesystem::path glslSourceFilename;
-            asset::AssetId_t      spvModuleAssetId;
+        };
+
+        /**
+         * The SMaterialMetaStage struct describes individual module's file
+         * references.
+         */
+        struct SMaterialMetaStage
+        {
+            asset::AssetId_t spvModuleAssetId;
         };
 
         /**
@@ -74,8 +82,6 @@ namespace engine
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                  (0 )
                 , name                 ({})
-                , signatureAssetUid    (0 )
-                , configurationAssetUid(0 )
                 , stages               (sEmptyMap)
             {}
 
@@ -85,20 +91,16 @@ namespace engine
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                  (aOther.uid                  )
                 , name                 (aOther.name                 )
-                , signatureAssetUid    (aOther.signatureAssetUid    )
-                , configurationAssetUid(aOther.configurationAssetUid)
                 , stages               (aOther.stages               )
             {}
 
             SHIRABE_INLINE
-            SMaterialMasterIndex(SMaterialMasterIndex &&aOther)
+            SMaterialMasterIndex(SMaterialMasterIndex &&aOther) noexcept
                 : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
-                , uid                  (std::move(aOther.uid                  ))
-                , name                 (std::move(aOther.name                 ))
-                , signatureAssetUid    (std::move(aOther.signatureAssetUid    ))
-                , configurationAssetUid(std::move(aOther.configurationAssetUid))
-                , stages               (std::move(aOther.stages               ))
+                , uid                  (aOther.uid                  )
+                , name                 (std::move(aOther.name      ))
+                , stages               (std::move(aOther.stages    ))
             {}
 
         public_operators:
@@ -107,20 +109,16 @@ namespace engine
             {
                 uid                   = aOther.uid;
                 name                  = aOther.name;
-                signatureAssetUid     = aOther.signatureAssetUid;
-                configurationAssetUid = aOther.configurationAssetUid;
                 stages                = aOther.stages;
 
                 return (*this);
             }
 
             SHIRABE_INLINE
-            SMaterialMasterIndex &operator=(SMaterialMasterIndex &&aOther)
+            SMaterialMasterIndex &operator=(SMaterialMasterIndex &&aOther) noexcept
             {
-                uid                   = std::move(aOther.uid);
+                uid                   = aOther.uid;
                 name                  = std::move(aOther.name);
-                signatureAssetUid     = std::move(aOther.signatureAssetUid);
-                configurationAssetUid = std::move(aOther.configurationAssetUid);
                 stages                = std::move(aOther.stages);
 
                 return (*this);
@@ -129,8 +127,6 @@ namespace engine
         public_members:
             uint64_t                                                         uid;
             std::string                                                      name;
-            asset::AssetId_t                                                 signatureAssetUid;
-            asset::AssetId_t                                                 configurationAssetUid;
             std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> stages;
 
         public_methods:
@@ -139,14 +135,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const;
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const final;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer);
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer) final;
         };
 
         /**
@@ -234,6 +230,100 @@ namespace engine
              * @return
              */
             bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer);
+        };
+
+
+        /**
+         * The SMaterialIndex describes all necessary data for a basic material composition
+         * in the engine.
+         * The specific implementation will be provided in files referenced by the stages member.
+         */
+        struct SMaterialMeta
+                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>
+                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>
+        {
+            static std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const sEmptyMap;
+
+        public_constructors:
+            SHIRABE_INLINE
+            SMaterialMeta()
+                    : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>()
+                    , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>()
+                    , uid                  (0 )
+                    , name                 ({})
+                    , signatureAssetUid    (0 )
+                    , configurationAssetUid(0 )
+                    , stages               (sEmptyMap)
+            {}
+
+            SHIRABE_INLINE
+            SMaterialMeta(SMaterialMeta const &aOther)
+                    : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>()
+                    , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>()
+                    , uid                  (aOther.uid                  )
+                    , name                 (aOther.name                 )
+                    , signatureAssetUid    (aOther.signatureAssetUid    )
+                    , configurationAssetUid(aOther.configurationAssetUid)
+                    , stages               (aOther.stages               )
+            {}
+
+            SHIRABE_INLINE
+            SMaterialMeta(SMaterialMeta &&aOther) noexcept
+                    : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>()
+                    , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>()
+                    , uid                  (aOther.uid                  )
+                    , name                 (std::move(aOther.name      ))
+                    , signatureAssetUid    (aOther.signatureAssetUid    )
+                    , configurationAssetUid(aOther.configurationAssetUid)
+                    , stages               (std::move(aOther.stages    ))
+            {}
+
+        public_operators:
+            SHIRABE_INLINE
+            SMaterialMeta &operator=(SMaterialMeta const &aOther)
+            {
+                uid                   = aOther.uid;
+                name                  = aOther.name;
+                signatureAssetUid     = aOther.signatureAssetUid;
+                configurationAssetUid = aOther.configurationAssetUid;
+                stages                = aOther.stages;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            SMaterialMeta &operator=(SMaterialMeta &&aOther) noexcept
+            {
+                uid                   = aOther.uid;
+                name                  = std::move(aOther.name);
+                signatureAssetUid     = aOther.signatureAssetUid;
+                configurationAssetUid = aOther.configurationAssetUid;
+                stages                = std::move(aOther.stages);
+
+                return (*this);
+            }
+
+        public_members:
+            uint64_t                                                        uid;
+            std::string                                                     name;
+            asset::AssetId_t                                                signatureAssetUid;
+            asset::AssetId_t                                                configurationAssetUid;
+            std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> stages;
+
+        public_methods:
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(serialization::IJSONSerializer<SMaterialMeta> &aSerializer) const final;
+
+            /**
+             * @brief acceptDeserializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMeta> &aDeserializer) final;
         };
 
         /**

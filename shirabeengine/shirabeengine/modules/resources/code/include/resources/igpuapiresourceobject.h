@@ -65,7 +65,7 @@ namespace engine
             using ObservableState_t = CSubject<EGpuApiResourceState>;
 
         public_api:
-            virtual GpuApiHandle_t const getHandle() = 0;
+            virtual resources::GpuApiHandle_t const getHandle() = 0;
 
             virtual CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies) = 0;
             virtual CEngineResult<> load()                                                   = 0;

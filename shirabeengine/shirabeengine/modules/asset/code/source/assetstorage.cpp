@@ -113,6 +113,26 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<ByteBuffer> CAssetStorage::loadAssetMeta(AssetId_t const &aAssetUID)
+        {
+            CEngineResult<ByteBuffer> data = { EEngineStatus::Error };
+
+            CEngineResult<SAsset> assetFetch = mAssetIndex.getAsset(aAssetUID);
+            if(not assetFetch.successful())
+            {
+                return { EEngineStatus::Error };
+            }
+
+            SAsset const asset = assetFetch.data();
+
+            // Append .meta to the file in order to load an associated meta file.
+            return mAssetDataSource->readAsset(std::filesystem::path(asset.uri.string() + ".meta"));
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         CEngineResult<ByteBuffer> CAssetStorage::loadAssetData(AssetId_t const &aAssetUID)
         {
             CEngineResult<ByteBuffer> data = { EEngineStatus::Error };
