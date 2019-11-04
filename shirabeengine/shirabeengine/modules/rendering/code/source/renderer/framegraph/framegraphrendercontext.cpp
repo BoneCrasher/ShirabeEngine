@@ -361,18 +361,18 @@ namespace engine
 
             {
                 CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
-                if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
+                if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
                 {
                     return {EEngineStatus::Ok};
                 }
-                else if( not(EEngineStatus::Ok==renderPassObject.result()))
+                else if( not (EEngineStatus::Ok==renderPassObject.result()))
                 {
                     EngineStatusPrintOnError(renderPassObject.result(), logTag(), "Failed to create render pass.");
                     return {renderPassObject.result()};
                 }
-            }
 
-            // Next: Create FrameBuffer Resource Types in VK Backend
+                registerUsedResource(renderPassDesc.name, renderPassObject.data());
+            }
 
             SFrameBufferDescription frameBufferDesc = {};
             frameBufferDesc.name   = aFrameBufferId;
@@ -394,11 +394,11 @@ namespace engine
                 {
                     EngineStatusPrintOnError(status.result(), logTag(), "Failed to create frame buffer.");
                 }
+
+                registerUsedResource(frameBufferDesc.name, status.data());
             }
 
             return EEngineStatus::Ok;
-
-            // return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -408,6 +408,12 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                                std::string const &aRenderPassId)
         {
+            Shared<ILogicalResourceObject> renderPass  = getUsedResource(aRenderPassId);
+            Shared<ILogicalResourceObject> frameBuffer = getUsedResource(aFrameBufferId);
+
+            CEngineResult<> renderPassBound  = renderPass->bind();
+            CEngineResult<> frameBufferBound = frameBuffer->bind();
+
             EEngineStatus const status=mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
             if( not CheckEngineError(status))
             {
@@ -1076,6 +1082,41 @@ namespace engine
             unloadMaterialAsset(aMaterial);
 
             return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphRenderContext::registerUsedResource(  std::string                                               const &aResourceId
+                                                            , engine::Shared<engine::resources::ILogicalResourceObject> const &aResource)
+        {
+            mUsedResources[aResourceId] = aResource;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        void CFrameGraphRenderContext::unregisterUsedResource(std::string const &aResourceId)
+        {
+            mUsedResources.erase(aResourceId);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        Shared<ILogicalResourceObject> CFrameGraphRenderContext::getUsedResource(std::string const &aResourceId)
+        {
+            if(mUsedResources.end() == mUsedResources.find(aResourceId))
+            {
+                return nullptr;
+            }
+            else
+            {
+                return mUsedResources[aResourceId];
+            }
         }
         //<-----------------------------------------------------------------------------
 

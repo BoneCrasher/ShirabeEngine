@@ -66,14 +66,14 @@ namespace engine
              *
              * @return EEngineStatus::Ok, if successful.
              */
-            CEngineResult<> beginPass() override;
+            CEngineResult<> beginPass() final;
 
             /**
              * End a pass.
              *
              * @return EEngineStatus::Ok, if successful.
              */
-            CEngineResult<> endPass() override;
+            CEngineResult<> endPass() final;
 
             /**
              * Copy the content of one image to another.
@@ -84,7 +84,7 @@ namespace engine
              * @return             EEngineStatus::Error otherwise.
              */
             CEngineResult<> copyImage(SFrameGraphTexture const &aSourceTexture,
-                                      SFrameGraphTexture const &aTargetTexture) override;
+                                      SFrameGraphTexture const &aTargetTexture) final;
 
             /**
              * Copy the content of an image to the backbuffer.
@@ -93,7 +93,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId) override;
+            CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId) final;
 
             /**
              * Bind a swapchain, if any, for further framegraph operations.
@@ -469,6 +469,10 @@ namespace engine
              */
             CEngineResult<> removeMappedInternalResourceIds(std::string const &aName);
 
+            void registerUsedResource(std::string const &aResourceId, Shared<ILogicalResourceObject> const &aResource);
+            void unregisterUsedResource(std::string const &aResourceId);
+            Shared<ILogicalResourceObject> getUsedResource(std::string const &aResourceId);
+
         private_members:
             Shared<IAssetStorage>    mAssetStorage;
             Shared<CMaterialLoader>  mMaterialLoader;
@@ -477,10 +481,11 @@ namespace engine
 
             Map<std::string, Vector<std::string>> mResourceMap;
 
+            Map<std::string, Shared<ILogicalResourceObject>> mUsedResources;
+
             std::string mCurrentFrameBufferHandle;
             std::string mCurrentRenderPassHandle;
             uint32_t    mCurrentSubpass;
-
         };
 
     }

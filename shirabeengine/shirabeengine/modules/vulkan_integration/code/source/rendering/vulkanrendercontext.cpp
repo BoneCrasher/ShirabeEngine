@@ -14,15 +14,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------        
-        bool CVulkanRenderContext::initialize(
-                Shared<CVulkanEnvironment>             const &aVulkanEnvironment,
-                Shared<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend)
+        bool CVulkanRenderContext::initialize(Shared<CVulkanEnvironment> const &aVulkanEnvironment)
         {
             assert(nullptr != aVulkanEnvironment);
-            assert(nullptr != aGraphicsAPIResourceBackend);
 
-            mVulkanEnvironment          = aVulkanEnvironment;
-            mGraphicsAPIResourceBackend = aGraphicsAPIResourceBackend;
+            mVulkanEnvironment = aVulkanEnvironment;
 
             return true;
         }
@@ -33,7 +29,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool CVulkanRenderContext::deinitialize()
         {
-            mGraphicsAPIResourceBackend = nullptr;
+            mVulkanEnvironment = nullptr;
 
             return true;
         }
@@ -53,8 +49,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::endSubpass()
         {
-            CVulkanEnvironment::SVulkanState &state         = mVulkanEnvironment->getState();
-            VkCommandBuffer                   commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            SVulkanState    &state        = mVulkanEnvironment->getState();
+            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
             vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -66,8 +62,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
 
-        EEngineStatus CVulkanRenderContext::copyImage(PublicResourceId_t const &aSourceImageId,
-                                                      PublicResourceId_t const &aTargetImageId)
+        EEngineStatus CVulkanRenderContext::copyImage(std::string const &aSourceImageId,
+                                                      std::string const &aTargetImageId)
         {
             return EEngineStatus::Ok;
         }
@@ -76,9 +72,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::copyToBackBuffer(PublicResourceId_t const &aSourceImageId)
+        EEngineStatus CVulkanRenderContext::copyToBackBuffer(std::string const &aSourceImageId)
         {
-            CEngineResult<Shared<SVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
+            CEngineResult<Shared<CVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
             if(not resourceFetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch copy source image '%0'.", aSourceImageId);
@@ -298,7 +294,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindSwapChain(PublicResourceId_t const &aSwapChainResourceId)
+        EEngineStatus CVulkanRenderContext::bindSwapChain(std::string const &aSwapChainResourceId)
         {
             CVulkanEnvironment::SVulkanState     &vkState     = mVulkanEnvironment->getState();
             CVulkanEnvironment::SVulkanSwapChain &vkSwapChain = vkState.swapChain;
@@ -419,7 +415,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindPipeline(const engine::resources::PublicResourceId_t &aPipelineUID)
+        EEngineStatus CVulkanRenderContext::bindPipeline(const engine::resources::std::string &aPipelineUID)
         {
             CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
 
@@ -445,7 +441,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::unbindPipeline(const engine::resources::PublicResourceId_t &aPipelineUID)
+        EEngineStatus CVulkanRenderContext::unbindPipeline(const engine::resources::std::string &aPipelineUID)
         {
             return EEngineStatus::Ok;
         }
@@ -454,7 +450,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindResource(PublicResourceId_t const &aId)
+        EEngineStatus CVulkanRenderContext::bindResource(std::string const &aId)
         {
             CLog::Verbose(logTag(), CString::format("Binding resource with id %0", aId));
             return EEngineStatus::Ok;
@@ -464,7 +460,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::unbindResource(PublicResourceId_t const &aId)
+        EEngineStatus CVulkanRenderContext::unbindResource(std::string const &aId)
         {
             CLog::Verbose(logTag(), CString::format("Unbinding resource with id %0", aId));
             return EEngineStatus::Ok;

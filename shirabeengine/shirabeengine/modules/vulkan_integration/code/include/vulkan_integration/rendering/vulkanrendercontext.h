@@ -29,9 +29,7 @@ namespace engine
              * @param aVulkanEnvironment          The current vulkan environment initialized for this application.
              * @return                            True, if successful. False otherwise.
              */
-            bool initialize(
-                    Shared<CVulkanEnvironment>             const &aVulkanEnvironment,
-                    Shared<gfxapi::CGFXAPIResourceBackend> const &aGraphicsAPIResourceBackend);
+            bool initialize(Shared<CVulkanEnvironment> const &aVulkanEnvironment);
 
             /**
              * Destroy and run...
@@ -49,14 +47,14 @@ namespace engine
              *
              * @return EEngineStatus::Ok, if successful.
              */
-            EEngineStatus beginSubpass();
+            EEngineStatus beginSubpass() final;
 
             /**
              * End a subpass.
              *
              * @return EEngineStatus::Ok, if successful.
              */
-            EEngineStatus endSubpass();
+            EEngineStatus endSubpass() final;
 
             /**
              * Copy one image to another.
@@ -67,8 +65,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error on any error.
              */
-            EEngineStatus copyImage(PublicResourceId_t const &aSourceImageId,
-                                    PublicResourceId_t const &aTargetImageId);
+            EEngineStatus copyImage(std::string const &aSourceImageId,
+                                    std::string const &aTargetImageId) final;
 
             /**
              * Copy one image to the current backbuffer.
@@ -77,14 +75,14 @@ namespace engine
              * @param aImageId
              * @return
              */
-            EEngineStatus copyToBackBuffer(PublicResourceId_t const &aImageId);
+            EEngineStatus copyToBackBuffer(std::string const &aImageId) final;
             /**
              * Put the current internal command buffer into recording mode.
              *
              * @return EEngineStatus::Ok, if successful.
              * @return EEngineStatus::Error, on any error.
              */
-            EEngineStatus beginGraphicsCommandBuffer();
+            EEngineStatus beginGraphicsCommandBuffer() final;
 
             /**
              * Stop recording in the current internal command buffer.
@@ -92,7 +90,7 @@ namespace engine
              * @return EEngineStatus::Ok, if successful.
              * @return EEngineStatus::Error, on any error.
              */
-            EEngineStatus commitGraphicsCommandBuffer();
+            EEngineStatus commitGraphicsCommandBuffer() final;
 
             /**
              * Bind the framebuffer and render pass with the provided ids, if found.
@@ -104,7 +102,7 @@ namespace engine
              * @return               EEngineStatus::Error, on any error.
              */
             EEngineStatus bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                       std::string const &aRenderPassId);
+                                                       std::string const &aRenderPassId) final;
 
             /**
              * Bind the framebuffer and render pass with the provided ids, if found.
@@ -116,7 +114,7 @@ namespace engine
              * @return               EEngineStatus::Error, on any error.
              */
             EEngineStatus unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                         std::string const &aRenderPassId);
+                                                         std::string const &aRenderPassId) final;
 
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
@@ -124,14 +122,14 @@ namespace engine
              * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
              * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus bindSwapChain(PublicResourceId_t const &aSwapChainResourceId);
+            EEngineStatus bindSwapChain(std::string const &aSwapChainResourceId) final;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
              *
              * @return EEngineStatus::Ok if successful. False otherwise.
              */
-            EEngineStatus present();
+            EEngineStatus present() final;
 
             /**
              * Bind a pipeline instance  in the GPU.
@@ -140,7 +138,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            EEngineStatus bindPipeline(PublicResourceId_t const &aPipelineUID);
+            EEngineStatus bindPipeline(std::string const &aPipelineUID) final;
 
             /**
              * Unbind a pipeline instance from the GPU.
@@ -149,7 +147,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            EEngineStatus unbindPipeline(PublicResourceId_t const &aPipelineUID);
+            EEngineStatus unbindPipeline(std::string const &aPipelineUID) final;
 
             /**
              * Bind a resource to the pipeline.
@@ -157,7 +155,7 @@ namespace engine
              * @param aResourceId The id of the resourcer to bind.
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
-            EEngineStatus bindResource(PublicResourceId_t const &aResourceId);
+            EEngineStatus bindResource(std::string const &aResourceId) final;
 
             /**
              * Undbind a resource from the pipeline.
@@ -165,7 +163,7 @@ namespace engine
              * @param aResourceId The id of the resourcer to bind.
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
-            EEngineStatus unbindResource(PublicResourceId_t const &aResourceId);
+            EEngineStatus unbindResource(std::string const &aResourceId) final;
 
             /**
              * Render a renderable entity using vulkan.
@@ -173,11 +171,10 @@ namespace engine
              * @param aRenderable The renderable entity to process.
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
-            EEngineStatus render(SRenderable const &aRenderable);
+            EEngineStatus render(SRenderable const &aRenderable) final;
 
         private_members:
-            Shared<CVulkanEnvironment>             mVulkanEnvironment;
-            Shared<gfxapi::CGFXAPIResourceBackend> mGraphicsAPIResourceBackend;
+            Shared<CVulkanEnvironment> mVulkanEnvironment;
         };
     }
 }
