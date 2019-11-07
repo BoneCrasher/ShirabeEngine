@@ -220,14 +220,14 @@ namespace engine
         EEngineStatus CVulkanRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
                                                                          std::string const &aRenderPassId)
         {
-            CEngineResult<Shared<SVulkanFrameBufferResource>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
+            CEngineResult<Shared<ILogicalResourceObject>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
             if(not frameBufferFetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch frame buffer '%0'.", aFrameBufferId);
                 return frameBufferFetch.result();
             }
 
-            CEngineResult<Shared<SVulkanRenderPassResource>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
+            CEngineResult<Shared<ILogicalResourceObject>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
             if(not renderPassFetch.successful())
             {
                 CLog::Error(logTag(), "Failed to fetch render pass '%0'.", aRenderPassId);

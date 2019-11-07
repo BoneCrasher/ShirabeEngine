@@ -116,6 +116,7 @@ namespace engine
         {
             using CResourceObject<SPipelineDescription>::CResourceObject;
         };
+
     }
 }
 

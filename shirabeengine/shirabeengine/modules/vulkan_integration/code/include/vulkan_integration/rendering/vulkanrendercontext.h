@@ -2,9 +2,11 @@
 #define __SHIRABE_VULKAN_RENDERCONTEXT_H__
 
 #include <log/log.h>
+#include <resources/resourcetypes.h>
 #include <renderer/irendercontext.h>
 #include <renderer/renderertypes.h>
 #include "vulkan_integration/vulkanenvironment.h"
+#include "vulkan_integration/resources/vulkanresourcebinders.h"
 
 namespace engine
 {
@@ -76,6 +78,32 @@ namespace engine
              * @return
              */
             EEngineStatus copyToBackBuffer(std::string const &aImageId) final;
+
+            /**
+             *
+             * @tparam TRelatedResources
+             * @param aResourceObjects
+             * @return
+             */
+            template <typename... TRelatedResources>
+            CEngineResult<> bindResources(TRelatedResources &&...aResourceObjects)
+            {
+                return resources::SResourceBinder<TRelatedResources...>::operator()(std::forward<TRelatedResources>(aResourceObjects)...);
+            }
+
+            /**
+             *
+             * @tparam TRelatedResources
+             * @param aResourceObjects
+             * @return
+             */
+            template <typename... TRelatedResources>
+            CEngineResult<> unbindResources(TRelatedResources &&...aResourceObjects)
+            {
+                return resources::SResourceUnbinder<TRelatedResources...>::operator()(std::forward<TRelatedResources>(aResourceObjects)...);
+            }
+
+
             /**
              * Put the current internal command buffer into recording mode.
              *
