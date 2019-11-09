@@ -9,6 +9,7 @@
 #include <core/patterns/observer.h>
 
 #include "resources/igpuapiresourceobject.h"
+#include "cgpuapiresourcestorage.h"
 
 class CResourceManager; // Declared/defined in resources/cresourcemanager.h
 
@@ -35,7 +36,7 @@ namespace engine
 
         public_api:
             // IGpuApiResourceObject
-            CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) override;
+            CEngineResult<> create(CGpuApiResourceStorage const &aDependencies) override;
             CEngineResult<> destroy() override;
 
             Shared<ObservableState_t> observableState() final;
@@ -90,7 +91,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::create(CGpuApiDependencyCollection const &aDependencies)
+        CEngineResult<> AGpuApiResourceObject<TDescription>::create(CGpuApiResourceStorage const &aDependencies)
         {
             SHIRABE_UNUSED(aDependencies);
 

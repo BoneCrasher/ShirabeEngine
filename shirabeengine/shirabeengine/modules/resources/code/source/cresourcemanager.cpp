@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include "resources/cresourcemanager.h"
+#include "cgpuapiresourcestorage.cpp"
 
 namespace engine
 {
@@ -94,10 +95,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CGpuApiDependencyCollection CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
+        CGpuApiResourceStorage CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
         {
-            CGpuApiDependencyCollection dependencies {};
-            for(auto const              &dependencyId : mResourceTree.getAdjacentFor(aId))
+            CGpuApiResourceStorage dependencies {};
+            for(auto const         &dependencyId : mResourceTree.getAdjacentFor(aId))
             {
                 Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId);
                 Unique<IGpuApiResourceObject> &gpuapiResource  = logicalResource->getGpuApiResourceInterface();

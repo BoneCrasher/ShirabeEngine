@@ -8,6 +8,7 @@
 #include <resources/resourcetypes.h>
 #include <resources/agpuapiresourceobject.h>
 #include "vulkan_integration/resources/cvkapiresource.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine
 {
@@ -28,7 +29,7 @@ namespace engine
             using CVkApiResource<STextureViewDescription>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) final;
+            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) final;
             CEngineResult<> destroy() final;
 
         public_members:

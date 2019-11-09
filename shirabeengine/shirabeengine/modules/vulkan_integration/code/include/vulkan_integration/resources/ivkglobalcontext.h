@@ -11,16 +11,24 @@
 
 namespace engine
 {
+    namespace resources
+    {
+        class CGpuApiResourceStorage;
+    }
+
     namespace vulkan
     {
+        using resources::CGpuApiResourceStorage;
+
         class SHIRABE_TEST_EXPORT IVkGlobalContext
         {
             SHIRABE_DECLARE_INTERFACE(IVkGlobalContext);
 
         public_api:
-            virtual VkDevice                getLogicalDevice()         = 0;
-            virtual VkPhysicalDevice        getPhysicalDevice()        = 0;
-            virtual Shared<IVkFrameContext> getVkCurrentFrameContext() = 0;
+            virtual VkDevice                       getLogicalDevice()         = 0;
+            virtual VkPhysicalDevice               getPhysicalDevice()        = 0;
+            virtual Shared<IVkFrameContext>        getVkCurrentFrameContext() = 0;
+            virtual Shared<CGpuApiResourceStorage> getResourceStorage()       = 0;
         };
 
     }

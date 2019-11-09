@@ -4,13 +4,14 @@
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::create(CGpuApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanTextureResource::create(CGpuApiResourceStorage const &aDependencies)
     {
         SHIRABE_UNUSED(aDependencies);
 

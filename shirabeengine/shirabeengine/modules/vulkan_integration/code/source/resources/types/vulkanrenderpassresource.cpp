@@ -3,13 +3,14 @@
 //
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanRenderPassResource::create(CGpuApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanRenderPassResource::create(CGpuApiResourceStorage const &aDependencies)
     {
         SHIRABE_UNUSED(aDependencies);
 

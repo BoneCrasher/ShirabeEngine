@@ -4,13 +4,14 @@
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::create(CGpuApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanTextureViewResource::create(CGpuApiResourceStorage const &aDependencies)
     {
         CVulkanTextureResource const *const textureResource = aDependencies.extract<CVulkanTextureResource>(getDescription().subjacentTextureId);
         if(nullptr == textureResource)

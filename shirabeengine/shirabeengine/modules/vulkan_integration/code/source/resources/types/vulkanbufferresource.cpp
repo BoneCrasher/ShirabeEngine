@@ -3,6 +3,7 @@
 //
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
@@ -55,7 +56,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferResource::create(CGpuApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanBufferResource::create(GpuApiResourceDependencies_t const &aDependencies)
     {
         SHIRABE_UNUSED(aDependencies);
 

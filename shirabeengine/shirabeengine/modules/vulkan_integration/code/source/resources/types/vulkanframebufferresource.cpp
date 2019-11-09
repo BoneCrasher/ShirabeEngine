@@ -5,13 +5,14 @@
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanFrameBufferResource::create(CGpuApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanFrameBufferResource::create(CGpuApiResourceStorage const &aDependencies)
     {
         SFrameBufferDescription const &desc = getDescription();
 

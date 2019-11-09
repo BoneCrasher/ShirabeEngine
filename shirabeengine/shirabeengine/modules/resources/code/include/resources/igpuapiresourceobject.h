@@ -9,7 +9,6 @@
 #include <core/enginestatus.h>
 
 #include "resources/resourcedescriptions.h"
-#include "resources/ilogicalresourceobject.h"
 
 namespace engine
 {
@@ -24,13 +23,18 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         class CResourceManager;
-        class CGpuApiDependencyCollection;
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         using GpuApiHandle_t = uint64_t;
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        using GpuApiResourceDependencies_t = std::unordered_map<ResourceId_t, GpuApiHandle_t>;
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -55,7 +59,6 @@ namespace engine
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT IGpuApiResourceObject
-            : public ILogicalResourceObject // Inherits signature of bind, unbind and transfer
         {
             friend class CResourceManager;
 
@@ -67,65 +70,13 @@ namespace engine
         public_api:
             virtual resources::GpuApiHandle_t const getHandle() = 0;
 
-            virtual CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) = 0;
-            virtual CEngineResult<> destroy()                                                = 0;
+            virtual CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) = 0;
+            virtual CEngineResult<> destroy()                                                 = 0;
 
             virtual Shared<ObservableState_t> observableState() = 0;
         };
         //<-----------------------------------------------------------------------------
 
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        class
-            SHIRABE_LIBRARY_EXPORT CGpuApiDependencyCollection
-        {
-        public_constructors:
-            CGpuApiDependencyCollection() = default;
-
-        public_destructors:
-            ~CGpuApiDependencyCollection() = default;
-
-        public_methods:
-            SHIRABE_INLINE
-            bool add(ResourceId_t const &aId, Unique<IGpuApiResourceObject> &aResourceReference)
-            {
-                mDependencies.erase(aId);
-                mDependencies.insert({ aId, aResourceReference });
-
-                return true;
-            };
-
-            SHIRABE_INLINE
-            Unique<IGpuApiResourceObject> const& get(ResourceId_t const &aId) const
-            {
-                static Unique<IGpuApiResourceObject> sNullRef = nullptr;
-
-                if(mDependencies.end() == mDependencies.find(aId))
-                {
-                    return sNullRef;
-                }
-
-                return mDependencies.at(aId);
-            }
-
-            template <typename T>
-            T const *const extract(ResourceId_t const &aId) const
-            {
-                T const *result = nullptr;
-
-                Unique<IGpuApiResourceObject> const &ref = get(aId);
-                if(nullptr != ref)
-                {
-                    result = dynamic_cast<T*>(ref.get());
-                }
-
-                return result;
-            }
-
-        private_members:
-            std::unordered_map<ResourceId_t, Unique<IGpuApiResourceObject>&> mDependencies;
-        };
         //<-----------------------------------------------------------------------------
     }
 }

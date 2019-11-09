@@ -38,17 +38,18 @@ namespace engine
             ~CResourceObject() override = default;
 
         private_api:
-            void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) final;
+            void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) final;
 
-            Unique<IGpuApiResourceObject>& getGpuApiResourceInterface() final;
+            [[nodiscard]]
+            GpuApiHandle_t getGpuApiResourceHandle() const final;
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
             { return mDescription; }
 
         private_members:
-            TDescription const mDescription;
-            Unique<IGpuApiResourceObject>                           mGpuApiInterface;
+            TDescription const                                      mDescription;
+            Unique<IGpuApiResourceObject>                           mGpuApiResourceHandle;
             IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
         };
 
@@ -67,9 +68,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        CEngineResult<> CResourceObject<TDescriptor>::bind()
+        void CResourceObject<TDescriptor>::setGpuApiResourceHandle(GpuApiHandle_t const &aHandle)
         {
-            return { EEngineStatus::Ok };
+            mGpuApiResourceHandle = aHandle;
         }
         //<-----------------------------------------------------------------------------
 
@@ -77,57 +78,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescriptor>
-        CEngineResult<> CResourceObject<TDescriptor>::unbind()
+        GpuApiHandle_t CResourceObject<TDescriptor>::getGpuApiResourceHandle() const
         {
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescriptor>
-        CEngineResult<> CResourceObject<TDescriptor>::transfer()
-        {
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescriptor>
-        void CResourceObject<TDescriptor>::bindGpuApiResourceInterface(
-                engine::Unique<engine::resources::IGpuApiResourceObject> aGpuApiInterface)
-        {
-            if(mGpuApiInterface)
-            {
-                mGpuApiInterface->observableState()->ignore(mStateObserver);
-                mGpuApiInterface = nullptr;
-            }
-
-            mGpuApiInterface = std::move(aGpuApiInterface);
-
-            mStateObserver = makeShared<CObserver<Unique<IGpuApiResourceObject>, EGpuApiResourceState>>(
-                    mGpuApiInterface, // Taking the unique pointer by reference is valid at this point, since the ownership won't change anymore...
-                    [this] (Unique<IGpuApiResourceObject> const &aSubject, EGpuApiResourceState &&aState)
-                    {
-                        SHIRABE_UNUSED(aSubject);
-
-                        // ... Do stuff.
-                    });
-
-            mGpuApiInterface->observableState()->observe(mStateObserver);
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescriptor>
-        Unique<IGpuApiResourceObject>& CResourceObject<TDescriptor>::getGpuApiResourceInterface()
-        {
-            return mGpuApiInterface;
+            return mGpuApiResourceHandle;
         }
         //<-----------------------------------------------------------------------------
     }

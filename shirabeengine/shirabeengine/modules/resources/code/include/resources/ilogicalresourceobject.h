@@ -7,6 +7,7 @@
 
 #include <platform/platform.h>
 #include <core/enginestatus.h>
+#include "resources/igpuapiresourceobject.h"
 
 namespace engine
 {
@@ -23,9 +24,10 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(ILogicalResourceObject);
 
         private_api:
-            virtual void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) = 0;
+            virtual void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) const = 0;
 
-            virtual Unique<IGpuApiResourceObject>& getGpuApiResourceInterface() = 0;
+            [[nodiscard]]
+            virtual GpuApiHandle_t getGpuApiResourceHandle() const = 0;
         };
 
     }

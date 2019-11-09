@@ -11,6 +11,7 @@
 #include <core/datastructures/adjacencytree.h>
 #include "resources/cresourceobject.h"
 #include "resources/agpuapiresourceobjectfactory.h"
+#include "cgpuapiresourcestorage.h"
 
 namespace engine {
     namespace resources
@@ -51,7 +52,7 @@ namespace engine {
 
             void removeResourceObject(ResourceId_t const &aId);
 
-            CGpuApiDependencyCollection getGpuApiDependencies(ResourceId_t const &aId);
+            CGpuApiResourceStorage getGpuApiDependencies(ResourceId_t const &aId);
 
         private_members:
             Unique<CGpuApiResourceObjectFactory>                             mGpuApiResourceObjectFactory;
