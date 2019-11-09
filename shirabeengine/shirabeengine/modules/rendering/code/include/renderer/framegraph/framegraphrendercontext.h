@@ -131,18 +131,26 @@ namespace engine
             /**
              * Create a framebuffer and render pass including subpasses for the provided attachment info.
              *
-             * @param aFrameBufferId       Unique Id of the frame buffer instance to create.
              * @param aRenderPassId        Unique Id of the render pass instance to create.
              * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
              * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
              * @return                     EEngineStatus::Ok if successful.
              * @return                     EEngineStatus::Error otherwise.
              */
-            CEngineResult<> createFrameBufferAndRenderPass(
-                    std::string                     const &aFrameBufferId,
+            CEngineResult<> createRenderPass(
                     std::string                     const &aRenderPassId,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
                     CFrameGraphMutableResources     const &aFrameGraphResources) override;
+
+            /**
+             *
+             * @param aFrameBufferId       Unique Id of the frame buffer instance to create.
+             * @param aRenderPassId        Unique Id of the render pass instance to create.
+             * @param aFrameGraphResources
+             * @return
+             */
+            CEngineResult<> createFrameBuffer(std::string const &aFrameBufferId,
+                                              std::string const &aRenderPassId) override;
 
             /**
              * Bind the framebuffer and render pass in the command buffer.

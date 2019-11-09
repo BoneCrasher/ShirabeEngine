@@ -6,7 +6,7 @@
 #include <renderer/irendercontext.h>
 #include <renderer/renderertypes.h>
 #include "vulkan_integration/vulkanenvironment.h"
-#include "vulkan_integration/resources/vulkanresourcebinders.h"
+#include "vulkan_integration/resources/vulkanresourceoperations.h"
 
 namespace engine
 {
@@ -79,30 +79,21 @@ namespace engine
              */
             EEngineStatus copyToBackBuffer(std::string const &aImageId) final;
 
-            /**
-             *
-             * @tparam TRelatedResources
-             * @param aResourceObjects
-             * @return
-             */
-            template <typename... TRelatedResources>
-            CEngineResult<> bindResources(TRelatedResources &&...aResourceObjects)
-            {
-                return resources::SResourceBinder<TRelatedResources...>::operator()(std::forward<TRelatedResources>(aResourceObjects)...);
+#define ImplementResourceOperation(name, op, desc)                                                                    \
+            template <typename TLogicalResource, typename... TLogicalResourceDependencies>                            \
+            CEngineResult<> name(TLogicalResource &&aResource, TLogicalResourceDependencies &&... aDependencies)      \
+            {                                                                                                         \
+                return resources::op<TLogicalResource, TLogicalResourceDependencies...>{}()                           \
+                                (std::forward<TLogicalResource>(aResource), std::forward<TLogicalResourceDependencies>(aDependencies)...); \
             }
 
-            /**
-             *
-             * @tparam TRelatedResources
-             * @param aResourceObjects
-             * @return
-             */
-            template <typename... TRelatedResources>
-            CEngineResult<> unbindResources(TRelatedResources &&...aResourceObjects)
-            {
-                return resources::SResourceUnbinder<TRelatedResources...>::operator()(std::forward<TRelatedResources>(aResourceObjects)...);
-            }
-
+            ImplementResourceOperation(createResource,   SResourceCreator,     "Creates a new hardware resource based on type TLogicalResource ");
+            ImplementResourceOperation(loadResource,     SResourceLoader,      "Loads a hardware resource based on type TLogicalResource ");
+            ImplementResourceOperation(bindResource,     SResourceBinder,      "Binds a hardware resource based on type TLogicalResource ");
+            ImplementResourceOperation(transferResource, SResourceTransferrer, "Transfer a hardware resource based on type TLogicalResource ");
+            ImplementResourceOperation(unbindResource,   SResourceUnbinder,    "Unbinds a hardware resource based on type TLogicalResource ");
+            ImplementResourceOperation(unloadResource,   SResourceUnloader,    "Unloads a hardware resource based on type TLogicalResource ");
+            ImplementResourceOperation(destroyResource,  SResourceDestructor,  "Destorys a hardware resource based on type TLogicalResource ");
 
             /**
              * Put the current internal command buffer into recording mode.

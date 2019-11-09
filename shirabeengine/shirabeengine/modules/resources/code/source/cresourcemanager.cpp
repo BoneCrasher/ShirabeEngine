@@ -94,10 +94,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CGpiApiDependencyCollection CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
+        CGpuApiDependencyCollection CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
         {
-            CGpiApiDependencyCollection dependencies {};
-            for(auto const &dependencyId : mResourceTree.getAdjacentFor(aId))
+            CGpuApiDependencyCollection dependencies {};
+            for(auto const              &dependencyId : mResourceTree.getAdjacentFor(aId))
             {
                 Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId);
                 Unique<IGpuApiResourceObject> &gpuapiResource  = logicalResource->getGpuApiResourceInterface();

@@ -76,14 +76,14 @@ namespace engine
 
         private_methods:
             template <typename T>
-            Unique<IGpuApiResourceObject> create(typename T::Descriptor_t const &aDescriptor)
+            GpuApiHandle_t create(typename T::Descriptor_t const &aDescriptor)
             {
                 std::type_info const &typeInfo = typeid(T);
 
                 auto entry = mCreators.find(typeInfo.name());
                 if(mCreators.end() == entry)
                 {
-                    return nullptr;
+                    return GpuApiHandle_t {};
                 }
 
                 Unique<IGpuApiResourceObject>            result      = nullptr;

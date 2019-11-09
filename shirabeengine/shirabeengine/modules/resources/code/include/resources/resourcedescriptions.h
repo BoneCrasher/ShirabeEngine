@@ -131,9 +131,12 @@ namespace engine
         {
         public_members:
             std::string                         name;
+            VkExtent3D                          attachmentExtent;
+            std::vector<std::string>            attachmentTextureViews;
             std::vector<SAttachmentDescription> attachmentDescriptions;
             std::vector<SSubpassDescription>    subpassDescriptions;
         };
+
         struct
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SFrameBufferDescription
@@ -141,9 +144,7 @@ namespace engine
 
         public_members:
             std::string name;
-            uint32_t    width;
-            uint32_t    height;
-            uint32_t    layers;
+            std::string referenceRenderPassId; // Used as a template to create a compatible framebuffer
         };
 
         struct

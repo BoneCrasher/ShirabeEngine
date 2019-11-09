@@ -10,7 +10,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::create(CGpiApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanTextureViewResource::create(CGpuApiDependencyCollection const &aDependencies)
     {
         CVulkanTextureResource const *const textureResource = aDependencies.extract<CVulkanTextureResource>(getDescription().subjacentTextureId);
         if(nullptr == textureResource)

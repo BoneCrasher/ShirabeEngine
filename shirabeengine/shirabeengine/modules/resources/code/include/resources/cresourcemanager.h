@@ -51,7 +51,7 @@ namespace engine {
 
             void removeResourceObject(ResourceId_t const &aId);
 
-            CGpiApiDependencyCollection getGpuApiDependencies(ResourceId_t const &aId);
+            CGpuApiDependencyCollection getGpuApiDependencies(ResourceId_t const &aId);
 
         private_members:
             Unique<CGpuApiResourceObjectFactory>                             mGpuApiResourceObjectFactory;
@@ -78,17 +78,12 @@ namespace engine {
                 mResourceTree.connect(aResourceId, dependency);
             }
 
-
-
             // TODO: Dependency check. Already loaded? Etc...
-            Shared<ILogicalResourceObject> resource       = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
-            Unique<IGpuApiResourceObject>  gpuApiResource = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
+            Shared<ILogicalResourceObject> resource         = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
+            GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
             resource->bindGpuApiResourceInterface(std::move(gpuApiResource));
 
             auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-
-            resource->getGpuApiResourceInterface()->create(dependenciesResolved);
-            resource->getGpuApiResourceInterface()->load(); // TODO: Load on demand? Auto-Unload if not accessed?
 
             storeResourceObject(aResourceId, resource);
 

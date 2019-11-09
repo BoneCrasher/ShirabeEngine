@@ -5,17 +5,32 @@
 #include <vulkan/vulkan_core.h>
 
 #include <base/declaration.h>
+#include <resources/resourcetypes.h>
+#include <resources/agpuapiresourceobject.h>
+#include "vulkan_integration/resources/cvkapiresource.h"
 
 namespace engine
 {
     namespace vulkan
     {
+        using namespace resources;
+
         /**
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanFrameBufferResource
+        class CVulkanFrameBufferResource
+                : public CVkApiResource<SFrameBufferDescription>
         {
+            SHIRABE_DECLARE_LOG_TAG(CVulkanFrameBufferResource);
+
+        public_constructors:
+            using CVkApiResource<SFrameBufferDescription>::CVkApiResource;
+
+        public_methods:
+            CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) final;
+            CEngineResult<> destroy()  final;
+
         public_members:
             VkFramebuffer handle;
         };

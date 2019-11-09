@@ -35,15 +35,8 @@ namespace engine
 
         public_api:
             // IGpuApiResourceObject
-            CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)  override;
-            CEngineResult<> load()    override;
-            CEngineResult<> unload()  override;
+            CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) override;
             CEngineResult<> destroy() override;
-
-            // ILogicalResourceObject
-            CEngineResult<> bind()     override;
-            CEngineResult<> transfer() override;
-            CEngineResult<> unbind()   override;
 
             Shared<ObservableState_t> observableState() final;
 
@@ -97,31 +90,11 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::create(CGpiApiDependencyCollection const &aDependencies)
+        CEngineResult<> AGpuApiResourceObject<TDescription>::create(CGpuApiDependencyCollection const &aDependencies)
         {
             SHIRABE_UNUSED(aDependencies);
 
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::load()
-        {
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::unload()
-        {
-            return { EEngineStatus::Ok };
+            return { EEngineStatus::NotImplemented };
         }
         //<-----------------------------------------------------------------------------
 
@@ -131,37 +104,7 @@ namespace engine
         template <typename TDescription>
         CEngineResult<> AGpuApiResourceObject<TDescription>::destroy()
         {
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::bind()
-        {
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::transfer()
-        {
-            return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::unbind()
-        {
-            return { EEngineStatus::Ok };
+            return { EEngineStatus::NotImplemented };
         }
         //<-----------------------------------------------------------------------------
 

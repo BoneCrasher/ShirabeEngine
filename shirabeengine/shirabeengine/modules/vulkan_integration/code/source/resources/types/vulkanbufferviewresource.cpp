@@ -10,9 +10,9 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::create(CGpiApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanBufferViewResource::create(CGpuApiDependencyCollection const &aDependencies)
     {
-        CVulkanBufferResource const *const bufferResource = aDependencies.extract<CVulkanBufferResource>(getDescription().bufferId);
+        auto const *const bufferResource = aDependencies.extract<CVulkanBufferResource>(getDescription().bufferId);
         if(nullptr == bufferResource)
         {
             return { EEngineStatus::Error };
@@ -39,26 +39,6 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::load()
-    {
-        // Nothing to be done...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::unload()
-    {
-        // Nothing to be done...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::destroy()
     {
         VkBufferView vkBufferView    = this->handle;
@@ -66,36 +46,6 @@ namespace engine::vulkan
 
         vkDestroyBufferView(vkLogicalDevice, vkBufferView, nullptr);
 
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::bind()
-    {
-        // Nothing to be done as buffer views are not explicitly bound...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::transfer()
-    {
-        // Nothing to be done...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::unbind()
-    {
-        // Nothing to be done as buffer views are not explicitly unbound...
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------

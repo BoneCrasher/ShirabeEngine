@@ -10,7 +10,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::create(CGpiApiDependencyCollection const &aDependencies)
+    CEngineResult<> CVulkanTextureResource::create(CGpuApiDependencyCollection const &aDependencies)
     {
         SHIRABE_UNUSED(aDependencies);
 
@@ -236,16 +236,6 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::bind()
-    {
-        // Nothing to be done, as the texture is only transferred.
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::transfer()
     {
         Shared<IVkFrameContext> frameContext = getVkContext()->getVkCurrentFrameContext();
@@ -270,16 +260,6 @@ namespace engine::vulkan
         //                        , 1, &region);
 
         return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::unbind()
-    {
-        // Nothing to do...
-        return {EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
 }

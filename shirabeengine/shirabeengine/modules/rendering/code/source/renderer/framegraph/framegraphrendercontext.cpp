@@ -208,8 +208,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::createFrameBufferAndRenderPass(
-                std::string                     const &aFrameBufferId,
+
+        /**
+         * Create a framebuffer and render pass including subpasses for the provided attachment info.
+         *
+         * @param aRenderPassId        Unique Id of the render pass instance to create.
+         * @param aAttachmentInfo      Attachment information describing all subpasses, their attachments, etc...
+         * @param aFrameGraphResources List of frame graph resources affiliated with the attachments
+         * @return                     EEngineStatus::Ok if successful.
+         * @return                     EEngineStatus::Error otherwise.
+         */
+        CEngineResult<> CFrameGraphRenderContext::createRenderPass(
                 std::string                     const &aRenderPassId,
                 SFrameGraphAttachmentCollection const &aAttachmentInfo,
                 CFrameGraphMutableResources     const &aFrameGraphResources)
@@ -257,6 +266,7 @@ namespace engine
             SRenderPassDescription renderPassDesc = {};
             renderPassDesc.name = aRenderPassId;
 
+            // Traverse all referenced attachmentments foreach pass.
             for(auto const &[passUID, attachmentResourceIndexList] : aAttachmentInfo.getAttachmentPassAssignment())
             {
                 SSubpassDescription subpassDesc = {};
@@ -359,6 +369,11 @@ namespace engine
                 renderPassDesc.subpassDescriptions.push_back(subpassDesc);
             }
 
+            renderPassDesc.attachmentExtent.width  = width;
+            renderPassDesc.attachmentExtent.height = height;
+            renderPassDesc.attachmentExtent.depth  = layers;
+            renderPassDesc.attachmentTextureViews  = textureViewIds;
+
             {
                 CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
                 if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
@@ -374,11 +389,33 @@ namespace engine
                 registerUsedResource(renderPassDesc.name, renderPassObject.data());
             }
 
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+
+        /**
+         *
+         * @param aFrameBufferId       Unique Id of the frame buffer instance to create.
+         * @param aRenderPassId        Unique Id of the render pass instance to create.
+         * @param aFrameGraphResources
+         * @return
+         */
+        CEngineResult<> CFrameGraphRenderContext::createFrameBuffer(std::string const &aFrameBufferId,
+                                                                    std::string const &aRenderPassId)
+        {
+            Shared<SRenderPass>          renderPass     = std::static_pointer_cast<SRenderPass>(getUsedResource(aRenderPassId));
+            SRenderPassDescription const renderPassDesc = renderPass->getDescription();
+
             SFrameBufferDescription frameBufferDesc = {};
-            frameBufferDesc.name   = aFrameBufferId;
-            frameBufferDesc.width  = static_cast<uint32_t>(width);
-            frameBufferDesc.height = static_cast<uint32_t>(height);
-            frameBufferDesc.layers = static_cast<uint32_t>(layers);
+            frameBufferDesc.name                  = aFrameBufferId;
+            frameBufferDesc.referenceRenderPassId = aRenderPassId;
+
+            std::vector<std::string> const &textureViewIds = renderPassDesc.attachmentTextureViews;
 
             {
                 std::vector<std::string> frameBufferDependencies {};
@@ -411,10 +448,7 @@ namespace engine
             Shared<ILogicalResourceObject> renderPass  = getUsedResource(aRenderPassId);
             Shared<ILogicalResourceObject> frameBuffer = getUsedResource(aFrameBufferId);
 
-            CEngineResult<> renderPassBound  = renderPass->bind();
-            CEngineResult<> frameBufferBound = frameBuffer->bind();
-
-            EEngineStatus const status=mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+            EEngineStatus const status = mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
             if( not CheckEngineError(status))
             {
                 // TODO: Implication of string -> std::string. Will break, once the underlying type

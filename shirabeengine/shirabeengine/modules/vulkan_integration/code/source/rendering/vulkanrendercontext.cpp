@@ -65,6 +65,9 @@ namespace engine
         EEngineStatus CVulkanRenderContext::copyImage(std::string const &aSourceImageId,
                                                       std::string const &aTargetImageId)
         {
+            SHIRABE_UNUSED(aSourceImageId);
+            SHIRABE_UNUSED(aTargetImageId);
+
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -72,7 +75,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::copyToBackBuffer(std::string const &aSourceImageId)
+        EEngineStatus CVulkanRenderContext::copyToBackBuffer(Unique<IGpuApiResourceObject> &aSourceImage)
         {
             CEngineResult<Shared<CVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
             if(not resourceFetch.successful())
@@ -81,10 +84,10 @@ namespace engine
                 return resourceFetch.result();
             }
 
-            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+            SVulkanState &state = mVulkanEnvironment->getState();
 
-            VkCommandBuffer const vkCommandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
-            VkImage         const swapChainImage  = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
+            VkCommandBuffer vkCommandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
+            VkImage         swapChainImage  = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
 
             VkImageMemoryBarrier vkImageMemoryBarrier {};
             vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

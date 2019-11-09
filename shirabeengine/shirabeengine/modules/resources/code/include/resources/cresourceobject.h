@@ -37,12 +37,6 @@ namespace engine
         public_destructors:
             ~CResourceObject() override = default;
 
-        public_api:
-            // ILogicalResourceObject
-            CEngineResult<> bind()     override;
-            CEngineResult<> unbind()   override;
-            CEngineResult<> transfer() override;
-
         private_api:
             void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) final;
 

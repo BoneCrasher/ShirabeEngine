@@ -7,6 +7,8 @@
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
 #include <resources/agpuapiresourceobject.h>
+#include <resources/iloadablegpuapiresourceobject.h>
+#include <resources/itransferrablegpuapiresourceobject.h>
 #include "vulkan_integration/resources/cvkapiresource.h"
 
 namespace engine
@@ -21,6 +23,8 @@ namespace engine
          */
         class CVulkanTextureResource
                 : public CVkApiResource<STextureDescription>
+                , public ILoadableGpuApiResourceObject
+                , public ITransferrableGpuApiResourceObject
         {
             SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
 
@@ -28,13 +32,16 @@ namespace engine
             using CVkApiResource<STextureDescription>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)   final;
+            // AGpuApiResourceObject
+            CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) final;
+            CEngineResult<> destroy()  final;
+
+            // ILoadableGpuApiResourceObject
             CEngineResult<> load()     final;
             CEngineResult<> unload()   final;
-            CEngineResult<> destroy()  final;
-            CEngineResult<> bind()     final;
+
+            // ITransferrableGpuApiResourceObject
             CEngineResult<> transfer() final;
-            CEngineResult<> unbind()   final;
 
         public_members:
             VkBuffer       stagingBuffer;

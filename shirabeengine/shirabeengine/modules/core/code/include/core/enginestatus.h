@@ -24,6 +24,7 @@ namespace engine
     {
         Ok                                                              =       0,
         Error                                                           =      -1,  // Non-specific issues
+        NotImplemented                                                  =     -10,
         NullPointer                                                     =     -26,  // General parameter issues
         OutOfBounds                                                     =     -51,  // Array/Vector
         CollectionOperationException                                    =     -70,  // Collection issues

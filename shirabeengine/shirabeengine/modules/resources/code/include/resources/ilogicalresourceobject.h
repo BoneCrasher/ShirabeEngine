@@ -22,11 +22,6 @@ namespace engine
 
             SHIRABE_DECLARE_INTERFACE(ILogicalResourceObject);
 
-        public_api:
-            virtual CEngineResult<> bind()     = 0;
-            virtual CEngineResult<> unbind()   = 0;
-            virtual CEngineResult<> transfer() = 0;
-
         private_api:
             virtual void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) = 0;
 

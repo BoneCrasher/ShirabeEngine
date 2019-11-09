@@ -24,7 +24,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         class CResourceManager;
-        class CGpiApiDependencyCollection;
+        class CGpuApiDependencyCollection;
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -67,9 +67,7 @@ namespace engine
         public_api:
             virtual resources::GpuApiHandle_t const getHandle() = 0;
 
-            virtual CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies) = 0;
-            virtual CEngineResult<> load()                                                   = 0;
-            virtual CEngineResult<> unload()                                                 = 0;
+            virtual CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) = 0;
             virtual CEngineResult<> destroy()                                                = 0;
 
             virtual Shared<ObservableState_t> observableState() = 0;
@@ -80,13 +78,13 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         class
-            SHIRABE_LIBRARY_EXPORT CGpiApiDependencyCollection
+            SHIRABE_LIBRARY_EXPORT CGpuApiDependencyCollection
         {
         public_constructors:
-            CGpiApiDependencyCollection() = default;
+            CGpuApiDependencyCollection() = default;
 
         public_destructors:
-            ~CGpiApiDependencyCollection() = default;
+            ~CGpuApiDependencyCollection() = default;
 
         public_methods:
             SHIRABE_INLINE

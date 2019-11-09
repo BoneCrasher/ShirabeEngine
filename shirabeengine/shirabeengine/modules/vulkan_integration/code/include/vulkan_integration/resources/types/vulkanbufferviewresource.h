@@ -28,13 +28,8 @@ namespace engine
             using CVkApiResource<SBufferViewDescription>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(CGpiApiDependencyCollection const &aDependencies)   final;
-            CEngineResult<> load()     final;
-            CEngineResult<> unload()   final;
-            CEngineResult<> destroy()  final;
-            CEngineResult<> bind()     final;
-            CEngineResult<> transfer() final;
-            CEngineResult<> unbind()   final;
+            CEngineResult<> create(CGpuApiDependencyCollection const &aDependencies) final;
+            CEngineResult<> destroy() final;
 
         public_members:
             VkBufferView handle;
