@@ -62,8 +62,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
 
-        EEngineStatus CVulkanRenderContext::copyImage(std::string const &aSourceImageId,
-                                                      std::string const &aTargetImageId)
+        EEngineStatus CVulkanRenderContext::copyImage(GpuApiHandle_t const &aSourceImageId,
+                                                      GpuApiHandle_t const &aTargetImageId)
         {
             SHIRABE_UNUSED(aSourceImageId);
             SHIRABE_UNUSED(aTargetImageId);
@@ -75,13 +75,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::copyToBackBuffer(Unique<IGpuApiResourceObject> &aSourceImage)
+        EEngineStatus CVulkanRenderContext::copyToBackBuffer(GpuApiHandle_t const &aSourceImageId)
         {
-            CEngineResult<Shared<CVulkanTextureResource>> resourceFetch = mGraphicsAPIResourceBackend->getResource<SVulkanTextureResource>(aSourceImageId);
-            if(not resourceFetch.successful())
+            auto const *const texture = mVulkanEnvironment->getResourceStorage()->extract<CVulkanTextureResource>(aSourceImageId);
+            if(nullptr == texture)
             {
                 CLog::Error(logTag(), "Failed to fetch copy source image '%0'.", aSourceImageId);
-                return resourceFetch.result();
+                return EEngineStatus::Error;
             }
 
             SVulkanState &state = mVulkanEnvironment->getState();
@@ -135,7 +135,7 @@ namespace engine
             vkRegion.extent         = vkExtent;
 
             vkCmdCopyImage(vkCommandBuffer,
-                           resourceFetch.data()->handle,
+                           texture->imageHandle,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                            swapChainImage,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -151,7 +151,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::beginGraphicsCommandBuffer()
         {
-            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+            SVulkanState &state = mVulkanEnvironment->getState();
 
             VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
             vkCommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -163,7 +163,7 @@ namespace engine
             VkResult const result = vkBeginCommandBuffer(commandBuffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
             if(VkResult::VK_SUCCESS != result)
             {
-                throw new CVulkanError("Failed to begin command buffer.", result);
+                throw CVulkanError("Failed to begin command buffer.", result);
             }
 
             return EEngineStatus::Ok;
@@ -175,9 +175,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::commitGraphicsCommandBuffer()
         {
-            CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
-            VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
-            VkImage         const swapChainImage  = vkState.swapChain.swapChainImages.at(vkState.swapChain.currentSwapChainImageIndex);
+            SVulkanState &vkState = mVulkanEnvironment->getState();
+            VkCommandBuffer vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkImage         swapChainImage  = vkState.swapChain.swapChainImages.at(vkState.swapChain.currentSwapChainImageIndex);
 
             //
             // Make sure the swap chain is presentable.
@@ -210,7 +210,7 @@ namespace engine
             VkResult const result = vkEndCommandBuffer(vkCommandBuffer); // The commandbuffers and swapchain count currently match
             if(VkResult::VK_SUCCESS != result)
             {
-                throw new CVulkanError("Failed to record and commit command buffer.", result);
+                throw CVulkanError("Failed to record and commit command buffer.", result);
             }
 
             return EEngineStatus::Ok;
@@ -220,35 +220,33 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                                         std::string const &aRenderPassId)
+        EEngineStatus CVulkanRenderContext::bindRenderPass(GpuApiHandle_t const &aRenderPassId,
+                                                           GpuApiHandle_t const &aFrameBufferId)
         {
-            CEngineResult<Shared<ILogicalResourceObject>> frameBufferFetch = mGraphicsAPIResourceBackend->getResource<SVulkanFrameBufferResource>(aFrameBufferId);
-            if(not frameBufferFetch.successful())
+            auto const *const renderPass  = mVulkanEnvironment->getResourceStorage()->extract<CVulkanRenderPassResource>(aRenderPassId);
+            auto const *const frameBuffer = mVulkanEnvironment->getResourceStorage()->extract<CVulkanFrameBufferResource>(aFrameBufferId);
+
+            if(nullptr == frameBuffer)
             {
                 CLog::Error(logTag(), "Failed to fetch frame buffer '%0'.", aFrameBufferId);
-                return frameBufferFetch.result();
+                return EEngineStatus::Error;
             }
 
-            CEngineResult<Shared<ILogicalResourceObject>> renderPassFetch = mGraphicsAPIResourceBackend->getResource<SVulkanRenderPassResource>(aRenderPassId);
-            if(not renderPassFetch.successful())
+            if(nullptr == renderPass)
             {
                 CLog::Error(logTag(), "Failed to fetch render pass '%0'.", aRenderPassId);
-                return renderPassFetch.result();
+                return EEngineStatus::Error;
             }
 
-            SVulkanFrameBufferResource const &frameBuffer = *frameBufferFetch.data();
-            SVulkanRenderPassResource  const &renderPass  = *renderPassFetch.data();
-
-            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+            SVulkanState &state = mVulkanEnvironment->getState();
 
             VkClearValue clearColor = { 0.0f, 0.5f, 0.5f, 1.0f };
 
             VkRenderPassBeginInfo vkRenderPassBeginInfo {};
             vkRenderPassBeginInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
             vkRenderPassBeginInfo.pNext             = nullptr;
-            vkRenderPassBeginInfo.renderPass        = renderPass.handle;
-            vkRenderPassBeginInfo.framebuffer       = frameBuffer.handle;
+            vkRenderPassBeginInfo.renderPass        = renderPass->handle;
+            vkRenderPassBeginInfo.framebuffer       = frameBuffer->handle;
             vkRenderPassBeginInfo.renderArea.offset = { 0, 0 };
             vkRenderPassBeginInfo.renderArea.extent = state.swapChain.selectedExtents;
             vkRenderPassBeginInfo.clearValueCount   = 1;
@@ -263,8 +261,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                                           std::string const &aRenderPassId)
+        EEngineStatus CVulkanRenderContext::unbindRenderPass(GpuApiHandle_t const &aFrameBufferId,
+                                                             GpuApiHandle_t const &aRenderPassId)
         {
             SHIRABE_UNUSED(aFrameBufferId);
             SHIRABE_UNUSED(aRenderPassId);
@@ -286,7 +284,7 @@ namespace engine
             // SVulkanFrameBufferResource const &frameBuffer = *frameBufferFetch.data();
             // SVulkanRenderPassResource  const &renderPass  = *renderPassFetch.data();
 
-            CVulkanEnvironment::SVulkanState &state = mVulkanEnvironment->getState();
+            SVulkanState &state = mVulkanEnvironment->getState();
 
             vkCmdEndRenderPass(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex));
 
@@ -297,10 +295,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindSwapChain(std::string const &aSwapChainResourceId)
+        EEngineStatus CVulkanRenderContext::bindSwapChain(GpuApiHandle_t const &aSwapChainResourceId)
         {
-            CVulkanEnvironment::SVulkanState     &vkState     = mVulkanEnvironment->getState();
-            CVulkanEnvironment::SVulkanSwapChain &vkSwapChain = vkState.swapChain;
+            SHIRABE_UNUSED(aSwapChainResourceId);
+
+            SVulkanState     &vkState     = mVulkanEnvironment->getState();
+            SVulkanSwapChain &vkSwapChain = vkState.swapChain;
 
             uint32_t nextImageIndex = 0;
 
@@ -339,16 +339,10 @@ namespace engine
 
             vkState.swapChain.currentSwapChainImageIndex = nextImageIndex;
 
-            VkImage               &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
-            Shared<void>  resource = Shared<void>(static_cast<void*>(&image), [] (void*) {});
+            // VkImage      &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
+            // Shared<void>  resource = Shared<void>(static_cast<void*>(&image), [] (void*) {});
 
-            CEngineResult<> registration =
-                    mGraphicsAPIResourceBackend->registerResource(
-                        aSwapChainResourceId,
-                        resource,
-                        gfxapi::CGFXAPIResourceBackend::EImportStorageMode::Overwrite);
-
-            return (registration.result());
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -357,12 +351,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::present()
         {
-            CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
+            SVulkanState &vkState = mVulkanEnvironment->getState();
 
             VkQueue presentQueue  = mVulkanEnvironment->getPresentQueue();
             VkQueue graphicsQueue = mVulkanEnvironment->getGraphicsQueue();
 
-            VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkCommandBuffer vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
             VkSwapchainKHR swapChains[]       = { vkState.swapChain.handle                   };
             VkSemaphore    waitSemaphores[]   = { vkState.swapChain.imageAvailableSemaphore  };
@@ -418,22 +412,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindPipeline(const engine::resources::std::string &aPipelineUID)
+        EEngineStatus CVulkanRenderContext::bindPipeline(GpuApiHandle_t  const &aPipelineUID)
         {
-            CVulkanEnvironment::SVulkanState &vkState = mVulkanEnvironment->getState();
+            SVulkanState     &vkState        = mVulkanEnvironment->getState();
+            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
-            VkCommandBuffer const vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
-
-            CEngineResult<Shared<SVulkanPipelineResource>> fetch = mGraphicsAPIResourceBackend->getResource<SVulkanPipelineResource>(aPipelineUID);
-            if(not fetch.successful())
+            auto const *const pipeline = mVulkanEnvironment->getResourceStorage()->extract<CVulkanPipelineResource>(aPipelineUID);
+            if(nullptr == pipeline)
             {
                 CLog::Error(logTag(), "Failed to fetch pipeline '%0'.", aPipelineUID);
-                return fetch.result();
+                return EEngineStatus::Error;
             }
 
-            SVulkanPipelineResource const &pipelineResource = *(fetch.data());
-
-            vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineResource.pipeline);
+            vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->handle);
 
             vkCmdDraw(vkCommandBuffer, 3, 1, 0, 0); // Single triangle for now.
 
@@ -444,8 +435,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::unbindPipeline(const engine::resources::std::string &aPipelineUID)
+        EEngineStatus CVulkanRenderContext::unbindPipeline(GpuApiHandle_t const &aPipelineUID)
         {
+            SHIRABE_UNUSED(aPipelineUID);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -453,7 +445,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindResource(std::string const &aId)
+        EEngineStatus CVulkanRenderContext::bindResource(GpuApiHandle_t const &aId)
         {
             CLog::Verbose(logTag(), CString::format("Binding resource with id %0", aId));
             return EEngineStatus::Ok;
@@ -463,7 +455,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::unbindResource(std::string const &aId)
+        EEngineStatus CVulkanRenderContext::unbindResource(GpuApiHandle_t const &aId)
         {
             CLog::Verbose(logTag(), CString::format("Unbinding resource with id %0", aId));
             return EEngineStatus::Ok;

@@ -442,13 +442,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                                               std::string const &aRenderPassId)
+        CEngineResult<> CFrameGraphRenderContext::bindRenderPass(std::string const &aRenderPassId,
+                                                                 std::string const &aFrameBufferId)
         {
             Shared<ILogicalResourceObject> renderPass  = getUsedResource(aRenderPassId);
             Shared<ILogicalResourceObject> frameBuffer = getUsedResource(aFrameBufferId);
 
-            EEngineStatus const status = mGraphicsAPIRenderContext->bindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+            EEngineStatus const status = mGraphicsAPIRenderContext->bindRenderPass(aRenderPassId, aFrameBufferId);
             if( not CheckEngineError(status))
             {
                 // TODO: Implication of string -> std::string. Will break, once the underlying type
@@ -464,28 +464,37 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                                                 std::string const &aRenderPassId)
+        CEngineResult<> CFrameGraphRenderContext::unbindRenderPass(std::string const &aRenderPassId,
+                                                                   std::string const &aFrameBufferId)
         {
             mCurrentFrameBufferHandle = {};
             mCurrentRenderPassHandle  = {};
             mCurrentSubpass           = 0;
 
-            return mGraphicsAPIRenderContext->unbindFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
+            return mGraphicsAPIRenderContext->unbindRenderPass(aRenderPassId, aFrameBufferId);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::destroyFrameBufferAndRenderPass(
-                std::string                     const &aFrameBufferId,
-                std::string                     const &aRenderPassId)
+        CEngineResult<> CFrameGraphRenderContext::destroyFrameBuffer(std::string const &aFrameBufferId)
         {
             CEngineResult<> destruction = mResourceManager->discardResource(aFrameBufferId);
             EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy frame buffer.");
 
-            destruction = mResourceManager->discardResource(aRenderPassId);
+            return destruction;
+
+            // return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CFrameGraphRenderContext::destroyRenderPass(std::string const &aRenderPassId)
+        {
+            CEngineResult<> destruction = mResourceManager->discardResource(aRenderPassId);
             EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy render pass.");
 
             return destruction;

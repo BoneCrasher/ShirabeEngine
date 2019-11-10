@@ -8,7 +8,7 @@
 #include <platform/platform.h>
 #include <base/declaration.h>
 #include <core/enginetypehelper.h>
-
+#include "resources/cgpuapiresourcestorage.h"
 #include "resources/igpuapiresourceobject.h"
 
 namespace engine
@@ -86,18 +86,25 @@ namespace engine
                     return GpuApiHandle_t {};
                 }
 
-                Unique<IGpuApiResourceObject>            result      = nullptr;
-                Unique<IResourceObjectCreatorBase> const &creatorBase = mCreators[typeInfo.name()];
+                Unique<IGpuApiResourceObject>             gpuApiObject = nullptr;
+                Unique<IResourceObjectCreatorBase> const &creatorBase  = mCreators[typeInfo.name()];
 
                 auto creator = static_cast<CResourceObjectCreator<T> *const>(creatorBase.get());
                 if(nullptr != creator)
                 {
-                    result = std::move(creator->create(aDescriptor));
+                    gpuApiObject = std::move(creator->create(aDescriptor));
+
+                    GpuApiHandle_t handle = gpuApiObject->getHandle();
+                    mResourceStorage->add(handle, std::move(gpuApiObject));
+
+                    return handle;
                 }
-                return result;
+
+                return GpuApiHandle_t{};
             }
 
         private_members:
+            Shared<CGpuApiResourceStorage>                                      mResourceStorage;
             std::unordered_map<char const*, Unique<IResourceObjectCreatorBase>> mCreators;
         };
 

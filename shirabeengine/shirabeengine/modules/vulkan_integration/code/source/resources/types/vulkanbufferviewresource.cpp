@@ -12,8 +12,8 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferViewResource::create(GpuApiResourceDependencies_t const &aDependencies)
     {
-        GpuApiHandle_t const        bufferGpuApiId = aDependencies.at(getDescription().bufferId);
-        auto           const *const bufferResource = getVkContext()->getResourceStorage()->extract<CVulkanBufferResource>(bufferGpuApiId);
+        GpuApiHandle_t        const        bufferGpuApiId = aDependencies.at(getDescription().bufferId);
+        CVulkanBufferResource const *const bufferResource = getVkContext()->getResourceStorage()->extract<CVulkanBufferResource>(bufferGpuApiId);
 
         if(nullptr == bufferResource)
         {

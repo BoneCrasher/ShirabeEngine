@@ -4,6 +4,7 @@
 #include <core/basictypes.h>
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
+#include <resources/igpuapiresourceobject.h>
 #include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"
@@ -13,6 +14,7 @@ namespace engine
     namespace rendering
     {
         using namespace os;
+        using resources::GpuApiHandle_t;
         // using namespace engine::resources;
 
         /**
@@ -48,8 +50,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error on any error.
              */
-            virtual EEngineStatus copyImage(std::string const &aSourceImageId,
-                                            std::string const &aTargetImageId) = 0;
+            virtual EEngineStatus copyImage(GpuApiHandle_t const &aSourceImageId,
+                                            GpuApiHandle_t const &aTargetImageId) = 0;
 
             /**
              * Copy one image to the current backbuffer.
@@ -58,7 +60,7 @@ namespace engine
              * @param aImageId
              * @return
              */
-            virtual EEngineStatus copyToBackBuffer(std::string const &aImageId) = 0;
+            virtual EEngineStatus copyToBackBuffer(GpuApiHandle_t const &aImageId) = 0;
 
             /**
              * Put the current internal command buffer into recording mode.
@@ -85,8 +87,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error, on any error.
              */
-            virtual EEngineStatus bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                               std::string const &aRenderPassId) = 0;
+            virtual EEngineStatus bindRenderPass(GpuApiHandle_t const &aRenderPassId,
+                                                 GpuApiHandle_t const &aFrameBufferId) = 0;
 
             /**
              * Bind the framebuffer and render pass with the provided ids, if found.
@@ -97,8 +99,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error, on any error.
              */
-            virtual EEngineStatus unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                                 std::string const &aRenderPassId) = 0;
+            virtual EEngineStatus unbindRenderPass(GpuApiHandle_t const &aRenderPassId,
+                                                   GpuApiHandle_t const &aFrameBufferId) = 0;
 
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
@@ -106,7 +108,7 @@ namespace engine
              * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
              * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus bindSwapChain(std::string const &aSwapChainResourceId) = 0;
+            virtual EEngineStatus bindSwapChain(GpuApiHandle_t const &aSwapChainResourceId) = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
@@ -122,7 +124,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            virtual EEngineStatus bindPipeline(std::string const &aPipelineUID) = 0;
+            virtual EEngineStatus bindPipeline(GpuApiHandle_t const &aPipelineUID) = 0;
 
             /**
              * Unbind a pipeline instance from the GPU.
@@ -131,7 +133,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            virtual EEngineStatus unbindPipeline(std::string const &aPipelineUID) = 0;
+            virtual EEngineStatus unbindPipeline(GpuApiHandle_t const &aPipelineUID) = 0;
 
             /**
              * Bind a resource to the pipeline of the respective graphics API used.
@@ -139,14 +141,14 @@ namespace engine
              * @param aResourceUID The UID of the resource to be bound.
              * @return             EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus bindResource(std::string const &aResourceUID)   = 0;
+            virtual EEngineStatus bindResource(GpuApiHandle_t const &aResourceUID)   = 0;
             /**
              * Unbind a resource from the pipeline of the respective graphics API used.
              *
              * @param aResourceUID The UID of the resource to be bound.
              * @return             EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus unbindResource(std::string const &aResourceUID) = 0;
+            virtual EEngineStatus unbindResource(GpuApiHandle_t const &aResourceUID) = 0;
 
             /**
              * Render a renderable entity using the pipeline of the respective graphics API used.

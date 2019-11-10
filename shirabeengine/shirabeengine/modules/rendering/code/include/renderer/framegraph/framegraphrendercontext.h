@@ -161,8 +161,8 @@ namespace engine
              * @return               EEngineStatus::Ok if successful.
              * @return               EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                         std::string const &aRenderPassId) override;
+            CEngineResult<> bindRenderPass(std::string const &aRenderPassId,
+                                           std::string const &aFrameBufferId) override;
 
             /**
              * Unbind the framebuffer and render pass in the command buffer.
@@ -173,20 +173,26 @@ namespace engine
              * @return               EEngineStatus::Ok if successful.
              * @return               EEngineStatus::Error otherwise.
              */
-            CEngineResult<> unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                           std::string const &aRenderPassId) override;
+            CEngineResult<> unbindRenderPass(std::string const &aRenderPassId,
+                                             std::string const &aFrameBufferId) override;
 
             /**
-             * Destroy the frame buffer and render pass identified by the arguments' UIDs.
+             * Destroy the frame buffer identified by the arguments' UIDs.
              *
              * @param aFrameBufferId Unique Id of the frame buffer to destroy
+             * @return               EEngineStatus::Ok if successful.
+             * @return               EEngineStatus::Error otherwise.
+             */
+            CEngineResult<> destroyFrameBuffer(std::string const &aFrameBufferId) override;
+
+            /**
+             * Destroy the render pass identified by the arguments' UIDs.
+             *
              * @param aRenderPassId  Unique Id of the render pass to destroy
              * @return               EEngineStatus::Ok if successful.
              * @return               EEngineStatus::Error otherwise.
              */
-            CEngineResult<> destroyFrameBufferAndRenderPass(
-                    std::string                     const &aFrameBufferId,
-                    std::string                     const &aRenderPassId) override;
+            CEngineResult<> destroyRenderPass(std::string const &aRenderPassId) override;
 
             /**
              * Load a texture asset using the asset manager into the graphics API.

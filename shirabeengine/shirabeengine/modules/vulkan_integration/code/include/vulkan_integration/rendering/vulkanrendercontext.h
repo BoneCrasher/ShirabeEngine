@@ -67,8 +67,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error on any error.
              */
-            EEngineStatus copyImage(std::string const &aSourceImageId,
-                                    std::string const &aTargetImageId) final;
+            EEngineStatus copyImage(GpuApiHandle_t const &aSourceImageId,
+                                    GpuApiHandle_t const &aTargetImageId) final;
 
             /**
              * Copy one image to the current backbuffer.
@@ -77,23 +77,7 @@ namespace engine
              * @param aImageId
              * @return
              */
-            EEngineStatus copyToBackBuffer(std::string const &aImageId) final;
-
-#define ImplementResourceOperation(name, op, desc)                                                                    \
-            template <typename TLogicalResource, typename... TLogicalResourceDependencies>                            \
-            CEngineResult<> name(TLogicalResource &&aResource, TLogicalResourceDependencies &&... aDependencies)      \
-            {                                                                                                         \
-                return resources::op<TLogicalResource, TLogicalResourceDependencies...>{}()                           \
-                                (std::forward<TLogicalResource>(aResource), std::forward<TLogicalResourceDependencies>(aDependencies)...); \
-            }
-
-            ImplementResourceOperation(createResource,   SResourceCreator,     "Creates a new hardware resource based on type TLogicalResource ");
-            ImplementResourceOperation(loadResource,     SResourceLoader,      "Loads a hardware resource based on type TLogicalResource ");
-            ImplementResourceOperation(bindResource,     SResourceBinder,      "Binds a hardware resource based on type TLogicalResource ");
-            ImplementResourceOperation(transferResource, SResourceTransferrer, "Transfer a hardware resource based on type TLogicalResource ");
-            ImplementResourceOperation(unbindResource,   SResourceUnbinder,    "Unbinds a hardware resource based on type TLogicalResource ");
-            ImplementResourceOperation(unloadResource,   SResourceUnloader,    "Unloads a hardware resource based on type TLogicalResource ");
-            ImplementResourceOperation(destroyResource,  SResourceDestructor,  "Destorys a hardware resource based on type TLogicalResource ");
+            EEngineStatus copyToBackBuffer(GpuApiHandle_t const &aImageId) final;
 
             /**
              * Put the current internal command buffer into recording mode.
@@ -120,8 +104,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error, on any error.
              */
-            EEngineStatus bindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                       std::string const &aRenderPassId) final;
+            EEngineStatus bindRenderPass(GpuApiHandle_t const &aRenderPassId,
+                                         GpuApiHandle_t const &aFrameBufferId) final;
 
             /**
              * Bind the framebuffer and render pass with the provided ids, if found.
@@ -132,8 +116,8 @@ namespace engine
              * @return               EEngineStatus::Ok, if successful.
              * @return               EEngineStatus::Error, on any error.
              */
-            EEngineStatus unbindFrameBufferAndRenderPass(std::string const &aFrameBufferId,
-                                                         std::string const &aRenderPassId) final;
+            EEngineStatus unbindRenderPass(GpuApiHandle_t const &aRenderPassId,
+                                           GpuApiHandle_t const &aFrameBufferId) final;
 
             /**
              * Bind the graphics API swapchain to the pipeline (if any...)
@@ -141,7 +125,7 @@ namespace engine
              * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
              * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus bindSwapChain(std::string const &aSwapChainResourceId) final;
+            EEngineStatus bindSwapChain(GpuApiHandle_t const &aSwapChainResourceId) final;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
@@ -157,7 +141,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            EEngineStatus bindPipeline(std::string const &aPipelineUID) final;
+            EEngineStatus bindPipeline(GpuApiHandle_t const &aPipelineUID) final;
 
             /**
              * Unbind a pipeline instance from the GPU.
@@ -166,7 +150,7 @@ namespace engine
              * @return             EEngineStatus::Ok, if successful.
              * @return             EEngineStatus::Error, if failed.
              */
-            EEngineStatus unbindPipeline(std::string const &aPipelineUID) final;
+            EEngineStatus unbindPipeline(GpuApiHandle_t const &aPipelineUID) final;
 
             /**
              * Bind a resource to the pipeline.
@@ -174,7 +158,7 @@ namespace engine
              * @param aResourceId The id of the resourcer to bind.
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
-            EEngineStatus bindResource(std::string const &aResourceId) final;
+            EEngineStatus bindResource(GpuApiHandle_t const &aResourceId) final;
 
             /**
              * Undbind a resource from the pipeline.
@@ -182,7 +166,7 @@ namespace engine
              * @param aResourceId The id of the resourcer to bind.
              * @return            EEngineStatus::Ok if successful. False otherwise.
              */
-            EEngineStatus unbindResource(std::string const &aResourceId) final;
+            EEngineStatus unbindResource(GpuApiHandle_t const &aResourceId) final;
 
             /**
              * Render a renderable entity using vulkan.

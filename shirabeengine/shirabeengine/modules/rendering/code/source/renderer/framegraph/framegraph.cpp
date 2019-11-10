@@ -287,7 +287,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext->bindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                aRenderContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
             }
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
@@ -316,7 +316,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
             {
-                aRenderContext->unbindFrameBufferAndRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                aRenderContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
                 CEngineResult<Shared<SFrameGraphTextureView>> sourceResourceFetch = mResourceData.get<SFrameGraphTextureView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
@@ -478,10 +478,13 @@ namespace engine
                 return initialization;
             }
 
-            CEngineResult<> const creation = aRenderContext->createFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId, attachments, mResourceData);
-            EngineStatusPrintOnError(creation.result(), logTag(), "Failed to create frame buffer and/or render pass.");
+            CEngineResult<> const renderPassCreation = aRenderContext->createRenderPass(aRenderPassId, attachments, mResourceData);
+            EngineStatusPrintOnError(renderPassCreation.result(), logTag(), "Failed to create render pass.");
 
-            return creation;
+            CEngineResult<> const frameBufferCreation = aRenderContext->createFrameBuffer(aFrameBufferId, aRenderPassId);
+            EngineStatusPrintOnError(frameBufferCreation.result(), logTag(), "Failed to create framebuffer.");
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -490,19 +493,22 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeRenderPassAndFrameBuffer(
                 Shared<IFrameGraphRenderContext>       &aRenderContext,
-                std::string                               const &aRenderPassId,
-                std::string                               const &aFrameBufferId)
+                std::string                      const &aRenderPassId,
+                std::string                      const &aFrameBufferId)
         {
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
             FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementResourceIds();
 
-            CEngineResult<> const destruction = aRenderContext->destroyFrameBufferAndRenderPass(aFrameBufferId, aRenderPassId);
-            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy frame buffer and/or render pass.");
+            CEngineResult<> const frameBufferDestruction = aRenderContext->destroyFrameBuffer(aFrameBufferId);
+            EngineStatusPrintOnError(frameBufferDestruction.result(), logTag(), "Failed to destroy frame buffer.");
+
+            CEngineResult<> const renderPassDestruction = aRenderContext->destroyRenderPass(aRenderPassId);
+            EngineStatusPrintOnError(renderPassDestruction.result(), logTag(), "Failed to destroy render pass.");
 
             CEngineResult<> const deinitialization = deinitializeResources(aRenderContext, attachmentResourceIds);
             EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to deinitialize resources.");
 
-            return deinitialization;
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -617,10 +623,9 @@ namespace engine
                                 return (aId == texture->resourceId);
                             };
 
-                            std::remove_if(
-                                        mInstantiatedResources.begin(),
-                                        mInstantiatedResources.end(),
-                                        condition);
+                            auto const iterator = std::remove_if(mInstantiatedResources.begin(),
+                                                                 mInstantiatedResources.end(),
+                                                                 condition);
                         }
                     }
                     break;
@@ -650,10 +655,9 @@ namespace engine
                             return (aId == textureView->resourceId);
                         };
 
-                        std::remove_if(
-                                    mInstantiatedResources.begin(),
-                                    mInstantiatedResources.end(),
-                                    condition);
+                        auto const iterator = std::remove_if(mInstantiatedResources.begin(),
+                                                             mInstantiatedResources.end(),
+                                                             condition);
 
                         --(texture->referenceCount);
 
