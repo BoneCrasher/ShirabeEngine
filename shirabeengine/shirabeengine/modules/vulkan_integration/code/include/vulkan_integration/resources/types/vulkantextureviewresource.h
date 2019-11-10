@@ -8,7 +8,6 @@
 #include <resources/resourcetypes.h>
 #include <resources/agpuapiresourceobject.h>
 #include "vulkan_integration/resources/cvkapiresource.h"
-#include "cgpuapiresourcestorage.h"
 
 namespace engine
 {

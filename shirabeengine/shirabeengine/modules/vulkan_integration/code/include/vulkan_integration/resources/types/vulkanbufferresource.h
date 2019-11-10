@@ -12,7 +12,6 @@
 
 #include "vulkan_integration/vulkandevicecapabilities.h"
 #include "vulkan_integration/resources/cvkapiresource.h"
-#include "cgpuapiresourcestorage.h"
 
 namespace engine
 {
