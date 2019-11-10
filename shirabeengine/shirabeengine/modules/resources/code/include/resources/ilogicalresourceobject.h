@@ -24,8 +24,9 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(ILogicalResourceObject);
 
         private_api:
-            virtual void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) const = 0;
+            virtual void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) = 0;
 
+        public_api:
             [[nodiscard]]
             virtual GpuApiHandle_t getGpuApiResourceHandle() const = 0;
         };

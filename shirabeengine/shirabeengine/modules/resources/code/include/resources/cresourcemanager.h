@@ -43,16 +43,13 @@ namespace engine {
 
             CEngineResult<> discardResource(ResourceId_t const &aResourceId);
 
-        private_static_functions:
-            static Shared<IGpuApiResourceObject> asPrivate(Shared<ILogicalResourceObject> const &aObject);
-
         private_methods:
             bool storeResourceObject(ResourceId_t               const &aId
                                      , Shared <ILogicalResourceObject> const &aObject);
 
             void removeResourceObject(ResourceId_t const &aId);
 
-            CGpuApiResourceStorage getGpuApiDependencies(ResourceId_t const &aId);
+            GpuApiResourceDependencies_t getGpuApiDependencies(ResourceId_t const &aId);
 
         private_members:
             Unique<CGpuApiResourceObjectFactory>                             mGpuApiResourceObjectFactory;
@@ -82,9 +79,9 @@ namespace engine {
             // TODO: Dependency check. Already loaded? Etc...
             Shared<ILogicalResourceObject> resource         = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
             GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
-            resource->bindGpuApiResourceInterface(std::move(gpuApiResource));
+            resource->setGpuApiResourceHandle(gpuApiResourceId);
 
-            auto dependenciesResolved = getGpuApiDependencies(aResourceId);
+            // auto dependenciesResolved = getGpuApiDependencies(aResourceId);
 
             storeResourceObject(aResourceId, resource);
 

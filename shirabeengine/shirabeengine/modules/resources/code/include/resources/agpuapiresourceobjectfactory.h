@@ -103,6 +103,19 @@ namespace engine
                 return GpuApiHandle_t{};
             }
 
+            SHIRABE_INLINE
+            Unique<IGpuApiResourceObject> const &get(GpuApiHandle_t const &aHandle)
+            {
+                return mResourceStorage->get(aHandle);
+            }
+
+            SHIRABE_INLINE
+            void destroy(GpuApiHandle_t const &aHandle)
+            {
+                mResourceStorage->get(aHandle)->destroy();
+                mResourceStorage->remove(aHandle);
+            }
+
         private_members:
             Shared<CGpuApiResourceStorage>                                      mResourceStorage;
             std::unordered_map<char const*, Unique<IResourceObjectCreatorBase>> mCreators;

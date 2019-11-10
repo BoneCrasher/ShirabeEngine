@@ -2,7 +2,7 @@
 // Created by dotti on 07.11.19.
 //
 #include <type_traits>
-#incldue <tuple>
+#include <tuple>
 
 #ifndef __SHIRABEDEVELOPMENT_CPP_TOOLS_H__
 #define __SHIRABEDEVELOPMENT_CPP_TOOLS_H__

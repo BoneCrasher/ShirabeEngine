@@ -4,16 +4,15 @@
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
-#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::create(CGpuApiResourceStorage const &aDependencies)
+    CEngineResult<> CVulkanTextureViewResource::create(GpuApiResourceDependencies_t const &aDependencies)
     {
-        CVulkanTextureResource const *const textureResource = aDependencies.extract<CVulkanTextureResource>(getDescription().subjacentTextureId);
+        CVulkanTextureResource const *const textureResource = getVkContext()->getResourceStorage()->extract<CVulkanTextureResource>(aDependencies.at(getDescription().subjacentTextureId));
         if(nullptr == textureResource)
         {
             return { EEngineStatus::Error };
@@ -95,26 +94,6 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::load()
-    {
-        // Nothing to be done...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::unload()
-    {
-        // Nothing to be done...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureViewResource::destroy()
     {
         VkImageView vkImageView     = this->handle;
@@ -122,36 +101,6 @@ namespace engine::vulkan
 
         vkDestroyImageView(vkLogicalDevice, vkImageView, nullptr);
 
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::bind()
-    {
-        // Nothing to be done as texture views are not explicitly bound...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::transfer()
-    {
-        // Nothing to be done...
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::unbind()
-    {
-        // Nothing to be done as texture views are not explicitly unbound...
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------

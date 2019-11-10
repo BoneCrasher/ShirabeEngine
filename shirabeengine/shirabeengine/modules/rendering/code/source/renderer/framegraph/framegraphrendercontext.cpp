@@ -144,7 +144,10 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceImage,
                                                             SFrameGraphTexture const &aTargetImage)
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->copyImage(aSourceImage.readableName, aTargetImage.readableName);
+            Shared<ILogicalResourceObject> source = getUsedResource(aSourceImage.readableName);
+            Shared<ILogicalResourceObject> target = getUsedResource(aTargetImage.readableName);
+
+            CEngineResult<> const status = mGraphicsAPIRenderContext->copyImage(source->getGpuApiResourceHandle(), target->getGpuApiResourceHandle());
 
             return status;
         }
@@ -155,7 +158,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId)
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->copyToBackBuffer(aSourceImageId.readableName);
+            Shared<ILogicalResourceObject> source = getUsedResource(aSourceImageId.readableName);
+
+            CEngineResult<> const status = mGraphicsAPIRenderContext->copyToBackBuffer(source->getGpuApiResourceHandle());
 
             return status;
         }
@@ -166,7 +171,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)
         {
-            CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(aSwapChainId);
+            Shared<ILogicalResourceObject> source = getUsedResource(aSwapChainId);
+
+            CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(source->getGpuApiResourceHandle());
 
             return status;
         }
@@ -448,7 +455,7 @@ namespace engine
             Shared<ILogicalResourceObject> renderPass  = getUsedResource(aRenderPassId);
             Shared<ILogicalResourceObject> frameBuffer = getUsedResource(aFrameBufferId);
 
-            EEngineStatus const status = mGraphicsAPIRenderContext->bindRenderPass(aRenderPassId, aFrameBufferId);
+            EEngineStatus const status = mGraphicsAPIRenderContext->bindRenderPass(renderPass->getGpuApiResourceHandle(), frameBuffer->getGpuApiResourceHandle());
             if( not CheckEngineError(status))
             {
                 // TODO: Implication of string -> std::string. Will break, once the underlying type
@@ -467,11 +474,15 @@ namespace engine
         CEngineResult<> CFrameGraphRenderContext::unbindRenderPass(std::string const &aRenderPassId,
                                                                    std::string const &aFrameBufferId)
         {
+            Shared<ILogicalResourceObject> renderPass  = getUsedResource(aRenderPassId);
+            Shared<ILogicalResourceObject> frameBuffer = getUsedResource(aFrameBufferId);
+
+            return mGraphicsAPIRenderContext->unbindRenderPass(renderPass->getGpuApiResourceHandle(), frameBuffer->getGpuApiResourceHandle());
+
             mCurrentFrameBufferHandle = {};
             mCurrentRenderPassHandle  = {};
             mCurrentSubpass           = 0;
 
-            return mGraphicsAPIRenderContext->unbindRenderPass(aRenderPassId, aFrameBufferId);
         }
         //<-----------------------------------------------------------------------------
 
@@ -630,7 +641,8 @@ namespace engine
             {
                 for(std::string const &pid : subjacentResourcesFetch.data())
                 {
-                    mGraphicsAPIRenderContext->bindResource(pid);
+                    Shared<ILogicalResourceObject> resource = getUsedResource(pid);
+                    mGraphicsAPIRenderContext->bindResource(resource->getGpuApiResourceHandle());
                 }
             }
 
@@ -651,7 +663,8 @@ namespace engine
             {
                 for(std::string const &pid : subjacentResourcesFetch.data())
                 {
-                    mGraphicsAPIRenderContext->unbindResource(pid);
+                    Shared<ILogicalResourceObject> resource = getUsedResource(pid);
+                    mGraphicsAPIRenderContext->unbindResource(resource->getGpuApiResourceHandle());
                 }
             }
 
@@ -1083,7 +1096,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)
         {
-            auto const result = mGraphicsAPIRenderContext->bindPipeline(aMaterial.readableName);
+            Shared<ILogicalResourceObject> pipeline = getUsedResource(aMaterial.readableName);
+            auto const result = mGraphicsAPIRenderContext->bindPipeline(pipeline->getGpuApiResourceHandle());
             return result;
         }
         //<-----------------------------------------------------------------------------
@@ -1093,7 +1107,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
         {
-            auto const result = mGraphicsAPIRenderContext->unbindPipeline(aMaterial.readableName);
+            Shared<ILogicalResourceObject> pipeline = getUsedResource(aMaterial.readableName);
+            auto const result = mGraphicsAPIRenderContext->unbindPipeline(pipeline->getGpuApiResourceHandle());
             return result;
         }
         //<-----------------------------------------------------------------------------

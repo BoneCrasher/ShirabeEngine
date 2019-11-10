@@ -424,7 +424,7 @@ namespace engine
                 return EEngineStatus::Error;
             }
 
-            vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->handle);
+            vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
 
             vkCmdDraw(vkCommandBuffer, 3, 1, 0, 0); // Single triangle for now.
 

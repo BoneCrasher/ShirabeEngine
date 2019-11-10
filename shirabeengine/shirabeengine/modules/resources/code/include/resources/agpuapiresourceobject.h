@@ -36,24 +36,10 @@ namespace engine
 
         public_api:
             // IGpuApiResourceObject
-            CEngineResult<> create(CGpuApiResourceStorage const &aDependencies) override;
+            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) override;
             CEngineResult<> destroy() override;
 
             Shared<ObservableState_t> observableState() final;
-
-        private_api:
-            SHIRABE_INLINE
-            void bindGpuApiResourceInterface(Unique<IGpuApiResourceObject> aGpuApiInterface) final
-            {
-                SHIRABE_UNUSED(aGpuApiInterface);
-            };
-
-            SHIRABE_INLINE
-            Unique<IGpuApiResourceObject>& getGpuApiResourceInterface() final
-            {
-                static Unique<IGpuApiResourceObject> sNullRef = nullptr;
-                return sNullRef;
-            };
 
         public_methods:
             SHIRABE_INLINE TDescription const &getDescription() const
@@ -91,7 +77,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::create(CGpuApiResourceStorage const &aDependencies)
+        CEngineResult<> AGpuApiResourceObject<TDescription>::create(GpuApiResourceDependencies_t const &aDependencies)
         {
             SHIRABE_UNUSED(aDependencies);
 

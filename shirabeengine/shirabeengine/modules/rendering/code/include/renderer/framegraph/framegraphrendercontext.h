@@ -4,6 +4,7 @@
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <asset/assetstorage.h>
+#include <resources/ilogicalresourceobject.h>
 
 #include "renderer/irendercontext.h"
 #include "renderer/renderertypes.h"

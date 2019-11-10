@@ -49,7 +49,7 @@ namespace engine
 
         private_members:
             TDescription const                                      mDescription;
-            Unique<IGpuApiResourceObject>                           mGpuApiResourceHandle;
+            GpuApiHandle_t                                          mGpuApiResourceHandle;
             IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
         };
 

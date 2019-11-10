@@ -22,15 +22,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        Shared<IGpuApiResourceObject> CResourceManager::asPrivate(Shared<ILogicalResourceObject> const &aObject)
-        {
-            return std::static_pointer_cast<IGpuApiResourceObject>(aObject);
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
         CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useAssetResource(  ResourceId_t const &aResourceId
                                                                                          , AssetId_t    const &aAssetResourceId)
         {
@@ -48,12 +39,10 @@ namespace engine
             {
                 mResourceTree.remove(aResourceId);
 
-                Shared<ILogicalResourceObject>  p = mResourceObjects[aResourceId];
-                Unique<IGpuApiResourceObject>  &q = p->getGpuApiResourceInterface();
+                Shared<ILogicalResourceObject>        p = mResourceObjects[aResourceId];
+                GpuApiHandle_t                 const &q = p->getGpuApiResourceHandle();
 
-                SHIRABE_EXPLICIT_DISCARD(p->unbind());
-                SHIRABE_EXPLICIT_DISCARD(q->unload());
-                SHIRABE_EXPLICIT_DISCARD(q->destroy());
+                mGpuApiResourceObjectFactory->destroy(q);
 
                 removeResourceObject(aResourceId);
             }
@@ -95,14 +84,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CGpuApiResourceStorage CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
+        GpuApiResourceDependencies_t CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
         {
-            CGpuApiResourceStorage dependencies {};
+            GpuApiResourceDependencies_t dependencies {};
             for(auto const         &dependencyId : mResourceTree.getAdjacentFor(aId))
             {
                 Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId);
-                Unique<IGpuApiResourceObject> &gpuapiResource  = logicalResource->getGpuApiResourceInterface();
-                dependencies.add( dependencyId, gpuapiResource );
+                dependencies.insert({ dependencyId, logicalResource->getGpuApiResourceHandle() });
             }
             return dependencies;
         }

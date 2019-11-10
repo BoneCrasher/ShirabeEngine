@@ -3,7 +3,6 @@
 //
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
-#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {

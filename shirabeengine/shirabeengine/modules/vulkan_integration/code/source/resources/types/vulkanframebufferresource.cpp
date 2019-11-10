@@ -5,25 +5,24 @@
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
-#include "cgpuapiresourcestorage.h"
 
 namespace engine::vulkan
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanFrameBufferResource::create(CGpuApiResourceStorage const &aDependencies)
+    CEngineResult<> CVulkanFrameBufferResource::create(GpuApiResourceDependencies_t const &aDependencies)
     {
         SFrameBufferDescription const &desc = getDescription();
 
-        auto                   const *const renderPass            = aDependencies.extract<CVulkanRenderPassResource>(desc.referenceRenderPassId);
+        auto                   const *const renderPass            = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aDependencies.at(desc.referenceRenderPassId));
         SRenderPassDescription const       &renderPassDescription = renderPass->getDescription();
 
         std::vector<VkImageView> textureViews {};
 
         for(auto const &id : renderPassDescription.attachmentTextureViews)
         {
-            auto const *const textureView = aDependencies.extract<CVulkanTextureViewResource>(id);
+            auto const *const textureView = getVkContext()->getResourceStorage()->extract<CVulkanTextureViewResource>(aDependencies.at(id));
             textureViews.push_back(textureView->handle);
         }
 
