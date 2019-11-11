@@ -1071,7 +1071,8 @@ namespace engine
             std::vector<std::string> const textureViewHandles = {}; // All texture view names are immediately based on the texture-names, no further decoration needed.
             std::vector<std::string> const bufferViewHandles  = {}; // All uniform buffer names are a compounds as <materialname>_<buffername>.
 
-            pipelineDescriptor.name = aMaterial.readableName;
+            pipelineDescriptor.name                  = aMaterial.readableName;
+            pipelineDescriptor.referenceRenderPassId = renderPassHandle;
 
             std::vector<std::string> pipelineDependencies {};
             pipelineDependencies.push_back(renderPassHandle);

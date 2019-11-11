@@ -175,6 +175,8 @@ namespace engine
             SHIRABE_TEST_EXPORT SPipelineDescription
         {
             std::string                                                  name;
+            ResourceId_t                                                 referenceRenderPassId;
+
             VkViewport                                                   viewPort;
             VkRect2D                                                     scissor;
 
