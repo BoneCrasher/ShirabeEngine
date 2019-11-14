@@ -453,12 +453,12 @@ public_methods:
                     bool const created = std::filesystem::create_directories(path);
                     if(not created)
                     {
-                        CLog::Error(logTag(), "Can't create directory '%0'", path);
+                        CLog::Error(logTag(), "Can't create directory '{}'", path.string());
                     }
                 }
                 catch(std::filesystem::filesystem_error const &fserr)
                 {
-                    CLog::Error(logTag(), "Cant create directory '%0'. Error: %1", path, fserr.what());
+                    CLog::Error(logTag(), "Cant create directory '{}'. Error: {}", path.string(), fserr.what());
                 }
             }
         };

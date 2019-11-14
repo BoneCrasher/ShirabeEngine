@@ -12,6 +12,31 @@ namespace engine
 {
     namespace graphicsapi
     {
+
+        /**
+         * The EGFXAPI enum identifies a specific graphics API
+         */
+        enum class EGFXAPI
+        {
+            DirectX = 1,
+            OpenGL  = 2,
+            Vulkan  = 4
+        };
+
+        /**
+         * The EGFXAPIVersion enum identifies a specific graphics API version requirement.
+         */
+        enum class EGFXAPIVersion
+        {
+            DirectX_11_0,
+            DirectX_11_1,
+            DirectX_11_2,
+            DirectX_12_0,
+            OpenGL_,
+            Vulkan_1_0,
+            Vulkan_1_1
+        };
+
         enum class EFormat
                 : uint16_t
         {

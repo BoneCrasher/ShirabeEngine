@@ -211,10 +211,10 @@ namespace engine
                     std::future<ResourceTaskFn_t::result_type> &aOutSharedFuture);
 
         private_members:
-            Shared<ResourceTaskBackend_t>                       mResourceTaskBackend;
-            ResolvedDependencyCollection_t                               mStorage;
-            threading::CLooper<ResourceTaskFn_t::result_type>            mResourceThread;
-            threading::CLooper<ResourceTaskFn_t::result_type>::CHandler &mResourceThreadHandler;
+            Shared<ResourceTaskBackend_t>                                  mResourceTaskBackend;
+            ResolvedDependencyCollection_t                                 mStorage;
+            threading::CLooper<ResourceTaskFn_t::result_type>              mResourceThread;
+            threading::CLooper<ResourceTaskFn_t::result_type>::CDispatcher &mResourceThreadHandler;
         };
         //<-----------------------------------------------------------------------------
 

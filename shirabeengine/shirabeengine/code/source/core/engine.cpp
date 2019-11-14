@@ -3,30 +3,26 @@
 #include <asset/assetindex.h>
 #include <asset/filesystemassetdatasource.h>
 #include <core/enginestatus.h>
-#include <resources/core/resourcemanagerbase.h>
-#include <resources/core/resourceproxyfactory.h>
 #include <renderer/renderer.h>
 #include <renderer/framegraph/framegraphrendercontext.h>
-#include <graphicsapi/resources/gfxapiresourcebackend.h>
-#include <graphicsapi/resources/gfxapiresourceproxy.h>
-#include <graphicsapi/resources/types/all.h>
+#include <graphicsapi/definitions.h>
 #include <material/material_loader.h>
-#include <vulkan/resources/vulkanresourcetaskbackend.h>
-#include <vulkan/rendering/vulkanrendercontext.h>
-#include <vulkan/vulkandevicecapabilities.h>
+#include <resources/agpuapiresourceobjectfactory.h>
+#include <vulkan_integration/rendering/vulkanrendercontext.h>
+#include <vulkan_integration/vulkandevicecapabilities.h>
+#include <vulkan_integration/resources/cvulkanprivateresourceobjectfactory.h>
 
 #include <wsi/display.h>
 
 #if defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11display.h>
     #include <wsi/x11/x11windowfactory.h>
-    #include <vulkan/wsi/x11surface.h>
+    #include <vulkan_integration/wsi/x11surface.h>
 #elif defined SHIRABE_PLATFORM_WINDOWS
     #include <wsi/windows/windowsdisplay.h>
     #include <wsi/windows/windowswindowfactory.h>
 #endif
 
-#include "resource_management/resourcemanager.h"
 #include "core/engine.h"
 
 namespace engine
@@ -40,40 +36,40 @@ namespace engine
         SHIRABE_DECLARE_LOG_TAG("TestDummy")
 
         public_methods:
-            void onResume(Shared<IWindow> const &)
+        void onResume(Shared<IWindow> const &) override
         {
             //Log::Status(logTag(), "OnResume");
         }
 
-        void onShow(Shared<IWindow> const &)
+        void onShow(Shared<IWindow> const &) override
         {
             //Log::Status(logTag(), "onShow");
         }
 
         void onBoundsChanged(
                 Shared<IWindow> const &,
-                CRect                    const &)
+                CRect                    const &) override
         {
             //Log::Status(logTag(), String::format("onBoundsChanged: %0/%1/%2/%3", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
         }
 
-        void onHide(Shared<IWindow> const &)
+        void onHide(Shared<IWindow> const &) override
         {
             //Log::Status(logTag(), "onHide");
         }
 
-        void onPause(Shared<IWindow> const &)
+        void onPause(Shared<IWindow> const &) override
         {
             //Log::Status(logTag(), "onPause");
         }
 
-        void onClose(Shared<IWindow> const &)
+        void onClose(Shared<IWindow> const &) override
         {
             // Log::Status(logTag(), "onClose");
             // PostQuitMessage(0);
         }
 
-        void onDestroy(Shared<IWindow> const &)
+        void onDestroy(Shared<IWindow> const &) override
         {
 
         }
@@ -83,12 +79,11 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineInstance::CEngineInstance(Shared<os::SApplicationEnvironment> const &aEnvironment)
-        : mApplicationEnvironment(aEnvironment)
+    CEngineInstance::CEngineInstance(Shared<os::SApplicationEnvironment> aEnvironment)
+        : mApplicationEnvironment(std::move(aEnvironment))
         , mWindowManager    (nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
         , mMainWindow       (nullptr)
         , mAssetStorage     (nullptr)
-        , mProxyFactory     (nullptr)
         , mResourceManager  (nullptr)
         , mVulkanEnvironment(nullptr)
         , mRenderer         (nullptr)
@@ -112,34 +107,6 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    /**
-     * Templated helper struct to spawn a typed gfxapi backend resource proxy creator functor.
-     */
-    template <typename TResource>
-    struct SSpawnProxy
-    {
-        /**
-         * Create and return a gfxapi resource backend proxy creation functor from TResource.
-         *
-         * @param aBackend The backend to create a proxy for.
-         * @return         A valid creation functor for a proxy of type TResource.
-         */
-        static CResourceProxyFactory::CreatorFn_t<TResource> forGFXAPIBackend(Shared<CGFXAPIResourceBackend> aBackend)
-        {
-            auto const creator = [=]() -> CResourceProxyFactory::CreatorFn_t<TResource>
-            {
-                return
-                        [=](resources::EProxyType const &aType, typename TResource::CCreationRequest const &aRequest)
-                        -> Shared<IResourceProxy<TResource>>
-                {
-                    return makeShared<CGFXAPIResourceProxy<TResource>>(aType, aRequest, aBackend);
-                };
-            };
-
-            return creator();
-        }
-    };
-    //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
@@ -148,8 +115,7 @@ namespace engine
     {
         EEngineStatus status = EEngineStatus::Ok;
 
-        Shared<CGFXAPIResourceBackend> resourceBackend = nullptr;
-        Shared<CWSIDisplay>            display         = nullptr;
+        Shared<CWSIDisplay> display = nullptr;
 
 #if defined SHIRABE_PLATFORM_LINUX
         Shared<x11::CX11Display> x11Display = makeShared<x11::CX11Display>();
@@ -165,8 +131,8 @@ namespace engine
                 windowWidth  = displayDesc.bounds.size.x(),
                 windowHeight = displayDesc.bounds.size.y();
 
-        EGFXAPI        const gfxApi        = EGFXAPI::Vulkan;
-        EGFXAPIVersion const gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
+        EGFXAPI        gfxApi        = EGFXAPI::Vulkan;
+        EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
 
         auto const fnCreatePlatformWindowSystem = [&, this] () -> CEngineResult<>
         {
@@ -255,7 +221,7 @@ namespace engine
 
                 mVulkanEnvironment->setSurface(surfaceCreation.data());
 
-                VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(Format::R8G8B8A8_UNORM);
+                VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(EFormat::R8G8B8A8_UNORM);
                 mVulkanEnvironment->createSwapChain(
                              displayDesc.bounds,
                              requiredFormat,
@@ -282,14 +248,14 @@ namespace engine
 
             CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/"game.assetindex.xml");
 
-            CStdUniquePtr_t<IAssetDataSource> assetDataSource = makeUnique<CFileSystemAssetDataSource>(resourcesPath);
+            Unique<IAssetDataSource> assetDataSource = makeUnique<CFileSystemAssetDataSource>(resourcesPath);
             Shared<CAssetStorage>    assetStorage    = makeShared<CAssetStorage>(std::move(assetDataSource));
             assetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
             materialLoader = makeShared<material::CMaterialLoader>(assetStorage);
 
-            Shared<CGFXAPIResourceTaskBackend> resourceTaskBackend = nullptr;
+            Unique<CGpuApiResourceObjectFactory> gpuApiResourceFactory = nullptr;
 
             // The graphics API resource backend is static and does not have to be replaced.
             // On switching the graphics API the task backend (also containing the effective API handles),
@@ -299,29 +265,11 @@ namespace engine
             // The reset of the taskbackend should thus occur through the resource backend.
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                Shared<CVulkanResourceTaskBackend> vkResourceTaskBackend = makeShared<CVulkanResourceTaskBackend>(mVulkanEnvironment);
-                vkResourceTaskBackend->initialize();
-
-                resourceTaskBackend = vkResourceTaskBackend;
+                gpuApiResourceFactory = makeUnique<CVulkanPrivateResourceObjectFactory>();
             }
 
-            resourceBackend = makeShared<CGFXAPIResourceBackend>();
-            resourceBackend->setResourceTaskBackend(resourceTaskBackend);
-            resourceBackend->initialize();
-
-            mProxyFactory = makeShared<CResourceProxyFactory>();
-            mProxyFactory->addCreator<CTexture>    (EResourceSubType::TEXTURE_2D,   SSpawnProxy<CTexture>    ::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CTextureView>(EResourceSubType::TEXTURE_VIEW, SSpawnProxy<CTextureView>::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CBuffer>     (EResourceSubType::BUFFER,       SSpawnProxy<CBuffer>     ::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CBufferView> (EResourceSubType::BUFFERVIEW,   SSpawnProxy<CBufferView> ::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CRenderPass> (EResourceSubType::RENDER_PASS,  SSpawnProxy<CRenderPass> ::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CFrameBuffer>(EResourceSubType::FRAME_BUFFER, SSpawnProxy<CFrameBuffer>::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CPipeline>   (EResourceSubType::PIPELINE,     SSpawnProxy<CPipeline>   ::forGFXAPIBackend(resourceBackend));
-            mProxyFactory->addCreator<CMesh>       (EResourceSubType::MESH_STATIC,  SSpawnProxy<CMesh>       ::forGFXAPIBackend(resourceBackend));
-
-            Shared<CResourceManagerBase> manager = makeShared<CResourceManager>(mProxyFactory);
-            mResourceManager = manager;            
-            mResourceManager->initialize();
+            Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory));
+            mResourceManager = manager;
 
             return { EEngineStatus::Ok };
         };
@@ -336,7 +284,7 @@ namespace engine
             if(EGFXAPI::Vulkan == gfxApi)
             {
                 Shared<CVulkanRenderContext> vulkanRenderContext = makeShared<CVulkanRenderContext>();
-                vulkanRenderContext->initialize(mVulkanEnvironment, resourceBackend);
+                vulkanRenderContext->initialize(mVulkanEnvironment);
 
                 gfxApiRenderContext = vulkanRenderContext;
             }
@@ -367,7 +315,7 @@ namespace engine
             creation = fnCreatePlatformRenderer();
 
         }
-        catch(std::exception const stde)
+        catch(std::exception &stde)
         {
             CLog::Error(logTag(), stde.what());
             return EEngineStatus::Error;
@@ -391,18 +339,13 @@ namespace engine
 
         if(nullptr != mResourceManager)
         {
-            mResourceManager->clear(); // Will implicitely clear all subsystems!
+            // mResourceManager->reset(); // Will implicitely clear all subsystems!
             mResourceManager = nullptr;
-        }
-
-        if(nullptr != mProxyFactory)
-        {
-            mProxyFactory = nullptr;
         }
 
         if(nullptr != mRenderer)
         {
-                status = mRenderer->deinitialize();
+            status = mRenderer->deinitialize();
         }
 
         if(nullptr != mMainWindow)

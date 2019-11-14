@@ -4,8 +4,8 @@ THIS=`pwd -P`
 
 buildOne ()
 {
-    export CFLAGS="-m${addressmode}"
-    export CXXFLAGS="-m${addressmode}"
+    export CFLAGS="-m${addressmode} -fPIC"
+    export CXXFLAGS="-m${addressmode} -fPIC"
 
     cd ${build_directory}
 

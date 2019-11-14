@@ -1360,20 +1360,20 @@ Possible candidates:
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:402: warning: no matching class member found for 
   template < TTaskResult >
-  void engine::threading::CLooper::CHandler::storeDelayedPostFuture(std::future< TTaskResult > &aFunction)
+  void engine::threading::CLooper::CDispatcher::storeDelayedPostFuture(std::future< TTaskResult > &aFunction)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:414: warning: documented symbol `bool engine::threading::CLooper::CHandler::is_ready' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:414: warning: documented symbol `bool engine::threading::CLooper::CDispatcher::is_ready' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:427: warning: no matching class member found for 
   template < TTaskResult >
-  void engine::threading::CLooper::CHandler::checkDelayedPostFutures()
+  void engine::threading::CLooper::CDispatcher::checkDelayedPostFutures()
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:464: warning: no matching class member found for 
   template < TTaskResult >
-  bool engine::threading::CLooper::CHandler::post(TaskType &&aRunnable)
+  bool engine::threading::CLooper::CDispatcher::post(TaskType &&aRunnable)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:476: warning: no matching class member found for 
   template < TTaskResult >
-  bool engine::threading::CLooper::CHandler::postDelayed(TaskType &&aRunnable, uint64_t const &aTimeoutMilliseconds)
+  bool engine::threading::CLooper::CDispatcher::postDelayed(TaskType &&aRunnable, uint64_t const &aTimeoutMilliseconds)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:531: warning: no matching class member found for 
   template < TTaskResult >

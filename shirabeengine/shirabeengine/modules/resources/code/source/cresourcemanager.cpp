@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 #include "resources/cresourcemanager.h"
-#include "cgpuapiresourcestorage.cpp"
+
 
 namespace engine
 {

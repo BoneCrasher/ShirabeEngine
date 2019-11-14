@@ -25,6 +25,7 @@ set(SHIRABE_EXCLUDED_SOURCES
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
+        SHIRABEMODULEMATERIAL
         SHIRABEMODULEASSET
         SHIRABEMODULEWSI
         SHIRABEMODULEGRAPHICSAPI
@@ -57,3 +58,4 @@ add_dependencies(vulkan_integration INSTALL_rendering)
 add_dependencies(vulkan_integration INSTALL_graphicsapi)
 add_dependencies(vulkan_integration INSTALL_wsi)
 add_dependencies(vulkan_integration INSTALL_asset)
+add_dependencies(vulkan_integration INSTALL_material)

@@ -18,7 +18,6 @@ namespace engine
         public_constructors:
             CVulkanPrivateResourceObjectFactory() = default;
 
-        private_destructors:
             ~CVulkanPrivateResourceObjectFactory() final = default;
 
         public_methods:

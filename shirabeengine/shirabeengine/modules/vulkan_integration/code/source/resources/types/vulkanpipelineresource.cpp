@@ -18,7 +18,7 @@ namespace engine::vulkan
 
         SPipelineDescription const &desc = getDescription();
 
-        CVulkanRenderPassResource const *const renderPass = getVkContext()->getResourceStorage()->extract(aDependencies.at(desc.referenceRenderPassId));
+        auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aDependencies.at(desc.referenceRenderPassId));
 
         // Create the shader modules here...
         // IMPORTANT: The task backend receives access to the asset system to not have the raw data stored in the descriptors and requests...
@@ -223,9 +223,9 @@ namespace engine::vulkan
         pipelineCreateInfo.stageCount          = shaderStages.size();
         pipelineCreateInfo.pStages             = shaderStages.data();
 
-        VkPipeline pipeline = VK_NULL_HANDLE;
+        VkPipeline pipelineHandle = VK_NULL_HANDLE;
         {
-            VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
+            VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipelineHandle);
             if( VkResult::VK_SUCCESS!=result )
             {
                 CLog::Error(logTag(), "Failed to create pipeline. Result %0", result);
@@ -233,7 +233,7 @@ namespace engine::vulkan
             }
         }
 
-        this->pipeline       = pipeline;
+        this->pipeline       = pipelineHandle;
         this->shaderModules  = vkShaderModules;
         this->descriptorPool = vkDescriptorPool;
         this->descriptorSets = vkDescriptorSets;

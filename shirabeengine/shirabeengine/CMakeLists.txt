@@ -68,6 +68,7 @@ set(
         CRYPTOPP
         STBI
         FXGLTF
+		FMT
         JSON
         XML2
         ZLIB)

@@ -14,6 +14,7 @@ set(
         VULKANHEADERS
         STBI
         FXGLTF
+        FMT
         JSON
         XML2)
 

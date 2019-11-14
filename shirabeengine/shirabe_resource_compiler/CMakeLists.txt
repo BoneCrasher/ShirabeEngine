@@ -7,6 +7,10 @@ set(SHIRABE_TEMPLATE "Application")
 
 set(SHIRABE_COMPILER__SUBSYSTEM CONSOLE)
 
+set(SHIRABE_ADDITIONAL_PROJECT_PREPROCESSOR_DEFINITIONS
+        VK_NO_PROTOTYPES # Required to not access the function pointers to vulkan functionality to be dynamically loaded from the DLL.
+    )
+
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEMATERIAL
@@ -25,6 +29,7 @@ set(
         CRYPTOPP
         GLSLANG
         FXGLTF
+        FMT
         JSON
         XML2
         ZLIB)

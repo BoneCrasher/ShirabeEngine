@@ -28,7 +28,7 @@ namespace engine::resources
         bool add(GpuApiHandle_t const &aId, engine::Unique<IGpuApiResourceObject> aResourceReference);
         void remove(GpuApiHandle_t const &aId);
 
-        engine::Unique<IGpuApiResourceObject> const &get(GpuApiHandle_t const &aId) const;
+        Unique<IGpuApiResourceObject> const &get(GpuApiHandle_t const &aId) const;
 
         template<typename T>
         T const *extract(GpuApiHandle_t const &aId) const;

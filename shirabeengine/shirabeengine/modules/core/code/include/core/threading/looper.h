@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <thread>
 #include <future>
+#include <queue>
 
 #include <base/declaration.h>
 #include <log/log.h>
@@ -185,7 +186,7 @@ namespace engine
              * The Handler is the public interface to the looper and provides various
              * means of pushing a task over into the looper queue.
              */
-            class CHandler
+            class CDispatcher
             {
             public_typedefs:
                 friend class CLooper; // Allow the looper to access the private constructor.
@@ -215,7 +216,7 @@ namespace engine
                  *
                  * @param aLooper
                  */
-                SHIRABE_INLINE CHandler(LooperType &aLooper)
+                SHIRABE_INLINE CDispatcher(LooperType &aLooper)
                     : mAssignedLooper(aLooper)
                 {}
 
@@ -310,9 +311,9 @@ namespace engine
              * Return the handler attached to the looper.
              * @return
              */
-            SHIRABE_INLINE CHandler &getHandler()
+            SHIRABE_INLINE CDispatcher &getDispatcher()
             {
-                return mHandler;
+                return mDispatcher;
             }
 
          private_methods:
@@ -366,10 +367,10 @@ namespace engine
             std::atomic_bool      mRunning;
             std::atomic_bool      mAbortRequested;
 
-            CHandler               mHandler;
+            CDispatcher mDispatcher;
 
             std::recursive_mutex  mRunnablesMutex;
-            std::vector<TaskType> mRunnables;
+            std::queue<TaskType>  mRunnables;
         };
 
         //<-----------------------------------------------------------------------------
@@ -399,7 +400,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        void CLooper<TTaskResult>::CHandler::storeDelayedPostFuture(std::future<TTaskResult> &aFunction)
+        void CLooper<TTaskResult>::CDispatcher::storeDelayedPostFuture(std::future<TTaskResult> &aFunction)
         {
             std::lock_guard<std::recursive_mutex> guard(mDelayedPostFuturesMutex);
 
@@ -411,7 +412,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool CLooper<TTaskResult>::CHandler::is_ready(std::future<TTaskResult> const &aFunction)
+        bool CLooper<TTaskResult>::CDispatcher::is_ready(std::future<TTaskResult> const &aFunction)
         {
             std::future_status const status = aFunction.wait_for(std::chrono::seconds(0));
             bool               const ready  = (status == std::future_status::ready);
@@ -424,7 +425,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        void CLooper<TTaskResult>::CHandler::checkDelayedPostFutures()
+        void CLooper<TTaskResult>::CDispatcher::checkDelayedPostFutures()
         {
             std::lock_guard<std::recursive_mutex> guard(mDelayedPostFuturesMutex);
 
@@ -446,8 +447,10 @@ namespace engine
                 it != mDelayedPostFutures.end();
                 ++ it)
             {
-                if(is_ready(*it))
+                if( is_ready(*it))
+                {
                     readyFutures.push_back(it);
+                }
             }
 
             for(f_it& readyIt : readyFutures)
@@ -461,7 +464,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool CLooper<TTaskResult>::CHandler::post(TaskType &&aRunnable)
+        bool CLooper<TTaskResult>::CDispatcher::post(TaskType &&aRunnable)
         {
             checkDelayedPostFutures();
 
@@ -473,7 +476,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TTaskResult>
-        bool CLooper<TTaskResult>::CHandler
+        bool CLooper<TTaskResult>::CDispatcher
         ::postDelayed(
                 TaskType      &&aRunnable,
                 uint64_t const &aTimeoutMilliseconds)
@@ -490,10 +493,10 @@ namespace engine
                 storeDelayedPostFuture(std::move(f));
                 checkDelayedPostFutures();
             }
-            catch(std::bad_alloc ba) {
+            catch(std::bad_alloc &ba) {
                 return false;
             }
-            catch(std::system_error se) {
+            catch(std::system_error &se) {
                 return false;
             }
             catch(...) {
@@ -514,7 +517,7 @@ namespace engine
             {
                 std::lock_guard<std::recursive_mutex> guard(mRunnablesMutex);
 
-                mRunnables.push_back(std::move(aRunnable));
+                mRunnables.push(std::move(aRunnable));
             }
             catch(...) {
                 return false;
@@ -532,7 +535,7 @@ namespace engine
             : ILooper<TTaskResult>()
             , mRunning(false)
             , mAbortRequested(false)
-            , mHandler(*this)
+            , mDispatcher(*this)
         { }
         //<-----------------------------------------------------------------------------
 
@@ -576,8 +579,8 @@ namespace engine
 
             // Implement dequeueing by priority with proper
             // load balancing here.
-            typename CLooper<TTaskResult>::TaskType runnable = std::move(mRunnables.back());
-            mRunnables.pop_back();
+            typename CLooper<TTaskResult>::TaskType runnable = std::move(mRunnables.front());
+            mRunnables.pop();
 
             aOutTask = std::move(runnable);
             return CEngineResult<>(EEngineStatus::Ok);
@@ -654,6 +657,8 @@ namespace engine
         template <typename TTaskResult>
         bool CLooper<TTaskResult>::abortAndJoin(uint64_t const &aTimeoutMilliseconds)
         {
+            SHIRABE_UNUSED(aTimeoutMilliseconds);
+
             mAbortRequested.store(true);
 
             // If the thread was detached, it won't be joinable.
@@ -676,11 +681,13 @@ namespace engine
             try
             {
                 if(aRunnable)
+                {
                     aRunnable.run();
+                }
 
                 return true;
             }
-            catch(std::exception aException)
+            catch(std::exception &aException)
             {
                 CLog::Error(logTag(), std::string("Exception in Looper::loop(...): ") + aException.what());
                 return false;

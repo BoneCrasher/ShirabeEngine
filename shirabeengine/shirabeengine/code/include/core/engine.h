@@ -8,10 +8,10 @@
 #include <core/benchmarking/timer/timer.h>
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
-#include <resources/core/resourceproxyfactory.h>
 #include <renderer/irenderer.h>
+#include <resources/cresourcemanager.h>
 
-#include <vulkan/vulkanenvironment.h>
+#include <vulkan_integration/vulkanenvironment.h>
 
 #if   defined SHIRABE_PLATFORM_WINDOWS
     #include <wsi/windows/windowserror.h>
@@ -44,7 +44,7 @@ namespace engine
          * @brief CEngineInstance
          * @param aEnvironment
          */
-        CEngineInstance(Shared<os::SApplicationEnvironment> const &aEnvironment);
+        explicit CEngineInstance(Shared<os::SApplicationEnvironment> aEnvironment);
 
     public_destructors:
         /**
@@ -84,8 +84,7 @@ namespace engine
 
         // Assets & Resources
         Shared<CAssetStorage>         mAssetStorage;
-        Shared<CResourceProxyFactory> mProxyFactory;
-        Shared<CResourceManagerBase>  mResourceManager;
+        Shared<CResourceManager>      mResourceManager;
 
         // Rendering
         Shared<CVulkanEnvironment>    mVulkanEnvironment;

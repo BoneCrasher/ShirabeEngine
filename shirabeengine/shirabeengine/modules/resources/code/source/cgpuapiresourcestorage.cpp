@@ -26,13 +26,13 @@ namespace engine::resources
     void CGpuApiResourceStorage::remove(GpuApiHandle_t const &aId)
     {
         mDependencies.erase(aId);
-    };
+    }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    engine::Unique<IGpuApiResourceObject> const& CGpuApiResourceStorage::get(GpuApiHandle_t const &aId) const
+    Unique<IGpuApiResourceObject> const& CGpuApiResourceStorage::get(GpuApiHandle_t const &aId) const
     {
         static engine::Unique<IGpuApiResourceObject> sNullRef = nullptr;
 
