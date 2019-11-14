@@ -6,6 +6,9 @@
 #include "vulkan_integration/resources/types/vulkanbufferviewresource.h"
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
+#include "vulkan_integration/resources/types/vulkanframebufferresource.h"
+#include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
+#include "vulkan_integration/resources/types/vulkanpipelineresource.h"
 
 #include "vulkan_integration/resources/cvulkanprivateresourceobjectfactory.h"
 
@@ -25,7 +28,8 @@ namespace engine
             return makeUnique<CResourceObjectCreator<TLogicalResource>>(
                     [aContext] (typename TLogicalResource::Descriptor_t const &aDescription)
                     {
-                        return makeUnique<TGpuApiResource>(aContext, aDescription);
+                        Unique<TGpuApiResource> resource = makeUnique<TGpuApiResource>(aContext, aDescription);
+                        return resource;
                     });
         }
         //<-----------------------------------------------------------------------------
@@ -42,6 +46,9 @@ namespace engine
             setCreatorForType<CVulkanBufferViewResource> (std::move(makeCreator<SBufferView,  CVulkanBufferViewResource> (mVkContext)));
             setCreatorForType<CVulkanTextureResource>    (std::move(makeCreator<STexture,     CVulkanTextureResource>    (mVkContext)));
             setCreatorForType<CVulkanTextureViewResource>(std::move(makeCreator<STextureView, CVulkanTextureViewResource>(mVkContext)));
+            setCreatorForType<CVulkanFrameBufferResource>(std::move(makeCreator<SFrameBuffer, CVulkanFrameBufferResource>(mVkContext)));
+            setCreatorForType<CVulkanRenderPassResource> (std::move(makeCreator<SRenderPass,  CVulkanRenderPassResource> (mVkContext)));
+            setCreatorForType<CVulkanPipelineResource>   (std::move(makeCreator<SPipeline,    CVulkanPipelineResource>   (mVkContext)));
 
             return EEngineStatus::Ok;
         }

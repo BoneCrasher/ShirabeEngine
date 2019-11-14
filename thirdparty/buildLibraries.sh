@@ -253,6 +253,9 @@ function build
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "                                                                        \n"
 
+                    export CC=/usr/bin/gcc-9
+                    export CXX=/usr/bin/g++-9
+                    
                     local source_directory=${LIBRARY_SOURCE_DIR}/${libraryToBuild}
                     local build_directory=${BUILD_BASE_DIR}/${libraryToBuild}
                     local deploy_directory=${DEPLOY_BASE_DIR}/${libraryToBuild}/linux${addressmode}/${configuration}

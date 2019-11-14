@@ -4,12 +4,12 @@ namespace engine
 {
     CMaterialComponent::CMaterialComponent()
         : IComponent()
-        , mMaterialInstance(nullptr)
+        //, mMaterialInstance(nullptr)
     {}
 
     CMaterialComponent::~CMaterialComponent()
     {
-        mMaterialInstance = nullptr;
+        //mMaterialInstance = nullptr;
     }
 
     EEngineStatus CMaterialComponent::update(CTimer const &aTimer)

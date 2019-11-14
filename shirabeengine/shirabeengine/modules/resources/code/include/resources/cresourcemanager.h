@@ -81,9 +81,12 @@ namespace engine {
             GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
             resource->setGpuApiResourceHandle(gpuApiResourceId);
 
-            // auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-
             storeResourceObject(aResourceId, resource);
+
+            // TODO: For now immediately create... in the future make it more intelligent...
+            auto dependenciesResolved = getGpuApiDependencies(aResourceId);
+
+            mGpuApiResourceObjectFactory->get(gpuApiResourceId)->create(dependenciesResolved);
 
             return result;
         }

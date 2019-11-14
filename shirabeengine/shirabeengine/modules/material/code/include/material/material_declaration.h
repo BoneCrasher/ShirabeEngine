@@ -1,19 +1,19 @@
 #ifndef __SHIRABE_MATERIAL_DECLARATION_H__
 #define __SHIRABE_MATERIAL_DECLARATION_H__
 
-#include <assert.h>
+#include <cassert>
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <filesystem>
 #include <cstring>
 
-#include <vulkan/vk_platform.h>
-#include <vulkan/vulkan_core.h>
+#include <platform/platform.h>
+
+#include <vulkan/vulkan.h>
 
 #include <base/declaration.h>
 #include <base/stl_container_helpers.h>
-#include <platform/platform.h>
 #include <core/enginestatus.h>
 #include <core/bitfield.h>
 #include <core/serialization/serialization.h>
@@ -462,6 +462,7 @@ namespace engine
             {}
 
         public_operators:
+            SHIRABE_INLINE
             SUniformBuffer &operator=(SUniformBuffer const &aOther)
             {
                 name     = aOther.name;
@@ -508,6 +509,7 @@ namespace engine
             {}
 
         public_operators:
+            SHIRABE_INLINE
             SMaterialStage &operator=(SMaterialStage const &aOther)
             {
                 stage     = aOther.stage;
@@ -587,6 +589,7 @@ namespace engine
             {}
 
         public_operators:
+            SHIRABE_INLINE
             SMaterialSignature &operator=(SMaterialSignature const &aOther)
             {
                 asset::CAssetReference::operator=(aOther);
@@ -656,6 +659,7 @@ namespace engine
              * @brief getValues
              * @return
              */
+            SHIRABE_INLINE
             Map<std::string, SBufferLocation> const &getValues() const
             {
                 return mValueIndex;
@@ -756,6 +760,7 @@ namespace engine
                 return (*this);
             }
 
+            SHIRABE_INLINE
             CMaterialConfig &operator=(CMaterialConfig &&aOther)
             {
                 mBufferIndex = std::move(aOther.mBufferIndex);

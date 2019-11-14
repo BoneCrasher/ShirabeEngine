@@ -4,11 +4,11 @@
 #include <cstdint>
 #include <string>
 #include <filesystem>
+#include <vulkan/vulkan.hpp>
 
 #include <core/basictypes.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
-#include <vulkan/vulkan.hpp>
 #include <graphicsapi/definitions.h>
 #include "asset/asseterror.h"
 

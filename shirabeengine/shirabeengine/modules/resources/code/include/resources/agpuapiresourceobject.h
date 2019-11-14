@@ -47,6 +47,12 @@ namespace engine
                 return mDescription;
             }
 
+            [[nodiscard]]
+            SHIRABE_INLINE EGpuApiResourceState getResourceState() const final
+            {
+                return mState;
+            }
+
         protected_methods:
             SHIRABE_INLINE void setResourceState(EGpuApiResourceState const &aState)
             {

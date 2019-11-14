@@ -73,6 +73,9 @@ namespace engine
             virtual CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) = 0;
             virtual CEngineResult<> destroy()                                                 = 0;
 
+            [[nodiscard]]
+            virtual EGpuApiResourceState getResourceState() const = 0;
+
             virtual Shared<ObservableState_t> observableState() = 0;
         };
         //<-----------------------------------------------------------------------------

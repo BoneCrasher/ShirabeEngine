@@ -1,8 +1,8 @@
 #ifndef __SHIRABE_COMPONENT_MATERIAL_H__
 #define __SHIRABE_COMPONENT_MATERIAL_H__
 
-#include <material/material_declaration.h>
-#include "icomponent.h"
+//#include <material/material_declaration.h>
+#include "ecws/icomponent.h"
 
 namespace engine {
 
@@ -19,7 +19,7 @@ namespace engine {
 		EEngineStatus update(CTimer const &aTimer) override;
 
 	private_members:
-	    Shared<material::CMaterialInstance> mMaterialInstance;
+	    //Shared<material::CMaterialInstance> mMaterialInstance;
 	};
 
 }
