@@ -77,7 +77,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("ImportTexture(...):\n%0", to_string(aTexture)));
+            CLog::Verbose(logTag(), CString::format("ImportTexture(...):\n%0", convert_to_string(aTexture)));
 
             return EEngineStatus::Ok;
         }
@@ -88,7 +88,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::createTexture(SFrameGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("CreateTexture(...):\n%0", to_string(aTexture)));
+            CLog::Verbose(logTag(), CString::format("CreateTexture(...):\n%0", convert_to_string(aTexture)));
 
             return EEngineStatus::Ok;
         }
@@ -101,7 +101,7 @@ namespace Test
                 SFrameGraphTexture      const &aTexture,
                 SFrameGraphTextureView  const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("CreateTextureView(...):\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("CreateTextureView(...):\n%0", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -115,7 +115,7 @@ namespace Test
                 SFrameGraphResource    const &aResource,
                 SFrameGraphBuffer      const &aBuffer)
         {
-            CLog::Verbose(logTag(), CString::format("CreateBuffer(...):\n%0", to_string(aBuffer)));
+            CLog::Verbose(logTag(), CString::format("CreateBuffer(...):\n%0", convert_to_string(aBuffer)));
 
             return EEngineStatus::Ok;
         }
@@ -129,7 +129,7 @@ namespace Test
                 SFrameGraphResource    const &aResource,
                 SFrameGraphBufferView  const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("CreateBufferView(...):\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("CreateBufferView(...):\n%0", convert_to_string(aView)));
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::bindTextureView(SFrameGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("BindTextureView(...):\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("BindTextureView(...):\n%0", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -195,7 +195,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::unbindTextureView(SFrameGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("UnbindTextureView(...):\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("UnbindTextureView(...):\n%0", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -251,7 +251,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::destroyTexture(SFrameGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("DestroyTexture(...):\n%0", to_string(aTexture)));
+            CLog::Verbose(logTag(), CString::format("DestroyTexture(...):\n%0", convert_to_string(aTexture)));
 
             return EEngineStatus::Ok;
         }
@@ -262,7 +262,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::destroyTextureView(SFrameGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("DestroyTextureView(...):\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("DestroyTextureView(...):\n%0", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -291,7 +291,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockFrameGraphRenderContext::render(SRenderable const &aRenderable)
         {
-            CLog::Verbose(logTag(), CString::format("Render(...):\n", to_string(aRenderable)));
+            CLog::Verbose(logTag(), CString::format("Render(...):\n", convert_to_string(aRenderable)));
 
             return EEngineStatus::Ok;
         }

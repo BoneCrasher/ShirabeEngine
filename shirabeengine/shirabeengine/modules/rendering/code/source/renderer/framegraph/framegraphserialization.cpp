@@ -463,10 +463,10 @@ namespace engine
                         aTexture.resourceId,
                         aTexture.readableName,
                         aTexture.width, aTexture.height, aTexture.depth,
-                        to_string(aTexture.format),
+                        convert_to_string(aTexture.format),
                         aTexture.arraySize,
                         aTexture.mipLevels,
-                        to_string(aTexture.initialState),
+                        convert_to_string(aTexture.initialState),
                         aTexture.referenceCount);
 
             mStream << "    Texture" << aTexture.resourceId << " [" << textureStyle << ",label=" << textureLabel << "];\n";
@@ -537,9 +537,9 @@ namespace engine
                                : (viewIsFwdMode
                                   ? "Forward"
                                   : "Accept"))),
-                        to_string(aView.format),
-                        to_string(aView.arraySliceRange),
-                        to_string(aView.mipSliceRange),
+                        convert_to_string(aView.format),
+                        convert_to_string(aView.arraySliceRange),
+                        convert_to_string(aView.mipSliceRange),
                         aView.referenceCount);
 
             mStream << "    " << viewId << " [" << viewStyle << ",label=" << viewLabel << "];\n";

@@ -50,7 +50,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<CRange>(CRange const& aRange)
+    std::string convert_to_string<CRange>(CRange const& aRange)
     {
         return CString::format("[off:%0,len:%1]", aRange.offset, aRange.length);
     }

@@ -467,7 +467,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::render(SRenderable const &aRenderable)
         {
-            CLog::Verbose(logTag(), CString::format("Rendering renderable: %0", to_string(aRenderable)));
+            CLog::Verbose(logTag(), CString::format("Rendering renderable: %0", convert_to_string(aRenderable)));
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------

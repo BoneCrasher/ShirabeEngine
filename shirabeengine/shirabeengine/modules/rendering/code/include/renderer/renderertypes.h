@@ -28,12 +28,12 @@ namespace engine
     }
 
     /**
-     * Overload to_string to make SRenderables printable.
+     * Overload convert_to_string to make SRenderables printable.
      *
      * @param aRenderable The renderable to convert to string.
      */
     template <>
-    inline std::string to_string<rendering::SRenderable>(rendering::SRenderable const &aRenderable)
+    inline std::string convert_to_string<rendering::SRenderable>(rendering::SRenderable const &aRenderable)
     {
 
         std::string message =

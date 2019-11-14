@@ -25,7 +25,6 @@
 #undef max
 #endif
 
-#include <math.h>
 #include <cmath>
 
 namespace engine

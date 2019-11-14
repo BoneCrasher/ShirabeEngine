@@ -646,8 +646,8 @@ public_methods:
         {
             ss << CString::format("<Asset aid=\"%0\" parent_aid=\"0\" type=\"%1\" subtype=\"%2\" uri=\"%3\"></Asset>\n"
                                   , a.id
-                                  , to_string<asset::EAssetType>(a.type)
-                                  , to_string<asset::EAssetSubtype>(a.subtype)
+                                  , convert_to_string<asset::EAssetType>(a.type)
+                                  , convert_to_string<asset::EAssetSubtype>(a.subtype)
                                   , a.uri.string());
         }
         ss << "</Index>";

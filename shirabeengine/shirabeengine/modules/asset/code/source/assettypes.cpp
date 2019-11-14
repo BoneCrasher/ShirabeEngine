@@ -98,7 +98,7 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<asset::EAssetType>(asset::EAssetType const &aInput)
+    std::string convert_to_string<asset::EAssetType>(asset::EAssetType const &aInput)
     {
         using namespace asset;
 
@@ -117,7 +117,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<asset::EAssetSubtype>(asset::EAssetSubtype const &aInput)
+    std::string convert_to_string<asset::EAssetSubtype>(asset::EAssetSubtype const &aInput)
     {
         using namespace asset;
 

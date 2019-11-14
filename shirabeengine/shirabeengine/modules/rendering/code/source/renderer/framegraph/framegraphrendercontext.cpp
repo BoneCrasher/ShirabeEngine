@@ -597,7 +597,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::destroyTexture(SFrameGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("Texture:\n%0", to_string(aTexture)));
+            CLog::Verbose(logTag(), CString::format("Texture:\n%0", convert_to_string(aTexture)));
 
             CEngineResult<> status = mResourceManager->discardResource(aTexture.readableName);
 
@@ -612,7 +612,7 @@ namespace engine
                 SFrameGraphTexture     const &aTexture,
                 SFrameGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", convert_to_string(aView)));
 
             STextureViewDescription desc = { };
             desc.name                 = aView.readableName;
@@ -634,7 +634,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindTextureView(SFrameGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", convert_to_string(aView)));
 
             CEngineResult<Vector<std::string>> const &subjacentResourcesFetch = getMappedInternalResourceIds(aView.readableName);
             if(subjacentResourcesFetch.successful())
@@ -655,7 +655,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::unbindTextureView(SFrameGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", convert_to_string(aView)));
 
             CEngineResult<Vector<std::string>> subjacentResourcesFetch = getMappedInternalResourceIds(aView.readableName);
 
@@ -677,7 +677,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::destroyTextureView(SFrameGraphTextureView  const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", to_string(aView)));
+            CLog::Verbose(logTag(), CString::format("TextureView:\n%0", convert_to_string(aView)));
 
             CEngineResult<> status = EEngineStatus::Ok;
             status = mResourceManager->discardResource(aView.readableName);

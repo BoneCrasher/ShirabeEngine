@@ -201,7 +201,7 @@ namespace engine
      * @return       A EAssetType string representation.
      *               If not matched, EAssetType::Undefined is returned.
      */
-    template <> std::string to_string<asset::EAssetType>(asset::EAssetType const &aInput);
+    template <> std::string convert_to_string<asset::EAssetType>(asset::EAssetType const &aInput);
 
     /**
      * Convert an EAssetSubtype to string.
@@ -210,7 +210,7 @@ namespace engine
      * @return       A EAssetType string representation.
      *               If not matched, EAssetType::Undefined is returned.
      */
-    template <> std::string to_string<asset::EAssetSubtype>(asset::EAssetSubtype const &aInput);
+    template <> std::string convert_to_string<asset::EAssetSubtype>(asset::EAssetSubtype const &aInput);
 }
 
 #endif

@@ -2,7 +2,6 @@
 #define __SHIRABE_BASICTYPES_H__
 
 #include <array>
-#include <math.h>
 #include <cmath>
 #include <cstdint>
 
@@ -74,12 +73,12 @@ namespace engine
     }
 
     /**
-     * @brief to_string
+     * @brief convert_to_string
      * @param aInput
      * @return
      */
     template <typename T>
-    std::string to_string(T const &aInput)
+    std::string convert_to_string(T const &aInput)
     {
         std::string output{ };
 
@@ -91,12 +90,12 @@ namespace engine
     }
 
     /**
-     * @brief to_string<CRange>
+     * @brief convert_to_string<CRange>
      * @param aRange
      * @return
      */
     template <>
-    std::string to_string<CRange>(CRange const&aRange);
+    std::string convert_to_string<CRange>(CRange const&aRange);
 }
 
 #endif

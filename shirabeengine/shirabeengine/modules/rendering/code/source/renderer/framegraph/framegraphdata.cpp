@@ -9,7 +9,7 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<EFrameGraphResourceType>(EFrameGraphResourceType const&type)
+    std::string convert_to_string<EFrameGraphResourceType>(EFrameGraphResourceType const&type)
     {
         switch(type)
         {
@@ -27,7 +27,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<FrameGraphFormat_t>(FrameGraphFormat_t const &aFormat)
+    std::string convert_to_string<FrameGraphFormat_t>(FrameGraphFormat_t const &aFormat)
     {
         switch(aFormat)
         {
@@ -88,7 +88,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::EFrameGraphResourceUsage>(framegraph::EFrameGraphResourceUsage const &aUsage)
+    std::string convert_to_string<framegraph::EFrameGraphResourceUsage>(framegraph::EFrameGraphResourceUsage const &aUsage)
     {
         switch(aUsage)
         {
@@ -110,7 +110,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::EFrameGraphWriteTarget>(framegraph::EFrameGraphWriteTarget const &aTarget)
+    std::string convert_to_string<framegraph::EFrameGraphWriteTarget>(framegraph::EFrameGraphWriteTarget const &aTarget)
     {
         SHIRABE_UNUSED(aTarget);
 
@@ -122,7 +122,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::EFrameGraphResourceAccessibility>(framegraph::EFrameGraphResourceAccessibility const &aAccessibility)
+    std::string convert_to_string<framegraph::EFrameGraphResourceAccessibility>(framegraph::EFrameGraphResourceAccessibility const &aAccessibility)
     {
         SHIRABE_UNUSED(aAccessibility);
 
@@ -134,7 +134,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::EFrameGraphResourceInitState>(framegraph::EFrameGraphResourceInitState const &aState)
+    std::string convert_to_string<framegraph::EFrameGraphResourceInitState>(framegraph::EFrameGraphResourceInitState const &aState)
     {
         switch(aState)
         {
@@ -149,7 +149,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::EFrameGraphViewAccessMode>(framegraph::EFrameGraphViewAccessMode const &aAccessMode)
+    std::string convert_to_string<framegraph::EFrameGraphViewAccessMode>(framegraph::EFrameGraphViewAccessMode const &aAccessMode)
     {
         SHIRABE_UNUSED(aAccessMode);
 
@@ -167,7 +167,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         std::ostream& operator<<(std::ostream &strm, EFrameGraphResourceType const&e)
         {
-            strm << to_string(e).c_str();
+            strm << convert_to_string(e).c_str();
             return strm;
         }
         //<-----------------------------------------------------------------------------
@@ -177,7 +177,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         std::ostream& operator<<(std::ostream &strm, FrameGraphFormat_t const&e)
         {
-            strm << to_string(e).c_str();
+            strm << convert_to_string(e).c_str();
             return strm;
         }
         //<-----------------------------------------------------------------------------
@@ -457,7 +457,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::SFrameGraphTexture>(framegraph::SFrameGraphTexture const &aTexture)
+    std::string convert_to_string<framegraph::SFrameGraphTexture>(framegraph::SFrameGraphTexture const &aTexture)
     {
         std::string s =
                 CString::format(
@@ -473,10 +473,10 @@ namespace engine
                     aTexture.resourceId,
                     aTexture.readableName,
                     aTexture.width, aTexture.height, aTexture.depth,
-                    to_string(aTexture.format),
+                    convert_to_string(aTexture.format),
                     aTexture.arraySize,
                     aTexture.mipLevels,
-                    to_string(aTexture.initialState),
+                    convert_to_string(aTexture.initialState),
                     aTexture.referenceCount);
         return s;
     }
@@ -486,7 +486,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::SFrameGraphTextureView>(framegraph::SFrameGraphTextureView const &aTextureView)
+    std::string convert_to_string<framegraph::SFrameGraphTextureView>(framegraph::SFrameGraphTextureView const &aTextureView)
     {
         bool viewIsReadMode  = aTextureView.mode.check(EFrameGraphViewAccessMode::Read);
 
@@ -503,9 +503,9 @@ namespace engine
                     aTextureView.resourceId,
                     aTextureView.subjacentResource,
                     (viewIsReadMode ? "Read" : "Write"),
-                    to_string(aTextureView.format),
-                    to_string(aTextureView.arraySliceRange),
-                    to_string(aTextureView.mipSliceRange),
+                    convert_to_string(aTextureView.format),
+                    convert_to_string(aTextureView.arraySliceRange),
+                    convert_to_string(aTextureView.mipSliceRange),
                     aTextureView.referenceCount);
         return s;
     }
@@ -515,7 +515,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::SFrameGraphBuffer>(framegraph::SFrameGraphBuffer const &aBuffer)
+    std::string convert_to_string<framegraph::SFrameGraphBuffer>(framegraph::SFrameGraphBuffer const &aBuffer)
     {
         std::string s =
                 CString::format(
@@ -530,7 +530,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string to_string<framegraph::SFrameGraphBufferView>(framegraph::SFrameGraphBufferView const &aBufferView)
+    std::string convert_to_string<framegraph::SFrameGraphBufferView>(framegraph::SFrameGraphBufferView const &aBufferView)
     {
         std::string s =
                 CString::format(
