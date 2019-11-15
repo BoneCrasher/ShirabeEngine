@@ -37,8 +37,8 @@ function(linkLinuxOSEnvironment)
     append_parentscope(SHIRABE_PROJECT_DEPENDPATH          ${LIBLNX_OS_DEPEND_PATHS}        )
     append_parentscope(SHIRABE_PROJECT_LIBRARY_DIRECTORIES ${LIBLNX_OS_LIBRARY_DIRECTORIES} )
     append_parentscope(SHIRABE_PROJECT_LIBRARY_TARGETS     ${LIBLNX_OS_LIBRARY_LINK_TARGETS} 
-                                                           #stdc++fs
-                                                           # gcc
+                                                           stdc++fs
+                                                           gcc
                                                            )
 
 endfunction(linkLinuxOSEnvironment)

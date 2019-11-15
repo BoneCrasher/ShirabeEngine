@@ -535,7 +535,7 @@ public_methods:
             return EResult::SerializationFailed;
         }
 
-        writeFile(outputIndexPathAbsolute, serializedData);
+        writeFile(outputMetaPathAbsolute, serializedData);
 
         CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
         if(not signatureSerializationResult.successful())

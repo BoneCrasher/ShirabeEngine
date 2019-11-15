@@ -36,11 +36,11 @@ namespace engine
          * @param aBufferMemoryProperties
          * @return
          */
-        static CEngineResult<SVulkanBufferCreationResult> __createVkBuffer(  VkPhysicalDevice      const &aPhysicalDevice
-                                                                           , VkDevice              const &aLogicalDevice
-                                                                           , VkDeviceSize          const &aBufferSize
-                                                                           , VkBufferUsageFlags    const &aBufferUsage
-                                                                           , VkMemoryPropertyFlags const &aBufferMemoryProperties);
+        CEngineResult<SVulkanBufferCreationResult> __createVkBuffer(  VkPhysicalDevice      const &aPhysicalDevice
+                                                                    , VkDevice              const &aLogicalDevice
+                                                                    , VkDeviceSize          const &aBufferSize
+                                                                    , VkBufferUsageFlags    const &aBufferUsage
+                                                                    , VkMemoryPropertyFlags const &aBufferMemoryProperties);
 
         /**
          * The SVulkanTextureResource struct describes the relevant data to deal
