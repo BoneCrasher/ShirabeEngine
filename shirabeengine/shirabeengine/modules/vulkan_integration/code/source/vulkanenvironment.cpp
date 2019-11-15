@@ -871,9 +871,12 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    EEngineStatus CVulkanEnvironment::initialize(SApplicationEnvironment const &aApplicationEnvironment)
+    EEngineStatus CVulkanEnvironment::initialize(SApplicationEnvironment        const &aApplicationEnvironment
+                                               , Shared<CGpuApiResourceStorage>       &aStorage)
     {
         try {
+            mResourceStorage = aStorage;
+
             EEngineStatus status = EEngineStatus::Ok;
 
             createVulkanInstance("ShirabeEngine Demo");

@@ -38,6 +38,7 @@ layout (location = 3) in vec2 vertex_texcoord;
 layout (location = 0)
 out struct_Output
 {
+    vec3 vertex_color;
     vec3 vertex_position;
     vec3 vertex_normal;
     vec3 vertex_tangent;
@@ -50,12 +51,15 @@ void main()
     {
         case 0:
         gl_Position = vec4(0.0, -0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
+        shader_output.vertex_color = vec3(1.0f, 0.0f, 0.0f);
         break;
         case 1:
         gl_Position = vec4(0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
+        shader_output.vertex_color = vec3(0.0f, 1.0f, 0.0f);
         break;
         case 2:
         gl_Position = vec4(-0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
+        shader_output.vertex_color = vec3(0.0f, 0.0f, 1.0f);
         break;
     }
 

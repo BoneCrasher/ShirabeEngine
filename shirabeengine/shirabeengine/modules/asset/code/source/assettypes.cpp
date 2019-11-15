@@ -125,6 +125,7 @@ namespace engine
 
         switch(aInput)
         {
+            case EAssetSubtype::Meta:      return "Meta";
             case EAssetSubtype::Master:    return "Master";
             case EAssetSubtype::Signature: return "Signature";
             case EAssetSubtype::Config:    return "Config";

@@ -23,11 +23,12 @@ namespace engine
             , public IVkApiResource
         {
         public_constructors:
-            explicit CVkApiResource(  Shared<IVkGlobalContext>        aVkContext
-                                    , TDescriptor              const &aDescription)
+            explicit CVkApiResource(  Shared<IVkGlobalContext>         aVkContext
+                                    , resources::GpuApiHandle_t const &aHandle
+                                    , TDescriptor               const &aDescription)
                 : resources::AGpuApiResourceObject<TDescriptor>::AGpuApiResourceObject(aDescription)
                 , mVkContext(std::move(aVkContext))
-                , mHandle   (resources::GpuApiHandle_t {})
+                , mHandle   (aHandle)
             {}
 
         public_destructors:

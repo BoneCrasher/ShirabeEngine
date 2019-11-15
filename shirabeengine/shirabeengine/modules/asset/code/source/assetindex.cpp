@@ -95,11 +95,19 @@ namespace engine
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry)
         {
-            std::string const aid     = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"aid"));
-            std::string const parent  = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"parent_aid"));
-            std::string const type    = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"type"));
-            std::string const subtype = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"subtype"));
-            std::string const uri     = CString::format("%0", (unsigned char*)xmlGetProp(aAsset, (const xmlChar *)"uri"));
+            auto const getProp = [] (xmlNodePtr aNode, char const *aPropId) -> std::string {
+                char const *p = (char const *)xmlGetProp(aNode, (xmlChar const *)aPropId);
+                std::string const value(p, strlen(p));
+                xmlFree((void *)p);
+
+                return value;
+            };
+
+            std::string const aid     = CString::format("{}", getProp(aAsset, "aid"));
+            std::string const parent  = CString::format("{}", getProp(aAsset, "parent_aid"));
+            std::string const type    = CString::format("{}", getProp(aAsset, "type"));
+            std::string const subtype = CString::format("{}", getProp(aAsset, "subtype"));
+            std::string const uri     = CString::format("{}", getProp(aAsset, "uri"));
 
             std::filesystem::path uriPath     = std::filesystem::path(uri).lexically_normal();
             std::filesystem::path composedURI = aSourceDir.lexically_normal();

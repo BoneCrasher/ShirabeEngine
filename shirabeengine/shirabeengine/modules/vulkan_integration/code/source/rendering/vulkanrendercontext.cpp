@@ -14,11 +14,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------        
-        bool CVulkanRenderContext::initialize(Shared<CVulkanEnvironment> const &aVulkanEnvironment)
+        bool CVulkanRenderContext::initialize(Shared<CVulkanEnvironment>     const &aVulkanEnvironment
+                                            , Shared<CGpuApiResourceStorage> const &aResourceStorage)
         {
             assert(nullptr != aVulkanEnvironment);
+            assert(nullptr != aResourceStorage);
 
             mVulkanEnvironment = aVulkanEnvironment;
+            mResourceStorage   = aResourceStorage;
 
             return true;
         }

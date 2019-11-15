@@ -47,6 +47,7 @@ namespace engine
         enum class EAssetSubtype
         {
             Undefined = 0,
+            Meta,
             /** Material **/
             Master    = 10,
             Signature,

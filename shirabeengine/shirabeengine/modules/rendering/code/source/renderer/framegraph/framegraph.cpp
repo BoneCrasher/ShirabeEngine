@@ -287,7 +287,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId);
             }
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
@@ -316,7 +316,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
             {
-                aRenderContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                aRenderContext->unbindRenderPass(sRenderPassResourceId, sFrameBufferResourceId);
 
                 CEngineResult<Shared<SFrameGraphTextureView>> sourceResourceFetch = mResourceData.get<SFrameGraphTextureView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
@@ -361,7 +361,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeResources(
                 Shared<IFrameGraphRenderContext>       &aRenderContext,
-                FrameGraphResourceIdList                  const &aResourceIds)
+                FrameGraphResourceIdList         const &aResourceIds)
         {
             CEngineResult<> initialization { EEngineStatus::Ok };
             CEngineResult<> result         { EEngineStatus::Ok };
@@ -461,8 +461,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeRenderPassAndFrameBuffer(
                 Shared<IFrameGraphRenderContext>       &aRenderContext,
-                std::string                               const &aRenderPassId,
-                std::string                               const &aFrameBufferId)
+                std::string                      const &aRenderPassId,
+                std::string                      const &aFrameBufferId)
         {
             std::vector<Shared<SFrameGraphTexture>>     textureReferences{};
             std::vector<Shared<SFrameGraphTextureView>> textureViewReferences{};

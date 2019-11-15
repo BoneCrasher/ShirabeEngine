@@ -31,7 +31,8 @@ namespace engine
              * @param aVulkanEnvironment          The current vulkan environment initialized for this application.
              * @return                            True, if successful. False otherwise.
              */
-            bool initialize(Shared<CVulkanEnvironment> const &aVulkanEnvironment);
+            bool initialize(Shared<CVulkanEnvironment>     const &aVulkanEnvironment
+                          , Shared<CGpuApiResourceStorage> const &aResourceStorage);
 
             /**
              * Destroy and run...
@@ -177,7 +178,8 @@ namespace engine
             EEngineStatus render(SRenderable const &aRenderable) final;
 
         private_members:
-            Shared<CVulkanEnvironment> mVulkanEnvironment;
+            Shared<CVulkanEnvironment>     mVulkanEnvironment;
+            Shared<CGpuApiResourceStorage> mResourceStorage;
         };
     }
 }

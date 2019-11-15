@@ -313,9 +313,9 @@ EST_EXPORT CGraphBuilder
 
         private_members:
 
-            framegraph::CGraph::EGraphMode                         mGraphMode;
-            bool                                                   mRenderToBackBuffer;
-            FrameGraphResourceId_t                                 mOutputResourceId;
+            framegraph::CGraph::EGraphMode                mGraphMode;
+            bool                                          mRenderToBackBuffer;
+            FrameGraphResourceId_t                        mOutputResourceId;
 
             Shared<SApplicationEnvironment>               mApplicationEnvironment;
             Shared<wsi::CWSIDisplay>                      mDisplay;
@@ -324,11 +324,11 @@ EST_EXPORT CGraphBuilder
             Shared<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
             Map<std::string, std::string>                 mImportedResources;
 
-            PassMap                                                mPasses;
-            FrameGraphResourceIdList                               mResources;
-            CFrameGraphMutableResources                            mResourceData;
+            PassMap                                       mPasses;
+            FrameGraphResourceIdList                      mResources;
+            CFrameGraphMutableResources                   mResourceData;
 
-            AdjacencyListMap_t<PassUID_t>                          mPassAdjacency;
+            AdjacencyListMap_t<PassUID_t>                 mPassAdjacency;
 
             Unique<CGraph>                                mFrameGraph;
 

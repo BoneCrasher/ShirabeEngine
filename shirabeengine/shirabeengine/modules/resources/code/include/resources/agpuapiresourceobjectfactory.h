@@ -8,6 +8,7 @@
 #include <platform/platform.h>
 #include <base/declaration.h>
 #include <core/enginetypehelper.h>
+#include <core/uid.h>
 #include "resources/cgpuapiresourcestorage.h"
 #include "resources/igpuapiresourceobject.h"
 
@@ -15,6 +16,9 @@ namespace engine
 {
     namespace resources
     {
+        using core::IUIDGenerator;
+        using core::CSequenceUIDGenerator;
+
         class CResourceManager;
 
         class SHIRABE_LIBRARY_EXPORT IResourceObjectCreatorBase
@@ -29,7 +33,7 @@ namespace engine
             : public IResourceObjectCreatorBase
         {
         public_typedefs:
-            using Fn_t = std::function<Unique<IGpuApiResourceObject>(typename TResource::Descriptor_t const &)>;
+            using Fn_t = std::function<Unique<IGpuApiResourceObject>(GpuApiHandle_t const &, typename TResource::Descriptor_t const &)>;
 
         public_constructors:
             explicit CResourceObjectCreator(Fn_t const &aFn)
@@ -37,11 +41,11 @@ namespace engine
             {};
 
         public_methods:
-            Unique<IGpuApiResourceObject> create(typename TResource::Descriptor_t const &aDescriptor)
+            Unique<IGpuApiResourceObject> create(GpuApiHandle_t const &aHandle, typename TResource::Descriptor_t const &aDescriptor)
             {
                 return (nullptr == mFn)
                             ? nullptr
-                            : mFn(aDescriptor);
+                            : mFn(aHandle, aDescriptor);
             }
 
         private_methods:
@@ -55,7 +59,12 @@ namespace engine
         private_typedefs:
 
         public_constructors:
-            CGpuApiResourceObjectFactory() = default;
+            SHIRABE_INLINE
+            explicit CGpuApiResourceObjectFactory(Shared<CGpuApiResourceStorage> aStorage)
+                : mResourceStorage(std::move(aStorage))
+                , mResourceUidGenerator(std::make_shared<CSequenceUIDGenerator<GpuApiHandle_t >>(1))
+                , mCreators()
+            {};
 
         public_destructors:
             virtual ~CGpuApiResourceObjectFactory() = default;
@@ -92,9 +101,9 @@ namespace engine
                 auto creator = static_cast<CResourceObjectCreator<T> *const>(creatorBase.get());
                 if(nullptr != creator)
                 {
-                    gpuApiObject = std::move(creator->create(aDescriptor));
+                    GpuApiHandle_t const handle = mResourceUidGenerator->generate();
+                    gpuApiObject = std::move(creator->create(handle, aDescriptor));
 
-                    GpuApiHandle_t handle = gpuApiObject->getHandle();
                     mResourceStorage->add(handle, std::move(gpuApiObject));
 
                     return handle;
@@ -118,6 +127,7 @@ namespace engine
 
         private_members:
             Shared<CGpuApiResourceStorage>                                      mResourceStorage;
+            Shared<IUIDGenerator<GpuApiHandle_t>>                               mResourceUidGenerator;
             std::unordered_map<char const*, Unique<IResourceObjectCreatorBase>> mCreators;
         };
 

@@ -37,14 +37,13 @@ int main(int aArgc, char **aArgv)
     // EngineConfiguration engineConfiguration = EngineConfiguration::loadConfiguration(/* target? */);
 
     Shared<CEngineInstance> engine     = makeShared<CEngineInstance>(appEnvironment/*, engineConfiguration*/);
-    CEngineResult<>                  engineInit = engine->initialize();
+    CEngineResult<>         engineInit = engine->initialize();
     if(not engineInit.successful())
     {
         CLog::Error(Main::logTag(), "Failed to initialize engine instance.");
     }
 
     CEngineResult<> engineUpdate = { EEngineStatus::Ok };
-
     while ((engineUpdate = engine->update()).successful())
     {
         // Just run the shit out of the engine...

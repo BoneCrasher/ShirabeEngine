@@ -12,13 +12,17 @@ namespace engine
 {
     namespace vulkan
     {
-        class SHIRABE_LIBRARY_EXPORT CVulkanPrivateResourceObjectFactory
-            : public resources::CGpuApiResourceObjectFactory
+        class SHIRABE_LIBRARY_EXPORT CVulkanResourceObjectFactory
+            : public CGpuApiResourceObjectFactory
         {
         public_constructors:
-            CVulkanPrivateResourceObjectFactory() = default;
+            SHIRABE_INLINE
+            explicit CVulkanResourceObjectFactory(Shared<CGpuApiResourceStorage> const &aStorage)
+                : CGpuApiResourceObjectFactory(aStorage)
+            {}
 
-            ~CVulkanPrivateResourceObjectFactory() final = default;
+        public_destructors:
+            ~CVulkanResourceObjectFactory() final = default;
 
         public_methods:
             [[nodiscard]]

@@ -33,7 +33,8 @@ namespace engine::vulkan
          * @param aApplicationEnvironment The application environment to attach to.
          * @return                        EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus initialize(SApplicationEnvironment const &aApplicationEnvironment);
+        EEngineStatus initialize(SApplicationEnvironment        const &aApplicationEnvironment
+                               , Shared<CGpuApiResourceStorage>       &aStorage);
 
         /**
          * Stop and clean up all vulkan API related functionality.

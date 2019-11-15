@@ -23,55 +23,23 @@ namespace engine
             return (aAdjacency.end() != std::find(aAdjacency.begin(), aAdjacency.end(), aPossiblyAdjacent));
         };
 
-        /**
-         * The SequenceUIDGene rator class implements IUIDGenerator so that it
-         * increments a FrameGraphResourceId_t linearly on each call to 'generate',
-         * starting at 'aInitialID' provided to the constructor.
-         */
-        class CSequenceUIDGenerator
-                : public IUIDGenerator<FrameGraphResourceId_t>
-        {
-        public_constructors:
-            /**
-             * Default-Construct the generator with an initial Id to start incrementing from.
-             *
-             * @param aInitialID See brief.
-             */
-            CSequenceUIDGenerator(FrameGraphResourceId_t const &aInitialID = 1)
-                : mId(aInitialID)
-            {}
-
-        public_methods:
-            /**
-             * Increment the counter and return it as a new id.
-             *
-             * @return See brief.
-             */
-            FrameGraphResourceId_t generate()
-            {
-                return (mId++);
-            }
-
-        private_members:
-            FrameGraphResourceId_t mId;
-        };
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         CGraphBuilder::CGraphBuilder()
-            : mGraphMode              (framegraph::CGraph::EGraphMode::Compute   )
-            , mRenderToBackBuffer     (false                                     )
-            , mOutputResourceId       (0                                         )
-            , mApplicationEnvironment (nullptr                                   )
-            , mDisplay                (nullptr                                   )
-            , mPassUIDGenerator       (std::make_shared<CSequenceUIDGenerator>(0))
-            , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator>(1))
-            , mImportedResources      (                                          )
-            , mPasses                 (                                          )
-            , mResources              (                                          )
-            , mResourceData           (                                          )
-            , mPassAdjacency          (                                          )
-            , mFrameGraph             (nullptr                                   )
+            : mGraphMode              (framegraph::CGraph::EGraphMode::Compute                                        )
+            , mRenderToBackBuffer     (false                                                                          )
+            , mOutputResourceId       (0                                                                              )
+            , mApplicationEnvironment (nullptr                                                                        )
+            , mDisplay                (nullptr                                                                        )
+            , mPassUIDGenerator       (std::make_shared<CSequenceUIDGenerator<FrameGraphResourceId_t >>(0))
+            , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator<FrameGraphResourceId_t >>(1))
+            , mImportedResources      (                                                                               )
+            , mPasses                 (                                                                               )
+            , mResources              (                                                                               )
+            , mResourceData           (                                                                               )
+            , mPassAdjacency          (                                                                               )
+            , mFrameGraph             (nullptr                                                                        )
     #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             , mResourceAdjacency      (                                          )
             , mPassToResourceAdjacency(                                          )

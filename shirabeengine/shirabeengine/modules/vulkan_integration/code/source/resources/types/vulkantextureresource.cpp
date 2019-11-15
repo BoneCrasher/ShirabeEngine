@@ -223,11 +223,18 @@ namespace engine::vulkan
     CEngineResult<> CVulkanTextureResource::destroy()
     {
         VkImage        vkImage         = this->imageHandle;
-        VkDeviceMemory vkDeviceMemory  = this->imageMemory;
+        VkDeviceMemory vkImageMemory   = this->imageMemory;
+        VkSampler      vkSampler       = this->attachedSampler;
+        VkBuffer       vkBuffer        = this->stagingBuffer;
+        VkDeviceMemory vkBufferMemory  = this->stagingBufferMemory;
+
         VkDevice       vkLogicalDevice = getVkContext()->getLogicalDevice();
 
-        vkFreeMemory  (vkLogicalDevice, vkDeviceMemory, nullptr);
-        vkDestroyImage(vkLogicalDevice, vkImage, nullptr);
+        vkDestroySampler(vkLogicalDevice, vkSampler,      nullptr);
+        vkFreeMemory    (vkLogicalDevice, vkImageMemory,  nullptr);
+        vkDestroyImage  (vkLogicalDevice, vkImage,        nullptr);
+        vkFreeMemory    (vkLogicalDevice, vkBufferMemory, nullptr);
+        vkDestroyBuffer (vkLogicalDevice, vkBuffer,       nullptr);
 
         return { EEngineStatus::Ok };
     }

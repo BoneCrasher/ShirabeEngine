@@ -171,9 +171,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)
         {
-            Shared<ILogicalResourceObject> source = getUsedResource(aSwapChainId);
+            //Shared<ILogicalResourceObject> source = getUsedResource(aSwapChainId);
 
-            CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(source->getGpuApiResourceHandle());
+            CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(GpuApiHandle_t{});
 
             return status;
         }
@@ -394,6 +394,8 @@ namespace engine
                 }
 
                 registerUsedResource(renderPassDesc.name, renderPassObject.data());
+
+                mCurrentRenderPassHandle = renderPassDesc.name;
             }
 
 
@@ -440,6 +442,8 @@ namespace engine
                 }
 
                 registerUsedResource(frameBufferDesc.name, status.data());
+
+                mCurrentFrameBufferHandle = frameBufferDesc.name;
             }
 
             return EEngineStatus::Ok;
@@ -586,6 +590,8 @@ namespace engine
                 {
                     EngineStatusPrintOnError(textureObject.result(), logTag(), "Failed to create texture.");
                 }
+
+                registerUsedResource(desc.name, textureObject.data());
             }
 
             return EEngineStatus::Ok;
@@ -624,6 +630,8 @@ namespace engine
 
             CEngineResult<Shared<ILogicalResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, {aTexture.readableName });
             EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
+
+            registerUsedResource(desc.name, textureViewObject.data());
 
             return textureViewObject.result();
         }
@@ -1087,6 +1095,8 @@ namespace engine
 
             CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = mResourceManager->useDynamicResource<SPipeline>(pipelineDescriptor.name, pipelineDescriptor, std::move(pipelineDependencies));
             EngineStatusPrintOnError(pipelineObject.result(), logTag(), "Failed to create pipeline.");
+
+            registerUsedResource(pipelineDescriptor.name, pipelineObject.data());
 
             return pipelineObject.result();
         }

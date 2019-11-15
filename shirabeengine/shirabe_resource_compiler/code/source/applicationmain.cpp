@@ -468,6 +468,7 @@ public_methods:
         checkPathExists(outputPathAbsolute);
         checkPathExists(outputModulePathAbsolute);
         checkPathExists(outputIndexPathAbsolute);
+        checkPathExists(outputMetaPathAbsolute);
         checkPathExists(outputSignaturePathAbsolute);
         checkPathExists(outputConfigurationPathAbsolute);
 
@@ -608,10 +609,12 @@ public_methods:
 
             asset::SAsset a {};
 
-            if(".instance" == extension)
+            std::cout << extension.string() << std::endl;
+
+            if(".meta" == extension)
             {
                 a.type    = asset::EAssetType::Material;
-                a.subtype = asset::EAssetSubtype::Instance;
+                a.subtype = asset::EAssetSubtype::Meta;
                 a.uri = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
                 a.id  = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);

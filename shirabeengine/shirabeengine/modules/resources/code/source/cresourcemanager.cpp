@@ -87,7 +87,8 @@ namespace engine
         GpuApiResourceDependencies_t CResourceManager::getGpuApiDependencies(ResourceId_t const &aId)
         {
             GpuApiResourceDependencies_t dependencies {};
-            for(auto const         &dependencyId : mResourceTree.getAdjacentFor(aId))
+            auto const adjacent = mResourceTree.getAdjacentFor(aId);
+            for(auto const &dependencyId : adjacent)
             {
                 Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId);
                 dependencies.insert({ dependencyId, logicalResource->getGpuApiResourceHandle() });

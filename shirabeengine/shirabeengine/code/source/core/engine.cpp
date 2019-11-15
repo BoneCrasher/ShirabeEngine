@@ -193,6 +193,8 @@ namespace engine
         rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
         rendererConfiguration.requestFullscreen       = false;
 
+        Shared<CGpuApiResourceStorage> gpuApiResourceStorage = makeShared<CGpuApiResourceStorage>();
+
         Shared<material::CMaterialLoader> materialLoader = nullptr;
 
         auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
@@ -200,7 +202,7 @@ namespace engine
             if(EGFXAPI::Vulkan == gfxApi)
             {
                 mVulkanEnvironment = makeShared<CVulkanEnvironment>();
-                EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
+                EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment, gpuApiResourceStorage);
 
                 if(CheckEngineError(status))
                 {
@@ -265,7 +267,14 @@ namespace engine
             // The reset of the taskbackend should thus occur through the resource backend.
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                gpuApiResourceFactory = makeUnique<CVulkanPrivateResourceObjectFactory>();
+                gpuApiResourceFactory = makeUnique<CVulkanResourceObjectFactory>(gpuApiResourceStorage);
+
+                CEngineResult<> initializationResult = ((CVulkanResourceObjectFactory *)gpuApiResourceFactory.get())->initialize(mVulkanEnvironment);
+                if(CheckEngineError(initializationResult.result()))
+                {
+                    CLog::Error(logTag(), "Failed to initialize vulkan resource factory.");
+                    return { EEngineStatus::Error };
+                }
             }
 
             Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory));
@@ -284,7 +293,7 @@ namespace engine
             if(EGFXAPI::Vulkan == gfxApi)
             {
                 Shared<CVulkanRenderContext> vulkanRenderContext = makeShared<CVulkanRenderContext>();
-                vulkanRenderContext->initialize(mVulkanEnvironment);
+                vulkanRenderContext->initialize(mVulkanEnvironment, gpuApiResourceStorage);
 
                 gfxApiRenderContext = vulkanRenderContext;
             }

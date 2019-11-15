@@ -88,7 +88,7 @@ namespace engine {
 
             mGpuApiResourceObjectFactory->get(gpuApiResourceId)->create(dependenciesResolved);
 
-            return result;
+            return { EEngineStatus::Ok, resource };
         }
     }
 }

@@ -293,6 +293,7 @@ namespace engine::datastructures
     bool CAdjacencyTree<TIdType>::add(TIdType const &aId)
     {
         CAdjacencyTreeHelper::insertTreeEntryIfNotAddedFn(mForwardTree, aId);
+        CAdjacencyTreeHelper::insertListEntryIfNotAddedFn(mForwardRoots, aId);
         regenerateTree();
         return true;
     }
@@ -326,6 +327,7 @@ namespace engine::datastructures
             return false;
         }
 
+        CAdjacencyTreeHelper::removeListEntryIfAdded(mForwardRoots, aSource);
         CAdjacencyTreeHelper::insertListEntryIfNotAddedFn(mForwardTree[aSource], aTarget);
         return true;
     }
@@ -378,19 +380,19 @@ namespace engine::datastructures
         mReverseTree .clear();
 
         // Copy all known IDs to the forward root list
-        for(auto const &[id, references] : mForwardTree)
-        {
-            mForwardRoots.push_back(id);
-        }
+        // for(auto const &[id, references] : mForwardTree)
+        // {
+        //     mForwardRoots.push_back(id);
+        // }
 
         // Erase every ID, which is referenced (can't be root).
-        for(auto &[id, references] : mForwardTree)
-        {
-            for(auto const &aReferenceId : references)
-            {
-                mForwardRoots.erase(std::find(mForwardRoots.begin(), mForwardRoots.end(), aReferenceId));
-            }
-        }
+        // for(auto &[id, references] : mForwardTree)
+        // {
+        //     for(auto const &aReferenceId : references)
+        //     {
+        //         std::remove_if(mForwardRoots.begin(), mForwardRoots.end(), [aReferenceId] (TIdType const &aId) -> bool { return aId == aReferenceId; });
+        //     }
+        // }
 
         CAdjacencyTreeHelper::deriveReverseTree(mForwardTree, mForwardRoots, TIdType{}, mReverseTree, mReverseRoots);
     }
