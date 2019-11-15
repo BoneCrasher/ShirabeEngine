@@ -3,14 +3,8 @@
 THIS=`pwd -P`
 
 buildOne ()
-{
-    export CC=gcc-8
-    export CPP=g++-8 
-    export CXX=g++-8 
-    export LD=g++-8
-    
-    export CFLAGS="-m${addressmode} -std=c++17"
-    export CXXFLAGS="-m${addressmode} -std=c++17 -ffast-math"
+{    
+    export CXXFLAGS="${CXXFLAGS} -ffast-math"
     
     export PREFIX=${deploy_directory}
     
@@ -26,8 +20,6 @@ buildOne ()
     make -f GNUmakefile clean
     
     # Make sure to reset exported variables
-    export CFLAGS=
-    export CXXFLAGS=
 
     cd ${THIS}
 }

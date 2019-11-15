@@ -2,9 +2,6 @@
 
 buildOne ()
 {
-    export CFLAGS="-m${addressmode}"
-    export CXXFLAGS="-m${addressmode}"
-
     cd ${source_directory}
 
     # make clean
@@ -24,10 +21,6 @@ buildOne ()
     make -j12
     make check
     make install
-
-    # Make sure to reset exported variables
-    export CFLAGS=
-    export CXXFLAGS=
 
     cd ${THIS}
 }

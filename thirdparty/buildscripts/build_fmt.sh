@@ -4,8 +4,8 @@ THIS=`pwd -P`
 
 buildOne ()
 {
-    export CFLAGS="-m${addressmode} -fPIC"
-    export CXXFLAGS="-m${addressmode} -fPIC"
+    export CFLAGS="${CFLAGS} -fPIC"
+    export CXXFLAGS="${CXXFLAGS} -fPIC"
 
     cd ${build_directory}
 
@@ -20,8 +20,6 @@ buildOne ()
     cmake --build . --target install
 
     # Make sure to reset exported variables
-    export CFLAGS=
-    export CXXFLAGS=
 
     cd ${THIS}
 }

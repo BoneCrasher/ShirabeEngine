@@ -2,7 +2,6 @@
 
 buildOne ()
 {
-    export CFLAGS="-m${addressmode}"
 
     cd ${source_directory}
 
@@ -12,8 +11,6 @@ buildOne ()
     local libxml2_dir=${DEPLOY_BASE_DIR}/libxml2/linux${addressmode}/${configuration}
     local zlib_dir=${DEPLOY_BASE_DIR}/zlib/linux${addressmode}/${configuration}
 
-    export CFLAGS="-m${addressmode}"
-    export CXXFLAGS="-m${addressmode}"
     export LDFLAGS="-L${libxml2_dir}/lib -lxml2"
 
     local Compiler=i386
@@ -35,10 +32,6 @@ buildOne ()
     make -j12
     make install
 
-    # Make sure to reset exported variables
-    export CFLAGS=
-    export CXXFLAGS=
-    export LDFLAGS=
 
     cd ${THIS}
 }

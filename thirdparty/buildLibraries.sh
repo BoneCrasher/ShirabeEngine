@@ -253,8 +253,14 @@ function build
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "                                                                        \n"
 
-                    export CC=/usr/bin/gcc-9
-                    export CXX=/usr/bin/g++-9
+                    export CC=gcc-9
+                    export CPP=g++-9 
+                    export CXX=g++-9 
+                    export LD=g++-9
+                    export CFLAGS="-m${addressmode} -std=c++17"
+                    export CXXFLAGS="-m${addressmode} -std=c++17"
+                    export LDFLAGS=
+                    export ASFLAGS=
                     
                     local source_directory=${LIBRARY_SOURCE_DIR}/${libraryToBuild}
                     local build_directory=${BUILD_BASE_DIR}/${libraryToBuild}
@@ -270,6 +276,15 @@ function build
                     source ${buildscript}
 
                     ALREADY_BUILT_LIBS=( ${ALREADY_BUILT_LIBS[@]} ${libraryToBuild}_${addressmode}_${configuration} )
+
+                    export ASFLAGS=
+                    export LDFLAGS=
+                    export CXXFLAGS=
+                    export CFLAGS=
+                    export CC=
+                    export CPP= 
+                    export CXX= 
+                    export LD=
 
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "/* Done building ${libraryToBuild} as ${addressmode}/${configuration} */\n"

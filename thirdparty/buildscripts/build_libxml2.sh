@@ -2,15 +2,11 @@
 
 buildOne ()
 {
-    export CFLAGS="-m${addressmode}"
 
     cd ${source_directory}
 
     # make clean
     # make distclean
-
-    export CFLAGS="-m${addressmode}"
-    export CXXFLAGS="-m${addressmode}"
 
     local zlib_dir=${DEPLOY_BASE_DIR}/zlib/linux${addressmode}/${configuration}
 
@@ -31,9 +27,6 @@ buildOne ()
     make -j12
     make install
 
-    # Make sure to reset exported variables
-    export CFLAGS=
-    export CXXFLAGS=
 
     cd ${THIS}
 }
