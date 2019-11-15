@@ -90,7 +90,7 @@ namespace engine {
       JSONDocument::openFile(
         std::string const& filename)
     {
-      namespace fs = std::experimental::filesystem;
+      namespace fs = std::filesystem;
       if(!fs::exists(fs::path(filename)))
         return JSONDocumentOpenState::FILE_NOT_FOUND;
 

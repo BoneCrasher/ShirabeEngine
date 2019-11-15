@@ -2,6 +2,8 @@
 #include <util/crc32.h>
 #include <graphicsapi/definitions.h>
 
+#include <core/basictypes.h>
+
 namespace engine
 {
     namespace asset

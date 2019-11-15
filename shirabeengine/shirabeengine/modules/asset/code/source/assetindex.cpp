@@ -1,4 +1,4 @@
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include <base/string.h>
 #include "asset/assetindex.h"
@@ -42,7 +42,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CAssetRegistry<SAsset> CAssetIndex::loadIndexById(std::filesystem::path const &aIndexPath)
         {
-            namespace fs  = std::experimental::filesystem;
+            namespace fs  = std::filesystem;
 
             std::filesystem::path const parent = aIndexPath.parent_path();
 

@@ -43,7 +43,7 @@ set(
         rendering
         graphicsapi
         material
-        vulkan
+        vulkan_integration
         asset)
 
 set(

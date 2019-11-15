@@ -7,8 +7,15 @@
 
 #include "shadercompilationunit.h"
 
+namespace engine::material
+{
+    struct SMaterialSignature;
+}
+
 namespace resource_compiler
 {
+    using engine::material::SMaterialSignature;
+    
     /**
      * Read a uint32_t word SPIR-V file into a vector<uint32_t>.
      *

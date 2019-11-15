@@ -1,13 +1,17 @@
+#include "extraction.h"
+
 #include <filesystem>
 #include <fstream>
 #include <optional>
 
 #include <spirv_cross/spirv_cross.hpp>
 #include <core/helpers.h>
-#include "extraction.h"
+#include <material/material_declaration.h>
 
 namespace resource_compiler
 {
+    using namespace engine::material;
+
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------

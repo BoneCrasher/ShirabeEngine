@@ -66,7 +66,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer)
         {
-            aDeserializer.readValue("uid",          uid);
+            aDeserializer.readValue("uid", uid);
             aDeserializer.readValue("name",name);
 
             aDeserializer.beginObject("stages");

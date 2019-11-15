@@ -32,11 +32,13 @@
 #include <core/result.h>
 #include <core/helpers.h>
 #include <material/materialserialization.h>
+#include <material/material_declaration.h>
 
 #include "definition.h"
 #include "extraction.h"
 
 using namespace engine;
+using namespace engine::material;
 using namespace resource_compiler;
 
 //<-----------------------------------------------------------------------------
@@ -267,7 +269,7 @@ public_methods:
             std::filesystem::path const extension = file.path().extension();
 
             // We only accept files with extension
-            bool const extensionIsEmpty = ("" == extension.string());
+            bool const extensionIsEmpty = (extension.string().empty());
             if(extensionIsEmpty)
             {
                 continue;

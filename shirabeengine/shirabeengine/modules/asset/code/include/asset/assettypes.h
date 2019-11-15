@@ -4,9 +4,8 @@
 #include <cstdint>
 #include <string>
 #include <filesystem>
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
-#include <core/basictypes.h>
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <graphicsapi/definitions.h>
@@ -14,6 +13,8 @@
 
 namespace engine
 {
+    class CRange;
+
     namespace asset
     {
         using namespace graphicsapi;

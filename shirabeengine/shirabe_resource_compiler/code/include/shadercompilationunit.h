@@ -2,13 +2,12 @@
 #define _SHIRABE_RESOURCECOMP_COMPILATIONUNIT_H_
 
 #include <core/serialization/serialization.h>
-#include <material/material_declaration.h>
-
+#include <vulkan/vulkan.h>
 #include "definition.h"
 
 namespace resource_compiler
 {
-    using namespace engine::material;
+    // using namespace engine::material;
 
     /**
      * @brief The SShaderCompilationElement struct

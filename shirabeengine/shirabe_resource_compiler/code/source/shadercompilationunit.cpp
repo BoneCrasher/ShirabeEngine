@@ -1,4 +1,5 @@
 #include "shadercompilationunit.h"
+#include <material/materialserialization.h>
 
 namespace resource_compiler
 {
