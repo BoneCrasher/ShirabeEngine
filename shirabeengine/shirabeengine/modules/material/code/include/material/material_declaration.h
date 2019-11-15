@@ -74,7 +74,7 @@ namespace engine
                 : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>
         {
-            static std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const sEmptyMap;
+            static std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const sEmptyMasterMap;
 
         public_constructors:
             SHIRABE_INLINE
@@ -83,7 +83,7 @@ namespace engine
                 , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                  (0 )
                 , name                 ({})
-                , stages               (sEmptyMap)
+                , stages(sEmptyMasterMap)
             {}
 
             SHIRABE_INLINE
@@ -243,7 +243,7 @@ namespace engine
                 : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>
                 , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>
         {
-            static std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const sEmptyMap;
+            static std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const sEmptyMetaMap;
 
         public_constructors:
             SHIRABE_INLINE
@@ -254,7 +254,7 @@ namespace engine
                     , name                 ({})
                     , signatureAssetUid    (0 )
                     , configurationAssetUid(0 )
-                    , stages               (sEmptyMap)
+                    , stages(sEmptyMetaMap)
             {}
 
             SHIRABE_INLINE

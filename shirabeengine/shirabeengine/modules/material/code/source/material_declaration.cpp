@@ -8,7 +8,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const SMaterialMasterIndex::sEmptyMap =
+        std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const SMaterialMasterIndex::sEmptyMasterMap =
         {
             { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                  , {} },
             { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT    , {} },
@@ -23,7 +23,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
 
-        std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const SMaterialMeta::sEmptyMap =
+        std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const SMaterialMeta::sEmptyMetaMap =
         {
                 { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                  , {} },
                 { VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT    , {} },
