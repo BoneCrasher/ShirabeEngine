@@ -1,0 +1,353 @@
+{
+    "name": "TestObject",
+    "properties": {
+        "doubleProperty": {
+            "capacity": 1,
+            "default": 0.0,
+            "name": "doubleProperty",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 198,
+            "values": [
+                1.5707963267948966
+            ],
+            "valuetype": 11,
+            "writable": 1
+        },
+        "floatProperty": {
+            "capacity": 1,
+            "default": 0.0,
+            "name": "floatProperty",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 196,
+            "values": [
+                10.0
+            ],
+            "valuetype": 10,
+            "writable": 1
+        },
+        "int16Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "int16Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 199,
+            "values": [
+                -4232
+            ],
+            "valuetype": 3,
+            "writable": 1
+        },
+        "int32Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "int32Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 200,
+            "values": [
+                2323333
+            ],
+            "valuetype": 4,
+            "writable": 1
+        },
+        "int64Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "int64Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 202,
+            "values": [
+                -23554545342
+            ],
+            "valuetype": 5,
+            "writable": 1
+        },
+        "int8Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "int8Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 201,
+            "values": [
+                23
+            ],
+            "valuetype": 2,
+            "writable": 1
+        },
+        "objectProperty": {
+            "capacity": 1,
+            "default": null,
+            "name": "objectProperty",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 192,
+            "values": [
+                {
+                    "name": "OtherTestObject",
+                    "properties": {
+                        "doubleProperty": {
+                            "capacity": 1,
+                            "default": 0.0,
+                            "name": "doubleProperty",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 185,
+                            "values": [
+                                1.5707963267948966
+                            ],
+                            "valuetype": 11,
+                            "writable": 1
+                        },
+                        "floatProperty": {
+                            "capacity": 1,
+                            "default": 0.0,
+                            "name": "floatProperty",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 183,
+                            "values": [
+                                10.0
+                            ],
+                            "valuetype": 10,
+                            "writable": 1
+                        },
+                        "int16Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "int16Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 186,
+                            "values": [
+                                -4232
+                            ],
+                            "valuetype": 3,
+                            "writable": 1
+                        },
+                        "int32Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "int32Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 187,
+                            "values": [
+                                2323333
+                            ],
+                            "valuetype": 4,
+                            "writable": 1
+                        },
+                        "int64Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "int64Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 189,
+                            "values": [
+                                -23554545342
+                            ],
+                            "valuetype": 5,
+                            "writable": 1
+                        },
+                        "int8Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "int8Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 188,
+                            "values": [
+                                23
+                            ],
+                            "valuetype": 2,
+                            "writable": 1
+                        },
+                        "objectProperty": {
+                            "capacity": 1,
+                            "default": null,
+                            "name": "objectProperty",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 179,
+                            "values": [
+                                null
+                            ],
+                            "valuetype": 14,
+                            "writable": 1
+                        },
+                        "stringProperty": {
+                            "capacity": 1,
+                            "default": "",
+                            "name": "stringProperty",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 180,
+                            "values": [
+                                "Tralala"
+                            ],
+                            "valuetype": 12,
+                            "writable": 1
+                        },
+                        "uint16Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "uint16Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 191,
+                            "values": [
+                                0
+                            ],
+                            "valuetype": 7,
+                            "writable": 1
+                        },
+                        "uint32Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "uint32Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 184,
+                            "values": [
+                                12351611
+                            ],
+                            "valuetype": 8,
+                            "writable": 1
+                        },
+                        "uint64Property": {
+                            "capacity": 1,
+                            "default": 0,
+                            "name": "uint64Property",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 181,
+                            "values": [
+                                6646777643353
+                            ],
+                            "valuetype": 9,
+                            "writable": 1
+                        },
+                        "uint8Property": {
+                            "capacity": 2,
+                            "default": 0,
+                            "name": "uint8Property",
+                            "replicationmode": 0,
+                            "structuretype": 2,
+                            "uid": 190,
+                            "values": [
+                                45,
+                                0
+                            ],
+                            "valuetype": 6,
+                            "writable": 1
+                        },
+                        "wstringProperty": {
+                            "capacity": 1,
+                            "default": "",
+                            "name": "wstringProperty",
+                            "replicationmode": 0,
+                            "structuretype": 1,
+                            "uid": 182,
+                            "values": [
+                                "This is ridiculous..."
+                            ],
+                            "valuetype": 13,
+                            "writable": 1
+                        }
+                    },
+                    "prototypeId": "",
+                    "uid": 50000
+                }
+            ],
+            "valuetype": 14,
+            "writable": 1
+        },
+        "stringProperty": {
+            "capacity": 1,
+            "default": "",
+            "name": "stringProperty",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 193,
+            "values": [
+                "Tralala"
+            ],
+            "valuetype": 12,
+            "writable": 1
+        },
+        "uint16Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "uint16Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 204,
+            "values": [
+                0
+            ],
+            "valuetype": 7,
+            "writable": 1
+        },
+        "uint32Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "uint32Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 197,
+            "values": [
+                12351611
+            ],
+            "valuetype": 8,
+            "writable": 1
+        },
+        "uint64Property": {
+            "capacity": 1,
+            "default": 0,
+            "name": "uint64Property",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 194,
+            "values": [
+                6646777643353
+            ],
+            "valuetype": 9,
+            "writable": 1
+        },
+        "uint8Property": {
+            "capacity": 2,
+            "default": 0,
+            "name": "uint8Property",
+            "replicationmode": 0,
+            "structuretype": 2,
+            "uid": 203,
+            "values": [
+                45,
+                123
+            ],
+            "valuetype": 6,
+            "writable": 1
+        },
+        "wstringProperty": {
+            "capacity": 1,
+            "default": "",
+            "name": "wstringProperty",
+            "replicationmode": 0,
+            "structuretype": 1,
+            "uid": 195,
+            "values": [
+                "This is ridiculous..."
+            ],
+            "valuetype": 13,
+            "writable": 1
+        }
+    },
+    "prototypeId": "",
+    "uid": 1337
+}

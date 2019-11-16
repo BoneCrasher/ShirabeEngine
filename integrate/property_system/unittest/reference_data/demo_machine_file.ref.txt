@@ -1,0 +1,97 @@
+{
+  "name": "Sensor",
+  "properties": {
+    "Imagers": {
+      "capacity": 1,
+      "default": null,
+      "name": "Imagers",
+      "structuretype": 1,
+      "replicationmode": 1,
+      "uid": 1,
+      "values": [
+        {
+          "name": "PythonImager",
+          "properties": {
+            "RegionOfInterest": {
+              "capacity": 1,
+              "default": null,
+              "name": "RegionOfInterest",
+              "structuretype": 1,
+              "replicationmode": 1,
+              "uid": 2,
+              "values": [
+                {
+                  "name": "RegionOfInterest",
+                  "properties": {
+                    "Offset_X": {
+                      "capacity": 1,
+                      "default": 0,
+                      "name": "Offset_X",
+                      "structuretype": 1,
+                      "replicationmode": 1,
+                      "uid": 3,
+                      "values": [
+                        0
+                      ],
+                      "valuetype": 8,
+                      "writable": 1
+                    },
+                    "Offset_Y": {
+                      "capacity": 1,
+                      "default": 0,
+                      "name": "Offset_Y",
+                      "structuretype": 1,
+                      "replicationmode": 1,
+                      "uid": 4,
+                      "values": [
+                        0
+                      ],
+                      "valuetype": 8,
+                      "writable": 1
+                    },
+                    "Width": {
+                      "capacity": 1,
+                      "default": 0,
+                      "name": "Width",
+                      "structuretype": 1,
+                      "replicationmode": 1,
+                      "uid": 5,
+                      "values": [
+                        1920
+                      ],
+                      "valuetype": 8,
+                      "writable": 1
+                    },
+                    "Height": {
+                      "capacity": 1,
+                      "default": 0,
+                      "name": "Height",
+                      "structuretype": 1,
+                      "replicationmode": 1,
+                      "uid": 6,
+                      "values": [
+                        1200
+                      ],
+                      "valuetype": 8,
+                      "writable": 1
+                    }
+                  },
+                  "prototypeId": "",
+                  "uid": 7
+                }
+              ],
+              "valuetype": 14,
+              "writable": 1
+            }
+          },
+          "prototypeId": "",
+          "uid": 8
+        }
+      ],
+      "valuetype": 14,
+      "writable": 1
+    }
+  },
+  "prototypeId": "",
+  "uid": 9
+}
