@@ -1,0 +1,7 @@
+_documentation
+_build
+_deploy
+
+thirdparty/sources
+*.a
+*.so
