@@ -6,5 +6,5 @@ THIS=$(pwd -P)
 ./buildLibraries.sh -a 64 -c debug
 ./buildLibraries.sh -a 64 -c release
 
-rm -rf ${THIS}/_build
-rm -rf ${THIS}/sources
+# rm -rf ${THIS}/_build
+# rm -rf ${THIS}/sources
