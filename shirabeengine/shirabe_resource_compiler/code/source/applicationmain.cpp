@@ -441,15 +441,17 @@ public_methods:
         {
             std::filesystem::path path = aPath;
 
+            CLog::Error(logTag(), "Making sure that '{}' exists...", path.string());
+
             bool const pathExists = std::filesystem::exists(path);
+            bool const pathIsFile = not std::filesystem::is_directory(path);
+            if(pathExists and pathIsFile)
+            {
+                path = aPath.parent_path();
+            }
+
             if(not pathExists)
             {
-                bool const pathIsFile = not std::filesystem::is_directory(path);
-                if(pathIsFile)
-                {
-                    path = aPath.parent_path();
-                }
-
                 try
                 {
                     bool const created = std::filesystem::create_directories(path);
@@ -467,10 +469,10 @@ public_methods:
 
         checkPathExists(outputPathAbsolute);
         checkPathExists(outputModulePathAbsolute);
-        checkPathExists(outputIndexPathAbsolute);
-        checkPathExists(outputMetaPathAbsolute);
-        checkPathExists(outputSignaturePathAbsolute);
-        checkPathExists(outputConfigurationPathAbsolute);
+        // checkPathExists(outputIndexPathAbsolute);
+        // checkPathExists(outputMetaPathAbsolute);
+        // checkPathExists(outputSignaturePathAbsolute);
+        // checkPathExists(outputConfigurationPathAbsolute);
 
         std::string const indexFileContents = readFile(materialPathAbs);
 
