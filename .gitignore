@@ -1,7 +1,18 @@
+# IDE 
+.idea
+.vs
+.vscode
+
+# Temprorary directories
 _documentation
 _build
 _deploy
 
+# Specific directories
 thirdparty/sources
+
+# Linux
+
+# Binaries
 *.a
 *.so
