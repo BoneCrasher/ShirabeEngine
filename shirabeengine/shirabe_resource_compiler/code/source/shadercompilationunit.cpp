@@ -91,9 +91,9 @@ namespace resource_compiler
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    SShaderCompilationUnit::SShaderCompilationUnit(SShaderCompilationUnit &&aOther)
-        : compiler(std::move(aOther.compiler))
-        , language(std::move(aOther.language))
+    SShaderCompilationUnit::SShaderCompilationUnit(SShaderCompilationUnit &&aOther) noexcept
+        : compiler(aOther.compiler           )
+        , language(aOther.language           )
         , elements(std::move(aOther.elements))
     {}
     //<-----------------------------------------------------------------------------

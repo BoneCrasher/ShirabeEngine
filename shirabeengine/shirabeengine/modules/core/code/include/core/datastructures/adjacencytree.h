@@ -125,6 +125,7 @@ namespace engine::datastructures
             }
 
             aInOutList.erase(std::find(aInOutList.begin(), aInOutList.end(), aId));
+            return true;
         }
 
         static auto printTree(  Tree_t<uint32_t> const &aTree

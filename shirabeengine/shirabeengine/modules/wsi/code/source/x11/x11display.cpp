@@ -88,7 +88,7 @@ namespace engine
                         descriptor.bounds.size.x(x11ScreenWidth);
                         descriptor.bounds.size.y(x11ScreenHeight);
                         descriptor.name          = "";
-                        descriptor.isPrimary     = (x11DefaultScreen == k);
+                        descriptor.isPrimary     = (x11DefaultScreen == static_cast<int32_t>(k));
                         descriptor.monitorHandle = k;
 
                         if(descriptor.isPrimary)

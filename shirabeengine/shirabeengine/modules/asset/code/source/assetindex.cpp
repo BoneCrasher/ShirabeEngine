@@ -78,7 +78,7 @@ namespace engine
             std::string   const path   = CString::format("/Index/Asset");
             xmlNodeSetPtr const assets = aFile.xmlSelect(path);
 
-            for(uint32_t k=0; k<assets->nodeNr; ++k)
+            for(uint32_t k=0; k<static_cast<uint32_t>(assets->nodeNr); ++k)
             {
                 xmlNodePtr const asset = assets->nodeTab[k];
                 __readAsset(aSourceDir, asset, aFile, aOutRegistry);

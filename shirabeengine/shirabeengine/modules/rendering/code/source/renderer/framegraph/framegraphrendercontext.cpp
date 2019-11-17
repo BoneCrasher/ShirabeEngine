@@ -487,6 +487,7 @@ namespace engine
             mCurrentRenderPassHandle  = {};
             mCurrentSubpass           = 0;
 
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 

@@ -16,5 +16,7 @@ namespace engine
     EEngineStatus CMeshComponent::update(CTimer const &aTimer)
     {
         SHIRABE_UNUSED(aTimer);
+
+        return EEngineStatus::Ok;
     }
 }

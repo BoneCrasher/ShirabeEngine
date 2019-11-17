@@ -337,6 +337,10 @@ if(MSVC)
     )
 elseif(UNIX AND NOT APPLE)
 
+    if(SHIRABE_WERRORMODE)
+        append(SHIRABE_CMAKE_CXXFLAGS -Werror)
+    endif(SHIRABE_WERRORMODE)
+
 	# Add additional compiler flags for the GCC C-compiler "gcc"
     append(
         SHIRABE_CMAKE_CFLAGS

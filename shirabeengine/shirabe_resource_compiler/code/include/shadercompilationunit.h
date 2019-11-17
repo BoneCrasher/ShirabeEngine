@@ -76,7 +76,6 @@ namespace resource_compiler
         /**
          * @brief SShaderCompilationUnit
          */
-        SHIRABE_INLINE
         SShaderCompilationUnit();
 
         /**
@@ -84,23 +83,20 @@ namespace resource_compiler
          * @param aCompiler
          * @param aLanguage
          */
-        SHIRABE_INLINE
-        SShaderCompilationUnit(EShaderCompiler  const aCompiler,
-                               EShadingLanguage const aLanguage);
+        SShaderCompilationUnit(EShaderCompiler  aCompiler,
+                               EShadingLanguage aLanguage);
 
         /**
          * @brief SShaderCompilationUnit
          * @param aOther
          */
-        SHIRABE_INLINE
         SShaderCompilationUnit(SShaderCompilationUnit const &aOther);
 
         /**
          * @brief SShaderCompilationUnit
          * @param aOther
          */
-        SHIRABE_INLINE
-        SShaderCompilationUnit(SShaderCompilationUnit &&aOther);
+        SShaderCompilationUnit(SShaderCompilationUnit &&aOther) noexcept;
 
     public_destructors:
         virtual ~SShaderCompilationUnit() = default;
