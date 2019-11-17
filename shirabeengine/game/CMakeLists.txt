@@ -9,14 +9,7 @@ set(SHIRABE_COMPILER__SUBSYSTEM CONSOLE)
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEENGINE
-        VULKANSDK
-        VULKANHEADERS
-        STBI
-        FXGLTF
-        FMT
-        JSON
-        XML2)
+        SHIRABEENGINE)
 
 include(project_setup)
 

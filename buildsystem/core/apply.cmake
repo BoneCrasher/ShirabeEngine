@@ -153,25 +153,6 @@ endif()
 set(CMAKE_STATIC_LIBRARY_SUFFIX ${SHIRABE_PROJECT_TARGET_SUFFIX_STATIC}) # [.lib/.a]
 set(CMAKE_SHARED_LIBRARY_SUFFIX ${SHIRABE_PROJECT_TARGET_SUFFIX_SHARED}) # [.dll/.so]
 set(CMAKE_EXECUTABLE_SUFFIX     ${SHIRABE_PROJECT_TARGET_SUFFIX_APP})    # [.exe/-]
-		
-#-----------------------------------------------------------------------------------------
-# Add -L Options for the linker!
-# IMPORTANT: The link directories have to be added BEFORE the targets are created!
-#-----------------------------------------------------------------------------------------
-# -L
-if(SHIRABE_PROJECT_LIBRARY_TARGETS)
-    LogStatus(MESSAGES "Appending library directories:")
-    foreach(LIB_DIR ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES})
-        LogStatus(MESSAGES "-> ${LIB_DIR}")
-    endforeach(LIB_DIR)
-    LogStatus(MESSAGES " ")
-
-    link_directories(
-        ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES}
-    )
-endif()
-#-----------------------------------------------------------------------------------------
-
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SHIRABE_PROJECT_DEPLOY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SHIRABE_PROJECT_DEPLOY_DIR}/lib)
@@ -391,6 +372,28 @@ append(SHIRABE_PROJECT_INCLUDEPATH ${SHIRABE_PROJECT_GEN_DIR}/export_headers/pro
 #-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------
+# Add -L Options for the linker!
+# IMPORTANT: The link directories have to be added BEFORE the targets are created!
+#-----------------------------------------------------------------------------------------
+# -L
+if(SHIRABE_PROJECT_LIBRARY_DIRECTORIES)
+    LogStatus(MESSAGES "Appending library directories:")
+    foreach(LIB_DIR ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES})
+        LogStatus(MESSAGES "-> ${LIB_DIR}")
+    endforeach(LIB_DIR)
+    LogStatus(MESSAGES " ")
+
+    if(NOT SHIRABE_HEADER_ONLY)
+        target_link_directories(
+                ${SHIRABE_MODULE_NAME}
+                PUBLIC ${SHIRABE_PROJECT_LIBRARY_DIRECTORIES}
+        )
+    endif()
+endif()
+#-----------------------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------------------
 # Set -l flags
 #-----------------------------------------------------------------------------------------
 
@@ -401,57 +404,10 @@ set(SHIRABE_PROJECT_PROPAGATED_PATHS)
 # Important: --whole-archive statements first, as they are solution internal dependencies 
 #            usually and might be dependent on the ~LIBRARY_TARGETS
 if(SHIRABE_PROJECT_LIBRARY_MODULES AND NOT SHIRABE_HEADER_ONLY)
-
-    LogStatus(MESSAGES " ")
-    LogStatus(MESSAGES "Appending library modules:")
-    foreach(LIB_TARGET ${SHIRABE_PROJECT_LIBRARY_MODULES})
-        LogStatus(MESSAGES "-> ${LIB_TARGET}")
-    endforeach(LIB_TARGET)
-    LogStatus(MESSAGES " ")
-
-    foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_MODULES})
-        if(TARGET ${MODULE})
-            get_target_property(SHIRABE_TARGET_TYPE ${MODULE} TYPE)
-            message(STATUS ${SHIRABE_TARGET_TYPE})
-            if(("${SHIRABE_TARGET_TYPE}" STREQUAL "STATIC_LIBRARY")    OR
-               ("${SHIRABE_TARGET_TYPE}" STREQUAL "SHARED_LIBRARY")    OR
-               ("${SHIRABE_TARGET_TYPE}" STREQUAL "EXECUTABLE"))
-                get_target_property(${MODULE}_ITF_DEFS  ${MODULE} INTERFACE_COMPILE_DEFINITIONS)
-                get_target_property(${MODULE}_ITF_PATHS ${MODULE} INTERFACE_INCLUDE_DIRECTORIES)
-                get_target_property(${MODULE}_ITF_LIBS  ${MODULE} INTERFACE_LINK_LIBRARIES)
-            endif()
-
-            if(NOT ("${${MODULE}_ITF_DEFS}" STREQUAL "${MODULE}_ITF_DEFS-NOTFOUND"))
-                append(SHIRABE_PROJECT_PROPAGATED_DEFS  ${${MODULE}_ITF_DEFS} )
-            endif()
-            if(NOT ("${${MODULE}_ITF_PATHS}" STREQUAL "${MODULE}_ITF_PATHS-NOTFOUND"))
-                append(SHIRABE_PROJECT_PROPAGATED_PATHS  ${${MODULE}_ITF_PATHS})
-            endif()
-            if(NOT ("${${MODULE}_ITF_LIBS}" STREQUAL "${MODULE}_ITF_LIBS-NOTFOUND"))
-                append(SHIRABE_PROJECT_PROPAGATED_LIBS ${${MODULE}_ITF_LIBS} )
-            endif()
-        endif()
-
-        set(BINARY_NAME ${MODULE})
-        formatPlatformConfigName(
-                ${MODULE}
-                SHIRABE_ADDRESSMODEL_64BIT
-                SHIRABE_PLATFORM_CONFIG
-                ON
-                BINARY_NAME
-        )
-
-        target_link_libraries(
-                ${SHIRABE_MODULE_NAME}
-                PUBLIC ${MODULE}
-                #PUBLIC -Wl,--whole-archive ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a -Wl,--no-whole-archive
-        )
-    endforeach()
-
-    # target_compile_definitions(${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_PROJECT_PROPAGATED_DEFS})
-    # target_include_directories(${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_PROJECT_PROPAGATED_PATHS})
-    # target_link_libraries     (${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_PROJECT_PROPAGATED_LIBS})
+    set(SHIRABE_PROJECT_LIBRARY_TARGETS ${SHIRABE_PROJECT_LIBRARY_MODULES} ${SHIRABE_PROJECT_LIBRARY_TARGETS})
 endif()
+
+LogStatus(MESSAGES "Unprocessed libraries to be linked: " "${SHIRABE_PROJECT_LIBRARY_TARGETS}" "")
 
 if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
 
@@ -465,7 +421,7 @@ if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
     foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_TARGETS})
         if(TARGET ${MODULE})
             get_target_property(SHIRABE_TARGET_TYPE ${MODULE} TYPE)
-            message(STATUS ${SHIRABE_TARGET_TYPE})
+            message(STATUS "${MODULE} is a ${SHIRABE_TARGET_TYPE}")
 
             if(("${SHIRABE_TARGET_TYPE}" STREQUAL "STATIC_LIBRARY")    OR
                ("${SHIRABE_TARGET_TYPE}" STREQUAL "SHARED_LIBRARY")    OR
@@ -489,6 +445,7 @@ if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
         target_link_libraries(
                 ${SHIRABE_MODULE_NAME}
                 PUBLIC ${MODULE}
+                #PUBLIC -Wl,--whole-archive ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a -Wl,--no-whole-archive
         )
     endforeach()
     LogStatus(MESSAGES " ")

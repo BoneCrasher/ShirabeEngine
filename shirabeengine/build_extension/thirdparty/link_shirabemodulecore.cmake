@@ -21,16 +21,9 @@ function(linkLibrary)
     # -l
 
     # -l
-    if(SHIRABE_BUILD_STATICLIB)
-        append_parentscope(
-                SHIRABE_PROJECT_LIBRARY_TARGETS
-                ${TARGET_NAME}
-        )
-    elseif(SHIRABE_BUILD_SHAREDLIB)
-        append_parentscope(
-                SHIRABE_PROJECT_LIBRARY_MODULES
-                ${TARGET_NAME}
-        )
-    endif()
+    append_parentscope(
+            SHIRABE_PROJECT_LIBRARY_TARGETS
+            ${TARGET_NAME}
+    )
 
 endfunction(linkLibrary)

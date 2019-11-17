@@ -15,7 +15,8 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEMATERIAL
         SPIRVCROSS
-        SPIRVTOOLS)
+        SPIRVTOOLS
+        GLSLANG)
 
 include(project_setup)
 

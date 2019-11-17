@@ -2,16 +2,8 @@ function(linkLibrary)
 
     set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine)
 
-    set(BINARY_NAME shirabeengine)
+    set(TARGET_NAME shirabeengine)
     set(LINK_STATIC OFF)
-
-    formatPlatformConfigName(
-        ${BINARY_NAME}
-        SHIRABE_ADDRESSMODEL_64BIT
-        SHIRABE_PLATFORM_CONFIG
-        OFF
-        BINARY_NAME
-        )
 
     # -I
     append_parentscope(
@@ -29,7 +21,7 @@ function(linkLibrary)
 	# -l
 	append_parentscope(
 		SHIRABE_PROJECT_LIBRARY_TARGETS
-		${BINARY_NAME}
+		${TARGET_NAME}
 		)
 
 endfunction(linkLibrary)
