@@ -171,7 +171,7 @@ namespace engine
     {
     #define SHIRABE_USE_FMT 1
     #if defined SHIRABE_USE_FMT
-        fmt::format(aFormat, std::forward<TArgs>(aArgs)...);
+        return fmt::format(aFormat, std::forward<TArgs>(aArgs)...);
     #else
         std::array<std::string, sizeof...(aArgs)> formattedArguments{};
 
