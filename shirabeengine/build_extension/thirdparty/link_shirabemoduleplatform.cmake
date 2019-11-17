@@ -1,17 +1,10 @@
 function(linkLibrary)
 
-    set(BINARY_NAME platform)
+    SET(TARGET_NAME platform)
+    set(BINARY_NAME ${TARGET_NAME})
     set(LINK_STATIC OFF)
 
     set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/platform)
-
-    formatPlatformConfigName(
-        ${BINARY_NAME}
-        SHIRABE_ADDRESSMODEL_64BIT
-        SHIRABE_PLATFORM_CONFIG
-        ON
-        BINARY_NAME
-        )
 
     # -I
     append_parentscope(
@@ -25,10 +18,19 @@ function(linkLibrary)
     #    ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib
     #    )
 	#
-	## -l
-	#append_parentscope(
-	#	SHIRABE_PROJECT_LIBRARY_TARGETS
-	#	${BINARY_NAME}
-	#	)
+	# -l
+
+    # -l
+    if(SHIRABE_BUILD_STATICLIB)
+        append_parentscope(
+                SHIRABE_PROJECT_LIBRARY_TARGETS
+                ${TARGET_NAME}
+        )
+    elseif(SHIRABE_BUILD_SHAREDLIB)
+        append_parentscope(
+                SHIRABE_PROJECT_LIBRARY_MODULES
+                ${TARGET_NAME}
+        )
+    endif()
 
 endfunction(linkLibrary)

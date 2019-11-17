@@ -11,14 +11,7 @@ set(SHIRABE_EXCLUDED_SOURCES
 	
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEMATH    
-        SHIRABEMODULELOG     
-        SHIRABEMODULEBASE
-        SHIRABEMODULEPLATFORM
-        FMT
-        JSON                 
-        #XML2
-        )
+        SHIRABEMODULEMATH)
 
 include(project_setup)
 

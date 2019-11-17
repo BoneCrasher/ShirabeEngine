@@ -1,3 +1,5 @@
+cmake_policy (SET CMP0022 NEW)
+
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 # PROJECT ID
 #---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,6 +66,9 @@ set(SHIRABE_PROJECT_DIR               ${CMAKE_CURRENT_SOURCE_DIR}) # Directory o
 set(SHIRABE_MODULE_NAME               ${SHIRABE_PROJECT_ID})            # Project-name = Module-name!
 set(SHIRABE_MODULE_TARGET_OUTPUT_NAME ${SHIRABE_PROJECT_ID})            # Target-Output-name = Module-name!
 set(SHIRABE_PROJECT_TEMPLATE          ${SHIRABE_TEMPLATE})              # Application | StaticLib | SharedLib
+
+set(SHIRABE_PROJECT_TEMPLATE_${SHIRABE_PROJECT_ID} ${SHIRABE_TEMPLATE} PARENT_SCOPE)
+# message(STATUS "Globally set project template id: ${SHIRABE_PROJECT_TEMPLATE_${SHIRABE_PROJECT_ID}}")
 
 set(SHIRABE_PROJECT_LANGUAGE          CXX)                         # Always assume C++ unless overwritten
 if(SHIRABE_LANGUAGE)

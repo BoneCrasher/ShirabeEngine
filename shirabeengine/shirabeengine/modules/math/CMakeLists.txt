@@ -7,12 +7,7 @@ set(SHIRABE_TEMPLATE "StaticLib")
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULELOG
-        SHIRABEMODULEPLATFORM
-        SHIRABEMODULEBASE
-        JSON                 
-        XML2
-        ZLIB)
+        SHIRABEMODULELOG)
 
 include(project_setup)
 

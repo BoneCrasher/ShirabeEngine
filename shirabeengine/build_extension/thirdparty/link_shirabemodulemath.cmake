@@ -1,17 +1,10 @@
 function(linkLibrary)
 
+    set(TARGET_NAME math)
     set(BINARY_NAME math)
     set(LINK_STATIC OFF)
 
     set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/math)
-
-    formatPlatformConfigName(
-        ${BINARY_NAME}
-        SHIRABE_ADDRESSMODEL_64BIT
-        SHIRABE_PLATFORM_CONFIG
-        ON
-        BINARY_NAME
-        )
 
     # -I
     append_parentscope(
@@ -26,16 +19,18 @@ function(linkLibrary)
         )
 
     # -l
+
+    # -l
     if(SHIRABE_BUILD_STATICLIB)
         append_parentscope(
                 SHIRABE_PROJECT_LIBRARY_TARGETS
-                ${BINARY_NAME}
-                )
-    else()
+                ${TARGET_NAME}
+        )
+    elseif(SHIRABE_BUILD_SHAREDLIB)
         append_parentscope(
                 SHIRABE_PROJECT_LIBRARY_MODULES
-                ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a
-                )
+                ${TARGET_NAME}
+        )
     endif()
 
 endfunction(linkLibrary)

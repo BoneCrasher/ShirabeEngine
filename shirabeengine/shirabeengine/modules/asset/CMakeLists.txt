@@ -9,18 +9,8 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEUTILITY
         SHIRABEMODULEGRAPHICSAPI
-        SHIRABEMODULECORE       
-        SHIRABEMODULEMATH       
-        SHIRABEMODULELOG        
-        SHIRABEMODULEBASE
-        SHIRABEMODULEPLATFORM
-        VULKANHEADERS
         STBI                    
-        FXGLTF
-        FMT
-        JSON
-        XML2
-        ZLIB)
+        FXGLTF)
 
 include(project_setup)
 

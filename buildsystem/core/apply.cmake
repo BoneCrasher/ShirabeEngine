@@ -120,6 +120,7 @@ LogStatus(
         "Transformed LD C-flags: "   ${SHIRABE_TRANSFORMED_CLDFLAGS}
         "Transformed LD CXX-flags: " ${SHIRABE_TRANSFORMED_CXXLDFLAGS}
 )
+LogStatus(MESSAGES " ")
 
 set(CMAKE_C_FLAGS   ${SHIRABE_TRANSFORMED_CFLAGS})
 set(CMAKE_CXX_FLAGS ${SHIRABE_TRANSFORMED_CXXFLAGS})
@@ -181,6 +182,11 @@ LogStatus(
     "Determining CMAKE Target..."
     " ")
 
+LogStatus(
+    MESSAGES
+        "Adding target ${SHIRABE_MODULE_NAME}..."
+)
+
 if(SHIRABE_BUILD_APPLICATION)
     add_executable(
         ${SHIRABE_MODULE_NAME}
@@ -233,7 +239,7 @@ elseif(SHIRABE_BUILD_SHAREDLIB)
         "--> Shared Library"
         " ")
 elseif(SHIRABE_HEADER_ONLY)
-    add_custom_target(${SHIRABE_MODULE_NAME})
+    add_library(${SHIRABE_MODULE_NAME} INTERFACE)
 
     LogStatus(
         MESSAGES
@@ -343,8 +349,7 @@ set(
 if(NOT SHIRABE_HEADER_ONLY)
     target_compile_definitions(
         ${SHIRABE_MODULE_NAME}
-        PUBLIC
-        ${SHIRABE_PROJECT_DEFINITIONS}
+        PUBLIC ${SHIRABE_PROJECT_DEFINITIONS}
     )
 endif()
 
@@ -386,29 +391,142 @@ append(SHIRABE_PROJECT_INCLUDEPATH ${SHIRABE_PROJECT_GEN_DIR}/export_headers/pro
 #-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------
+# Set -l flags
+#-----------------------------------------------------------------------------------------
+
+set(SHIRABE_PROJECT_PROPAGATED_DEFS)
+set(SHIRABE_PROJECT_PROPAGATED_LIBS)
+set(SHIRABE_PROJECT_PROPAGATED_PATHS)
+
+# Important: --whole-archive statements first, as they are solution internal dependencies 
+#            usually and might be dependent on the ~LIBRARY_TARGETS
+if(SHIRABE_PROJECT_LIBRARY_MODULES AND NOT SHIRABE_HEADER_ONLY)
+
+    LogStatus(MESSAGES " ")
+    LogStatus(MESSAGES "Appending library modules:")
+    foreach(LIB_TARGET ${SHIRABE_PROJECT_LIBRARY_MODULES})
+        LogStatus(MESSAGES "-> ${LIB_TARGET}")
+    endforeach(LIB_TARGET)
+    LogStatus(MESSAGES " ")
+
+    foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_MODULES})
+        if(TARGET ${MODULE})
+            get_target_property(SHIRABE_TARGET_TYPE ${MODULE} TYPE)
+            message(STATUS ${SHIRABE_TARGET_TYPE})
+            if(("${SHIRABE_TARGET_TYPE}" STREQUAL "STATIC_LIBRARY")    OR
+               ("${SHIRABE_TARGET_TYPE}" STREQUAL "SHARED_LIBRARY")    OR
+               ("${SHIRABE_TARGET_TYPE}" STREQUAL "EXECUTABLE"))
+                get_target_property(${MODULE}_ITF_DEFS  ${MODULE} INTERFACE_COMPILE_DEFINITIONS)
+                get_target_property(${MODULE}_ITF_PATHS ${MODULE} INTERFACE_INCLUDE_DIRECTORIES)
+                get_target_property(${MODULE}_ITF_LIBS  ${MODULE} INTERFACE_LINK_LIBRARIES)
+            endif()
+
+            if(NOT ("${${MODULE}_ITF_DEFS}" STREQUAL "${MODULE}_ITF_DEFS-NOTFOUND"))
+                append(SHIRABE_PROJECT_PROPAGATED_DEFS  ${${MODULE}_ITF_DEFS} )
+            endif()
+            if(NOT ("${${MODULE}_ITF_PATHS}" STREQUAL "${MODULE}_ITF_PATHS-NOTFOUND"))
+                append(SHIRABE_PROJECT_PROPAGATED_PATHS  ${${MODULE}_ITF_PATHS})
+            endif()
+            if(NOT ("${${MODULE}_ITF_LIBS}" STREQUAL "${MODULE}_ITF_LIBS-NOTFOUND"))
+                append(SHIRABE_PROJECT_PROPAGATED_LIBS ${${MODULE}_ITF_LIBS} )
+            endif()
+        endif()
+
+        set(BINARY_NAME ${MODULE})
+        formatPlatformConfigName(
+                ${MODULE}
+                SHIRABE_ADDRESSMODEL_64BIT
+                SHIRABE_PLATFORM_CONFIG
+                ON
+                BINARY_NAME
+        )
+
+        target_link_libraries(
+                ${SHIRABE_MODULE_NAME}
+                PUBLIC ${MODULE}
+                #PUBLIC -Wl,--whole-archive ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/lib/lib${BINARY_NAME}.a -Wl,--no-whole-archive
+        )
+    endforeach()
+
+    # target_compile_definitions(${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_PROJECT_PROPAGATED_DEFS})
+    # target_include_directories(${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_PROJECT_PROPAGATED_PATHS})
+    # target_link_libraries     (${SHIRABE_MODULE_NAME} PUBLIC ${SHIRABE_PROJECT_PROPAGATED_LIBS})
+endif()
+
+if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
+
+    LogStatus(MESSAGES " ")
+    LogStatus(MESSAGES "Appending library targets:")
+    foreach(LIB_TARGET ${SHIRABE_PROJECT_LIBRARY_TARGETS})
+        LogStatus(MESSAGES "-> ${LIB_TARGET}")
+    endforeach(LIB_TARGET)
+    LogStatus(MESSAGES " ")
+
+    foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_TARGETS})
+        if(TARGET ${MODULE})
+            get_target_property(SHIRABE_TARGET_TYPE ${MODULE} TYPE)
+            message(STATUS ${SHIRABE_TARGET_TYPE})
+
+            if(("${SHIRABE_TARGET_TYPE}" STREQUAL "STATIC_LIBRARY")    OR
+               ("${SHIRABE_TARGET_TYPE}" STREQUAL "SHARED_LIBRARY")    OR
+               ("${SHIRABE_TARGET_TYPE}" STREQUAL "EXECUTABLE"))
+                get_target_property(${MODULE}_ITF_DEFS  ${MODULE} INTERFACE_COMPILE_DEFINITIONS)
+                get_target_property(${MODULE}_ITF_PATHS ${MODULE} INTERFACE_INCLUDE_DIRECTORIES)
+                get_target_property(${MODULE}_ITF_LIBS  ${MODULE} INTERFACE_LINK_LIBRARIES)
+            endif()
+
+            if(NOT ("${${MODULE}_ITF_DEFS}" STREQUAL "${MODULE}_ITF_DEFS-NOTFOUND"))
+                append(SHIRABE_PROJECT_PROPAGATED_DEFS  ${${MODULE}_ITF_DEFS} )
+            endif()
+            if(NOT ("${${MODULE}_ITF_PATHS}" STREQUAL "${MODULE}_ITF_PATHS-NOTFOUND"))
+                append(SHIRABE_PROJECT_PROPAGATED_PATHS ${${MODULE}_ITF_PATHS})
+            endif()
+            if(NOT ("${${MODULE}_ITF_LIBS}" STREQUAL "${MODULE}_ITF_LIBS-NOTFOUND"))
+                append(SHIRABE_PROJECT_PROPAGATED_LIBS ${${MODULE}_ITF_LIBS} )
+            endif()
+        endif()
+
+        target_link_libraries(
+                ${SHIRABE_MODULE_NAME}
+                PUBLIC ${MODULE}
+        )
+    endforeach()
+    LogStatus(MESSAGES " ")
+endif()
+
+LogStatus(MESSAGES "Propagated interface compile defintions: " ${SHIRABE_PROJECT_PROPAGATED_DEFS} )
+LogStatus(MESSAGES " ")
+LogStatus(MESSAGES "Propagated interface include paths: "      ${SHIRABE_PROJECT_PROPAGATED_PATHS} )
+LogStatus(MESSAGES " ")
+LogStatus(MESSAGES "Propagated interface libraries: "          ${SHIRABE_PROJECT_PROPAGATED_LIBS})
+LogStatus(MESSAGES " ")
+
+
+#-----------------------------------------------------------------------------------------
 # Append the includepaths to CMake
 #-----------------------------------------------------------------------------------------
 
 set(TRANSFORMED_INCLUDES)
 if(SHIRABE_PROJECT_INCLUDEPATH)
     set(
-        INCLUDE_PATH_INPUT
-        ${SHIRABE_PROJECT_INCLUDEPATH}
-        ${SHIRABE_PROJECT_ADDITIONAL_INCLUDEPATH})
-
-    set(TRANSFORMED_INCLUDES)
+            INCLUDE_PATH_INPUT
+            ${SHIRABE_PROJECT_INCLUDEPATH}
+            ${SHIRABE_PROJECT_ADDITIONAL_INCLUDEPATH})
 
     foreach(INC_TMP ${INCLUDE_PATH_INPUT})
         set(TMP "${INC_TMP}/")
         file(TO_CMAKE_PATH "${INC_TMP}/" TMP)
 
         append(
-            TRANSFORMED_INCLUDES
-            ${TMP})
+                TRANSFORMED_INCLUDES
+                ${TMP})
     endforeach()
 
     if(NOT SHIRABE_HEADER_ONLY)
-        target_include_directories(${SHIRABE_MODULE_NAME} BEFORE PUBLIC ${SHIRABE_PROJECT_INCLUDEPATH})
+
+        target_include_directories(
+                ${SHIRABE_MODULE_NAME}
+                PUBLIC ${TRANSFORMED_INCLUDES})
     endif()
 endif()
 
@@ -417,36 +535,22 @@ foreach(INC_PATH ${TRANSFORMED_INCLUDES})
     LogStatus(MESSAGES "-> ${INC_PATH}")
 endforeach(INC_PATH)
 LogStatus(MESSAGES " ")
-#-----------------------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------
-# Set -l flags
-#-----------------------------------------------------------------------------------------
+if(("${SHIRABE_TARGET_TYPE}" STREQUAL "STATIC_LIBRARY")    OR
+   ("${SHIRABE_TARGET_TYPE}" STREQUAL "SHARED_LIBRARY")    OR
+   ("${SHIRABE_TARGET_TYPE}" STREQUAL "EXECUTABLE"))
+    get_target_property(${SHIRABE_MODULE_NAME}_DEFS  ${SHIRABE_MODULE_NAME} COMPILE_DEFINITIONS)
+    get_target_property(${SHIRABE_MODULE_NAME}_PATHS ${SHIRABE_MODULE_NAME} INCLUDE_DIRECTORIES)
+    get_target_property(${SHIRABE_MODULE_NAME}_LIBS  ${SHIRABE_MODULE_NAME} LINK_LIBRARIES)
 
-# Important: --whole-archive statements first, as they are solution internal dependencies 
-#            usually and might be dependent on the ~LIBRARY_TARGETS
-if(SHIRABE_PROJECT_LIBRARY_MODULES AND NOT SHIRABE_HEADER_ONLY)
-    foreach(MODULE ${SHIRABE_PROJECT_LIBRARY_MODULES})
-       target_link_libraries(
-           ${SHIRABE_MODULE_NAME}
-           -Wl,--whole-archive ${MODULE} -Wl,--no-whole-archive
-       )
-    endforeach()
-endif()
-
-if(SHIRABE_PROJECT_LIBRARY_TARGETS AND NOT SHIRABE_HEADER_ONLY)
-
-    LogStatus(MESSAGES "Appending library targets:")
-    foreach(LIB_TARGET ${SHIRABE_PROJECT_LIBRARY_TARGETS})
-        LogStatus(MESSAGES "-> ${LIB_TARGET}")
-    endforeach(LIB_TARGET)
+    LogStatus(MESSAGES "Target compile defintions: " ${${SHIRABE_MODULE_NAME}_DEFS} )
     LogStatus(MESSAGES " ")
-
-    target_link_libraries(
-        ${SHIRABE_MODULE_NAME}
-        ${SHIRABE_PROJECT_LIBRARY_TARGETS}
-    )
+    LogStatus(MESSAGES "Target include paths: "      ${${SHIRABE_MODULE_NAME}_PATHS} )
+    LogStatus(MESSAGES " ")
+    LogStatus(MESSAGES "Target libraries: "          ${${SHIRABE_MODULE_NAME}_LIBS})
+    LogStatus(MESSAGES " ")
 endif()
+#-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------
 # Fix output filename to contain the x64 and d suffixes.
@@ -457,7 +561,9 @@ LogStatus(
     "Setting compilate output name to:"
     "--> ${SHIRABE_MODULE_TARGET_OUTPUT_NAME}"
     " ")
-set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES OUTPUT_NAME ${SHIRABE_MODULE_TARGET_OUTPUT_NAME})
+if(NOT SHIRABE_HEADER_ONLY)
+    set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES OUTPUT_NAME ${SHIRABE_MODULE_TARGET_OUTPUT_NAME})
+endif()
 #-----------------------------------------------------------------------------------------
 		
 #-----------------------------------------------------------------------------------------
@@ -469,7 +575,9 @@ LogStatus(
     "Forcing linker language to:"
     "--> ${SHIRABE_PROJECT_LANGUAGE}"
     " ")
-set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_PROJECT_LANGUAGE})
+if(NOT SHIRABE_HEADER_ONLY)
+    set_target_properties(${SHIRABE_MODULE_NAME} PROPERTIES LINKER_LANGUAGE ${SHIRABE_PROJECT_LANGUAGE})
+endif()
 #-----------------------------------------------------------------------------------------
 
 

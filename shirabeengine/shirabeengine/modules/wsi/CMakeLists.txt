@@ -14,18 +14,8 @@ endif()
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEOS         
-        SHIRABEMODULECORE       
-        SHIRABEMODULEMATH       
-        SHIRABEMODULELOG        
-        SHIRABEMODULEBASE
-        SHIRABEMODULEPLATFORM
-        VULKANHEADERS
-        FMT
-        XLIB
-        JSON
-        XML2
-        ZLIB)
+        SHIRABEMODULEOS
+        XLIB)
 
 include(project_setup)
 

@@ -11,14 +11,8 @@ set(SHIRABE_EXCLUDED_SOURCES documents/json.cpp)
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULECORE       
-        SHIRABEMODULEMATH       
-        SHIRABEMODULELOG
-        SHIRABEMODULEBASE
-        SHIRABEMODULEPLATFORM
-        CRYPTOPP
-        JSON
-        XML2)
+        SHIRABEMODULECORE
+        CRYPTOPP)
 
 include(project_setup)
 
