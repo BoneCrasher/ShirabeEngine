@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
+      <config projectName="shirabedevelopment" targetName="log" />
+      <config projectName="shirabedevelopment" targetName="game" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_material" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
+      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
+      <config projectName="shirabedevelopment" targetName="core" />
+      <config projectName="shirabedevelopment" targetName="crc32generator" />
+      <config projectName="shirabedevelopment" targetName="utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
+      <config projectName="shirabedevelopment" targetName="wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
+      <config projectName="shirabedevelopment" targetName="resources" />
+      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
+      <config projectName="shirabedevelopment" targetName="math" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_os" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="asset" />
+      <config projectName="shirabedevelopment" targetName="material" />
+      <config projectName="shirabedevelopment" targetName="os" />
+      <config projectName="shirabedevelopment" targetName="base" />
+      <config projectName="shirabedevelopment" targetName="shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="rendering" />
+      <config projectName="shirabedevelopment" targetName="platform" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Default" GENERATION_OPTIONS="-DCMAKE_INSTALL_PREFIX=/home/dotti/workspaces/shirabeengine/shirabeengine/_deploy/linux64/debug -DSHIRABE_REQUEST_x64_BUILD_CFG=ON" GENERATION_DIR="_build" BUILD_OPTIONS="-j 12" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5d6f3558-3d84-40e2-a418-ceb18ce7a105" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/page-layout-test-navbar-subsite.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/page-layout-test-navbar-subsite.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/themes.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/themes.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/doxygen.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/doxygen.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/python.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/python.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/themes/pelican.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/themes/pelican.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/doxygen.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/doxygen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/python.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/python.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_base_derived_in_root_namespace/structNamespace_1_1BothBaseAndDerivedInRootNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_base_derived_in_root_namespace/structNamespace_1_1BothBaseAndDerivedInRootNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_crazy_template_params/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_crazy_template_params/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/DeprecatedFile_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/DeprecatedFile_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/annotated.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/annotated.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/dir_da5033def2d0db76e9883b31b76b3d0c.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/dir_da5033def2d0db76e9883b31b76b3d0c.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/files.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/files.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/group__group.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/group__group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/modules.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/modules.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/namespaceDeprecatedNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/namespaceDeprecatedNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/namespaces.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/namespaces.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/structDeprecatedNamespace_1_1BaseDeprecatedClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/structDeprecatedNamespace_1_1BaseDeprecatedClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/structDeprecatedNamespace_1_1DeprecatedClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/structDeprecatedNamespace_1_1DeprecatedClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceEno.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceEno.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceFoo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceFoo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceNamee.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceNamee.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceType.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceType.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceVar.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceVar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceWarning.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/namespaceWarning.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/structTemplate.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/structTemplate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/structTemplateWarning.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/structTemplateWarning.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/structTemplate_3_01void_01_4.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_detailed/structTemplate_3_01void_01_4.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/_u_p_p_e_r_c_a_s_e.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/_u_p_p_e_r_c_a_s_e.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/class_u_p_p_e_r_c_l_a_s_s.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/class_u_p_p_e_r_c_l_a_s_s.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_filename_case/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/classClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/classClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/group__group.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/group__group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceContained.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceContained.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceContainsNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceContainsNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceContainsNamespace_1_1ContainsClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceContainsNamespace_1_1ContainsClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceEmpty.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceEmpty.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceSpread.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes/namespaceSpread.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/classClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/classClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/group__group.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/group__group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/namespaceContained.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/namespaceContained.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/namespaceSpread.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_disabled/namespaceSpread.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_templated/namespaceSpread.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_templated/namespaceSpread.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_templated/structStruct.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_includes_templated/structStruct.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/Class_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/Class_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/annotated.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/annotated.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/classRoot_1_1Directory_1_1Sub_1_1Class.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/classRoot_1_1Directory_1_1Sub_1_1Class.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/dir_4b0d5f8864bf89936129251a2d32609b.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/dir_4b0d5f8864bf89936129251a2d32609b.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/dir_bbe5918fe090eee9db2d9952314b6754.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/dir_bbe5918fe090eee9db2d9952314b6754.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/files.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/files.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/namespaceAnother.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/namespaceAnother.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/namespaceRoot_1_1Directory.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/namespaceRoot_1_1Directory.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/namespaces.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/namespaces.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/page-no-toc.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/page-no-toc.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_listing/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/group__group.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/group__group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/group__group2.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/group__group2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/group__subgroup.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/group__subgroup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/modules.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_modules/modules.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/namespaceNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/namespaceNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope_define_base_url/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope_define_base_url/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_warnings/namespaceMagnum.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_warnings/namespaceMagnum.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_html_no_prefix_bug/some-long-page-name.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_html_no_prefix_bug/some-long-page-name.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_in_both_group_and_namespace/group__fizzbuzz.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_in_both_group_and_namespace/group__fizzbuzz.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_in_both_group_and_namespace/namespaceFoo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_in_both_group_and_namespace/namespaceFoo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_cpp_comments/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_cpp_comments/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_heading/namespaceNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_heading/namespaceNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_hr/namespaceNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_hr/namespaceNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_multiline/namespaceNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_autobrief_multiline/namespaceNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/old.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/old.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/old_1814.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/old_1814.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/todo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/todo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/todo_1814.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_blocks/todo_1814.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_brief_multiline_ingroup/group__thatgroup.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_brief_multiline_ingroup/group__thatgroup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code/warnings.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code/warnings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code_language/ansi.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code_language/ansi.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code_language/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code_language/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code_language/warnings.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_code_language/warnings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/dot-236.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/dot-236.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/dot-238.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/dot-238.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/dot.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/dot.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/math.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_custom/math.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_dot/index-238.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_dot/index-238.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_dot/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_dot/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_dot/warnings.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_dot/warnings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_htmlinclude/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_htmlinclude/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_htmlinclude/warnings.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_htmlinclude/warnings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_image/imagelink.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_image/imagelink.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_image/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_image/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_image/warnings.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_image/warnings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_internal/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_internal/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_math/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_math/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_math_cached/math.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_math_cached/math.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_section_underscore_one/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_section_underscore_one/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_sections_headings/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_sections_headings/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_sections_headings/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_sections_headings/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_sections_headings/warnings.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_sections_headings/warnings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_tagfile/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_tagfile/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_typography/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_typography/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_unexpected_sections/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_unexpected_sections/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/annotated.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/annotated.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classAnother_1_1ProtectedBase.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classAnother_1_1ProtectedBase.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classBaseOutsideANamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classBaseOutsideANamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classDerivedOutsideANamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classDerivedOutsideANamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classNamespace_1_1A.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classNamespace_1_1A.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classNamespace_1_1PrivateBase.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classNamespace_1_1PrivateBase.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classNamespace_1_1VirtualBase.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/classNamespace_1_1VirtualBase.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/structAnother_1_1Final.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_derived/structAnother_1_1Final.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_enum_class/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_enum_class/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_friends/classClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_friends/classClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_friends/classTemplate.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_friends/classTemplate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/classBase.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/classBase.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/classDerived.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/classDerived.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/structFinal.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/structFinal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/structFoo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes/structFoo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes_nospace/structFoo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_function_attributes_nospace/structFoo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_signals_slots/classClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_signals_slots/classClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_template_alias/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_template_alias/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_template_alias/structTemplate.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_template_alias/structTemplate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_variable_template/structBar.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_variable_template/structBar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_variable_template/structFoo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/cpp_variable_template/structFoo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/a_8txt-example.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/a_8txt-example.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/path-prefix_2CMakeLists_8txt-example.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/path-prefix_2CMakeLists_8txt-example.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/path-prefix_2configure_8h_8cmake-example.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/path-prefix_2configure_8h_8cmake-example.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/path-prefix_2main_8cpp-example.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/example/path-prefix_2main_8cpp-example.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/js-test-data/searchdata.b85" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/js-test-data/searchdata.b85" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_generated_doxyfile/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_generated_doxyfile/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_minimal/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_minimal/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_navbar_html/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_navbar_html/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_navbar_main_project_url/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_navbar_main_project_url/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_navbar_single_column/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_navbar_single_column/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_search_binary/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_search_binary/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_search_opensearch/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_search_opensearch/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_template_fallback/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/layout_template_fallback/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_brief/page-a.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_brief/page-a.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_brief/page-b.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_brief/page-b.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_brief/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_brief/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_empty_index/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_empty_index/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_empty_title/untitled.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_empty_title/untitled.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_footernavigation/subpage1.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_footernavigation/subpage1.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_footernavigation/subpage2.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_footernavigation/subpage2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_in_navbar/page-b.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_in_navbar/page-b.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_in_navbar/page-in-navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_in_navbar/page-in-navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_order/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_order/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_subpage_of_index/page.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_subpage_of_index/page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_subpage_of_index/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_subpage_of_index/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_toc/page-toc.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/page_toc/page-toc.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/annotated.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/annotated.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/classClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/classClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/dir_4b0d5f8864bf89936129251a2d32609b.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/dir_4b0d5f8864bf89936129251a2d32609b.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/files.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/files.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/group__group.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/group__group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/namespaceNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/namespaceNamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/structNamespace_1_1ClassInANamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/undocumented/structNamespace_1_1ClassInANamespace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/content/classes.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/content/classes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/content/content.Class.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/content/content.Class.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/content/content.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/content/content.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_all_property/inspect_all_property.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_all_property/inspect_all_property.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/inspect_annotations.Foo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/inspect_annotations.Foo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/inspect_annotations.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/inspect_annotations.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/math.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/math.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/math36.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_annotations/math36.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_name_mapping/inspect_name_mapping.Class.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_name_mapping/inspect_name_mapping.Class.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_name_mapping/inspect_name_mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_name_mapping/inspect_name_mapping.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_name_mapping/inspect_name_mapping.submodule.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_name_mapping/inspect_name_mapping.submodule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/classes.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/classes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.Foo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.Foo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.Specials.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.Specials.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.another_module.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.another_module.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/inspect_string.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/modules.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/inspect_string/modules.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/layout/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/layout/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page/another.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page/another.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page/pages.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page/pages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page_plugins/dot-238.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page_plugins/dot-238.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page_plugins/dot.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page_plugins/dot.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page_plugins/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/page_plugins/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_enums/pybind_enums.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_enums/pybind_enums.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_name_mapping/pybind_name_mapping.Class.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_name_mapping/pybind_name_mapping.Class.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_name_mapping/pybind_name_mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_name_mapping/pybind_name_mapping.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_name_mapping/pybind_name_mapping.submodule.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_name_mapping/pybind_name_mapping.submodule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_signatures/pybind_signatures.MyClass.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_signatures/pybind_signatures.MyClass.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_signatures/pybind_signatures.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_signatures/pybind_signatures.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_submodules/pybind_submodules.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_python/pybind_submodules/pybind_submodules.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/dot.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/dot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/filesize.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/filesize.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/code/page.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/code/page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_content/page.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_content/page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/article-jumbo.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/article-jumbo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/article-lang.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/article-lang.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/author-an-author.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/author-an-author.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/category-a-category.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/category-a-category.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/page-lang.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/page-lang.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/page.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/tag-tagging-a-name.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/htmlsanity_typography/tag-tagging-a-name.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_code.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_code.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../thirdparty/autobuild.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../thirdparty/autobuild.sh" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/vulkanresourcetaskmodule_pipeline.cpp" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="ProjectId" id="1MxwnQZh6ezParMSrxJQc4EvUso" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.advertisement.text.has.clang-format" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="dynamic.analysis.tools.valgrind" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/types_new" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/graphicsapi/code/source/types" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
+    <configuration name="INSTALL_asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_asset" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_base" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_base" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_core" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_core" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_crc32generator" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_crc32generator" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_game" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_game" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="shirabedevelopment" RUN_TARGET_NAME="game">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_graphicsapi" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_graphicsapi" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_log" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_log" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_material" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_material" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_math" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_math" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_os" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_os" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_platform" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_platform" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_rendering" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_rendering" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_resources" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_resources" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_shirabe_resource_compiler" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-i=./data/input/resources -o=./data/output/resources" WORKING_DIR="file://$PROJECT_DIR$/_deploy/linux64/debug/bin" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_shirabe_resource_compiler" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="shirabedevelopment" RUN_TARGET_NAME="shirabe_resource_compiler">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_shirabe_shader_precompiler" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--verbose --debug --optimize -I=./shaders/include -id=./data/input/resources -od=./data/output/resources -om=./shaders/standard -oi=./shaders/standard/standard.mat.index -os=./shaders/standard/standard.mat.signature -oc=./shaders/standard/standard.mat.config -i=./shaders/standard/standard.mat.index" WORKING_DIR="file://$PROJECT_DIR$/_deploy/linux64/debug/bin" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_shirabe_shader_precompiler" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="shirabedevelopment" RUN_TARGET_NAME="shirabe_shader_precompiler">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_shirabeengine" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_shirabeengine" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_utility" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_utility" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_vulkan_integration" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_vulkan_integration" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_wsi" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_wsi" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="asset" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="base" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="base" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="core" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="core" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="crc32generator" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="crc32generator" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="shirabedevelopment" RUN_TARGET_NAME="crc32generator">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="game" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="game" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="shirabedevelopment" RUN_TARGET_NAME="game">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="graphicsapi" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="graphicsapi" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="log" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="log" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="material" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="material" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="math" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="math" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="os" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="os" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="platform" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="platform" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="rendering" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="rendering" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="resources" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="resources" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="shirabe_game_copy_resources" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="shirabe_game_copy_resources" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="shirabe_game_precopy" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="shirabe_game_precopy" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="shirabe_game_process_resources" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="shirabe_game_process_resources" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="shirabe_resource_compiler" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="shirabe_resource_compiler" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="shirabedevelopment" RUN_TARGET_NAME="shirabe_resource_compiler">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="shirabeengine" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="shirabeengine" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="utility" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="utility" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="vulkan_integration" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="vulkan_integration" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="wsi" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="wsi" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.crc32generator" />
+      <item itemvalue="CMake Application.INSTALL_crc32generator" />
+      <item itemvalue="CMake Application.game" />
+      <item itemvalue="CMake Application.INSTALL_game" />
+      <item itemvalue="CMake Application.shirabe_game_copy_resources" />
+      <item itemvalue="CMake Application.shirabe_game_precopy" />
+      <item itemvalue="CMake Application.shirabe_game_process_resources" />
+      <item itemvalue="CMake Application.INSTALL_shirabe_resource_compiler" />
+      <item itemvalue="CMake Application.shirabe_resource_compiler" />
+      <item itemvalue="CMake Application.INSTALL_shirabeengine" />
+      <item itemvalue="CMake Application.shirabeengine" />
+      <item itemvalue="CMake Application.asset" />
+      <item itemvalue="CMake Application.INSTALL_asset" />
+      <item itemvalue="CMake Application.base" />
+      <item itemvalue="CMake Application.INSTALL_base" />
+      <item itemvalue="CMake Application.core" />
+      <item itemvalue="CMake Application.INSTALL_core" />
+      <item itemvalue="CMake Application.graphicsapi" />
+      <item itemvalue="CMake Application.INSTALL_graphicsapi" />
+      <item itemvalue="CMake Application.INSTALL_log" />
+      <item itemvalue="CMake Application.log" />
+      <item itemvalue="CMake Application.INSTALL_material" />
+      <item itemvalue="CMake Application.material" />
+      <item itemvalue="CMake Application.INSTALL_math" />
+      <item itemvalue="CMake Application.math" />
+      <item itemvalue="CMake Application.INSTALL_os" />
+      <item itemvalue="CMake Application.os" />
+      <item itemvalue="CMake Application.INSTALL_platform" />
+      <item itemvalue="CMake Application.platform" />
+      <item itemvalue="CMake Application.INSTALL_rendering" />
+      <item itemvalue="CMake Application.rendering" />
+      <item itemvalue="CMake Application.INSTALL_resources" />
+      <item itemvalue="CMake Application.resources" />
+      <item itemvalue="CMake Application.INSTALL_utility" />
+      <item itemvalue="CMake Application.utility" />
+      <item itemvalue="CMake Application.INSTALL_vulkan_integration" />
+      <item itemvalue="CMake Application.vulkan_integration" />
+      <item itemvalue="CMake Application.INSTALL_wsi" />
+      <item itemvalue="CMake Application.wsi" />
+      <item itemvalue="CMake Application.INSTALL_shirabe_shader_precompiler" />
+    </list>
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",KIND" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5d6f3558-3d84-40e2-a418-ceb18ce7a105" name="Default Changelist" comment="" />
+      <created>1559926514601</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1559926514601</updated>
+      <workItem from="1559926517034" duration="441000" />
+      <workItem from="1559934816712" duration="75000" />
+      <workItem from="1559934948875" duration="25000" />
+      <workItem from="1559935163879" duration="45000" />
+      <workItem from="1559935649725" duration="1009000" />
+      <workItem from="1560012134605" duration="459000" />
+      <workItem from="1560012605598" duration="373000" />
+      <workItem from="1560012991965" duration="111000" />
+      <workItem from="1560013115418" duration="2566000" />
+      <workItem from="1560077631823" duration="7978000" />
+      <workItem from="1560344201006" duration="1559000" />
+      <workItem from="1560709608944" duration="2046000" />
+      <workItem from="1560711831082" duration="3507000" />
+      <workItem from="1560796305304" duration="3849000" />
+      <workItem from="1560963360848" duration="1474000" />
+      <workItem from="1561138907025" duration="55000" />
+      <workItem from="1561138977540" duration="121000" />
+      <workItem from="1561139121661" duration="963000" />
+      <workItem from="1561140189840" duration="595000" />
+      <workItem from="1562437526001" duration="1592000" />
+      <workItem from="1562493161787" duration="949000" />
+      <workItem from="1562495659284" duration="1052000" />
+      <workItem from="1562605606511" duration="4394000" />
+      <workItem from="1562612058782" duration="5966000" />
+      <workItem from="1562660525208" duration="5598000" />
+      <workItem from="1562760836063" duration="10622000" />
+      <workItem from="1563099356180" duration="6066000" />
+      <workItem from="1563127003211" duration="445000" />
+      <workItem from="1563123860601" duration="5095000" />
+      <workItem from="1563218590740" duration="8766000" />
+      <workItem from="1563292038320" duration="11623000" />
+      <workItem from="1563303943908" duration="1547000" />
+      <workItem from="1571063065652" duration="2534000" />
+      <workItem from="1571122453707" duration="280000" />
+      <workItem from="1571227311961" duration="1883000" />
+      <workItem from="1571472220823" duration="1533000" />
+      <workItem from="1571473786701" duration="5696000" />
+      <workItem from="1571479506023" duration="5941000" />
+      <workItem from="1571637321861" duration="1241000" />
+      <workItem from="1571657590468" duration="3371000" />
+      <workItem from="1571689320240" duration="2038000" />
+      <workItem from="1571723274862" duration="1210000" />
+      <workItem from="1571724495822" duration="1925000" />
+      <workItem from="1571740119658" duration="626000" />
+      <workItem from="1571740757975" duration="4523000" />
+      <workItem from="1571842662559" duration="161000" />
+      <workItem from="1571843419747" duration="11675000" />
+      <workItem from="1571929937724" duration="6171000" />
+      <workItem from="1572627268609" duration="33223000" />
+      <workItem from="1572876797966" duration="4554000" />
+      <workItem from="1573056662466" duration="7371000" />
+      <workItem from="1573133714867" duration="5219000" />
+      <workItem from="1573217694640" duration="8165000" />
+      <workItem from="1573308826970" duration="14697000" />
+      <workItem from="1573382292065" duration="13795000" />
+      <workItem from="1573472824844" duration="6744000" />
+      <workItem from="1573756405957" duration="17698000" />
+      <workItem from="1573811325067" duration="17746000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/cpp_tools.h</url>
+          <line>4</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/vulkanenvironment.h</url>
+          <line>99</line>
+          <option name="timeStamp" value="73" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp</url>
+          <line>1095</line>
+          <option name="timeStamp" value="74" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp</url>
+          <line>858</line>
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_loader.cpp</url>
+          <line>251</line>
+          <option name="timeStamp" value="77" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_loader.cpp</url>
+          <line>130</line>
+          <option name="timeStamp" value="78" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_loader.cpp</url>
+          <line>135</line>
+          <option name="timeStamp" value="79" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_loader.cpp</url>
+          <line>36</line>
+          <option name="timeStamp" value="80" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

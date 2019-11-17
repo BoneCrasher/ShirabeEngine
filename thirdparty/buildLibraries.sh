@@ -254,10 +254,10 @@ function build
                     printf "                                                                        \n"
 
                     export CC=gcc-8
-                    export CPP=g++-8 
+                    export CPP=cpp-8 
                     export CXX=g++-8 
                     export LD=g++-8
-                    export CFLAGS="-m${addressmode}"
+                    export CFLAGS="-m${addressmode} -std=c++17"
                     export CXXFLAGS="-m${addressmode} -std=c++17"
                     export LDFLAGS=
                     export ASFLAGS=
