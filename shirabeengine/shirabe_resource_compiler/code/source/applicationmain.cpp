@@ -1215,7 +1215,7 @@ private_methods:
 
         auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
         {
-            std::string                const command       = CString::format("{} -o {} {} {}", application, options, aOutputFilename, aInputFilenames);
+            std::string                const command       = CString::format("{} {} -o {} {}", application, options, aOutputFilename, aInputFilenames);
             CEngineResult<std::string> const commandResult = executeCmd(command);
 
             bool const compilationError = (std::string::npos != commandResult.data().find("compilation error")
