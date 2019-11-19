@@ -132,7 +132,6 @@ append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-extra-semi")
 append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-reserved-id-macro")
 append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wno-ignored-qualifiers")
 
-
 #
 # Convert SHIRABE_CC__OPTIMIZATION_LEVEL
 #

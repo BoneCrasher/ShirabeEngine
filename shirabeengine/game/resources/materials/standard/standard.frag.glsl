@@ -14,14 +14,7 @@
 
 // Input
 layout (location = 0)
-in struct_Input
-{
-    vec3 vertex_color;
-    vec3 vertex_position;
-    vec3 vertex_normal;
-    vec3 vertex_tangent;
-    vec2 vertex_texcoord;
-} shader_input;
+in struct_vertexData_full shader_input;
 
 // Output
 layout (location = 0) out vec4 fragment_color_0;

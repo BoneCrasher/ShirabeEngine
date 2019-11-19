@@ -289,6 +289,11 @@ namespace resource_compiler
                 spirv_cross::SPIRType const &type          = compiler.get_type(stageInput.type_id);
                 SMaterialType         const  typeExtracted = reflectType(type);
 
+                if("Struct" == typeExtracted.name)
+                {
+                    
+                }
+                
                 SStageInput stageInputExtracted{};
                 stageInputExtracted.name     = stageInput.name;
                 stageInputExtracted.location = location;

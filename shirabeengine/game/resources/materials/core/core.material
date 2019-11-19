@@ -1,5 +1,5 @@
 {
-    "uid"                       : 1,
+    "uid"                       : 1337,
     "name"                      : "Standard",
     "signatureFilename"         : 0,
     "baseConfigurationFilename" : 0,
@@ -7,14 +7,14 @@
         {
             "vertex"             :
                 { 
-                    "glslSourceFilename" : "standard.vert.glsl"
+                    "glslSourceFilename" : "core.vert.glsl"
                 },
             "tess_control_point" : null,
             "tess_evaluation"    : null,
             "geometry"           : null,
             "fragment"           : 
                 {
-                    "glslSourceFilename" : "standard.frag.glsl"
+                    "glslSourceFilename" : "core.frag.glsl"
                 },
             "compute"            : null
         }
