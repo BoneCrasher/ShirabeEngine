@@ -3,10 +3,12 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <unordered_map>
 
 #include <spirv_cross/spirv_cross.hpp>
 #include <core/helpers.h>
 #include <material/material_declaration.h>
+
 
 namespace resource_compiler
 {
@@ -150,7 +152,7 @@ namespace resource_compiler
                 //     goto invalid;
                 // }
 
-                // SUniformBufferMember const &otherMember = aBuffer.members.at(name);
+                // SBufferMember const &otherMember = aBuffer.members.at(name);
                 // if ( member.location.equals(otherMember.location)
                 //      or member.location.overlapsWith(otherMember.location) )
                 // {
@@ -200,7 +202,8 @@ namespace resource_compiler
             }
         };
 
-        auto const reflectType = [] (spirv_cross::SPIRType const &aType) -> SMaterialType
+        std::function<Shared<SMaterialType const>(spirv_cross::Compiler const&, spirv_cross::SPIRType const&)> reflectType = nullptr;
+        reflectType = [&] (spirv_cross::Compiler const &aCompiler, spirv_cross::SPIRType const &aType) -> Shared<SMaterialType const>
         {
             std::string           const  typeName       = determineSPIRVTypeName(aType);
             uint32_t              const  typeByteWidth  = (aType.width /* bit */ / 8);
@@ -216,14 +219,24 @@ namespace resource_compiler
                 arraySize = aType.array[0]; // Multidimensional arrays not yet supported.
             }
 
-            SMaterialType type {};
-            type.name               = determineSPIRVTypeName(aType);
-            type.vectorSize         = typeVectorSize;
-            type.arraySize          = arraySize;
-            type.arrayStride        = arrayStride;
-            type.matrixRows         = matrixRows;
-            type.matrixColumns      = matrixColumns;
-            type.matrixColumnStride = matrixStride;
+            Shared<SMaterialType> type = makeShared<SMaterialType>();
+            type->name               = determineSPIRVTypeName(aType);
+            type->vectorSize         = typeVectorSize;
+            type->arraySize          = arraySize;
+            type->arrayStride        = arrayStride;
+            type->matrixRows         = matrixRows;
+            type->matrixColumns      = matrixColumns;
+            type->matrixColumnStride = matrixStride;
+
+            if(not aType.member_types.empty())
+            {
+                for(auto const &member : aType.member_types)
+                {
+                    spirv_cross::SPIRType const &memberType          = aCompiler.get_type(member);
+                    Shared<SMaterialType const>  processedMemberType = reflectType(aCompiler, memberType);
+                    type->members[processedMemberType->name] = std::move(processedMemberType);
+                }
+            }
 
             CLog::Debug(logTag(),
                         "\n     Type:                       "
@@ -234,13 +247,13 @@ namespace resource_compiler
                         "\n         Matrix-Rows:          {}"
                         "\n         Matrix-Columns:       {}"
                         "\n         Matrix-Column-Stride: {}",
-                        type.name,
-                        type.vectorSize,
-                        type.arraySize,
-                        type.arrayStride,
-                        type.matrixRows,
-                        type.matrixColumns,
-                        type.matrixColumnStride);
+                        type->name,
+                        type->vectorSize,
+                        type->arraySize,
+                        type->arrayStride,
+                        type->matrixRows,
+                        type->matrixColumns,
+                        type->matrixColumnStride);
 
             return type;
         };
@@ -255,7 +268,7 @@ namespace resource_compiler
             std::string           const inputFile   = aElement.outputPathAbsolute;
             std::vector<uint32_t> const spirvSource = readSpirVFile(inputFile);
 
-            spirv_cross::Compiler compiler(std::move(spirvSource));
+            spirv_cross::Compiler compiler(spirvSource);
 
             //
             // Handle entry points
@@ -287,17 +300,12 @@ namespace resource_compiler
                 uint32_t const location = compiler.get_decoration(stageInput.id, spv::DecorationLocation);
 
                 spirv_cross::SPIRType const &type          = compiler.get_type(stageInput.type_id);
-                SMaterialType         const  typeExtracted = reflectType(type);
+                Shared<SMaterialType  const> typeExtracted = reflectType(compiler, type);
 
-                if("Struct" == typeExtracted.name)
-                {
-                    
-                }
-                
                 SStageInput stageInputExtracted{};
                 stageInputExtracted.name     = stageInput.name;
                 stageInputExtracted.location = location;
-                stageInputExtracted.type     = typeExtracted;
+                stageInputExtracted.type     = std::move(typeExtracted);
                 stageExtracted.inputs.push_back(stageInputExtracted);
 
                 CLog::Debug(logTag(),
@@ -318,12 +326,12 @@ namespace resource_compiler
                 uint32_t const location = compiler.get_decoration(stageOutput.id, spv::DecorationLocation);
 
                 spirv_cross::SPIRType const &type          = compiler.get_type(stageOutput.type_id);
-                SMaterialType         const  typeExtracted = reflectType(type);
+                Shared<SMaterialType  const> typeExtracted = reflectType(compiler, type);
 
                 SStageOutput stageOutputExtracted{};
                 stageOutputExtracted.name     = stageOutput.name;
                 stageOutputExtracted.location = location;
-                stageOutputExtracted.type     = typeExtracted;
+                stageOutputExtracted.type     = std::move(typeExtracted);
                 stageExtracted.outputs.push_back(stageOutputExtracted);
 
                 CLog::Debug(logTag(),
@@ -368,13 +376,12 @@ namespace resource_compiler
                             binding);
             }
 
-
-
             //
             // Read UBOs
             //
             for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
             {
+                uint32_t const location = compiler.get_decoration(uniformBuffer.id, spv::DecorationLocation);
                 uint32_t const set      = compiler.get_decoration(uniformBuffer.id, spv::DecorationDescriptorSet);
                 uint32_t const binding  = compiler.get_decoration(uniformBuffer.id, spv::DecorationBinding);
 
@@ -405,31 +412,47 @@ namespace resource_compiler
                             binding,
                             bufferSize);
 
-                uint64_t memberCount = type.member_types.size();
-                for(uint32_t k=0; k<memberCount; ++k)
+                std::function<BufferMemberMap_t(spirv_cross::Compiler const&, spirv_cross::SPIRType const &)> deriveUniformBufferMembers = nullptr;
+                deriveUniformBufferMembers = [&] (spirv_cross::Compiler const&aCompiler, spirv_cross::SPIRType const &aParent) -> BufferMemberMap_t
                 {
-                    spirv_cross::SPIRType const &memberType = compiler.get_type(type.member_types[k]);
-                    SHIRABE_UNUSED(memberType);
+                    BufferMemberMap_t map {};
 
-                    // Fetch basic information
-                    std::string const &name   = compiler.get_member_name(type.self, k);
-                    uint64_t    const  offset = compiler.type_struct_member_offset(type, k);
-                    uint64_t    const  size   = compiler.get_declared_struct_member_size(type, k);
+                    uint64_t memberCount = aParent.member_types.size();
+                    for(uint64_t k=0; k<memberCount; ++k)
+                    {
+                        spirv_cross::SPIRType const &memberType = aCompiler.get_type(aParent.member_types[k]);
+                        SHIRABE_UNUSED(memberType);
 
-                    SUniformBufferMember uniformBufferMemberExtracted{};
-                    uniformBufferMemberExtracted.name             = name;
-                    uniformBufferMemberExtracted.location.offset  = offset;
-                    uniformBufferMemberExtracted.location.length  = size;
-                    uniformBufferMemberExtracted.location.padding = 0;
-                    uniformBufferExtracted.members[name]          = uniformBufferMemberExtracted;
+                        // Fetch basic information
+                        std::string const &name   = aCompiler.get_member_name(aParent.self, k);
+                        uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
+                        uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
 
-                    CLog::Debug(logTag(),
-                                "\n    UniformBuffer-Member : "
-                                "\n      Name:            {}"
-                                "\n      Offset:          {}"
-                                "\n      Size:            {}",
-                                name, offset, size);
-                }                
+                        Shared<SBufferMember> uniformBufferMemberExtracted = makeShared<SBufferMember>();
+                        uniformBufferMemberExtracted->name             = name;
+                        uniformBufferMemberExtracted->location.offset  = offset;
+                        uniformBufferMemberExtracted->location.length  = size;
+                        uniformBufferMemberExtracted->location.padding = 0;
+
+                        if(not memberType.member_types.empty())
+                        {
+                            uniformBufferMemberExtracted->members = deriveUniformBufferMembers(aCompiler, memberType);
+                        }
+
+                        map.insert({ name, std::move(uniformBufferMemberExtracted) });
+
+                        CLog::Debug(logTag(),
+                                    "\n    UniformBuffer-Member : "
+                                    "\n      Name:            {}"
+                                    "\n      Offset:          {}"
+                                    "\n      Size:            {}",
+                                    name, offset, size);
+                    }
+
+                    return map;
+                };
+
+                uniformBufferExtracted.members = deriveUniformBufferMembers(compiler, type);
 
                 // separate_samplers
                 // separate_images

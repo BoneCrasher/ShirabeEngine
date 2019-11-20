@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <cstring>
+#include <unordered_map>
 
 #include <platform/platform.h>
 
@@ -327,19 +328,23 @@ namespace engine
             bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMeta> &aDeserializer) final;
         };
 
+        using MutableMaterialTypeMap_t = std::unordered_map<std::string, Shared<struct SMaterialType>>;
+        using MaterialTypeMap_t        = std::unordered_map<std::string, Shared<struct SMaterialType const>>;
+
         /**
          * The SMaterialType struct describes a data type of a SPIR-V module and it's memory properties.
          */
         struct SMaterialType
         {
-            std::string name;
-            uint32_t    byteSize;
-            uint32_t    vectorSize;
-            uint32_t    matrixRows;
-            uint32_t    matrixColumns;
-            uint32_t    matrixColumnStride;
-            uint32_t    arraySize;
-            uint32_t    arrayStride;
+            uint32_t          byteSize;
+            uint32_t          vectorSize;
+            uint32_t          matrixRows;
+            uint32_t          matrixColumns;
+            uint32_t          matrixColumnStride;
+            uint32_t          arraySize;
+            uint32_t          arrayStride;
+            std::string       name;
+            MaterialTypeMap_t members;
         };
 
         /**
@@ -356,8 +361,8 @@ namespace engine
         struct SStageInput
             : public SNamedResource
         {
-            uint32_t      location;
-            SMaterialType type;
+            uint32_t                    location;
+            Shared<SMaterialType const> type;
         };
 
         /**
@@ -366,8 +371,8 @@ namespace engine
         struct SStageOutput
             : public SNamedResource
         {
-            uint32_t      location;
-            SMaterialType type;
+            uint32_t                    location;
+            Shared<SMaterialType const> type;
         };
 
         /**
@@ -432,44 +437,71 @@ namespace engine
         /**
          * Describes a single uniform buffer member by name and buffer location.
          */
-        struct SUniformBufferMember
+        using MutableBufferMemberMap_t = std::unordered_map<std::string, Shared<struct SBufferMember>>;
+        using BufferMemberMap_t        = std::unordered_map<std::string, Shared<struct SBufferMember const>>;
+        struct SBufferMember
         {
-            std::string     name;
-            SBufferLocation location;
+            std::string       name;
+            SBufferLocation   location;
+            BufferMemberMap_t members;
         };
-        using UniformBufferMemberMap_t = std::unordered_map<std::string, SUniformBufferMember>;
 
-        /**
-         * Describes a uniform buffer, it's name, location, set and binding as well
-         * as a collection of buffer members.
-         */
-        struct SUniformBuffer
-            : public SBoundResource
+        struct SMaterialBuffer
+                : public SBoundResource
         {
         public_members:
-            SBufferLocation                          location;
-            core::CBitField<VkPipelineStageFlagBits> stageBinding;
-            UniformBufferMemberMap_t                 members;
+            SBufferLocation   location;
+            BufferMemberMap_t members;
 
         public_constructors:
-            SUniformBuffer() = default;
+            SMaterialBuffer() = default;
 
             SHIRABE_INLINE
-            SUniformBuffer(SUniformBuffer const &aOther)
-                : SBoundResource(aOther)
-                , location(aOther.location)
-                , members (aOther.members )
+            SMaterialBuffer(SMaterialBuffer const &aOther)
+            : SBoundResource(aOther)
+            , location(aOther.location)
+            , members (aOther.members )
             {}
 
         public_operators:
             SHIRABE_INLINE
-            SUniformBuffer &operator=(SUniformBuffer const &aOther)
+            SMaterialBuffer &operator=(SMaterialBuffer const &aOther)
             {
                 name     = aOther.name;
                 location = aOther.location;
                 set      = aOther.set;
                 binding  = aOther.binding;
                 members  = aOther.members;
+
+                return (*this);
+            }
+        };
+
+        /**
+         * Describes a uniform buffer, it's name, location, set and binding as well
+         * as a collection of buffer members.
+         */
+        struct SUniformBuffer
+            : public SMaterialBuffer
+        {
+        public_members:
+            core::CBitField<VkPipelineStageFlagBits> stageBinding;
+
+        public_constructors:
+            SUniformBuffer() = default;
+
+            SHIRABE_INLINE
+            SUniformBuffer(SUniformBuffer const &aOther)
+                : SMaterialBuffer(aOther)
+                , stageBinding(aOther.stageBinding)
+            {}
+
+        public_operators:
+            SHIRABE_INLINE
+            SUniformBuffer &operator=(SUniformBuffer const &aOther)
+            {
+                SMaterialBuffer::operator=(aOther);
+                stageBinding = aOther.stageBinding;
 
                 return (*this);
             }
@@ -499,14 +531,10 @@ namespace engine
         public_constructors:
             SMaterialStage() = default;
 
+            SMaterialStage(SMaterialStage const &aOther) = default;
+
             SHIRABE_INLINE
-            SMaterialStage(SMaterialStage const &aOther)
-                : stage(aOther.stage)
-                , stageName(aOther.stageName)
-                , filename(aOther.filename)
-                , inputs(aOther.inputs)
-                , outputs(aOther.outputs)
-            {}
+            SMaterialStage(SMaterialStage &&aOther) noexcept = default;
 
         public_operators:
             SHIRABE_INLINE
@@ -517,6 +545,18 @@ namespace engine
                 filename  = aOther.filename;
                 inputs    = aOther.inputs;
                 outputs   = aOther.outputs;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            SMaterialStage &operator=(SMaterialStage &&aOther)
+            {
+                stage     = aOther.stage;
+                stageName = std::move(aOther.stageName);
+                filename  = std::move(aOther.filename);
+                inputs    = std::move(aOther.inputs);
+                outputs   = std::move(aOther.outputs);
 
                 return (*this);
             }

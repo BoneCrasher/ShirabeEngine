@@ -224,7 +224,7 @@ namespace engine
             aSerializer.beginObject("layoutInfo");
             aSerializer.writeValue ("setCount", layoutInfo.setCount);
             aSerializer.beginObject("setBindingCounts");
-            for(uint32_t k=0; k<layoutInfo.setBindingCount.size(); ++k)
+            for(uint64_t k=0; k<layoutInfo.setBindingCount.size(); ++k)
             {
                 aSerializer.writeValue(CString::format("{}", k), layoutInfo.setBindingCount[k]);
             }
@@ -253,7 +253,7 @@ namespace engine
             aSerializer.beginArray("uniformBuffers");
             auto const iterateUniformBuffers = [&] (SUniformBuffer const &aBuffer) -> void
             {
-                aSerializer.beginObject(aBuffer.name);                
+                aSerializer.beginObject(aBuffer.name);
                 aSerializer.writeValue("name",    aBuffer.name);
                 aSerializer.writeValue("offset",  aBuffer.location.offset);
                 aSerializer.writeValue("size",    aBuffer.location.length);
@@ -261,21 +261,36 @@ namespace engine
                 aSerializer.writeValue("set",     aBuffer.set);
                 aSerializer.writeValue("binding", aBuffer.binding);
 
-                aSerializer.beginArray("members");
-                auto const iterate = [&] (std::pair<std::string, SUniformBufferMember> const &aMember)
+                std::function<void(BufferMemberMap_t const &)> iterateUniformBufferMembers = nullptr;
+                iterateUniformBufferMembers = [&] (BufferMemberMap_t const &aMembers) -> void
                 {
-                    std::string          const aKey   = aMember.first;
-                    SUniformBufferMember const aValue = aMember.second;
+                    aSerializer.beginArray("members");
+                    auto const iterate = [&] (BufferMemberMap_t::value_type const &aMember)
+                    {
+                        std::string                        const  aKey   = aMember.first;
+                        Shared<SBufferMember const> const &aValue = aMember.second;
 
-                    aSerializer.beginObject(aKey);
-                    aSerializer.writeValue("name",    aKey);
-                    aSerializer.writeValue("offset",  aValue.location.offset);
-                    aSerializer.writeValue("size",    aValue.location.length);
-                    aSerializer.writeValue("padding", aValue.location.padding);
-                    aSerializer.endObject(); // aKey
+                        aSerializer.beginObject(aKey);
+                        aSerializer.writeValue("name",    aKey);
+                        aSerializer.writeValue("offset",  aValue->location.offset);
+                        aSerializer.writeValue("size",    aValue->location.length);
+                        aSerializer.writeValue("padding", aValue->location.padding);
+
+                        if(not aValue->members.empty())
+                        {
+                            iterateUniformBufferMembers(aValue->members);
+                        }
+
+                        aSerializer.endObject(); // aKey
+                    };
+                    std::for_each(aMembers.begin(), aMembers.end(), iterate);
+                    aSerializer.endArray(); // members
                 };
-                std::for_each(aBuffer.members.begin(), aBuffer.members.end(), iterate);
-                aSerializer.endArray(); // members
+
+                //if(not aBuffer.members.empty())
+                //{
+                    iterateUniformBufferMembers(aBuffer.members);
+                //}
 
                 aSerializer.endObject(); // aBuffer.Name
             };
@@ -301,24 +316,38 @@ namespace engine
             // Loop through stages
             //
             aSerializer.beginArray("stages");
-            auto const iterateStages = [&] (std::pair<VkPipelineStageFlagBits, SMaterialStage> const &aStage) -> void
+            std::function<void(std::pair<VkPipelineStageFlagBits const, SMaterialStage> const &)> iterateStages = nullptr;
+            iterateStages = [&] (std::pair<VkPipelineStageFlagBits const, SMaterialStage> const &aStage) -> void
             {
-                auto const writeType = [&] (SMaterialType const &aType) -> void
+                std::function<void(Shared<SMaterialType const> const &)> writeType = nullptr;
+                writeType = [&] (Shared<SMaterialType const> const &aType) -> void
                 {
+                    std::function<void(Shared<SMaterialType const> const &)> writeMemberTree = nullptr;
+                    writeMemberTree = [&] (Shared<SMaterialType const> const &aMemberType) -> void
+                    {
+                        aSerializer.beginArray("members");
+                        for(auto const &[name, type] : aMemberType->members)
+                        {
+                            writeType(type);
+                        }
+                        aSerializer.endArray();
+                    };
+
                     aSerializer.beginObject("type");
-                    aSerializer.writeValue("name",               aType.name);
-                    aSerializer.writeValue("byteSize",           aType.byteSize);
-                    aSerializer.writeValue("vectorSize",         aType.vectorSize);
-                    aSerializer.writeValue("matrixRows",         aType.matrixRows);
-                    aSerializer.writeValue("matrixColumns",      aType.matrixColumns);
-                    aSerializer.writeValue("matrixColumnStride", aType.matrixColumnStride);
-                    aSerializer.writeValue("arraySize",          aType.arraySize);
-                    aSerializer.writeValue("arrayStride",        aType.arrayStride);
+                    aSerializer.writeValue("name",               aType->name);
+                    aSerializer.writeValue("byteSize",           aType->byteSize);
+                    aSerializer.writeValue("vectorSize",         aType->vectorSize);
+                    aSerializer.writeValue("matrixRows",         aType->matrixRows);
+                    aSerializer.writeValue("matrixColumns",      aType->matrixColumns);
+                    aSerializer.writeValue("matrixColumnStride", aType->matrixColumnStride);
+                    aSerializer.writeValue("arraySize",          aType->arraySize);
+                    aSerializer.writeValue("arrayStride",        aType->arrayStride);
+                    writeMemberTree(aType);
                     aSerializer.endObject();
                 };
 
-                VkPipelineStageFlagBits const key   = aStage.first;
-                SMaterialStage          const stage = aStage.second;
+                VkPipelineStageFlagBits const  key   = aStage.first;
+                SMaterialStage          const &stage = aStage.second;
 
                 SHIRABE_UNUSED(key);
 
@@ -352,7 +381,7 @@ namespace engine
                 aSerializer.endArray();
                 aSerializer.endObject();
             };
-            std::for_each(this->stages.begin(), this->stages.end(), iterateStages);
+            std::for_each(this->stages.cbegin(), this->stages.cend(), iterateStages);
 
             aSerializer.endArray();
             aSerializer.endObject();
@@ -364,6 +393,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+
+        template <template <typename> typename TContainer, typename T>
+        void convertToConstSmartPtrMap(
+                  std::unordered_map<std::string, TContainer<T>>       &aInput
+                , std::unordered_map<std::string, TContainer<T const>> &aOutput)
+        {
+            auto const predicate = [] (typename std::unordered_map<std::string, TContainer<T>>::value_type &aMember)
+                    -> typename std::unordered_map<std::string, TContainer<T const>>::value_type
+            {
+                return { aMember.first, std::const_pointer_cast<T const>(aMember.second) };
+            };
+            std::transform(aInput.begin(), aInput.end(), getMapEmplacer(aOutput), predicate);
+        }
 
         /**
          * @brief acceptDeserializer
@@ -429,27 +471,39 @@ namespace engine
                 aDeserializer.readValue("set",     aBuffer.set);
                 aDeserializer.readValue("binding", aBuffer.binding);
 
-                uint32_t uniformBufferMemberCount = 0;
-                aDeserializer.beginArray("members", uniformBufferMemberCount);
+                std::function<void(MutableBufferMemberMap_t &)> readMembers = nullptr;
+                readMembers = [&] (MutableBufferMemberMap_t &aOutMembers) -> void {
+                    auto const iterate = [&](Shared<SBufferMember> const &aMember,
+                                             uint32_t                     const &aIndex) -> void
+                    {
+                        aDeserializer.beginObject(aIndex);
+                        aDeserializer.readValue("name",    aMember->name);
+                        aDeserializer.readValue("offset",  aMember->location.offset);
+                        aDeserializer.readValue("size",    aMember->location.length);
+                        aDeserializer.readValue("padding", aMember->location.padding);
+                        aDeserializer.endObject();
+                    };
 
-                auto const iterate = [&] (SUniformBufferMember &aMember, uint32_t const &aIndex) -> void
-                {
-                    aDeserializer.beginObject(aIndex);
-                    aDeserializer.readValue("name",    aMember.name);
-                    aDeserializer.readValue("offset",  aMember.location.offset);
-                    aDeserializer.readValue("size",    aMember.location.length);
-                    aDeserializer.readValue("padding", aMember.location.padding);
-                    aDeserializer.endObject();
+                    MutableBufferMemberMap_t resultMap {};
+                    uint32_t size = 0;
+                    aDeserializer.beginArray("members", size);
+                    for (uint32_t k = 0; k < size; ++k) {
+                        Shared<SBufferMember> member{};
+                        iterate(member, k);
+                        resultMap.insert({ member->name, std::move(member) });
+                    }
+                    aDeserializer.endArray();
+
+                    aOutMembers = resultMap;
                 };
 
-                for(uint32_t k=0; k<uniformBufferMemberCount; ++k)
-                {
-                    SUniformBufferMember member{};
-                    iterate(member, k);
-                    aBuffer.members[member.name] = member;
-                }
+                MutableBufferMemberMap_t mutableMembers {};
+                readMembers(mutableMembers);
 
-                aDeserializer.endArray();
+                convertToConstSmartPtrMap<Shared, SBufferMember>(mutableMembers, aBuffer.members);
+
+                mutableMembers.clear();
+
                 aDeserializer.endObject();
             };
 
@@ -491,17 +545,42 @@ namespace engine
 
             auto const iterateStages = [&] (SMaterialStage &aStage, uint32_t const &aIndex) -> void
             {
-                auto const readType = [&] (SMaterialType &aType) -> void
+                std::function<void(Shared<SMaterialType> &)> readType = nullptr;
+                readType = [&] (Shared<SMaterialType> &aType) -> void
                 {
+                    std::function<void(MutableMaterialTypeMap_t &)> readMembers = nullptr;
+                    readMembers = [&] (MutableMaterialTypeMap_t &aMembers) -> void
+                    {
+                        MutableMaterialTypeMap_t map {};
+
+                        uint32_t count = 0;
+                        aDeserializer.beginArray("members", count);
+                        for(uint32_t k=0; k<count; ++k)
+                        {
+                            Shared<SMaterialType> type = makeShared<SMaterialType>();
+                            readType(type);
+                            map.insert({ type->name, std::move(type) });
+                        }
+                        aDeserializer.endArray();
+
+                        aMembers = map;
+                    };
+
                     aDeserializer.beginObject("type");
-                    aDeserializer.readValue("name",               aType.name);
-                    aDeserializer.readValue("byteSize",           aType.byteSize);
-                    aDeserializer.readValue("vectorSize",         aType.vectorSize);
-                    aDeserializer.readValue("matrixRows",         aType.matrixRows);
-                    aDeserializer.readValue("matrixColumns",      aType.matrixColumns);
-                    aDeserializer.readValue("matrixColumnStride", aType.matrixColumnStride);
-                    aDeserializer.readValue("arraySize",          aType.arraySize);
-                    aDeserializer.readValue("arrayStride",        aType.arrayStride);
+                    aDeserializer.readValue("name",               aType->name);
+                    aDeserializer.readValue("byteSize",           aType->byteSize);
+                    aDeserializer.readValue("vectorSize",         aType->vectorSize);
+                    aDeserializer.readValue("matrixRows",         aType->matrixRows);
+                    aDeserializer.readValue("matrixColumns",      aType->matrixColumns);
+                    aDeserializer.readValue("matrixColumnStride", aType->matrixColumnStride);
+                    aDeserializer.readValue("arraySize",          aType->arraySize);
+                    aDeserializer.readValue("arrayStride",        aType->arrayStride);
+
+                    MutableMaterialTypeMap_t mutableMembers {};
+                    readMembers(mutableMembers);
+
+                    convertToConstSmartPtrMap<Shared, SMaterialType>(mutableMembers, aType->members);
+
                     aDeserializer.endObject();
                 };
 
@@ -520,7 +599,10 @@ namespace engine
                    aDeserializer.readValue("name",     aInput.name);
                    aDeserializer.readValue("location", aInput.location);
 
-                   readType(aInput.type);
+                   Shared<SMaterialType> processed = makeShared<SMaterialType>();
+                   readType(processed);
+
+                   aInput.type = std::const_pointer_cast<SMaterialType const>(processed);
 
                    aDeserializer.endObject();
                 };
@@ -541,6 +623,12 @@ namespace engine
                     aDeserializer.beginObject(aIndex);
                     aDeserializer.readValue("name",     aOutput.name);
                     aDeserializer.readValue("location", aOutput.location);
+
+                    Shared<SMaterialType> processed = makeShared<SMaterialType>();
+                    readType(processed);
+
+                    aOutput.type = std::const_pointer_cast<SMaterialType const>(processed);
+
                     aDeserializer.endObject();
                 };
 
@@ -558,7 +646,7 @@ namespace engine
                 SMaterialStage stage{};
 
                 iterateStages(stage, k);
-                stages[stage.stage] = stage;
+                stages[stage.stage] = std::move(stage);
             }
 
             aDeserializer.endArray();
@@ -592,11 +680,11 @@ namespace engine
                 for(auto const &[name, member] : buffer.members)
                 {
                     SBufferLocation adjustedMemberLocation {};
-                    adjustedMemberLocation.offset  = (adjustedBufferLocation.offset + member.location.offset);
-                    adjustedMemberLocation.length  = member.location.length;
-                    adjustedMemberLocation.padding = member.location.padding;
+                    adjustedMemberLocation.offset  = (adjustedBufferLocation.offset + member->location.offset);
+                    adjustedMemberLocation.length  = member->location.length;
+                    adjustedMemberLocation.padding = member->location.padding;
 
-                    data.mValueIndex[name] = member.location;
+                    data.mValueIndex[name] = member->location;
                 }
 
                 config.mBufferIndex[buffer.name] = data;
@@ -733,19 +821,19 @@ namespace engine
                 aDeserializer.beginArray("members", memberCount);
                 for(uint32_t l=0; l<memberCount; ++l)
                 {
-                    std::string     name     ={};
-                    SBufferLocation location ={};
+                    std::string     memberName ={};
+                    SBufferLocation location   ={};
 
                     aDeserializer.beginObject(l);
 
-                    aDeserializer.readValue("name",    name);
+                    aDeserializer.readValue("name",    memberName);
                     aDeserializer.readValue("offset",  location.offset);
                     aDeserializer.readValue("size",    location.length);
                     aDeserializer.readValue("padding", location.padding);
 
                     aDeserializer.endObject();
 
-                    buffer.mValueIndex[name] = location;
+                    buffer.mValueIndex[memberName] = location;
                 }
                 aDeserializer.endArray();
 

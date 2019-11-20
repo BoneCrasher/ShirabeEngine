@@ -928,7 +928,7 @@ namespace engine
 
                         VkVertexInputBindingDescription binding;
                         binding.binding   = k;
-                        binding.stride    = input.type.arrayStride;
+                        binding.stride    = input.type->arrayStride;
                         binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
                         VkVertexInputAttributeDescription attribute;

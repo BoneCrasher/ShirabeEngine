@@ -40,5 +40,39 @@ namespace engine
     private_members:
         T &mContainer;
     };
+
+    template<class TContainer>
+    class CMapEmplacer
+        : public std::iterator< std::output_iterator_tag, void, void, void, void >
+    {
+
+    public:
+        typedef TContainer container_type;
+
+        explicit CMapEmplacer(TContainer &aContainer)
+            : mContainer(&aContainer)
+        {}
+
+        template<class T>
+        CMapEmplacer<TContainer>& operator=(T &&t)
+        {
+            mContainer->emplace(std::forward<T>(t));
+            return *this;
+        }
+
+        CMapEmplacer& operator*()     { return *this; }
+        CMapEmplacer& operator++()    { return *this; }
+        CMapEmplacer& operator++(int) { return *this; }
+
+    protected_members:
+        TContainer *mContainer;
+    };
+
+    template <class TContainer>
+    inline CMapEmplacer<TContainer>
+    getMapEmplacer(TContainer &aContainer)
+    {
+        return CMapEmplacer<TContainer>(aContainer);
+    }
 }
 #endif // STL_CONTAINER_HELPERS_H
