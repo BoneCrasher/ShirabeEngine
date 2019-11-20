@@ -375,6 +375,9 @@ namespace engine
                     aSerializer.beginObject(aOutput.name);
                     aSerializer.writeValue("name",     aOutput.name);
                     aSerializer.writeValue("location", aOutput.location);
+
+                    writeType(aOutput.type);
+
                     aSerializer.endObject();
                 };
                 std::for_each(stage.outputs.begin(), stage.outputs.end(), iterateOutputs);
@@ -488,7 +491,7 @@ namespace engine
                     uint32_t size = 0;
                     aDeserializer.beginArray("members", size);
                     for (uint32_t k = 0; k < size; ++k) {
-                        Shared<SBufferMember> member{};
+                        Shared<SBufferMember> member = makeShared<SBufferMember>();
                         iterate(member, k);
                         resultMap.insert({ member->name, std::move(member) });
                     }
@@ -558,7 +561,9 @@ namespace engine
                         for(uint32_t k=0; k<count; ++k)
                         {
                             Shared<SMaterialType> type = makeShared<SMaterialType>();
+                            aDeserializer.beginObject(k);
                             readType(type);
+                            aDeserializer.endObject();
                             map.insert({ type->name, std::move(type) });
                         }
                         aDeserializer.endArray();
@@ -566,7 +571,6 @@ namespace engine
                         aMembers = map;
                     };
 
-                    aDeserializer.beginObject("type");
                     aDeserializer.readValue("name",               aType->name);
                     aDeserializer.readValue("byteSize",           aType->byteSize);
                     aDeserializer.readValue("vectorSize",         aType->vectorSize);
@@ -581,7 +585,6 @@ namespace engine
 
                     convertToConstSmartPtrMap<Shared, SMaterialType>(mutableMembers, aType->members);
 
-                    aDeserializer.endObject();
                 };
 
                 aDeserializer.beginObject(aIndex);
@@ -600,7 +603,9 @@ namespace engine
                    aDeserializer.readValue("location", aInput.location);
 
                    Shared<SMaterialType> processed = makeShared<SMaterialType>();
+                   aDeserializer.beginObject("type");
                    readType(processed);
+                   aDeserializer.endObject();
 
                    aInput.type = std::const_pointer_cast<SMaterialType const>(processed);
 
@@ -625,7 +630,9 @@ namespace engine
                     aDeserializer.readValue("location", aOutput.location);
 
                     Shared<SMaterialType> processed = makeShared<SMaterialType>();
+                    aDeserializer.beginObject("type");
                     readType(processed);
+                    aDeserializer.endObject();
 
                     aOutput.type = std::const_pointer_cast<SMaterialType const>(processed);
 
