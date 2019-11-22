@@ -3,7 +3,8 @@
 
 #include "icomponent.h"
 
-namespace engine {
+namespace engine::ecws
+{
 
 	class CMeshComponent
 		: public IComponent

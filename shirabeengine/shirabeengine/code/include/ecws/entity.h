@@ -4,7 +4,7 @@
 #include "core/enginestatus.h"
 #include "ecws/icomponent.h"
 
-namespace engine
+namespace engine::ecws
 {
     /**
      * A CEntity instance describes an engine entity, which can be enriched by various
@@ -24,6 +24,7 @@ namespace engine
          *
          * @return See brief.
          */
+         [[nodiscard]]
         SHIRABE_INLINE const std::string &name() const { return mName; }
 
         /**
@@ -31,7 +32,7 @@ namespace engine
          *
          * @param aName The new name of the component.
          */
-        SHIRABE_INLINE void  name(const std::string& name) { mName = name; }
+        SHIRABE_INLINE void setName(std::string const& aName) { mName = aName; }
 
         /**
          * Update the component with an optionally usable timer component.
@@ -63,6 +64,7 @@ namespace engine
          * @tparam TComponent The type of component to check for.
          */
         template<typename TComponent>
+        [[nodiscard]]
         bool hasComponentOfType() const;
 
         /**
@@ -71,11 +73,11 @@ namespace engine
          * @tparam TComponent The type of component to enumerate.
          */
         template <typename TComponent>
-        const Vector<Shared<TComponent>> getComponentsOfType();
+        CBoundedCollection<Shared<TComponent>> const getTypedComponentsOfType();
 
     private_members:
-        std::string    mName;
-        IComponentList mComponents;
+        std::string   mName;
+        IComponentMap mComponents;
     };
 
     //<-----------------------------------------------------------------------------
@@ -91,9 +93,28 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <typename TComponent>
-    const Vector<Shared<TComponent>> CEntity::getComponentsOfType()
+    CBoundedCollection<Shared<TComponent>> const CEntity::getTypedComponentsOfType()
     {
-        return {};
+        std::type_index const index = std::type_index(typeid(TComponent));
+        if(mComponents.end() == mComponents.find(index))
+        {
+            return {};
+        }
+
+        CBoundedCollection<Shared<IComponent>> const  components = mComponents.at(index);
+        CBoundedCollection<Shared<TComponent>> casted {};
+
+        auto const converter = [] (Shared<IComponent> const &input) -> Shared<TComponent>
+        {
+            return std::dynamic_pointer_cast<TComponent>(input);
+        };
+
+        std::transform(components.cbegin()
+                , components.cend()
+                , std::back_inserter(casted)
+                , converter);
+
+        return casted;
     }
     //<-----------------------------------------------------------------------------
 

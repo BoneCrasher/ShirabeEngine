@@ -10,6 +10,7 @@
 #include <asset/assetstorage.h>
 #include <renderer/irenderer.h>
 #include <resources/cresourcemanager.h>
+#include <material/material_loader.h>
 
 #include <vulkan_integration/vulkanenvironment.h>
 
@@ -17,6 +18,8 @@
     #include <wsi/windows/windowserror.h>
 #elif defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11error.h>
+#include <material/material_loader.h>
+
 #endif
 
 #include "buildingblocks/scene.h"
@@ -31,6 +34,7 @@ namespace engine
     using namespace engine::os;
     using namespace engine::wsi;
     using namespace engine::vulkan;
+    using material::CMaterialLoader;
 
     /**
      * @brief The CEngineInstance class
@@ -76,7 +80,7 @@ namespace engine
         Shared<os::SApplicationEnvironment> mApplicationEnvironment;
 
         // Timing
-        CTimer                                 mTimer;
+        CTimer                       mTimer;
 
         // WSI
         Shared<CWindowManager>        mWindowManager;
@@ -85,13 +89,14 @@ namespace engine
         // Assets & Resources
         Shared<CAssetStorage>         mAssetStorage;
         Shared<CResourceManager>      mResourceManager;
+        Shared<CMaterialLoader>       mMaterialLoader;
 
         // Rendering
         Shared<CVulkanEnvironment>    mVulkanEnvironment;
         Shared<IRenderer>             mRenderer;
 
         // Internals
-        CScene mScene;
+        CScene                        mScene;
     };
 }
 

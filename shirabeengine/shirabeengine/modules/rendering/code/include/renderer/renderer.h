@@ -22,7 +22,7 @@ namespace engine
             CRenderer();
 
         public_destructors:
-            ~CRenderer();
+            ~CRenderer() final;
 
         public_methods:
             /**
@@ -38,56 +38,57 @@ namespace engine
             EEngineStatus initialize(
                     Shared<SApplicationEnvironment>  const &aApplicationEnvironment,
                     Shared<wsi::CWSIDisplay>         const &aDisplay,
-                    SRendererConfiguration                    const &aConfiguration,
-                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext) ;
+                    SRendererConfiguration           const &aConfiguration,
+                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext) final;
 
             /**
              * Deinitialize and clear the renderer.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus deinitialize();
+            EEngineStatus deinitialize() final;
 
             /**
              * Try to reinitialize the renderer, e.g. due to a configuration change.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus reinitialize();
+            EEngineStatus reinitialize() final;
 
             /**
              * Pause the renderer, stopping and rejecting all upcoming render requests.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus pause();
+            EEngineStatus pause() final;
 
             /**
              * Resume the renderer.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus resume();
+            EEngineStatus resume() final;
 
             /**
              * Check, whether the renderer is paused.
              *
              * @return True, if paused. False otherwise.
              */
-            bool isPaused() const;
+             [[nodiscard]]
+            bool isPaused() const final;
 
             /**
              * Render an entire scene... (format not specified yet..)
              * @return
              */
-            EEngineStatus renderScene();
+            EEngineStatus renderScene(RenderableList const &aRenderableCollection) final;
 
         private_members:
-            SRendererConfiguration                    mConfiguration;
+            SRendererConfiguration           mConfiguration;
             Shared<SApplicationEnvironment>  mAppEnvironment;
             Shared<wsi::CWSIDisplay>         mDisplay;
             Shared<IFrameGraphRenderContext> mFrameGraphRenderContext;
-            std::atomic<bool>                         mPaused;
+            std::atomic<bool>                mPaused;
 
         };
 

@@ -1,45 +1,31 @@
-#include "buildingblocks/scene.h"
+//
+// Created by dottideveloper on 22.11.19.
+//
+#include "ecws/entity.h"
 
-namespace engine
+namespace engine::ecws
 {
     //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CScene::CScene()
-        : mComponentFactory(nullptr)
-        , mTimer()
-        , mPrimaryCamera()
-        , mEntities()
-    {}
+
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CScene::~CScene()
+    CEntity::CEntity()
+        : mName()
     {}
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
-    //<
+    //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::initialize()
-    {
-        return EEngineStatus::Ok;
-    }
+    CEntity::~CEntity()
+    {}
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
-    //<
+    //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::deinitialize()
-    {
-        return EEngineStatus::Ok;
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::update()
+    EEngineStatus CEntity::update(CTimer const &aTimer)
     {
         return EEngineStatus::Ok;
     }
@@ -48,15 +34,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::addEntity(Unique<ecws::CEntity> aEntity)
+    EEngineStatus CEntity::addComponent(const Shared<IComponent> &aComponent)
     {
-        auto const iterator = std::find(mEntities.cbegin(), mEntities.cend(), aEntity);
-        if(mEntities.end() != iterator)
-        {
-            return EEngineStatus::Error;
-        }
-
-        mEntities.emplace_back(std::move(aEntity));
         return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
@@ -64,16 +43,15 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::removeEntity(Unique<ecws::CEntity> aEntity)
+    EEngineStatus CEntity::removeComponent(const Shared<IComponent> &aComponent)
     {
-        auto const iterator = std::find(mEntities.cbegin(), mEntities.cend(), aEntity);
-        if(mEntities.end() == iterator)
-        {
-            return EEngineStatus::Ok;
-        }
-        mEntities.erase(iterator);
-
         return EEngineStatus::Ok;
     }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+
     //<-----------------------------------------------------------------------------
 }

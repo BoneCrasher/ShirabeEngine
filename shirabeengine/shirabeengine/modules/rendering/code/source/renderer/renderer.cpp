@@ -135,7 +135,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::renderScene()
+        EEngineStatus CRenderer::renderScene(RenderableList const &aRenderableCollection)
         {
             using namespace engine;
             using namespace engine::framegraph;
@@ -151,11 +151,9 @@ namespace engine
             graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
             graphBuilder.setRenderToBackBuffer(true);
 
-            RenderableList renderableCollection ={
-                { "Cube",    0, 317299467 },
-            };
+
             SFrameGraphRenderableList renderables{ };
-            renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
+            renderables = graphBuilder.registerRenderables("SceneRenderables", aRenderableCollection);
 
             CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                     graphicsAPICommonModule{ };
             CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule          { };

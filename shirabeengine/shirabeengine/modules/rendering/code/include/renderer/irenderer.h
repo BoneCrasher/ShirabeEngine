@@ -79,7 +79,7 @@ namespace engine
              * Render an entire scene... (format not specified yet..)
              * @return
              */
-            virtual EEngineStatus renderScene() = 0;
+            virtual EEngineStatus renderScene(RenderableList const &) = 0;
         };
     }
 }

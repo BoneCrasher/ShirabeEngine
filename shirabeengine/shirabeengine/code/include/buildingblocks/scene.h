@@ -48,14 +48,21 @@ namespace engine
          */
         CEngineResult<> update();
 
+        CEngineResult<> addEntity(Unique<ecws::CEntity> aEntity);
+
+        CEngineResult<> removeEntity(Unique<ecws::CEntity> aEntity);
+
+        [[nodiscard]]
+        SHIRABE_INLINE
+        Vector<Unique<ecws::CEntity>> const &getEntities() const { return mEntities; }
+
     private_members:
-        Shared<IComponentFactory> mComponentFactory;
+        Shared<ecws::IComponentFactory> mComponentFactory;
 
         CTimer  mTimer;
         CCamera mPrimaryCamera;
 
-        EntityList mEntities;
-
+        Vector<Unique<ecws::CEntity>> mEntities;
     };
 
 }

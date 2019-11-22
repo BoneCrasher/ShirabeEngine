@@ -5,7 +5,7 @@
 #include "ecws/icomponent.h"
 #include "ecws/ecomponenttype.h"
 
-namespace engine
+namespace engine::ecws
 {
     /**
      * The IComponentFactory interface describes valid factory signatures of a

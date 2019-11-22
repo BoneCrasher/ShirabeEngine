@@ -1,12 +1,79 @@
 #ifndef __SHIRABE_COMPONENT_H__
 #define __SHIRABE_COMPONENT_H__
 
+#include <typeindex>
 #include <core/enginetypehelper.h>
 #include <core/enginestatus.h>
 #include <core/benchmarking/timer/timer.h>
 
-namespace engine
+namespace engine::ecws
 {
+    template <typename TElement>
+    class CBoundedCollection
+    {
+    public_typedefs:
+        typedef typename Vector<TElement>::value_type value_type;
+
+    public_constructors:
+        SHIRABE_INLINE
+        CBoundedCollection()
+            : CBoundedCollection(0)
+        {}
+
+        SHIRABE_INLINE
+        explicit CBoundedCollection(std::size_t const &aMaxElements)
+            : mMaxElements(aMaxElements)
+        {}
+
+        SHIRABE_INLINE
+        EEngineStatus add(TElement const &aElement)
+        {
+            if(mElements.size() >= mMaxElements)
+            {
+                return EEngineStatus::Error;
+            }
+
+            if(mElements.end() != std::find(mElements.begin(), mElements.end(), aElement))
+            {
+                return EEngineStatus::Error;
+            }
+
+            mElements.push_back(aElement);
+            return EEngineStatus::Ok;
+        }
+
+        SHIRABE_INLINE
+        void remove(TElement const &aElement)
+        {
+            mElements.erase(aElement);
+        }
+
+        SHIRABE_INLINE
+        void push_back(TElement const &aElement)
+        {
+            add(aElement);
+        }
+
+        SHIRABE_INLINE
+        typename Vector<TElement>::iterator begin() { return mElements.begin(); }
+
+        SHIRABE_INLINE
+        typename Vector<TElement>::iterator end() { return mElements.end(); }
+
+        SHIRABE_INLINE
+        typename Vector<TElement>::const_iterator cbegin() const { return mElements.begin(); }
+
+        SHIRABE_INLINE
+        typename Vector<TElement>::const_iterator cend() const { return mElements.end(); }
+
+        SHIRABE_INLINE
+        Vector<TElement> const data() const { return mElements; }
+
+    private_members:
+        std::size_t const mMaxElements;
+        Vector<TElement>  mElements;
+    };
+
     /**
      * The IComponent interface describes the basic capabilitites of all system components.
      */
@@ -20,14 +87,8 @@ namespace engine
          *
          * @return See brief.
          */
+         [[nodiscard]]
         virtual std::string const &name() const = 0;
-
-        /**
-         * Set the component name.
-         *
-         * @param aName The new name of the component.
-         */
-        virtual void name(std::string const &aName) = 0;
 
         /**
          * Update the component with an optionally usable timer component.
@@ -39,7 +100,7 @@ namespace engine
     };
 
     SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IComponent>, IComponent);
-
+    SHIRABE_DECLARE_MAP_OF_TYPES(std::type_index, CBoundedCollection<Shared < IComponent>>, IComponent);
 }
 
 #endif

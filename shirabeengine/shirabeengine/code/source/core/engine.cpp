@@ -14,6 +14,9 @@
 
 #include <wsi/display.h>
 
+#include "ecws/meshcomponent.h"
+#include "ecws/materialcomponent.h"
+
 #if defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11display.h>
     #include <wsi/x11/x11windowfactory.h>
@@ -195,8 +198,6 @@ namespace engine
 
         Shared<CGpuApiResourceStorage> gpuApiResourceStorage = makeShared<CGpuApiResourceStorage>();
 
-        Shared<material::CMaterialLoader> materialLoader = nullptr;
-
         auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
         {
             if(EGFXAPI::Vulkan == gfxApi)
@@ -255,7 +256,7 @@ namespace engine
             assetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
-            materialLoader = makeShared<material::CMaterialLoader>(assetStorage);
+            mMaterialLoader = makeShared<material::CMaterialLoader>(assetStorage);
 
             Unique<CGpuApiResourceObjectFactory> gpuApiResourceFactory = nullptr;
 
@@ -298,15 +299,10 @@ namespace engine
                 gfxApiRenderContext = vulkanRenderContext;
             }
 
-            CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, materialLoader, mResourceManager, gfxApiRenderContext);
+            CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mMaterialLoader, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeShared<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
-            if(false == CheckEngineError(status))
-            {
-                CEngineResult<> initialization = mScene.initialize();
-                status = initialization.result();
-            }
 
             return { status };
         };
@@ -322,6 +318,20 @@ namespace engine
             creation = fnCreateDefaultGFXAPI();
             creation = fnCreatePlatformResourceSystem();
             creation = fnCreatePlatformRenderer();
+
+            // Setup scene
+            CEngineResult<> initialization = mScene.initialize();
+            status = initialization.result();
+
+            auto const &[result, material] = mMaterialLoader->loadMaterialInstance(317299467);
+
+            auto materialComponent = makeShared<ecws::CMaterialComponent>();
+            materialComponent->setMaterialInstance(material);
+
+            auto cube = makeUnique<ecws::CEntity>();
+            cube->addComponent(materialComponent);
+
+            mScene.addEntity(std::move(cube));
 
         }
         catch(std::exception &stde)
@@ -398,7 +408,21 @@ namespace engine
 
         if(mRenderer)
         {
-            mRenderer->renderScene();
+            RenderableList renderableCollection {};
+
+            Vector<Unique<ecws::CEntity>> const &entities = mScene.getEntities();
+            for(auto const &entity : entities)
+            {
+                std::string const &name = entity->name();
+                ecws::CBoundedCollection<Shared<ecws::CMeshComponent>>     meshes    = entity->getTypedComponentsOfType<ecws::CMeshComponent>();
+                ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> materials = entity->getTypedComponentsOfType<ecws::CMaterialComponent>();
+
+                // for(auto const &mesh : meshes)
+                    for(auto const &material : materials)
+                        renderableCollection.push_back({ name, 0, material->getMaterialInstance()->getAssetId() });
+            }
+
+            mRenderer->renderScene(renderableCollection);
         }
 
         return { EEngineStatus::Ok };

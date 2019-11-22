@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace engine
+namespace engine::ecws
 {
     enum class EComponentType
             : uint8_t

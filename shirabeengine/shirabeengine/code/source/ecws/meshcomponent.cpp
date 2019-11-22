@@ -1,6 +1,6 @@
 #include "ecws/meshcomponent.h"
 
-namespace engine
+namespace engine::ecws
 {
     CMeshComponent::CMeshComponent()
         : IComponent()
