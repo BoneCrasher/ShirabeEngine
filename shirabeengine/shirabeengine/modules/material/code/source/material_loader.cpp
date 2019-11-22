@@ -167,6 +167,8 @@ namespace engine
             SMaterialSignature const &masterSignature = signature;
             CMaterialConfig    const &masterConfig    = config;
 
+
+
             return { true, masterName, metaData, masterSignature, masterConfig };
         }
         //<-----------------------------------------------------------------------------
@@ -248,6 +250,15 @@ namespace engine
             // {
             //     return { EEngineStatus::Error };
             // }
+
+            //
+            // If the material has been loaded already, return it!
+            // TODO: Material reload on filesystem change?
+            //
+            if(mInstantiatedMaterialMasters.end() != mInstantiatedMaterialMasters.find(masterIndexId))
+            {
+                return { EEngineStatus::Ok, mInstantiatedMaterialMasters.at(masterIndexId) };
+            }
 
             auto [successful, masterName, masterMeta, masterSignature, masterConfig] = loadMasterMaterial(logTag(), mStorage, mInstantiatedMaterialMasters, masterIndexId);
             {

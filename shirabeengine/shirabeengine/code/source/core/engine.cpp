@@ -329,7 +329,7 @@ namespace engine
             materialComponent->setMaterialInstance(material);
 
             auto cube = makeUnique<ecws::CEntity>();
-            cube->addComponent(materialComponent);
+            cube->addComponent<ecws::CMaterialComponent>(materialComponent);
 
             mScene.addEntity(std::move(cube));
 
@@ -419,7 +419,9 @@ namespace engine
 
                 // for(auto const &mesh : meshes)
                     for(auto const &material : materials)
-                        renderableCollection.push_back({ name, 0, material->getMaterialInstance()->getAssetId() });
+                        renderableCollection.push_back({ name
+                                                         , 0
+                                                         , material->getMaterialInstance()->getAssetId() });
             }
 
             mRenderer->renderScene(renderableCollection);

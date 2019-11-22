@@ -48,7 +48,8 @@ namespace engine::ecws
          * @param aComponent The component to add to the entity instance.
          * @return           EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus addComponent(Shared<IComponent> const &aComponent);
+        template <typename TComponent>
+        EEngineStatus addComponent(Shared<TComponent> const &aComponent);
 
         /**
          * Remove a component from the internal component collection.
@@ -56,7 +57,8 @@ namespace engine::ecws
          * @param aComponent The component to add to the entity instance.
          * @return           EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus removeComponent(Shared<IComponent> const &aComponent);
+        template <typename TComponent>
+        EEngineStatus removeComponent(Shared<TComponent> const &aComponent);
 
         /**
          * Check, wether a specific component type is available in the internal component collection.
@@ -84,6 +86,54 @@ namespace engine::ecws
     //
     //<-----------------------------------------------------------------------------
     template <typename TComponent>
+    EEngineStatus CEntity::addComponent(Shared<TComponent> const &aComponent)
+    {
+        std::type_index const index = std::type_index(typeid(TComponent));
+
+        if(mComponents.end() == mComponents.find(index))
+        {
+            mComponents[index] = CBoundedCollection<Shared<IComponent>>(1); // For now permit one component per type...
+        }
+
+        CBoundedCollection<Shared<IComponent>> &collection = mComponents.at(index);
+        if(collection.contains(aComponent))
+        {
+            return EEngineStatus::Error;
+        }
+
+        collection.add(aComponent);
+        return EEngineStatus::Ok;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TComponent>
+    EEngineStatus CEntity::removeComponent(Shared<TComponent> const &aComponent)
+    {
+        std::type_index const index = std::type_index(typeid(TComponent));
+
+        if(mComponents.end() != mComponents.find(index))
+        {
+            return EEngineStatus::Error;
+        }
+
+        CBoundedCollection<Shared<IComponent>> &collection = mComponents.at(index);
+        if(not collection.contains(aComponent))
+        {
+            return EEngineStatus::Error;
+        }
+
+        collection.remove(aComponent);
+        return EEngineStatus::Ok;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TComponent>
     bool CEntity::hasComponentOfType() const {
         return false;
     }
@@ -102,17 +152,9 @@ namespace engine::ecws
         }
 
         CBoundedCollection<Shared<IComponent>> const  components = mComponents.at(index);
-        CBoundedCollection<Shared<TComponent>> casted {};
+        CBoundedCollection<Shared<TComponent>> casted = {};
 
-        auto const converter = [] (Shared<IComponent> const &input) -> Shared<TComponent>
-        {
-            return std::dynamic_pointer_cast<TComponent>(input);
-        };
-
-        std::transform(components.cbegin()
-                , components.cend()
-                , std::back_inserter(casted)
-                , converter);
+        casted.assign(components);
 
         return casted;
     }

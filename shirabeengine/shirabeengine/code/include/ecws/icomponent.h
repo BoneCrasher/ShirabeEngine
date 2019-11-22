@@ -8,6 +8,8 @@
 
 namespace engine::ecws
 {
+    class IComponent;
+
     template <typename TElement>
     class CBoundedCollection
     {
@@ -23,7 +25,50 @@ namespace engine::ecws
         SHIRABE_INLINE
         explicit CBoundedCollection(std::size_t const &aMaxElements)
             : mMaxElements(aMaxElements)
+            , mElements()
         {}
+
+        SHIRABE_INLINE CBoundedCollection(CBoundedCollection<TElement> const &aOther)
+            : mMaxElements(aOther.mMaxElements)
+            , mElements   (aOther.mElements)
+        {}
+
+        SHIRABE_INLINE CBoundedCollection(CBoundedCollection<TElement> &&aOther) noexcept
+                : mMaxElements(aOther.mMaxElements)
+                , mElements   (std::move(aOther.mElements))
+        {}
+
+        SHIRABE_INLINE
+        CBoundedCollection<TElement> &operator=(CBoundedCollection<TElement> const &aOther)
+        {
+            mMaxElements = aOther.mMaxElements;
+            mElements    = aOther.mElements;
+        }
+
+        [[nodiscard]]
+        SHIRABE_INLINE
+        std::size_t const capacity() const
+        {
+            return mMaxElements;
+        }
+
+        template <typename TOtherElementType>
+        SHIRABE_INLINE
+        void assign(CBoundedCollection<TOtherElementType> const &aOther)
+        {
+            mElements.clear();
+            mMaxElements = aOther.capacity();
+
+            auto const converter = [] (TOtherElementType const &input) -> TElement
+            {
+                return std::dynamic_pointer_cast<typename TElement::element_type>(input);
+            };
+
+            std::transform(aOther.cbegin()
+                    , aOther.cend()
+                    , std::back_inserter(mElements)
+                    , converter);
+        }
 
         SHIRABE_INLINE
         EEngineStatus add(TElement const &aElement)
@@ -49,6 +94,12 @@ namespace engine::ecws
         }
 
         SHIRABE_INLINE
+        bool contains(TElement const &aElement)
+        {
+            return (mElements.end() != std::find(mElements.cbegin(), mElements.cend(), aElement));
+        }
+
+        SHIRABE_INLINE
         void push_back(TElement const &aElement)
         {
             add(aElement);
@@ -70,7 +121,7 @@ namespace engine::ecws
         Vector<TElement> const data() const { return mElements; }
 
     private_members:
-        std::size_t const mMaxElements;
+        std::size_t       mMaxElements;
         Vector<TElement>  mElements;
     };
 
