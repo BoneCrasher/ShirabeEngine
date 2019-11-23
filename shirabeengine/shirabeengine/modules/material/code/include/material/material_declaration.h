@@ -19,6 +19,7 @@
 #include <core/bitfield.h>
 #include <core/serialization/serialization.h>
 #include <asset/assettypes.h>
+#include <resources/resourcedescriptions.h>
 
 namespace engine
 {
@@ -1078,87 +1079,133 @@ namespace engine
         class CMaterialMaster
                 : public asset::CAssetReference
         {
-            public_constructors:
-                CMaterialMaster() = default;
+        public_constructors:
+            CMaterialMaster() = default;
 
-                SHIRABE_INLINE
-                CMaterialMaster(asset::AssetId_t   const &aAssetUID,
-                                std::string        const &aName,
-                                SMaterialSignature      &&aSignature,
-                                CMaterialConfig         &&aConfig)
-                    : asset::CAssetReference (aAssetUID)
-                    , mName                  (aName                )
-                    , mSignature             (std::move(aSignature))
-                    , mConfiguration         (std::move(aConfig)   )
-                {}
+            SHIRABE_INLINE
+            CMaterialMaster(asset::AssetId_t   const &aAssetUID,
+                            std::string        const &aName,
+                            SMaterialSignature      &&aSignature,
+                            CMaterialConfig         &&aConfig)
+                : asset::CAssetReference (aAssetUID)
+                , mName                  (aName                )
+                , mSignature             (std::move(aSignature))
+                , mConfiguration         (std::move(aConfig)   )
+            {}
 
-                SHIRABE_INLINE
-                CMaterialMaster(CMaterialMaster const &aOther)
-                    : asset::CAssetReference (aOther.getAssetId())
-                    , mName                  (aOther.mName         )
-                    , mSignature             (aOther.mSignature    )
-                    , mConfiguration         (aOther.mConfiguration)
-                {}
+            SHIRABE_INLINE
+            CMaterialMaster(CMaterialMaster const &aOther)
+                : asset::CAssetReference (aOther.getAssetId())
+                , mName                  (aOther.mName         )
+                , mSignature             (aOther.mSignature    )
+                , mConfiguration         (aOther.mConfiguration)
+            {}
 
-                SHIRABE_INLINE
-                CMaterialMaster(CMaterialMaster &&aOther)
-                    : asset::CAssetReference (aOther.getAssetId())
-                    , mName                  (std::move(aOther.mName         ))
-                    , mSignature             (std::move(aOther.mSignature    ))
-                    , mConfiguration         (std::move(aOther.mConfiguration))
-                {}
+            SHIRABE_INLINE
+            CMaterialMaster(CMaterialMaster &&aOther)
+                : asset::CAssetReference (aOther.getAssetId())
+                , mName                  (std::move(aOther.mName         ))
+                , mSignature             (std::move(aOther.mSignature    ))
+                , mConfiguration         (std::move(aOther.mConfiguration))
+            {}
 
-            public_destructors:
-                ~CMaterialMaster() = default;
+        public_destructors:
+            ~CMaterialMaster() = default;
 
-            public_operators:
-                SHIRABE_INLINE
-                CMaterialMaster &operator=(CMaterialMaster const &aOther)
-                {
-                    asset::CAssetReference::operator=(aOther.getAssetId());
+        public_operators:
+            SHIRABE_INLINE
+            CMaterialMaster &operator=(CMaterialMaster const &aOther)
+            {
+                asset::CAssetReference::operator=(aOther.getAssetId());
 
-                    mName          = aOther.mName;
-                    mSignature     = aOther.mSignature;
-                    mConfiguration = aOther.mConfiguration;
+                mName          = aOther.mName;
+                mSignature     = aOther.mSignature;
+                mConfiguration = aOther.mConfiguration;
 
-                    return (*this);
-                }
+                return (*this);
+            }
 
-                SHIRABE_INLINE
-                CMaterialMaster &operator=(CMaterialMaster &&aOther) noexcept
-                {
-                    asset::CAssetReference::operator=(aOther.getAssetId());
+            SHIRABE_INLINE
+            CMaterialMaster &operator=(CMaterialMaster &&aOther) noexcept
+            {
+                asset::CAssetReference::operator=(aOther.getAssetId());
 
-                    mName          = std::move(aOther.mName         );
-                    mSignature     = std::move(aOther.mSignature    );
-                    mConfiguration = std::move(aOther.mConfiguration);
+                mName          = std::move(aOther.mName         );
+                mSignature     = std::move(aOther.mSignature    );
+                mConfiguration = std::move(aOther.mConfiguration);
 
-                    return (*this);
-                }
+                return (*this);
+            }
 
         public_methods:
-                SHIRABE_INLINE
-                std::string const &name() const
-                {
-                    return mName;
-                }
+            SHIRABE_INLINE
+            std::string const &name() const
+            {
+                return mName;
+            }
 
-                SHIRABE_INLINE
-                SMaterialSignature const &signature() const
-                {
-                    return mSignature;
-                }
+            SHIRABE_INLINE
+            SMaterialSignature const &signature() const
+            {
+                return mSignature;
+            }
 
-                SHIRABE_INLINE
-                CMaterialConfig const &config() const
-                {
-                    return mConfiguration;
-                }
+            SHIRABE_INLINE
+            CMaterialConfig const &config() const
+            {
+                return mConfiguration;
+            }
+
+            [[nodiscard]]
+            SHIRABE_INLINE
+            resources::SMaterialPipelineDescriptor const getPipelineDescriptor() const
+            {
+                return mPipelineDescription;
+            }
+
+            [[nodiscard]]
+            SHIRABE_INLINE
+            resources::SShaderModuleDescriptor const getShaderModuleDescriptor() const
+            {
+                return mShaderModuleDescription;
+            }
+
+            [[nodiscard]]
+            SHIRABE_INLINE
+            Vector<resources::SBufferDescription> const getBufferDescriptors() const
+            {
+                return mBufferDescription;
+            }
+
+        private_methods:
+            friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
+
+            SHIRABE_INLINE
+            void setPipelineDescription(resources::SMaterialPipelineDescriptor const &aDescriptor)
+            {
+                mPipelineDescription = aDescriptor;
+            }
+
+            SHIRABE_INLINE
+            void setShaderModuleDescription(resources::SShaderModuleDescriptor const &aDescriptor)
+            {
+                mShaderModuleDescription = aDescriptor;
+            }
+
+            SHIRABE_INLINE
+            void setBufferDescriptions(Vector<resources::SBufferDescription> const &aDescriptors)
+            {
+                mBufferDescription = aDescriptors;
+            }
 
         private_members:
             std::string        mName;
             SMaterialSignature mSignature;
             CMaterialConfig    mConfiguration;
+
+            resources::SMaterialPipelineDescriptor mPipelineDescription;
+            resources::SShaderModuleDescriptor     mShaderModuleDescription;
+            Vector<resources::SBufferDescription>  mBufferDescription;
         };
 
         /**
