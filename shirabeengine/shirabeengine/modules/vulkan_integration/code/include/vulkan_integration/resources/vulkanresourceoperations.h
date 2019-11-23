@@ -13,7 +13,7 @@
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkanframebufferresource.h"
-#include "vulkan_integration/resources/types/vulkanpipelineresource.h"
+#include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 #include "vulkan_integration/resources/ivkglobalcontext.h"
 
 namespace engine::resources

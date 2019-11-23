@@ -867,7 +867,7 @@ namespace engine
             SMaterialSignature      const &signature = master  ->signature();
             CMaterialConfig         const &config    = instance->config();
 
-            SPipelineDescription pipelineDescriptor {};
+            SMaterialPipelineDescriptor pipelineDescriptor {};
 
             pipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
             pipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
@@ -926,6 +926,7 @@ namespace engine
                     {
                         SStageInput const &input = stage.inputs.at(k);
 
+                        // This number has to be equal to the VkVertexInputBindingDescription::binding index which data should be taken from!
                         VkVertexInputBindingDescription binding;
                         binding.binding   = k;
                         binding.stride    = input.type->arrayStride;

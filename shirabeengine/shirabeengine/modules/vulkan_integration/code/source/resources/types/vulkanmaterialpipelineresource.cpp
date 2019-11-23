@@ -2,7 +2,7 @@
 // Created by dottideveloper on 29.10.19.
 //
 #include <material/materialserialization.h>
-#include "vulkan_integration/resources/types/vulkanpipelineresource.h"
+#include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
@@ -16,7 +16,7 @@ namespace engine::vulkan
     {
         VkDevice device = getVkContext()->getLogicalDevice();
 
-        SPipelineDescription const &desc = getDescription();
+        SMaterialPipelineDescriptor const &desc = getDescription();
 
         auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aDependencies.at(desc.referenceRenderPassId));
 

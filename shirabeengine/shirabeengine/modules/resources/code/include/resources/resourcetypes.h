@@ -112,9 +112,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SPipeline
-            : public CResourceObject<SPipelineDescription>
+            : public CResourceObject<SMaterialPipelineDescriptor>
         {
-            using CResourceObject<SPipelineDescription>::CResourceObject;
+            using CResourceObject<SMaterialPipelineDescriptor>::CResourceObject;
         };
 
     }

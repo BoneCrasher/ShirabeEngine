@@ -2,7 +2,7 @@
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
 #include "vulkan_integration/resources/types/vulkanframebufferresource.h"
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
-#include "vulkan_integration/resources/types/vulkanpipelineresource.h"
+#include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 
 #include <thread>
 #include <base/string.h>
