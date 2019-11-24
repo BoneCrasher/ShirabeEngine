@@ -207,6 +207,15 @@ namespace engine
             std::string                                                  name;
             std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
         };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMaterialDescriptor
+        {
+            SMaterialPipelineDescriptor pipelineDescriptor;
+            SShaderModuleDescriptor     shaderModuleDescriptor;
+            Vector<SBufferDescription>  uniformBufferDescriptors;
+        };
     }
 }
 

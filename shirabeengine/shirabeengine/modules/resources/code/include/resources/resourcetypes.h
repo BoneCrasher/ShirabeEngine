@@ -117,6 +117,27 @@ namespace engine
             using CResourceObject<SMaterialPipelineDescriptor>::CResourceObject;
         };
 
+        struct
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SShaderModule
+            : public CResourceObject<SShaderModuleDescriptor>
+        {
+            using CResourceObject<SShaderModuleDescriptor>::CResourceObject;
+
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SMaterial
+            : public CResourceObject<SMaterialDescriptor>
+        {
+            using CResourceObject<SMaterialDescriptor>::CResourceObject;
+
+            Shared<SPipeline>       pipelineResource;
+            Shared<SShaderModule>   shaderModuleResource;
+            Vector<Shared<SBuffer>> bufferResources;
+        };
+
     }
 }
 

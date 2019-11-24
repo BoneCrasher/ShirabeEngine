@@ -277,8 +277,12 @@ namespace engine
                     return { EEngineStatus::Error };
                 }
             }
-
+            
             Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory));
+            // manager->addAssetLoader<SMesh>(...);
+            manager->addAssetLoader<SMaterial>(makeUnique<CResourceFromAssetResourceObjectCreator<SMaterial>>([&](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
+            manager->addAssetLoader<SBuffer>  (makeUnique<CResourceFromAssetResourceObjectCreator<SBuffer>>  ([&](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
+            manager->addAssetLoader<STexture> (makeUnique<CResourceFromAssetResourceObjectCreator<STexture>> ([&](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
             mResourceManager = manager;
 
             return { EEngineStatus::Ok };

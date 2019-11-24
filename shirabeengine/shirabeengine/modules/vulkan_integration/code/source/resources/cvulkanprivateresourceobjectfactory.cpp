@@ -23,9 +23,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TLogicalResource, typename TGpuApiResource>
-        static Unique<CResourceObjectCreator<TLogicalResource>> makeCreator(Shared<IVkGlobalContext> aContext)
+        static Unique<CResourceGpuApiResourceObjectCreator<TLogicalResource>> makeCreator(Shared<IVkGlobalContext> aContext)
         {
-            return makeUnique<CResourceObjectCreator<TLogicalResource>>(
+            return makeUnique<CResourceGpuApiResourceObjectCreator<TLogicalResource>>(
                     [aContext] (GpuApiHandle_t const &aHandle, typename TLogicalResource::Descriptor_t const &aDescription)
                     {
                         Unique<TGpuApiResource> resource = makeUnique<TGpuApiResource>(aContext, aHandle, aDescription);

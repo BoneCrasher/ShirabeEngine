@@ -3,6 +3,8 @@
 //
 
 #include <unordered_map>
+#include <asset/assettypes.h>
+#include "resources/resourcetypes.h"
 #include "resources/cresourcemanager.h"
 
 
@@ -14,8 +16,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CResourceManager::CResourceManager(Unique<CGpuApiResourceObjectFactory> aPrivateResourceObjectFactory)
+        CResourceManager::CResourceManager(Unique<CGpuApiResourceObjectFactory> aPrivateResourceObjectFactory
+                                         , Shared<asset::IAssetStorage>         aAssetStorage)
                 : mGpuApiResourceObjectFactory(std::move(aPrivateResourceObjectFactory))
+                , mAssetStorage               (std::move(aAssetStorage))
+                , mAssetLoaders               ()
+                , mResourceObjects            ()
+                , mResourceTree               ()
         { }
         //<-----------------------------------------------------------------------------
 
@@ -25,6 +32,31 @@ namespace engine
         CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useAssetResource(  ResourceId_t const &aResourceId
                                                                                          , AssetId_t    const &aAssetResourceId)
         {
+            auto const &[result, asset] = mAssetStorage->loadAsset(aAssetResourceId);
+            if(CheckEngineError(result))
+            {
+                CLog::Error(logTag(), "Failed to load asset w/ ID {}", aAssetResourceId);
+                return EEngineStatus::Error;
+            }
+
+            switch(asset.type)
+            {
+                case EAssetType::Mesh:
+                    // return genericAssetLoading<SMesh>(aResourceId, aAssetResourceId);
+                    break;
+                case EAssetType::Material:
+                    return genericAssetLoading<SMaterial>(aResourceId, aAssetResourceId);
+                    break;
+                case EAssetType::Buffer:
+                    return genericAssetLoading<SBuffer>(aResourceId, aAssetResourceId);
+                    break;
+                case EAssetType::Texture:
+                    return genericAssetLoading<STexture>(aResourceId, aAssetResourceId);
+                    break;
+                default:
+                    break;
+            }
+
             return { EEngineStatus::Ok, nullptr };
         }
         //<-----------------------------------------------------------------------------

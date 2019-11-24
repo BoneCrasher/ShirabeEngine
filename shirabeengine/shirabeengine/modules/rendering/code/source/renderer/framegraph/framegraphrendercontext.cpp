@@ -878,7 +878,7 @@ namespace engine
             std::vector<std::string> const textureViewHandles = {}; // All texture view names are immediately based on the texture-names, no further decoration needed.
             std::vector<std::string> const bufferHandles      = {}; // All uniform buffer names are a compounds as <materialname>_<buffername>.
 
-            CEngineResult<Shared<ILogicalResourceObject>> shaderModuleObject = mResourceManager->useAssetResource(shaderModuleDescriptor.name, shaderModuleDescriptor...)
+            CEngineResult<Shared<ILogicalResourceObject>> shaderModuleObject = mResourceManager->useAssetResource<SShaderModule>(shaderModuleDescriptor.name, shaderModuleDescriptor);
 
             for(auto const &bufferDesc : bufferDescriptions)
             {

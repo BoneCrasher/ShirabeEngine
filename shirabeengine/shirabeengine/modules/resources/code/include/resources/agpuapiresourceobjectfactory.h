@@ -23,33 +23,43 @@ namespace engine
 
         class SHIRABE_LIBRARY_EXPORT IResourceObjectCreatorBase
         {
-            SHIRABE_DECLARE_INTERFACE(IResourceObjectCreatorBase);
+        SHIRABE_DECLARE_INTERFACE(IResourceObjectCreatorBase);
 
         public_api:
         };
 
-        template <typename TResource>
+        template <typename    TInputResourceType
+                , typename    TOutputResourceType
+                , typename... TArgs>
         class SHIRABE_LIBRARY_EXPORT CResourceObjectCreator
-            : public IResourceObjectCreatorBase
+                : public IResourceObjectCreatorBase
         {
         public_typedefs:
-            using Fn_t = std::function<Unique<IGpuApiResourceObject>(GpuApiHandle_t const &, typename TResource::Descriptor_t const &)>;
+            using Fn_t = std::function<TOutputResourceType(TArgs &&...)>;
 
         public_constructors:
             explicit CResourceObjectCreator(Fn_t const &aFn)
-                : mFn(aFn)
+                    : mFn(aFn)
             {};
 
         public_methods:
-            Unique<IGpuApiResourceObject> create(GpuApiHandle_t const &aHandle, typename TResource::Descriptor_t const &aDescriptor)
+            TOutputResourceType create(TArgs &&...aArgs)
             {
                 return (nullptr == mFn)
-                            ? nullptr
-                            : mFn(aHandle, aDescriptor);
+                       ? nullptr
+                       : mFn(std::forward<TArgs>(aArgs)...);
             }
 
         private_methods:
             Fn_t mFn;
+        };
+
+        template <typename TResource>
+        class SHIRABE_LIBRARY_EXPORT CResourceGpuApiResourceObjectCreator
+            : public CResourceObjectCreator<TResource, Unique<IGpuApiResourceObject>, GpuApiHandle_t const &, typename TResource::Descriptor_t const &>
+        {
+        public_constructors:
+            using CResourceObjectCreator<TResource, Unique<IGpuApiResourceObject>, GpuApiHandle_t const &, typename TResource::Descriptor_t const &>::CResourceObjectCreator;
         };
 
         class SHIRABE_LIBRARY_EXPORT CGpuApiResourceObjectFactory
@@ -98,7 +108,7 @@ namespace engine
                 Unique<IGpuApiResourceObject>             gpuApiObject = nullptr;
                 Unique<IResourceObjectCreatorBase> const &creatorBase  = mCreators[typeInfo.name()];
 
-                auto creator = static_cast<CResourceObjectCreator<T> *const>(creatorBase.get());
+                auto creator = static_cast<CResourceGpuApiResourceObjectCreator<T> *const>(creatorBase.get());
                 if(nullptr != creator)
                 {
                     GpuApiHandle_t const handle = mResourceUidGenerator->generate();
