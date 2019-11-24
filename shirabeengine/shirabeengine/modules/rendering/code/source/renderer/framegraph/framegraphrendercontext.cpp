@@ -858,49 +858,6 @@ namespace engine
         {
             SHIRABE_UNUSED(aRenderPassHandle);
 
-            auto const &[result, instance] = mMaterialLoader->loadMaterialInstance(aMaterial.materialAssetId);
-            if(CheckEngineError(result))
-            {
-                return { result };
-            }
-
-            Shared<CMaterialMaster> const &master    = instance; // instance->master();
-            SMaterialSignature      const &signature = master  ->signature();
-            CMaterialConfig         const &config    = instance->config();
-
-            // Copy the template!
-            SMaterialPipelineDescriptor pipelineDescriptor     = SMaterialPipelineDescriptor(instance->getPipelineDescriptor());
-            SShaderModuleDescriptor     shaderModuleDescriptor = instance->getShaderModuleDescriptor();
-            Vector<SBufferDescription>  bufferDescriptions     = instance->getBufferDescriptors();
-
-
-            std::string              const renderPassHandle   = mCurrentRenderPassHandle;
-            std::vector<std::string> const textureViewHandles = {}; // All texture view names are immediately based on the texture-names, no further decoration needed.
-            std::vector<std::string> const bufferHandles      = {}; // All uniform buffer names are a compounds as <materialname>_<buffername>.
-
-            CEngineResult<Shared<ILogicalResourceObject>> shaderModuleObject = mResourceManager->useAssetResource<SShaderModule>(shaderModuleDescriptor.name, shaderModuleDescriptor);
-
-            for(auto const &bufferDesc : bufferDescriptions)
-            {
-
-            }
-
-            pipelineDescriptor.name                  = aMaterial.readableName;
-            pipelineDescriptor.referenceRenderPassId = renderPassHandle;
-            pipelineDescriptor.subpass               = mCurrentSubpass;
-
-            std::vector<std::string> pipelineDependencies {};
-            pipelineDependencies.push_back(renderPassHandle);
-            for(auto const &textureViewHandle : textureViewHandles)
-            {
-                pipelineDependencies.push_back(textureViewHandle);
-            }
-            for(auto const &bufferViewHandle : bufferHandles)
-            {
-                pipelineDependencies.push_back(fmt::format("{}_{}", pipelineDescriptor.name, bufferViewHandle));
-            }
-            CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = mResourceManager->useDynamicResource<SPipeline>(pipelineDescriptor.name, pipelineDescriptor, std::move(pipelineDependencies));
-            EngineStatusPrintOnError(pipelineObject.result(), logTag(), "Failed to create pipeline.");
 
             registerUsedResource(master->getPipelineDescriptor().name, pipelineObject.data());
 
