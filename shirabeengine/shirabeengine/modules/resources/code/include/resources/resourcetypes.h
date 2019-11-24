@@ -24,114 +24,114 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBuffer
-            : public CResourceObject<SBufferDescription>
+            : public CResourceObject<SBufferDescription, SNoDependencies>
         {
-            using CResourceObject<SBufferDescription>::CResourceObject;
+            using CResourceObject<SBufferDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBufferView
-            : public CResourceObject<SBufferViewDescription>
+            : public CResourceObject<SBufferViewDescription, SBufferViewDependencies>
         {
-            using CResourceObject<SBufferViewDescription>::CResourceObject;
+            using CResourceObject<SBufferViewDescription, SBufferViewDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT STexture
-            : public CResourceObject<STextureDescription>
+            : public CResourceObject<STextureDescription, SNoDependencies>
         {
-            using CResourceObject<STextureDescription>::CResourceObject;
+            using CResourceObject<STextureDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT STextureView
-            : public CResourceObject<STextureViewDescription>
+            : public CResourceObject<STextureViewDescription, STextureViewDependencies>
         {
-            using CResourceObject<STextureViewDescription>::CResourceObject;
+            using CResourceObject<STextureViewDescription, STextureViewDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SDepthStencilState
-            : public CResourceObject<SDepthStencilStateDescription>
+            : public CResourceObject<SDepthStencilStateDescription, SNoDependencies>
         {
-            using CResourceObject<SDepthStencilStateDescription>::CResourceObject;
+            using CResourceObject<SDepthStencilStateDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SRasterizerState
-            : public CResourceObject<SRasterizerStateDescription>
+            : public CResourceObject<SRasterizerStateDescription, SNoDependencies>
         {
-            using CResourceObject<SRasterizerStateDescription>::CResourceObject;
+            using CResourceObject<SRasterizerStateDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SSubpass
-            : public CResourceObject<SSubpassDescription>
+            : public CResourceObject<SSubpassDescription, SNoDependencies>
         {
-            using CResourceObject<SSubpassDescription>::CResourceObject;
+            using CResourceObject<SSubpassDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SRenderPass
-            : public CResourceObject<SRenderPassDescription>
+            : public CResourceObject<SRenderPassDescription, SRenderPassDependencies>
         {
-            using CResourceObject<SRenderPassDescription>::CResourceObject;
+            using CResourceObject<SRenderPassDescription, SRenderPassDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SFrameBuffer
-            : public CResourceObject<SFrameBufferDescription>
+            : public CResourceObject<SFrameBufferDescription, SFrameBufferDependencies>
         {
-            using CResourceObject<SFrameBufferDescription>::CResourceObject;
+            using CResourceObject<SFrameBufferDescription, SFrameBufferDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SSwapChainBuffer
-            : public CResourceObject<SSwapChainBufferDescription>
+            : public CResourceObject<SSwapChainBufferDescription, SNoDependencies>
         {
-            using CResourceObject<SSwapChainBufferDescription>::CResourceObject;
+            using CResourceObject<SSwapChainBufferDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SSwapChain
-            : public CResourceObject<SSwapChainDescription>
+            : public CResourceObject<SSwapChainDescription, SNoDependencies>
         {
-            using CResourceObject<SSwapChainDescription>::CResourceObject;
+            using CResourceObject<SSwapChainDescription, SNoDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SPipeline
-            : public CResourceObject<SMaterialPipelineDescriptor>
+            : public CResourceObject<SMaterialPipelineDescriptor, SMaterialPipelineDependencies>
         {
-            using CResourceObject<SMaterialPipelineDescriptor>::CResourceObject;
+            using CResourceObject<SMaterialPipelineDescriptor, SMaterialPipelineDependencies>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SShaderModule
-            : public CResourceObject<SShaderModuleDescriptor>
+            : public CResourceObject<SShaderModuleDescriptor, SNoDependencies>
         {
-            using CResourceObject<SShaderModuleDescriptor>::CResourceObject;
+            using CResourceObject<SShaderModuleDescriptor, SNoDependencies>::CResourceObject;
 
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SMaterial
-            : public CResourceObject<SMaterialDescriptor>
+            : public CResourceObject<SMaterialDescriptor, SNoDependencies>
         {
-            using CResourceObject<SMaterialDescriptor>::CResourceObject;
+            using CResourceObject<SMaterialDescriptor, SNoDependencies>::CResourceObject;
 
             Shared<SPipeline>       pipelineResource;
             Shared<SShaderModule>   shaderModuleResource;

@@ -25,6 +25,10 @@ namespace engine
 
         struct
             [[nodiscard]]
+            SHIRABE_TEST_EXPORT SNoDependencies {};
+
+        struct
+            [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBufferDescription
         {
             std::string                       name;
@@ -37,8 +41,14 @@ namespace engine
             SHIRABE_TEST_EXPORT SBufferViewDescription
         {
             std::string            name;
-            ResourceId_t           bufferId;
             VkBufferViewCreateInfo createInfo;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SBufferViewDependencies
+        {
+            ResourceId_t bufferId;
         };
 
         struct
@@ -59,12 +69,18 @@ namespace engine
         {
         public_members:
             std::string   name;
-            ResourceId_t  subjacentTextureId;
             STextureInfo  subjacentTextureInfo;
             EFormat       textureFormat;
             ArraySlices_t arraySlices;
             MipSlices_t   mipMapSlices;
             // TODO: Distinguish binding and read/write mode
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT STextureViewDependencies
+        {
+            ResourceId_t  subjacentTextureId;
         };
 
         struct
@@ -132,9 +148,15 @@ namespace engine
         public_members:
             std::string                         name;
             VkExtent3D                          attachmentExtent;
-            std::vector<std::string>            attachmentTextureViews;
             std::vector<SAttachmentDescription> attachmentDescriptions;
             std::vector<SSubpassDescription>    subpassDescriptions;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SRenderPassDependencies
+        {
+            std::vector<std::string> attachmentTextureViews;
         };
 
         struct
@@ -144,6 +166,12 @@ namespace engine
 
         public_members:
             std::string name;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SFrameBufferDependencies
+        {
             std::string referenceRenderPassId; // Used as a template to create a compatible framebuffer
         };
 
@@ -175,7 +203,6 @@ namespace engine
             SHIRABE_TEST_EXPORT SMaterialPipelineDescriptor
         {
             std::string                                                  name;
-            ResourceId_t                                                 referenceRenderPassId;
 
             VkViewport                                                   viewPort;
             VkRect2D                                                     scissor;
@@ -195,9 +222,15 @@ namespace engine
 
             std::vector<VkDescriptorSetLayoutCreateInfo>                 descriptorSetLayoutCreateInfos;
             std::vector<std::vector<VkDescriptorSetLayoutBinding>>       descriptorSetLayoutBindings;
+        };
 
-            std::vector<ResourceId_t>                                    bufferViewIds;
-            std::vector<ResourceId_t>                                    textureViewIds;
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMaterialPipelineDependencies
+        {
+            ResourceId_t              referenceRenderPassId;
+            std::vector<ResourceId_t> bufferViewIds;
+            std::vector<ResourceId_t> textureViewIds;
         };
 
         struct

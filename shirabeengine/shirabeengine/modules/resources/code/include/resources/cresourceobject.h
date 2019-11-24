@@ -20,7 +20,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription>
+        template <typename TDescription, typename TDependencies>
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT CResourceObject
@@ -29,13 +29,23 @@ namespace engine
             friend class CResourceManager;
 
         public_typedefs:
-            using Descriptor_t = TDescription;
+            using Descriptor_t   = TDescription;
+            using Dependencies_t = TDependencies;
 
         public_constructors:
             explicit CResourceObject(TDescription const &aDescription);
 
         public_destructors:
             ~CResourceObject() override = default;
+
+        public_api:
+            SHIRABE_INLINE
+            TDescription const &getDescription() const
+            { return mDescription; }
+
+            EEngineStatus load();
+
+            EEngineStatus unload();
 
         private_api:
             void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) final;
@@ -44,11 +54,23 @@ namespace engine
             GpuApiHandle_t getGpuApiResourceHandle() const final;
 
         public_methods:
-            SHIRABE_INLINE TDescription const &getDescription() const
-            { return mDescription; }
+            SHIRABE_INLINE
+            void setDependencies(Dependencies_t const &aDependencies)
+            {
+                mDependencies = aDependencies;
+            };
+
+            [[nodiscard]]
+            SHIRABE_INLINE
+            Dependencies_t const &getDependencies() const
+            {
+                return mDependencies;
+            }
 
         private_members:
-            TDescription const                                      mDescription;
+            TDescription  const                                     mDescription;
+            TDependencies                                           mDependencies;
+
             GpuApiHandle_t                                          mGpuApiResourceHandle;
             IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
         };
