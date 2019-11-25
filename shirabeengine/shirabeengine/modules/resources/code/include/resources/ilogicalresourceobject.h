@@ -22,10 +22,6 @@ namespace engine
             friend class CResourceManager;
 
             SHIRABE_DECLARE_INTERFACE(ILogicalResourceObject);
-
-            virtual EEngineStatus load()   = 0;
-            virtual EEngineStatus unload() = 0;
-
         private_api:
             virtual void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) = 0;
 

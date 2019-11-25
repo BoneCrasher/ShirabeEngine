@@ -43,7 +43,7 @@ namespace engine
             TDescription const &getDescription() const
             { return mDescription; }
 
-            EEngineStatus load();
+            virtual EEngineStatus load(Dependencies_t const &aDependencies) = 0;
 
             EEngineStatus unload();
 
@@ -52,20 +52,6 @@ namespace engine
 
             [[nodiscard]]
             GpuApiHandle_t getGpuApiResourceHandle() const final;
-
-        public_methods:
-            SHIRABE_INLINE
-            void setDependencies(Dependencies_t const &aDependencies)
-            {
-                mDependencies = aDependencies;
-            };
-
-            [[nodiscard]]
-            SHIRABE_INLINE
-            Dependencies_t const &getDependencies() const
-            {
-                return mDependencies;
-            }
 
         private_members:
             TDescription  const                                     mDescription;

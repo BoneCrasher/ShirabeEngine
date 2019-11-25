@@ -444,32 +444,6 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            // auto const [instanceIndexAssetFetchResult, instanceIndexAsset] = mStorage->loadAsset(instanceIndexAssetId);
-            // {
-            //     PrintEngineError(instanceIndexAssetFetchResult, logTag(), "Couldn't fetch material instance index asset.");
-            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceIndexAssetFetchResult);
-            // }
-
-            // auto const [instanceIndexFetchResult, instanceIndex] = readMaterialInstanceIndexFile(logTag(), mStorage.get(), instanceIndexAssetId);
-            // {
-            //     PrintEngineError(instanceIndexFetchResult, logTag(), "Couldn't fetch material instance index for ID {}", instanceIndexAssetId);
-            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceIndexFetchResult);
-            // }
-//
-            // auto const [instanceConfigAssetFetchResult, instanceConfigAsset] = mStorage->loadAsset(instanceIndex.configurationAssetId);
-            // {
-            //     PrintEngineError(instanceConfigAssetFetchResult, logTag(), "Couldn't fetch instance config asset for ID {}.", instanceIndex.configurationAssetId);
-            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceConfigAssetFetchResult);
-            // }
-//
-            // auto [instanceConfigFetchResult, instanceConfig] = readMaterialConfig(logTag(), mStorage.get(), instanceConfigAsset.id);
-            // {
-            //     PrintEngineError(instanceConfigFetchResult, logTag(), "Couldn't fetch instance config for ID {}.", instanceConfigAsset.id);
-            //     SHIRABE_RETURN_RESULT_ON_ERROR(instanceConfigFetchResult);
-            // }
-//
-            // std::string const  instanceName = instanceIndex.name;
-
             //--------------------------------------------------------------------------------------------------------------------
             // Fetch master data
             //--------------------------------------------------------------------------------------------------------------------
@@ -505,7 +479,7 @@ namespace engine
             Shared<CMaterialMaster> master = makeShared<CMaterialMaster>  (masterIndexId, masterName, std::move(masterSignature), std::move(masterConfig));
             // Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
 
-            auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(mStorage, masterName, masterSignature, masterConfig);
+            auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(mStorage, masterName, master->signature(), master->config());
             master->setPipelineDescription    (pipelineDescription);
             master->setShaderModuleDescription(shaderModuleDescription);
             master->setBufferDescriptions     (bufferDescriptions);

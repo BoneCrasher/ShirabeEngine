@@ -34,20 +34,9 @@ namespace engine::material
             SShaderModuleDescriptor     shaderModuleDescriptor = instance->getShaderModuleDescriptor();
             Vector<SBufferDescription>  bufferDescriptions     = instance->getBufferDescriptors();
 
-            std::string              const renderPassHandle   = mCurrentRenderPassHandle;
-            std::vector<std::string> const textureViewHandles = {}; // All texture view names are immediately based on the texture-names, no further decoration needed.
-            std::vector<std::string> const bufferHandles      = {}; // All uniform buffer names are a compounds as <materialname>_<buffername>.
-
             CEngineResult<Shared<ILogicalResourceObject>> shaderModuleObject = aResourceManager->useAssetResource(shaderModuleDescriptor.name);
 
-            for(auto const &bufferDesc : bufferDescriptions)
-            {
-
-            }
-
-            pipelineDescriptor.name                  = aMaterial.readableName;
-            pipelineDescriptor.referenceRenderPassId = renderPassHandle;
-            pipelineDescriptor.subpass               = mCurrentSubpass;
+            pipelineDescriptor.name = instance->name();
 
             std::vector<std::string> pipelineDependencies {};
             pipelineDependencies.push_back(renderPassHandle);
