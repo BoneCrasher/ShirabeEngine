@@ -1202,10 +1202,6 @@ namespace engine
             std::string        mName;
             SMaterialSignature mSignature;
             CMaterialConfig    mConfiguration;
-
-            resources::SMaterialPipelineDescriptor mPipelineDescription;
-            resources::SShaderModuleDescriptor     mShaderModuleDescription;
-            Vector<resources::SBufferDescription>  mBufferDescription;
         };
 
         /**

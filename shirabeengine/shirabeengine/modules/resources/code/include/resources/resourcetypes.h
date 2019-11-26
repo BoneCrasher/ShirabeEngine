@@ -123,19 +123,36 @@ namespace engine
             : public CResourceObject<SShaderModuleDescriptor, SNoDependencies>
         {
             using CResourceObject<SShaderModuleDescriptor, SNoDependencies>::CResourceObject;
-
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SMaterial
-            : public CResourceObject<SMaterialDescriptor, SNoDependencies>
+            : public CResourceObject<SMaterialDescriptor, SMaterialDependencies>
         {
-            using CResourceObject<SMaterialDescriptor, SNoDependencies>::CResourceObject;
+            using CResourceObject<SMaterialDescriptor, SMaterialDependencies>::CResourceObject;
 
             Shared<SPipeline>       pipelineResource;
             Shared<SShaderModule>   shaderModuleResource;
             Vector<Shared<SBuffer>> bufferResources;
+
+            SHIRABE_INLINE
+            EEngineStatus load(SMaterialDependencies const &aDependencies) override
+            {
+                for(auto const &buffer : bufferResources)
+                {
+                    EEngineStatus const bufferStatus = buffer->load({});
+                    EngineStatusPrintOnError(bufferStatus, "SMaterial::load", "Failed to load buffer.");
+                }
+
+                EEngineStatus const shaderModuleStatus = shaderModuleResource->load({});
+                EngineStatusPrintOnError(shaderModuleStatus, "SMaterial::load", "Failed to load shader module.");
+
+                EEngineStatus const pipelineStatus = pipelineResource->load(aDependencies.pipelineDependencies);
+                EngineStatusPrintOnError(pipelineStatus, "SMaterial::load", "Failed to load pipeline.");
+
+                return EEngineStatus::Ok;
+            }
         };
 
     }

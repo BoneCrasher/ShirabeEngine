@@ -428,7 +428,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindPipeline(GpuApiHandle_t  const &aPipelineUID)
+        EEngineStatus CVulkanRenderContext::bindPipeline(GpuApiHandle_t const &aPipelineUID)
         {
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match

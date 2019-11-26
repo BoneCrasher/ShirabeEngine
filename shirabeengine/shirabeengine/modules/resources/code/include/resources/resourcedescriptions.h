@@ -245,9 +245,18 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialDescriptor
         {
+            std::string                 name;
             SMaterialPipelineDescriptor pipelineDescriptor;
             SShaderModuleDescriptor     shaderModuleDescriptor;
             Vector<SBufferDescription>  uniformBufferDescriptors;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMaterialDependencies
+        {
+            SMaterialPipelineDependencies pipelineDependencies;
+            // No dependencies structs required for shader module and buffers (yet...)
         };
     }
 }

@@ -45,7 +45,7 @@ namespace engine
 
             virtual EEngineStatus load(Dependencies_t const &aDependencies) = 0;
 
-            EEngineStatus unload();
+            virtual EEngineStatus unload() = 0;
 
         private_api:
             void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) final;
@@ -66,8 +66,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescriptor>
-        CResourceObject<TDescriptor>::CResourceObject(const TDescriptor &aDescription)
+        template <typename TDescription, typename TDependencies>
+        CResourceObject<TDescription, TDependencies>::CResourceObject(const TDescriptor &aDescription)
             : mDescription(aDescription)
         { }
         //<-----------------------------------------------------------------------------
@@ -75,8 +75,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescriptor>
-        void CResourceObject<TDescriptor>::setGpuApiResourceHandle(GpuApiHandle_t const &aHandle)
+        template <typename TDescription, typename TDependencies>
+        void CResourceObject<TDescription, TDependencies>::setGpuApiResourceHandle(GpuApiHandle_t const &aHandle)
         {
             mGpuApiResourceHandle = aHandle;
         }
@@ -85,8 +85,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescriptor>
-        GpuApiHandle_t CResourceObject<TDescriptor>::getGpuApiResourceHandle() const
+        template <typename TDescription, typename TDependencies>
+        GpuApiHandle_t CResourceObject<TDescription, TDependencies>::getGpuApiResourceHandle() const
         {
             return mGpuApiResourceHandle;
         }

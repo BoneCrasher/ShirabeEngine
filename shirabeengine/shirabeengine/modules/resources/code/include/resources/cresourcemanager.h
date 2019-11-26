@@ -149,32 +149,64 @@ namespace engine {
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        static void insertDependencies(CAdjacencyTree<ResourceId_t> &aTree, ResourceId_t const &aResourceId, std::vector<ResourceId_t> &&aDependencies)
+        {
+            // Add static dependencies
+            aTree.add(aResourceId);
+            for(auto const &dependency : aDependencies)
+            {
+                aTree.add    (dependency);
+                aTree.connect(aResourceId, dependency);
+            }
+        }
+
+        static void removeDependencies(CAdjacencyTree<ResourceId_t> &aTree, ResourceId_t const &aResourceId, std::vector<ResourceId_t> &&aDependencies)
+        {
+            // Add static dependencies
+            for(auto const &dependency : aDependencies)
+            {
+                aTree.disconnect(aResourceId, dependency);
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         template <typename TResource>
         CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useDynamicResource(
                   ResourceId_t                     const &aResourceId
                 , typename TResource::Descriptor_t const &aDescriptor
-                , std::vector<ResourceId_t>             &&aDependencies)
+                , std::vector<ResourceId_t>             &&aStaticDependencies)
         {
             CEngineResult<Shared<ILogicalResourceObject>> result = {EEngineStatus::Error, nullptr };
 
-            mResourceTree.add(aResourceId);
-            for(auto const &dependency : aDependencies)
-            {
-                mResourceTree.add    (dependency);
-                mResourceTree.connect(aResourceId, dependency);
-            }
+            // Static dependencies
+            insertDependencies(mResourceTree, aResourceId, std::move(aStaticDependencies));
 
-            // TODO: Dependency check. Already loaded? Etc...
-            Shared<ILogicalResourceObject> resource         = makeShared<CResourceObject<typename TResource::Descriptor_t>>(aDescriptor);
+            Shared<ILogicalResourceObject> resource         = makeShared<TResource>(aDescriptor);
             GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
             resource->setGpuApiResourceHandle(gpuApiResourceId);
+
+            auto const loader = [&, this] (std::vector<ResourceId_t> &&aDynamicDependencies) -> void
+            {
+                insertDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
+                auto dependenciesResolved = getGpuApiDependencies(aResourceId);
+                mGpuApiResourceObjectFactory->get(gpuApiResourceId)->create(dependenciesResolved);
+            };
+
+            auto const unloader = [&, this] (std::vector<ResourceId_t> &&aDynamicDependencies) -> void
+            {
+                removeDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
+                mGpuApiResourceObjectFactory->get(gpuApiResourceId)->destroy();
+            };
+
+            resource->setGpuApiResourceLoader(loader);
+            resource->setGpuApiResourceUnloader(unloader);
 
             storeResourceObject(aResourceId, resource);
 
             // TODO: For now immediately create... in the future make it more intelligent...
-            auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-
-            mGpuApiResourceObjectFactory->get(gpuApiResourceId)->create(dependenciesResolved);
 
             return { EEngineStatus::Ok, resource };
         }

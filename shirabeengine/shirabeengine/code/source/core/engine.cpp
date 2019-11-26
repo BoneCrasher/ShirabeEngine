@@ -257,7 +257,7 @@ namespace engine
             assetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
-            mMaterialLoader = makeShared<material::CMaterialLoader>(assetStorage);
+            mMaterialLoader = makeShared<material::CMaterialLoader>();
 
             Unique<CGpuApiResourceObjectFactory> gpuApiResourceFactory = nullptr;
 

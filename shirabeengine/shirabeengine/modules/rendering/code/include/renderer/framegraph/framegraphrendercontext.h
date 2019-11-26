@@ -400,8 +400,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-             CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial,
-                                               std::string  const &aRenderPassHandle) override;
+             CEngineResult<> loadMaterialAsset(SFrameGraphMaterial const &aMaterial) override;
 
              /**
              * Unload a material asset from the graphics API.
@@ -419,7 +418,8 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindMaterial(SFrameGraphMaterial const &aMaterial) override;
+            CEngineResult<> bindMaterial(SFrameGraphMaterial const &aMaterial,
+                                         std::string         const &aRenderPassHandle) override;
 
             /**
              * Unbind a material asset from the graphics API.

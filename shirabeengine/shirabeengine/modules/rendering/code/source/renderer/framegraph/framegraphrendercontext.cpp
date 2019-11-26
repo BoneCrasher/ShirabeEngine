@@ -853,24 +853,37 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial
-                                                                    , std::string       const &aRenderPassHandle)
+        CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
         {
-            SHIRABE_UNUSED(aRenderPassHandle);
+            CEngineResult<Shared<SMaterial>> materialObject = mResourceManager->useAssetResource(aMaterial.readableName, aMaterial.materialAssetId);
+            if(CheckEngineError(materialObject.result()))
+            {
+                CLog::Error(logTag(), "Cannot use material asset {} with id {}", aMaterial.readableName, aMaterial.materialAssetId);
+                return materialObject.result();
+            }
 
+            Shared<SMaterial> material = materialObject.data();
+            registerUsedResource(aMaterial.readableName, material);
 
-            registerUsedResource(master->getPipelineDescriptor().name, pipelineObject.data());
-
-            return pipelineObject.result();
+            return materialObject.result();
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)
+        CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial
+                                                               , std::string       const &aRenderPassHandle)
         {
-            Shared<ILogicalResourceObject> pipeline = getUsedResource(aMaterial.readableName);
+            SMaterialDependencies dependencies {};
+            dependencies.pipelineDependencies.referenceRenderPassId = aRenderPassHandle;
+
+            Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
+            EEngineStatus const status = material->load(dependencies);
+
+
+
+
             auto const result = mGraphicsAPIRenderContext->bindPipeline(pipeline->getGpuApiResourceHandle());
             return result;
         }
