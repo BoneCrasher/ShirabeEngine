@@ -41,16 +41,16 @@ namespace engine
 
             switch(asset.type)
             {
-                case EAssetType::Mesh:
+                case asset::EAssetType::Mesh:
                     // return genericAssetLoading<SMesh>(aResourceId, aAssetResourceId);
                     break;
-                case EAssetType::Material:
+                case asset::EAssetType::Material:
                     return genericAssetLoading<SMaterial>(aResourceId, aAssetResourceId);
                     break;
-                case EAssetType::Buffer:
+                case asset::EAssetType::Buffer:
                     return genericAssetLoading<SBuffer>(aResourceId, aAssetResourceId);
                     break;
-                case EAssetType::Texture:
+                case asset::EAssetType::Texture:
                     return genericAssetLoading<STexture>(aResourceId, aAssetResourceId);
                     break;
                 default:
@@ -86,7 +86,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        bool CResourceManager::storeResourceObject(ResourceId_t               const &aId
+        bool CResourceManager::storeResourceObject(ResourceId_t                      const &aId
                                                    , Shared <ILogicalResourceObject> const &aObject)
         {
             bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find( aId));

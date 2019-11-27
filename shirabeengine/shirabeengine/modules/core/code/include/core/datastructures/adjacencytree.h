@@ -345,7 +345,7 @@ namespace engine::datastructures
             return false;
         }
 
-        if(not CAdjacencyTreeHelper::listContainsElementFn(mForwardTree[aSource]))
+        if(not CAdjacencyTreeHelper::listContainsElementFn(mForwardTree[aSource], aTarget))
         {
             return false;
         }

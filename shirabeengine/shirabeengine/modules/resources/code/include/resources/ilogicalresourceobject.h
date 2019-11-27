@@ -28,6 +28,9 @@ namespace engine
         public_api:
             [[nodiscard]]
             virtual GpuApiHandle_t getGpuApiResourceHandle() const = 0;
+
+            virtual void setGpuApiResourceLoader  (std::function<EEngineStatus(std::vector<ResourceId_t>  &&)> const &aLoader) = 0;
+            virtual void setGpuApiResourceUnloader(std::function<EEngineStatus(std::vector<ResourceId_t>  &&)> const &aUnloader) = 0;
         };
 
     }

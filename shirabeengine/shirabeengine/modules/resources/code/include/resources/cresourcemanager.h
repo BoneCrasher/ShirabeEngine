@@ -45,7 +45,7 @@ namespace engine {
 
         public_methods:
             template <typename TResource>
-            CEngineResult<> addAssetLoader(Unique<CResourceFromAssetResourceObjectCreator<TResource>> aLoader);
+            CEngineResult<> addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader);
 
             template <typename TResource>
             // requires std::is_base_of_v<ILogicalResourceObject, TResource>
@@ -61,13 +61,13 @@ namespace engine {
 
         private_methods:
             template <typename TResource>
-            Unique<CResourceFromAssetResourceObjectCreator<TResource>> &getLoader();
+            Shared<CResourceFromAssetResourceObjectCreator<TResource>> getLoader();
 
             template <typename TResource>
             CEngineResult<Shared<ILogicalResourceObject>> genericAssetLoading(ResourceId_t const &aResourceId
                                                                             , AssetId_t    const &aAssetResourceId);
 
-            bool storeResourceObject(ResourceId_t               const &aId
+            bool storeResourceObject(ResourceId_t                      const &aId
                                      , Shared <ILogicalResourceObject> const &aObject);
 
             void removeResourceObject(ResourceId_t const &aId);
@@ -78,7 +78,7 @@ namespace engine {
             Unique<CGpuApiResourceObjectFactory>                                    mGpuApiResourceObjectFactory;
             Shared<asset::IAssetStorage>                                            mAssetStorage;
 
-            std::unordered_map<std::type_index, Unique<IResourceObjectCreatorBase>> mAssetLoaders;
+            std::unordered_map<std::type_index, Shared<IResourceObjectCreatorBase>> mAssetLoaders;
 
             std::unordered_map<ResourceId_t, Shared<ILogicalResourceObject>>        mResourceObjects;
             CAdjacencyTree<ResourceId_t>                                            mResourceTree;
@@ -89,7 +89,7 @@ namespace engine {
         //
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        CEngineResult<> CResourceManager::addAssetLoader(Unique<CResourceFromAssetResourceObjectCreator<TResource>> aLoader)
+        CEngineResult<> CResourceManager::addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader)
         {
             std::type_index const index = std::type_index(typeid(TResource));
 
@@ -108,16 +108,16 @@ namespace engine {
         //
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        Unique<CResourceFromAssetResourceObjectCreator<TResource>> &CResourceManager::getLoader()
+        Shared<CResourceFromAssetResourceObjectCreator<TResource>> CResourceManager::getLoader()
         {
-            static Unique<CResourceFromAssetResourceObjectCreator<TResource>> sEmptyLoader = nullptr;
+            static Shared<CResourceFromAssetResourceObjectCreator<TResource>> sEmptyLoader = nullptr;
 
             std::type_index const index = std::type_index(typeid(TResource));
 
             auto const it = mAssetLoaders.find(index);
             if(mAssetLoaders.end() != it)
             {
-                return mAssetLoaders.at(index);
+                return std::static_pointer_cast<CResourceFromAssetResourceObjectCreator<TResource>>(mAssetLoaders.at(index));
             }
 
             return sEmptyLoader;
@@ -130,7 +130,8 @@ namespace engine {
         template <typename TResource>
         CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::genericAssetLoading(ResourceId_t const &aResourceId
                                                                                             , AssetId_t    const &aAssetResourceId)
-        {            Unique<CResourceFromAssetResourceObjectCreator<TResource>> const &loader = getLoader<TResource>();
+        {
+            Shared<CResourceFromAssetResourceObjectCreator<TResource>> const &loader = getLoader<TResource>();
             if(nullptr == loader)
             {
                 return { EEngineStatus::Error, nullptr };
@@ -205,8 +206,6 @@ namespace engine {
             resource->setGpuApiResourceUnloader(unloader);
 
             storeResourceObject(aResourceId, resource);
-
-            // TODO: For now immediately create... in the future make it more intelligent...
 
             return { EEngineStatus::Ok, resource };
         }

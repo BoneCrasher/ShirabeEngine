@@ -53,12 +53,39 @@ namespace engine
             [[nodiscard]]
             GpuApiHandle_t getGpuApiResourceHandle() const final;
 
+            SHIRABE_INLINE
+            void setGpuApiResourceLoader  (std::function<EEngineStatus(std::vector<ResourceId_t> &&)> const &aLoader) final
+            {
+                mLoader = aLoader;
+            }
+            SHIRABE_INLINE
+            void setGpuApiResourceUnloader(std::function<EEngineStatus(std::vector<ResourceId_t> &&)> const &aUnloader) final
+            {
+                mUnloader = aUnloader;
+            }
+
+        protected_methods:
+            EEngineStatus loadGpuApiResource(std::vector<ResourceId_t> &&aDependencies)
+            {
+                return (mLoader) ? mLoader(std::move(aDependencies)) : EEngineStatus::Error;
+            }
+            EEngineStatus unloadGpuApiResource(std::vector<ResourceId_t> &&aDependencies)
+            {
+                return (mUnloader) ? mUnloader(std::move(aDependencies)) : EEngineStatus::Error;
+            }
+
+            std::optional<TDependencies> const &getCurrentDependencies() const { return mDependencies; }
+            void resetCurrentDependencies() { mDependencies.reset(); }
+
         private_members:
             TDescription  const                                     mDescription;
-            TDependencies                                           mDependencies;
+            std::optional<TDependencies>                            mDependencies;
 
             GpuApiHandle_t                                          mGpuApiResourceHandle;
             IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
+
+            std::function<EEngineStatus(std::vector<ResourceId_t> &&)> mLoader;
+            std::function<EEngineStatus(std::vector<ResourceId_t> &&)> mUnloader;
         };
 
         //<-----------------------------------------------------------------------------
@@ -67,11 +94,14 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TDescription, typename TDependencies>
-        CResourceObject<TDescription, TDependencies>::CResourceObject(const TDescriptor &aDescription)
+        CResourceObject<TDescription, TDependencies>::CResourceObject(const TDescription &aDescription)
             : mDescription(aDescription)
-        { }
-        //<-----------------------------------------------------------------------------
-
+            , mDependencies()
+            , mGpuApiResourceHandle()
+            , mStateObserver()
+            , mLoader()
+            , mUnloader()
+        {}
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------

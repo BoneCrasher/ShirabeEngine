@@ -156,7 +156,7 @@ namespace engine
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SRenderPassDependencies
         {
-            std::vector<std::string> attachmentTextureViews;
+            std::vector<ResourceId_t> attachmentTextureViews;
         };
 
         struct
@@ -172,7 +172,7 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SFrameBufferDependencies
         {
-            std::string referenceRenderPassId; // Used as a template to create a compatible framebuffer
+            ResourceId_t referenceRenderPassId; // Used as a template to create a compatible framebuffer
         };
 
         struct

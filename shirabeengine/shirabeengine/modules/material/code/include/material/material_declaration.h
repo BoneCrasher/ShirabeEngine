@@ -1156,47 +1156,9 @@ namespace engine
                 return mConfiguration;
             }
 
-            [[nodiscard]]
-            SHIRABE_INLINE
-            resources::SMaterialPipelineDescriptor const getPipelineDescriptor() const
-            {
-                return mPipelineDescription;
-            }
-
-            [[nodiscard]]
-            SHIRABE_INLINE
-            resources::SShaderModuleDescriptor const getShaderModuleDescriptor() const
-            {
-                return mShaderModuleDescription;
-            }
-
-            [[nodiscard]]
-            SHIRABE_INLINE
-            Vector<resources::SBufferDescription> const getBufferDescriptors() const
-            {
-                return mBufferDescription;
-            }
 
         private_methods:
             friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
-
-            SHIRABE_INLINE
-            void setPipelineDescription(resources::SMaterialPipelineDescriptor const &aDescriptor)
-            {
-                mPipelineDescription = aDescriptor;
-            }
-
-            SHIRABE_INLINE
-            void setShaderModuleDescription(resources::SShaderModuleDescriptor const &aDescriptor)
-            {
-                mShaderModuleDescription = aDescriptor;
-            }
-
-            SHIRABE_INLINE
-            void setBufferDescriptions(Vector<resources::SBufferDescription> const &aDescriptors)
-            {
-                mBufferDescription = aDescriptors;
-            }
 
         private_members:
             std::string        mName;

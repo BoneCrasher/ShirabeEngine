@@ -145,7 +145,7 @@ namespace engine
                 SHIRABE_RETURN_VALUE_ON_ERROR(signatureAssetFetchResult, failureReturnValue);
             }
 
-            auto const [signatureFetchResult, signature] = readMaterialSignature(aLogTag, aAssetStorage.get(), signatureAsset.id);
+            auto const [signatureFetchResult, signature] = readMaterialSignature(aLogTag, aAssetStorage, signatureAsset.id);
             {
                 PrintEngineError(signatureFetchResult, aLogTag, "Could not fetch signature data.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(signatureFetchResult, failureReturnValue);
