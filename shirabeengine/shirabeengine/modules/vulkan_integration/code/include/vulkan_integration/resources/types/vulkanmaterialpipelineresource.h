@@ -21,41 +21,21 @@ namespace engine
          * with textures inside the vulkan API.
          */
         class CVulkanPipelineResource
-                : public CVkApiResource<SMaterialPipelineDescriptor>
+                : public CVkApiResource<SPipeline>
         {
             SHIRABE_DECLARE_LOG_TAG(CVulkanPipelineResource);
 
         public_constructors:
-            using CVkApiResource<SMaterialPipelineDescriptor>::CVkApiResource;
+            using CVkApiResource<SPipeline>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) final;
+            CEngineResult<> create(  SMaterialPipelineDescriptor   const &aDescription
+                                   , SMaterialPipelineDependencies const &aDependencies
+                                   , GpuApiResourceDependencies_t  const &aResolvedDependencies) final;
             CEngineResult<> destroy()  final;
 
         public_members:
-            VkViewport                                                   viewPort;
-            VkRect2D                                                     scissor;
-
-            VkPipelineInputAssemblyStateCreateInfo                       inputAssemblyState;
-            std::vector<VkVertexInputBindingDescription>                 vertexInputBindings;
-            std::vector<VkVertexInputAttributeDescription>               vertexInputAttributes;
-
-            std::vector<VkDescriptorSetLayoutCreateInfo>                 descriptorSetLayoutCreateInfos;
-            std::vector<std::vector<VkDescriptorSetLayoutBinding>>       descriptorSetLayoutBindings;
-            std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
-
-            VkPipelineRasterizationStateCreateInfo                       rasterizerState;
-            VkPipelineMultisampleStateCreateInfo                         multiSampler;
-            VkPipelineDepthStencilStateCreateInfo                        depthStencilState;
-            std::vector<VkPipelineColorBlendAttachmentState>             colorBlendAttachmentStates;
-            VkPipelineColorBlendStateCreateInfo                          colorBlendState;
-
-            VkPipelineLayoutCreateInfo                                   pipelineLayout;
-            uint32_t                                                     subpass;
-
-
             VkPipeline                   pipeline;
-            std::vector<VkShaderModule>  shaderModules;
             VkDescriptorPool             descriptorPool;
             std::vector<VkDescriptorSet> descriptorSets;
         };

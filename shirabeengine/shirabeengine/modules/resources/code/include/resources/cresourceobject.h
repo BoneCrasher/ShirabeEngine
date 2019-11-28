@@ -43,6 +43,9 @@ namespace engine
             TDescription const &getDescription() const
             { return mDescription; }
 
+            [[nodiscard]]
+            GpuApiHandle_t getGpuApiResourceHandle() const final;
+
             virtual EEngineStatus load(Dependencies_t const &aDependencies) = 0;
 
             virtual EEngineStatus unload() = 0;
@@ -50,28 +53,25 @@ namespace engine
         private_api:
             void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) final;
 
-            [[nodiscard]]
-            GpuApiHandle_t getGpuApiResourceHandle() const final;
-
             SHIRABE_INLINE
-            void setGpuApiResourceLoader  (std::function<EEngineStatus(std::vector<ResourceId_t> &&)> const &aLoader) final
+            void setGpuApiResourceLoader  (std::function<EEngineStatus(Dependencies_t  const &, std::vector<ResourceId_t> &&)> const &aLoader)
             {
                 mLoader = aLoader;
             }
             SHIRABE_INLINE
-            void setGpuApiResourceUnloader(std::function<EEngineStatus(std::vector<ResourceId_t> &&)> const &aUnloader) final
+            void setGpuApiResourceUnloader(std::function<EEngineStatus(Dependencies_t  const &, std::vector<ResourceId_t> &&)> const &aUnloader)
             {
                 mUnloader = aUnloader;
             }
 
         protected_methods:
-            EEngineStatus loadGpuApiResource(std::vector<ResourceId_t> &&aDependencies)
+            EEngineStatus loadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
             {
-                return (mLoader) ? mLoader(std::move(aDependencies)) : EEngineStatus::Error;
+                return (mLoader) ? mLoader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
             }
-            EEngineStatus unloadGpuApiResource(std::vector<ResourceId_t> &&aDependencies)
+            EEngineStatus unloadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
             {
-                return (mUnloader) ? mUnloader(std::move(aDependencies)) : EEngineStatus::Error;
+                return (mUnloader) ? mUnloader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
             }
 
             std::optional<TDependencies> const &getCurrentDependencies() const { return mDependencies; }
@@ -84,8 +84,8 @@ namespace engine
             GpuApiHandle_t                                          mGpuApiResourceHandle;
             IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
 
-            std::function<EEngineStatus(std::vector<ResourceId_t> &&)> mLoader;
-            std::function<EEngineStatus(std::vector<ResourceId_t> &&)> mUnloader;
+            std::function<EEngineStatus(TDependencies const &, std::vector<ResourceId_t> &&)> mLoader;
+            std::function<EEngineStatus(TDependencies const &, std::vector<ResourceId_t> &&)> mUnloader;
         };
 
         //<-----------------------------------------------------------------------------

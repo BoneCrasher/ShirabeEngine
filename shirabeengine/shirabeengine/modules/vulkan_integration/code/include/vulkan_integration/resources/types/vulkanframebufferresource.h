@@ -20,15 +20,17 @@ namespace engine
          * with textures inside the vulkan API.
          */
         class CVulkanFrameBufferResource
-                : public CVkApiResource<SFrameBufferDescription>
+                : public CVkApiResource<SFrameBuffer>
         {
             SHIRABE_DECLARE_LOG_TAG(CVulkanFrameBufferResource);
 
         public_constructors:
-            using CVkApiResource<SFrameBufferDescription>::CVkApiResource;
+            using CVkApiResource<SFrameBuffer>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) final;
+            CEngineResult<> create(  SFrameBufferDescription      const &aDescription
+                                   , SFrameBufferDependencies     const &aDependencies
+                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
             CEngineResult<> destroy()  final;
 
         public_members:

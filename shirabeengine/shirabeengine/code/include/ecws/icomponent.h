@@ -43,6 +43,8 @@ namespace engine::ecws
         {
             mMaxElements = aOther.mMaxElements;
             mElements    = aOther.mElements;
+
+            return *this;
         }
 
         [[nodiscard]]

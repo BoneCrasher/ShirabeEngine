@@ -7,6 +7,7 @@
 #include <renderer/framegraph/framegraphrendercontext.h>
 #include <graphicsapi/definitions.h>
 #include <material/material_loader.h>
+#include <material/assetloader.h>
 #include <resources/agpuapiresourceobjectfactory.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>
 #include <vulkan_integration/vulkandevicecapabilities.h>
@@ -279,9 +280,9 @@ namespace engine
                 }
             }
 
-            Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory));
+            Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory), mAssetStorage);
             // manager->addAssetLoader<SMesh>(...);
-            manager->addAssetLoader<SMaterial>(material::getAssetLoader(assetStorage));
+            manager->addAssetLoader<SMaterial>(material::getAssetLoader(manager, mAssetStorage, mMaterialLoader));
             // manager->addAssetLoader<SBuffer>  (makeUnique<CResourceFromAssetResourceObjectCreator<SBuffer>>  ([assetStorage](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
             // manager->addAssetLoader<STexture> (makeUnique<CResourceFromAssetResourceObjectCreator<STexture>> ([assetStorage](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
             mResourceManager = manager;
@@ -328,7 +329,7 @@ namespace engine
             CEngineResult<> initialization = mScene.initialize();
             status = initialization.result();
 
-            auto const &[result, material] = mMaterialLoader->loadMaterialInstance(317299467);
+            auto const &[result, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage, 317299467);
 
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);

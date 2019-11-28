@@ -9,16 +9,18 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanRenderPassResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanRenderPassResource::create(  SRenderPassDescription       const &aDescription
+                                                      , SRenderPassDependencies      const &aDependencies
+                                                      , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
-        SHIRABE_UNUSED(aDependencies);
+        CVkApiResource<SRenderPass>::create(aDescription, aDependencies, aResolvedDependencies);
 
-        SRenderPassDescription const &desc = getDescription();
+        SHIRABE_UNUSED(aResolvedDependencies);
 
         std::vector<VkSubpassDescription>    vkSubpassDescriptions{};
         std::vector<VkAttachmentDescription> vkAttachmentDescriptions{};
 
-        for(auto const &attachmentDesc : desc.attachmentDescriptions)
+        for(auto const &attachmentDesc : aDescription.attachmentDescriptions)
         {
             VkAttachmentDescription vkAttachmentDesc{};
             vkAttachmentDesc.loadOp         = static_cast<VkAttachmentLoadOp> (attachmentDesc.loadOp);
@@ -38,7 +40,7 @@ namespace engine::vulkan
         std::vector<std::vector<VkAttachmentReference>> colorAttachmentReferenceList(0);
         std::vector<std::vector<VkAttachmentReference>> depthAttachmentReferenceList(0);
 
-        for(auto const &subpassDesc : desc.subpassDescriptions)
+        for(auto const &subpassDesc : aDescription.subpassDescriptions)
         {
             std::vector<VkAttachmentReference> inputAttachmentReferences(0);
             std::vector<VkAttachmentReference> colorAttachmentReferences(0);

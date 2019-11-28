@@ -35,13 +35,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
         //<-----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace engine
             SHIRABE_INLINE
             EEngineStatus load(SBufferViewDependencies const &aDependencies) override
             {
-                return loadGpuApiResource({ aDependencies.bufferId });
+                return loadGpuApiResource(aDependencies, { aDependencies.bufferId });
             }
 
             SHIRABE_INLINE
@@ -71,7 +71,7 @@ namespace engine
                     return EEngineStatus::Error;
                 }
 
-                return unloadGpuApiResource({ dependencies->bufferId });
+                return unloadGpuApiResource(*dependencies, { dependencies->bufferId });
             }
         };
         //<-----------------------------------------------------------------------------
@@ -90,13 +90,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
         //<-----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace engine
             SHIRABE_INLINE
             EEngineStatus load(STextureViewDependencies const &aDependencies) override
             {
-                return loadGpuApiResource({ aDependencies.subjacentTextureId });
+                return loadGpuApiResource(aDependencies, { aDependencies.subjacentTextureId });
             }
 
             SHIRABE_INLINE
@@ -126,7 +126,7 @@ namespace engine
                     return EEngineStatus::Error;
                 }
 
-                return unloadGpuApiResource({ dependencies->subjacentTextureId });
+                return unloadGpuApiResource(*dependencies, { dependencies->subjacentTextureId });
             }
 
         };
@@ -146,13 +146,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
         //<-----------------------------------------------------------------------------
@@ -171,13 +171,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
         //<-----------------------------------------------------------------------------
@@ -196,13 +196,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
         //<-----------------------------------------------------------------------------
@@ -220,7 +220,7 @@ namespace engine
             SHIRABE_INLINE
             EEngineStatus load(SRenderPassDependencies const &aDependencies) override
             {
-                return loadGpuApiResource(std::vector<ResourceId_t>(aDependencies.attachmentTextureViews));
+                return loadGpuApiResource(aDependencies, std::vector<ResourceId_t>(aDependencies.attachmentTextureViews));
             }
 
             SHIRABE_INLINE
@@ -232,7 +232,7 @@ namespace engine
                     return EEngineStatus::Error;
                 }
 
-                return unloadGpuApiResource(std::vector<ResourceId_t>(dependencies->attachmentTextureViews));
+                return unloadGpuApiResource(*dependencies, std::vector<ResourceId_t>(dependencies->attachmentTextureViews));
             }
         };
 
@@ -246,7 +246,7 @@ namespace engine
             SHIRABE_INLINE
             EEngineStatus load(SFrameBufferDependencies const &aDependencies) override
             {
-                return loadGpuApiResource({ aDependencies.referenceRenderPassId });
+                return loadGpuApiResource(aDependencies, { aDependencies.referenceRenderPassId });
             }
 
             SHIRABE_INLINE
@@ -258,7 +258,7 @@ namespace engine
                     return EEngineStatus::Error;
                 }
 
-                return unloadGpuApiResource({ dependencies->referenceRenderPassId });
+                return unloadGpuApiResource(*dependencies, { dependencies->referenceRenderPassId });
             }
         };
         //<-----------------------------------------------------------------------------
@@ -277,13 +277,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
 
@@ -298,13 +298,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
 
@@ -325,7 +325,7 @@ namespace engine
                     dependencies.push_back(buffer);
                 }
 
-                return loadGpuApiResource(std::move(dependencies));
+                return loadGpuApiResource(aDependencies, std::move(dependencies));
             }
 
             SHIRABE_INLINE
@@ -344,7 +344,7 @@ namespace engine
                     dependencies.push_back(buffer);
                 }
 
-                return unloadGpuApiResource(std::move(dependencies));
+                return unloadGpuApiResource(*currentDependencies, std::move(dependencies));
             }
         };
 
@@ -359,13 +359,13 @@ namespace engine
             EEngineStatus load(SNoDependencies const &aDependencies) override
             {
                 SHIRABE_UNUSED(aDependencies);
-                return loadGpuApiResource({});
+                return loadGpuApiResource(aDependencies, {});
             }
 
             SHIRABE_INLINE
             EEngineStatus unload() override
             {
-                return unloadGpuApiResource({});
+                return unloadGpuApiResource(*getCurrentDependencies(), {});
             }
         };
 

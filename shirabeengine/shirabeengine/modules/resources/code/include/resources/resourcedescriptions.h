@@ -172,7 +172,9 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SFrameBufferDependencies
         {
-            ResourceId_t referenceRenderPassId; // Used as a template to create a compatible framebuffer
+            ResourceId_t              referenceRenderPassId; // Used as a template to create a compatible framebuffer
+            VkExtent3D                attachmentExtent;
+            std::vector<ResourceId_t> attachmentTextureViews;
         };
 
         struct
@@ -199,6 +201,14 @@ namespace engine
         };
 
         struct
+                [[nodiscard]]
+                SHIRABE_TEST_EXPORT SShaderModuleDescriptor
+        {
+            std::string                                                  name;
+            std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
+        };
+
+        struct
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialPipelineDescriptor
         {
@@ -218,8 +228,6 @@ namespace engine
             VkPipelineColorBlendStateCreateInfo                          colorBlendState;
 
             VkPipelineLayoutCreateInfo                                   pipelineLayout;
-            uint32_t                                                     subpass;
-
             std::vector<VkDescriptorSetLayoutCreateInfo>                 descriptorSetLayoutCreateInfos;
             std::vector<std::vector<VkDescriptorSetLayoutBinding>>       descriptorSetLayoutBindings;
         };
@@ -229,16 +237,10 @@ namespace engine
             SHIRABE_TEST_EXPORT SMaterialPipelineDependencies
         {
             ResourceId_t              referenceRenderPassId;
+            uint32_t                  subpass;
+            ResourceId_t              shaderModuleId;
             std::vector<ResourceId_t> bufferViewIds;
             std::vector<ResourceId_t> textureViewIds;
-        };
-
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT SShaderModuleDescriptor
-        {
-            std::string                                                  name;
-            std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;
         };
 
         struct

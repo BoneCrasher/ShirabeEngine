@@ -12,6 +12,7 @@
 #include <asset/assetstorage.h>
 #include <core/datastructures/adjacencytree.h>
 #include "resources/cresourceobject.h"
+#include "resources/agpuapiresourceobject.h"
 #include "resources/agpuapiresourceobjectfactory.h"
 #include "cgpuapiresourcestorage.h"
 
@@ -186,24 +187,30 @@ namespace engine {
             insertDependencies(mResourceTree, aResourceId, std::move(aStaticDependencies));
 
             Shared<ILogicalResourceObject> resource         = makeShared<TResource>(aDescriptor);
-            GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>(aDescriptor);
+            auto                           resourceObject   = std::static_pointer_cast<CResourceObject<typename TResource::Descriptor_t, typename TResource::Dependencies_t>>(resource);
+            GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>();
             resource->setGpuApiResourceHandle(gpuApiResourceId);
 
-            auto const loader = [&, this] (std::vector<ResourceId_t> &&aDynamicDependencies) -> void
+            auto const loader = [&, this] (typename TResource::Dependencies_t const &aDependencies, std::vector<ResourceId_t> &&aDynamicDependencies) -> EEngineStatus
             {
                 insertDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
                 auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-                mGpuApiResourceObjectFactory->get(gpuApiResourceId)->create(dependenciesResolved);
+                CEngineResult<> const result = std::static_pointer_cast<AGpuApiResourceObject<TResource>>(mGpuApiResourceObjectFactory->get(gpuApiResourceId))->create(aDescriptor, aDependencies, dependenciesResolved);
+                return result.result();
             };
 
-            auto const unloader = [&, this] (std::vector<ResourceId_t> &&aDynamicDependencies) -> void
+            auto const unloader = [&, this] (typename TResource::Dependencies_t const &aDependencies, std::vector<ResourceId_t> &&aDynamicDependencies) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aDependencies);
+
+                auto dependenciesResolved = getGpuApiDependencies(aResourceId);
+                CEngineResult<> const result = mGpuApiResourceObjectFactory->get(gpuApiResourceId)->destroy();
                 removeDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
-                mGpuApiResourceObjectFactory->get(gpuApiResourceId)->destroy();
+                return result.result();
             };
 
-            resource->setGpuApiResourceLoader(loader);
-            resource->setGpuApiResourceUnloader(unloader);
+            resourceObject->setGpuApiResourceLoader(loader);
+            resourceObject->setGpuApiResourceUnloader(unloader);
 
             storeResourceObject(aResourceId, resource);
 

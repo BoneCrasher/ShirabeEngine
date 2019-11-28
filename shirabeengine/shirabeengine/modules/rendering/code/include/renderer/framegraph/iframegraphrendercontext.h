@@ -144,8 +144,10 @@ namespace engine
              * @return               EEngineStatus::Ok if successful.
              * @return               EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> bindRenderPass(std::string const &aRenderPassId,
-                                                   std::string const &aFrameBufferId) = 0;
+            virtual CEngineResult<> bindRenderPass(std::string                     const &aRenderPassId,
+                                                   std::string                     const &aFrameBufferId,
+                                                   SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                                                   CFrameGraphMutableResources     const &aFrameGraphResources) = 0;
 
 
             /**

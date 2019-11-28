@@ -249,7 +249,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    static Unique<CResourceFromAssetResourceObjectCreator<SMaterial>> getAssetLoader(Shared<resources::CResourceManager> const &aResourceManager
+    static Shared<CResourceFromAssetResourceObjectCreator<SMaterial>> getAssetLoader(Shared<resources::CResourceManager> const &aResourceManager
                                                                                    , Shared<asset::IAssetStorage>        const &aAssetStorage
                                                                                    , Shared<material::CMaterialLoader>   const &aMaterialLoader)
     {
@@ -316,7 +316,7 @@ namespace engine::material
             return material;
         };
 
-        return makeUnique<CResourceFromAssetResourceObjectCreator<SMaterial>>(loader);
+        return makeShared<CResourceFromAssetResourceObjectCreator<SMaterial>>(loader);
     }
 }
 

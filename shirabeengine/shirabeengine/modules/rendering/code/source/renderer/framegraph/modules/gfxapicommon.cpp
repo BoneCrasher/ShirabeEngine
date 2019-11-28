@@ -100,7 +100,7 @@ namespace engine
                 // Begin a command buffer.
                 aContext->beginCommandBuffer();
                 // Begin a render pass w/ a given framebuffer.
-                aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                // aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
                 return { EEngineStatus::Ok };
             };
@@ -196,7 +196,7 @@ namespace engine
 
                 SFrameGraphTexture const &texture = *textureFetch.data();
 
-                aContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+                // aContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
                 aContext->copyImageToBackBuffer(texture);
                 aContext->commitCommandBuffer();
                 aContext->present();

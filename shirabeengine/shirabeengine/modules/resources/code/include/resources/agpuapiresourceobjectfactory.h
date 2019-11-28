@@ -56,10 +56,10 @@ namespace engine
 
         template <typename TResource>
         class SHIRABE_LIBRARY_EXPORT CResourceGpuApiResourceObjectCreator
-            : public CResourceObjectCreator<TResource, Unique<IGpuApiResourceObject>, GpuApiHandle_t const &, typename TResource::Descriptor_t const &>
+            : public CResourceObjectCreator<TResource, Shared<IGpuApiResourceObject>, GpuApiHandle_t const &>
         {
         public_constructors:
-            using CResourceObjectCreator<TResource, Unique<IGpuApiResourceObject>, GpuApiHandle_t const &, typename TResource::Descriptor_t const &>::CResourceObjectCreator;
+            using CResourceObjectCreator<TResource, Shared<IGpuApiResourceObject>, GpuApiHandle_t const &>::CResourceObjectCreator;
         };
 
         class SHIRABE_LIBRARY_EXPORT CGpuApiResourceObjectFactory
@@ -95,7 +95,7 @@ namespace engine
 
         private_methods:
             template <typename T>
-            GpuApiHandle_t create(typename T::Descriptor_t const &aDescriptor)
+            GpuApiHandle_t create()
             {
                 std::type_info const &typeInfo = typeid(T);
 
@@ -105,16 +105,16 @@ namespace engine
                     return GpuApiHandle_t {};
                 }
 
-                Unique<IGpuApiResourceObject>             gpuApiObject = nullptr;
+                Shared<IGpuApiResourceObject>             gpuApiObject = nullptr;
                 Unique<IResourceObjectCreatorBase> const &creatorBase  = mCreators[typeInfo.name()];
 
                 auto creator = static_cast<CResourceGpuApiResourceObjectCreator<T> *const>(creatorBase.get());
                 if(nullptr != creator)
                 {
                     GpuApiHandle_t const handle = mResourceUidGenerator->generate();
-                    gpuApiObject = std::move(creator->create(handle, aDescriptor));
+                    gpuApiObject = std::move(creator->create(handle));
 
-                    mResourceStorage->add(handle, std::move(gpuApiObject));
+                    mResourceStorage->add(handle, gpuApiObject);
 
                     return handle;
                 }
@@ -123,12 +123,11 @@ namespace engine
             }
 
             SHIRABE_INLINE
-            Unique<IGpuApiResourceObject> const &get(GpuApiHandle_t const &aHandle)
+            Shared<IGpuApiResourceObject> const get(GpuApiHandle_t const &aHandle)
             {
                 return mResourceStorage->get(aHandle);
             }
 
-            SHIRABE_INLINE
             void destroy(GpuApiHandle_t const &aHandle)
             {
                 mResourceStorage->get(aHandle)->destroy();

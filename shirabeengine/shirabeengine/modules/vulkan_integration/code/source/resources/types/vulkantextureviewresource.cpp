@@ -10,26 +10,28 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureViewResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanTextureViewResource::create(  STextureViewDescription      const &aDescription
+                                                       , STextureViewDependencies     const &aDependencies
+                                                       , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
-        CVulkanTextureResource const *const textureResource = getVkContext()->getResourceStorage()->extract<CVulkanTextureResource>(aDependencies.at(getDescription().subjacentTextureId));
+        CVkApiResource<STextureView>::create(aDescription, aDependencies, aResolvedDependencies);
+
+        auto const *const textureResource = getVkContext()->getResourceStorage()->extract<CVulkanTextureResource>(aResolvedDependencies.at(aDependencies.subjacentTextureId));
         if(nullptr == textureResource)
         {
             return { EEngineStatus::Error };
         }
 
-        STextureViewDescription const desc = getDescription();
-
         uint8_t dimensionCount = 1;
-        dimensionCount += (desc.subjacentTextureInfo.height > 1) ? 1 : 0;
-        dimensionCount += (desc.subjacentTextureInfo.depth  > 1) ? 1 : 0;
+        dimensionCount += (aDescription.subjacentTextureInfo.height > 1) ? 1 : 0;
+        dimensionCount += (aDescription.subjacentTextureInfo.depth  > 1) ? 1 : 0;
 
         VkImageViewType imageViewType = VK_IMAGE_VIEW_TYPE_2D;
 
         switch(dimensionCount)
         {
             case 1:
-                if(1 < desc.subjacentTextureInfo.arraySize)
+                if(1 < aDescription.subjacentTextureInfo.arraySize)
                 {
                     imageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
                 }
@@ -39,7 +41,7 @@ namespace engine::vulkan
                 }
                 break;
             case 2:
-                if(1 < desc.subjacentTextureInfo.arraySize)
+                if(1 < aDescription.subjacentTextureInfo.arraySize)
                 {
                     imageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
                 }
@@ -61,12 +63,12 @@ namespace engine::vulkan
 
         VkImageViewCreateInfo vkImageViewCreateInfo ={ };
         vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        vkImageViewCreateInfo.format                          = CVulkanDeviceCapsHelper::convertFormatToVk(desc.textureFormat);
+        vkImageViewCreateInfo.format                          = CVulkanDeviceCapsHelper::convertFormatToVk(aDescription.textureFormat);
         vkImageViewCreateInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT; // TODO: Care about the specific aspect bits here in more detail.
-        vkImageViewCreateInfo.subresourceRange.baseArrayLayer = desc.arraySlices.offset;
-        vkImageViewCreateInfo.subresourceRange.layerCount     = static_cast<uint32_t>(desc.arraySlices.length);
-        vkImageViewCreateInfo.subresourceRange.baseMipLevel   = desc.mipMapSlices.offset;
-        vkImageViewCreateInfo.subresourceRange.levelCount     = static_cast<uint32_t>(desc.mipMapSlices.length);
+        vkImageViewCreateInfo.subresourceRange.baseArrayLayer = aDescription.arraySlices.offset;
+        vkImageViewCreateInfo.subresourceRange.layerCount     = static_cast<uint32_t>(aDescription.arraySlices.length);
+        vkImageViewCreateInfo.subresourceRange.baseMipLevel   = aDescription.mipMapSlices.offset;
+        vkImageViewCreateInfo.subresourceRange.levelCount     = static_cast<uint32_t>(aDescription.mipMapSlices.length);
         vkImageViewCreateInfo.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         vkImageViewCreateInfo.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         vkImageViewCreateInfo.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;

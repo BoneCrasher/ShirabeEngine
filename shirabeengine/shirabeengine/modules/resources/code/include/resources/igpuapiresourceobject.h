@@ -70,7 +70,7 @@ namespace engine
         public_api:
             virtual resources::GpuApiHandle_t const getHandle() = 0;
 
-            virtual CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) = 0;
+            // virtual CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) = 0;
             virtual CEngineResult<> destroy()                                                 = 0;
 
             [[nodiscard]]

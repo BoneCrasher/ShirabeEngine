@@ -20,7 +20,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription>
+        template <typename TResource>
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT AGpuApiResourceObject
@@ -29,28 +29,35 @@ namespace engine
             friend class CResourceManager;
 
         public_constructors:
-            explicit AGpuApiResourceObject(TDescription const &aDescription);
+            explicit AGpuApiResourceObject();
 
         public_destructors:
             ~AGpuApiResourceObject() override = default;
 
         public_api:
             // IGpuApiResourceObject
-            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) override;
-            CEngineResult<> destroy() override;
+            virtual CEngineResult<> create(  typename TResource::Descriptor_t   const &aDescription
+                                           , typename TResource::Dependencies_t const &aDependencies
+                                           , GpuApiResourceDependencies_t       const &aResolvedDependencies);
+            virtual CEngineResult<> destroy();
 
             Shared<ObservableState_t> observableState() final;
 
         public_methods:
-            SHIRABE_INLINE TDescription const &getDescription() const
-            {
-                return mDescription;
-            }
-
             [[nodiscard]]
             SHIRABE_INLINE EGpuApiResourceState getResourceState() const final
             {
                 return mState;
+            }
+
+            SHIRABE_INLINE std::optional<typename TResource::Descriptor_t> const &getCurrentDescriptor() const
+            {
+                return mDescriptor;
+            }
+
+            SHIRABE_INLINE std::optional<typename TResource::Dependencies_t> const &getCurrentDependencies() const
+            {
+                return mDependencies;
             }
 
         protected_methods:
@@ -60,8 +67,20 @@ namespace engine
                 observableState()->notify(makeSharedFromThis(this), mState);
             };
 
+            SHIRABE_INLINE void setCurrentDescriptor(typename TResource::Descriptor_t const &aDescriptor)
+            {
+                mDescriptor = aDescriptor;
+            }
+
+            SHIRABE_INLINE void setCurrentDependencies(typename TResource::Dependencies_t const &aDependencies)
+            {
+                mDependencies = aDependencies;
+            }
+
         private_members:
-            TDescription         const mDescription;
+            std::optional<typename TResource::Descriptor_t>   mDescriptor;
+            std::optional<typename TResource::Dependencies_t> mDependencies;
+
             Shared<ObservableState_t>  mObservableState;
             EGpuApiResourceState       mState;
         };
@@ -71,9 +90,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        AGpuApiResourceObject<TDescription>::AGpuApiResourceObject(const TDescription &aDescription)
-            : mDescription    (aDescription)
+        template <typename TResource>
+        AGpuApiResourceObject<TResource>::AGpuApiResourceObject()
+            : mDescriptor()
+            , mDependencies()
             , mObservableState(makeShared<CSubject<EGpuApiResourceState>>())
             , mState          (EGpuApiResourceState::Unknown)
         { }
@@ -82,30 +102,38 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::create(GpuApiResourceDependencies_t const &aDependencies)
+        template <typename TResource>
+        CEngineResult<> AGpuApiResourceObject<TResource>::create(  typename TResource::Descriptor_t   const &aDescription
+                                                                 , typename TResource::Dependencies_t const &aDependencies
+                                                                 , GpuApiResourceDependencies_t       const &aResolvedDependencies)
         {
-            SHIRABE_UNUSED(aDependencies);
+            SHIRABE_UNUSED(aResolvedDependencies);
 
-            return { EEngineStatus::NotImplemented };
+            mDescriptor   = aDescription;
+            mDependencies = aDependencies;
+
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        CEngineResult<> AGpuApiResourceObject<TDescription>::destroy()
+        template <typename TResource>
+        CEngineResult<> AGpuApiResourceObject<TResource>::destroy()
         {
-            return { EEngineStatus::NotImplemented };
+            mDependencies.reset();
+            mDescriptor.reset();
+
+            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription>
-        Shared<IGpuApiResourceObject::ObservableState_t> AGpuApiResourceObject<TDescription>::observableState()
+        template <typename TResource>
+        Shared<IGpuApiResourceObject::ObservableState_t> AGpuApiResourceObject<TResource>::observableState()
         {
             return mObservableState;
         }

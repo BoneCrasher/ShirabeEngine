@@ -11,7 +11,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    bool CGpuApiResourceStorage::add(GpuApiHandle_t const &aId, engine::Unique<IGpuApiResourceObject> aResourceReference)
+    bool CGpuApiResourceStorage::add(GpuApiHandle_t const &aId, engine::Shared<IGpuApiResourceObject> aResourceReference)
     {
         mDependencies.erase(aId);
         mDependencies.insert({aId, std::move(aResourceReference)});
@@ -32,13 +32,11 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    Unique<IGpuApiResourceObject> const& CGpuApiResourceStorage::get(GpuApiHandle_t const &aId) const
+    Shared<IGpuApiResourceObject> const CGpuApiResourceStorage::get(GpuApiHandle_t const &aId) const
     {
-        static engine::Unique<IGpuApiResourceObject> sNullRef = nullptr;
-
         if( mDependencies.end() == mDependencies.find(aId))
         {
-            return sNullRef;
+            return nullptr;
         }
 
         return mDependencies.at(aId);

@@ -20,15 +20,17 @@ namespace engine
          * with textures inside the vulkan API.
          */
         class CVulkanTextureViewResource
-                : public CVkApiResource<STextureViewDescription>
+                : public CVkApiResource<STextureView>
         {
             SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
 
         public_constructors:
-            using CVkApiResource<STextureViewDescription>::CVkApiResource;
+            using CVkApiResource<STextureView>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) final;
+            CEngineResult<> create(  STextureViewDescription      const &aDescription
+                                   , STextureViewDependencies     const &aDependencies
+                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
             CEngineResult<> destroy() final;
 
         public_members:

@@ -20,15 +20,17 @@ namespace engine
          * with textures inside the vulkan API.
          */
         class CVulkanRenderPassResource
-                : public CVkApiResource<SRenderPassDescription>
+                : public CVkApiResource<SRenderPass>
         {
             SHIRABE_DECLARE_LOG_TAG(CVulkanRenderPassResource);
 
         public_constructors:
-            using CVkApiResource<SRenderPassDescription>::CVkApiResource;
+            using CVkApiResource<SRenderPass>::CVkApiResource;
 
         public_methods:
-            CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) final;
+            CEngineResult<> create(  SRenderPassDescription       const &aDescription
+                                   , SRenderPassDependencies      const &aDependencies
+                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
             CEngineResult<> destroy()  final;
 
         public_members:

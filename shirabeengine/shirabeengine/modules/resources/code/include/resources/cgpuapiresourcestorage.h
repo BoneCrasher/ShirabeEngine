@@ -25,16 +25,16 @@ namespace engine::resources
         ~CGpuApiResourceStorage() = default;
 
     public_methods:
-        bool add(GpuApiHandle_t const &aId, engine::Unique<IGpuApiResourceObject> aResourceReference);
+        bool add(GpuApiHandle_t const &aId, engine::Shared<IGpuApiResourceObject> aResourceReference);
         void remove(GpuApiHandle_t const &aId);
 
-        Unique<IGpuApiResourceObject> const &get(GpuApiHandle_t const &aId) const;
+        Shared<IGpuApiResourceObject> const get(GpuApiHandle_t const &aId) const;
 
         template<typename T>
         T const *extract(GpuApiHandle_t const &aId) const;
 
     private_members:
-        std::unordered_map<GpuApiHandle_t, Unique <IGpuApiResourceObject>> mDependencies;
+        std::unordered_map<GpuApiHandle_t, Shared<IGpuApiResourceObject>> mDependencies;
     };
     //<-----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace engine::resources
     {
         T const *result = nullptr;
 
-        engine::Unique<IGpuApiResourceObject> const &ref = get(aId);
+        engine::Shared<IGpuApiResourceObject> const &ref = get(aId);
         if( nullptr != ref )
         {
             result = dynamic_cast<T *>(ref.get());

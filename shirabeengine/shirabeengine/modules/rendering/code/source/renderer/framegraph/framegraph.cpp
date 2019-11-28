@@ -287,7 +287,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId);
+                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, mResourceData.getAttachments(), mResourceData);
             }
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;

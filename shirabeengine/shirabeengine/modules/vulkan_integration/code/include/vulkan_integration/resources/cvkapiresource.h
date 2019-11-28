@@ -15,18 +15,17 @@ namespace engine
 {
     namespace vulkan
     {
-        template <typename TDescriptor>
+        template <typename TResource>
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT CVkApiResource
-            : public resources::AGpuApiResourceObject<TDescriptor>
+            : public resources::AGpuApiResourceObject<TResource>
             , public IVkApiResource
         {
         public_constructors:
             explicit CVkApiResource(  Shared<IVkGlobalContext>         aVkContext
-                                    , resources::GpuApiHandle_t const &aHandle
-                                    , TDescriptor               const &aDescription)
-                : resources::AGpuApiResourceObject<TDescriptor>::AGpuApiResourceObject(aDescription)
+                                    , resources::GpuApiHandle_t const &aHandle)
+                : resources::AGpuApiResourceObject<TResource>::AGpuApiResourceObject()
                 , mVkContext(std::move(aVkContext))
                 , mHandle   (aHandle)
             {}

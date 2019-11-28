@@ -22,7 +22,7 @@ namespace engine::framegraph
             Shared<IAssetStorage>    const &aAssetStorage,
             Shared<CMaterialLoader>  const &aMaterialLoader,
             Shared<CResourceManager> const &aResourceManager,
-            Shared<IRenderContext>   const &aRenderer)
+             Shared<IRenderContext>   const &aRenderer)
     {
         bool const inputInvalid =
                 nullptr == aAssetStorage    or
@@ -261,9 +261,8 @@ namespace engine::framegraph
 
         // This list will store the readable names of the texture views created upfront, so that the
         // framebuffer can bind to it.
-        std::vector<std::string> textureViewIds = {};
+        // std::vector<std::string> textureViewIds = {};
 
-        // asdfjialkfdaj;klfj;kl fd
         //
         // The derivation of whether something is an input/color/depth attachment or not is most likely broken.
 
@@ -325,7 +324,7 @@ namespace engine::framegraph
                 }
 
                 // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
-                textureViewIds.push_back(textureView.readableName);
+                // textureViewIds.push_back(textureView.readableName);
 
                 uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
 
@@ -379,10 +378,10 @@ namespace engine::framegraph
         renderPassDesc.attachmentExtent.width  = width;
         renderPassDesc.attachmentExtent.height = height;
         renderPassDesc.attachmentExtent.depth  = layers;
-        renderPassDesc.attachmentTextureViews  = textureViewIds;
+        // renderPassDesc.attachmentTextureViews  = textureViewIds;
 
         {
-            CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
+            CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc, {});
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
             {
                 return {EEngineStatus::Ok};
@@ -417,19 +416,18 @@ namespace engine::framegraph
     CEngineResult<> CFrameGraphRenderContext::createFrameBuffer(std::string const &aFrameBufferId,
                                                                 std::string const &aRenderPassId)
     {
-        Shared<SRenderPass>          renderPass     = std::static_pointer_cast<SRenderPass>(getUsedResource(aRenderPassId));
+        Shared<SRenderPass>          renderPass     = getUsedResourceTyped<SRenderPass>(aRenderPassId);
         SRenderPassDescription const renderPassDesc = renderPass->getDescription();
 
         SFrameBufferDescription frameBufferDesc = {};
-        frameBufferDesc.name                  = aFrameBufferId;
-        frameBufferDesc.referenceRenderPassId = aRenderPassId;
+        frameBufferDesc.name = aFrameBufferId;
+        // frameBufferDesc.referenceRenderPassId = aRenderPassId;
 
-        std::vector<std::string> const &textureViewIds = renderPassDesc.attachmentTextureViews;
 
         {
             std::vector<std::string> frameBufferDependencies {};
             frameBufferDependencies.push_back(renderPassDesc.name);
-            frameBufferDependencies.insert(frameBufferDependencies.end(), textureViewIds.begin(), textureViewIds.end());
+            // frameBufferDependencies.insert(frameBufferDependencies.end(), textureViewIds.begin(), textureViewIds.end());
 
             CEngineResult<Shared<ILogicalResourceObject>> status = mResourceManager->useDynamicResource<SFrameBuffer>(frameBufferDesc.name, frameBufferDesc, std::move(frameBufferDependencies));
             if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
@@ -453,11 +451,53 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::bindRenderPass(std::string const &aRenderPassId,
-                                                             std::string const &aFrameBufferId)
+    CEngineResult<> CFrameGraphRenderContext::bindRenderPass(std::string                     const &aRenderPassId,
+                                                             std::string                     const &aFrameBufferId,
+                                                             SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                                                             CFrameGraphMutableResources     const &aFrameGraphResources
+                                                             )
     {
-        Shared<ILogicalResourceObject> renderPass  = getUsedResource(aRenderPassId);
-        Shared<ILogicalResourceObject> frameBuffer = getUsedResource(aFrameBufferId);
+        Shared<SRenderPass>  renderPass  = getUsedResourceTyped<SRenderPass>(aRenderPassId);
+        Shared<SFrameBuffer> frameBuffer = getUsedResourceTyped<SFrameBuffer>(aFrameBufferId);
+
+        SRenderPassDescription const &renderPassDesc = renderPass->getDescription();
+
+        SRenderPassDependencies renderPassDependencies {};
+
+        FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementResourceIds();
+        for(auto const &[passUID, attachmentResourceIndexList] : aAttachmentInfo.getAttachmentPassAssignment())
+        {
+            SSubpassDescription subpassDesc = {};
+            for(auto const &index : attachmentResourceIndexList)
+            {
+                FrameGraphResourceId_t const &resourceId = attachmentResources.at(index);
+
+                CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                if(not textureViewFetch.successful())
+                {
+                    CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
+                    return { EEngineStatus::ResourceError_NotFound };
+                }
+
+                SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+
+                // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
+                renderPassDependencies.attachmentTextureViews.push_back(textureView.readableName);
+            }
+        }
+
+        EEngineStatus const renderPassLoaded = renderPass->load(renderPassDependencies); // Make sure the resource is loaded before it is used in a command...
+        EngineStatusPrintOnError(renderPassLoaded, logTag(), "Failed to load renderpass in backend.");
+        SHIRABE_RETURN_RESULT_ON_ERROR(EEngineStatus::Error);
+
+        SFrameBufferDependencies frameBufferDependencies {};
+        frameBufferDependencies.referenceRenderPassId  = aRenderPassId;
+        frameBufferDependencies.attachmentExtent       = renderPassDesc.attachmentExtent;
+        frameBufferDependencies.attachmentTextureViews = renderPassDependencies.attachmentTextureViews;
+
+        EEngineStatus const frameBufferLoaded = frameBuffer->load(frameBufferDependencies);
+        EngineStatusPrintOnError(frameBufferLoaded, logTag(), "Failed to load framebuffer in backend.");
+        SHIRABE_RETURN_RESULT_ON_ERROR(EEngineStatus::Error);
 
         EEngineStatus const status = mGraphicsAPIRenderContext->bindRenderPass(renderPass->getGpuApiResourceHandle(), frameBuffer->getGpuApiResourceHandle());
         if( not CheckEngineError(status))
@@ -624,7 +664,6 @@ namespace engine::framegraph
         STextureViewDescription desc = { };
         desc.name                 = aView.readableName;
         desc.textureFormat        = aView.format;
-        desc.subjacentTextureId   = aTexture.readableName;
         desc.subjacentTextureInfo = static_cast<graphicsapi::STextureInfo>(aTexture);
         desc.arraySlices          = aView.arraySliceRange;
         desc.mipMapSlices         = aView.mipSliceRange;
@@ -633,6 +672,14 @@ namespace engine::framegraph
         EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
 
         registerUsedResource(desc.name, textureViewObject.data());
+
+        Shared<STexture> texture = getUsedResourceTyped<STexture>(aTexture.readableName);
+        texture->load({});
+
+        STextureViewDependencies dependencies {};
+        dependencies.subjacentTextureId = aTexture.readableName;
+        Shared<STextureView> textureView = getUsedResourceTyped<STextureView>(aView.readableName);
+        textureView->load(dependencies);
 
         return textureViewObject.result();
     }
@@ -854,14 +901,14 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
     {
-        CEngineResult<Shared<SMaterial>> materialObject = mResourceManager->useAssetResource(aMaterial.readableName, aMaterial.materialAssetId);
+        CEngineResult<Shared<ILogicalResourceObject>> materialObject = mResourceManager->useAssetResource(aMaterial.readableName, aMaterial.materialAssetId);
         if(CheckEngineError(materialObject.result()))
         {
             CLog::Error(logTag(), "Cannot use material asset {} with id {}", aMaterial.readableName, aMaterial.materialAssetId);
             return materialObject.result();
         }
 
-        Shared<SMaterial> material = materialObject.data();
+        Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(materialObject.data());
         registerUsedResource(aMaterial.readableName, material);
 
         return materialObject.result();
@@ -874,16 +921,15 @@ namespace engine::framegraph
     CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial
                                                            , std::string       const &aRenderPassHandle)
     {
+        Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
+
         SMaterialDependencies dependencies {};
         dependencies.pipelineDependencies.referenceRenderPassId = aRenderPassHandle;
-
-        Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
+        dependencies.pipelineDependencies.subpass               = mCurrentSubpass;
+        dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
         EEngineStatus const status = material->load(dependencies);
 
-
-
-
-        auto const result = mGraphicsAPIRenderContext->bindPipeline(pipeline->getGpuApiResourceHandle());
+        auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
         return result;
     }
     //<-----------------------------------------------------------------------------
@@ -919,8 +965,8 @@ namespace engine::framegraph
     {
         SHIRABE_UNUSED(aMesh);
 
-        loadMaterialAsset  (aMaterial, "");
-        bindMaterial       (aMaterial);
+        loadMaterialAsset(aMaterial);
+        bindMaterial     (aMaterial, mCurrentRenderPassHandle);
 
         unbindMaterial     (aMaterial);
         unloadMaterialAsset(aMaterial);

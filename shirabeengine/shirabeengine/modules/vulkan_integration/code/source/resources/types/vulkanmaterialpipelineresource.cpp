@@ -5,6 +5,7 @@
 #include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"
+#include "vulkan_integration/resources/types/vulkanshadermoduleresource.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
 
 namespace engine::vulkan
@@ -12,13 +13,15 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanPipelineResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanPipelineResource::create(  SMaterialPipelineDescriptor   const &aDescription
+                                                    , SMaterialPipelineDependencies const &aDependencies
+                                                    , GpuApiResourceDependencies_t  const &aResolvedDependencies)
     {
+        CVkApiResource<SPipeline>::create(aDescription, aDependencies, aResolvedDependencies);
+
         VkDevice device = getVkContext()->getLogicalDevice();
 
-        SMaterialPipelineDescriptor const &desc = getDescription();
-
-        auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aDependencies.at(desc.referenceRenderPassId));
+        auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aResolvedDependencies.at(aDependencies.referenceRenderPassId));
 
         // Create the shader modules here...
         // IMPORTANT: The task backend receives access to the asset system to not have the raw data stored in the descriptors and requests...
@@ -34,79 +37,24 @@ namespace engine::vulkan
 
         VkRect2D scissor {};
         scissor.offset = { 0, 0 };
-        scissor.extent = { (uint32_t)desc.viewPort.width, (uint32_t)desc.viewPort.height };
+        scissor.extent = { (uint32_t)aDescription.viewPort.width, (uint32_t)aDescription.viewPort.height };
 
         VkPipelineViewportStateCreateInfo viewPortStateCreateInfo {};
         viewPortStateCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         viewPortStateCreateInfo.pNext          = nullptr;
         viewPortStateCreateInfo.flags          = 0;
         viewPortStateCreateInfo.viewportCount  = 1;
-        viewPortStateCreateInfo.pViewports     = &(desc.viewPort);
+        viewPortStateCreateInfo.pViewports     = &(aDescription.viewPort);
         viewPortStateCreateInfo.scissorCount   = 1;
         viewPortStateCreateInfo.pScissors      = &(scissor);
-
-        std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
-        std::vector<VkShaderModule>                  vkShaderModules;
-
-        for(auto const &[stage, dataAccessor] : desc.shaderStages)
-        {
-            if(not dataAccessor)
-            {
-                // If we don't have any data to access, then don't create a shader module.
-                continue;
-            }
-
-            ByteBuffer const data = dataAccessor();
-
-            // We need to convert from a regular 8-bit data buffer to uint32 words of SPIR-V.
-            // TODO: Refactor the asset system to permit loading 32-bit buffers...
-            std::vector<signed char> const &srcData      = data.dataVector();
-            uint32_t const                  srcDataSize  = srcData.size();
-
-            std::vector<uint32_t> convData {};
-            convData.resize( srcDataSize / 4 );
-
-            for(uint32_t k=0; k<srcDataSize; k += 4)
-            {
-                uint32_t const value = *reinterpret_cast<uint32_t const*>( srcData.data() + k );
-                convData[ k / 4 ] = value;
-            }
-
-            VkShaderModuleCreateInfo shaderModuleCreateInfo {};
-            shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-            shaderModuleCreateInfo.pNext    = nullptr;
-            shaderModuleCreateInfo.flags    = 0;
-            shaderModuleCreateInfo.pCode    = convData.data();
-            shaderModuleCreateInfo.codeSize = srcData.size();
-
-            VkShaderModule vkShaderModule = VK_NULL_HANDLE;
-            VkResult const moduleCreationResult = vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &vkShaderModule);
-            if(VkResult::VK_SUCCESS != moduleCreationResult)
-            {
-                CLog::Error(logTag(), "Failed to create shader module for stage {}", stage);
-                continue;
-            }
-            vkShaderModules.push_back(vkShaderModule);
-
-            VkPipelineShaderStageCreateInfo shaderStageCreateInfo {};
-            shaderStageCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-            shaderStageCreateInfo.pNext               = nullptr;
-            shaderStageCreateInfo.flags               = 0;
-            shaderStageCreateInfo.pName               = "main";
-            shaderStageCreateInfo.stage               = serialization::shaderStageFromPipelineStage(stage);
-            shaderStageCreateInfo.module              = vkShaderModule;
-            shaderStageCreateInfo.pSpecializationInfo = nullptr;
-
-            shaderStages.push_back(shaderStageCreateInfo);
-        }
 
         std::unordered_map<VkDescriptorType, uint32_t> typesAndSizes {};
         std::vector<VkDescriptorSetLayout>             setLayouts    {};
 
-        for(uint64_t k=0; k<desc.descriptorSetLayoutCreateInfos.size(); ++k)
+        for(uint64_t k=0; k<aDescription.descriptorSetLayoutCreateInfos.size(); ++k)
         {
-            std::vector<VkDescriptorSetLayoutBinding> bindings = desc.descriptorSetLayoutBindings[k];
-            VkDescriptorSetLayoutCreateInfo           info     = desc.descriptorSetLayoutCreateInfos[k];
+            std::vector<VkDescriptorSetLayoutBinding> bindings = aDescription.descriptorSetLayoutBindings[k];
+            VkDescriptorSetLayoutCreateInfo           info     = aDescription.descriptorSetLayoutCreateInfos[k];
 
             info.pBindings    = bindings.data();
             info.bindingCount = bindings.size();
@@ -148,7 +96,7 @@ namespace engine::vulkan
         vkDescriptorPoolCreateInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         vkDescriptorPoolCreateInfo.pNext         = nullptr;
         vkDescriptorPoolCreateInfo.flags         = 0;
-        vkDescriptorPoolCreateInfo.maxSets       = desc.descriptorSetLayoutCreateInfos.size();
+        vkDescriptorPoolCreateInfo.maxSets       = aDescription.descriptorSetLayoutCreateInfos.size();
         vkDescriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
         vkDescriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
 
@@ -200,28 +148,44 @@ namespace engine::vulkan
             }
         }
 
-        VkPipelineColorBlendStateCreateInfo colorBlending = desc.colorBlendState;
-        colorBlending.pAttachments    = desc.colorBlendAttachmentStates.data();
-        colorBlending.attachmentCount = desc.colorBlendAttachmentStates.size();
+        std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos {};
+        auto const *const shaderModule = getVkContext()->getResourceStorage()->extract<CVulkanShaderModuleResource>(aResolvedDependencies.at(aDependencies.shaderModuleId));
+        for(auto const &[stage, dataAccessor] : shaderModule->getCurrentDescriptor()->shaderStages)
+        {
+            VkPipelineShaderStageCreateInfo shaderStageCreateInfo {};
+            shaderStageCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            shaderStageCreateInfo.pNext               = nullptr;
+            shaderStageCreateInfo.flags               = 0;
+            shaderStageCreateInfo.pName               = "main";
+            shaderStageCreateInfo.stage               = serialization::shaderStageFromPipelineStage(stage);
+            shaderStageCreateInfo.module              = shaderModule->handles.at(stage);
+            shaderStageCreateInfo.pSpecializationInfo = nullptr;
+
+            shaderStageCreateInfos.push_back(shaderStageCreateInfo);
+        }
+
+        VkPipelineColorBlendStateCreateInfo colorBlending = aDescription.colorBlendState;
+        colorBlending.pAttachments    = aDescription.colorBlendAttachmentStates.data();
+        colorBlending.attachmentCount = aDescription.colorBlendAttachmentStates.size();
 
         VkGraphicsPipelineCreateInfo pipelineCreateInfo {};
         pipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineCreateInfo.pNext               = nullptr;
         pipelineCreateInfo.flags               = 0;
         pipelineCreateInfo.pVertexInputState   = &(vertexInputStateCreateInfo);
-        pipelineCreateInfo.pInputAssemblyState = &(desc.inputAssemblyState);
+        pipelineCreateInfo.pInputAssemblyState = &(aDescription.inputAssemblyState);
         pipelineCreateInfo.pViewportState      = &(viewPortStateCreateInfo);
-        pipelineCreateInfo.pRasterizationState = &(desc.rasterizerState);
-        pipelineCreateInfo.pMultisampleState   = &(desc.multiSampler);
-        pipelineCreateInfo.pDepthStencilState  = &(desc.depthStencilState);
+        pipelineCreateInfo.pRasterizationState = &(aDescription.rasterizerState);
+        pipelineCreateInfo.pMultisampleState   = &(aDescription.multiSampler);
+        pipelineCreateInfo.pDepthStencilState  = &(aDescription.depthStencilState);
         pipelineCreateInfo.pColorBlendState    = &(colorBlending);
         pipelineCreateInfo.pDynamicState       = nullptr;
         pipelineCreateInfo.pTessellationState  = nullptr;
         pipelineCreateInfo.layout              = vkPipelineLayout;
         pipelineCreateInfo.renderPass          = renderPass->handle;
-        pipelineCreateInfo.subpass             = desc.subpass;
-        pipelineCreateInfo.stageCount          = shaderStages.size();
-        pipelineCreateInfo.pStages             = shaderStages.data();
+        pipelineCreateInfo.subpass             = aDependencies.subpass;
+        pipelineCreateInfo.stageCount          = shaderStageCreateInfos.size();
+        pipelineCreateInfo.pStages             = shaderStageCreateInfos.data();
 
         VkPipeline pipelineHandle = VK_NULL_HANDLE;
         {
@@ -234,7 +198,6 @@ namespace engine::vulkan
         }
 
         this->pipeline       = pipelineHandle;
-        this->shaderModules  = vkShaderModules;
         this->descriptorPool = vkDescriptorPool;
         this->descriptorSets = vkDescriptorSets;
 
@@ -250,11 +213,6 @@ namespace engine::vulkan
         VkDevice device = getVkContext()->getLogicalDevice();
 
         vkDestroyDescriptorPool(device, this->descriptorPool, nullptr);
-        for(auto const &module : this->shaderModules)
-        {
-            vkDestroyShaderModule(device, module, nullptr);
-        }
-
         vkDestroyPipeline(device, this->pipeline, nullptr);
 
         return { EEngineStatus::Ok };

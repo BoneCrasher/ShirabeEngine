@@ -10,9 +10,13 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferViewResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanBufferViewResource::create(  SBufferViewDescription       const &aDescription
+                                                      , SBufferViewDependencies      const &aDependencies
+                                                      , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
-        GpuApiHandle_t        const        bufferGpuApiId = aDependencies.at(getDescription().bufferId);
+        CVkApiResource<SBufferView>::create(aDescription, aDependencies, aResolvedDependencies);
+
+        GpuApiHandle_t        const        bufferGpuApiId = aResolvedDependencies.at(aDependencies.bufferId);
         CVulkanBufferResource const *const bufferResource = getVkContext()->getResourceStorage()->extract<CVulkanBufferResource>(bufferGpuApiId);
 
         if(nullptr == bufferResource)
@@ -20,7 +24,7 @@ namespace engine::vulkan
             return { EEngineStatus::Error };
         }
 
-        VkBufferViewCreateInfo createInfo = getDescription().createInfo;
+        VkBufferViewCreateInfo createInfo = aDescription.createInfo;
         createInfo.buffer =  bufferResource->handle;
 
         VkBufferView vkBufferView = VK_NULL_HANDLE;

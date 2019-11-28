@@ -162,8 +162,10 @@ namespace engine
              * @return               EEngineStatus::Ok if successful.
              * @return               EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindRenderPass(std::string const &aRenderPassId,
-                                           std::string const &aFrameBufferId) override;
+            CEngineResult<> bindRenderPass(std::string                     const &aRenderPassId,
+                                           std::string                     const &aFrameBufferId,
+                                           SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                                           CFrameGraphMutableResources     const &aFrameGraphResources) override;
 
             /**
              * Unbind the framebuffer and render pass in the command buffer.
@@ -487,6 +489,12 @@ namespace engine
             void registerUsedResource(std::string const &aResourceId, Shared<ILogicalResourceObject> const &aResource);
             void unregisterUsedResource(std::string const &aResourceId);
             Shared<ILogicalResourceObject> getUsedResource(std::string const &aResourceId);
+
+            template <typename TResource>
+            Shared<TResource> getUsedResourceTyped(std::string const &aResourceId)
+            {
+                return std::static_pointer_cast<TResource>(getUsedResource(aResourceId));
+            }
 
         private_members:
             Shared<IAssetStorage>    mAssetStorage;

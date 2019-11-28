@@ -55,16 +55,21 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanBufferResource::create(  SBufferDescription           const &aDescription
+                                                  , SNoDependencies              const &aDependencies
+                                                  , GpuApiResourceDependencies_t const &aResolvedDependencies)
+
     {
-        SHIRABE_UNUSED(aDependencies);
+        SHIRABE_UNUSED(aResolvedDependencies);
+
+        CVkApiResource<SBuffer>::create(aDescription, aDependencies, aResolvedDependencies);
 
         Shared<IVkGlobalContext> vkContext = getVkContext();
 
         VkDevice         const &vkLogicalDevice  = vkContext->getLogicalDevice();
         VkPhysicalDevice const &vkPhysicalDevice = vkContext->getPhysicalDevice();
 
-        VkBufferCreateInfo createInfo = getDescription().createInfo;
+        VkBufferCreateInfo createInfo = aDescription.createInfo;
         createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         // createInfo.queueFamilyIndexCount = ...;
         // createInfo.pQueueFamilyIndices   = ...;

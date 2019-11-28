@@ -10,14 +10,15 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanTextureResource::create(  STextureDescription          const &aDescription
+                                                   , SNoDependencies              const &aDependencies
+                                                   , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
         SHIRABE_UNUSED(aDependencies);
+        SHIRABE_UNUSED(aResolvedDependencies);
 
         VkDevice         const &vkLogicalDevice  = getVkContext()->getLogicalDevice();
         VkPhysicalDevice const &vkPhysicalDevice = getVkContext()->getPhysicalDevice();
-
-        STextureDescription const desc = getDescription();
 
         VkImage        vkImage               = VK_NULL_HANDLE;
         VkDeviceMemory vkImageMemory         = VK_NULL_HANDLE;
@@ -37,11 +38,11 @@ namespace engine::vulkan
         SVulkanBufferCreationResult                bufferCreationResult  = {};
 
         VkImageType imageType = VkImageType::VK_IMAGE_TYPE_2D;
-        if(1 < desc.textureInfo.depth)
+        if(1 < aDescription.textureInfo.depth)
         {
             imageType = VkImageType::VK_IMAGE_TYPE_3D;
         }
-        else if(1 < desc.textureInfo.height)
+        else if(1 < aDescription.textureInfo.height)
         {
             imageType = VkImageType::VK_IMAGE_TYPE_2D;
         }
@@ -52,43 +53,43 @@ namespace engine::vulkan
 
         VkImageUsageFlags imageUsage = {};
         VkImageLayout     layout     = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
-        if(desc.gpuBinding.check(EBufferBinding::TextureInput))
+        if(aDescription.gpuBinding.check(EBufferBinding::TextureInput))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT;
         }
-        if(desc.gpuBinding.check(EBufferBinding::InputAttachment))
+        if(aDescription.gpuBinding.check(EBufferBinding::InputAttachment))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
         }
-        if(desc.gpuBinding.check(EBufferBinding::CopySource))
+        if(aDescription.gpuBinding.check(EBufferBinding::CopySource))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
         }
-        if(desc.gpuBinding.check(EBufferBinding::CopyTarget))
+        if(aDescription.gpuBinding.check(EBufferBinding::CopyTarget))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;
         }
-        if(desc.gpuBinding.check(EBufferBinding::ColorAttachment))
+        if(aDescription.gpuBinding.check(EBufferBinding::ColorAttachment))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         }
-        if(desc.gpuBinding.check(EBufferBinding::DepthAttachment))
+        if(aDescription.gpuBinding.check(EBufferBinding::DepthAttachment))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
         }
-        if(desc.gpuBinding.check(EBufferBinding::PresentSource))
+        if(aDescription.gpuBinding.check(EBufferBinding::PresentSource))
         {
             layout = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         }
 
         vkImageCreateInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         vkImageCreateInfo.imageType     = imageType;
-        vkImageCreateInfo.extent.width  = desc.textureInfo.width;
-        vkImageCreateInfo.extent.height = desc.textureInfo.height;
-        vkImageCreateInfo.extent.depth  = desc.textureInfo.depth;
-        vkImageCreateInfo.mipLevels     = desc.textureInfo.mipLevels;
-        vkImageCreateInfo.arrayLayers   = desc.textureInfo.arraySize;
-        vkImageCreateInfo.format        = CVulkanDeviceCapsHelper::convertFormatToVk(desc.textureInfo.format);
+        vkImageCreateInfo.extent.width  = aDescription.textureInfo.width;
+        vkImageCreateInfo.extent.height = aDescription.textureInfo.height;
+        vkImageCreateInfo.extent.depth  = aDescription.textureInfo.depth;
+        vkImageCreateInfo.mipLevels     = aDescription.textureInfo.mipLevels;
+        vkImageCreateInfo.arrayLayers   = aDescription.textureInfo.arraySize;
+        vkImageCreateInfo.format        = CVulkanDeviceCapsHelper::convertFormatToVk(aDescription.textureInfo.format);
         vkImageCreateInfo.usage         = imageUsage;
         vkImageCreateInfo.initialLayout = layout;
         vkImageCreateInfo.tiling        = VkImageTiling::VK_IMAGE_TILING_OPTIMAL;
@@ -163,7 +164,7 @@ namespace engine::vulkan
 
         stagingBufferCreation = __createVkBuffer(vkPhysicalDevice
                                                  , vkLogicalDevice
-                                                 , desc.textureInfo.width * desc.textureInfo.height  * 4
+                                                 , aDescription.textureInfo.width * aDescription.textureInfo.height  * 4
                                                  , VK_BUFFER_USAGE_TRANSFER_SRC_BIT
                                                  , VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         if(not stagingBufferCreation.successful())
@@ -200,7 +201,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::load()
     {
-        CResourceDataSource const &dataSource = getDescription().initialData[0];
+        CResourceDataSource const &dataSource = getCurrentDescriptor()->initialData[0];
         ByteBuffer          const &data       = dataSource.getData();
 
         return { EEngineStatus::Ok };
@@ -257,8 +258,10 @@ namespace engine::vulkan
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount     = 1;
 
+        STextureDescription const textureDesc = *getCurrentDescriptor();
+
         region.imageOffset = {0, 0, 0};
-        region.imageExtent = { getDescription().textureInfo.width, getDescription().textureInfo.height, 1 };
+        region.imageExtent = { textureDesc.textureInfo.width, textureDesc.textureInfo.height, 1 };
 
         // vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
         //                        , this->stagingBuffer

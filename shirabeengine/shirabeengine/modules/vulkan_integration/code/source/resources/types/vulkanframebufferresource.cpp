@@ -11,18 +11,18 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanFrameBufferResource::create(GpuApiResourceDependencies_t const &aDependencies)
+    CEngineResult<> CVulkanFrameBufferResource::create(  SFrameBufferDescription      const &aDescription
+                                                       , SFrameBufferDependencies     const &aDependencies
+                                                       , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
-        SFrameBufferDescription const &desc = getDescription();
+        CVkApiResource<SFrameBuffer>::create(aDescription, aDependencies, aResolvedDependencies);
 
-        auto                   const *const renderPass            = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aDependencies.at(desc.referenceRenderPassId));
-        SRenderPassDescription const       &renderPassDescription = renderPass->getDescription();
+        auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aResolvedDependencies.at(aDependencies.referenceRenderPassId));
 
         std::vector<VkImageView> textureViews {};
-
-        for(auto const &id : renderPassDescription.attachmentTextureViews)
+        for(auto const &id : aDependencies.attachmentTextureViews)
         {
-            auto const *const textureView = getVkContext()->getResourceStorage()->extract<CVulkanTextureViewResource>(aDependencies.at(id));
+            auto const *const textureView = getVkContext()->getResourceStorage()->extract<CVulkanTextureViewResource>(aResolvedDependencies.at(id));
             textureViews.push_back(textureView->handle);
         }
 
@@ -32,9 +32,9 @@ namespace engine::vulkan
         vkFrameBufferCreateInfo.pAttachments    = textureViews.data();
         vkFrameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(textureViews.size());
         vkFrameBufferCreateInfo.renderPass      = renderPass->handle;
-        vkFrameBufferCreateInfo.width           = renderPassDescription.attachmentExtent.width;
-        vkFrameBufferCreateInfo.height          = renderPassDescription.attachmentExtent.height;
-        vkFrameBufferCreateInfo.layers          = renderPassDescription.attachmentExtent.depth;
+        vkFrameBufferCreateInfo.width           = aDependencies.attachmentExtent.width;
+        vkFrameBufferCreateInfo.height          = aDependencies.attachmentExtent.height;
+        vkFrameBufferCreateInfo.layers          = aDependencies.attachmentExtent.depth;
         vkFrameBufferCreateInfo.flags           = 0;
 
         VkFramebuffer vkFrameBuffer = VK_NULL_HANDLE;
