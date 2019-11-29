@@ -59,7 +59,7 @@ namespace engine
              * @param aMaterialId
              * @return
              */
-            CEngineResult <Shared<CMaterialMaster>> loadMaterialInstance(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId);
+            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId);
 
             /**
              * @brief destroyMaterialInstance

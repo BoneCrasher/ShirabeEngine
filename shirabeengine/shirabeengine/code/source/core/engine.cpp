@@ -427,7 +427,7 @@ namespace engine
                     for(auto const &material : materials)
                         renderableCollection.push_back({ name
                                                          , 0
-                                                         , material->getMaterialInstance()->getAssetId() });
+                                                         , material->getMaterialInstance()->master()->getAssetId() });
             }
 
             mRenderer->renderScene(renderableCollection);

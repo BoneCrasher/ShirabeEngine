@@ -22,15 +22,15 @@ namespace engine::ecws
 
 		EEngineStatus update(CTimer const &aTimer) final;
 
-		EEngineStatus setMaterialInstance(Shared<material::CMaterialMaster> aMaterialInstance);
+		EEngineStatus setMaterialInstance(Shared<material::CMaterialInstance> aMaterialInstance);
 
 		[[nodiscard]]
 		SHIRABE_INLINE
-		Shared<material::CMaterialMaster> const getMaterialInstance() const { return mMaterialInstance; }
+		Shared<material::CMaterialInstance> const getMaterialInstance() const { return mMaterialInstance; }
 
 	private_members:
-	    std::string                       mName;
-	    Shared<material::CMaterialMaster> mMaterialInstance;
+	    std::string                         mName;
+	    Shared<material::CMaterialInstance> mMaterialInstance;
 	};
 
 }

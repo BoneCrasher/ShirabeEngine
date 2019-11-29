@@ -71,9 +71,13 @@ uniform struct_graphicsData
 //
 // Set 1: Reserved for future use
 //
-// layout (std140, set = 1, binding = 0)
-// uniform Reserved
-// {
-//     float _UNUSED;
-// }
-// reserved;
+layout (std140, set = 1, binding = 1)
+uniform Reserved
+{
+    float  _UNUSED;
+    vec2   _UNUSED2;
+    vec3   _UNUSED3;
+    vec4   _UNUSED4;
+    mat4   _UNUSED5;
+}
+reserved;

@@ -752,7 +752,7 @@ namespace engine
                 , public engine::serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>
         {
         public_static_functions:
-            static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial);
+            static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers = false);
 
         public_constructors:
             /**
@@ -1090,7 +1090,6 @@ namespace engine
                 : asset::CAssetReference (aAssetUID)
                 , mName                  (aName                )
                 , mSignature             (std::move(aSignature))
-                , mConfiguration         (std::move(aConfig)   )
             {}
 
             SHIRABE_INLINE
@@ -1098,7 +1097,6 @@ namespace engine
                 : asset::CAssetReference (aOther.getAssetId())
                 , mName                  (aOther.mName         )
                 , mSignature             (aOther.mSignature    )
-                , mConfiguration         (aOther.mConfiguration)
             {}
 
             SHIRABE_INLINE
@@ -1106,7 +1104,6 @@ namespace engine
                 : asset::CAssetReference (aOther.getAssetId())
                 , mName                  (std::move(aOther.mName         ))
                 , mSignature             (std::move(aOther.mSignature    ))
-                , mConfiguration         (std::move(aOther.mConfiguration))
             {}
 
         public_destructors:
@@ -1118,9 +1115,8 @@ namespace engine
             {
                 asset::CAssetReference::operator=(aOther.getAssetId());
 
-                mName          = aOther.mName;
-                mSignature     = aOther.mSignature;
-                mConfiguration = aOther.mConfiguration;
+                mName      = aOther.mName;
+                mSignature = aOther.mSignature;
 
                 return (*this);
             }
@@ -1130,9 +1126,8 @@ namespace engine
             {
                 asset::CAssetReference::operator=(aOther.getAssetId());
 
-                mName          = std::move(aOther.mName         );
-                mSignature     = std::move(aOther.mSignature    );
-                mConfiguration = std::move(aOther.mConfiguration);
+                mName      = std::move(aOther.mName     );
+                mSignature = std::move(aOther.mSignature);
 
                 return (*this);
             }
@@ -1150,20 +1145,12 @@ namespace engine
                 return mSignature;
             }
 
-            SHIRABE_INLINE
-            CMaterialConfig const &config() const
-            {
-                return mConfiguration;
-            }
-
-
         private_methods:
             friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
 
         private_members:
             std::string        mName;
             SMaterialSignature mSignature;
-            CMaterialConfig    mConfiguration;
         };
 
         /**
@@ -1174,34 +1161,21 @@ namespace engine
          * base configuration value changes or shader file updates.
          */
         class CMaterialInstance
-                : public asset::CAssetReference
         {
             public_constructors:
                 CMaterialInstance() = default;
 
                 SHIRABE_INLINE
-                CMaterialInstance(asset::AssetId_t                 const &aAssetUID,
-                                  std::string                      const &aName,
-                                  CMaterialConfig                       &&aConfig,
-                                  Shared<CMaterialMaster> const &aMaster)
-                    : asset::CAssetReference (aAssetUID)
-                    , mName                  (aName                )
-                    , mConfiguration         (std::move(aConfig)   )
-                    , mMasterReference       (aMaster              )
+                explicit CMaterialInstance(std::string             const &aName,
+                                           Shared<CMaterialMaster>        aMaster)
+                    : mName           ( aName            )
+                    , mConfiguration  (                  )
+                    , mMasterReference(std::move(aMaster))
                 {}
 
                 SHIRABE_INLINE
-                CMaterialInstance(CMaterialInstance const &aOther)
-                    : asset::CAssetReference (aOther.getAssetId()    )
-                    , mName                  (aOther.mName           )
-                    , mConfiguration         (aOther.mConfiguration  )
-                    , mMasterReference       (aOther.mMasterReference)
-                {}
-
-                SHIRABE_INLINE
-                CMaterialInstance(CMaterialInstance &&aOther)
-                    : asset::CAssetReference (aOther.getAssetId()               )
-                    , mName                  (std::move(aOther.mName           ))
+                explicit CMaterialInstance(CMaterialInstance &&aOther)
+                    : mName                  (std::move(aOther.mName           ))
                     , mConfiguration         (std::move(aOther.mConfiguration  ))
                     , mMasterReference       (std::move(aOther.mMasterReference))
                 {}
@@ -1211,22 +1185,8 @@ namespace engine
 
             public_operators:
                 SHIRABE_INLINE
-                CMaterialInstance &operator=(CMaterialInstance const &aOther)
-                {
-                    asset::CAssetReference::operator=(aOther.getAssetId());
-
-                    mName            = aOther.mName;
-                    mConfiguration   = aOther.mConfiguration;
-                    mMasterReference = aOther.mMasterReference;
-
-                    return (*this);
-                }
-
-                SHIRABE_INLINE
                 CMaterialInstance &operator=(CMaterialInstance &&aOther)
                 {
-                    asset::CAssetReference::operator=(aOther.getAssetId());
-
                     mName            = std::move(aOther.mName           );
                     mMasterReference = std::move(aOther.mMasterReference);
                     mConfiguration   = std::move(aOther.mConfiguration  );
@@ -1244,7 +1204,7 @@ namespace engine
                 SHIRABE_INLINE
                 CMaterialConfig const &config() const
                 {
-                    return mConfiguration;
+                    return *mConfiguration;
                 }
 
                 SHIRABE_INLINE
@@ -1253,10 +1213,12 @@ namespace engine
                     return mMasterReference;
                 }
 
+                EEngineStatus createConfiguration(bool aIncludeSystemBuffers = false);
+
         private_members:
-            std::string                      mName;
-            CMaterialConfig                  mConfiguration;
-            Shared<CMaterialMaster> mMasterReference;
+            std::string                    mName;
+            std::optional<CMaterialConfig> mConfiguration;
+            Shared<CMaterialMaster>        mMasterReference;
         };
 
 

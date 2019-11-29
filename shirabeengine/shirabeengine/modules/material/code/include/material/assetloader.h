@@ -261,11 +261,11 @@ namespace engine::material
                 return nullptr;
             }
 
-            Shared<CMaterialMaster> const &master    = instance; // instance->master();
+            Shared<CMaterialMaster> const &master    = instance->master();
             SMaterialSignature      const &signature = master  ->signature();
             CMaterialConfig         const &config    = instance->config();
 
-            auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), master->config());
+            auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config());
             //master->setPipelineDescription    (pipelineDescription);
             //master->setShaderModuleDescription(shaderModuleDescription);
             //master->setBufferDescriptions     (bufferDescriptions);

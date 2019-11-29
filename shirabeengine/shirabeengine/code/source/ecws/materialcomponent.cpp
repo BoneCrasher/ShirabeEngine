@@ -34,7 +34,7 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    EEngineStatus CMaterialComponent::setMaterialInstance(Shared<material::CMaterialMaster> aMaterialInstance)
+    EEngineStatus CMaterialComponent::setMaterialInstance(Shared<material::CMaterialInstance> aMaterialInstance)
     {
         if(nullptr == aMaterialInstance)
         {

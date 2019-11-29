@@ -122,12 +122,14 @@ namespace engine
         using MasterMaterialReturn_t = std::tuple<bool, std::string, SMaterialMeta, SMaterialSignature, CMaterialConfig>;
 
         static
-        auto loadMasterMaterialFiles(std::string                              const &aLogTag,
-                                Shared<asset::IAssetStorage>                   const &aAssetStorage,
-                                Map<asset::AssetID_t, Shared<CMaterialMaster>>       &aMasterMaterialIndex,
-                                asset::AssetID_t                               const &aMasterMaterialAssetId)
+        auto loadMasterMaterialFiles(std::string                                    const &aLogTag,
+                                     Shared<asset::IAssetStorage>                   const &aAssetStorage,
+                                     Map<asset::AssetID_t, Shared<CMaterialMaster>>       &aMasterMaterialIndex,
+                                     asset::AssetID_t                               const &aMasterMaterialAssetId)
             -> MasterMaterialReturn_t
         {
+            SHIRABE_UNUSED(aMasterMaterialIndex);
+
             AssetID_t              const masterIndexId    = aMasterMaterialAssetId; // Needs to be here, since it will be shared across both case-blocks.
             CResult<SMaterialMeta>       masterIndexFetch = {};
 
@@ -151,21 +153,21 @@ namespace engine
                 SHIRABE_RETURN_VALUE_ON_ERROR(signatureFetchResult, failureReturnValue);
             }
 
-            auto const [configAssetFetchResult, configAsset] = aAssetStorage->loadAsset(metaData.configurationAssetUid);
-            {
-                PrintEngineError(configAssetFetchResult, aLogTag, "Could not fetch configuration asset data.");
-                SHIRABE_RETURN_VALUE_ON_ERROR(configAssetFetchResult, failureReturnValue);
-            }
+            // auto const [configAssetFetchResult, configAsset] = aAssetStorage->loadAsset(metaData.configurationAssetUid);
+            // {
+            //     PrintEngineError(configAssetFetchResult, aLogTag, "Could not fetch configuration asset data.");
+            //     SHIRABE_RETURN_VALUE_ON_ERROR(configAssetFetchResult, failureReturnValue);
+            // }
 
-            auto const [configFetchResult, config] = readMaterialConfig(aLogTag, aAssetStorage, configAsset.id);
-            {
-                PrintEngineError(configFetchResult, aLogTag, "Could not fetch configuration data.");
-                SHIRABE_RETURN_VALUE_ON_ERROR(configFetchResult, failureReturnValue);
-            }
+            //auto const [configFetchResult, config] = readMaterialConfig(aLogTag, aAssetStorage, configAsset.id);
+            //{
+            //    PrintEngineError(configFetchResult, aLogTag, "Could not fetch configuration data.");
+            //    SHIRABE_RETURN_VALUE_ON_ERROR(configFetchResult, failureReturnValue);
+            //}
 
             std::string        const  masterName      = metaData.name;
             SMaterialSignature const &masterSignature = signature;
-            CMaterialConfig    const &masterConfig    = config;
+            CMaterialConfig    const &masterConfig    = {}; // config;
 
             return { true, masterName, metaData, masterSignature, masterConfig };
         }
@@ -201,7 +203,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<Shared<CMaterialMaster>> CMaterialLoader::loadMaterialInstance(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId)
+        CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::loadMaterialInstance(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId)
         {
             CEngineResult<ByteBuffer> data = {};
 
@@ -225,18 +227,31 @@ namespace engine
 
             //
             // If the material has been loaded already, return it!
-            // TODO: Material reload on filesystem change?
             //
+            Shared<CMaterialMaster> master = nullptr;
+
             if(mInstantiatedMaterialMasters.end() != mInstantiatedMaterialMasters.find(masterIndexId))
             {
-                return { EEngineStatus::Ok, mInstantiatedMaterialMasters.at(masterIndexId) };
+                master = mInstantiatedMaterialMasters.at(masterIndexId);
+            }
+            else
+            {
+                auto[successful, masterName, masterMeta, masterSignature, masterConfig] = loadMasterMaterialFiles(logTag(), aAssetStorage, mInstantiatedMaterialMasters, masterIndexId);
+                {
+                    PrintEngineError(not successful, logTag(), "Couldn't fetch master material data.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
+                }
+
+                master = makeShared<CMaterialMaster>(masterIndexId, masterName, std::move(masterSignature), std::move(masterConfig));
+                mInstantiatedMaterialMasters[master->getAssetId()] = master;
             }
 
-            auto [successful, masterName, masterMeta, masterSignature, masterConfig] = loadMasterMaterialFiles(logTag(), aAssetStorage, mInstantiatedMaterialMasters, masterIndexId);
+            if(nullptr == master)
             {
-                PrintEngineError(not successful, logTag(), "Couldn't fetch master material data.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
+                return { EEngineStatus::Error, nullptr };
             }
+
+            Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>();
 
             //--------------------------------------------------------------------------------------------------------------------
             // Override instance with master config.
@@ -246,13 +261,12 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Create Material instance
             //--------------------------------------------------------------------------------------------------------------------
-            Shared<CMaterialMaster> master = makeShared<CMaterialMaster>  (masterIndexId, masterName, std::move(masterSignature), std::move(masterConfig));
             // Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
 
-            mInstantiatedMaterialMasters  [master->getAssetId()] = master;
+
             // mInstantiatedMaterialInstances[instance->getAssetId()] = instance;
 
-            return { EEngineStatus::Ok, master };
+            return { EEngineStatus::Ok, instance };
         }
         //<-----------------------------------------------------------------------------
 
