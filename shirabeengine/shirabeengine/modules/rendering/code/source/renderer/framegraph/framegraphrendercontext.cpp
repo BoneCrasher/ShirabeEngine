@@ -929,6 +929,11 @@ namespace engine::framegraph
         dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
         EEngineStatus const status = material->load(dependencies);
 
+        for(auto const &buffer : material->bufferResources)
+        {
+            mGraphicsAPIRenderContext->transferBufferData(..., buffer->getGpuApiResourceHandle());
+        }
+
         auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
         return result;
     }

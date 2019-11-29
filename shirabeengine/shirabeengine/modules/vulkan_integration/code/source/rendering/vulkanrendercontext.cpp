@@ -150,6 +150,38 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle)
+        {
+            auto const *const gpuBuffer = mVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aGpuBufferHandle);
+            if(nullptr == gpuBuffer)
+            {
+                return EEngineStatus::Error;
+            }
+
+            VkDevice device = mVulkanEnvironment->getLogicalDevice();
+
+            VkDeviceSize     const offset = 0;
+            VkDeviceSize     const size   = aDataSource.size();
+            VkMemoryMapFlags const flags  = 0;
+
+            void *data = nullptr;
+            VkResult const result = vkMapMemory(device, gpuBuffer->attachedMemory, offset, size, flags, &data);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                CLog::Error(logTag(), "Failed to map vulkan buffer w/ handle {}", aGpuBufferHandle);
+                return EEngineStatus::Error;
+            }
+
+            memcpy(data, (void*)aDataSource.data(), size);
+            vkUnmapMemory(device, gpuBuffer->attachedMemory);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::beginGraphicsCommandBuffer()

@@ -252,19 +252,7 @@ namespace engine
             }
 
             Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>();
-
-            //--------------------------------------------------------------------------------------------------------------------
-            // Override instance with master config.
-            //--------------------------------------------------------------------------------------------------------------------
-            // instanceConfig.override(masterConfig);
-
-            //--------------------------------------------------------------------------------------------------------------------
-            // Create Material instance
-            //--------------------------------------------------------------------------------------------------------------------
-            // Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceIndexAssetId, instanceName, std::move(instanceConfig),  master);
-
-
-            // mInstantiatedMaterialInstances[instance->getAssetId()] = instance;
+            instance->createConfiguration()
 
             return { EEngineStatus::Ok, instance };
         }

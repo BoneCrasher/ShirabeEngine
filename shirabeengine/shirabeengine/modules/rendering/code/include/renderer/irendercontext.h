@@ -62,6 +62,8 @@ namespace engine
              */
             virtual EEngineStatus copyToBackBuffer(GpuApiHandle_t const &aImageId) = 0;
 
+            virtual EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) = 0;
+
             /**
              * Put the current internal command buffer into recording mode.
              *

@@ -72,7 +72,6 @@ namespace engine
 
         private_members:
             Map <asset::AssetID_t, Shared<CMaterialMaster>>   mInstantiatedMaterialMasters;
-            Map <asset::AssetID_t, Shared<CMaterialInstance>> mInstantiatedMaterialInstances;
         };
 
     }
