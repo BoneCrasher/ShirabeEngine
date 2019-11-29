@@ -17,6 +17,14 @@ namespace engine::vulkan
                                                     , SMaterialPipelineDependencies const &aDependencies
                                                     , GpuApiResourceDependencies_t  const &aResolvedDependencies)
     {
+        if(EGpuApiResourceState::Loaded == getResourceState()
+           || EGpuApiResourceState::Loading == getResourceState())
+        {
+            return EEngineStatus::Ok;
+        }
+
+        setResourceState(EGpuApiResourceState::Loading);
+
         CVkApiResource<SPipeline>::create(aDescription, aDependencies, aResolvedDependencies);
 
         VkDevice device = getVkContext()->getLogicalDevice();
@@ -201,6 +209,8 @@ namespace engine::vulkan
         this->descriptorPool = vkDescriptorPool;
         this->descriptorSets = vkDescriptorSets;
 
+        setResourceState(EGpuApiResourceState::Loaded);
+
         return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
@@ -214,6 +224,8 @@ namespace engine::vulkan
 
         vkDestroyDescriptorPool(device, this->descriptorPool, nullptr);
         vkDestroyPipeline(device, this->pipeline, nullptr);
+
+        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

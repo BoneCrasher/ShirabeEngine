@@ -14,6 +14,14 @@ namespace engine::vulkan
                                                        , STextureViewDependencies     const &aDependencies
                                                        , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
+        if(EGpuApiResourceState::Loaded == getResourceState()
+           || EGpuApiResourceState::Loading == getResourceState())
+        {
+            return EEngineStatus::Ok;
+        }
+
+        setResourceState(EGpuApiResourceState::Loading);
+
         CVkApiResource<STextureView>::create(aDescription, aDependencies, aResolvedDependencies);
 
         auto const *const textureResource = getVkContext()->getResourceStorage()->extract<CVulkanTextureResource>(aResolvedDependencies.at(aDependencies.subjacentTextureId));
@@ -80,6 +88,8 @@ namespace engine::vulkan
 
         VkImageView vkImageView = VK_NULL_HANDLE;
 
+        CLog::Debug(logTag(), "Creating textureview w/ name {}", aDescription.name);
+
         VkResult result = vkCreateImageView(getVkContext()->getLogicalDevice(), &vkImageViewCreateInfo, nullptr, &vkImageView);
         if(VkResult::VK_SUCCESS != result)
         {
@@ -88,6 +98,8 @@ namespace engine::vulkan
         }
 
         this->handle = vkImageView;
+
+        setResourceState(EGpuApiResourceState::Loaded);
 
         return { EEngineStatus::Ok };
     }
@@ -101,7 +113,11 @@ namespace engine::vulkan
         VkImageView vkImageView     = this->handle;
         VkDevice    vkLogicalDevice = getVkContext()->getLogicalDevice();
 
+        CLog::Debug(logTag(), "Destroying textureview w/ name {}", getCurrentDescriptor()->name);
+
         vkDestroyImageView(vkLogicalDevice, vkImageView, nullptr);
+
+        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

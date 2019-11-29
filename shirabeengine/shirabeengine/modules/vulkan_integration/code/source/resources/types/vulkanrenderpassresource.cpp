@@ -13,6 +13,14 @@ namespace engine::vulkan
                                                       , SRenderPassDependencies      const &aDependencies
                                                       , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
+        if(EGpuApiResourceState::Loaded == getResourceState()
+           || EGpuApiResourceState::Loading == getResourceState())
+        {
+            return EEngineStatus::Ok;
+        }
+
+        setResourceState(EGpuApiResourceState::Loading);
+
         CVkApiResource<SRenderPass>::create(aDescription, aDependencies, aResolvedDependencies);
 
         SHIRABE_UNUSED(aResolvedDependencies);
@@ -111,6 +119,8 @@ namespace engine::vulkan
 
         this->handle = vkRenderPass;
 
+        setResourceState(EGpuApiResourceState::Loaded);
+
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
@@ -121,6 +131,8 @@ namespace engine::vulkan
     CEngineResult<> CVulkanRenderPassResource::destroy()
     {
         vkDestroyRenderPass(getVkContext()->getLogicalDevice(), this->handle, nullptr);
+
+        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

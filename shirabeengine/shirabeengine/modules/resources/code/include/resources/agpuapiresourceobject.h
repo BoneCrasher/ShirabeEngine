@@ -64,7 +64,7 @@ namespace engine
             SHIRABE_INLINE void setResourceState(EGpuApiResourceState const &aState)
             {
                 mState = aState;
-                observableState()->notify(makeSharedFromThis(this), mState);
+                // observableState()->notify(makeSharedFromThis(this), mState);
             };
 
             SHIRABE_INLINE void setCurrentDescriptor(typename TResource::Descriptor_t const &aDescriptor)

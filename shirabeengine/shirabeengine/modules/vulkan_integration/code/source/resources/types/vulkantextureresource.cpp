@@ -17,6 +17,18 @@ namespace engine::vulkan
         SHIRABE_UNUSED(aDependencies);
         SHIRABE_UNUSED(aResolvedDependencies);
 
+        if(EGpuApiResourceState::Loaded == getResourceState()
+           || EGpuApiResourceState::Loading == getResourceState())
+        {
+            return EEngineStatus::Ok;
+        }
+
+        setResourceState(EGpuApiResourceState::Loading);
+
+        CVkApiResource<STexture>::create(aDescription, aDependencies, aResolvedDependencies);
+
+        CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
+
         VkDevice         const &vkLogicalDevice  = getVkContext()->getLogicalDevice();
         VkPhysicalDevice const &vkPhysicalDevice = getVkContext()->getPhysicalDevice();
 
@@ -158,7 +170,7 @@ namespace engine::vulkan
         result = vkCreateSampler(vkLogicalDevice, &vkSamplerCreateInfo, nullptr, &vkSampler);
         if(VkResult::VK_SUCCESS != result)
         {
-            CLog::Error(logTag(), CString::format("Failed to allocate image memory on GPU. Vulkan error: {}", result));
+            CLog::Error(logTag(), CString::format("Failed to create sampler. Vulkan error: {}", result));
             goto fail;
         }
 
@@ -184,6 +196,14 @@ namespace engine::vulkan
         this->stagingBuffer       = vkStagingBuffer;
         this->stagingBufferMemory = vkStagingBufferMemory;
 
+        getVkContext()->registerDebugObjectName((uint64_t)this->imageHandle,         VK_OBJECT_TYPE_IMAGE,         aDescription.name);
+        getVkContext()->registerDebugObjectName((uint64_t)this->imageMemory,         VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_Memory");
+        getVkContext()->registerDebugObjectName((uint64_t)this->attachedSampler,     VK_OBJECT_TYPE_SAMPLER,       std::string(aDescription.name) + "_Sampler");
+        getVkContext()->registerDebugObjectName((uint64_t)this->stagingBuffer,       VK_OBJECT_TYPE_BUFFER,        std::string(aDescription.name) + "_StagingBuffer");
+        getVkContext()->registerDebugObjectName((uint64_t)this->stagingBufferMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_StagingBufferMemory");
+
+        setResourceState(EGpuApiResourceState::Loaded);
+
         return { EEngineStatus::Ok };
 
         fail:
@@ -192,6 +212,9 @@ namespace engine::vulkan
         vkDestroySampler(vkLogicalDevice, vkSampler,             nullptr);
         vkDestroyBuffer (vkLogicalDevice, vkStagingBuffer,       nullptr);
         vkFreeMemory    (vkLogicalDevice, vkStagingBufferMemory, nullptr);
+
+        setResourceState(EGpuApiResourceState::Error);
+
         return { EEngineStatus::Error };
     }
     //<-----------------------------------------------------------------------------
@@ -231,11 +254,15 @@ namespace engine::vulkan
 
         VkDevice       vkLogicalDevice = getVkContext()->getLogicalDevice();
 
+        CLog::Debug(logTag(), "Destroying texture w/ name {}", getCurrentDescriptor()->name);
+
         vkDestroySampler(vkLogicalDevice, vkSampler,      nullptr);
         vkFreeMemory    (vkLogicalDevice, vkImageMemory,  nullptr);
         vkDestroyImage  (vkLogicalDevice, vkImage,        nullptr);
         vkFreeMemory    (vkLogicalDevice, vkBufferMemory, nullptr);
         vkDestroyBuffer (vkLogicalDevice, vkBuffer,       nullptr);
+
+        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

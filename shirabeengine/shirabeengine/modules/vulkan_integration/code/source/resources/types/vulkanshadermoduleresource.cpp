@@ -23,6 +23,14 @@ namespace engine::vulkan
     {
         SHIRABE_UNUSED(aResolvedDependencies);
 
+        if(EGpuApiResourceState::Loaded == getResourceState()
+           || EGpuApiResourceState::Loading == getResourceState())
+        {
+            return EEngineStatus::Ok;
+        }
+
+        setResourceState(EGpuApiResourceState::Loading);
+
         CVkApiResource<SShaderModule>::create(aDescription, aDependencies, aResolvedDependencies);
 
         Shared<IVkGlobalContext> vkContext = getVkContext();
@@ -73,6 +81,8 @@ namespace engine::vulkan
 
         this->handles = vkShaderModules;
 
+        setResourceState(EGpuApiResourceState::Loaded);
+
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
@@ -107,6 +117,10 @@ namespace engine::vulkan
             vkDestroyShaderModule(device, module, nullptr);
         }
         this->handles.clear();
+
+        setResourceState(EGpuApiResourceState::Discarded);
+
+        return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
 }

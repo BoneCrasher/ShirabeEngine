@@ -183,6 +183,12 @@ namespace engine {
         {
             CEngineResult<Shared<ILogicalResourceObject>> result = {EEngineStatus::Error, nullptr };
 
+            auto const alreadyFoundIt = mResourceObjects.find(aResourceId);
+            if(mResourceObjects.end() != mResourceObjects.find(aResourceId))
+            {
+                return { EEngineStatus::Ok, alreadyFoundIt->second };
+            }
+
             // Static dependencies
             insertDependencies(mResourceTree, aResourceId, std::move(aStaticDependencies));
 
@@ -191,11 +197,14 @@ namespace engine {
             GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>();
             resource->setGpuApiResourceHandle(gpuApiResourceId);
 
-            auto const loader = [&, this] (typename TResource::Dependencies_t const &aDependencies, std::vector<ResourceId_t> &&aDynamicDependencies) -> EEngineStatus
+            auto const loader = [aResourceId, aDescriptor, gpuApiResourceId, this] (typename TResource::Dependencies_t const &aDependencies, std::vector<ResourceId_t> &&aDynamicDependencies) -> EEngineStatus
             {
                 insertDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
                 auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-                CEngineResult<> const result = std::static_pointer_cast<AGpuApiResourceObject<TResource>>(mGpuApiResourceObjectFactory->get(gpuApiResourceId))->create(aDescriptor, aDependencies, dependenciesResolved);
+
+                Shared<IGpuApiResourceObject>            gpuResourceObject   = mGpuApiResourceObjectFactory->get(gpuApiResourceId);
+                Shared<AGpuApiResourceObject<TResource>> resourceObjectTyped = std::static_pointer_cast<AGpuApiResourceObject<TResource>>(gpuResourceObject);
+                CEngineResult<> const result = resourceObjectTyped->create(aDescriptor, aDependencies, dependenciesResolved);
                 return result.result();
             };
 

@@ -589,8 +589,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeResources(
-                Shared<IFrameGraphRenderContext>      &aRenderContext,
-                FrameGraphResourceIdList                  const&aResourceIds)
+                Shared<IFrameGraphRenderContext>       &aRenderContext,
+                FrameGraphResourceIdList         const &aResourceIds)
         {
             SHIRABE_UNUSED(aRenderContext);
 

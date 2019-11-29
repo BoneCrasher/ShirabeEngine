@@ -246,7 +246,14 @@ namespace engine
             SHIRABE_INLINE
             EEngineStatus load(SFrameBufferDependencies const &aDependencies) override
             {
-                return loadGpuApiResource(aDependencies, { aDependencies.referenceRenderPassId });
+                std::vector<ResourceId_t> dependencies {};
+                dependencies.push_back(aDependencies.referenceRenderPassId);
+                for(auto const &view : aDependencies.attachmentTextureViews)
+                {
+                    dependencies.push_back(view);
+                }
+
+                return loadGpuApiResource(aDependencies, std::move(dependencies));
             }
 
             SHIRABE_INLINE

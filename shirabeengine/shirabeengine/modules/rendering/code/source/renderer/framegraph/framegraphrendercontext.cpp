@@ -488,7 +488,7 @@ namespace engine::framegraph
 
         EEngineStatus const renderPassLoaded = renderPass->load(renderPassDependencies); // Make sure the resource is loaded before it is used in a command...
         EngineStatusPrintOnError(renderPassLoaded, logTag(), "Failed to load renderpass in backend.");
-        SHIRABE_RETURN_RESULT_ON_ERROR(EEngineStatus::Error);
+        SHIRABE_RETURN_RESULT_ON_ERROR(renderPassLoaded);
 
         SFrameBufferDependencies frameBufferDependencies {};
         frameBufferDependencies.referenceRenderPassId  = aRenderPassId;
@@ -497,7 +497,7 @@ namespace engine::framegraph
 
         EEngineStatus const frameBufferLoaded = frameBuffer->load(frameBufferDependencies);
         EngineStatusPrintOnError(frameBufferLoaded, logTag(), "Failed to load framebuffer in backend.");
-        SHIRABE_RETURN_RESULT_ON_ERROR(EEngineStatus::Error);
+        SHIRABE_RETURN_RESULT_ON_ERROR(renderPassLoaded);
 
         EEngineStatus const status = mGraphicsAPIRenderContext->bindRenderPass(renderPass->getGpuApiResourceHandle(), frameBuffer->getGpuApiResourceHandle());
         if( not CheckEngineError(status))

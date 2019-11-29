@@ -43,6 +43,23 @@ namespace engine::vulkan
          */
         EEngineStatus deinitialize();
 
+        SHIRABE_INLINE
+        void registerDebugObjectName(uint64_t const &aHandle, VkObjectType const &aObjectType, std::string const &aObjectName) final
+        {
+            static auto sDefinedDebugUtilsObjectNameFn = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetInstanceProcAddr(mVkState.instance, "vkSetDebugUtilsObjectNameEXT");
+            if(nullptr != sDefinedDebugUtilsObjectNameFn)
+            {
+                VkDebugUtilsObjectNameInfoEXT name = {
+                        .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+                        .pNext = nullptr,
+                        .objectType   = aObjectType,
+                        .objectHandle = aHandle,
+                        .pObjectName  = aObjectName.c_str()
+                };
+                sDefinedDebugUtilsObjectNameFn(mVkState.selectedLogicalDevice, &name);
+            }
+        }
+
         /**
          * Return the currently selected graphics queue, if any.
          *

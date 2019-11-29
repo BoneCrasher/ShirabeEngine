@@ -26,7 +26,7 @@ namespace engine
                 , public ILoadableGpuApiResourceObject
                 , public ITransferrableGpuApiResourceObject
         {
-            SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
+            SHIRABE_DECLARE_LOG_TAG(CVulkanTextureResource);
 
         public_constructors:
             using CVkApiResource<STexture>::CVkApiResource;

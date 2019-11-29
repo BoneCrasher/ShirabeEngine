@@ -29,6 +29,8 @@ namespace engine
             virtual VkPhysicalDevice               getPhysicalDevice()        = 0;
             virtual Shared<IVkFrameContext>        getVkCurrentFrameContext() = 0;
             virtual Shared<CGpuApiResourceStorage> getResourceStorage()       = 0;
+
+            virtual void registerDebugObjectName(uint64_t const &aHandle, VkObjectType const &aObjectType, std::string const &aObjectName) = 0;
         };
 
     }
