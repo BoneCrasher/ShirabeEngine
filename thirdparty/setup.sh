@@ -183,6 +183,12 @@ function setup_vulkan
     setup_one vulkan_sdk_validation_layers
 }
 
+function setup_vmem
+{
+    # copy all packaged dependencies to the sources directory during setup.
+    cp -rf packaged/* sources 
+}
+
 # Check, whether we should update.
 if [ ! -z ${1} ]; then
 
@@ -209,3 +215,4 @@ setup_spirv_cross
 setup_glslang
 setup_tools
 setup_vulkan
+setup_vmem

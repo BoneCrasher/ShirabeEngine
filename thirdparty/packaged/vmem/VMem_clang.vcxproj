@@ -1,0 +1,434 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug1_clang|Win32">
+      <Configuration>Debug1_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug1_clang|x64">
+      <Configuration>Debug1_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug2_clang|Win32">
+      <Configuration>Debug2_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug2_clang|x64">
+      <Configuration>Debug2_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug3_clang|Win32">
+      <Configuration>Debug3_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug3_clang|x64">
+      <Configuration>Debug3_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug4_clang|Win32">
+      <Configuration>Debug4_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug4_clang|x64">
+      <Configuration>Debug4_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug4_LargePages_clang|Win32">
+      <Configuration>Debug4_LargePages_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug4_LargePages_clang|x64">
+      <Configuration>Debug4_LargePages_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_clang|Win32">
+      <Configuration>Debug_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_LargePages_clang|Win32">
+      <Configuration>Debug_LargePages_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_LargePages_clang|x64">
+      <Configuration>Debug_LargePages_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Unicode_clang|Win32">
+      <Configuration>Debug_Unicode_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Unicode_clang|x64">
+      <Configuration>Debug_Unicode_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseWithAsserts_clang|Win32">
+      <Configuration>ReleaseWithAsserts_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseWithAsserts_clang|x64">
+      <Configuration>ReleaseWithAsserts_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_clang|Win32">
+      <Configuration>Release_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_clang|x64">
+      <Configuration>Debug_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_clang|x64">
+      <Configuration>Release_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Unicode_clang|Win32">
+      <Configuration>Release_Unicode_clang</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Unicode_clang|x64">
+      <Configuration>Release_Unicode_clang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AlignedCoalesceHeap.hpp" />
+    <ClInclude Include="AlignedLargeHeap.hpp" />
+    <ClInclude Include="BasicCoalesceHeap.hpp" />
+    <ClInclude Include="BasicFSA.hpp" />
+    <ClInclude Include="Bitfield.hpp" />
+    <ClInclude Include="BucketTree.hpp" />
+    <ClInclude Include="CoalesceHeap.hpp" />
+    <ClInclude Include="CoalesceHeapCache.hpp" />
+    <ClInclude Include="FSA.hpp" />
+    <ClInclude Include="FSACache.hpp" />
+    <ClInclude Include="FSAHeap.hpp" />
+    <ClInclude Include="HeapRegions.hpp" />
+    <ClInclude Include="InternalHeap.hpp" />
+    <ClInclude Include="LargeHeap.hpp" />
+    <ClInclude Include="List.hpp" />
+    <ClInclude Include="PageHeap.hpp" />
+    <ClInclude Include="PhysicalArray.hpp" />
+    <ClInclude Include="PhysicalHeap.hpp" />
+    <ClInclude Include="PhysicalPageHeap.hpp" />
+    <ClInclude Include="PhysicalPageMapper.hpp" />
+    <ClInclude Include="ProtectedHeap.hpp" />
+    <ClInclude Include="RangeMap.hpp" />
+    <ClInclude Include="RelaxedAtomic.hpp" />
+    <ClInclude Include="ServiceThread.hpp" />
+    <ClInclude Include="TieredBitfield.hpp" />
+    <ClInclude Include="TrailGuard.hpp" />
+    <ClInclude Include="VirtualMem.hpp" />
+    <ClInclude Include="VMemAlloc.hpp" />
+    <ClInclude Include="VMemArray.hpp" />
+    <ClInclude Include="VMemCore.hpp" />
+    <ClInclude Include="VMemCriticalSection.hpp" />
+    <ClInclude Include="VMemDefs.hpp" />
+    <ClInclude Include="VMemHashMap.hpp" />
+    <ClInclude Include="VMemHeap.hpp" />
+    <ClInclude Include="VMemMap.hpp" />
+    <ClInclude Include="VMemMemProStats.hpp" />
+    <ClInclude Include="VMemRedBlackTree.hpp" />
+    <ClInclude Include="VMemStats.hpp" />
+    <ClInclude Include="VMemSys.hpp" />
+    <ClInclude Include="VMemThread.hpp" />
+    <ClInclude Include="VMem_PCH.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AlignedLargeHeap.cpp" />
+    <ClCompile Include="BasicCoalesceHeap.cpp" />
+    <ClCompile Include="Bitfield.cpp" />
+    <ClCompile Include="CoalesceHeap.cpp" />
+    <ClCompile Include="FSA.cpp" />
+    <ClCompile Include="FSAHeap.cpp" />
+    <ClCompile Include="InternalHeap.cpp" />
+    <ClCompile Include="LargeHeap.cpp" />
+    <ClCompile Include="PageHeap.cpp" />
+    <ClCompile Include="PhysicalHeap.cpp" />
+    <ClCompile Include="PhysicalPageHeap.cpp" />
+    <ClCompile Include="PhysicalPageMapper.cpp" />
+    <ClCompile Include="ProtectedHeap.cpp" />
+    <ClCompile Include="TrailGuard.cpp" />
+    <ClCompile Include="VirtualMem.cpp" />
+    <ClCompile Include="VMemAlloc.cpp" />
+    <ClCompile Include="VMemCore.cpp" />
+    <ClCompile Include="VMemHeap.cpp" />
+    <ClCompile Include="VMemSys.cpp" />
+    <ClCompile Include="VMemThread.cpp" />
+    <ClCompile Include="VMem_PCH.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{d85ca912-c1e5-4a03-98f0-a5aea42b53bb}</ProjectGuid>
+    <Keyword>Clang</Keyword>
+    <RootNamespace>VMem_Clang</RootNamespace>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <ProjectName>VMem_clang</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <CharacterSet>
+    </CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <CharacterSet>
+    </CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <CharacterSet>
+    </CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <CharacterSet>
+    </CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|x64'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|Win32'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_clang|Win32'">WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|Win32'">WIN32;_DEBUG;_LIB;VMEM_DEBUG_LEVEL=4;SYS_PAGE_SIZE=(64*1024);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|Win32'">WIN32;_DEBUG;_LIB;VMEM_DEBUG_LEVEL=4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|Win32'">WIN32;_DEBUG;_LIB;VMEM_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|Win32'">WIN32;_DEBUG;_LIB;VMEM_DEBUG_LEVEL=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|Win32'">WIN32;_DEBUG;_LIB;VMEM_DEBUG_LEVEL=3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|Win32'">WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|Win32'">WIN32;_DEBUG;_LIB;SYS_PAGE_SIZE=65536;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release_clang|Win32'">WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|Win32'">WIN32;NDEBUG;_LIB;VMEM_ASSERTS;VMEM_ENABLE_MEMSET;VMEM_ENABLE_STATS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|Win32'">WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_clang|x64'">_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|x64'">_DEBUG;_LIB;VMEM_DEBUG_LEVEL=4;SYS_PAGE_SIZE=(64*1024);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|x64'">_DEBUG;_LIB;VMEM_DEBUG_LEVEL=4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|x64'">_DEBUG;_LIB;VMEM_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|x64'">_DEBUG;_LIB;VMEM_DEBUG_LEVEL=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|x64'">_DEBUG;_LIB;VMEM_DEBUG_LEVEL=3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|x64'">_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|x64'">_DEBUG;_LIB;SYS_PAGE_SIZE=65536;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release_clang|x64'">NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|x64'">NDEBUG;_LIB;VMEM_ASSERTS;VMEM_ENABLE_MEMSET;VMEM_ENABLE_STATS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|x64'">NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release_Unicode_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|Win32'">true</TreatWarningAsError>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug4_LargePages_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug4_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug2_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug1_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug3_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode_clang|Win32'">
+      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug_LargePages_clang|Win32'">
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug1|ORBIS">
+      <Configuration>Debug1</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug2|ORBIS">
+      <Configuration>Debug2</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug3|ORBIS">
+      <Configuration>Debug3</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug4|ORBIS">
+      <Configuration>Debug4</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ORBIS">
+      <Configuration>Debug</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseWithAsserts|ORBIS">
+      <Configuration>ReleaseWithAsserts</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ORBIS">
+      <Configuration>Release</Configuration>
+      <Platform>ORBIS</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DDD94484-52C4-4A8D-9270-24B61AD8998F}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts|ORBIS'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Win32|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts|Win32'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(DebuggerFlavor)'=='ORBISDebugger'" Label="OverrideDebuggerDefaults">
+    <!--LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand-->
+    <!--LocalDebuggerCommandArguments></LocalDebuggerCommandArguments-->
+    <!--LocalDebuggerTarget></LocalDebuggerTarget-->
+    <!--LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory-->
+    <!--LocalRunCommandLine></LocalRunCommandLine-->
+  </PropertyGroup>
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\OrbisWavePsslc.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\SCU.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug4|ORBIS'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug3|ORBIS'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug2|ORBIS'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug1|ORBIS'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts|ORBIS'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug4|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug3|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug1|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts|ORBIS'">
+    <OutDir>..\build\$(SolutionName)\bin\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>..\build\$(ProjectName)\intermediate\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;_DEBUG;_PS4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug4|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;_DEBUG;VMEM_DEBUG_LEVEL=4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug3|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;_DEBUG;VMEM_DEBUG_LEVEL=3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug2|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;_DEBUG;VMEM_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug1|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;_DEBUG;VMEM_DEBUG_LEVEL=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <OptimizationLevel>Level2</OptimizationLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithAsserts|ORBIS'">
+    <ClCompile>
+      <PreprocessorDefinitions>_PS4;NDEBUG;VMEM_ASSERTS;VMEM_ENABLE_MEMSET;VMEM_ENABLE_STATS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OptimizationLevel>Level2</OptimizationLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningsAsErrors>true</WarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="AlignedCoalesceHeap.hpp" />
+    <ClInclude Include="AlignedLargeHeap.hpp" />
+    <ClInclude Include="BasicCoalesceHeap.hpp" />
+    <ClInclude Include="BasicFSA.hpp" />
+    <ClInclude Include="Bitfield.hpp" />
+    <ClInclude Include="BucketTree.hpp" />
+    <ClInclude Include="CoalesceHeap.hpp" />
+    <ClInclude Include="CoalesceHeapCache.hpp" />
+    <ClInclude Include="FSA.hpp" />
+    <ClInclude Include="FSACache.hpp" />
+    <ClInclude Include="FSAHeap.hpp" />
+    <ClInclude Include="HeapRegions.hpp" />
+    <ClInclude Include="InternalHeap.hpp" />
+    <ClInclude Include="LargeHeap.hpp" />
+    <ClInclude Include="List.hpp" />
+    <ClInclude Include="PageHeap.hpp" />
+    <ClInclude Include="PhysicalArray.hpp" />
+    <ClInclude Include="PhysicalFSA.hpp" />
+    <ClInclude Include="PhysicalHeap.hpp" />
+    <ClInclude Include="PhysicalPageHeap.hpp" />
+    <ClInclude Include="PhysicalPageMapper.hpp" />
+    <ClInclude Include="ProtectedHeap.hpp" />
+    <ClInclude Include="RangeMap.hpp" />
+    <ClInclude Include="RelaxedAtomic.hpp" />
+    <ClInclude Include="ServiceThread.hpp" />
+    <ClInclude Include="TieredBitfield.hpp" />
+    <ClInclude Include="TrailGuard.hpp" />
+    <ClInclude Include="VirtualMem.hpp" />
+    <ClInclude Include="VMemAlloc.hpp" />
+    <ClInclude Include="VMemArray.hpp" />
+    <ClInclude Include="VMemCore.hpp" />
+    <ClInclude Include="VMemCriticalSection.hpp" />
+    <ClInclude Include="VMemDefs.hpp" />
+    <ClInclude Include="VMemHashMap.hpp" />
+    <ClInclude Include="VMemHeap.hpp" />
+    <ClInclude Include="VMemMemProStats.hpp" />
+    <ClInclude Include="VMemRedBlackTree.hpp" />
+    <ClInclude Include="VMemStats.hpp" />
+    <ClInclude Include="VMemSys.hpp" />
+    <ClInclude Include="VMemThread.hpp" />
+    <ClInclude Include="VMem_PCH.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AlignedLargeHeap.cpp" />
+    <ClCompile Include="BasicCoalesceHeap.cpp" />
+    <ClCompile Include="Bitfield.cpp" />
+    <ClCompile Include="CoalesceHeap.cpp" />
+    <ClCompile Include="FSA.cpp" />
+    <ClCompile Include="FSAHeap.cpp" />
+    <ClCompile Include="InternalHeap.cpp" />
+    <ClCompile Include="LargeHeap.cpp" />
+    <ClCompile Include="PageHeap.cpp" />
+    <ClCompile Include="PhysicalHeap.cpp" />
+    <ClCompile Include="PhysicalPageHeap.cpp" />
+    <ClCompile Include="PhysicalPageMapper.cpp" />
+    <ClCompile Include="ProtectedHeap.cpp" />
+    <ClCompile Include="TrailGuard.cpp" />
+    <ClCompile Include="VirtualMem.cpp" />
+    <ClCompile Include="VMemAlloc.cpp" />
+    <ClCompile Include="VMemCore.cpp" />
+    <ClCompile Include="VMemHeap.cpp" />
+    <ClCompile Include="VMemSys.cpp" />
+    <ClCompile Include="VMemThread.cpp" />
+    <ClCompile Include="VMem_PCH.cpp" />
+  </ItemGroup>
+  <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\OrbisWavePsslc.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\SCU.targets" />
+  </ImportGroup>
+</Project>
