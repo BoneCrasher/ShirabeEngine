@@ -27,14 +27,15 @@ namespace engine::material
     ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage>  const &aAssetStorage
                                                                      , std::string                 const &aMaterialName
                                                                      , SMaterialSignature          const &aSignature
-                                                                     , CMaterialConfig             const &aConfig)
+                                                                     , CMaterialConfig                   &aConfiguration)
     {
         using namespace resources;
 
-        SMaterialPipelineDescriptor pipelineDescriptor      {};
-        SShaderModuleDescriptor     shaderModuleDescriptors {};
-        Vector<SBufferDescription>  bufferDescriptions      {};
-        shaderModuleDescriptors.name = std::string(aMaterialName) + "ShaderModule";
+        SMaterialPipelineDescriptor pipelineDescriptor     {};
+        SShaderModuleDescriptor     shaderModuleDescriptor {};
+        Vector<SBufferDescription>  bufferDescriptions     {};
+        shaderModuleDescriptor.name = fmt::format("{}_{}", aMaterialName, "pipeline");
+        shaderModuleDescriptor.name = fmt::format("{}_{}", aMaterialName, "shadermodule");
 
         pipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         pipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
@@ -176,7 +177,7 @@ namespace engine::material
                     return buffer;
                 };
 
-                shaderModuleDescriptors.shaderStages[stageKey] = dataAccessor;
+                shaderModuleDescriptor.shaderStages[stageKey] = dataAccessor;
             }
         }
 
@@ -219,7 +220,34 @@ namespace engine::material
             layoutBinding.pImmutableSamplers = nullptr;
             pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
 
-            // TODO: Arrays?
+            CEngineResult<void *const> bufferDataFetch = aConfiguration.getBuffer(uniformBuffer.name);
+            if(CheckEngineError(bufferDataFetch.result()))
+            {
+                CLog::Debug("AssetLoader - Materials", "Can't find buffer w/ name {} in config.", uniformBuffer.name);
+                continue;
+            }
+
+            auto        *const data = static_cast<int8_t *const>(bufferDataFetch.data());
+            std::size_t  const size = uniformBuffer.location.length;
+
+            auto const dataSource =  [data, size] () -> ByteBuffer
+            {
+                return { data, size };
+            };
+
+            SBufferDescription desc {};
+            desc.name                             = fmt::format("{}_uniformbuffer_{}", aMaterialName, uniformBuffer.name);
+            desc.dataSource                       = dataSource;
+            desc.createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            desc.createInfo.pNext                 = nullptr;
+            desc.createInfo.flags                 = 0;
+            desc.createInfo.size                  = uniformBuffer.location.length;
+            desc.createInfo.pQueueFamilyIndices   = nullptr;
+            desc.createInfo.queueFamilyIndexCount = 0;
+            desc.createInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
+            desc.createInfo.usage                 = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+
+            bufferDescriptions.push_back(desc);
         }
 
         for(SSampledImage const &sampledImage : aSignature.sampledImages)
@@ -242,7 +270,7 @@ namespace engine::material
         viewPort.maxDepth = 1.0;
         pipelineDescriptor.viewPort = viewPort;
 
-        return { true, pipelineDescriptor, shaderModuleDescriptors, bufferDescriptions };
+        return {true, pipelineDescriptor, shaderModuleDescriptor, bufferDescriptions };
     };
     //<-----------------------------------------------------------------------------
 
@@ -255,7 +283,7 @@ namespace engine::material
     {
         auto const loader = [=] (ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject>
         {
-            auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aAssetStorage, aAssetId);
+            auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aAssetStorage, aAssetId, true);
             if(CheckEngineError(result))
             {
                 return nullptr;
@@ -263,7 +291,7 @@ namespace engine::material
 
             Shared<CMaterialMaster> const &master    = instance->master();
             SMaterialSignature      const &signature = master  ->signature();
-            CMaterialConfig         const &config    = instance->config();
+            CMaterialConfig               &config    = instance->config();
 
             auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config());
             //master->setPipelineDescription    (pipelineDescription);

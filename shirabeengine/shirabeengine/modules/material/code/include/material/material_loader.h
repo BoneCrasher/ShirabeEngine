@@ -59,7 +59,9 @@ namespace engine
              * @param aMaterialId
              * @return
              */
-            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId);
+            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                          , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                          , bool                                aAutoCreateConfiguration);
 
             /**
              * @brief destroyMaterialInstance

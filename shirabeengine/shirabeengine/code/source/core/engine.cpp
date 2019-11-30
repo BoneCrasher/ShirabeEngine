@@ -329,7 +329,7 @@ namespace engine
             CEngineResult<> initialization = mScene.initialize();
             status = initialization.result();
 
-            auto const &[result, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage, 317299467);
+            auto const &[result, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage, 317299467, true);
 
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);

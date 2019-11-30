@@ -32,6 +32,12 @@ namespace engine
         CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useAssetResource(  ResourceId_t const &aResourceId
                                                                                          , AssetId_t    const &aAssetResourceId)
         {
+            Shared<ILogicalResourceObject> object = getResourceObject(aResourceId);
+            if(nullptr != object)
+            {
+                return { EEngineStatus::Ok, object };
+            }
+
             auto const &[result, asset] = mAssetStorage->loadAsset(aAssetResourceId);
             if(CheckEngineError(result))
             {
@@ -96,6 +102,21 @@ namespace engine
             }
 
             return (false == hasObjectForId);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        Shared<ILogicalResourceObject> CResourceManager::getResourceObject(ResourceId_t const &aId)
+        {
+            bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find(aId));
+            if(hasObjectForId)
+            {
+                mResourceObjects.at(aId);
+            }
+
+            return nullptr;
         }
         //<-----------------------------------------------------------------------------
 

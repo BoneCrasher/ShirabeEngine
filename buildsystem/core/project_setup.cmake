@@ -186,6 +186,7 @@ set(SHIRABE_PROJECT_INC_DIR          ${SHIRABE_PROJECT_DIR}/code/include)
 set(SHIRABE_PROJECT_SRC_DIR          ${SHIRABE_PROJECT_DIR}/code/source)
 set(SHIRABE_PROJECT_UI_DIR           ${SHIRABE_PROJECT_DIR}/ui)
 set(SHIRABE_PROJECT_RES_DIR          ${SHIRABE_PROJECT_DIR}/resources)
+set(SHIRABE_PROJECT_DOC_DIR          ${SHIRABE_PROJECT_DIR}/documentation)
 
 set(SHIRABE_PROJECT_BUILD_DIR        ${SHIRABE_PUBLIC_BUILD_ROOT}/${SHIRABE_PLATFORM_CONFIG_SUFFIX})
 set(SHIRABE_PROJECT_INTERMEDIATE_DIR ${SHIRABE_PUBLIC_BUILD_ROOT}/${SHIRABE_PLATFORM_CONFIG_SUFFIX}/intermediate)
@@ -215,6 +216,7 @@ LogStatus(
         "${NAME} - Source Directory:          ${SHIRABE_PROJECT_SRC_DIR}"
         "${NAME} - Ui Files Directory:        ${SHIRABE_PROJECT_UI_DIR}"
         "${NAME} - Resources Directory:       ${SHIRABE_PROJECT_RES_DIR}"
+        "${NAME} - Documentation Directory:   ${SHIRABE_PROJECT_DOC_DIR}"
         ""
         "${NAME} - Build Directory:           ${SHIRABE_PROJECT_BUILD_DIR}"
         "${NAME} - Intermediate Directory:    ${SHIRABE_PROJECT_INTERMEDIATE_DIR}"

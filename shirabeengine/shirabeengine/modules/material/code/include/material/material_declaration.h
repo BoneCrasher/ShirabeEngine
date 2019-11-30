@@ -821,7 +821,26 @@ namespace engine
              * @return             EEngineStatus::Error and nullptr or any error code on failure.
              */
             template <typename TBufferType>
-            CEngineResult<TBufferType const*> getBuffer(std::string const &aBufferName) const;
+            CEngineResult<TBufferType const*> getBufferTyped(std::string const &aBufferName) const;
+
+            /**
+             * Return a pointer to a specific data.
+             * The buffer is identified by it's name.
+             *
+             * @param aBufferName  The name of the buffer to fetch.
+             * @return             EEngineStatus::Ok and a valid pointer to the buffer, if successful.
+             * @return             EEngineStatus::Error and nullptr or any error code on failure.
+             */
+            CEngineResult<void const *const> getBuffer(std::string const &aBufferName) const;
+            /**
+             * Return a pointer to nutable specific data.
+             * The buffer is identified by it's name.
+             *
+             * @param aBufferName  The name of the buffer to fetch.
+             * @return             EEngineStatus::Ok and a valid pointer to the buffer, if successful.
+             * @return             EEngineStatus::Error and nullptr or any error code on failure.
+             */
+            CEngineResult<void *const> getBuffer(std::string const &aBufferName);
 
             /**
              * Return the value of a buffer member identified by buffername/fieldname.
@@ -996,7 +1015,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TBufferType>
-        CEngineResult<TBufferType const*> CMaterialConfig::getBuffer(std::string const &aBufferName) const
+        CEngineResult<TBufferType const*> CMaterialConfig::getBufferTyped(std::string const &aBufferName) const
         {
             bool const has = hasBuffer(aBufferName);
             if(not has)
@@ -1163,8 +1182,6 @@ namespace engine
         class CMaterialInstance
         {
             public_constructors:
-                CMaterialInstance() = default;
-
                 SHIRABE_INLINE
                 explicit CMaterialInstance(std::string             const &aName,
                                            Shared<CMaterialMaster>        aMaster)

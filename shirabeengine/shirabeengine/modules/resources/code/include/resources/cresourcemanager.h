@@ -71,6 +71,8 @@ namespace engine {
             bool storeResourceObject(ResourceId_t                      const &aId
                                      , Shared <ILogicalResourceObject> const &aObject);
 
+            Shared<ILogicalResourceObject> getResourceObject(ResourceId_t const &aId);
+
             void removeResourceObject(ResourceId_t const &aId);
 
             GpuApiResourceDependencies_t getGpuApiDependencies(ResourceId_t const &aId);
@@ -129,7 +131,7 @@ namespace engine {
         //
         //<-----------------------------------------------------------------------------
         template <typename TResource>
-        CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::genericAssetLoading(ResourceId_t const &aResourceId
+        CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::genericAssetLoading(  ResourceId_t const &aResourceId
                                                                                             , AssetId_t    const &aAssetResourceId)
         {
             Shared<CResourceFromAssetResourceObjectCreator<TResource>> const &loader = getLoader<TResource>();
@@ -143,6 +145,8 @@ namespace engine {
             {
                 return {EEngineStatus::Error, nullptr};
             }
+
+            storeResourceObject(aResourceId, resourceObject);
 
             return { EEngineStatus::Ok, resourceObject };
         }

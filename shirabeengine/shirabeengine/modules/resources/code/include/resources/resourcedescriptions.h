@@ -33,6 +33,7 @@ namespace engine
         {
             std::string                       name;
             VkBufferCreateInfo                createInfo;
+            DataSourceAccessor_t              dataSource;
             std::vector<DataSourceAccessor_t> initialData; // Important: Just an accessor. Resource data is not in memory here.
         };
 

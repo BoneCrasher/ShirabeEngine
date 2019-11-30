@@ -691,7 +691,7 @@ namespace engine::material
 
         uint64_t previousSize = 0;
         uint64_t currentSize  = 0;
-        uint64_t totalSize    = 0;
+        uint64_t  totalSize    = 0;
 
         if(aMaterial.uniformBuffers.empty())
         {
@@ -774,6 +774,56 @@ namespace engine::material
         }
 
         return (0 == chk);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CEngineResult<void const *const> CMaterialConfig::getBuffer(std::string const &aBufferName) const
+    {
+        bool const has = hasBuffer(aBufferName);
+        if(not has)
+        {
+            return CEngineResult<void const *const>(EEngineStatus::Error, nullptr);
+        }
+
+        SBufferData     const &buffer   = mBufferIndex.at(aBufferName);
+        SBufferLocation const &location = buffer.getLocation();
+
+        void const *const data = (mData.data() + location.offset);
+
+        return { EEngineStatus::Ok, data };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CEngineResult<void *const> CMaterialConfig::getBuffer(std::string const &aBufferName)
+    {
+        bool const has = hasBuffer(aBufferName);
+        if(not has)
+        {
+            return CEngineResult<void *const>(EEngineStatus::Error, nullptr);
+        }
+
+        SBufferData     const &buffer   = mBufferIndex.at(aBufferName);
+        SBufferLocation const &location = buffer.getLocation();
+
+        void *const data = (mData.data() + location.offset);
+
+        return { EEngineStatus::Ok, data };
     }
     //<-----------------------------------------------------------------------------
 

@@ -30,6 +30,7 @@ namespace engine {
          * @param size
          */
         CDataBuffer( std::vector<T> &&aData, uint64_t const aSize);
+        CDataBuffer( T *const aData, uint64_t const aSize);
 
     public_methods:
         /**
@@ -38,7 +39,9 @@ namespace engine {
          */
         inline T const*const data() const
         {
-            return mData.data();
+            return mUseRawData
+                   ? mRawData
+                   : mVectorData.data();
         }
 
         /**
@@ -47,17 +50,19 @@ namespace engine {
          */
         inline T *const mutableData()
         {
-            return mData.data();
+            return mUseRawData
+                   ? mRawData
+                   : mVectorData.data();
         }
 
         inline std::vector<T> const &dataVector() const
         {
-            return mData;
+            return mVectorData;
         }
 
         inline std::vector<T> &mutableDataVector()
         {
-            return mData;
+            return mVectorData;
         }
 
         /**
@@ -70,8 +75,10 @@ namespace engine {
         }
 
     private_members:
-        std::vector<T> mData;
-        uint64_t       mSize;
+        std::vector<T> mVectorData;
+        T             *mRawData;
+        uint64_t  mSize;
+        bool      mUseRawData;
     };
     //<-----------------------------------------------------------------------------
 
@@ -95,8 +102,10 @@ namespace engine {
     //<-----------------------------------------------------------------------------
     template <typename T>
     CDataBuffer<T>::CDataBuffer()
-        : mData()
+        : mVectorData()
+        , mRawData(nullptr)
         , mSize(0)
+        , mUseRawData(false)
     {}
     //<-----------------------------------------------------------------------------
 
@@ -105,8 +114,10 @@ namespace engine {
     //<-----------------------------------------------------------------------------
     template <typename T>
     CDataBuffer<T>::CDataBuffer(CDataBuffer<T> const &aOther)
-        : mData(aOther.mData)
+        : mVectorData(aOther.mVectorData)
+        , mRawData(aOther.mRawData)
         , mSize(aOther.mSize)
+        , mUseRawData(aOther.mUseRawData)
     { }
     //<-----------------------------------------------------------------------------
 
@@ -115,8 +126,10 @@ namespace engine {
     //<-----------------------------------------------------------------------------
     template <typename T>
     CDataBuffer<T>::CDataBuffer(CDataBuffer<T> &&aOther)
-        : mData(std::move(aOther.mData))
+        : mVectorData(std::move(aOther.mVectorData))
+        , mRawData(std::move(aOther.mRawData))
         , mSize(std::move(aOther.mSize))
+        , mUseRawData(aOther.mUseRawData)
     { }
     //<-----------------------------------------------------------------------------
 
@@ -127,8 +140,24 @@ namespace engine {
     CDataBuffer<T>::CDataBuffer(
             std::vector<T>     &&aData,
             uint64_t       const aSize)
-        : mData(std::move(aData))
+        : mVectorData(std::move(aData))
+        , mRawData(nullptr)
         , mSize(aSize)
+        , mUseRawData(false)
+    {}
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T>::CDataBuffer(
+            T      * const aData,
+            uint64_t const aSize)
+            : mVectorData(0)
+            , mRawData(std::move(aData))
+            , mSize(aSize)
+            , mUseRawData(false)
     {}
     //<-----------------------------------------------------------------------------
 

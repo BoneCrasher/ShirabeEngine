@@ -3,6 +3,7 @@
 #include <asset/assetstorage.h>
 #include <resources/resourcedescriptions.h>
 #include <resources/resourcetypes.h>
+#include <util/crc32.h>
 
 #include "material/material_declaration.h"
 #include "material/materialserialization.h"
@@ -203,7 +204,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::loadMaterialInstance(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId)
+        CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                                      , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                                      , bool                                aAutoCreateConfiguration)
         {
             CEngineResult<ByteBuffer> data = {};
 
@@ -251,8 +254,15 @@ namespace engine
                 return { EEngineStatus::Error, nullptr };
             }
 
-            Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>();
-            instance->createConfiguration()
+            static uint64_t sInstanceIndex = 0;
+            std::string instanceName = fmt::format("{}_instance_{}", master->name(), ++sInstanceIndex);
+
+            Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceName, master);
+
+            if(aAutoCreateConfiguration)
+            {
+                instance->createConfiguration();
+            }
 
             return { EEngineStatus::Ok, instance };
         }

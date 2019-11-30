@@ -931,7 +931,7 @@ namespace engine::framegraph
 
         for(auto const &buffer : material->bufferResources)
         {
-            mGraphicsAPIRenderContext->transferBufferData(..., buffer->getGpuApiResourceHandle());
+            mGraphicsAPIRenderContext->transferBufferData(buffer->getDescription().dataSource(), buffer->getGpuApiResourceHandle());
         }
 
         auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
