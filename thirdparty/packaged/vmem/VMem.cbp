@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="VMem" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="VMem" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="VMem" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Release/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++11" />
+		</Compiler>
+		<Unit filename="AlignedCoalesceHeap.hpp" />
+		<Unit filename="AlignedLargeHeap.cpp" />
+		<Unit filename="AlignedLargeHeap.hpp" />
+		<Unit filename="BasicCoalesceHeap.cpp" />
+		<Unit filename="BasicCoalesceHeap.hpp" />
+		<Unit filename="BasicFSA.hpp" />
+		<Unit filename="Bitfield.cpp" />
+		<Unit filename="Bitfield.hpp" />
+		<Unit filename="BucketTree.hpp" />
+		<Unit filename="CoalesceHeap.cpp" />
+		<Unit filename="CoalesceHeap.hpp" />
+		<Unit filename="CoalesceHeapCache.hpp" />
+		<Unit filename="FSA.cpp" />
+		<Unit filename="FSA.hpp" />
+		<Unit filename="FSACache.hpp" />
+		<Unit filename="FSAHeap.cpp" />
+		<Unit filename="FSAHeap.hpp" />
+		<Unit filename="HeapRegions.hpp" />
+		<Unit filename="InternalHeap.cpp" />
+		<Unit filename="InternalHeap.hpp" />
+		<Unit filename="LargeHeap.cpp" />
+		<Unit filename="LargeHeap.hpp" />
+		<Unit filename="List.hpp" />
+		<Unit filename="PageHeap.cpp" />
+		<Unit filename="PageHeap.hpp" />
+		<Unit filename="PhysicalArray.hpp" />
+		<Unit filename="PhysicalFSA.hpp" />
+		<Unit filename="PhysicalHeap.cpp" />
+		<Unit filename="PhysicalHeap.hpp" />
+		<Unit filename="PhysicalPageHeap.cpp" />
+		<Unit filename="PhysicalPageHeap.hpp" />
+		<Unit filename="PhysicalPageMapper.cpp" />
+		<Unit filename="PhysicalPageMapper.hpp" />
+		<Unit filename="ProtectedHeap.cpp" />
+		<Unit filename="ProtectedHeap.hpp" />
+		<Unit filename="RangeMap.hpp" />
+		<Unit filename="RelaxedAtomic.hpp" />
+		<Unit filename="ServiceThread.hpp" />
+		<Unit filename="SpinLock.hpp" />
+		<Unit filename="TieredBitfield.hpp" />
+		<Unit filename="TrailGuard.cpp" />
+		<Unit filename="TrailGuard.hpp" />
+		<Unit filename="VMemAlloc.cpp" />
+		<Unit filename="VMemAlloc.hpp" />
+		<Unit filename="VMemArray.hpp" />
+		<Unit filename="VMemCore.cpp" />
+		<Unit filename="VMemCore.hpp" />
+		<Unit filename="VMemCriticalSection.hpp" />
+		<Unit filename="VMemDefs.hpp" />
+		<Unit filename="VMemHashMap.hpp" />
+		<Unit filename="VMemHeap.cpp" />
+		<Unit filename="VMemHeap.hpp" />
+		<Unit filename="VMemMap.hpp" />
+		<Unit filename="VMemMemProStats.hpp" />
+		<Unit filename="VMemRedBlackTree.hpp" />
+		<Unit filename="VMemStats.hpp" />
+		<Unit filename="VMemSys.cpp" />
+		<Unit filename="VMemSys.hpp" />
+		<Unit filename="VMemThread.cpp" />
+		<Unit filename="VMemThread.hpp" />
+		<Unit filename="VMem_PCH.cpp" />
+		<Unit filename="VMem_PCH.hpp" />
+		<Unit filename="VirtualMem.cpp" />
+		<Unit filename="VirtualMem.hpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
