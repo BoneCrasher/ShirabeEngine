@@ -5,7 +5,7 @@
 //
 // Model specific matrices.
 //
-layout (std140, set = 2, binding = 1)
+layout (std140, set = 2, binding = 0)
 uniform struct_modelMatricess
 {
     mat4 world;

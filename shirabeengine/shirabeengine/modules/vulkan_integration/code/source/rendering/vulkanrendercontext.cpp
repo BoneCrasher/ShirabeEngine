@@ -177,6 +177,59 @@ namespace engine
             memcpy(data, (void*)aDataSource.data(), size);
             vkUnmapMemory(device, gpuBuffer->attachedMemory);
 
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::updateResourceBindings(GpuApiHandle_t const &aGpuMaterialHandle, std::vector<GpuApiHandle_t> const &aGpuBufferHandles)
+        {
+            VkDevice device = mVulkanEnvironment->getLogicalDevice();
+
+            auto                       *const pipeline           = mResourceStorage->extract<CVulkanPipelineResource>(aGpuMaterialHandle);
+            SMaterialPipelineDescriptor const pipelineDescriptor = *(pipeline->getCurrentDescriptor());
+
+            std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
+            std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
+            descriptorSetWrites          .resize(aGpuBufferHandles.size());
+            descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
+
+            std::size_t index_offset = 0;
+            for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
+            {
+                std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
+                for(std::size_t j=0; j<setBindings.size(); ++j)
+                {
+                    VkDescriptorSetLayoutBinding const bufferBinding = setBindings[j];
+
+                    auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[index_offset]);
+                    sdfasdfasdf
+                    VkDescriptorBufferInfo bufferInfo = {};
+                    bufferInfo.buffer = buffer->handle;
+                    bufferInfo.offset = 0;
+                    bufferInfo.range  = buffer->getCurrentDescriptor()->createInfo.size;
+                    descriptorSetWriteBufferInfos[k] = bufferInfo;
+
+                    VkWriteDescriptorSet descriptorWrite = {};
+                    descriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                    descriptorWrite.dstSet          = pipeline->descriptorSets[k];
+                    descriptorWrite.dstBinding      = bufferBinding.binding;
+                    descriptorWrite.dstArrayElement = 0;
+                    descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                    descriptorWrite.descriptorCount  = 1;
+                    descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[k]);
+                    descriptorWrite.pImageInfo       = nullptr; // Optional
+                    descriptorWrite.pTexelBufferView = nullptr;
+                    descriptorSetWrites[k] = descriptorWrite;
+
+                    ++index_offset;
+                }
+            }
+
+            vkUpdateDescriptorSets(device, descriptorSetWrites.size(), descriptorSetWrites.data(), 0, nullptr);
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -473,6 +526,13 @@ namespace engine
             }
 
             vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+
+            vkCmdBindDescriptorSets(vkCommandBuffer
+                    , VK_PIPELINE_BIND_POINT_GRAPHICS
+                    , pipeline->pipelineLayout
+                    , 0 , 1
+                    , pipeline->descriptorSets.data()
+                    , 0, nullptr);
 
             vkCmdDraw(vkCommandBuffer, 3, 1, 0, 0); // Single triangle for now.
 

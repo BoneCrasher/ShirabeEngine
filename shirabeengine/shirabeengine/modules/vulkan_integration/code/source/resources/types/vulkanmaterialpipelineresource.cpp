@@ -206,6 +206,7 @@ namespace engine::vulkan
         }
 
         this->pipeline       = pipelineHandle;
+        this->pipelineLayout = vkPipelineLayout;
         this->descriptorPool = vkDescriptorPool;
         this->descriptorSets = vkDescriptorSets;
 

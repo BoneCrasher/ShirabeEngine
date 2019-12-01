@@ -64,6 +64,8 @@ namespace engine
 
             virtual EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) = 0;
 
+            virtual EEngineStatus updateResourceBindings(GpuApiHandle_t const &aGpuMaterialHandle, std::vector<GpuApiHandle_t> const &aGpuBufferHandles) = 0;
+
             /**
              * Put the current internal command buffer into recording mode.
              *

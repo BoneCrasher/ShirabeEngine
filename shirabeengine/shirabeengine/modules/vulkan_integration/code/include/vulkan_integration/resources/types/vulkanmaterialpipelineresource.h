@@ -36,6 +36,7 @@ namespace engine
 
         public_members:
             VkPipeline                   pipeline;
+            VkPipelineLayout             pipelineLayout;
             VkDescriptorPool             descriptorPool;
             std::vector<VkDescriptorSet> descriptorSets;
         };

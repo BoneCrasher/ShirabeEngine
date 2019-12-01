@@ -80,7 +80,9 @@ namespace engine
              */
             EEngineStatus copyToBackBuffer(GpuApiHandle_t const &aImageId) final;
 
-            EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle);
+            EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) final;
+
+            EEngineStatus updateResourceBindings(GpuApiHandle_t const &aGpuMaterialHandle, std::vector<GpuApiHandle_t> const &aGpuBufferHandles) final;
 
             /**
              * Put the current internal command buffer into recording mode.

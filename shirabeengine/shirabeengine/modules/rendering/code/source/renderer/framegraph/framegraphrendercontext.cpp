@@ -929,10 +929,15 @@ namespace engine::framegraph
         dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
         EEngineStatus const status = material->load(dependencies);
 
+        std::vector<GpuApiHandle_t> gpuBufferIds {};
+
         for(auto const &buffer : material->bufferResources)
         {
             mGraphicsAPIRenderContext->transferBufferData(buffer->getDescription().dataSource(), buffer->getGpuApiResourceHandle());
+            gpuBufferIds.push_back(buffer->getGpuApiResourceHandle());
         }
+
+        mGraphicsAPIRenderContext->updateResourceBindings(material->pipelineResource->getGpuApiResourceHandle(), gpuBufferIds);
 
         auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
         return result;
@@ -945,6 +950,7 @@ namespace engine::framegraph
     CEngineResult<> CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
     {
         Shared<ILogicalResourceObject> pipeline = getUsedResource(aMaterial.readableName);
+
         auto const result = mGraphicsAPIRenderContext->unbindPipeline(pipeline->getGpuApiResourceHandle());
         return result;
     }
