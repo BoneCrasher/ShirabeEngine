@@ -157,7 +157,7 @@ namespace engine {
             : mVectorData(0)
             , mRawData(std::move(aData))
             , mSize(aSize)
-            , mUseRawData(false)
+            , mUseRawData(true)
     {}
     //<-----------------------------------------------------------------------------
 
