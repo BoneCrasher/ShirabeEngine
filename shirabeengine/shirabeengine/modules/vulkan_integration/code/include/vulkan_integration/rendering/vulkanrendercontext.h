@@ -45,6 +45,8 @@ namespace engine
             // IRenderContext implementation
             //
 
+            EEngineStatus clearAttachments(GpuApiHandle_t const &aRenderPassId) final;
+
             /**
              * Begin a subpass.
              *

@@ -39,6 +39,42 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::clearAttachments(GpuApiHandle_t const &aRenderPassId)
+        {
+            SVulkanState    &state        = mVulkanEnvironment->getState();
+            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
+
+            auto                   const *const renderPass = mResourceStorage->extract<CVulkanRenderPassResource>(aRenderPassId);
+            SRenderPassDescription const       &description = *(renderPass->getCurrentDescriptor());
+
+            std::vector<VkClearRect>       clearRects       {};
+            std::vector<VkClearAttachment> clearAttachments {};
+            for(std::size_t k=0; k<description.attachmentDescriptions.size(); ++k)
+            {
+                SAttachmentDescription const &desc = description.attachmentDescriptions[k];
+                VkClearAttachment clear {};
+                clear.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT;
+                clear.clearValue      = { 0.5f, 0.5f, 0.5f, 1.0f };
+                clear.colorAttachment = k;
+
+                VkClearRect rect {};
+                rect.baseArrayLayer = 0;
+                rect.layerCount     = 1;
+                rect.rect.offset    = { 0, 0 };
+                rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
+
+                clearAttachments.push_back(clear);
+                clearRects.push_back(rect);
+            }
+
+            vkCmdClearAttachments(commandBuffer, clearAttachments.size(), clearAttachments.data(), clearRects.size(), clearRects.data());
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::beginSubpass()
@@ -331,7 +367,12 @@ namespace engine
 
             SVulkanState &state = mVulkanEnvironment->getState();
 
-            VkClearValue clearColor = { 0.0f, 0.5f, 0.5f, 1.0f };
+            std::vector<VkClearValue> clearValues {};
+            clearValues.resize(renderPass->getCurrentDescriptor()->attachmentDescriptions.size());
+            for(auto &clearValue : clearValues)
+            {
+                clearValue = { 0.0f, 0.5f, 0.5f, 1.0f };
+            }
 
             VkRenderPassBeginInfo vkRenderPassBeginInfo {};
             vkRenderPassBeginInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -340,8 +381,8 @@ namespace engine
             vkRenderPassBeginInfo.framebuffer       = frameBuffer->handle;
             vkRenderPassBeginInfo.renderArea.offset = { 0, 0 };
             vkRenderPassBeginInfo.renderArea.extent = state.swapChain.selectedExtents;
-            vkRenderPassBeginInfo.clearValueCount   = 1;
-            vkRenderPassBeginInfo.pClearValues      = &clearColor;
+            vkRenderPassBeginInfo.clearValueCount   = clearValues.size();
+            vkRenderPassBeginInfo.pClearValues      = clearValues.data();
 
             vkCmdBeginRenderPass(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex), &vkRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 

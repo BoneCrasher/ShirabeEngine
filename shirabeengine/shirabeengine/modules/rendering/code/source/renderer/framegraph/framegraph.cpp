@@ -610,24 +610,24 @@ namespace engine
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
-                    if(aIncludeSubjacent)
-                    {
-                        texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
-
-                        if(not texture->isExternalResource and resource->referenceCount == 0)
-                        {
-                            deinitialized = deinitializeTexture(aRenderContext, texture);
-
-                            auto const condition = [&] (FrameGraphResourceId_t const &aId) -> bool
-                            {
-                                return (aId == texture->resourceId);
-                            };
-
-                            auto const iterator = std::remove_if(mInstantiatedResources.begin(),
-                                                                 mInstantiatedResources.end(),
-                                                                 condition);
-                        }
-                    }
+                    //if(aIncludeSubjacent)
+                    //{
+                    //    texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
+//
+                    //    if(not texture->isExternalResource and resource->referenceCount == 0)
+                    //    {
+                    //        deinitialized = deinitializeTexture(aRenderContext, texture);
+//
+                    //        auto const condition = [&] (FrameGraphResourceId_t const &aId) -> bool
+                    //        {
+                    //            return (aId == texture->resourceId);
+                    //        };
+//
+                    //        auto const iterator = std::remove_if(mInstantiatedResources.begin(),
+                    //                                             mInstantiatedResources.end(),
+                    //                                             condition);
+                    //    }
+                    //}
                     break;
                 case EFrameGraphResourceType::TextureView:
                     // Decrease the texture view's count

@@ -22,7 +22,7 @@ namespace engine::framegraph
             Shared<IAssetStorage>    const &aAssetStorage,
             Shared<CMaterialLoader>  const &aMaterialLoader,
             Shared<CResourceManager> const &aResourceManager,
-             Shared<IRenderContext>   const &aRenderer)
+            Shared<IRenderContext>   const &aRenderer)
     {
         bool const inputInvalid =
                 nullptr == aAssetStorage    or
@@ -102,6 +102,23 @@ namespace engine::framegraph
     {
         mResourceMap.erase(aName);
         return { EEngineStatus::Ok };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    CEngineResult<> CFrameGraphRenderContext::clearAttachments(std::string const &aRenderPassId)
+    {
+        Shared<SRenderPass> renderPass = getUsedResourceTyped<SRenderPass>(aRenderPassId);
+
+        EEngineStatus const status = mGraphicsAPIRenderContext->clearAttachments(renderPass->getGpuApiResourceHandle());
+        if(CheckEngineError(status))
+        {
+            // ...
+        }
+
+        return status;
     }
     //<-----------------------------------------------------------------------------
 
@@ -334,7 +351,7 @@ namespace engine::framegraph
                 attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
                 attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                 attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
-                attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::DONT_CARE : EAttachmentLoadOp::LOAD;
+                attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::CLEAR : EAttachmentLoadOp::LOAD;
                 attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                 attachmentDesc.format         = textureView.format;
 
@@ -396,7 +413,6 @@ namespace engine::framegraph
 
             mCurrentRenderPassHandle = renderPassDesc.name;
         }
-
 
         return EEngineStatus::Ok;
     }

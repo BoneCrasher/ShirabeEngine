@@ -122,6 +122,8 @@ namespace engine
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
+                // aRenderContext->clearAttachments("DefaultRenderPass");
+
                 for(SRenderableResources const &renderableResources : aPassData.importData.renderables)
                 {
                     auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(renderableResources.materialResource.resourceId);

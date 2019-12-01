@@ -31,6 +31,8 @@ namespace engine
 
         public_api:
 
+            virtual CEngineResult<> clearAttachments(std::string const &aRenderPassId) = 0;
+
             /**
              * Begin a pass.
              *
@@ -43,7 +45,7 @@ namespace engine
              * End a pass.
              *
              * @return EEngineStatus::Ok if successful.
-             * @return EEngineStatus::Error otherwise.
+             * @return EEngineStatus::Esrror otherwise.
              */
             virtual CEngineResult<> endPass() = 0;
 

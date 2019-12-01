@@ -27,6 +27,8 @@ namespace engine
 
         public_api:
 
+            virtual EEngineStatus clearAttachments(GpuApiHandle_t const &aRenderPassId) = 0;
+
             /**
              * Begin a subpass.
              *

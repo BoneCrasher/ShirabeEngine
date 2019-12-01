@@ -83,10 +83,9 @@ namespace engine
             };
 
             auto const execute = [=] (
-                    SPrePassData                              const &aPassData,
-                    CFrameGraphResources                      const &aFrameGraphResources,
-                    Shared<IFrameGraphRenderContext>
-                    &aContext)
+                    SPrePassData                     const &aPassData,
+                    CFrameGraphResources             const &aFrameGraphResources,
+                    Shared<IFrameGraphRenderContext>       &aContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aFrameGraphResources);
@@ -101,6 +100,8 @@ namespace engine
                 aContext->beginCommandBuffer();
                 // Begin a render pass w/ a given framebuffer.
                 // aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
+
+                aContext->clearAttachments(sRenderPassResourceId);
 
                 return { EEngineStatus::Ok };
             };

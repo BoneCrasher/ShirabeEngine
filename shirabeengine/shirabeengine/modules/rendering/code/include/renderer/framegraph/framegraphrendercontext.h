@@ -62,6 +62,8 @@ namespace engine
             // IFrameGraphRenderContext implementation
             //
 
+            CEngineResult<> clearAttachments(std::string const &aFrameBufferId) final;
+
             /**
              * Begin a pass.
              *
