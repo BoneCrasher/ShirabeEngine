@@ -409,6 +409,7 @@ namespace engine
             return { EEngineStatus::Ok };
         }
 
+        CLog::Debug(logTag(), "Tick...");
         mTimer.resetTick();
 
         mScene.update();
@@ -416,6 +417,12 @@ namespace engine
         if(mRenderer)
         {
             RenderableList renderableCollection {};
+
+            // JUST A TEST, Remove that stuff...
+            static int16_t counter = 0;
+            counter = (++counter % 360);
+            static float newHorizontalScale = 0.0f;
+            newHorizontalScale = cosf( (((float) counter) / 180.0f) * M_PIf32 );
 
             Vector<Unique<ecws::CEntity>> const &entities = mScene.getEntities();
             for(auto const &entity : entities)
@@ -426,11 +433,14 @@ namespace engine
 
                 // for(auto const &mesh : meshes)
                     for(auto const &material : materials)
+                    {
+                        material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "horizontalScale", newHorizontalScale);
                         renderableCollection.push_back({ name
                                                          , ""
                                                          , 0
                                                          , material->getMaterialInstance()->name()
                                                          , material->getMaterialInstance()->master()->getAssetId() });
+                    }
             }
 
             mRenderer->renderScene(renderableCollection);

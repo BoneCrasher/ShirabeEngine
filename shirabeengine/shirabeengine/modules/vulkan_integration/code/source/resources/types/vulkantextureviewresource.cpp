@@ -88,7 +88,7 @@ namespace engine::vulkan
 
         VkImageView vkImageView = VK_NULL_HANDLE;
 
-        CLog::Debug(logTag(), "Creating textureview w/ name {}", aDescription.name);
+        // CLog::Debug(logTag(), "Creating textureview w/ name {}", aDescription.name);
 
         VkResult result = vkCreateImageView(getVkContext()->getLogicalDevice(), &vkImageViewCreateInfo, nullptr, &vkImageView);
         if(VkResult::VK_SUCCESS != result)
@@ -113,7 +113,7 @@ namespace engine::vulkan
         VkImageView vkImageView     = this->handle;
         VkDevice    vkLogicalDevice = getVkContext()->getLogicalDevice();
 
-        CLog::Debug(logTag(), "Destroying textureview w/ name {}", getCurrentDescriptor()->name);
+        // CLog::Debug(logTag(), "Destroying textureview w/ name {}", getCurrentDescriptor()->name);
 
         vkDestroyImageView(vkLogicalDevice, vkImageView, nullptr);
 
