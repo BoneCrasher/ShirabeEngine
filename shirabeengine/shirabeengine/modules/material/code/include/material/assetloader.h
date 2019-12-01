@@ -27,7 +27,7 @@ namespace engine::material
     ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage>  const &aAssetStorage
                                                                      , std::string                 const &aMaterialName
                                                                      , SMaterialSignature          const &aSignature
-                                                                     , CMaterialConfig                   &aConfiguration)
+                                                                     , CMaterialConfig             const &aConfiguration)
     {
         using namespace resources;
 
@@ -220,14 +220,14 @@ namespace engine::material
             layoutBinding.pImmutableSamplers = nullptr;
             pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
 
-            CEngineResult<void *const> bufferDataFetch = aConfiguration.getBuffer(uniformBuffer.name);
+            CEngineResult<void const *const> bufferDataFetch = aConfiguration.getBuffer(uniformBuffer.name);
             if(CheckEngineError(bufferDataFetch.result()))
             {
                 CLog::Debug("AssetLoader - Materials", "Can't find buffer w/ name {} in config.", uniformBuffer.name);
                 continue;
             }
 
-            auto        *const data = static_cast<int8_t *const>(bufferDataFetch.data());
+            auto  const *const data = static_cast<int8_t const *const>(bufferDataFetch.data());
             std::size_t  const size = uniformBuffer.location.length;
 
             auto const dataSource =  [data, size] () -> ByteBuffer
@@ -291,7 +291,7 @@ namespace engine::material
 
             Shared<CMaterialMaster> const &master    = instance->master();
             SMaterialSignature      const &signature = master  ->signature();
-            CMaterialConfig               &config    = instance->config();
+            CMaterialConfig         const &config    = instance->config();
 
             auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config());
             //master->setPipelineDescription    (pipelineDescription);

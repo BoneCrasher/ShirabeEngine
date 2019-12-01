@@ -30,7 +30,7 @@ namespace engine {
          * @param size
          */
         CDataBuffer( std::vector<T> &&aData, uint64_t const aSize);
-        CDataBuffer( T *const aData, uint64_t const aSize);
+        CDataBuffer( T const *const aData, uint64_t const aSize);
 
     public_methods:
         /**
@@ -76,9 +76,9 @@ namespace engine {
 
     private_members:
         std::vector<T> mVectorData;
-        T             *mRawData;
-        uint64_t  mSize;
-        bool      mUseRawData;
+        T       const *mRawData;
+        uint64_t       mSize;
+        bool           mUseRawData;
     };
     //<-----------------------------------------------------------------------------
 
@@ -152,8 +152,8 @@ namespace engine {
     //<-----------------------------------------------------------------------------
     template <typename T>
     CDataBuffer<T>::CDataBuffer(
-            T      * const aData,
-            uint64_t const aSize)
+            T const * const aData,
+            uint64_t  const aSize)
             : mVectorData(0)
             , mRawData(std::move(aData))
             , mSize(aSize)
