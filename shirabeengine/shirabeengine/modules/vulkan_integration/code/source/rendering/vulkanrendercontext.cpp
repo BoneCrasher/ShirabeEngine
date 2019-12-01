@@ -369,9 +369,10 @@ namespace engine
 
             std::vector<VkClearValue> clearValues {};
             clearValues.resize(renderPass->getCurrentDescriptor()->attachmentDescriptions.size());
-            for(auto &clearValue : clearValues)
+            for(std::size_t k=0; k<renderPass->getCurrentDescriptor()->attachmentDescriptions.size(); ++k)
             {
-                clearValue = { 0.0f, 0.5f, 0.5f, 1.0f };
+                SAttachmentDescription const &desc = renderPass->getCurrentDescriptor()->attachmentDescriptions[k];
+                clearValues.push_back(desc.clearColor);
             }
 
             VkRenderPassBeginInfo vkRenderPassBeginInfo {};

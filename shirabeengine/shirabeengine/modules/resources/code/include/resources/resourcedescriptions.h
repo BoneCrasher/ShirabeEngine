@@ -123,6 +123,7 @@ namespace engine
             EAttachmentStoreOp stencilStoreOp;
             EImageLayout       initialLayout;
             EImageLayout       finalLayout;
+            VkClearValue       clearColor;
         };
 
         struct SAttachmentReference

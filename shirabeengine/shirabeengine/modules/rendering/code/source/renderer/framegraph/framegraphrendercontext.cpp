@@ -351,11 +351,10 @@ namespace engine::framegraph
                 attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
                 attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                 attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
-                attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::CLEAR : EAttachmentLoadOp::LOAD;
+                attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::DONT_CARE : EAttachmentLoadOp::LOAD;
                 attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                 attachmentDesc.format         = textureView.format;
 
-                renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
 
                 bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
                 bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
@@ -366,11 +365,16 @@ namespace engine::framegraph
 
                 if(isColorAttachment)
                 {
+                    attachmentDesc.loadOp      = EAttachmentLoadOp::CLEAR;
+                    attachmentDesc.clearColor  = { 0.0f, 0.0f, 0.0f, 1.0f };
                     attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
                     subpassDesc.colorAttachments.push_back(attachmentReference);
                 }
                 else if(isDepthAttachment)
                 {
+                    attachmentDesc.loadOp      = EAttachmentLoadOp::CLEAR;
+                    attachmentDesc.clearColor  = { 0.0f, 0.0f, 0.0f, 1.0f };
+
                     if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
                     {
                         attachmentReference.layout = EImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -384,9 +388,11 @@ namespace engine::framegraph
                 }
                 else if(isInputAttachment)
                 {
+                    attachmentDesc.loadOp      = EAttachmentLoadOp::LOAD;
                     attachmentReference.layout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
                     subpassDesc.inputAttachments.push_back(attachmentReference);
                 }
+                renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
             }
 
             renderPassDesc.subpassDescriptions.push_back(subpassDesc);
