@@ -396,7 +396,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineResult<> CEngineInstance::update()
     {
-        mTimer.update();
+        //mTimer.update();
 
         if(CheckWindowManagerError(mWindowManager->update()))
         {
@@ -404,13 +404,13 @@ namespace engine
                 return { EEngineStatus::UpdateError };
         }        
 
-        if(not mTimer.isTick())
-        {
-            return { EEngineStatus::Ok };
-        }
+       //if(not mTimer.isTick())
+       //{
+       //    return { EEngineStatus::Ok };
+       //}
 
         CLog::Debug(logTag(), "Tick...");
-        mTimer.resetTick();
+        //mTimer.resetTick();
 
         mScene.update();
 

@@ -263,7 +263,7 @@ macro(
 	    
     # Append 'd' in case of debug, but AFTER appending x64!
     
-    if(SHIRABE_DEBUG)
+    if(${SHIRABE_DEBUG})
         set(TMP_MODULE_NAME
             "${TMP_MODULE_NAME}d"
             )

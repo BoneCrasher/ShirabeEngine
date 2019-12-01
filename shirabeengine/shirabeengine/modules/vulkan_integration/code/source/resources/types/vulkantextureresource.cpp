@@ -27,7 +27,7 @@ namespace engine::vulkan
 
         CVkApiResource<STexture>::create(aDescription, aDependencies, aResolvedDependencies);
 
-        CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
+        /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
 
         VkDevice         const &vkLogicalDevice  = getVkContext()->getLogicalDevice();
         VkPhysicalDevice const &vkPhysicalDevice = getVkContext()->getPhysicalDevice();
@@ -254,7 +254,7 @@ namespace engine::vulkan
 
         VkDevice       vkLogicalDevice = getVkContext()->getLogicalDevice();
 
-        CLog::Debug(logTag(), "Destroying texture w/ name {}", getCurrentDescriptor()->name);
+        // CLog::Debug(logTag(), "Destroying texture w/ name {}", getCurrentDescriptor()->name);
 
         vkDestroySampler(vkLogicalDevice, vkSampler,      nullptr);
         vkFreeMemory    (vkLogicalDevice, vkImageMemory,  nullptr);
