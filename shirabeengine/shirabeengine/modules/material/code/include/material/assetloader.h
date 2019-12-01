@@ -215,7 +215,7 @@ namespace engine::material
             VkDescriptorSetLayoutBinding layoutBinding {};
             layoutBinding.binding            = uniformBuffer.binding;
             layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            layoutBinding.stageFlags         = serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
+            layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL; // serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
             layoutBinding.descriptorCount    = 1;
             layoutBinding.pImmutableSamplers = nullptr;
             pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
@@ -283,7 +283,7 @@ namespace engine::material
     {
         auto const loader = [=] (ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject>
         {
-            auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aAssetStorage, aAssetId, true);
+            auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aResourceId, aAssetStorage, aAssetId, true);
             if(CheckEngineError(result))
             {
                 return nullptr;

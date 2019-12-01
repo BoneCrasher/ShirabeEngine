@@ -108,6 +108,8 @@ namespace engine::vulkan
         uint32_t                      selectedPhysicalDevice;
         // Logical Device
         VkDevice                      selectedLogicalDevice;
+        // Limits
+        VkPhysicalDeviceProperties    properties;
         // Swap Chain
         SVulkanSwapChain              swapChain;
         // Command Pool & Buffer

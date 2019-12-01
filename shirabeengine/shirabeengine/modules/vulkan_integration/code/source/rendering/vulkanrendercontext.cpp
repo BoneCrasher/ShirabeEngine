@@ -197,16 +197,20 @@ namespace engine
             descriptorSetWrites          .resize(aGpuBufferHandles.size());
             descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
 
-            std::size_t index_offset = 0;
-            for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
+            for(std::size_t k=0; k<aGpuBufferHandles.size(); ++k)
             {
                 std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
                 for(std::size_t j=0; j<setBindings.size(); ++j)
                 {
-                    VkDescriptorSetLayoutBinding const bufferBinding = setBindings[j];
+                    VkDescriptorSetLayoutBinding const binding = setBindings[j];
 
-                    auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[index_offset]);
-                    sdfasdfasdf
+                    if(binding.descriptorType != VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+                    {
+                        continue; // Only supporting UBOs for now...
+                    }
+
+                    auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[k]);
+
                     VkDescriptorBufferInfo bufferInfo = {};
                     bufferInfo.buffer = buffer->handle;
                     bufferInfo.offset = 0;
@@ -214,18 +218,17 @@ namespace engine
                     descriptorSetWriteBufferInfos[k] = bufferInfo;
 
                     VkWriteDescriptorSet descriptorWrite = {};
-                    descriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                    descriptorWrite.dstSet          = pipeline->descriptorSets[k];
-                    descriptorWrite.dstBinding      = bufferBinding.binding;
-                    descriptorWrite.dstArrayElement = 0;
+                    descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                    descriptorWrite.pNext            = nullptr;
                     descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                    descriptorWrite.dstSet           = pipeline->descriptorSets[k];
+                    descriptorWrite.dstBinding       = binding.binding;
+                    descriptorWrite.dstArrayElement  = 0;
                     descriptorWrite.descriptorCount  = 1;
                     descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[k]);
                     descriptorWrite.pImageInfo       = nullptr; // Optional
                     descriptorWrite.pTexelBufferView = nullptr;
                     descriptorSetWrites[k] = descriptorWrite;
-
-                    ++index_offset;
                 }
             }
 
@@ -530,7 +533,8 @@ namespace engine
             vkCmdBindDescriptorSets(vkCommandBuffer
                     , VK_PIPELINE_BIND_POINT_GRAPHICS
                     , pipeline->pipelineLayout
-                    , 0 , 1
+                    , 0
+                    , pipeline->descriptorSets.size()
                     , pipeline->descriptorSets.data()
                     , 0, nullptr);
 

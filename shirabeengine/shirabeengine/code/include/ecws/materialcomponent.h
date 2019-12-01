@@ -28,6 +28,19 @@ namespace engine::ecws
 		SHIRABE_INLINE
 		Shared<material::CMaterialInstance> const getMaterialInstance() const { return mMaterialInstance; }
 
+		SHIRABE_INLINE
+		material::CMaterialConfig &getMutableConfiguration()
+        {
+		    static material::CMaterialConfig sEmptyConfig = {};
+
+		    if(nullptr == mMaterialInstance)
+            {
+		        return sEmptyConfig;
+            }
+
+		    return mMaterialInstance->getMutableConfiguration();
+        }
+
 	private_members:
 	    std::string                         mName;
 	    Shared<material::CMaterialInstance> mMaterialInstance;

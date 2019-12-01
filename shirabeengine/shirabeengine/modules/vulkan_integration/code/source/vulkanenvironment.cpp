@@ -179,7 +179,7 @@ namespace engine::vulkan
         vkDebugReportCallbackCreateInfo.flags       = reportFlags;
         vkDebugReportCallbackCreateInfo.pfnCallback = __vkValidationLayerReportCallback;
 
-        PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT =
+        auto vkCreateDebugReportCallbackEXT =
                 (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
         if(!vkCreateDebugReportCallbackEXT)
         {
@@ -433,6 +433,8 @@ namespace engine::vulkan
         {
             throw CVulkanError(CString::format("Failed to create logical device for physical device at index {}.", aIndex), result);
         }
+
+        vkGetPhysicalDeviceProperties(physicalDevice.handle, &(mVkState.properties));
 
         mVkState.selectedLogicalDevice = vkLogicalDevice;
     }
@@ -878,7 +880,6 @@ namespace engine::vulkan
             mResourceStorage = aStorage;
 
             EEngineStatus status = EEngineStatus::Ok;
-
             createVulkanInstance("ShirabeEngine Demo");
             determinePhysicalDevices();
             selectPhysicalDevice(0);

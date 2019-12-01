@@ -856,17 +856,6 @@ namespace engine
                     std::string const &aFieldName) const;
 
             /**
-             * Return the value of a buffer member identified by buffer location as byte-pointer.
-             *
-             * @param aBufferName  The name of the buffer containing the value to fetch.
-             * @param aFieldName   The name of the value to fetch.
-             * @return             EEngineStatus::Ok and a valid pointer to the data, if successful.
-             * @return             EEngineStatus::Error and nullptr or any error code on failure.
-             */
-            SHIRABE_INLINE
-            CEngineResult<uint8_t const*> getBufferValue(SBufferLocation const &aLocation) const;
-
-            /**
              * setValue
              *
              * @tparam TDataType   Type of the data to be set.
@@ -881,29 +870,6 @@ namespace engine
                     std::string const &aBufferName,
                     std::string const &aFieldName,
                     TDataType   const &aFieldValue);
-
-            /**
-             * Set the value of a buffer member identified by buffer location
-             *
-             * @param aLocation   The location in the material data buffer to set.
-             * @param aData       The byte data to set.
-             * @return            EEngineStatus::Ok, if successful.
-             * @return            EEngineStatus::<ErrorCode> on error.
-             */
-            SHIRABE_INLINE
-            CEngineResult<> setBufferValue(
-                    SBufferLocation const       &aLocation,
-                    uint8_t         const *const aData);
-
-            /**
-             * Override individual data points in the configuration in order to implement
-             * material instance behaviour.
-             *
-             * @param aOther The configuration to apply to this instance.
-             * @return       EEngineStatus::Ok, if successful.
-             * @return       EEngineStatus::<ErrorCode> on error.
-             */
-            CEngineResult<> override(CMaterialConfig const &aOther);
 
             /**
              * @brief acceptSerializer
@@ -960,7 +926,8 @@ namespace engine
 
         private_members:
             Map<std::string, SBufferData> mBufferIndex;
-            std::vector<uint8_t>          mData;
+            // std::vector<uint8_t>          mData;
+            std::unordered_map<std::string, Shared<void>> mData;
         };
         //<-----------------------------------------------------------------------------
 
@@ -988,10 +955,10 @@ namespace engine
 
             SBufferLocation const &location = buffer.getValueLocation(aBufferValue);
 
-            uint8_t   const *const data       = (mData.data() + location.offset);
-            TDataType const *const bufferData = reinterpret_cast<TDataType const *>(data);
-
-            return CEngineResult<TDataType const *>(EEngineStatus::Ok, bufferData);
+            Shared<void>           alignedData = mData.at(aBufferName);
+            TDataType const *const bufferData  = reinterpret_cast<TDataType const *>(alignedData.get());
+            TDataType const *const adjusted    = (bufferData + (location.offset / sizeof(TDataType)));
+            return { EEngineStatus::Ok, adjusted };
         }
         //<-----------------------------------------------------------------------------
 
@@ -1004,10 +971,10 @@ namespace engine
                 std::string  const &aBufferValue)
         {
             // Dirty hack to reuse the function implementation...
-            TDataType                       const *constData = nullptr;
             CEngineResult<TDataType const*> const  result    = static_cast<CMaterialConfig const*>(this)->getBufferValuePointer<TDataType>(aBufferName, aBufferValue);
+            TDataType                       const *constData = result.data();
 
-            return CEngineResult(result.result(), const_cast<TDataType *>(constData));
+            return { result.result(), const_cast<TDataType *>(constData) };
         }
         //<-----------------------------------------------------------------------------
 
@@ -1026,8 +993,9 @@ namespace engine
             SBufferData     const &buffer = mBufferIndex.at(aBufferName);
             SBufferLocation const &location = buffer.getLocation();
 
-            uint8_t     const *const data       = (mData.data() + location.offset);
-            TBufferType const *const bufferData = static_cast<TBufferType const *const>(data);
+            // uint8_t     const *const data       = (mData.data() + location.offset);
+            Shared<void>             alignedData = mData.at(aBufferName);
+            TBufferType const *const bufferData  = static_cast<TBufferType const *const>(alignedData.get());
 
             return CEngineResult(EEngineStatus::Ok, bufferData);
         }
@@ -1048,21 +1016,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<uint8_t const*> CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const
-        {
-            bool const validRequest = (0 < aLocation.offset && mData.size() > (aLocation.offset + aLocation.length));
-            if(not validRequest)
-            {
-                return { EEngineStatus::Error };
-            }
-
-            return { EEngineStatus::Ok, (mData.data() + aLocation.offset) };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         template <typename TDataType>
         CEngineResult<> CMaterialConfig::setBufferValue(
                 std::string const &aBufferName,
@@ -1075,19 +1028,7 @@ namespace engine
                 *(result.data()) = aFieldValue;
             }
 
-            return result;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CMaterialConfig::setBufferValue(
-                SBufferLocation const       &aLocation,
-                uint8_t         const *const aData)
-        {
-            std::memcpy(mData.data() + aLocation.offset, aData, sizeof(uint8_t) * aLocation.length);
-            return { EEngineStatus::Ok };
+            return result.result();
         }
         //<-----------------------------------------------------------------------------
 
@@ -1222,6 +1163,12 @@ namespace engine
                 CMaterialConfig const &config() const
                 {
                     return *mConfiguration;
+                }
+
+                SHIRABE_INLINE
+                CMaterialConfig &getMutableConfiguration()
+                {
+                    return mConfiguration.value();
                 }
 
                 SHIRABE_INLINE

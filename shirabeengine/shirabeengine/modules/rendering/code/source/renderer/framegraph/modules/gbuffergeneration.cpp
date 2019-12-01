@@ -96,8 +96,8 @@ namespace engine
                 // Register all meshes and materials for use.
                 for(SRenderable const &renderable : aRenderableInput.renderableList)
                 {
-                    SFrameGraphMesh     const &meshResource     = aBuilder.useMesh    (renderable.meshAssetId    ).data();
-                    SFrameGraphMaterial const &materialResource = aBuilder.useMaterial(renderable.materialAssetId).data();
+                    SFrameGraphMesh     const &meshResource     = aBuilder.useMesh    (renderable.meshInstanceId    , renderable.meshInstanceAssetId).data();
+                    SFrameGraphMaterial const &materialResource = aBuilder.useMaterial(renderable.materialInstanceId, renderable.materialInstanceAssetId).data();
 
                     SRenderableResources resources {};
                     resources.meshResource     = meshResource;
@@ -113,8 +113,8 @@ namespace engine
             // Execution
             // ----------------------------------------------------------------------------------
             auto const execute = [=] (
-                    SPassData                                 const&aPassData,
-                    CFrameGraphResources                      const&aFrameGraphResources,
+                    SPassData                        const&aPassData,
+                    CFrameGraphResources             const&aFrameGraphResources,
                     Shared<IFrameGraphRenderContext>      &aRenderContext)
                     -> CEngineResult<>
             {

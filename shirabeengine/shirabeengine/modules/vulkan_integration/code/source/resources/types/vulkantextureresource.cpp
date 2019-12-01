@@ -196,11 +196,11 @@ namespace engine::vulkan
         this->stagingBuffer       = vkStagingBuffer;
         this->stagingBufferMemory = vkStagingBufferMemory;
 
-        getVkContext()->registerDebugObjectName((uint64_t)this->imageHandle,         VK_OBJECT_TYPE_IMAGE,         aDescription.name);
-        getVkContext()->registerDebugObjectName((uint64_t)this->imageMemory,         VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_Memory");
-        getVkContext()->registerDebugObjectName((uint64_t)this->attachedSampler,     VK_OBJECT_TYPE_SAMPLER,       std::string(aDescription.name) + "_Sampler");
-        getVkContext()->registerDebugObjectName((uint64_t)this->stagingBuffer,       VK_OBJECT_TYPE_BUFFER,        std::string(aDescription.name) + "_StagingBuffer");
-        getVkContext()->registerDebugObjectName((uint64_t)this->stagingBufferMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_StagingBufferMemory");
+        // getVkContext()->registerDebugObjectName((uint64_t)this->imageHandle,         VK_OBJECT_TYPE_IMAGE,         aDescription.name);
+        // getVkContext()->registerDebugObjectName((uint64_t)this->imageMemory,         VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_Memory");
+        // getVkContext()->registerDebugObjectName((uint64_t)this->attachedSampler,     VK_OBJECT_TYPE_SAMPLER,       std::string(aDescription.name) + "_Sampler");
+        // getVkContext()->registerDebugObjectName((uint64_t)this->stagingBuffer,       VK_OBJECT_TYPE_BUFFER,        std::string(aDescription.name) + "_StagingBuffer");
+        // getVkContext()->registerDebugObjectName((uint64_t)this->stagingBufferMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_StagingBufferMemory");
 
         setResourceState(EGpuApiResourceState::Loaded);
 

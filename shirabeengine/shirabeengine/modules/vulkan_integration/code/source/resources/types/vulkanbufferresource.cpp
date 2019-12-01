@@ -131,8 +131,8 @@ namespace engine::vulkan
         this->handle         = buffer;
         this->attachedMemory = memory;
 
-        getVkContext()->registerDebugObjectName((uint64_t)this->handle,         VK_OBJECT_TYPE_BUFFER, aDescription.name);
-        getVkContext()->registerDebugObjectName((uint64_t)this->attachedMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_Memory");
+        // getVkContext()->registerDebugObjectName((uint64_t)this->handle,         VK_OBJECT_TYPE_BUFFER, aDescription.name);
+        // getVkContext()->registerDebugObjectName((uint64_t)this->attachedMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_Memory");
 
         setResourceState(EGpuApiResourceState::Loaded);
 

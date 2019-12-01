@@ -3,6 +3,7 @@
 
 #include <log/log.h>
 #include <core/enginestatus.h>
+#include <resources/resourcedescriptions.h>
 
 namespace engine
 {
@@ -54,12 +55,16 @@ namespace engine
              */
             CEngineResult <SMaterialMeta> loadMaterialMeta(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId);
 
+            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                          , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                          , bool                                aAutoCreateConfiguration);
             /**
              * @brief loadMaterial
              * @param aMaterialId
              * @return
              */
-            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
+            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( std::string                  const &aMaterialInstanceId
+                                                                          , Shared<asset::IAssetStorage> const &aAssetStorage
                                                                           , asset::AssetID_t             const &aMaterialInstanceAssetId
                                                                           , bool                                aAutoCreateConfiguration);
 
@@ -73,7 +78,8 @@ namespace engine
         private_methods:
 
         private_members:
-            Map <asset::AssetID_t, Shared<CMaterialMaster>>   mInstantiatedMaterialMasters;
+            Map <asset::AssetID_t, Shared<CMaterialMaster>>          mInstantiatedMaterialMasters;
+            Map <resources::ResourceId_t, Shared<CMaterialInstance>> mInstantiatedMaterialInstances;
         };
 
     }

@@ -687,11 +687,22 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     CMaterialConfig CMaterialConfig::fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers)
     {
+        uint32_t const minUBOOffsetAlignment = 16; // Hardcoded for the platform... make accessible in any other way...
+        std::size_t alignment = minUBOOffsetAlignment; // 16 * sizeof(float);
+        // if (0 < minUBOOffsetAlignment) {
+        //     alignment = (alignment + minUBOOffsetAlignment - 1) & ~(minUBOOffsetAlignment - 1);
+        // }
+
+        auto const nextMultiple = [] (uint32_t const &aInput, uint32_t const &aAlignment) -> uint32_t
+        {
+            return (aInput + aAlignment - 1) & -aAlignment;
+        };
+
         CMaterialConfig config {};
 
         uint64_t previousSize = 0;
         uint64_t currentSize  = 0;
-        uint64_t  totalSize    = 0;
+        uint64_t totalSize    = 0;
 
         if(aMaterial.uniformBuffers.empty())
         {
@@ -732,7 +743,7 @@ namespace engine::material
         {
             SBufferLocation adjustedBufferLocation {};
             adjustedBufferLocation.offset  = (totalSize + buffer.location.offset) - baseBackShift;
-            adjustedBufferLocation.length  = buffer.location.length;
+            adjustedBufferLocation.length  = nextMultiple(buffer.location.length, alignment);
             adjustedBufferLocation.padding = buffer.location.padding;
 
             SBufferData data{};
@@ -750,13 +761,18 @@ namespace engine::material
 
             config.mBufferIndex[buffer.name] = data;
 
-            previousSize = currentSize;
-            currentSize  = (buffer.location.offset + buffer.location.length + buffer.location.padding) - baseBackShift;
-            totalSize   += currentSize;
+            int8_t *alignedData = (int8_t *)aligned_alloc(alignment, adjustedBufferLocation.length);
+            memset(alignedData, 0, adjustedBufferLocation.length);
+            config.mData.insert({ buffer.name, Shared<void>(alignedData) });
+
+            // previousSize = currentSize;
+            //currentSize  = (buffer.location.offset + buffer.location.length + buffer.location.padding) - baseBackShift;
+            //currentSize  = nextMultiple(currentSize, alignment);
+            //totalSize   += currentSize;
         }
 
-        config.mData.resize(totalSize);
-        config.mData.assign(totalSize, 0);
+        // config.mData.resize(totalSize);
+        // config.mData.assign(totalSize, 0);
 
         return config;
     }
@@ -793,12 +809,14 @@ namespace engine::material
             return CEngineResult<void const *const>(EEngineStatus::Error, nullptr);
         }
 
-        SBufferData     const &buffer   = mBufferIndex.at(aBufferName);
-        SBufferLocation const &location = buffer.getLocation();
+        Shared<void> const alignedData = mData.at(aBufferName);
 
-        void const *const data = (mData.data() + location.offset);
+        // SBufferData     const &buffer   = mBufferIndex.at(aBufferName);
+        // SBufferLocation const &location = buffer.getLocation();
+//
+        // void const *const data = (mData.data() + location.offset);
 
-        return { EEngineStatus::Ok, data };
+        return { EEngineStatus::Ok, alignedData.get() };
     }
     //<-----------------------------------------------------------------------------
 
@@ -818,41 +836,14 @@ namespace engine::material
             return CEngineResult<void *const>(EEngineStatus::Error, nullptr);
         }
 
-        SBufferData     const &buffer   = mBufferIndex.at(aBufferName);
-        SBufferLocation const &location = buffer.getLocation();
+        Shared<void> alignedData = mData.at(aBufferName);
 
-        void *const data = (mData.data() + location.offset);
+        // SBufferData     const &buffer   = mBufferIndex.at(aBufferName);
+        // SBufferLocation const &location = buffer.getLocation();
 
-        return { EEngineStatus::Ok, data };
-    }
-    //<-----------------------------------------------------------------------------
+        // void *const data = (mData.data() + location.offset);
 
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CMaterialConfig::override(CMaterialConfig const &aOther)
-    {
-        for(auto const &[bufferId, data] : mBufferIndex)
-        {
-            for(auto const &[valueId, location] : data.mValueIndex)
-            {
-                CEngineResult<uint8_t const *> valueFetch = aOther.getBufferValue(location);
-                if(not valueFetch.successful())
-                {
-                    // Ignore, as the desired value might not be part of the master material.
-                    continue;
-                }
-
-                // If override value is not null-array. Override.
-                uint8_t const *const value = valueFetch.data();
-                if(not checkIsZeroArray(value, location))
-                {
-                    CEngineResult<> result = setBufferValue(location, value);
-                }
-            }
-        }
-
-        return { EEngineStatus::Ok };
+        return { EEngineStatus::Ok, alignedData.get() };
     }
     //<-----------------------------------------------------------------------------
 
@@ -863,7 +854,7 @@ namespace engine::material
     {
         aSerializer.beginObject("");
 
-        aSerializer.writeValue("uniformBufferData", mData);
+        // aSerializer.writeValue("uniformBufferData", mData);
 
         aSerializer.beginArray("uniformBuffers");
         auto const iterateUniformBuffers = [&] (std::pair<std::string, SBufferData> const &aBuffer) -> void
@@ -911,7 +902,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     bool CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer<CMaterialConfig> &aDeserializer)
     {
-        aDeserializer.readValue("uniformBufferData", mData);
+        // aDeserializer.readValue("uniformBufferData", mData);
 
         uint32_t bufferCount = 0;
         aDeserializer.beginArray("uniformBuffers", bufferCount);

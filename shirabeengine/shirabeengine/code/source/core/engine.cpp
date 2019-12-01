@@ -333,6 +333,7 @@ namespace engine
 
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);
+            materialComponent->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "horizontalScale", 0.5f);
 
             auto cube = makeUnique<ecws::CEntity>();
             cube->addComponent<ecws::CMaterialComponent>(materialComponent);
@@ -426,7 +427,9 @@ namespace engine
                 // for(auto const &mesh : meshes)
                     for(auto const &material : materials)
                         renderableCollection.push_back({ name
+                                                         , ""
                                                          , 0
+                                                         , material->getMaterialInstance()->name()
                                                          , material->getMaterialInstance()->master()->getAssetId() });
             }
 

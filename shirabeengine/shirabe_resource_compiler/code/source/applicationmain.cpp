@@ -549,15 +549,15 @@ public_methods:
 
         writeFile(outputSignaturePathAbsolute, serializedData);
 
-        CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data());
-        CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);
-        if(not configSerializationResult.successful())
-        {
-            CLog::Error(logTag(), "Failed to serialize config data.");
-            return EResult::SerializationFailed;
-        }
-
-        writeFile(outputConfigurationPathAbsolute, serializedData);
+        //CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data(), );
+        //CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);
+        //if(not configSerializationResult.successful())
+        //{
+        //    CLog::Error(logTag(), "Failed to serialize config data.");
+        //    return EResult::SerializationFailed;
+        //}
+        //
+        //writeFile(outputConfigurationPathAbsolute, serializedData);
 
         return EResult::Success;
     }

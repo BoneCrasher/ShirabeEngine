@@ -20,9 +20,11 @@ namespace engine
         struct SRenderable
         {
         public_members:
-            std::string      name;
-            asset::AssetId_t meshAssetId;
-            asset::AssetId_t materialAssetId;
+            std::string     name;
+            std::string     meshInstanceId;
+            asset::AssetId_t meshInstanceAssetId;
+            std::string      materialInstanceId;
+            asset::AssetId_t materialInstanceAssetId;
         };
         SHIRABE_DECLARE_LIST_OF_TYPE(SRenderable, Renderable);
     }
@@ -42,8 +44,8 @@ namespace engine
                     "    MeshId:     {}\n"
                     "    MaterialId: {}\n",
                     aRenderable.name,
-                    aRenderable.meshAssetId,
-                    aRenderable.materialAssetId);
+                    aRenderable.meshInstanceId,
+                    aRenderable.materialInstanceId);
         return message;
     }
 }

@@ -204,6 +204,23 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::loadMaterialInstance( std::string                  const &aMaterialInstanceId
+                                                                                      , Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                                      , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                                      , bool                                aAutoCreateConfiguration)
+        {
+            if(mInstantiatedMaterialInstances.end() != mInstantiatedMaterialInstances.find(aMaterialInstanceId))
+            {
+                return { EEngineStatus::Ok, mInstantiatedMaterialInstances.at(aMaterialInstanceId) };
+            }
+
+            return loadMaterialInstance(aAssetStorage, aMaterialInstanceAssetId, aAutoCreateConfiguration);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
                                                                                       , asset::AssetID_t             const &aMaterialInstanceAssetId
                                                                                       , bool                                aAutoCreateConfiguration)
@@ -263,6 +280,8 @@ namespace engine
             {
                 instance->createConfiguration();
             }
+
+            mInstantiatedMaterialInstances.insert({ instanceName, instance });
 
             return { EEngineStatus::Ok, instance };
         }

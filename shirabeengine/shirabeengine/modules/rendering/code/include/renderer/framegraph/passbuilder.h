@@ -177,14 +177,14 @@ namespace engine
              * @param aMeshId
              * @return
              */
-            CEngineResult<SFrameGraphMesh> useMesh(asset::AssetId_t const &aMeshId);
+            CEngineResult<SFrameGraphMesh> useMesh(std::string const &aMeshId, asset::AssetId_t const &aMeshAssetId);
 
             /**
              * Register a material for use in the framegraph.
              * @param aMaterialId
              * @return
              */
-            CEngineResult<SFrameGraphMaterial> useMaterial(asset::AssetId_t const &aMaterialId);
+            CEngineResult<SFrameGraphMaterial> useMaterial(std::string const &aMaterialId, asset::AssetId_t const &aMaterialAssetId);
 
         private_methods:
             /**

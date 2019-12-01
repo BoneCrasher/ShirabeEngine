@@ -6,10 +6,11 @@
 // Model specific matrices.
 //
 layout (std140, set = 2, binding = 0)
-uniform struct_modelMatricess
+uniform struct_modelMatrices
 {
-    mat4 world;
-    mat4 inverseTransposeWorld;
+    mat4  world;
+    mat4  inverseTransposeWorld;
+    float horizontalScale;
 } modelMatrices;
 
 //
@@ -28,21 +29,25 @@ out struct_vertexData_full shader_output;
 
 void main()
 {
+    vec4 position = vec4(0.0, 0.0, 0.0, 0.0);
     switch(gl_VertexIndex)
     {
         case 0:
-        gl_Position = vec4(0.0, -0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
+        position = vec4(0.0, -0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
         shader_output.vertex_color = vec3(1.0f, 0.0f, 0.0f);
         break;
         case 1:
-        gl_Position = vec4(0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
+        position = vec4(0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
         shader_output.vertex_color = vec3(0.0f, 1.0f, 0.0f);
         break;
         case 2:
-        gl_Position = vec4(-0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
+        position = vec4(-0.5, 0.5, 0.0, 1.0); // vec4(vertex_position, 1.0);
         shader_output.vertex_color = vec3(0.0f, 0.0f, 1.0f);
         break;
     }
+
+    position.x *= modelMatrices.horizontalScale;
+    gl_Position = position;
 
     shader_output.vertex_position = gl_Position.xyz;
     shader_output.vertex_normal   = vec3(1.0, 0.0,  0.0);
