@@ -209,11 +209,12 @@ namespace resource_compiler
             uint32_t              const  typeByteWidth  = (aType.width /* bit */ / 8);
             uint32_t              const  typeVectorSize = aType.vecsize;
 
-            uint32_t arraySize     = 1;
-            uint32_t arrayStride   = (typeVectorSize * typeByteWidth);
-            uint32_t matrixRows    = typeVectorSize;
-            uint32_t matrixColumns = aType.columns;
-            uint32_t matrixStride  = (typeVectorSize * typeByteWidth);
+            uint32_t byteSize        = typeByteWidth;
+            uint32_t arraySize       = 1; // Set to one, as a scalar of type T is equivalent to T[1];
+            uint32_t arrayStride     = (typeVectorSize * typeByteWidth);
+            uint32_t matrixRows      = typeVectorSize;
+            uint32_t matrixColumns   = aType.columns;
+            uint32_t matrixStride    = (typeVectorSize * typeByteWidth);
             if (not aType.array.empty())
             {
                 arraySize = aType.array[0]; // Multidimensional arrays not yet supported.
@@ -221,6 +222,7 @@ namespace resource_compiler
 
             Shared<SMaterialType> type = makeShared<SMaterialType>();
             type->name               = determineSPIRVTypeName(aType);
+            type->byteSize           = byteSize;
             type->vectorSize         = typeVectorSize;
             type->arraySize          = arraySize;
             type->arrayStride        = arrayStride;
@@ -241,6 +243,7 @@ namespace resource_compiler
             CLog::Debug(logTag(),
                         "\n     Type:                       "
                         "\n         Type-Name:            {}"
+                        "\n         Element-Size:         {}"
                         "\n         Vector-Size:          {}"
                         "\n         Array-Size:           {}"
                         "\n         Array-Stride:         {}"
@@ -248,6 +251,7 @@ namespace resource_compiler
                         "\n         Matrix-Columns:       {}"
                         "\n         Matrix-Column-Stride: {}",
                         type->name,
+                        type->byteSize,
                         type->vectorSize,
                         type->arraySize,
                         type->arrayStride,
@@ -387,9 +391,17 @@ namespace resource_compiler
 
                 updateLayoutInfoFn(set, binding);
 
-                spirv_cross::SPIRType const &type       = compiler.get_type(uniformBuffer.base_type_id);
-                size_t                const  bufferSize = compiler.get_declared_struct_size(type);
+                spirv_cross::SPIRType const &baseType   = compiler.get_type(uniformBuffer.base_type_id);
+                spirv_cross::SPIRType const &type       = compiler.get_type(uniformBuffer.type_id);
+                size_t                const  bufferSize = compiler.get_declared_struct_size(baseType);
 
+                Shared<SMaterialType  const> baseTypeExtracted = reflectType(compiler, baseType);
+                Shared<SMaterialType  const> typeExtracted     = reflectType(compiler, type);
+
+                SMaterialType const baseTypeData = *baseTypeExtracted;
+                SMaterialType const typeData     = *typeExtracted;
+
+                CLog::Debug(logTag(), "Buffer...");
                 SUniformBuffer uniformBufferExtracted{};
                 uniformBufferExtracted.name             = uniformBuffer.name;
                 uniformBufferExtracted.set              = set;
@@ -397,6 +409,8 @@ namespace resource_compiler
                 uniformBufferExtracted.location.offset  = 0;
                 uniformBufferExtracted.location.length  = bufferSize;
                 uniformBufferExtracted.location.padding = 0;
+                uniformBufferExtracted.type             = *typeExtracted;
+                uniformBufferExtracted.baseType         = *baseTypeExtracted;
                 uniformBufferExtracted.stageBinding.set(stageExtracted.stage);
 
                 CLog::Debug(logTag(),
@@ -404,7 +418,7 @@ namespace resource_compiler
                             "\n  ID:              {}"
                             "\n  Name:            {}"
                             "\n  Set:             {}"
-                            "\n  Binding:         {}",
+                            "\n  Binding:         {}"
                             "\n  Buf.-Size:       {}",
                             uniformBuffer.id,
                             uniformBuffer.name,
@@ -427,12 +441,18 @@ namespace resource_compiler
                         std::string const &name   = aCompiler.get_member_name(aParent.self, k);
                         uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
                         uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
+                        //spirv_cross::SPIRType const  &baseType          = memberType.basetype;
+                        spirv_cross::SPIRType const  &type              = memberType;
+                        //Shared<SMaterialType  const>  localBaseTypeExtracted = reflectType(compiler, baseType);
+                        Shared<SMaterialType  const>  localTypeExtracted     = reflectType(compiler, type);
 
                         Shared<SBufferMember> uniformBufferMemberExtracted = makeShared<SBufferMember>();
                         uniformBufferMemberExtracted->name             = name;
                         uniformBufferMemberExtracted->location.offset  = offset;
                         uniformBufferMemberExtracted->location.length  = size;
                         uniformBufferMemberExtracted->location.padding = 0;
+                        uniformBufferMemberExtracted->type             = *localTypeExtracted;
+                        //uniformBufferMemberExtracted->baseType         = *localBaseTypeExtracted;
 
                         if(not memberType.member_types.empty())
                         {

@@ -18,8 +18,8 @@
       <config projectName="shirabedevelopment" targetName="core" />
       <config projectName="shirabedevelopment" targetName="crc32generator" />
       <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
       <config projectName="shirabedevelopment" targetName="wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
       <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
       <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
       <config projectName="shirabedevelopment" targetName="resources" />
@@ -31,8 +31,8 @@
       <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
       <config projectName="shirabedevelopment" targetName="INSTALL_os" />
       <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="asset" />
       <config projectName="shirabedevelopment" targetName="material" />
+      <config projectName="shirabedevelopment" targetName="asset" />
       <config projectName="shirabedevelopment" targetName="os" />
       <config projectName="shirabedevelopment" targetName="base" />
       <config projectName="shirabedevelopment" targetName="shirabeengine" />
@@ -263,12 +263,10 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_loader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_loader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_loader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_loader.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/extraction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/extraction.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_declaration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_declaration.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -343,7 +341,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="CMake Application.INSTALL_game">
+  <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
     <configuration name="INSTALL_asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_asset" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -656,7 +654,8 @@
       <workItem from="1574537189509" duration="6019000" />
       <workItem from="1574618310008" duration="3414000" />
       <workItem from="1574770390369" duration="10265000" />
-      <workItem from="1575008692202" duration="30215000" />
+      <workItem from="1575008692202" duration="30815000" />
+      <workItem from="1575312406711" duration="6792000" />
     </task>
     <servers />
   </component>
