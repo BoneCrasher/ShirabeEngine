@@ -283,23 +283,16 @@ namespace engine::material
         auto const iterateUniformBuffers = [&] (SUniformBuffer const &aBuffer) -> void
         {
             aSerializer.beginObject(aBuffer.name);
-            aSerializer.writeValue("name",      aBuffer.name);
-            aSerializer.writeValue("offset",    aBuffer.location.offset);
-            aSerializer.writeValue("size",      aBuffer.location.length);
-            aSerializer.writeValue("padding",   aBuffer.location.padding);
-            aSerializer.writeValue("set",       aBuffer.set);
-            aSerializer.writeValue("binding",   aBuffer.binding);
-            aSerializer.beginObject("type");
-            {
-                Shared<SMaterialType const> type = Shared<SMaterialType const>(&(aBuffer.type), [] (SMaterialType const *) {});
-                writeType(type, false);
-            }
-            aSerializer.endObject();
-            aSerializer.beginObject("baseType");
-            {
-                Shared<SMaterialType const> type = Shared<SMaterialType const>(&(aBuffer.baseType), [] (SMaterialType const *) {});
-                writeType(type, false);
-            }
+            aSerializer.writeValue("name",        aBuffer.name);
+            aSerializer.writeValue("offset",      aBuffer.location.offset);
+            aSerializer.writeValue("size",        aBuffer.location.length);
+            aSerializer.writeValue("padding",     aBuffer.location.padding);
+            aSerializer.writeValue("set",         aBuffer.set);
+            aSerializer.writeValue("binding",     aBuffer.binding);
+
+            aSerializer.beginObject("array");
+            aSerializer.writeValue("layers", aBuffer.array.layers);
+            aSerializer.writeValue("stride", aBuffer.array.stride);
             aSerializer.endObject();
 
             std::function<void(BufferMemberMap_t const &)> iterateUniformBufferMembers = nullptr;
@@ -312,21 +305,14 @@ namespace engine::material
                     Shared<SBufferMember const> const &aValue = aMember.second;
 
                     aSerializer.beginObject(aKey);
-                    aSerializer.writeValue("name",    aKey);
-                    aSerializer.writeValue("offset",  aValue->location.offset);
-                    aSerializer.writeValue("size",    aValue->location.length);
-                    aSerializer.writeValue("padding", aValue->location.padding);
-                    aSerializer.beginObject("type");
-                    {
-                        Shared<SMaterialType const> type = Shared<SMaterialType const>(&(aValue->type), [] (SMaterialType const *) {});
-                        writeType(type, false);
-                    }
-                    aSerializer.endObject();
-                    aSerializer.beginObject("baseType");
-                    {
-                        Shared<SMaterialType const> type = Shared<SMaterialType const>(&(aValue->baseType), [] (SMaterialType const *) {});
-                        writeType(type, false);
-                    }
+                    aSerializer.writeValue("name",        aKey);
+                    aSerializer.writeValue("offset",      aValue->location.offset);
+                    aSerializer.writeValue("size",        aValue->location.length);
+                    aSerializer.writeValue("padding",     aValue->location.padding);
+
+                    aSerializer.beginObject("array");
+                    aSerializer.writeValue("layers", aValue->array.layers);
+                    aSerializer.writeValue("stride", aValue->array.stride);
                     aSerializer.endObject();
 
                     if(not aValue->members.empty())
@@ -535,25 +521,16 @@ namespace engine::material
         auto const iterateUniformBuffers = [&] (SUniformBuffer &aBuffer, uint32_t const &aIndex) -> void
         {
             aDeserializer.beginObject(aIndex);
-            aDeserializer.readValue("name",      aBuffer.name);
-            aDeserializer.readValue("offset",    aBuffer.location.offset);
-            aDeserializer.readValue("size",      aBuffer.location.length);
-            aDeserializer.readValue("padding",   aBuffer.location.padding);
-            aDeserializer.readValue("set",       aBuffer.set);
-            aDeserializer.readValue("binding",   aBuffer.binding);
-            aDeserializer.beginObject("type");
-            {
-                Shared<SMaterialType> type = makeShared<SMaterialType>();
-                readType(type, false);
-                aBuffer.type = *type;
-            }
-            aDeserializer.endObject();
-            aDeserializer.beginObject("baseType");
-            {
-                Shared<SMaterialType> type = makeShared<SMaterialType>();
-                readType(type, false);
-                aBuffer.baseType = *type;
-            }
+            aDeserializer.readValue("name",        aBuffer.name);
+            aDeserializer.readValue("offset",      aBuffer.location.offset);
+            aDeserializer.readValue("size",        aBuffer.location.length);
+            aDeserializer.readValue("padding",     aBuffer.location.padding);
+            aDeserializer.readValue("set",         aBuffer.set);
+            aDeserializer.readValue("binding",     aBuffer.binding);
+
+            aDeserializer.beginObject("array");
+            aDeserializer.readValue("layers", aBuffer.array.layers);
+            aDeserializer.readValue("stride", aBuffer.array.stride);
             aDeserializer.endObject();
 
             std::function<void(MutableBufferMemberMap_t &)> readMembers = nullptr;
@@ -562,24 +539,16 @@ namespace engine::material
                                          uint32_t              const &aIndex) -> void
                 {
                     aDeserializer.beginObject(aIndex);
-                    aDeserializer.readValue("name",    aMember->name);
-                    aDeserializer.readValue("offset",  aMember->location.offset);
-                    aDeserializer.readValue("size",    aMember->location.length);
-                    aDeserializer.readValue("padding", aMember->location.padding);
-                    aDeserializer.beginObject("type");
-                    {
-                        Shared<SMaterialType> type = makeShared<SMaterialType>();
-                        readType(type, false);
-                        aMember->type = *type;
-                    }
+                    aDeserializer.readValue("name",        aMember->name);
+                    aDeserializer.readValue("offset",      aMember->location.offset);
+                    aDeserializer.readValue("size",        aMember->location.length);
+                    aDeserializer.readValue("padding",     aMember->location.padding);
+
+                    aDeserializer.beginObject("array");
+                    aDeserializer.readValue("layers", aMember->array.layers);
+                    aDeserializer.readValue("stride", aMember->array.stride);
                     aDeserializer.endObject();
-                    aDeserializer.beginObject("baseType");
-                    {
-                        Shared<SMaterialType> type = makeShared<SMaterialType>();
-                        readType(type, false);
-                        aMember->baseType = *type;
-                    }
-                    aDeserializer.endObject();
+
                     aDeserializer.endObject();
                 };
 

@@ -32,6 +32,12 @@ struct test2
     test1 test;
 };
 
+struct test3
+{
+    mat4 mat00;
+    vec2 vec00;
+};
+
 layout (std140, set = 2, binding = 1)
 uniform struct_structureTest0
 {
@@ -64,6 +70,12 @@ uniform struct_structureTest5
     test2 test;
     vec3  vec01;
 } structureTest5;
+
+layout (std140, set = 2, binding = 6)
+uniform struct_structureTest6
+{
+    test3 test00[7];
+} structuretest6;
 
 //
 // Input description

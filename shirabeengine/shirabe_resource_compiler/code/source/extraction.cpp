@@ -124,7 +124,7 @@ namespace resource_compiler
             bool equalName          = false;
             bool equalSetAndBinding = false;
             // Make sure that globally, there are no duplicate buffer names.
-            equalName          = ( 0 == aCompareBuffer.name.compare(aBuffer.name) );
+            equalName          = ( aBuffer.name == aCompareBuffer.name );
             // Make sure that globally, no buffers have equal sets and bindings.
             equalSetAndBinding = ( aCompareBuffer.set == aBuffer.set and aCompareBuffer.binding == aBuffer.binding );
 
@@ -401,7 +401,6 @@ namespace resource_compiler
                 SMaterialType const baseTypeData = *baseTypeExtracted;
                 SMaterialType const typeData     = *typeExtracted;
 
-                CLog::Debug(logTag(), "Buffer...");
                 SUniformBuffer uniformBufferExtracted{};
                 uniformBufferExtracted.name             = uniformBuffer.name;
                 uniformBufferExtracted.set              = set;
@@ -409,8 +408,8 @@ namespace resource_compiler
                 uniformBufferExtracted.location.offset  = 0;
                 uniformBufferExtracted.location.length  = bufferSize;
                 uniformBufferExtracted.location.padding = 0;
-                uniformBufferExtracted.type             = *typeExtracted;
-                uniformBufferExtracted.baseType         = *baseTypeExtracted;
+                uniformBufferExtracted.array.layers     = typeExtracted->arraySize;
+                uniformBufferExtracted.array.stride     = typeExtracted->arrayStride;
                 uniformBufferExtracted.stageBinding.set(stageExtracted.stage);
 
                 CLog::Debug(logTag(),
@@ -442,17 +441,16 @@ namespace resource_compiler
                         uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
                         uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
                         //spirv_cross::SPIRType const  &baseType          = memberType.basetype;
-                        spirv_cross::SPIRType const  &type              = memberType;
-                        //Shared<SMaterialType  const>  localBaseTypeExtracted = reflectType(compiler, baseType);
-                        Shared<SMaterialType  const>  localTypeExtracted     = reflectType(compiler, type);
+                        spirv_cross::SPIRType const  &type               = memberType;
+                        Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
 
                         Shared<SBufferMember> uniformBufferMemberExtracted = makeShared<SBufferMember>();
                         uniformBufferMemberExtracted->name             = name;
                         uniformBufferMemberExtracted->location.offset  = offset;
                         uniformBufferMemberExtracted->location.length  = size;
                         uniformBufferMemberExtracted->location.padding = 0;
-                        uniformBufferMemberExtracted->type             = *localTypeExtracted;
-                        //uniformBufferMemberExtracted->baseType         = *localBaseTypeExtracted;
+                        uniformBufferMemberExtracted->array.layers     = localTypeExtracted->arraySize;
+                        uniformBufferMemberExtracted->array.stride     = localTypeExtracted->arrayStride;
 
                         if(not memberType.member_types.empty())
                         {

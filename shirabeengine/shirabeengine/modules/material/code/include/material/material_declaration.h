@@ -435,6 +435,12 @@ namespace engine
             }
         };
 
+        struct SBufferArray
+        {
+            uint64_t layers;
+            uint64_t stride;
+        };
+
         /**
          * Describes a single uniform buffer member by name and buffer location.
          */
@@ -444,8 +450,9 @@ namespace engine
         {
             std::string       name;
             SBufferLocation   location;
-            SMaterialType     baseType;
-            SMaterialType     type;
+            SBufferArray      array;
+            // SMaterialType     baseType;
+            // SMaterialType     type;
             BufferMemberMap_t members;
         };
 
@@ -454,8 +461,9 @@ namespace engine
         {
         public_members:
             SBufferLocation   location;
-            SMaterialType     baseType;
-            SMaterialType     type;
+            SBufferArray      array;
+            // SMaterialType     baseType;
+            // SMaterialType     type;
             BufferMemberMap_t members;
 
         public_constructors:
