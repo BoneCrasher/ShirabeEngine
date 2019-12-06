@@ -567,10 +567,10 @@ namespace engine::material
 
             MutableBufferMemberMap_t mutableMembers {};
             readMembers(mutableMembers);
+            aBuffer.members = mutableMembers;
+            //convertToConstSmartPtrMap<Shared, SBufferMember>(mutableMembers, aBuffer.members);
 
-            convertToConstSmartPtrMap<Shared, SBufferMember>(mutableMembers, aBuffer.members);
-
-            mutableMembers.clear();
+            //mutableMembers.clear();
 
             aDeserializer.endObject();
         };
@@ -728,11 +728,43 @@ namespace engine::material
             return (aInput + aAlignment - 1) & -aAlignment;
         };
 
-        CMaterialConfig config {};
+        std::function<void(std::unordered_map<std::string, Shared<SBufferMember const>> &
+                         , Shared<SBufferMember> &
+                         , std::string const &
+                         , uint64_t const &
+                         , uint64_t const &)> iterate = nullptr;
 
-        uint64_t previousSize = 0;
-        uint64_t currentSize  = 0;
-        uint64_t totalSize    = 0;
+        iterate = [&iterate] (std::unordered_map<std::string, Shared<SBufferMember const>>       &aIndex
+                            , Shared<SBufferMember>                                              &aMember
+                            , std::string                                                  const &aParentPath
+                            , uint64_t                                                     const &aOffsetBackshift
+                            , uint64_t                                                     const &aCurrentBaseOffset)
+        {
+            uint64_t const arrayLayers = std::max(1lu, aMember->array.layers); // Ensure at least one iteration with std::max...
+            for(std::size_t k=0; k<arrayLayers; ++k)
+            {
+                aMember->location.offset  = (aCurrentBaseOffset + aMember->location.offset + (k * aMember->array.stride));
+
+                //aMember->location.length  = nextMultiple(buffer.location.length, alignment);
+                //adjustedBufferLocation.padding = buffer.location.padding;
+
+                std::string const path = fmt::format("{}.{}", aParentPath, aMember->name);
+                aIndex.insert({path, aMember});
+
+                for(auto &[n, v] : aMember->members)
+                {
+                    std::string prefixPath = path;
+                    if(1 < arrayLayers)
+                    {
+                        prefixPath = fmt::format("{}[{}]", path, n, k);
+                    }
+
+                    iterate(aIndex, v, prefixPath, aOffsetBackshift, aMember->location.offset);
+                }
+            }
+        };
+
+        CMaterialConfig config {};
 
         if(aMaterial.uniformBuffers.empty())
         {
@@ -769,30 +801,39 @@ namespace engine::material
         // Due to previous sorting and optional filtering by set and index, we can simply check the offset of the first buffer and subtract it from all the other offsets.
         //
         uint64_t const baseBackShift = sorted[0].location.offset;
-        for(auto const &buffer : sorted)
+        for(auto &buffer : sorted)
         {
-            SBufferLocation adjustedBufferLocation {};
-            adjustedBufferLocation.offset  = (totalSize + buffer.location.offset) - baseBackShift;
-            adjustedBufferLocation.length  = nextMultiple(buffer.location.length, alignment);
-            adjustedBufferLocation.padding = buffer.location.padding;
-
-            SBufferData data{};
-            data.mLocation = adjustedBufferLocation;
-
-            for(auto const &[name, member] : buffer.members)
+            uint64_t const arrayLayers = std::max(1lu, buffer.array.layers); // Ensure at least one iteration with std::max...
+            for(std::size_t k=0; k<arrayLayers; ++k)
             {
-                SBufferLocation adjustedMemberLocation {};
-                adjustedMemberLocation.offset  = (adjustedBufferLocation.offset + member->location.offset) - baseBackShift;
-                adjustedMemberLocation.length  = member->location.length;
-                adjustedMemberLocation.padding = member->location.padding;
+                buffer.location.offset = (0 + buffer.location.offset + (k * buffer.array.stride));
 
-                data.mValueIndex[name] = member->location;
+                //aMember->location.length  = nextMultiple(buffer.location.length, alignment);
+                //adjustedBufferLocation.padding = buffer.location.padding;
+
+                std::string const path = fmt::format("{}", buffer.name);
+
+                Shared<SBufferMember> member = makeShared<SBufferMember>();
+                member->name     = buffer.name;
+                member->location = buffer.location;
+                member->array    = buffer.array;
+                member->members  = buffer.members;
+                config.mBufferIndex.insert({path, member});
+
+                for(auto &[n, v] : buffer.members)
+                {
+                    std::string prefixPath = path;
+                    if(1 < arrayLayers)
+                    {
+                        prefixPath = fmt::format("{}[{}]", path, n, k);
+                    }
+
+                    iterate(config.mBufferIndex, v, prefixPath, 0, buffer.location.offset);
+                }
             }
 
-            config.mBufferIndex[buffer.name] = data;
-
-            int8_t *alignedData = (int8_t *)aligned_alloc(alignment, adjustedBufferLocation.length);
-            memset(alignedData, 0, adjustedBufferLocation.length);
+            int8_t *alignedData = (int8_t *)aligned_alloc(alignment, buffer.location.length);
+            memset(alignedData, 0, buffer.location.length);
             config.mData.insert({ buffer.name, Shared<void>(alignedData) });
 
             // previousSize = currentSize;

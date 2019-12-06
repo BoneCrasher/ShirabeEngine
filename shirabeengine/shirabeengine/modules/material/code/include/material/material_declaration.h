@@ -445,7 +445,7 @@ namespace engine
          * Describes a single uniform buffer member by name and buffer location.
          */
         using MutableBufferMemberMap_t = std::unordered_map<std::string, Shared<struct SBufferMember>>;
-        using BufferMemberMap_t        = std::unordered_map<std::string, Shared<struct SBufferMember const>>;
+        using BufferMemberMap_t        = std::unordered_map<std::string, Shared<struct SBufferMember>>;
         struct SBufferMember
         {
             std::string       name;
@@ -474,6 +474,7 @@ namespace engine
             : SBoundResource(aOther)
             , location(aOther.location)
             , members (aOther.members )
+            , array   (aOther.array   )
             {}
 
         public_operators:
@@ -485,6 +486,7 @@ namespace engine
                 set      = aOther.set;
                 binding  = aOther.binding;
                 members  = aOther.members;
+                array    = aOther.array;
 
                 return (*this);
             }
@@ -703,9 +705,14 @@ namespace engine
              *
              * @return See brief.
              */
-            SHIRABE_INLINE SBufferLocation const &getLocation() const
+            SHIRABE_INLINE SBufferLocation getMember(std::string const &aAccessor) const
             {
-                return mLocation;
+                if(mValueIndex.end() == mValueIndex.find(aAccessor))
+                {
+                    return {};
+                }
+
+                return mValueIndex.at(aAccessor).location;
             }
 
             /**
@@ -713,20 +720,9 @@ namespace engine
              * @return
              */
             SHIRABE_INLINE
-            Map<std::string, SBufferLocation> const &getValues() const
+            Map<std::string, SBufferMember> const &getValues() const
             {
                 return mValueIndex;
-            }
-
-            /**
-             * Return the location information for the desired buffer value.
-             *
-             * @param aBufferValue The name of the desired buffer value.
-             * @return See brief.
-             */
-            SHIRABE_INLINE SBufferLocation const &getValueLocation(std::string const &aBufferValue) const
-            {
-                return mValueIndex.at(aBufferValue);
             }
 
             /**
@@ -742,8 +738,7 @@ namespace engine
             }
 
         private_members:
-            SBufferLocation                   mLocation;
-            Map<std::string, SBufferLocation> mValueIndex;
+            Map<std::string, SBufferMember> mValueIndex;
         };
 
         /**
@@ -937,7 +932,7 @@ namespace engine
             }
 
         private_members:
-            Map<std::string, SBufferData> mBufferIndex;
+            Map<std::string, Shared<SBufferMember>> mBufferIndex;
             // std::vector<uint8_t>          mData;
             std::unordered_map<std::string, Shared<void>> mData;
         };
