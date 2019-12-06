@@ -205,20 +205,20 @@ namespace resource_compiler
         std::function<Shared<SMaterialType const>(spirv_cross::Compiler const&, spirv_cross::SPIRType const&)> reflectType = nullptr;
         reflectType = [&] (spirv_cross::Compiler const &aCompiler, spirv_cross::SPIRType const &aType) -> Shared<SMaterialType const>
         {
-            std::string           const  typeName       = determineSPIRVTypeName(aType);
-            uint32_t              const  typeByteWidth  = (aType.width /* bit */ / 8);
-            uint32_t              const  typeVectorSize = aType.vecsize;
+            std::string const  typeName       = determineSPIRVTypeName(aType);
+            uint32_t    const  typeByteWidth  = (aType.width /* bit */ / 8);
+            uint32_t    const  typeVectorSize = aType.vecsize;
 
             uint32_t byteSize        = typeByteWidth;
-            uint32_t arraySize       = 1; // Set to one, as a scalar of type T is equivalent to T[1];
-            uint32_t arrayStride     = (typeVectorSize * typeByteWidth);
             uint32_t matrixRows      = typeVectorSize;
             uint32_t matrixColumns   = aType.columns;
             uint32_t matrixStride    = (typeVectorSize * typeByteWidth);
+            uint32_t arraySize       = 1; // Set to one, as a scalar of type T is equivalent to T[1];
             if (not aType.array.empty())
             {
                 arraySize = aType.array[0]; // Multidimensional arrays not yet supported.
             }
+            uint32_t arrayStride = 1;
 
             Shared<SMaterialType> type = makeShared<SMaterialType>();
             type->name               = determineSPIRVTypeName(aType);
@@ -395,21 +395,21 @@ namespace resource_compiler
                 spirv_cross::SPIRType const &type       = compiler.get_type(uniformBuffer.type_id);
                 size_t                const  bufferSize = compiler.get_declared_struct_size(baseType);
 
-                Shared<SMaterialType  const> baseTypeExtracted = reflectType(compiler, baseType);
-                Shared<SMaterialType  const> typeExtracted     = reflectType(compiler, type);
+                // Shared<SMaterialType  const> baseTypeExtracted = reflectType(compiler, baseType);
+                // Shared<SMaterialType  const> typeExtracted     = reflectType(compiler, type);
 
-                SMaterialType const baseTypeData = *baseTypeExtracted;
-                SMaterialType const typeData     = *typeExtracted;
+                // SMaterialType const baseTypeData = *baseTypeExtracted;
+                // SMaterialType const typeData     = *typeExtracted;
 
                 SUniformBuffer uniformBufferExtracted{};
                 uniformBufferExtracted.name             = uniformBuffer.name;
                 uniformBufferExtracted.set              = set;
                 uniformBufferExtracted.binding          = binding;
+                uniformBufferExtracted.array.layers     = type.array.empty() ? 1 : type.array[0];
+                uniformBufferExtracted.array.stride     = compiler.get_declared_struct_size(baseType);
                 uniformBufferExtracted.location.offset  = 0;
-                uniformBufferExtracted.location.length  = bufferSize;
+                uniformBufferExtracted.location.length  = bufferSize * uniformBufferExtracted.array.layers;
                 uniformBufferExtracted.location.padding = 0;
-                uniformBufferExtracted.array.layers     = typeExtracted->arraySize;
-                uniformBufferExtracted.array.stride     = typeExtracted->arrayStride;
                 uniformBufferExtracted.stageBinding.set(stageExtracted.stage);
 
                 CLog::Debug(logTag(),
@@ -440,17 +440,16 @@ namespace resource_compiler
                         std::string const &name   = aCompiler.get_member_name(aParent.self, k);
                         uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
                         uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
-                        //spirv_cross::SPIRType const  &baseType          = memberType.basetype;
-                        spirv_cross::SPIRType const  &type               = memberType;
-                        Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
+                        // spirv_cross::SPIRType const  &memberBaseType = memberType.basetype;
+                        // Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
 
                         Shared<SBufferMember> uniformBufferMemberExtracted = makeShared<SBufferMember>();
                         uniformBufferMemberExtracted->name             = name;
                         uniformBufferMemberExtracted->location.offset  = offset;
                         uniformBufferMemberExtracted->location.length  = size;
                         uniformBufferMemberExtracted->location.padding = 0;
-                        uniformBufferMemberExtracted->array.layers     = localTypeExtracted->arraySize;
-                        uniformBufferMemberExtracted->array.stride     = localTypeExtracted->arrayStride;
+                        uniformBufferMemberExtracted->array.layers     = memberType.array.empty() ? 1 : memberType.array[0];
+                        uniformBufferMemberExtracted->array.stride     = size / uniformBufferMemberExtracted->array.layers;
 
                         if(not memberType.member_types.empty())
                         {

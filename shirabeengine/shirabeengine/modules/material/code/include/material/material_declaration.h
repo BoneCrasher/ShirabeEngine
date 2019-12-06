@@ -758,6 +758,12 @@ namespace engine
                 , public engine::serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>
                 , public engine::serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>
         {
+
+        private_typedefs:
+            using BufferValueIndex_t = Map<std::string, Shared<SBufferMember>>;
+            using BufferIndex_t      = Map<std::string, BufferValueIndex_t>;
+            using BufferData_t       = Map<std::string, Shared<void>>;
+
         public_static_functions:
             static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers = false);
 
@@ -932,9 +938,8 @@ namespace engine
             }
 
         private_members:
-            Map<std::string, Shared<SBufferMember>> mBufferIndex;
-            // std::vector<uint8_t>          mData;
-            std::unordered_map<std::string, Shared<void>> mData;
+            BufferIndex_t mBufferIndex;
+            BufferData_t  mData;
         };
         //<-----------------------------------------------------------------------------
 
@@ -952,19 +957,21 @@ namespace engine
                 return CEngineResult<TDataType const *>(EEngineStatus::Error, nullptr);
             }
 
-            SBufferData const &buffer = mBufferIndex.at(aBufferName);
+            BufferValueIndex_t const &bufferIndex = mBufferIndex.at(aBufferName);
 
-            bool const hasValue = buffer.hasValue(aBufferValue);
+            std::string const combinedValuePath = fmt::format("{}.{}", aBufferName, aBufferValue);
+
+            bool const hasValue = (bufferIndex.end() != bufferIndex.find(combinedValuePath));
             if(not hasValue)
             {
                 return CEngineResult<TDataType const *>(EEngineStatus::Error, nullptr);
             }
 
-            SBufferLocation const &location = buffer.getValueLocation(aBufferValue);
+            Shared<SBufferMember> const &bufferValue = bufferIndex.at(combinedValuePath);
 
             Shared<void>           alignedData = mData.at(aBufferName);
             TDataType const *const bufferData  = reinterpret_cast<TDataType const *>(alignedData.get());
-            TDataType const *const adjusted    = (bufferData + (location.offset / sizeof(TDataType)));
+            TDataType const *const adjusted    = (bufferData + (bufferValue->location.offset / sizeof(TDataType)));
             return { EEngineStatus::Ok, adjusted };
         }
         //<-----------------------------------------------------------------------------
@@ -997,8 +1004,8 @@ namespace engine
                 return CEngineResult<TBufferType const*>(EEngineStatus::Error, nullptr);
             }
 
-            SBufferData     const &buffer = mBufferIndex.at(aBufferName);
-            SBufferLocation const &location = buffer.getLocation();
+            BufferValueIndex_t const &bufferIndex = mBufferIndex.at(aBufferName);
+            SBufferLocation    const &location    = bufferIndex.at(aBufferName)->location;
 
             // uint8_t     const *const data       = (mData.data() + location.offset);
             Shared<void>             alignedData = mData.at(aBufferName);

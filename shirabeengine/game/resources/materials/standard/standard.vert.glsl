@@ -18,64 +18,67 @@ struct test0
     mat4 mat00;
     mat4 mat01;
 };
-
-struct test1
-{
-    mat4 mats[10];
-};
-
-struct test2
-{
-    mat4 mat00;
-    vec3 vec00;
-    vec2 vec05;
-    test1 test;
-};
-
-struct test3
-{
-    mat4 mat00;
-    vec2 vec00;
-};
+//struct test1
+//{
+//    mat4 mats[10];
+//};
+//struct test2
+//{
+//    mat4 mat00;
+//    vec3 vec00;
+//    vec2 vec05;
+//    test1 test;
+//};
+//struct test3
+//{
+//    mat4 mat00;
+//    vec2 vec00;
+//};
 
 layout (std140, set = 2, binding = 1)
 uniform struct_structureTest0
 {
     test0 test;
 } structureTest0;
-
-layout (std140, set = 2, binding = 2)
-uniform struct_structureTest1
-{
-    test1 test;
-} structureTest1;
-
-layout (std140, set = 2, binding = 3)
-uniform struct_structureTest3
-{
-    test2 test;
-    test1 test1;
-} structureTest3;
-
-layout (std140, set = 2, binding = 4)
-uniform struct_structureTest4
-{
-    test2 test[5];
-} structureTest4;
-
-layout (std140, set = 2, binding = 5)
-uniform struct_structureTest5
-{
-    vec4  vec00;
-    test2 test;
-    vec3  vec01;
-} structureTest5;
-
-layout (std140, set = 2, binding = 6)
-uniform struct_structureTest6
-{
-    test3 test00[7];
-} structuretest6;
+//
+// layout (std140, set = 2, binding = 2)
+// uniform struct_structureTest1
+// {
+//     test1 test;
+// } structureTest1;
+//
+// layout (std140, set = 2, binding = 3)
+// uniform struct_structureTest3
+// {
+//     test2 test;
+//     test1 test1;
+// } structureTest3;
+//
+// layout (std140, set = 2, binding = 4)
+// uniform struct_structureTest4
+// {
+//     test2 test[5];
+// } structureTest4;
+//
+// layout (std140, set = 2, binding = 5)
+// uniform struct_structureTest5
+// {
+//     vec4  vec00;
+//     test2 test;
+//     vec3  vec01;
+// } structureTest5;
+//
+// layout (std140, set = 2, binding = 6)
+// uniform struct_structureTest6
+// {
+//     test3 test00[7];
+// } structuretest6;
+//
+// layout (std140, set = 2, binding = 7)
+// uniform struct_structureTest7
+// {
+//     mat4 mat;
+// } structureTest7[6];
 
 //
 // Input description

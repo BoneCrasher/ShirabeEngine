@@ -228,7 +228,7 @@ namespace engine::material
                 aSerializer.endArray();
             };
 
-            //aSerializer.beginObject("type");
+            aSerializer.beginObject("type");
             aSerializer.writeValue("name",               aType->name);
             aSerializer.writeValue("byteSize",           aType->byteSize);
             aSerializer.writeValue("vectorSize",         aType->vectorSize);
@@ -242,7 +242,7 @@ namespace engine::material
             {
                 writeMemberTree(aType);
             }
-            //aSerializer.endObject();
+            aSerializer.endObject();
         };
 
         aSerializer.beginObject(name);
@@ -728,22 +728,24 @@ namespace engine::material
             return (aInput + aAlignment - 1) & -aAlignment;
         };
 
-        std::function<void(std::unordered_map<std::string, Shared<SBufferMember const>> &
+        std::function<void(CMaterialConfig::BufferValueIndex_t &
                          , Shared<SBufferMember> &
                          , std::string const &
                          , uint64_t const &
                          , uint64_t const &)> iterate = nullptr;
 
-        iterate = [&iterate] (std::unordered_map<std::string, Shared<SBufferMember const>>       &aIndex
-                            , Shared<SBufferMember>                                              &aMember
-                            , std::string                                                  const &aParentPath
-                            , uint64_t                                                     const &aOffsetBackshift
-                            , uint64_t                                                     const &aCurrentBaseOffset)
+        iterate = [&iterate, &nextMultiple, &alignment] (
+                              CMaterialConfig::BufferValueIndex_t       &aIndex
+                            , Shared<SBufferMember>                     &aMember
+                            , std::string                         const &aParentPath
+                            , uint64_t                            const &aOffsetBackshift
+                            , uint64_t                            const &aCurrentBaseOffset)
         {
             uint64_t const arrayLayers = std::max(1lu, aMember->array.layers); // Ensure at least one iteration with std::max...
             for(std::size_t k=0; k<arrayLayers; ++k)
             {
                 aMember->location.offset  = (aCurrentBaseOffset + aMember->location.offset + (k * aMember->array.stride));
+                aMember->location.length  = nextMultiple(aMember->location.length, alignment);
 
                 //aMember->location.length  = nextMultiple(buffer.location.length, alignment);
                 //adjustedBufferLocation.padding = buffer.location.padding;
@@ -784,7 +786,10 @@ namespace engine::material
             {
                 return (sFirstPermittedUserSetIndex > aBuffer.set);
             };
-            std::remove_if(sorted.begin(), sorted.end(), filter);
+
+            sorted.erase(
+                    std::remove_if(sorted.begin(), sorted.end(), filter)
+                    , sorted.end());
         }
 
         //
@@ -803,43 +808,51 @@ namespace engine::material
         uint64_t const baseBackShift = sorted[0].location.offset;
         for(auto &buffer : sorted)
         {
+            CMaterialConfig::BufferValueIndex_t bufferValueIndex {};
+
+            Shared<SBufferMember> member = makeShared<SBufferMember>();
+            member->name             = buffer.name;
+            member->location.offset  = buffer.location.offset;
+            member->location.length  = nextMultiple(buffer.location.length, alignment);
+            member->location.padding = buffer.location.padding;
+            member->array            = buffer.array;
+            member->members          = buffer.members;
+
+            std::string const path = fmt::format("{}", buffer.name);
+            bufferValueIndex.insert({path, member});
+
             uint64_t const arrayLayers = std::max(1lu, buffer.array.layers); // Ensure at least one iteration with std::max...
             for(std::size_t k=0; k<arrayLayers; ++k)
             {
-                buffer.location.offset = (0 + buffer.location.offset + (k * buffer.array.stride));
+                buffer.location.offset = (buffer.location.offset + (k * buffer.array.stride));
 
-                //aMember->location.length  = nextMultiple(buffer.location.length, alignment);
-                //adjustedBufferLocation.padding = buffer.location.padding;
+                Shared<SBufferMember> arrayMember = makeShared<SBufferMember>();
+                arrayMember->name             = buffer.name;
+                arrayMember->location.offset  = buffer.location.offset;
+                arrayMember->location.length  = nextMultiple(buffer.location.length, alignment);
+                arrayMember->location.padding = buffer.location.padding;
+                arrayMember->array.layers     = 1;
+                arrayMember->array.stride     = buffer.array.stride;
+                arrayMember->members          = buffer.members;
 
-                std::string const path = fmt::format("{}", buffer.name);
-
-                Shared<SBufferMember> member = makeShared<SBufferMember>();
-                member->name     = buffer.name;
-                member->location = buffer.location;
-                member->array    = buffer.array;
-                member->members  = buffer.members;
-                config.mBufferIndex.insert({path, member});
+                std::string arrayPath = buffer.name;
+                if(1 < arrayLayers)
+                {
+                    arrayPath = fmt::format("{}[{}]", buffer.name, k);
+                }
+                bufferValueIndex.insert({arrayPath, arrayMember});
 
                 for(auto &[n, v] : buffer.members)
                 {
-                    std::string prefixPath = path;
-                    if(1 < arrayLayers)
-                    {
-                        prefixPath = fmt::format("{}[{}]", path, n, k);
-                    }
-
-                    iterate(config.mBufferIndex, v, prefixPath, 0, buffer.location.offset);
+                    iterate(bufferValueIndex, v, arrayPath, 0lu, buffer.location.offset);
                 }
             }
 
-            int8_t *alignedData = (int8_t *)aligned_alloc(alignment, buffer.location.length);
-            memset(alignedData, 0, buffer.location.length);
-            config.mData.insert({ buffer.name, Shared<void>(alignedData) });
+            config.mBufferIndex.insert({ buffer.name, bufferValueIndex });
 
-            // previousSize = currentSize;
-            //currentSize  = (buffer.location.offset + buffer.location.length + buffer.location.padding) - baseBackShift;
-            //currentSize  = nextMultiple(currentSize, alignment);
-            //totalSize   += currentSize;
+            int8_t *alignedData = (int8_t *)aligned_alloc(alignment, member->location.length);
+            memset(alignedData, 0, member->location.length);
+            config.mData.insert({ buffer.name, Shared<void>(alignedData) });
         }
 
         // config.mData.resize(totalSize);
@@ -927,40 +940,48 @@ namespace engine::material
 
         // aSerializer.writeValue("uniformBufferData", mData);
 
-        aSerializer.beginArray("uniformBuffers");
-        auto const iterateUniformBuffers = [&] (std::pair<std::string, SBufferData> const &aBuffer) -> void
-        {
-            std::string const &name = aBuffer.first;
-            SBufferData const &data = aBuffer.second;
-
-            SBufferLocation const &location = data.getLocation();
-
-            aSerializer.beginObject(name);
-            aSerializer.writeValue("name",    name);
-            aSerializer.writeValue("offset",  location.offset);
-            aSerializer.writeValue("size",    location.length);
-            aSerializer.writeValue("padding", location.padding);
-
-            aSerializer.beginArray("members");
-            auto const iterate = [&] (std::pair<std::string, SBufferLocation> const &aMember)
-            {
-                std::string     const name     = aMember.first;
-                SBufferLocation const location = aMember.second;
-
-                aSerializer.beginObject(name);
-                aSerializer.writeValue("name",    name);
-                aSerializer.writeValue("offset",  location.offset);
-                aSerializer.writeValue("size",    location.length);
-                aSerializer.writeValue("padding", location.padding);
-                aSerializer.endObject();
-            };
-            std::for_each(data.mValueIndex.begin(), data.mValueIndex.end(), iterate);
-            aSerializer.endArray();
-
-            aSerializer.endObject();
-        };
-        std::for_each(mBufferIndex.begin(), mBufferIndex.end(), iterateUniformBuffers);
-        aSerializer.endArray();
+        // aSerializer.beginArray("uniformBuffers");
+        // auto const iterateUniformBuffers = [&] (BufferValueIndex_t::value_type const &aBuffer) -> void
+        // {
+        //     std::string           const &name = aBuffer.first;
+        //     Shared<SBufferMember> const &data = aBuffer.second;
+//
+        //     SBufferLocation const &location = data->location;
+        //     SBufferArray    const &array    = data->array;
+//
+        //     aSerializer.beginObject(name);
+        //     aSerializer.writeValue("name",        name);
+        //     aSerializer.writeValue("offset",      location.offset);
+        //     aSerializer.writeValue("size",        location.length);
+        //     aSerializer.writeValue("padding",     location.padding);
+        //     aSerializer.writeValue("arraySize",   array.layers);
+        //     aSerializer.writeValue("arrayStride", array.stride);
+//
+        //     aSerializer.beginArray("members");
+        //     auto const iterate = [&] (BufferValueIndex_t::value_type const &aMember)
+        //     {
+        //         std::string           const  memberName = aMember.first;
+        //         Shared<SBufferMember> const &memberData = aMember.second;
+//
+        //         SBufferLocation const &memberLocation = memberData->location;
+        //         SBufferArray    const &memberArray    = memberData->array;
+//
+        //         aSerializer.beginObject(name);
+        //         aSerializer.writeValue("name",        memberName);
+        //         aSerializer.writeValue("offset",      memberLocation.offset);
+        //         aSerializer.writeValue("size",        memberLocation.length);
+        //         aSerializer.writeValue("padding",     memberLocation.padding);
+        //         aSerializer.writeValue("arraySize",   memberArray.layers);
+        //         aSerializer.writeValue("arrayStride", memberArray.stride);
+        //         aSerializer.endObject();
+        //     };
+        //     std::for_each(data->members.begin(), data->members.end(), iterate);
+        //     aSerializer.endArray();
+//
+        //     aSerializer.endObject();
+        // };
+        // std::for_each(mBufferIndex.begin(), mBufferIndex.end(), iterateUniformBuffers);
+        // aSerializer.endArray();
 
         aSerializer.endObject();
 
@@ -977,43 +998,43 @@ namespace engine::material
 
         uint32_t bufferCount = 0;
         aDeserializer.beginArray("uniformBuffers", bufferCount);
-        for(uint32_t k=0; k<bufferCount; ++k)
-        {
-            SBufferData buffer = {};
-
-            std::string     name     = {};
-
-            aDeserializer.beginObject(k);
-
-            aDeserializer.readValue("name",    name);
-            aDeserializer.readValue("offset",  buffer.mLocation.offset);
-            aDeserializer.readValue("size",    buffer.mLocation.length);
-            aDeserializer.readValue("padding", buffer.mLocation.padding);
-
-            uint32_t memberCount = 0;
-            aDeserializer.beginArray("members", memberCount);
-            for(uint32_t l=0; l<memberCount; ++l)
-            {
-                std::string     memberName ={};
-                SBufferLocation location   ={};
-
-                aDeserializer.beginObject(l);
-
-                aDeserializer.readValue("name",    memberName);
-                aDeserializer.readValue("offset",  location.offset);
-                aDeserializer.readValue("size",    location.length);
-                aDeserializer.readValue("padding", location.padding);
-
-                aDeserializer.endObject();
-
-                buffer.mValueIndex[memberName] = location;
-            }
-            aDeserializer.endArray();
-
-            aDeserializer.endObject();
-
-            mBufferIndex[name] = buffer;
-        }
+        //for(uint32_t k=0; k<bufferCount; ++k)
+        //{
+        //    SBufferData buffer = {};
+//
+        //    std::string     name     = {};
+//
+        //    aDeserializer.beginObject(k);
+//
+        //    aDeserializer.readValue("name",    name);
+        //    aDeserializer.readValue("offset",  buffer.mLocation.offset);
+        //    aDeserializer.readValue("size",    buffer.mLocation.length);
+        //    aDeserializer.readValue("padding", buffer.mLocation.padding);
+//
+        //    uint32_t memberCount = 0;
+        //    aDeserializer.beginArray("members", memberCount);
+        //    for(uint32_t l=0; l<memberCount; ++l)
+        //    {
+        //        std::string     memberName ={};
+        //        SBufferLocation location   ={};
+//
+        //        aDeserializer.beginObject(l);
+//
+        //        aDeserializer.readValue("name",    memberName);
+        //        aDeserializer.readValue("offset",  location.offset);
+        //        aDeserializer.readValue("size",    location.length);
+        //        aDeserializer.readValue("padding", location.padding);
+//
+        //        aDeserializer.endObject();
+//
+        //        buffer.mValueIndex[memberName] = location;
+        //    }
+        //    aDeserializer.endArray();
+//
+        //    aDeserializer.endObject();
+//
+        //    mBufferIndex[name] = buffer;
+        //}
         aDeserializer.endArray();
 
         return true;
