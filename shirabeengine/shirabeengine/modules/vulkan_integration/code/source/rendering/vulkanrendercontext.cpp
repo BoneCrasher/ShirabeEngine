@@ -233,7 +233,8 @@ namespace engine
             descriptorSetWrites          .resize(aGpuBufferHandles.size());
             descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
 
-            for(std::size_t k=0; k<aGpuBufferHandles.size(); ++k)
+            uint64_t writeCounter = 0;
+            for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
             {
                 std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
                 for(std::size_t j=0; j<setBindings.size(); ++j)
@@ -245,13 +246,13 @@ namespace engine
                         continue; // Only supporting UBOs for now...
                     }
 
-                    auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[k]);
+                    auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[writeCounter]);
 
                     VkDescriptorBufferInfo bufferInfo = {};
                     bufferInfo.buffer = buffer->handle;
                     bufferInfo.offset = 0;
                     bufferInfo.range  = buffer->getCurrentDescriptor()->createInfo.size;
-                    descriptorSetWriteBufferInfos[k] = bufferInfo;
+                    descriptorSetWriteBufferInfos[writeCounter] = bufferInfo;
 
                     VkWriteDescriptorSet descriptorWrite = {};
                     descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -260,11 +261,11 @@ namespace engine
                     descriptorWrite.dstSet           = pipeline->descriptorSets[k];
                     descriptorWrite.dstBinding       = binding.binding;
                     descriptorWrite.dstArrayElement  = 0;
-                    descriptorWrite.descriptorCount  = 1;
-                    descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[k]);
+                    descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                    descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[writeCounter]);
                     descriptorWrite.pImageInfo       = nullptr; // Optional
                     descriptorWrite.pTexelBufferView = nullptr;
-                    descriptorSetWrites[k] = descriptorWrite;
+                    descriptorSetWrites[writeCounter++] = descriptorWrite;
                 }
             }
 
@@ -548,7 +549,7 @@ namespace engine
             result = vkQueueWaitIdle(presentQueue);
             if(VK_SUCCESS != result)
             {
-                throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
+                // throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
             }
 
             return EEngineStatus::Ok;

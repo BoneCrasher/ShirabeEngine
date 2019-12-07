@@ -17,6 +17,7 @@
 
 #include "ecws/meshcomponent.h"
 #include "ecws/materialcomponent.h"
+#include <array>
 
 #if defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11display.h>
@@ -333,7 +334,9 @@ namespace engine
 
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);
-            materialComponent->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "horizontalScale", 0.5f);
+
+            std::array<float, 2> scale = { 1.0f, 0.5f };
+            materialComponent->getMutableConfiguration().setBufferValue("struct_modelMatrices", "horizontalScale", scale);
 
             auto cube = makeUnique<ecws::CEntity>();
             cube->addComponent<ecws::CMaterialComponent>(materialComponent);
@@ -434,7 +437,8 @@ namespace engine
                 // for(auto const &mesh : meshes)
                     for(auto const &material : materials)
                     {
-                        material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "horizontalScale", newHorizontalScale);
+                        std::array<float, 2> scale = { newHorizontalScale, newHorizontalScale * 0.5f };
+                        material->getMutableConfiguration().setBufferValue<std::array<float, 2>>("struct_modelMatrices", "scale", scale);
                         renderableCollection.push_back({ name
                                                          , ""
                                                          , 0

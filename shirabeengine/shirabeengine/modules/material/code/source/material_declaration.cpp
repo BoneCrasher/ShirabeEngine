@@ -717,7 +717,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     CMaterialConfig CMaterialConfig::fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers)
     {
-        uint32_t const minUBOOffsetAlignment = 16; // Hardcoded for the platform... make accessible in any other way...
+        uint32_t const minUBOOffsetAlignment = 256; // Hardcoded for the platform... make accessible in any other way...
         std::size_t alignment = minUBOOffsetAlignment; // 16 * sizeof(float);
         // if (0 < minUBOOffsetAlignment) {
         //     alignment = (alignment + minUBOOffsetAlignment - 1) & ~(minUBOOffsetAlignment - 1);
@@ -745,7 +745,7 @@ namespace engine::material
             for(std::size_t k=0; k<arrayLayers; ++k)
             {
                 aMember->location.offset  = (aCurrentBaseOffset + aMember->location.offset + (k * aMember->array.stride));
-                aMember->location.length  = nextMultiple(aMember->location.length, alignment);
+                aMember->location.length  = aMember->location.length; // nextMultiple(aMember->location.length, alignment);
 
                 //aMember->location.length  = nextMultiple(buffer.location.length, alignment);
                 //adjustedBufferLocation.padding = buffer.location.padding;
@@ -778,7 +778,8 @@ namespace engine::material
         //
         // Filter out all non-user-set indexed buffers, so that they won't have any influence on the buffer size calculation.
         //
-        if(not aIncludeSystemBuffers)
+        bool const processSystemUBOs = true; // = aIncludeSystemBuffers;
+        if(not processSystemUBOs)
         {
             static constexpr uint8_t sFirstPermittedUserSetIndex = 2;
 
@@ -813,7 +814,7 @@ namespace engine::material
             Shared<SBufferMember> member = makeShared<SBufferMember>();
             member->name             = buffer.name;
             member->location.offset  = buffer.location.offset;
-            member->location.length  = nextMultiple(buffer.location.length, alignment);
+            member->location.length  = buffer.location.length; // nextMultiple(buffer.location.length, alignment);
             member->location.padding = buffer.location.padding;
             member->array            = buffer.array;
             member->members          = buffer.members;
@@ -829,7 +830,7 @@ namespace engine::material
                 Shared<SBufferMember> arrayMember = makeShared<SBufferMember>();
                 arrayMember->name             = buffer.name;
                 arrayMember->location.offset  = buffer.location.offset;
-                arrayMember->location.length  = nextMultiple(buffer.location.length, alignment);
+                arrayMember->location.length  = buffer.location.length; // nextMultiple(buffer.location.length, alignment);
                 arrayMember->location.padding = buffer.location.padding;
                 arrayMember->array.layers     = 1;
                 arrayMember->array.stride     = buffer.array.stride;

@@ -216,7 +216,7 @@ namespace engine::material
             layoutBinding.binding            = uniformBuffer.binding;
             layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL; // serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
-            layoutBinding.descriptorCount    = 1;
+            layoutBinding.descriptorCount    = uniformBuffer.array.layers;
             layoutBinding.pImmutableSamplers = nullptr;
             pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
 
