@@ -265,12 +265,6 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/definition.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/extraction.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/shadercompilationunit.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/extraction.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/shadercompilationunit.cpp" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -680,7 +674,7 @@
       <workItem from="1575709197244" duration="316000" />
       <workItem from="1575710381137" duration="634000" />
       <workItem from="1575724854259" duration="958000" />
-      <workItem from="1575726097553" duration="25343000" />
+      <workItem from="1575726097553" duration="25993000" />
     </task>
     <servers />
   </component>
