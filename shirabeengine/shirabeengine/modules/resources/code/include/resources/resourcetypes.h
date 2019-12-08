@@ -409,20 +409,20 @@ namespace engine
             EEngineStatus unload() override
             {
                 std::optional<SMaterialDependencies> const &dependencies = getCurrentDependencies();
-                if(false == dependencies.has_value())
+                if(not dependencies.has_value())
                 {
                     return EEngineStatus::Error;
                 }
 
-                EEngineStatus const pipelineStatus = pipelineResource->load(dependencies->pipelineDependencies);
+                EEngineStatus const pipelineStatus = pipelineResource->unload();
                 EngineStatusPrintOnError(pipelineStatus, "SMaterial::load", "Failed to load pipeline.");
 
-                EEngineStatus const shaderModuleStatus = shaderModuleResource->load({});
+                EEngineStatus const shaderModuleStatus = shaderModuleResource->unload();
                 EngineStatusPrintOnError(shaderModuleStatus, "SMaterial::load", "Failed to load shader module.");
 
                 for(auto const &buffer : bufferResources)
                 {
-                    EEngineStatus const bufferStatus = buffer->load({});
+                    EEngineStatus const bufferStatus = buffer->unload();
                     EngineStatusPrintOnError(bufferStatus, "SMaterial::load", "Failed to load buffer.");
                 }
 
@@ -431,6 +431,49 @@ namespace engine
             }
         };
 
+        struct
+                [[nodiscard]]
+                SHIRABE_LIBRARY_EXPORT SMesh
+                : public CResourceObject<SMeshDescriptor, SMeshDependencies>
+        {
+            using CResourceObject<SMeshDescriptor, SMeshDependencies>::CResourceObject;
+
+            Shared<SBuffer> vertexDataBufferResource;
+            Shared<SBuffer> indexBufferResource;
+
+            SHIRABE_INLINE
+            EEngineStatus load(SMeshDependencies const &aDependencies) override
+            {
+                SHIRABE_UNUSED(aDependencies);
+
+                EEngineStatus const vertexBufferStatus = vertexDataBufferResource->load({});
+                EngineStatusPrintOnError(vertexBufferStatus, "SMesh::load", "Failed to load vertex buffer.");
+
+                EEngineStatus const bufferStatus = indexBufferResource->load({});
+                EngineStatusPrintOnError(bufferStatus, "SMesh::load", "Failed to load index buffer.");
+
+                return EEngineStatus::Ok;
+            }
+
+            SHIRABE_INLINE
+            EEngineStatus unload() override
+            {
+                std::optional<SMeshDependencies> const &dependencies = getCurrentDependencies();
+                if(not dependencies.has_value())
+                {
+                    return EEngineStatus::Error;
+                }
+
+                EEngineStatus const indexBufferStatus = indexBufferResource->unload();
+                EngineStatusPrintOnError(indexBufferStatus, "SMesh::unload", "Failed to unload index buffer.");
+
+                EEngineStatus const bufferStatus = vertexDataBufferResource->unload();
+                EngineStatusPrintOnError(bufferStatus, "SMesh::unload", "Failed to unload vertex buffer.");
+
+                resetCurrentDependencies();
+                return EEngineStatus::Ok;
+            }
+        };
     }
 }
 

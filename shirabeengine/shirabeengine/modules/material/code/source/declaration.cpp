@@ -1,5 +1,6 @@
-﻿#include "material/material_declaration.h"
-#include "material/materialserialization.h"
+﻿#include "material/declaration.h"
+#include "material/serialization.h"
+#include <util/documents/json.h>
 
 namespace engine::material
 {
@@ -35,7 +36,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    bool SMaterialMasterIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const
+    bool SMaterialMasterIndex::acceptSerializer(documents::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const
     {
         aSerializer.beginObject(name);
 
@@ -62,7 +63,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer)
+    bool SMaterialMasterIndex::acceptDeserializer(documents::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer)
     {
         aDeserializer.readValue("uid", uid);
         aDeserializer.readValue("name",name);
@@ -105,7 +106,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool SMaterialMeta::acceptSerializer(serialization::IJSONSerializer<SMaterialMeta> &aSerializer) const
+    bool SMaterialMeta::acceptSerializer(documents::IJSONSerializer<SMaterialMeta> &aSerializer) const
     {
         aSerializer.beginObject(name);
 
@@ -134,7 +135,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool SMaterialMeta::acceptDeserializer(serialization::IJSONDeserializer<SMaterialMeta> &aDeserializer)
+    bool SMaterialMeta::acceptDeserializer(documents::IJSONDeserializer<SMaterialMeta> &aDeserializer)
     {
         aDeserializer.readValue("uid",                       uid);
         aDeserializer.readValue("name",                      name);
@@ -179,7 +180,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool SMaterialInstanceIndex::acceptSerializer(serialization::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const
+    bool SMaterialInstanceIndex::acceptSerializer(documents::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const
     {
         aSerializer.beginObject(name);
 
@@ -197,7 +198,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool SMaterialInstanceIndex::acceptDeserializer(serialization::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer)
+    bool SMaterialInstanceIndex::acceptDeserializer(documents::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer)
     {
         aDeserializer.readValue("uid",  uid);
         aDeserializer.readValue("name", name);
@@ -212,7 +213,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool SMaterialSignature::acceptSerializer(serialization::IJSONSerializer<SMaterialSignature> &aSerializer) const
+    bool SMaterialSignature::acceptSerializer(documents::IJSONSerializer<SMaterialSignature> &aSerializer) const
     {
         std::function<void(Shared<SMaterialType const> const &, bool)> writeType = nullptr;
         writeType = [&] (Shared<SMaterialType const> const &aType, bool aRecursive) -> void
@@ -429,7 +430,7 @@ namespace engine::material
      * @param aSerializer
      * @return
      */
-    bool SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer<SMaterialSignature> &aDeserializer)
+    bool SMaterialSignature::acceptDeserializer(documents::IJSONDeserializer<SMaterialSignature> &aDeserializer)
     {
         std::function<void(Shared<SMaterialType> &, bool)> readType = nullptr;
         readType = [&] (Shared<SMaterialType> &aType, bool aRecursive) -> void
@@ -935,7 +936,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool CMaterialConfig::acceptSerializer(serialization::IJSONSerializer<CMaterialConfig> &aSerializer) const
+    bool CMaterialConfig::acceptSerializer(documents::IJSONSerializer<CMaterialConfig> &aSerializer) const
     {
         aSerializer.beginObject("");
 
@@ -993,7 +994,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer<CMaterialConfig> &aDeserializer)
+    bool CMaterialConfig::acceptDeserializer(documents::IJSONDeserializer<CMaterialConfig> &aDeserializer)
     {
         // aDeserializer.readValue("uniformBufferData", mData);
 

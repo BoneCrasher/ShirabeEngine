@@ -1,9 +1,11 @@
-#include "material/materialserialization.h"
+#include "material/serialization.h"
+#include <util/documents/json.h>
 
 namespace engine
 {
     namespace serialization
     {
+        using namespace engine::documents;
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------

@@ -6,7 +6,7 @@ include(project_default_template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
 
-set(SHIRABE_EXCLUDED_HEADERS util/documents/json.h)
+# set(SHIRABE_EXCLUDED_HEADERS util/documents/json.h)
 set(SHIRABE_EXCLUDED_SOURCES documents/json.cpp)
 
 set(

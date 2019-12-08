@@ -18,6 +18,7 @@ add_subdirectory(modules/rendering)
 add_subdirectory(modules/vulkan_integration)
 add_subdirectory(modules/asset)
 add_subdirectory(modules/material)
+add_subdirectory(modules/mesh)
 
 include($ENV{SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
 include(project_default_template)

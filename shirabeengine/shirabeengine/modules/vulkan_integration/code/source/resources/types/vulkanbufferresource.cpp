@@ -145,6 +145,19 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanBufferResource::load()
     {
+        SBufferDescription const description = *getCurrentDescriptor();
+        if(nullptr != description.dataSource)
+        {
+            VkDevice device = getVkContext()->getLogicalDevice();
+
+            ByteBuffer const dataSource = description.dataSource();
+
+            void *mappedData = nullptr;
+            vkMapMemory(device, this->attachedMemory, 0, dataSource.size(), 0, &mappedData);
+            memcpy(mappedData, dataSource.data(), dataSource.size());
+            vkUnmapMemory(device, this->attachedMemory);
+        }
+
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------

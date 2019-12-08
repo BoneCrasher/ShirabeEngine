@@ -7,7 +7,7 @@
 
 #include <spirv_cross/spirv_cross.hpp>
 #include <core/helpers.h>
-#include <material/material_declaration.h>
+#include <material/declaration.h>
 
 
 namespace resource_compiler

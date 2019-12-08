@@ -264,6 +264,26 @@ namespace engine
             SMaterialPipelineDependencies pipelineDependencies;
             // No dependencies structs required for shader module and buffers (yet...)
         };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMeshDescriptor
+        {
+            std::string                               name;
+            SBufferDescription                        dataBufferDescription;
+            SBufferDescription                        indexBufferDescription;
+            Vector<VkVertexInputBindingDescription>   bindingDescriptions;
+            Vector<VkVertexInputAttributeDescription> attributeDescriptions;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMeshDependencies
+        {
+            ResourceId_t dataBufferId;
+            ResourceId_t indexBufferId;
+        };
+
     }
 }
 

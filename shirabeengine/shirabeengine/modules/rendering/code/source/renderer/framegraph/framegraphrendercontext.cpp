@@ -1,9 +1,9 @@
 #include <cassert>
 
 #include <fmt/format.h>
-#include <material/material_loader.h>
-#include <material/material_declaration.h>
-#include <material/materialserialization.h>
+#include <material/loader.h>
+#include <material/declaration.h>
+#include <material/serialization.h>
 #include <resources/cresourcemanager.h>
 #include <resources/resourcetypes.h>
 

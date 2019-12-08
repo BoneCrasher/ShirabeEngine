@@ -23,7 +23,7 @@
 
 namespace engine
 {
-    namespace serialization
+    namespace documents
     {
         template <typename T>
         class IJSONSerializer;
@@ -73,16 +73,16 @@ namespace engine
          * The specific implementation will be provided in files referenced by the stages member.
          */
         struct SMaterialMasterIndex
-                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>
+                : engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialMasterIndex>>
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMasterIndex>>
         {
             static std::unordered_map<VkPipelineStageFlagBits, SMaterialIndexStage> const sEmptyMasterMap;
 
         public_constructors:
             SHIRABE_INLINE
             SMaterialMasterIndex()
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
+                : serialization::ISerializable<documents::IJSONSerializer<SMaterialMasterIndex>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                  (0 )
                 , name                 ({})
                 , stages(sEmptyMasterMap)
@@ -90,8 +90,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialMasterIndex(SMaterialMasterIndex const &aOther)
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
+                : serialization::ISerializable<documents::IJSONSerializer<SMaterialMasterIndex>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                  (aOther.uid                  )
                 , name                 (aOther.name                 )
                 , stages               (aOther.stages               )
@@ -99,8 +99,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialMasterIndex(SMaterialMasterIndex &&aOther) noexcept
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMasterIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMasterIndex>>()
+                : serialization::ISerializable<documents::IJSONSerializer<SMaterialMasterIndex>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMasterIndex>>()
                 , uid                  (aOther.uid                  )
                 , name                 (std::move(aOther.name      ))
                 , stages               (std::move(aOther.stages    ))
@@ -138,14 +138,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const final;
+            bool acceptSerializer(documents::IJSONSerializer<SMaterialMasterIndex> &aSerializer) const final;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer) final;
+            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer) final;
         };
 
         /**
@@ -154,16 +154,16 @@ namespace engine
          * The specific implementation will be provided in files referenced by the stages member.
          */
         struct SMaterialInstanceIndex
-                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>
+                : engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>
         {
             static std::unordered_map<EShaderStage, SMaterialIndexStage> const sEmptyMap;
 
         public_constructors:
             SHIRABE_INLINE
             SMaterialInstanceIndex()
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
+                : serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>()
                 , uid                 (0 )
                 , name                ({})
                 , masterIndexAssetId  (0 )
@@ -172,8 +172,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialInstanceIndex(SMaterialInstanceIndex const &aOther)
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
+                : serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>()
                 , uid                 (aOther.uid                 )
                 , name                (aOther.name                )
                 , masterIndexAssetId  (aOther.masterIndexAssetId  )
@@ -182,8 +182,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialInstanceIndex(SMaterialInstanceIndex &&aOther)
-                : serialization::ISerializable<serialization::IJSONSerializer<SMaterialInstanceIndex>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialInstanceIndex>>()
+                : serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>()
                 , uid                 (std::move(aOther.uid                   ))
                 , name                (std::move(aOther.name                  ))
                 , masterIndexAssetId  (std::move(aOther.masterIndexAssetId    ))
@@ -225,14 +225,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const;
+            bool acceptSerializer(documents::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer);
+            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer);
         };
 
 
@@ -242,16 +242,16 @@ namespace engine
          * The specific implementation will be provided in files referenced by the stages member.
          */
         struct SMaterialMeta
-                : engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>
+                : engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>
         {
             static std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const sEmptyMetaMap;
 
         public_constructors:
             SHIRABE_INLINE
             SMaterialMeta()
-                    : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>()
-                    , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>()
+                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>()
                     , uid                  (0 )
                     , name                 ({})
                     , signatureAssetUid    (0 )
@@ -261,8 +261,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialMeta(SMaterialMeta const &aOther)
-                    : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>()
-                    , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>()
+                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>()
                     , uid                  (aOther.uid                  )
                     , name                 (aOther.name                 )
                     , signatureAssetUid    (aOther.signatureAssetUid    )
@@ -272,8 +272,8 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialMeta(SMaterialMeta &&aOther) noexcept
-                    : serialization::ISerializable<serialization::IJSONSerializer<SMaterialMeta>>()
-                    , serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialMeta>>()
+                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>()
                     , uid                  (aOther.uid                  )
                     , name                 (std::move(aOther.name      ))
                     , signatureAssetUid    (aOther.signatureAssetUid    )
@@ -319,14 +319,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterialMeta> &aSerializer) const final;
+            bool acceptSerializer(documents::IJSONSerializer<SMaterialMeta> &aSerializer) const final;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialMeta> &aDeserializer) final;
+            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialMeta> &aDeserializer) final;
         };
 
         using MutableMaterialTypeMap_t = std::unordered_map<std::string, Shared<struct SMaterialType>>;
@@ -602,8 +602,8 @@ namespace engine
          */
         struct SMaterialSignature
                 : public asset::CAssetReference
-                , public engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>
-                , public engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>
+                , public engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialSignature>>
+                , public engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialSignature>>
         {
         public_members:
             std::string                 name;
@@ -620,8 +620,8 @@ namespace engine
             SHIRABE_INLINE
             SMaterialSignature(asset::AssetId_t const &aAssetUid = 0)
                 : asset::CAssetReference(aAssetUid)
-                , engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>()
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>()
+                , engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialSignature>>()
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialSignature>>()
                 , name          ({})
                 , layoutInfo    ({})
                 , stages        ({})
@@ -633,8 +633,8 @@ namespace engine
             SHIRABE_INLINE
             SMaterialSignature(SMaterialSignature const &aOther)
                 : asset::CAssetReference(aOther.getAssetId())
-                , engine::serialization::ISerializable<serialization::IJSONSerializer<SMaterialSignature>>()
-                , engine::serialization::IDeserializable<serialization::IJSONDeserializer<SMaterialSignature>>()
+                , engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialSignature>>()
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialSignature>>()
                 , name          (aOther.name)
                 , layoutInfo    (aOther.layoutInfo)
                 , stages        (aOther.stages)
@@ -672,14 +672,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<SMaterialSignature> &aSerializer) const;
+            bool acceptSerializer(documents::IJSONSerializer<SMaterialSignature> &aSerializer) const;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<SMaterialSignature> &aDeserializer);
+            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialSignature> &aDeserializer);
         };
 
         // Fwd-Declare for friending...
@@ -755,8 +755,8 @@ namespace engine
          */
         class CMaterialConfig
                 : public asset::CAssetReference
-                , public engine::serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>
-                , public engine::serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>
+                , public engine::serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>
+                , public engine::serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>
         {
 
         private_typedefs:
@@ -774,8 +774,8 @@ namespace engine
             SHIRABE_INLINE
             CMaterialConfig(asset::AssetId_t const &aAssetUID = 0)
                 : asset::CAssetReference(aAssetUID)
-                , serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>()
+                , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
                 , mBufferIndex({})
                 , mData({})
             { }
@@ -783,8 +783,8 @@ namespace engine
             SHIRABE_INLINE
             CMaterialConfig(CMaterialConfig const &aOther)
                 : asset::CAssetReference(aOther.getAssetId())
-                , serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>()
+                , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
                 , mBufferIndex(aOther.mBufferIndex)
                 , mData       (aOther.mData)
             { }
@@ -792,8 +792,8 @@ namespace engine
             SHIRABE_INLINE
             CMaterialConfig(CMaterialConfig  &&aOther)
                 : asset::CAssetReference(aOther.getAssetId())
-                , serialization::ISerializable<serialization::IJSONSerializer<CMaterialConfig>>()
-                , serialization::IDeserializable<serialization::IJSONDeserializer<CMaterialConfig>>()
+                , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
+                , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
                 , mBufferIndex(std::move(aOther.mBufferIndex))
                 , mData       (std::move(aOther.mData))
             { }
@@ -889,14 +889,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(serialization::IJSONSerializer<CMaterialConfig> &aSerializer) const;
+            bool acceptSerializer(documents::IJSONSerializer<CMaterialConfig> &aSerializer) const;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(serialization::IJSONDeserializer<CMaterialConfig> &aDeserializer);
+            bool acceptDeserializer(documents::IJSONDeserializer<CMaterialConfig> &aDeserializer);
 
         private_methods:
             /**

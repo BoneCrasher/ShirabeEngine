@@ -10,7 +10,7 @@
 #include <asset/assetstorage.h>
 #include <renderer/irenderer.h>
 #include <resources/cresourcemanager.h>
-#include <material/material_loader.h>
+#include <material/loader.h>
 
 #include <vulkan_integration/vulkanenvironment.h>
 
@@ -18,7 +18,7 @@
     #include <wsi/windows/windowserror.h>
 #elif defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11error.h>
-#include <material/material_loader.h>
+#include <material/loader.h>
 
 #endif
 

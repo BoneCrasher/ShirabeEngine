@@ -995,12 +995,12 @@ Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/m
 Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/include/log/log.h...
 Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/source/log.cpp...
 Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/source/log.cpp...
-Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h...
-Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h...
-Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_loader.h...
-Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_loader.h...
-Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h...
-Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h...
+Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h...
+Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h...
+Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/loader.h...
+Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/loader.h...
+Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h...
+Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h...
 Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/material_declaration.cpp...
 Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/material_declaration.cpp...
 Preprocessing /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/material_loader.cpp...
@@ -1597,39 +1597,39 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/include/log/log.h:91: warning: no uniquely matching class member found for 
   case engine::CLog::ELogLevel::WTF()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:862: warning: documented symbol `CEngineResult< TBufferType const  * > engine::material::CMaterialConfig::getBuffer' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:348: warning: no uniquely matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:862: warning: documented symbol `CEngineResult< TBufferType const  * > engine::material::CMaterialConfig::getBuffer' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:348: warning: no uniquely matching class member found for
   template < T >
   bool engine::serialization::CJSONSerializer< T >::initialize()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:569: warning: documented symbol `bool engine::serialization::CJSONSerializer< T >::writeValueImpl' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:603: warning: no matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:569: warning: documented symbol `bool engine::serialization::CJSONSerializer< T >::writeValueImpl' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:603: warning: no matching class member found for
   template < T >
   engine::serialization::CJSONSerializer::CSerializationResult::CSerializationResult()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:613: warning: no matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:613: warning: no matching class member found for
   template < T >
   engine::serialization::CJSONSerializer::CSerializationResult::CSerializationResult(nlohmann::json const &aResult)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:623: warning: documented symbol `CResult< std::string > engine::serialization::CJSONSerializer::CSerializationResult::asString' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:634: warning: no uniquely matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:623: warning: documented symbol `CResult< std::string > engine::serialization::CJSONSerializer::CSerializationResult::asString' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:634: warning: no uniquely matching class member found for
   template < T >
   CResult< std::vector< uint8_t > > engine::serialization::CJSONSerializer::CSerializationResult::asBinaryBuffer() const
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:833: warning: no uniquely matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:833: warning: no uniquely matching class member found for
   template < T >
   bool engine::serialization::CJSONDeserializer< T >::initialize()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:1146: warning: documented symbol `bool engine::serialization::CJSONDeserializer< T >::readValueImpl' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:1189: warning: no matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:1146: warning: documented symbol `bool engine::serialization::CJSONDeserializer< T >::readValueImpl' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:1189: warning: no matching class member found for
   template < T >
   engine::serialization::CJSONDeserializer::CDeserializationResult::CDeserializationResult()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:1199: warning: no matching class member found for 
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:1199: warning: no matching class member found for
   template < T >
   engine::serialization::CJSONDeserializer::CDeserializationResult::CDeserializationResult(T const &aResult)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:1209: warning: documented symbol `CResult< T > const engine::serialization::CJSONDeserializer::CDeserializationResult::asT' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:1209: warning: documented symbol `CResult< T > const engine::serialization::CJSONDeserializer::CDeserializationResult::asT' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/material_declaration.cpp:25: warning: no uniquely matching class member found for 
   bool engine::material::SMaterialMasterIndex::acceptSerializer(serialization::IJSONSerializer< SMaterialMasterIndex > &aSerializer) const
 
@@ -2134,9 +2134,9 @@ Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shir
 Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/types/texture.h...
 Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/types/textureview.h...
 Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/include/log/log.h...
-Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h...
-Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_loader.h...
-Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h...
+Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h...
+Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/loader.h...
+Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h...
 Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/axisangle.h...
 Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h...
 Generating code for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/geometric/rect.h...
@@ -2500,9 +2500,9 @@ Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shir
 Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/source/types/textureview.cpp...
 Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/include/log/log.h...
 Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/log/code/source/log.cpp...
-Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h...
-Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_loader.h...
-Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h...
+Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h...
+Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/loader.h...
+Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h...
 Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/material_declaration.cpp...
 Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/material_loader.cpp...
 Generating docs for file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/source/materialserialization.cpp...
@@ -3638,23 +3638,23 @@ Generating XML output for class engine:/home/dotti/workspaces/shirabeengine/shir
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h:177: warning: The following parameters of engine::framegraph::CGraphBuilder::registerRenderables(std::string const &aReadableIdentifier, rendering::RenderableList const &aRenderables) are not documented:
   parameter 'aReadableIdentifier'
   parameter 'aRenderables'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:712: warning: argument 'aInput' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::string const &aSource)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:712: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::string const &aSource)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:720: warning: The following parameters of engine::serialization::CJSONDeserializer::deserialize(std::string const &aSource) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:712: warning: argument 'aInput' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::string const &aSource)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:712: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::string const &aSource)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:720: warning: The following parameters of engine::serialization::CJSONDeserializer::deserialize(std::string const &aSource) are not documented:
   parameter 'aSource'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:723: warning: argument 'aInput' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::vector< uint8_t > const &aSource)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:723: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::vector< uint8_t > const &aSource)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:731: warning: The following parameters of engine::serialization::CJSONDeserializer::deserialize(std::vector< uint8_t > const &aSource) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:723: warning: argument 'aInput' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::vector< uint8_t > const &aSource)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:723: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::deserialize(std::vector< uint8_t > const &aSource)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:731: warning: The following parameters of engine::serialization::CJSONDeserializer::deserialize(std::vector< uint8_t > const &aSource) are not documented:
   parameter 'aSource'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:739: warning: The following parameters of engine::serialization::CJSONDeserializer::beginArray(std::string const &aName, uint32_t &aOutArraySize) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:739: warning: The following parameters of engine::serialization::CJSONDeserializer::beginArray(std::string const &aName, uint32_t &aOutArraySize) are not documented:
   parameter 'aOutArraySize'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:756: warning: argument 'aName' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::beginObject(uint32_t const &aIndex)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:761: warning: The following parameters of engine::serialization::CJSONDeserializer::beginObject(uint32_t const &aIndex) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:756: warning: argument 'aName' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::beginObject(uint32_t const &aIndex)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:761: warning: The following parameters of engine::serialization::CJSONDeserializer::beginObject(uint32_t const &aIndex) are not documented:
   parameter 'aIndex'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:771: warning: argument 'aValue' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::readValue(std::string const &aKey, std::string &aOutValue)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:777: warning: The following parameters of engine::serialization::CJSONDeserializer::readValue(std::string const &aKey, std::string &aOutValue) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:771: warning: argument 'aValue' of command @param is not found in the argument list of engine::serialization::CJSONDeserializer< T >::readValue(std::string const &aKey, std::string &aOutValue)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:777: warning: The following parameters of engine::serialization::CJSONDeserializer::readValue(std::string const &aKey, std::string &aOutValue) are not documented:
   parameter 'aOutValue'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:246: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::CJSONSerializer< T >::serialize(T const &aInput)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:246: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::CJSONSerializer< T >::serialize(T const &aInput)
 /home/dotti/workspaces/shirabeengine/shirabeengine/doxygen/m.css/documentation/test_doxygen/search/Dir/File.h:31: warning: Found unknown command `\m_keywords'
 /home/dotti/workspaces/shirabeengine/shirabeengine/doxygen/m.css/documentation/test_doxygen/search/Dir/File.h:24: warning: Found unknown command `\m_keywords'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/linuxtime.h:53: warning: argument 'buffer' of command @param is not found in the argument list of engine::CLinuxTime::getClockResolution(InternalTimeValueType_t &aBuffer) const
@@ -3687,19 +3687,19 @@ Generating XML output for class engine:/home/dotti/workspaces/shirabeengine/shir
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:350: warning: argument 'runnable' of command @param is not found in the argument list of engine::threading::CLooper< TTaskResult >::loop(typename threading::ILooper< TTaskResult >::CTask &&aRunnable)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:355: warning: The following parameters of engine::threading::CLooper::loop(typename threading::ILooper< TTaskResult >::CTask &&aRunnable) are not documented:
   parameter 'aRunnable'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:703: warning: argument 'aBufferName' of command @param is not found in the argument list of engine::material::CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:703: warning: argument 'aFieldName' of command @param is not found in the argument list of engine::material::CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:711: warning: The following parameters of engine::material::CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:703: warning: argument 'aBufferName' of command @param is not found in the argument list of engine::material::CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:703: warning: argument 'aFieldName' of command @param is not found in the argument list of engine::material::CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:711: warning: The following parameters of engine::material::CMaterialConfig::getBufferValue(SBufferLocation const &aLocation) const are not documented:
   parameter 'aLocation'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:721: warning: Unsupported xml/html tag <ErrorCode> found
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:735: warning: Unsupported xml/html tag <ErrorCode> found
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:748: warning: Unsupported xml/html tag <ErrorCode> found
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:760: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer< CMaterialConfig > &aDeserializer)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:764: warning: The following parameters of engine::material::CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer< CMaterialConfig > &aDeserializer) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:721: warning: Unsupported xml/html tag <ErrorCode> found
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:735: warning: Unsupported xml/html tag <ErrorCode> found
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:748: warning: Unsupported xml/html tag <ErrorCode> found
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:760: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer< CMaterialConfig > &aDeserializer)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:764: warning: The following parameters of engine::material::CMaterialConfig::acceptDeserializer(serialization::IJSONDeserializer< CMaterialConfig > &aDeserializer) are not documented:
   parameter 'aDeserializer'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:781: warning: argument 'aOutPointer' of command @param is not found in the argument list of engine::material::CMaterialConfig::getBufferValuePointer(std::string const &aBufferName, std::string const &aBufferValue)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_loader.h:48: warning: argument 'aMaterialId' of command @param is not found in the argument list of engine::material::CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_loader.h:52: warning: The following parameters of engine::material::CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:781: warning: argument 'aOutPointer' of command @param is not found in the argument list of engine::material::CMaterialConfig::getBufferValuePointer(std::string const &aBufferName, std::string const &aBufferValue)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/loader.h:48: warning: argument 'aMaterialId' of command @param is not found in the argument list of engine::material::CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/loader.h:52: warning: The following parameters of engine::material::CMaterialLoader::loadMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId) are not documented:
   parameter 'aMaterialInstanceAssetId'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/measurementchunk.h:91: warning: argument 'strm' of command @param is not found in the argument list of engine::benchmarking::CMeasurementChunk< TParameter, TValue >::operator<<(std::basic_ostream< wchar_t > &aStream, CMeasurementChunk< ParameterType_t, ValueType_t > const &aChunk)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/measurementchunk.h:91: warning: argument 'chunk' of command @param is not found in the argument list of engine::benchmarking::CMeasurementChunk< TParameter, TValue >::operator<<(std::basic_ostream< wchar_t > &aStream, CMeasurementChunk< ParameterType_t, ValueType_t > const &aChunk)
@@ -4049,11 +4049,11 @@ Generating XML output for class documentation::test_doxygen::test_cpp::Enum/home
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:406: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)=0
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:412: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)=0 are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:137: warning: argument 'aName' of command @param is not found in the argument list of engine::serialization::IJSONDeserializer< T >::beginObject(uint32_t const &aIndex)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:142: warning: The following parameters of engine::serialization::IJSONDeserializer::beginObject(uint32_t const &aIndex)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:137: warning: argument 'aName' of command @param is not found in the argument list of engine::serialization::IJSONDeserializer< T >::beginObject(uint32_t const &aIndex)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:142: warning: The following parameters of engine::serialization::IJSONDeserializer::beginObject(uint32_t const &aIndex)=0 are not documented:
   parameter 'aIndex'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:152: warning: argument 'aValue' of command @param is not found in the argument list of engine::serialization::IJSONDeserializer< T >::readValue(std::string const &aKey, std::string &aOutValue)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/materialserialization.h:158: warning: The following parameters of engine::serialization::IJSONDeserializer::readValue(std::string const &aKey, std::string &aOutValue)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:152: warning: argument 'aValue' of command @param is not found in the argument list of engine::serialization::IJSONDeserializer< T >::readValue(std::string const &aKey, std::string &aOutValue)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:158: warning: The following parameters of engine::serialization::IJSONDeserializer::readValue(std::string const &aKey, std::string &aOutValue)=0 are not documented:
   parameter 'aOutValue'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:160: warning: argument 'runnable' of command @param is not found in the argument list of engine::threading::ILooper< TTaskResult >::loop(ILooper< TTaskResult >::CTask &&aRunnable)=0
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/threading/looper.h:166: warning: The following parameters of engine::threading::ILooper::loop(ILooper< TTaskResult >::CTask &&aRunnable)=0 are not documented:
@@ -4259,11 +4259,11 @@ Generating XML output for class engine::material::SBufferData
 Generating XML output for class engine::material::SBufferLocation
 Generating XML output for class engine::framegraph::SCompositingModuleTag_t
 Generating XML output for class engine::gfxapi::SDeferredResourceOperationHandle
-Generating XML output for class engine::resource/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:232: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::SMaterialInstanceIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialInstanceIndex > &aDeserializer)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:236: warning: The following parameters of engine::material::SMaterialInstanceIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialInstanceIndex > &aDeserializer) are not documented:
+Generating XML output for class engine::resource/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:232: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::SMaterialInstanceIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialInstanceIndex > &aDeserializer)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:236: warning: The following parameters of engine::material::SMaterialInstanceIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialInstanceIndex > &aDeserializer) are not documented:
   parameter 'aDeserializer'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:145: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialMasterIndex > &aDeserializer)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:149: warning: The following parameters of engine::material::SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialMasterIndex > &aDeserializer) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:145: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialMasterIndex > &aDeserializer)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:149: warning: The following parameters of engine::material::SMaterialMasterIndex::acceptDeserializer(serialization::IJSONDeserializer< SMaterialMasterIndex > &aDeserializer) are not documented:
   parameter 'aDeserializer'
 s::SDescriptorImplBase
 Generating XML output for class documentation::test_doxygen::test_search::Search
@@ -4317,8 +4317,8 @@ Generating XML output for class engine::material::SMaterialLayoutInfo
 Generating XML output for class engine::material::SMaterialMasterIndex
 Generating XML output for class engine::gfxapi::SMaterialMultisamplingState
 Generating XML output for class engine::gfxapi::SMaterialRasterizerState
-Generating XML output for class engine::gfxapi/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:529: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer< SMaterialSignature > &aDeserializer)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/material_declaration.h:533: warning: The following parameters of engine::material::SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer< SMaterialSignature > &aDeserializer) are not documented:
+Generating XML output for class engine::gfxapi/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:529: warning: argument 'aSerializer' of command @param is not found in the argument list of engine::material::SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer< SMaterialSignature > &aDeserializer)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/declaration.h:533: warning: The following parameters of engine::material::SMaterialSignature::acceptDeserializer(serialization::IJSONDeserializer< SMaterialSignature > &aDeserializer) are not documented:
   parameter 'aDeserializer'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabe_shader_precompiler/code/include/shadercompilationunit.h:37: warning: The following parameters of shader_precompiler::SShaderCompilationElement::SShaderCompilationElement(std::string const &aFileName, std::string const &aOutputPath, std::string const &aContents, VkPipelineStageFlagBits const aStage) are not documented:
   parameter 'aOutputPath'

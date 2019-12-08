@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_COMPONENT_MATERIAL_H__
 #define __SHIRABE_COMPONENT_MATERIAL_H__
 
-#include <material/material_declaration.h>
+#include <material/declaration.h>
 #include "ecws/icomponent.h"
 
 namespace engine::ecws

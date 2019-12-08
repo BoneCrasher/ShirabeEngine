@@ -8,6 +8,7 @@ set(SHIRABE_TEMPLATE "StaticLib")
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEMATERIAL
+        SHIRABEMODULEMESH
         SHIRABEMODULEWSI)
 
 include(project_setup)
@@ -15,6 +16,7 @@ include(project_setup)
 add_dependencies(rendering INSTALL_asset)
 add_dependencies(rendering INSTALL_graphicsapi)
 add_dependencies(rendering INSTALL_resources)
+add_dependencies(rendering INSTALL_mesh)
 add_dependencies(rendering INSTALL_material)
 add_dependencies(rendering INSTALL_wsi)
 add_dependencies(rendering INSTALL_core)

@@ -32,6 +32,15 @@ namespace engine {
         CDataBuffer( std::vector<T> &&aData, uint64_t const aSize);
         CDataBuffer( T const *const aData, uint64_t const aSize);
 
+    public_destructors:
+        ~CDataBuffer()
+        {
+            if(mUseRawData || nullptr != mRawData)
+            {
+                free(const_cast<T*>(mRawData));
+            }
+        };
+
     public_methods:
         /**
          * @brief data
@@ -72,6 +81,16 @@ namespace engine {
         inline uint64_t const size() const
         {
             return mSize;
+        }
+
+        CDataBuffer<T> const createView(uint64_t const &aOffset, uint64_t const &aSize) const
+        {
+            if(mSize <= (aOffset + aSize))
+            {
+                return {}; // Empty view...
+            }
+
+            return CDataBuffer(mRawData + aOffset, aSize);
         }
 
     private_members:

@@ -6,7 +6,7 @@
 #include <renderer/renderer.h>
 #include <renderer/framegraph/framegraphrendercontext.h>
 #include <graphicsapi/definitions.h>
-#include <material/material_loader.h>
+#include <material/loader.h>
 #include <material/assetloader.h>
 #include <resources/agpuapiresourceobjectfactory.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>

@@ -21,7 +21,7 @@
 
 #ifdef SHIRABE_PLATFORM_LINUX
 #include <execinfo.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #endif
 
@@ -31,8 +31,9 @@
 #include <core/enginetypehelper.h>
 #include <core/result.h>
 #include <core/helpers.h>
-#include <material/materialserialization.h>
-#include <material/material_declaration.h>
+#include <material/serialization.h>
+#include <material/declaration.h>
+#include <util/documents/json.h>
 
 #include "definition.h"
 #include "extraction.h"
@@ -40,6 +41,7 @@
 using namespace engine;
 using namespace engine::material;
 using namespace resource_compiler;
+using namespace engine::documents;
 
 //<-----------------------------------------------------------------------------
 
@@ -476,7 +478,7 @@ public_methods:
 
         std::string const indexFileContents = readFile(materialPathAbs);
 
-        Shared<serialization::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeShared<serialization::CJSONDeserializer<SMaterialMasterIndex>>();
+        Shared<documents::IJSONDeserializer<SMaterialMasterIndex>> indexDeserializer = makeShared<documents::CJSONDeserializer<SMaterialMasterIndex>>();
         indexDeserializer->initialize();
 
         auto [success, index] = indexDeserializer->deserialize(indexFileContents);

@@ -4,10 +4,12 @@
 #include <resources/resourcedescriptions.h>
 #include <resources/resourcetypes.h>
 #include <util/crc32.h>
+#include <util/documents/json.h>
 
-#include "material/material_declaration.h"
-#include "material/materialserialization.h"
-#include "material/material_loader.h"
+#include "material/declaration.h"
+#include "material/serialization.h"
+#include "material/loader.h"
+
 
 namespace engine
 {
@@ -30,7 +32,7 @@ namespace engine
                                           , Shared<asset::IAssetStorage> const &aAssetStorage
                                           , asset::AssetId_t             const &aAssetUID)
         {
-            using namespace serialization;
+            using namespace documents;
 
             CJSONDeserializer<T> deserializer {};
             deserializer.initialize();

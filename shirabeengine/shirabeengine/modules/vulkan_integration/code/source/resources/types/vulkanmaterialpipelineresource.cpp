@@ -1,7 +1,7 @@
 //
 // Created by dottideveloper on 29.10.19.
 //
-#include <material/materialserialization.h>
+#include <material/serialization.h>
 #include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkantextureviewresource.h"

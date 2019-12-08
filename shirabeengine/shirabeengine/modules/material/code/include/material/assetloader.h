@@ -2,15 +2,15 @@
 // Created by dotti on 24.11.19.
 //
 
-#ifndef __SHIRABEDEVELOPMENT_ASSETLOADER_H__
-#define __SHIRABEDEVELOPMENT_ASSETLOADER_H__
+#ifndef __SHIRABEDEVELOPMENT_MATERIAL_ASSETLOADER_H__
+#define __SHIRABEDEVELOPMENT_MATERIAL_ASSETLOADER_H__
 
 #include <asset/assetstorage.h>
 #include <resources/resourcedescriptions.h>
 #include <resources/resourcetypes.h>
 #include <resources/cresourcemanager.h>
-#include "material/material_declaration.h"
-#include "material/materialserialization.h"
+#include "material/declaration.h"
+#include "material/serialization.h"
 
 namespace engine::material
 {

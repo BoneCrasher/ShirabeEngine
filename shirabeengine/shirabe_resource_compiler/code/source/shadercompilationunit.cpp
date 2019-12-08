@@ -1,9 +1,9 @@
 #include "shadercompilationunit.h"
-#include <material/materialserialization.h>
+#include <material/serialization.h>
 
 namespace resource_compiler
 {
-    using serialization::IJSONSerializer;
+    using documents::IJSONSerializer;
 
     //<-----------------------------------------------------------------------------
     //
