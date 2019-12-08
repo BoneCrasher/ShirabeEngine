@@ -335,8 +335,8 @@ namespace engine
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);
 
-            std::array<float, 2> scale = { 1.0f, 0.5f };
-            materialComponent->getMutableConfiguration().setBufferValue("struct_modelMatrices", "horizontalScale", scale);
+            material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", 1.0f);
+            material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.5f);
 
             auto cube = makeUnique<ecws::CEntity>();
             cube->addComponent<ecws::CMaterialComponent>(materialComponent);
@@ -437,8 +437,8 @@ namespace engine
                 // for(auto const &mesh : meshes)
                     for(auto const &material : materials)
                     {
-                        std::array<float, 2> scale = { newHorizontalScale, newHorizontalScale * 0.5f };
-                        material->getMutableConfiguration().setBufferValue<std::array<float, 2>>("struct_modelMatrices", "scale", scale);
+                        material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", newHorizontalScale);
+                        material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.3f * newHorizontalScale);
                         renderableCollection.push_back({ name
                                                          , ""
                                                          , 0

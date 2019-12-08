@@ -263,10 +263,11 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_declaration.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/material_declaration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -661,7 +662,7 @@
       <workItem from="1575709197244" duration="316000" />
       <workItem from="1575710381137" duration="634000" />
       <workItem from="1575724854259" duration="958000" />
-      <workItem from="1575726097553" duration="3655000" />
+      <workItem from="1575726097553" duration="6907000" />
     </task>
     <servers />
   </component>
@@ -716,17 +717,7 @@
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp</url>
           <line>441</line>
-          <option name="timeStamp" value="93" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_declaration.h</url>
-          <line>1041</line>
-          <option name="timeStamp" value="94" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/material_declaration.h</url>
-          <line>971</line>
-          <option name="timeStamp" value="95" />
+          <option name="timeStamp" value="119" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

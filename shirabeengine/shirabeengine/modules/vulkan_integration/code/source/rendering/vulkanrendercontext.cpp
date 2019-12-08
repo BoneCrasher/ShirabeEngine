@@ -233,8 +233,10 @@ namespace engine
             descriptorSetWrites          .resize(aGpuBufferHandles.size());
             descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
 
-            uint64_t writeCounter = 0;
-            for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
+            uint64_t        writeCounter = 0;
+            uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
+
+            for(std::size_t k=startSetIndex; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
             {
                 std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
                 for(std::size_t j=0; j<setBindings.size(); ++j)

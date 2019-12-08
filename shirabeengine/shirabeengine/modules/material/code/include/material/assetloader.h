@@ -281,6 +281,7 @@ namespace engine::material
                                                                                    , Shared<asset::IAssetStorage>        const &aAssetStorage
                                                                                    , Shared<material::CMaterialLoader>   const &aMaterialLoader)
     {
+        static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
         auto const loader = [=] (ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject>
         {
             auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aResourceId, aAssetStorage, aAssetId, true);
@@ -293,7 +294,10 @@ namespace engine::material
             SMaterialSignature      const &signature = master  ->signature();
             CMaterialConfig         const &config    = instance->config();
 
-            auto const [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config());
+            auto [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config());
+
+            pipelineDescription.includesSystemBuffers = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == aResourceId);
+
             //master->setPipelineDescription    (pipelineDescription);
             //master->setShaderModuleDescription(shaderModuleDescription);
             //master->setBufferDescriptions     (bufferDescriptions);

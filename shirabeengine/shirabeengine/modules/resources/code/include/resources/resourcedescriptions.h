@@ -219,6 +219,8 @@ namespace engine
             VkViewport                                                   viewPort;
             VkRect2D                                                     scissor;
 
+            bool                                                         includesSystemBuffers;
+
             VkPipelineInputAssemblyStateCreateInfo                       inputAssemblyState;
             std::vector<VkVertexInputBindingDescription>                 vertexInputBindings;
             std::vector<VkVertexInputAttributeDescription>               vertexInputAttributes;

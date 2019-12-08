@@ -741,27 +741,27 @@ namespace engine::material
                             , uint64_t                            const &aOffsetBackshift
                             , uint64_t                            const &aCurrentBaseOffset)
         {
+            std::string const path = fmt::format("{}.{}", aParentPath, aMember->name);
+            aIndex.insert({path, aMember});
+
             uint64_t const arrayLayers = std::max(1lu, aMember->array.layers); // Ensure at least one iteration with std::max...
             for(std::size_t k=0; k<arrayLayers; ++k)
             {
-                aMember->location.offset  = (aCurrentBaseOffset + aMember->location.offset + (k * aMember->array.stride));
-                aMember->location.length  = aMember->location.length; // nextMultiple(aMember->location.length, alignment);
+                Shared<SBufferMember> member = makeShared<SBufferMember>(*aMember);
 
-                //aMember->location.length  = nextMultiple(buffer.location.length, alignment);
-                //adjustedBufferLocation.padding = buffer.location.padding;
+                member->location.offset  = (aCurrentBaseOffset + member->location.offset + (k * member->array.stride));
+                member->location.length  = member->location.length; // nextMultiple(aMember->location.length, alignment);
 
-                std::string const path = fmt::format("{}.{}", aParentPath, aMember->name);
-                aIndex.insert({path, aMember});
-
-                for(auto &[n, v] : aMember->members)
+                std::string prefixPath = path;
+                if(1 < arrayLayers)
                 {
-                    std::string prefixPath = path;
-                    if(1 < arrayLayers)
-                    {
-                        prefixPath = fmt::format("{}[{}]", path, n, k);
-                    }
+                    prefixPath = fmt::format("{}[{}]", path, k);
+                }
+                aIndex.insert({prefixPath, member});
 
-                    iterate(aIndex, v, prefixPath, aOffsetBackshift, aMember->location.offset);
+                for(auto &[n, v] : member->members)
+                {
+                    iterate(aIndex, v, prefixPath, aOffsetBackshift, member->location.offset);
                 }
             }
         };
@@ -778,7 +778,7 @@ namespace engine::material
         //
         // Filter out all non-user-set indexed buffers, so that they won't have any influence on the buffer size calculation.
         //
-        bool const processSystemUBOs = true; // = aIncludeSystemBuffers;
+        bool const processSystemUBOs = aIncludeSystemBuffers;
         if(not processSystemUBOs)
         {
             static constexpr uint8_t sFirstPermittedUserSetIndex = 2;

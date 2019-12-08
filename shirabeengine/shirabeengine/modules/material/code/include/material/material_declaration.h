@@ -969,9 +969,9 @@ namespace engine
 
             Shared<SBufferMember> const &bufferValue = bufferIndex.at(combinedValuePath);
 
-            Shared<void>           alignedData = mData.at(aBufferName);
-            TDataType const *const bufferData  = reinterpret_cast<TDataType const *>(alignedData.get());
-            TDataType const *const adjusted    = (bufferData + (bufferValue->location.offset / sizeof(TDataType)));
+            Shared<void>      alignedData = mData.at(aBufferName);
+            auto const *const bufferData  = reinterpret_cast<int8_t const *>(alignedData.get());
+            auto const *const adjusted    = reinterpret_cast<TDataType const *>(bufferData + bufferValue->location.offset); // (bufferData + (bufferValue->location.offset / sizeof(TDataType)));
             return { EEngineStatus::Ok, adjusted };
         }
         //<-----------------------------------------------------------------------------
@@ -1039,7 +1039,8 @@ namespace engine
             CEngineResult<TDataType *> result = getBufferValuePointer<TDataType>(aBufferName, aFieldName);
             if(result.successful())
             {
-                *(result.data()) = aFieldValue;
+                TDataType *buffer = result.data();
+                *buffer = aFieldValue;
             }
 
             return result.result();
