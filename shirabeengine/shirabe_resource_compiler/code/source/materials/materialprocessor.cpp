@@ -5,12 +5,13 @@
 
 #include "common/config.h"
 
+#include <core/helpers.h>
 #include <util/documents/json.h>
 #include <material/declaration.h>
-#include <material/serialization.h>
 
 namespace materials
 {
+    using namespace engine::core;
     using namespace engine::documents;
     using namespace engine::material;
 
@@ -69,7 +70,7 @@ namespace materials
         else
         {
             // Invalid
-            usage();
+            // usage();
             return { EShadingLanguage::Unknown, VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM };
         }
 
@@ -135,8 +136,8 @@ namespace materials
      */
     [[nodiscard]]
     std::string const getOutputFilename(std::string                 const &aFileBaseName,
-            materials::EShadingLanguage const &aLanguage,
-            VkPipelineStageFlagBits     const &aStage) const
+                                        materials::EShadingLanguage const &aLanguage,
+                                        VkPipelineStageFlagBits     const &aStage)
     {
         using namespace materials;
 
@@ -200,7 +201,8 @@ namespace materials
      * @param aOptions
      * @return
      */
-    CResult<SShaderCompilationUnit> generateCompilationUnit(  std::vector<std::filesystem::path> const &aFilenames
+    CResult<SShaderCompilationUnit> generateCompilationUnit(  SConfiguration                     const &aConfiguration
+                                                            , std::vector<std::filesystem::path> const &aFilenames
                                                             , std::filesystem::path              const &aModuleOutputPath
                                                             , SMaterialMeta                            &aInOutMeta)
     {
@@ -209,7 +211,7 @@ namespace materials
         EShaderCompiler  compiler = EShaderCompiler::Unknown;
         EShadingLanguage language = EShadingLanguage::Unknown;
 
-        auto const deriveElement = [&, this] (std::string const &aFilename) -> SShaderCompilationElement
+        auto const deriveElement = [&] (std::string const &aFilename) -> SShaderCompilationElement
         {
             std::string shaderString = readFile(aFilename);
             if(shaderString.empty())
@@ -245,7 +247,7 @@ namespace materials
             element.contents           = shaderString;
             element.stage              = stage;
             element.outputPathAbsolute = outputPath;
-            element.outputPathRelative = std::filesystem::relative(outputPath, (std::filesystem::current_path() / mConfig.outputPath));
+            element.outputPathRelative = std::filesystem::relative(outputPath, (std::filesystem::current_path() / aConfiguration.outputPath));
 
             std::string const path = element.outputPathRelative;
             aInOutMeta.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
@@ -618,7 +620,7 @@ namespace materials
         }
 
         // Determine compilation items and config.
-        auto [generationSuccessful, unit] = generateCompilationUnit(inputFiles, outputModulePathAbsolute, metaData);
+        auto [generationSuccessful, unit] = generateCompilationUnit(aConfig, inputFiles, outputModulePathAbsolute, metaData);
         if(not generationSuccessful)
         {
             CLog::Error(logTag(), "Failed to derive shader compilation units and configuration");

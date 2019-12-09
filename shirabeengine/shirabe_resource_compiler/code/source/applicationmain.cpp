@@ -37,7 +37,9 @@
 
 #include "common/config.h"
 #include "common/definition.h"
+
 #include "materials/materialprocessor.h"
+#include "meshes/meshprocessor.h"
 
 using namespace engine;
 using namespace engine::material;
@@ -296,7 +298,7 @@ public_methods:
             std::filesystem::path const extension = file.extension();
             if(".material" == extension)
             {
-                auto const &[result, code] = materials::processMaterial(file);
+                auto const &[result, code] = materials::processMaterial(file, mConfig);
                 if(EResult::Success != code)
                 {
                     CLog::Error(logTag(), "Failed to process material file w/ name {}", file.string());
@@ -314,7 +316,12 @@ public_methods:
             }
             else if(".gltf" == extension)
             {
-
+                auto const &[result, code] = meshes::processMesh(file, mConfig);
+                if(EResult::Success != code)
+                {
+                    CLog::Error(logTag(), "Failed to process mesh file w/ name {}", file.string());
+                    continue;
+                }
             }
             else
             {
@@ -390,115 +397,6 @@ public_methods:
     }
 
 private_methods:
-    fx::gltf::Document const __loadFromData(ByteBuffer const &aInputBuffer)
-    {
-        try
-        {
-            nlohmann::json json;
-            {
-                std::string const  data = std::string(reinterpret_cast<char const*>(aInputBuffer.data()));
-                std::istringstream stream(data);
-                stream >> json;
-            }
-
-            return fx::gltf::detail::Create(json, { });
-        }
-        catch (fx::gltf::invalid_gltf_document &)
-        {
-            throw;
-        }
-        catch (std::system_error &)
-        {
-            throw;
-        }
-        catch (...)
-        {
-            std::throw_with_nested(fx::gltf::invalid_gltf_document("Invalid glTF document. See nested exception for details."));
-        }
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    struct SBufferInfo
-    {
-        fx::gltf::Accessor const *accessor;
-
-        uint8_t const *data;
-        uint32_t       dataStride;
-        uint32_t       totalSize;
-
-        [[nodiscard]]
-        bool hasData() const noexcept
-        {
-            return (nullptr != data);
-        }
-    };
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    static uint32_t __calculateDataTypeSize(fx::gltf::Accessor const &aAccessor) noexcept
-    {
-        uint32_t elementSize = 0;
-        switch (aAccessor.componentType)
-        {
-            case fx::gltf::Accessor::ComponentType::Byte:
-            case fx::gltf::Accessor::ComponentType::UnsignedByte:
-                elementSize = 1;
-                break;
-            case fx::gltf::Accessor::ComponentType::Short:
-            case fx::gltf::Accessor::ComponentType::UnsignedShort:
-                elementSize = 2;
-                break;
-            case fx::gltf::Accessor::ComponentType::Float:
-            case fx::gltf::Accessor::ComponentType::UnsignedInt:
-                elementSize = 4;
-                break;
-        }
-
-        switch (aAccessor.type)
-        {
-            case fx::gltf::Accessor::Type::Mat2:
-                return (4 * elementSize);
-            case fx::gltf::Accessor::Type::Mat3:
-                return (9 * elementSize);
-            case fx::gltf::Accessor::Type::Mat4:
-                return (16 * elementSize);
-            case fx::gltf::Accessor::Type::Scalar:
-                return (elementSize);
-            case fx::gltf::Accessor::Type::Vec2:
-                return (2 * elementSize);
-            case fx::gltf::Accessor::Type::Vec3:
-                return (3 * elementSize);
-            case fx::gltf::Accessor::Type::Vec4:
-                return (4 * elementSize);
-        }
-
-        return 0;
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    static SBufferInfo __getData(  fx::gltf::Document const &aDocument
-                                 , fx::gltf::Accessor const &aAccessor)
-    {
-        fx::gltf::BufferView const &bufferView = aDocument.bufferViews[aAccessor.bufferView];
-        fx::gltf::Buffer     const &buffer     = aDocument.buffers    [bufferView.buffer];
-
-        uint32_t const dataTypeSize = __calculateDataTypeSize(aAccessor);
-        return SBufferInfo
-                {
-                        &(aAccessor)
-                        , &(buffer.data[static_cast<uint64_t>(bufferView.byteOffset) + aAccessor.byteOffset])
-                        , dataTypeSize
-                        , (aAccessor.count * dataTypeSize)
-                };
-    }
 
 
     /**

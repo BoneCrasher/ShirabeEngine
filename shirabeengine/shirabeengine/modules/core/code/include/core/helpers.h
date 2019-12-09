@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include <core/helpers.h>
 #include <log/log.h>
 #include "result.h"
 #include "enginestatus.h"
@@ -109,6 +110,15 @@ namespace engine
      * @return          EResult::WriteFailed, on error.
      */
     CEngineResult<> writeFile(std::string const &aFilename, std::vector<int8_t> const &aData);
+    /**
+     * Write a byte vector to a file.
+     *
+     * @param aFilename The filename of the file to write to. Will be overwritten, if extist.
+     * @param aData     The data to write.
+     * @return          EResult::Success, if successful.
+     * @return          EResult::WriteFailed, on error.
+     */
+    CEngineResult<> writeFile(std::string const &aFilename, std::vector<uint8_t> const &aData);
 
     /**
      * Write a byte buffer to a file.

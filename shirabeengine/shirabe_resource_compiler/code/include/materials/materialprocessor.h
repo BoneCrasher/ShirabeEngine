@@ -7,12 +7,14 @@
 
 #include <filesystem>
 #include <core/result.h>
-#include "definition.h"
-#include "shadercompilationunit.h"
+
+#include "common/config.h"
+#include "materials/definition.h"
+#include "materials/shadercompilationunit.h"
 
 namespace materials
 {
-    CResult<EResult> processMaterial(std::filesystem::path const &aMaterialFile);
+    CResult<EResult> processMaterial(std::filesystem::path const &aMaterialFile, SConfiguration const &aConfig);
 }
 
 #endif //__SHIRABEDEVELOPMENT_MATERIALPROCESSOR_H__
