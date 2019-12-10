@@ -54,7 +54,6 @@ namespace engine
              */
             static CEngineResult<Shared<CFrameGraphRenderContext>> create(
                     Shared<IAssetStorage>    const &aAssetStorage,
-                    Shared<CMaterialLoader>  const &aMaterialLoader,
                     Shared<CResourceManager> const &aResourceManager,
                     Shared<IRenderContext>   const &aRenderer);
 
@@ -455,7 +454,6 @@ namespace engine
              */
             CFrameGraphRenderContext(
                     Shared<IAssetStorage>    aAssetStorage,
-                    Shared<CMaterialLoader>  aMaterialLoader,
                     Shared<CResourceManager> aResourceManager,
                     Shared<IRenderContext>   aRenderer);
 
@@ -500,7 +498,6 @@ namespace engine
 
         private_members:
             Shared<IAssetStorage>    mAssetStorage;
-            Shared<CMaterialLoader>  mMaterialLoader;
             Shared<CResourceManager> mResourceManager;
             Shared<IRenderContext>   mGraphicsAPIRenderContext;
 

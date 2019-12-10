@@ -18,6 +18,7 @@ namespace engine
     {
         struct SMaterialMeta;
         class CMeshInstance;
+        class SMeshMeta;
 
         /**
          * @brief The CMaterialLoader class

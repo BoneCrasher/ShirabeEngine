@@ -4,6 +4,7 @@
 #include "materials/shadercompilationunit.h"
 
 #include "common/config.h"
+#include "common/functions.h"
 
 #include <core/helpers.h>
 #include <util/documents/json.h>
@@ -550,35 +551,6 @@ namespace materials
         std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / aConfig.outputPath / outputSignaturePath    ).lexically_normal();
         std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / aConfig.outputPath / outputConfigurationPath).lexically_normal();
 
-        auto const checkPathExists = [] (std::filesystem::path const &aPath) -> void
-        {
-            std::filesystem::path path = aPath;
-
-            CLog::Error(logTag(), "Making sure that '{}' exists...", path.string());
-
-            bool const pathExists = std::filesystem::exists(path);
-            bool const pathIsFile = not std::filesystem::is_directory(path);
-            if(pathExists and pathIsFile)
-            {
-                path = aPath.parent_path();
-            }
-
-            if(not pathExists)
-            {
-                try
-                {
-                    bool const created = std::filesystem::create_directories(path);
-                    if(not created)
-                    {
-                        CLog::Error(logTag(), "Can't create directory '{}'", path.string());
-                    }
-                }
-                catch(std::filesystem::filesystem_error const &fserr)
-                {
-                    CLog::Error(logTag(), "Cant create directory '{}'. Error: {}", path.string(), fserr.what());
-                }
-            }
-        };
 
         checkPathExists(outputPathAbsolute);
         checkPathExists(outputModulePathAbsolute);

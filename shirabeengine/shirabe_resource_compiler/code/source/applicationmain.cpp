@@ -343,7 +343,10 @@ public_methods:
 
             if(".meta" == extension)
             {
-                a.type    = asset::EAssetType::Material;
+                std::filesystem::path const stemExtension = filePath.stem().extension();
+                if(".material" == stemExtension) a.type = asset::EAssetType::Material;
+                if(".mesh"     == stemExtension) a.type = asset::EAssetType::Mesh;
+
                 a.subtype = asset::EAssetSubtype::Meta;
                 a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
                 a.id      = asset::assetIdFromUri(a.uri);
@@ -369,6 +372,30 @@ public_methods:
             {
                 a.type    = asset::EAssetType::Material;
                 a.subtype = asset::EAssetSubtype::SPVModule;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".attributes" == extension)
+            {
+                a.type    = asset::EAssetType::Mesh;
+                a.subtype = asset::EAssetSubtype::AttributeBuffer;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".indices" == extension)
+            {
+                a.type    = asset::EAssetType::Mesh;
+                a.subtype = asset::EAssetSubtype::AttributeBuffer;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".datafile" == extension)
+            {
+                a.type    = asset::EAssetType::Mesh;
+                a.subtype = asset::EAssetSubtype::DataFile;
                 a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
                 a.id      = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);

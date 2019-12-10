@@ -35,16 +35,6 @@ struct SConfiguration
     std::vector<std::filesystem::path>   includePaths;
     std::vector<std::filesystem::path>   filesToProcess;
     engine::core::CBitField<EOptions>    options;
-
-    // SMaterialMasterIndex                    indexFile;
-    // std::filesystem::path                   inputPath;
-    // std::filesystem::path                   outputPath;
-    // std::vector<std::filesystem::path>      includePaths;
-    // std::vector<std::filesystem::path>      inputPaths;
-    // std::filesystem::path                   moduleOutputPath;
-    // std::filesystem::path                   indexOutputFile;
-    // std::filesystem::path                   signatureOutputFile;
-    // std::filesystem::path                   configOutputFile;
 };
 
 #endif //__SHIRABEDEVELOPMENT_CONFIG_H__

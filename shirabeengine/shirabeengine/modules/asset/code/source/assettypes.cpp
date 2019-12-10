@@ -60,14 +60,10 @@ namespace engine
     {
         using namespace asset;
 
-        if(0 == aInput.compare("Mesh"))
-            return EAssetType::Mesh;
-        if(0 == aInput.compare("Material"))
-            return EAssetType::Material;
-        if(0 == aInput.compare("Texture"))
-            return EAssetType::Texture;
-        if(0 == aInput.compare("Buffer"))
-            return EAssetType::Buffer;
+        if("Mesh"     == aInput) return EAssetType::Mesh;
+        if("Material" == aInput) return EAssetType::Material;
+        if("Texture"  == aInput) return EAssetType::Texture;
+        if("Buffer"   == aInput) return EAssetType::Buffer;
 
         return EAssetType::Undefined;
     }
@@ -81,16 +77,15 @@ namespace engine
     {
         using namespace asset;
 
-        if(0 == aInput.compare("Master"))
-            return EAssetSubtype::Master;
-        if(0 == aInput.compare("Signature"))
-            return EAssetSubtype::Signature;
-        if(0 == aInput.compare("Config"))
-            return EAssetSubtype::Config;
-        if(0 == aInput.compare("SPVModule"))
-            return EAssetSubtype::SPVModule;
-        if(0 == aInput.compare("Instance"))
-            return EAssetSubtype::Instance;
+        if("Meta"            == aInput) return EAssetSubtype::Meta;
+        if("Master"          == aInput) return EAssetSubtype::Master;
+        if("Signature"       == aInput) return EAssetSubtype::Signature;
+        if("Config"          == aInput) return EAssetSubtype::Config;
+        if("SPVModule"       == aInput) return EAssetSubtype::SPVModule;
+        if("Instance"        == aInput) return EAssetSubtype::Instance;
+        if("AttributeBuffer" == aInput) return EAssetSubtype::AttributeBuffer;
+        if("IndexBuffer"     == aInput) return EAssetSubtype::IndexBuffer;
+        if("DataFile"        == aInput) return EAssetSubtype::DataFile;
 
         return EAssetSubtype::Undefined;
     }
@@ -125,13 +120,16 @@ namespace engine
 
         switch(aInput)
         {
-            case EAssetSubtype::Meta:      return "Meta";
-            case EAssetSubtype::Master:    return "Master";
-            case EAssetSubtype::Signature: return "Signature";
-            case EAssetSubtype::Config:    return "Config";
-            case EAssetSubtype::SPVModule: return "SPVModule";
-            case EAssetSubtype::Instance:  return "Instance";
-            default:                       return "Invalid";
+            case EAssetSubtype::Meta:            return "Meta";
+            case EAssetSubtype::Master:          return "Master";
+            case EAssetSubtype::Signature:       return "Signature";
+            case EAssetSubtype::Config:          return "Config";
+            case EAssetSubtype::SPVModule:       return "SPVModule";
+            case EAssetSubtype::Instance:        return "Instance";
+            case EAssetSubtype::AttributeBuffer: return "AttributeBuffer";
+            case EAssetSubtype::IndexBuffer:     return "IndexBuffer";
+            case EAssetSubtype::DataFile:        return "DataFile";
+            default:                             return "Invalid";
         }
     }
     //<-----------------------------------------------------------------------------

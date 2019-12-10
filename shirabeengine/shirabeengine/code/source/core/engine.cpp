@@ -8,7 +8,10 @@
 #include <graphicsapi/definitions.h>
 #include <material/loader.h>
 #include <material/assetloader.h>
+#include <mesh/loader.h>
+#include <mesh/assetloader.h>
 #include <resources/agpuapiresourceobjectfactory.h>
+#include <util/crc32.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>
 #include <vulkan_integration/vulkandevicecapabilities.h>
 #include <vulkan_integration/resources/cvulkanprivateresourceobjectfactory.h>
@@ -259,6 +262,7 @@ namespace engine
             assetStorage->readIndex(assetIndex);
             mAssetStorage = assetStorage;
 
+            mMeshLoader     = makeShared<mesh::CMeshLoader>();
             mMaterialLoader = makeShared<material::CMaterialLoader>();
 
             Unique<CGpuApiResourceObjectFactory> gpuApiResourceFactory = nullptr;
@@ -284,8 +288,7 @@ namespace engine
             Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory), mAssetStorage);
             // manager->addAssetLoader<SMesh>(...);
             manager->addAssetLoader<SMaterial>(material::getAssetLoader(manager, mAssetStorage, mMaterialLoader));
-            // manager->addAssetLoader<SBuffer>  (makeUnique<CResourceFromAssetResourceObjectCreator<SBuffer>>  ([assetStorage](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
-            // manager->addAssetLoader<STexture> (makeUnique<CResourceFromAssetResourceObjectCreator<STexture>> ([assetStorage](ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject> { return nullptr; }));
+            manager->addAssetLoader<SMesh>    (mesh    ::getAssetLoader(manager, mAssetStorage, mMeshLoader));
             mResourceManager = manager;
 
             return { EEngineStatus::Ok };
@@ -306,7 +309,7 @@ namespace engine
                 gfxApiRenderContext = vulkanRenderContext;
             }
 
-            CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mMaterialLoader, mResourceManager, gfxApiRenderContext);
+            CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeShared<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
@@ -330,7 +333,11 @@ namespace engine
             CEngineResult<> initialization = mScene.initialize();
             status = initialization.result();
 
-            auto const &[result, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage, 317299467, true);
+            auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage,         util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
+            auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage, util::crc32FromString("materials/standard/standard.material.meta"), true);
+
+            auto meshComponent = makeShared<ecws::CMeshComponent>();
+            meshComponent->setMeshInstance(mesh);
 
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);
@@ -339,7 +346,8 @@ namespace engine
             material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.5f);
 
             auto cube = makeUnique<ecws::CEntity>();
-            cube->addComponent<ecws::CMaterialComponent>(materialComponent);
+            cube->addComponent(materialComponent);
+            cube->addComponent(meshComponent);
 
             mScene.addEntity(std::move(cube));
 
@@ -434,14 +442,14 @@ namespace engine
                 ecws::CBoundedCollection<Shared<ecws::CMeshComponent>>     meshes    = entity->getTypedComponentsOfType<ecws::CMeshComponent>();
                 ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> materials = entity->getTypedComponentsOfType<ecws::CMaterialComponent>();
 
-                // for(auto const &mesh : meshes)
+                for(auto const &mesh : meshes)
                     for(auto const &material : materials)
                     {
                         material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", newHorizontalScale);
                         material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.3f * newHorizontalScale);
                         renderableCollection.push_back({ name
-                                                         , ""
-                                                         , 0
+                                                         , mesh->getMeshInstance()->name()
+                                                         , mesh->getMeshInstance()->getAssetId()
                                                          , material->getMaterialInstance()->name()
                                                          , material->getMaterialInstance()->master()->getAssetId() });
                     }

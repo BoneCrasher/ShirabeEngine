@@ -20,13 +20,11 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<Shared<CFrameGraphRenderContext>> CFrameGraphRenderContext::create(
             Shared<IAssetStorage>    const &aAssetStorage,
-            Shared<CMaterialLoader>  const &aMaterialLoader,
             Shared<CResourceManager> const &aResourceManager,
             Shared<IRenderContext>   const &aRenderer)
     {
         bool const inputInvalid =
                 nullptr == aAssetStorage    or
-                nullptr == aMaterialLoader  or
                 nullptr == aResourceManager or
                 nullptr == aRenderer;
 
@@ -36,9 +34,8 @@ namespace engine::framegraph
         }
 
         auto context = makeShared<CFrameGraphRenderContext>(aAssetStorage
-                                                                   , aMaterialLoader
-                                                                   , aResourceManager
-                                                                   , aRenderer);
+                                                          , aResourceManager
+                                                          , aRenderer);
         if(not context)
         {
             CLog::Error(logTag(), "Failed to create render context from renderer and resourcemanager.");
@@ -56,11 +53,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CFrameGraphRenderContext::CFrameGraphRenderContext(
             Shared<IAssetStorage>    aAssetStorage,
-            Shared<CMaterialLoader>  aMaterialLoader,
             Shared<CResourceManager> aResourceManager,
             Shared<IRenderContext>   aRenderer)
         : mAssetStorage            (std::move(aAssetStorage   ))
-        , mMaterialLoader          (std::move(aMaterialLoader ))
         , mResourceManager         (std::move(aResourceManager))
         , mGraphicsAPIRenderContext(std::move(aRenderer       ))
         , mCurrentFrameBufferHandle({})

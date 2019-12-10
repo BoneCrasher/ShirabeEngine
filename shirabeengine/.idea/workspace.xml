@@ -19,8 +19,8 @@
       <config projectName="shirabedevelopment" targetName="core" />
       <config projectName="shirabedevelopment" targetName="crc32generator" />
       <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="wsi" />
       <config projectName="shirabedevelopment" targetName="INSTALL_base" />
+      <config projectName="shirabedevelopment" targetName="wsi" />
       <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
       <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
       <config projectName="shirabedevelopment" targetName="resources" />
@@ -51,7 +51,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d6f3558-3d84-40e2-a418-ceb18ce7a105" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes/meshprocessor.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common/functions.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css.rst" afterDir="false" />
@@ -266,12 +266,19 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/materials/definition.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/materials/definition.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/materials/materialprocessor.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/materials/materialprocessor.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common/config.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common/config.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/materials/materialprocessor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/materials/materialprocessor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/helpers.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/helpers.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/source/helpers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/source/helpers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/core/engine.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/core/engine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/meshcomponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/meshcomponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/asset/code/include/asset/assettypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/asset/code/include/asset/assettypes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/asset/code/source/assettypes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/asset/code/source/assettypes.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/loader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/loader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/loader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/loader.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -323,16 +330,17 @@
     <property name="settings.editor.selected.configurable" value="dynamic.analysis.tools.valgrind" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source/common" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes" />
       <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common" />
       <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
-      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -347,7 +355,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
+  <component name="RunManager" selected="CMake Application.INSTALL_game">
     <configuration name="INSTALL_asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_asset" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -680,6 +688,7 @@
       <workItem from="1575724854259" duration="958000" />
       <workItem from="1575726097553" duration="26021000" />
       <workItem from="1575920160273" duration="5755000" />
+      <workItem from="1575952059624" duration="5885000" />
     </task>
     <servers />
   </component>
@@ -732,9 +741,19 @@
           <option name="timeStamp" value="80" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp</url>
-          <line>171</line>
-          <option name="timeStamp" value="85" />
+          <url>file://$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp</url>
+          <line>335</line>
+          <option name="timeStamp" value="90" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/loader.cpp</url>
+          <line>198</line>
+          <option name="timeStamp" value="91" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/loader.cpp</url>
+          <line>109</line>
+          <option name="timeStamp" value="92" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -109,13 +109,13 @@ namespace engine
 
             auto const [metaDataFetchResult, metaData] = readMeshMeta(aLogTag, aAssetStorage, meshId);
             {
-                PrintEngineError(metaDataFetchResult, aLogTag, "Could not fetch master meta data.");
+                PrintEngineError(metaDataFetchResult, aLogTag, "Could not fetch meta data.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(metaDataFetchResult, failureReturnValue);
             }
 
             auto const [meshAssetFetchResult, meshAsset] = aAssetStorage->loadAsset(metaData.dataFileId);
             {
-                PrintEngineError(meshAssetFetchResult, aLogTag, "Could not fetch signature asset data.");
+                PrintEngineError(meshAssetFetchResult, aLogTag, "Could not fetch data file asset.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(meshAssetFetchResult, failureReturnValue);
             }
 

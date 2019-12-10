@@ -53,7 +53,11 @@ namespace engine
             Signature,
             Config,
             SPVModule,
-            Instance
+            Instance,
+            /** Meshes **/
+            AttributeBuffer = 20,
+            IndexBuffer,
+            DataFile
         };
         
         /**

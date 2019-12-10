@@ -11,6 +11,7 @@
 #include <renderer/irenderer.h>
 #include <resources/cresourcemanager.h>
 #include <material/loader.h>
+#include <mesh/loader.h>
 
 #include <vulkan_integration/vulkanenvironment.h>
 
@@ -35,6 +36,7 @@ namespace engine
     using namespace engine::wsi;
     using namespace engine::vulkan;
     using material::CMaterialLoader;
+    using mesh::CMeshLoader;
 
     /**
      * @brief The CEngineInstance class
@@ -90,6 +92,7 @@ namespace engine
         Shared<CAssetStorage>         mAssetStorage;
         Shared<CResourceManager>      mResourceManager;
         Shared<CMaterialLoader>       mMaterialLoader;
+        Shared<CMeshLoader>           mMeshLoader;
 
         // Rendering
         Shared<CVulkanEnvironment>    mVulkanEnvironment;
