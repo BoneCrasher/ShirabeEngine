@@ -133,9 +133,14 @@ namespace engine
                         continue;
                     }
 
-                    SFrameGraphMesh const mesh {}; // TODO
+                    auto const &[result2, meshPointer] = aFrameGraphResources.get<SFrameGraphMesh>(renderableResources.meshResource.resourceId);
+                    if(CheckEngineError(result2) || nullptr == meshPointer)
+                    {
+                        CLog::Error(logTag(), "Failed to fetch mesh for id {}", renderableResources.meshResource);
+                        continue;
+                    }
 
-                    aRenderContext->render(mesh, *materialPointer);
+                    aRenderContext->render(*meshPointer, *materialPointer);
                 }
 
                 return { EEngineStatus::Ok };

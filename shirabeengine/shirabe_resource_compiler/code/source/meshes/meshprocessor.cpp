@@ -287,10 +287,12 @@ namespace meshes
         engine::writeFile(outputIndexBufferPathAbs,     indexBuffer);
 
         mesh::SMeshDataFile dataFile {};
-        dataFile.uid                 = 1234;
-        dataFile.name                = meshID;
-        dataFile.dataBinaryFilename  = outputAttributeBufferPath;
-        dataFile.indexBinaryFilename = outputIndexBufferPath;
+        dataFile.uid                  = 1234;
+        dataFile.name                 = meshID;
+        dataFile.dataBinaryFilename   = outputAttributeBufferPath;
+        dataFile.indexBinaryFilename  = outputIndexBufferPath;
+        dataFile.attributeSampleCount = positionBufferInfo.count;
+        dataFile.indexSampleCount     = indexBufferInfo.count;
 
         mesh::SMeshAttributeDescription positionAttribute {};
         mesh::SMeshAttributeDescription normalAttribute   {};

@@ -141,6 +141,8 @@ namespace engine
              */
             EEngineStatus present() final;
 
+            EEngineStatus bindAttributeAndIndexBuffers(GpuApiHandle_t const &aAttributeBufferId, GpuApiHandle_t const &aIndexBufferId, Vector<VkDeviceSize> aOffsets) final;
+
             /**
              * Bind a pipeline instance  in the GPU.
              *
@@ -183,9 +185,14 @@ namespace engine
              */
             EEngineStatus render(SRenderable const &aRenderable) final;
 
+            EEngineStatus drawIndex(uint32_t const aIndexCount) final;
+
         private_members:
             Shared<CVulkanEnvironment>     mVulkanEnvironment;
             Shared<CGpuApiResourceStorage> mResourceStorage;
+
+            Shared<CVulkanBufferResource> mCurrentAttributeBuffer;
+            Shared<CVulkanBufferResource> mCurrentIndexBuffer;
         };
     }
 }

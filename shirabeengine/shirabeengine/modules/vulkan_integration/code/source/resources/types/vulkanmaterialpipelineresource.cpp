@@ -38,10 +38,10 @@ namespace engine::vulkan
         vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputStateCreateInfo.pNext                           = nullptr;
         vertexInputStateCreateInfo.flags                           = 0;
-        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0; // static_cast<uint32_t>(desc.vertexInputAttributes.size());
-        vertexInputStateCreateInfo.vertexBindingDescriptionCount   = 0; // static_cast<uint32_t>(desc.vertexInputBindings  .size());
-        vertexInputStateCreateInfo.pVertexAttributeDescriptions    = nullptr; // desc.vertexInputAttributes.data();
-        vertexInputStateCreateInfo.pVertexBindingDescriptions      = nullptr; // desc.vertexInputBindings  .data();
+        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(aDescription.vertexInputAttributes.size());
+        vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast<uint32_t>(aDescription.vertexInputBindings  .size());
+        vertexInputStateCreateInfo.pVertexAttributeDescriptions    = aDescription.vertexInputAttributes.data();
+        vertexInputStateCreateInfo.pVertexBindingDescriptions      = aDescription.vertexInputBindings  .data();
 
         VkRect2D scissor {};
         scissor.offset = { 0, 0 };

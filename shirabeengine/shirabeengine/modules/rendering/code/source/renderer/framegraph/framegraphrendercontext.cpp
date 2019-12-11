@@ -878,8 +878,17 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)
     {
-        SHIRABE_UNUSED(aMesh);
-        return EEngineStatus::Ok;
+        CEngineResult<Shared<ILogicalResourceObject>> meshObject = mResourceManager->useAssetResource(aMesh.readableName, aMesh.meshAssetId);
+        if(CheckEngineError(meshObject.result()))
+        {
+            CLog::Error(logTag(), "Cannot use material asset {} with id {}", aMesh.readableName, aMesh.meshAssetId);
+            return meshObject.result();
+        }
+
+        Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(meshObject.data());
+        registerUsedResource(aMesh.readableName, mesh);
+
+        return meshObject.result();
     }
     //<-----------------------------------------------------------------------------
 
@@ -898,8 +907,17 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::bindMesh(SFrameGraphMesh const &aMesh)
     {
-        SHIRABE_UNUSED(aMesh);
-        return EEngineStatus::Ok;
+        Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
+
+        SMeshDependencies dependencies {};
+        EEngineStatus const status = mesh->load(dependencies);
+
+        Shared<SBuffer> attributeBuffer = mesh->vertexDataBufferResource;
+        Shared<SBuffer> indexBuffer     = mesh->indexBufferResource;
+        mGraphicsAPIRenderContext->transferBufferData(attributeBuffer->getDescription().dataSource(), attributeBuffer->getGpuApiResourceHandle());
+        mGraphicsAPIRenderContext->transferBufferData(indexBuffer    ->getDescription().dataSource(), indexBuffer    ->getGpuApiResourceHandle());
+
+        return mGraphicsAPIRenderContext->bindAttributeAndIndexBuffers(attributeBuffer->getGpuApiResourceHandle(), indexBuffer->getGpuApiResourceHandle(), mesh->getDescription().offsets);
     }
     //<-----------------------------------------------------------------------------
 
@@ -993,11 +1011,20 @@ namespace engine::framegraph
     {
         SHIRABE_UNUSED(aMesh);
 
+        loadMeshAsset    (aMesh);
         loadMaterialAsset(aMaterial);
-        bindMaterial     (aMaterial, mCurrentRenderPassHandle);
 
-        unbindMaterial     (aMaterial);
+        bindMaterial(aMaterial, mCurrentRenderPassHandle);
+        bindMesh    (aMesh);
+
+        Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
+        mGraphicsAPIRenderContext->drawIndex(mesh->getDescription().indexSampleCount);
+
+        unbindMaterial(aMaterial);
+        unbindMesh    (aMesh);
+
         unloadMaterialAsset(aMaterial);
+        unloadMeshAsset    (aMesh);
 
         return EEngineStatus::Ok;
     }

@@ -48,7 +48,7 @@ namespace engine
             switch(asset.type)
             {
                 case asset::EAssetType::Mesh:
-                    // return genericAssetLoading<SMesh>(aResourceId, aAssetResourceId);
+                    return genericAssetLoading<SMesh>(aResourceId, aAssetResourceId);
                     break;
                 case asset::EAssetType::Material:
                     return genericAssetLoading<SMaterial>(aResourceId, aAssetResourceId);

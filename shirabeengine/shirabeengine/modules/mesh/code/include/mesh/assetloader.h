@@ -34,7 +34,7 @@ namespace engine::mesh
         uint64_t accumulatedVertexDataSize = 0;
         for(auto const &attributeDescription : aDataFile.attributes)
         {
-            accumulatedVertexDataSize += attributeDescription.length;
+            accumulatedVertexDataSize += (attributeDescription.length * attributeDescription.bytesPerSample);
         }
 
         DataSourceAccessor_t dataAccessor = [=] () -> ByteBuffer
@@ -83,7 +83,7 @@ namespace engine::mesh
         indexBufferDescription.createInfo.pNext                 = nullptr;
         indexBufferDescription.createInfo.flags                 = 0;
         indexBufferDescription.dataSource                       = indexDataAccessor;
-        indexBufferDescription.createInfo.size                  = aDataFile.indices.length;
+        indexBufferDescription.createInfo.size                  = (aDataFile.indices.length * aDataFile.indices.bytesPerSample);
         indexBufferDescription.createInfo.pQueueFamilyIndices   = nullptr;
         indexBufferDescription.createInfo.queueFamilyIndexCount = 0;
         indexBufferDescription.createInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
@@ -109,12 +109,25 @@ namespace engine::mesh
                 return nullptr;
             }
 
+            SMeshDataFile const &dataFile = instance->dataFile();
+
             auto [derivationSuccessful, vertexBufferDescription, indexBufferDescription] = deriveResourceDescriptions(aAssetStorage, instance->name(), instance->dataFile());
 
             SMeshDescriptor meshDescriptor {};
             meshDescriptor.name                   = aResourceId;
             meshDescriptor.dataBufferDescription  = vertexBufferDescription;
             meshDescriptor.indexBufferDescription = indexBufferDescription;
+
+            meshDescriptor.attributeCount         = dataFile.attributeSampleCount;
+            meshDescriptor.indexSampleCount       = dataFile.indexSampleCount;
+
+            Vector<VkDeviceSize> offsets;
+            offsets.resize(4);
+            for(uint64_t k=0; k<4; ++k)
+            {
+                offsets[k] = dataFile.attributes[k].offset;
+            }
+            meshDescriptor.offsets = offsets;
 
             CEngineResult<Shared<ILogicalResourceObject>> bufferResourceObject = aResourceManager->useDynamicResource<SBuffer>(meshDescriptor.dataBufferDescription.name, meshDescriptor.dataBufferDescription);
             EngineStatusPrintOnError(bufferResourceObject.result(),  "Mesh::AssetLoader", "Failed to create vertex buffer.");

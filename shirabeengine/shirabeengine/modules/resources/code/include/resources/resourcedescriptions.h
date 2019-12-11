@@ -270,18 +270,19 @@ namespace engine
             SHIRABE_TEST_EXPORT SMeshDescriptor
         {
             std::string                               name;
+            uint32_t                                  attributeCount;
+            uint32_t                                  indexSampleCount;
             SBufferDescription                        dataBufferDescription;
             SBufferDescription                        indexBufferDescription;
             Vector<VkVertexInputBindingDescription>   bindingDescriptions;
             Vector<VkVertexInputAttributeDescription> attributeDescriptions;
+            Vector<VkDeviceSize>                      offsets;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMeshDependencies
         {
-            ResourceId_t dataBufferId;
-            ResourceId_t indexBufferId;
         };
 
     }

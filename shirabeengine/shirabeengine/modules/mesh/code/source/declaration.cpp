@@ -54,10 +54,12 @@ namespace engine::mesh
 
         aSerializer.beginObject(name);
 
-        aSerializer.writeValue("uid",                 uid);
-        aSerializer.writeValue("name",                name);
-        aSerializer.writeValue("indexBinaryFilename", indexBinaryFilename);
-        aSerializer.writeValue("dataBinaryFilename",  dataBinaryFilename);
+        aSerializer.writeValue("uid",                  uid);
+        aSerializer.writeValue("name",                 name);
+        aSerializer.writeValue("indexBinaryFilename",  indexBinaryFilename);
+        aSerializer.writeValue("dataBinaryFilename",   dataBinaryFilename);
+        aSerializer.writeValue("attributeSampleCount", attributeSampleCount);
+        aSerializer.writeValue("indexSampleCount",     indexSampleCount);
 
         aSerializer.beginArray("attributes");
         for(auto const &attributeDesc : attributes)
@@ -103,6 +105,9 @@ namespace engine::mesh
         aDeserializer.readValue("dataBinaryFilename",  dataBinaryFilenameString);
         dataBinaryFilename  = std::filesystem::path(dataBinaryFilenameString);
         indexBinaryFilename = std::filesystem::path(indexBinaryFilenameString);
+
+        aDeserializer.readValue("attributeSampleCount", attributeSampleCount);
+        aDeserializer.readValue("indexSampleCount",     indexSampleCount);
 
         uint32_t attributeCount = 0;
         aDeserializer.beginArray("attributes", attributeCount);

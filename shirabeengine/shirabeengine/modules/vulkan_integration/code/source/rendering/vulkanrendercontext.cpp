@@ -561,6 +561,32 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::bindAttributeAndIndexBuffers(GpuApiHandle_t const &aAttributeBufferId, GpuApiHandle_t const &aIndexBufferId, Vector<VkDeviceSize> aOffsets)
+        {
+            SVulkanState     &vkState        = mVulkanEnvironment->getState();
+            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex);
+
+            auto const *const attributeBuffer = mVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aAttributeBufferId);
+            auto const *const indexBuffer     = mVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aIndexBufferId);
+
+            if(nullptr == attributeBuffer || nullptr == indexBuffer)
+            {
+                CLog::Error(logTag(), "Failed to fetch attribute or indexbuffer '{}/{}'.", aAttributeBufferId, aIndexBufferId);
+                return EEngineStatus::Error;
+            }
+
+            std::vector<VkBuffer> buffers = { attributeBuffer->handle, attributeBuffer->handle, attributeBuffer->handle, attributeBuffer->handle };
+
+            vkCmdBindVertexBuffers(vkCommandBuffer, 0, buffers.size(), buffers.data(), aOffsets.data());
+            vkCmdBindIndexBuffer(vkCommandBuffer, indexBuffer->handle, 0, VkIndexType::VK_INDEX_TYPE_UINT16);
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::bindPipeline(GpuApiHandle_t const &aPipelineUID)
         {
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
@@ -582,8 +608,6 @@ namespace engine
                     , pipeline->descriptorSets.size()
                     , pipeline->descriptorSets.data()
                     , 0, nullptr);
-
-            vkCmdDraw(vkCommandBuffer, 3, 1, 0, 0); // Single triangle for now.
 
             return EEngineStatus::Ok;
         }
@@ -626,6 +650,18 @@ namespace engine
         {
             CLog::Verbose(logTag(), CString::format("Rendering renderable: {}", convert_to_string(aRenderable)));
             return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::drawIndex(uint32_t const aIndexCount)
+        {
+            SVulkanState     &vkState        = mVulkanEnvironment->getState();
+            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+
+            vkCmdDrawIndexed(vkCommandBuffer, aIndexCount, 1, 0, 0, 0); // Single triangle for now.
         }
         //<-----------------------------------------------------------------------------
     }

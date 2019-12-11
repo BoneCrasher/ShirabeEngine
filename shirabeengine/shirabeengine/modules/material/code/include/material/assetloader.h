@@ -97,7 +97,7 @@ namespace engine::material
                     // This number has to be equal to the VkVertexInputBindingDescription::binding index which data should be taken from!
                     VkVertexInputBindingDescription binding;
                     binding.binding   = k;
-                    binding.stride    = input.type->arrayStride;
+                    binding.stride    = (input.type->byteSize * input.type->vectorSize);
                     binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
                     VkVertexInputAttributeDescription attribute;

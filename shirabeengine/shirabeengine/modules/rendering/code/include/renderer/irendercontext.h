@@ -123,6 +123,8 @@ namespace engine
              */
             virtual EEngineStatus present() = 0;
 
+            virtual EEngineStatus bindAttributeAndIndexBuffers(GpuApiHandle_t const &aAttributeBufferId, GpuApiHandle_t const &aIndexBufferId, Vector<VkDeviceSize> aOffsets) = 0;
+
             /**
              * Bind a pipeline instance  in the GPU.
              *
@@ -163,6 +165,10 @@ namespace engine
              * @return            EEngineStatus::Ok, if successful. An error code otherwise.
              */
             virtual EEngineStatus render(SRenderable const &aRenderable) = 0;
+
+            virtual EEngineStatus drawIndex(uint32_t const aIndexCount) = 0;
+
+
         };
     }
 }

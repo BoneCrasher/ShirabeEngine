@@ -37,7 +37,7 @@ namespace engine {
         {
             if(mUseRawData || nullptr != mRawData)
             {
-                free(const_cast<T*>(mRawData));
+                //free(const_cast<T*>(mRawData));
             }
         };
 

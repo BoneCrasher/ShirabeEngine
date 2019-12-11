@@ -15,7 +15,7 @@ struct struct_vertexData_extended
 
 struct struct_vertexData_full
 {
-    vec3 vertex_color;
+    vec4 vertex_color;
     vec3 vertex_position;
     vec3 vertex_normal;
     vec3 vertex_tangent;

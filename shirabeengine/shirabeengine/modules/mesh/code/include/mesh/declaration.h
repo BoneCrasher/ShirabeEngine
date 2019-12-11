@@ -142,6 +142,8 @@ namespace engine
                       , indices              ({})
                       , dataBinaryFilename   ()
                       , indexBinaryFilename  ()
+                      , attributeSampleCount (0)
+                      , indexSampleCount     (0)
             {}
 
             SHIRABE_INLINE
@@ -154,6 +156,8 @@ namespace engine
                       , indices              (aOther.indices              )
                       , dataBinaryFilename   (aOther.dataBinaryFilename   )
                       , indexBinaryFilename  (aOther.indexBinaryFilename  )
+                      , attributeSampleCount (aOther.attributeSampleCount )
+                      , indexSampleCount     (aOther.indexSampleCount     )
             {}
 
             SHIRABE_INLINE
@@ -166,18 +170,22 @@ namespace engine
                       , indices              (aOther.indices              )
                       , dataBinaryFilename   (aOther.dataBinaryFilename   )
                       , indexBinaryFilename  (aOther.indexBinaryFilename  )
+                      , attributeSampleCount (aOther.attributeSampleCount )
+                      , indexSampleCount     (aOther.indexSampleCount     )
             {}
 
         public_operators:
             SHIRABE_INLINE
             SMeshDataFile &operator=(SMeshDataFile const &aOther)
             {
-                uid                 = aOther.uid;
-                name                = aOther.name;
-                attributes          = aOther.attributes;
-                indices             = aOther.indices;
-                dataBinaryFilename  = aOther.dataBinaryFilename;
-                indexBinaryFilename = aOther.indexBinaryFilename;
+                uid                  = aOther.uid;
+                name                 = aOther.name;
+                attributes           = aOther.attributes;
+                indices              = aOther.indices;
+                dataBinaryFilename   = aOther.dataBinaryFilename;
+                indexBinaryFilename  = aOther.indexBinaryFilename;
+                attributeSampleCount = aOther.attributeSampleCount;
+                indexSampleCount     = aOther.indexSampleCount;
 
                 return (*this);
             }
@@ -185,12 +193,14 @@ namespace engine
             SHIRABE_INLINE
             SMeshDataFile &operator=(SMeshDataFile &&aOther) noexcept
             {
-                uid                 = aOther.uid;
-                name                = std::move(aOther.name);
-                attributes          = std::move(aOther.attributes);
-                indices             = aOther.indices;
-                dataBinaryFilename  = aOther.dataBinaryFilename;
-                indexBinaryFilename = aOther.indexBinaryFilename;
+                uid                  = aOther.uid;
+                name                 = std::move(aOther.name);
+                attributes           = std::move(aOther.attributes);
+                indices              = aOther.indices;
+                dataBinaryFilename   = aOther.dataBinaryFilename;
+                indexBinaryFilename  = aOther.indexBinaryFilename;
+                attributeSampleCount = aOther.attributeSampleCount;
+                indexSampleCount     = aOther.indexSampleCount;
 
                 return (*this);
             }
@@ -200,6 +210,8 @@ namespace engine
             std::string                            name;
             std::vector<SMeshAttributeDescription> attributes;
             SMeshAttributeDescription              indices;
+            uint32_t                               attributeSampleCount;
+            uint32_t                               indexSampleCount;
             std::filesystem::path                  dataBinaryFilename;
             std::filesystem::path                  indexBinaryFilename;
 
