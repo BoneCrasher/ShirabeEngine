@@ -39,7 +39,8 @@ namespace engine
                     Shared<SApplicationEnvironment>  const &aApplicationEnvironment,
                     Shared<wsi::CWSIDisplay>         const &aDisplay,
                     SRendererConfiguration           const &aConfiguration,
-                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext) final;
+                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext,
+                    Shared<IRenderContext>                 &aGpuApiRenderContext) final;
 
             /**
              * Deinitialize and clear the renderer.
@@ -77,6 +78,8 @@ namespace engine
              [[nodiscard]]
             bool isPaused() const final;
 
+            EEngineStatus updateBuffer(GpuApiHandle_t const &aBufferId, ByteBuffer aData) final;
+
             /**
              * Render an entire scene... (format not specified yet..)
              * @return
@@ -88,6 +91,7 @@ namespace engine
             Shared<SApplicationEnvironment>  mAppEnvironment;
             Shared<wsi::CWSIDisplay>         mDisplay;
             Shared<IFrameGraphRenderContext> mFrameGraphRenderContext;
+            Shared<IRenderContext>           mGpuApiRenderContext;
             std::atomic<bool>                mPaused;
 
         };

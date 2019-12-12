@@ -281,7 +281,7 @@ namespace engine::material
                                                                                    , Shared<asset::IAssetStorage>        const &aAssetStorage
                                                                                    , Shared<material::CMaterialLoader>   const &aMaterialLoader)
     {
-        static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
+        static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "core";
         auto const loader = [=] (ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject>
         {
             auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aResourceId, aAssetStorage, aAssetId, true);

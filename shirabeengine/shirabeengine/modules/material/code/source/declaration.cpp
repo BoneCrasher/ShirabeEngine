@@ -718,7 +718,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     CMaterialConfig CMaterialConfig::fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers)
     {
-        uint32_t const minUBOOffsetAlignment = 256; // Hardcoded for the platform... make accessible in any other way...
+        uint32_t const minUBOOffsetAlignment = 0x20; //256; // Hardcoded for the platform... make accessible in any other way...
         std::size_t alignment = minUBOOffsetAlignment; // 16 * sizeof(float);
         // if (0 < minUBOOffsetAlignment) {
         //     alignment = (alignment + minUBOOffsetAlignment - 1) & ~(minUBOOffsetAlignment - 1);

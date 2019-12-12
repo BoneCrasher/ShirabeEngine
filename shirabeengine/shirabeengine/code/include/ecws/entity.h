@@ -13,7 +13,7 @@ namespace engine::ecws
     class CEntity
     {
     public_constructors:
-        CEntity();
+        explicit CEntity(std::string aName);
 
     public_destructors:
         ~CEntity();

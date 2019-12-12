@@ -39,17 +39,20 @@ namespace engine
         EEngineStatus CRenderer::initialize(
                 Shared<SApplicationEnvironment> const &aApplicationEnvironment,
                 Shared<wsi::CWSIDisplay>        const &aDisplay,
-                SRendererConfiguration                   const &aConfiguration,
-                Shared<IFrameGraphRenderContext>      &aFrameGraphRenderContext)
+                SRendererConfiguration          const &aConfiguration,
+                Shared<IFrameGraphRenderContext>      &aFrameGraphRenderContext,
+                Shared<IRenderContext>                &aGpuApiRenderContext)
         {
             assert(nullptr != aApplicationEnvironment);
             assert(nullptr != aDisplay);
             assert(nullptr != aFrameGraphRenderContext);
+            assert(nullptr != aGpuApiRenderContext);
 
             mConfiguration           = aConfiguration;
             mAppEnvironment          = aApplicationEnvironment;
             mDisplay                 = aDisplay;
             mFrameGraphRenderContext = aFrameGraphRenderContext;
+            mGpuApiRenderContext     = aGpuApiRenderContext;
 
             return EEngineStatus::Ok;
         }
@@ -129,6 +132,15 @@ namespace engine
 
             // File will be closed when leaving scope.
             return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CRenderer::updateBuffer(GpuApiHandle_t const &aBufferId, ByteBuffer aData)
+        {
+            mGpuApiRenderContext->transferBufferData(aData, aBufferId);
         }
         //<-----------------------------------------------------------------------------
 

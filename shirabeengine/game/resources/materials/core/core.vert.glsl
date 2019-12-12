@@ -10,7 +10,7 @@ out struct_vertexData_full shader_output;
 
 void main()
 {
-    shader_output.vertex_color    = vec3(0.0, 0.0,  0.0);
+    shader_output.vertex_color    = vec4(0.0, 0.0,  0.0, 10);
     shader_output.vertex_position = vec3(0.0, 0.0,  0.0);
     shader_output.vertex_normal   = vec3(1.0, 0.0,  0.0);
     shader_output.vertex_tangent  = vec3(0.0, 0.0, -1.0);

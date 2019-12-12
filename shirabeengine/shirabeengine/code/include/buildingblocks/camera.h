@@ -174,6 +174,11 @@ namespace engine
             return mLookAtTarget;
         }
 
+        SHIRABE_INLINE CTransform &transform()
+        {
+            return mTransform;
+        }
+
         /**
          * Return the current world matrix representation of the underlying transform.
          *

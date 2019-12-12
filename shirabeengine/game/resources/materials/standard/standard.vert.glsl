@@ -30,15 +30,20 @@ out struct_vertexData_full shader_output;
 void main()
 {
     vec4 position = vec4(vertex_position.xyz, 1.0);
+    mat3 view3x3  = mat3(graphicsData.primaryCamera.view);
 
-    position.x *= modelMatrices.scale[0] * 4;
-    position.y *= modelMatrices.scale[1] * 4;
-    gl_Position = position;
+    vec4 position_viewspace  = (graphicsData.primaryCamera.view * position);
+    vec3 normal_viewspace    = (view3x3 * vertex_normal);
+    vec3 tangent_viewspace   = (view3x3 * vertex_tangent.xyz);
+    vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace));
 
-    shader_output.vertex_position = gl_Position.xyz;
-    shader_output.vertex_normal   = vec3(1.0, 0.0,  0.0);
-    shader_output.vertex_tangent  = vec3(0.0, 0.0, -1.0);
-    shader_output.vertex_texcoord = vec2(gl_Position.xy);
-    shader_output.vertex_color    = vec4(gl_Position.xyz, 1.0);
+    gl_Position = vec4(vertex_position.xyz, 1.0); // (graphicsData.primaryCamera.projection * position_viewspace);
+    //gl_Position.x *= modelMatrices.scale[0];
+
+    shader_output.vertex_position = position_viewspace.xyz;
+    shader_output.vertex_normal   = normal_viewspace;
+    shader_output.vertex_tangent  = tangent_viewspace;
+    shader_output.vertex_texcoord = vertex_texcoord;
+    shader_output.vertex_color    = vec4(clamp(gl_Position.xyz * 5, 0.0, 1.0), 1.0);
 
 }

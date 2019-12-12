@@ -1009,22 +1009,21 @@ namespace engine::framegraph
     CEngineResult<> CFrameGraphRenderContext::render(SFrameGraphMesh     const &aMesh,
                                                      SFrameGraphMaterial const &aMaterial)
     {
-        SHIRABE_UNUSED(aMesh);
-
-        loadMeshAsset    (aMesh);
         loadMaterialAsset(aMaterial);
-
         bindMaterial(aMaterial, mCurrentRenderPassHandle);
-        bindMesh    (aMesh);
 
-        Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
-        mGraphicsAPIRenderContext->drawIndex(mesh->getDescription().indexSampleCount);
+        if(EFrameGraphResourceType::Undefined != aMesh.type)
+        {
+            loadMeshAsset(aMesh);
+            bindMesh     (aMesh);
+            Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
+            mGraphicsAPIRenderContext->drawIndex(mesh->getDescription().indexSampleCount);
+            unbindMesh     (aMesh);
+            unloadMeshAsset(aMesh);
+        }
 
-        unbindMaterial(aMaterial);
-        unbindMesh    (aMesh);
-
+        unbindMaterial     (aMaterial);
         unloadMaterialAsset(aMaterial);
-        unloadMeshAsset    (aMesh);
 
         return EEngineStatus::Ok;
     }

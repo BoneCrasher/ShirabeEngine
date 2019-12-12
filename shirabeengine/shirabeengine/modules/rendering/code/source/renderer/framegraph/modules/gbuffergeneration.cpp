@@ -96,12 +96,20 @@ namespace engine
                 // Register all meshes and materials for use.
                 for(SRenderable const &renderable : aRenderableInput.renderableList)
                 {
-                    SFrameGraphMesh     const &meshResource     = aBuilder.useMesh    (renderable.meshInstanceId    , renderable.meshInstanceAssetId).data();
-                    SFrameGraphMaterial const &materialResource = aBuilder.useMaterial(renderable.materialInstanceId, renderable.materialInstanceAssetId).data();
-
                     SRenderableResources resources {};
-                    resources.meshResource     = meshResource;
-                    resources.materialResource = materialResource;
+                    if(0 != renderable.meshInstanceAssetId)
+                    {
+                        SFrameGraphMesh const &meshResource = aBuilder.useMesh(renderable.meshInstanceId,
+                                                                               renderable.meshInstanceAssetId).data();
+                        resources.meshResource = meshResource;
+                    }
+
+                    if(0 != renderable.materialInstanceAssetId)
+                    {
+                        SFrameGraphMaterial const &materialResource = aBuilder.useMaterial(renderable.materialInstanceId,
+                                                                                           renderable.materialInstanceAssetId).data();
+                        resources.materialResource = materialResource;
+                    }
 
                     aOutPassData.importData.renderables.push_back(resources);
                 }

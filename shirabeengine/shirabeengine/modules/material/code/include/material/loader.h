@@ -57,7 +57,8 @@ namespace engine
 
             CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
                                                                           , asset::AssetID_t             const &aMaterialInstanceAssetId
-                                                                          , bool                                aAutoCreateConfiguration);
+                                                                          , bool                                aAutoCreateConfiguration
+                                                                          , bool                                aIncludeSystemBuffers = false);
             /**
              * @brief loadMaterial
              * @param aMaterialId

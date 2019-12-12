@@ -4,6 +4,7 @@
 #include <core/basictypes.h>
 #include <core/enginestatus.h>
 #include <os/applicationenvironment.h>
+#include <material/declaration.h>
 #include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
 #include "renderer/renderertypes.h"
@@ -40,8 +41,9 @@ namespace engine
             virtual EEngineStatus initialize(
                     Shared<SApplicationEnvironment>  const &aApplicationEnvironment,
                     Shared<wsi::CWSIDisplay>         const &aDisplay,
-                    SRendererConfiguration                    const &aConfiguration,
-                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext) = 0;
+                    SRendererConfiguration           const &aConfiguration,
+                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext,
+                    Shared<IRenderContext>                 &aGpuApiRenderContext) = 0;
 
             /**
              * Deinitialize and clear the renderer.
@@ -74,6 +76,8 @@ namespace engine
              * @return True, if paused. False otherwise.
              */
             virtual bool isPaused() const = 0;
+
+            virtual EEngineStatus updateBuffer(GpuApiHandle_t const &aBufferId, ByteBuffer aData) = 0;
 
             /**
              * Render an entire scene... (format not specified yet..)

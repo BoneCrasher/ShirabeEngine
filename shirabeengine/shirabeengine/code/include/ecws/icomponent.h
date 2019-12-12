@@ -54,6 +54,13 @@ namespace engine::ecws
             return mMaxElements;
         }
 
+        [[nodiscard]]
+        SHIRABE_INLINE
+        bool const empty() const
+        {
+            return mElements.empty();
+        }
+
         template <typename TOtherElementType>
         SHIRABE_INLINE
         void assign(CBoundedCollection<TOtherElementType> const &aOther)

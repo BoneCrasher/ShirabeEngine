@@ -312,7 +312,7 @@ namespace engine
             CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
 
             mRenderer = makeShared<CRenderer>();
-            status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data());
+            status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data(), gfxApiRenderContext);
 
             return { status };
         };
@@ -333,8 +333,24 @@ namespace engine
             CEngineResult<> initialization = mScene.initialize();
             status = initialization.result();
 
-            auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage,         util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
-            auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage, util::crc32FromString("materials/standard/standard.material.meta"), true);
+            auto const &[coreMaterialLoadResult, core] = mMaterialLoader->loadMaterialInstance(mAssetStorage
+                                                                                               , util::crc32FromString("materials/core/core.material.meta")
+                                                                                               , true
+                                                                                               , true);
+
+            auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>();
+            coreMaterialComponent->setMaterialInstance(core);
+
+            auto coreEntity = makeUnique<ecws::CEntity>("core");
+            coreEntity->addComponent(coreMaterialComponent);
+
+            mScene.addEntity(std::move(coreEntity));
+
+            auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage
+                                                                                     , util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
+            auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage
+                                                                                             , util::crc32FromString("materials/standard/standard.material.meta")
+                                                                                             , true);
 
             auto meshComponent = makeShared<ecws::CMeshComponent>();
             meshComponent->setMeshInstance(mesh);
@@ -345,12 +361,16 @@ namespace engine
             material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", 1.0f);
             material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.5f);
 
-            auto cube = makeUnique<ecws::CEntity>();
-            cube->addComponent(materialComponent);
-            cube->addComponent(meshComponent);
+            auto barramundi = makeUnique<ecws::CEntity>("barramundi");
+            barramundi->addComponent(materialComponent);
+            barramundi->addComponent(meshComponent);
 
-            mScene.addEntity(std::move(cube));
+            mScene.addEntity(std::move(barramundi));
 
+            mCamera = makeShared<CCamera>(ECameraViewType::FreeCamera
+                                        , CCamera::SFrustumParameters::Default()
+                                        , CCamera::SProjectionParameters::Default());
+            mCamera->transform().translate(CVector3D_t({0.0, 0.0, -10.0}));
         }
         catch(std::exception &stde)
         {
@@ -407,33 +427,49 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineResult<> CEngineInstance::update()
     {
-        //mTimer.update();
 
         if(CheckWindowManagerError(mWindowManager->update()))
         {
                 CLog::Error(logTag(), "Failed to update window manager.");
                 return { EEngineStatus::UpdateError };
-        }        
+        }
 
-       //if(not mTimer.isTick())
-       //{
-       //    return { EEngineStatus::Ok };
-       //}
-
+        mTimer.update();
+        if(not mTimer.isTick())
+        {
+            return { EEngineStatus::Ok };
+        }
+        mTimer.resetTick();
         CLog::Debug(logTag(), "Tick...");
-        //mTimer.resetTick();
 
         mScene.update();
 
         if(mRenderer)
         {
-            RenderableList renderableCollection {};
+            Unique<ecws::CEntity> const &core = mScene.findEntity("core");
+            ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> coreMaterials = core->getTypedComponentsOfType<ecws::CMaterialComponent>();
+            Shared<ecws::CMaterialComponent>                           coreMaterial  = *(coreMaterials.begin());
+            coreMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4>("struct_graphicsData", "primaryCamera.view",       mCamera->view());
+            coreMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4>("struct_graphicsData", "primaryCamera.projection", mCamera->projection());
 
             // JUST A TEST, Remove that stuff...
             static int16_t counter = 0;
             counter = (++counter % 360);
             static float newHorizontalScale = 0.0f;
             newHorizontalScale = cosf( (((float) counter) / 180.0f) * M_PIf32 );
+
+            Unique<ecws::CEntity> const &barramundi = mScene.findEntity("barramundi");
+            ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> barramundiMaterials = barramundi->getTypedComponentsOfType<ecws::CMaterialComponent>();
+            Shared<ecws::CMaterialComponent>                           barramundiMaterial  = *(barramundiMaterials.begin());
+            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", newHorizontalScale);
+            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.3f * newHorizontalScale);
+
+            RenderableList renderableCollection {};
+            renderableCollection.push_back({ core->name()
+                                           , ""
+                                           , 0
+                                           , coreMaterial->getMaterialInstance()->name()
+                                           , coreMaterial->getMaterialInstance()->master()->getAssetId() });
 
             Vector<Unique<ecws::CEntity>> const &entities = mScene.getEntities();
             for(auto const &entity : entities)
@@ -445,8 +481,6 @@ namespace engine
                 for(auto const &mesh : meshes)
                     for(auto const &material : materials)
                     {
-                        material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", newHorizontalScale);
-                        material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.3f * newHorizontalScale);
                         renderableCollection.push_back({ name
                                                          , mesh->getMeshInstance()->name()
                                                          , mesh->getMeshInstance()->getAssetId()

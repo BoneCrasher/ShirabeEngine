@@ -225,7 +225,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
                                                                                       , asset::AssetID_t             const &aMaterialInstanceAssetId
-                                                                                      , bool                                aAutoCreateConfiguration)
+                                                                                      , bool                                aAutoCreateConfiguration
+                                                                                      , bool                                aIncludeSystemBuffers)
         {
             CEngineResult<ByteBuffer> data = {};
 
@@ -280,7 +281,7 @@ namespace engine
 
             if(aAutoCreateConfiguration)
             {
-                instance->createConfiguration();
+                instance->createConfiguration(aIncludeSystemBuffers);
             }
 
             mInstantiatedMaterialInstances.insert({ instanceName, instance });

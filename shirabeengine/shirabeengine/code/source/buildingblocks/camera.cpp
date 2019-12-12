@@ -76,7 +76,7 @@ namespace engine
             CVector3D_t       const &aEye,
             CVector3D_t       const &aUp,
             CVector3D_t       const &aForward,
-            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::LH)
+            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {      
         SHIRABE_UNUSED(aCoordinateSystem);
 
@@ -84,18 +84,18 @@ namespace engine
         CVector3D_t const n_forward = math::normalize(aForward);
         CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
 
-        CMatrix4x4  const orientation = CMatrix4x4({
-            n_right.x(), n_up.x(), n_forward.x(), 0.0f,
-            n_right.y(), n_up.y(), n_forward.y(), 0.0f,
-            n_right.z(), n_up.z(), n_forward.z(), 0.0f,
-            0.0f,        0.0f,     0.0f,          1.0f
+        CMatrix4x4 const orientation = CMatrix4x4({
+            n_right  .x(),   n_right.y(),   n_right.z(), 0.0f,
+            n_up     .x(),      n_up.y(),      n_up.z(), 0.0f,
+            n_forward.x(), n_forward.y(), n_forward.z(), 0.0f,
+            0.0f,          0.0f,          0.0f,          1.0f
         });
 
         CMatrix4x4 const translation = CMatrix4x4({
-            1.0f,      0.0f,      0.0f,      0.0f,
-            0.0f,      1.0f,      0.0f,      0.0f,
-            0.0f,      0.0f,      1.0f,      0.0f,
-            -aEye.x(), -aEye.y(), -aEye.z(), 1.0f
+            1.0f,      0.0f,      0.0f,      -aEye.x(),
+            0.0f,      1.0f,      0.0f,      -aEye.y(),
+            0.0f,      0.0f,      1.0f,      -aEye.z(),
+            0.0f,      0.0f,      0.0f,      1.0f
         });
 
         return SMMatrixMultiply(orientation, translation);
@@ -128,17 +128,17 @@ namespace engine
         CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
 
         CMatrix4x4 const orientation = CMatrix4x4({
-            n_right.x(), n_up.x(), n_forward.x(), 0.0f,
-            n_right.y(), n_up.y(), n_forward.y(), 0.0f,
-            n_right.z(), n_up.z(), n_forward.z(), 0.0f,
-            0.0f,        0.0f,     0.0f,          1.0f
+                n_right  .x(),   n_right.y(),   n_right.z(), 0.0f,
+                n_up     .x(),      n_up.y(),      n_up.z(), 0.0f,
+                n_forward.x(), n_forward.y(), n_forward.z(), 0.0f,
+                0.0f,          0.0f,          0.0f,          1.0f
         });
 
         CMatrix4x4 const translation = CMatrix4x4({
-            1.0f,      0.0f,      0.0f,      0.0f,
-            0.0f,      1.0f,      0.0f,      0.0f,
-            0.0f,      0.0f,      1.0f,      0.0f,
-            -aEye.x(), -aEye.y(), -aEye.z(), 1.0f
+                1.0f,      0.0f,      0.0f,      -aEye.x(),
+                0.0f,      1.0f,      0.0f,      -aEye.y(),
+                0.0f,      0.0f,      1.0f,      -aEye.z(),
+                0.0f,      0.0f,      0.0f,      1.0f
         });
 
         return SMMatrixMultiply(orientation, translation);
@@ -176,7 +176,7 @@ namespace engine
 
         CMatrix4x4 const projection = CMatrix4x4({
             (n2 / width),      0.0f,                0.0f,                                     0.0f,
-            0.0f,              (n2 / height),       0.0f,                                     0.0f,
+            0.0f,              -(n2 / height),      0.0f,                                     0.0f,
             ((r + l) / width), ((t + b) / height), -((f + n) / depth),                        coordinateSystemFactor,
             0.0f,              0.0f,               -((fn2 / depth) * coordinateSystemFactor), 0.0f
         });
@@ -200,7 +200,7 @@ namespace engine
             double            const &aNear,
             double            const &aFar,
             double            const &aFovY,
-            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
+            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::LH)
     {
         float const aspect       =  static_cast<float>(aBounds.size.x()) / static_cast<float>(aBounds.size.y());
         float const fovFactorRad =  ( (static_cast<float>(aFovY) / 2.0f) * static_cast<float>(M_PI / 180.0) );

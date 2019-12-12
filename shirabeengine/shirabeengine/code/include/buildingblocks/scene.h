@@ -56,6 +56,20 @@ namespace engine
         SHIRABE_INLINE
         Vector<Unique<ecws::CEntity>> const &getEntities() const { return mEntities; }
 
+        Unique<ecws::CEntity> const &findEntity(std::string const &aName)
+        {
+            for(auto const &e : mEntities)
+            {
+                if(aName == e->name())
+                {
+                    return e;
+                }
+            }
+
+            static Unique<ecws::CEntity> gNullEntity = nullptr;
+            return gNullEntity;
+        }
+
     private_members:
         Shared<ecws::IComponentFactory> mComponentFactory;
 
