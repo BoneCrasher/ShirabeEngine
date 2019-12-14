@@ -204,7 +204,7 @@ namespace engine
             void assign(ClassType_t const & aOther);
 
         protected_members:
-            T mField[TN * TByteSize];
+            T mField[TN];
         };
         //<-----------------------------------------------------------------------------
 

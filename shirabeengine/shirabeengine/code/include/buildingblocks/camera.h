@@ -209,6 +209,12 @@ namespace engine
             return mProjectionMatrix;
         }
 
+        SHIRABE_INLINE void update()
+        {
+            createViewMatrix();
+            createProjectionMatrix();
+        }
+
     private_methods:
         /**
          * Create a view matrix representation of the current configuration for a given handedness.

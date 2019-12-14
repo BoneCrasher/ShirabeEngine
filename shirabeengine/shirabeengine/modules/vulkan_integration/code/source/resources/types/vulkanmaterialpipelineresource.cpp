@@ -62,10 +62,11 @@ namespace engine::vulkan
         viewPortStateCreateInfo.scissorCount   = 1;
         viewPortStateCreateInfo.pScissors      = &(scissor);
 
-        std::unordered_map<VkDescriptorType, uint32_t> typesAndSizes {};
-        std::vector<VkDescriptorSetLayout>             setLayouts    {};
+        std::unordered_map<VkDescriptorType, uint32_t> typesAndSizes    {};
+        std::vector<VkDescriptorSetLayout>             setLayouts       {};
+        std::vector<VkDescriptorSetLayout>             createdSetLayouts{};
 
-        auto const createDescriptorSetLayouts = [&device, &typesAndSizes, &setLayouts] (SMaterialPipelineDescriptor const &aDescriptor) -> EEngineStatus
+        auto const createDescriptorSetLayouts = [&device, &typesAndSizes, &setLayouts, &createdSetLayouts] (SMaterialPipelineDescriptor const &aDescriptor, bool aRegisterForDescriptorSetAlloc) -> EEngineStatus
         {
             for(uint64_t k=0; k<aDescriptor.descriptorSetLayoutCreateInfos.size(); ++k)
             {
@@ -78,7 +79,7 @@ namespace engine::vulkan
                 VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
                 {
                     VkResult const result = vkCreateDescriptorSetLayout(device, &info, nullptr, &vkDescriptorSetLayout);
-                    if(VkResult::VK_SUCCESS != result)
+                    if( VkResult::VK_SUCCESS != result )
                     {
                         CLog::Error(logTag(), "Failed to create pipeline descriptor set layout. Result {}", result);
                         return EEngineStatus::Error;
@@ -87,9 +88,14 @@ namespace engine::vulkan
                     setLayouts.push_back(vkDescriptorSetLayout);
                 }
 
-                for(auto const &binding : bindings)
+                if(aRegisterForDescriptorSetAlloc)
                 {
-                    typesAndSizes[binding.descriptorType] += binding.descriptorCount;
+                    createdSetLayouts.push_back(vkDescriptorSetLayout);
+
+                    for( auto const &binding : bindings )
+                    {
+                        typesAndSizes[binding.descriptorType] += binding.descriptorCount;
+                    }
                 }
             }
 
@@ -103,17 +109,17 @@ namespace engine::vulkan
         {
             // We are creating the system UBO, nothing to add...
             SMaterialPipelineDescriptor const &systemUBODescriptor = systemUBOPipeline->getCurrentDescriptor().value();
-            EEngineStatus const status = createDescriptorSetLayouts(systemUBODescriptor);
-            if(CheckEngineError(status))
-            {
-                return { EEngineStatus::Error };
-            }
+            EEngineStatus const status = createDescriptorSetLayouts(systemUBODescriptor, false);
+            //if(CheckEngineError(status))
+            //{
+            //    return { EEngineStatus::Error };
+            //}
         }
 
         //
         // Then everything else...
         //
-        EEngineStatus const status = createDescriptorSetLayouts(aDescription);
+        EEngineStatus const status = createDescriptorSetLayouts(aDescription, true);
         if(CheckEngineError(status))
         {
             return { EEngineStatus::Error };
@@ -138,7 +144,7 @@ namespace engine::vulkan
         vkDescriptorPoolCreateInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         vkDescriptorPoolCreateInfo.pNext         = nullptr;
         vkDescriptorPoolCreateInfo.flags         = 0;
-        vkDescriptorPoolCreateInfo.maxSets       = aDescription.descriptorSetLayoutCreateInfos.size();
+        vkDescriptorPoolCreateInfo.maxSets       = createdSetLayouts.size();
         vkDescriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
         vkDescriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
 
@@ -156,19 +162,35 @@ namespace engine::vulkan
         vkDescriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         vkDescriptorSetAllocateInfo.pNext              = nullptr;
         vkDescriptorSetAllocateInfo.descriptorPool     = vkDescriptorPool;
-        vkDescriptorSetAllocateInfo.descriptorSetCount = setLayouts.size();
-        vkDescriptorSetAllocateInfo.pSetLayouts        = setLayouts.data();
+        vkDescriptorSetAllocateInfo.descriptorSetCount = createdSetLayouts.size();
+        vkDescriptorSetAllocateInfo.pSetLayouts        = createdSetLayouts.data();
 
-        std::vector<VkDescriptorSet> vkDescriptorSets {};
+        std::vector<VkDescriptorSet> vkCreatedDescriptorSets {};
         {
-            vkDescriptorSets.resize(setLayouts.size());
+            vkCreatedDescriptorSets.resize(createdSetLayouts.size());
 
-            VkResult const result = vkAllocateDescriptorSets(device, &vkDescriptorSetAllocateInfo, vkDescriptorSets.data());
+            VkResult const result = vkAllocateDescriptorSets(device, &vkDescriptorSetAllocateInfo, vkCreatedDescriptorSets.data());
             if(VkResult::VK_SUCCESS != result)
             {
                 CLog::Error(logTag(), "Could not create descriptor sets.");
                 return { EEngineStatus::Error };
             }
+        }
+
+        std::vector<VkDescriptorSet> vkDescriptorSets {};
+        if(nullptr != systemUBOPipeline)
+        {
+            // We are creating the system UBO, nothing to add...
+            SMaterialPipelineDescriptor const &systemUBODescriptor = systemUBOPipeline->getCurrentDescriptor().value();
+            for(VkDescriptorSet set : systemUBOPipeline->descriptorSets)
+            {
+                vkDescriptorSets.push_back(set);
+            }
+        }
+
+        for(VkDescriptorSet set : vkCreatedDescriptorSets)
+        {
+            vkDescriptorSets.push_back(set);
         }
 
         VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo {};

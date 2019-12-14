@@ -536,8 +536,9 @@ namespace engine::material
 
             std::function<void(MutableBufferMemberMap_t &)> readMembers = nullptr;
             readMembers = [&] (MutableBufferMemberMap_t &aOutMembers) -> void {
-                auto const iterate = [&](Shared<SBufferMember> const &aMember,
-                                         uint32_t              const &aIndex) -> void
+                std::function<void(Shared<SBufferMember> const &, uint32_t const &)> iterate = nullptr;
+                iterate = [&](Shared<SBufferMember> const &aMember,
+                              uint32_t              const &aIndex) -> void
                 {
                     aDeserializer.beginObject(aIndex);
                     aDeserializer.readValue("name",        aMember->name);
@@ -549,6 +550,10 @@ namespace engine::material
                     aDeserializer.readValue("layers", aMember->array.layers);
                     aDeserializer.readValue("stride", aMember->array.stride);
                     aDeserializer.endObject();
+
+                    MutableBufferMemberMap_t mutableMembers {};
+                    readMembers(mutableMembers);
+                    aMember->members = mutableMembers;
 
                     aDeserializer.endObject();
                 };

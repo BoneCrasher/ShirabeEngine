@@ -442,6 +442,7 @@ namespace engine
         mTimer.resetTick();
         CLog::Debug(logTag(), "Tick...");
 
+        mCamera->update();
         mScene.update();
 
         if(mRenderer)

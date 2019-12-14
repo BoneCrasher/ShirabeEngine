@@ -265,13 +265,11 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/core/core.material" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/core/core.material" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/field.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/field.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -685,7 +683,7 @@
       <workItem from="1575952059624" duration="17724000" />
       <workItem from="1576167583391" duration="1206000" />
       <workItem from="1576304313810" duration="6873000" />
-      <workItem from="1576313748831" duration="6531000" />
+      <workItem from="1576313748831" duration="15316000" />
     </task>
     <servers />
   </component>
@@ -747,12 +745,28 @@
           <line>315</line>
           <option name="timeStamp" value="153" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp</url>
+          <line>452</line>
+          <option name="timeStamp" value="215" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/camera.cpp</url>
+          <line>256</line>
+          <option name="timeStamp" value="218" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp</url>
+          <line>372</line>
+          <option name="timeStamp" value="219" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
         <watch expression="aConfig" />
         <watch expression="vertexInputStateCreateInfo" />
+        <watch expression="this-&gt;mCamera.get()-&gt;mViewMatrix.mField" />
       </configuration>
     </watches-manager>
   </component>
