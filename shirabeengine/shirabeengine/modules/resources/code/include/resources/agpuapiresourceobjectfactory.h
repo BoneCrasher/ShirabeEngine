@@ -102,6 +102,7 @@ namespace engine
                 auto entry = mCreators.find(typeInfo.name());
                 if(mCreators.end() == entry)
                 {
+                    //throw std::runtime_error("You cunt! I can't load this type");
                     return GpuApiHandle_t {};
                 }
 
@@ -119,7 +120,7 @@ namespace engine
                     return handle;
                 }
 
-                return GpuApiHandle_t{};
+                return {};
             }
 
             SHIRABE_INLINE

@@ -959,6 +959,7 @@ namespace engine::framegraph
         Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
 
         SMaterialDependencies dependencies {};
+        dependencies.pipelineDependencies.systemUBOPipelineId   = "Core_pipeline";
         dependencies.pipelineDependencies.referenceRenderPassId = aRenderPassHandle;
         dependencies.pipelineDependencies.subpass               = mCurrentSubpass;
         dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;

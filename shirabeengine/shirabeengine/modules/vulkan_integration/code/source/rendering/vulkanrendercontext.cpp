@@ -236,7 +236,7 @@ namespace engine
             uint64_t        writeCounter = 0;
             uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
 
-            for(std::size_t k=startSetIndex; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
+            for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
             {
                 std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
                 for(std::size_t j=0; j<setBindings.size(); ++j)
@@ -260,7 +260,7 @@ namespace engine
                     descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                     descriptorWrite.pNext            = nullptr;
                     descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                    descriptorWrite.dstSet           = pipeline->descriptorSets[k];
+                    descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
                     descriptorWrite.dstBinding       = binding.binding;
                     descriptorWrite.dstArrayElement  = 0;
                     descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;

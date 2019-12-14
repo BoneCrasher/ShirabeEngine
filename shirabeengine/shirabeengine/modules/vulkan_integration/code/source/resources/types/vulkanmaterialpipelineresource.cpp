@@ -29,6 +29,12 @@ namespace engine::vulkan
 
         VkDevice device = getVkContext()->getLogicalDevice();
 
+        CVulkanPipelineResource const *systemUBOPipeline = nullptr;
+        if(aResolvedDependencies.end() != aResolvedDependencies.find(aDependencies.systemUBOPipelineId))
+        {
+            systemUBOPipeline = getVkContext()->getResourceStorage()->extract<CVulkanPipelineResource>(aResolvedDependencies.at(aDependencies.systemUBOPipelineId));
+        }
+
         auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aResolvedDependencies.at(aDependencies.referenceRenderPassId));
 
         // Create the shader modules here...
@@ -59,30 +65,58 @@ namespace engine::vulkan
         std::unordered_map<VkDescriptorType, uint32_t> typesAndSizes {};
         std::vector<VkDescriptorSetLayout>             setLayouts    {};
 
-        for(uint64_t k=0; k<aDescription.descriptorSetLayoutCreateInfos.size(); ++k)
+        auto const createDescriptorSetLayouts = [&device, &typesAndSizes, &setLayouts] (SMaterialPipelineDescriptor const &aDescriptor) -> EEngineStatus
         {
-            std::vector<VkDescriptorSetLayoutBinding> bindings = aDescription.descriptorSetLayoutBindings[k];
-            VkDescriptorSetLayoutCreateInfo           info     = aDescription.descriptorSetLayoutCreateInfos[k];
-
-            info.pBindings    = bindings.data();
-            info.bindingCount = bindings.size();
-
-            VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
+            for(uint64_t k=0; k<aDescriptor.descriptorSetLayoutCreateInfos.size(); ++k)
             {
-                VkResult const result = vkCreateDescriptorSetLayout(device, &info, nullptr, &vkDescriptorSetLayout);
-                if(VkResult::VK_SUCCESS != result)
+                std::vector<VkDescriptorSetLayoutBinding> bindings = aDescriptor.descriptorSetLayoutBindings[k];
+                VkDescriptorSetLayoutCreateInfo           info     = aDescriptor.descriptorSetLayoutCreateInfos[k];
+
+                info.pBindings    = bindings.data();
+                info.bindingCount = bindings.size();
+
+                VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
                 {
-                    CLog::Error(logTag(), "Failed to create pipeline descriptor set layout. Result {}", result);
-                    return {EEngineStatus::Error};
+                    VkResult const result = vkCreateDescriptorSetLayout(device, &info, nullptr, &vkDescriptorSetLayout);
+                    if(VkResult::VK_SUCCESS != result)
+                    {
+                        CLog::Error(logTag(), "Failed to create pipeline descriptor set layout. Result {}", result);
+                        return EEngineStatus::Error;
+                    }
+
+                    setLayouts.push_back(vkDescriptorSetLayout);
                 }
 
-                setLayouts.push_back(vkDescriptorSetLayout);
+                for(auto const &binding : bindings)
+                {
+                    typesAndSizes[binding.descriptorType] += binding.descriptorCount;
+                }
             }
 
-            for(auto const &binding : bindings)
+            return EEngineStatus::Ok;
+        };
+
+        //
+        // First of all, push back all system UBOs...
+        //
+        if(nullptr != systemUBOPipeline)
+        {
+            // We are creating the system UBO, nothing to add...
+            SMaterialPipelineDescriptor const &systemUBODescriptor = systemUBOPipeline->getCurrentDescriptor().value();
+            EEngineStatus const status = createDescriptorSetLayouts(systemUBODescriptor);
+            if(CheckEngineError(status))
             {
-                typesAndSizes[binding.descriptorType] += binding.descriptorCount;
+                return { EEngineStatus::Error };
             }
+        }
+
+        //
+        // Then everything else...
+        //
+        EEngineStatus const status = createDescriptorSetLayouts(aDescription);
+        if(CheckEngineError(status))
+        {
+            return { EEngineStatus::Error };
         }
 
         std::vector<VkDescriptorPoolSize> poolSizes {};

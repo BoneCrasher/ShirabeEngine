@@ -27,15 +27,18 @@ namespace engine::material
     ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage>  const &aAssetStorage
                                                                      , std::string                 const &aMaterialName
                                                                      , SMaterialSignature          const &aSignature
-                                                                     , CMaterialConfig             const &aConfiguration)
+                                                                     , CMaterialConfig             const &aConfiguration
+                                                                     , bool                               aIncludeSystemBuffers = false)
     {
         using namespace resources;
 
         SMaterialPipelineDescriptor pipelineDescriptor     {};
         SShaderModuleDescriptor     shaderModuleDescriptor {};
         Vector<SBufferDescription>  bufferDescriptions     {};
-        shaderModuleDescriptor.name = fmt::format("{}_{}", aMaterialName, "pipeline");
+        pipelineDescriptor    .name = fmt::format("{}_{}", aMaterialName, "pipeline");
         shaderModuleDescriptor.name = fmt::format("{}_{}", aMaterialName, "shadermodule");
+
+        pipelineDescriptor.includesSystemBuffers                     = aIncludeSystemBuffers;
 
         pipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         pipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
@@ -181,9 +184,12 @@ namespace engine::material
             }
         }
 
+        uint32_t const setSubtractionValue = aIncludeSystemBuffers ? 0 : 2;
+        uint32_t const setCount            = aSignature.layoutInfo.setCount - setSubtractionValue;
+
         std::vector<VkDescriptorSetLayoutCreateInfo> descriptorSets {};
-        descriptorSets.resize(aSignature.layoutInfo.setCount);
-        pipelineDescriptor.descriptorSetLayoutBindings.resize(aSignature.layoutInfo.setCount);
+        descriptorSets.resize(setCount);
+        pipelineDescriptor.descriptorSetLayoutBindings.resize(setCount);
 
         for(std::size_t k=0; k<descriptorSets.size(); ++k)
         {
@@ -192,7 +198,7 @@ namespace engine::material
             info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
             info.pNext        = nullptr;
             info.flags        = 0;
-            info.bindingCount = aSignature.layoutInfo.setBindingCount[k];
+            info.bindingCount = aSignature.layoutInfo.setBindingCount[k + setSubtractionValue];
 
             pipelineDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
         }
@@ -201,24 +207,34 @@ namespace engine::material
 
         for(SSubpassInput const &input : aSignature.subpassInputs)
         {
+            if(not aIncludeSystemBuffers && 2 > input.set)
+            {
+                continue;
+            }
+
             VkDescriptorSetLayoutBinding layoutBinding {};
             layoutBinding.binding            = input.binding;
             layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
             layoutBinding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT; // Subpass inputs are only accessibly in fragment shaders.
             layoutBinding.descriptorCount    = 1;
             layoutBinding.pImmutableSamplers = nullptr;
-            pipelineDescriptor.descriptorSetLayoutBindings[input.set][input.binding] = layoutBinding;
+            pipelineDescriptor.descriptorSetLayoutBindings[input.set - setSubtractionValue][input.binding] = layoutBinding;
         }
 
         for(SUniformBuffer const &uniformBuffer : aSignature.uniformBuffers)
         {
+            if(not aIncludeSystemBuffers && 2 > uniformBuffer.set)
+            {
+                continue;
+            }
+
             VkDescriptorSetLayoutBinding layoutBinding {};
             layoutBinding.binding            = uniformBuffer.binding;
             layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL; // serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
             layoutBinding.descriptorCount    = uniformBuffer.array.layers;
             layoutBinding.pImmutableSamplers = nullptr;
-            pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set][uniformBuffer.binding] = layoutBinding;
+            pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set - setSubtractionValue][uniformBuffer.binding] = layoutBinding;
 
             CEngineResult<void const *const> bufferDataFetch = aConfiguration.getBuffer(uniformBuffer.name);
             if(CheckEngineError(bufferDataFetch.result()))
@@ -252,13 +268,18 @@ namespace engine::material
 
         for(SSampledImage const &sampledImage : aSignature.sampledImages)
         {
+            if(not aIncludeSystemBuffers && 2 > sampledImage.set)
+            {
+                continue;
+            }
+
             VkDescriptorSetLayoutBinding layoutBinding {};
             layoutBinding.binding            = sampledImage.binding;
             layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             layoutBinding.stageFlags         = serialization::shaderStageFromPipelineStage(sampledImage.stageBinding.value());
             layoutBinding.descriptorCount    = 1;
             layoutBinding.pImmutableSamplers = nullptr;
-            pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set][sampledImage.binding] = layoutBinding;
+            pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set - setSubtractionValue][sampledImage.binding] = layoutBinding;
         }
 
         VkViewport viewPort = {};
@@ -281,7 +302,7 @@ namespace engine::material
                                                                                    , Shared<asset::IAssetStorage>        const &aAssetStorage
                                                                                    , Shared<material::CMaterialLoader>   const &aMaterialLoader)
     {
-        static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "core";
+        static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
         auto const loader = [=] (ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject>
         {
             auto const &[result, instance] = aMaterialLoader->loadMaterialInstance(aResourceId, aAssetStorage, aAssetId, true);
@@ -294,9 +315,8 @@ namespace engine::material
             SMaterialSignature      const &signature = master  ->signature();
             CMaterialConfig         const &config    = instance->config();
 
-            auto [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config());
-
-            pipelineDescription.includesSystemBuffers = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == aResourceId);
+            bool const includeSystemBuffers =  (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == master->name());
+            auto [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config(), includeSystemBuffers);
 
             //master->setPipelineDescription    (pipelineDescription);
             //master->setShaderModuleDescription(shaderModuleDescription);
@@ -333,6 +353,11 @@ namespace engine::material
             // {
             //     pipelineDependencies.push_back(textureViewHandle);
             // }
+
+            if(not includeSystemBuffers)
+            {
+                pipelineDependencies.push_back("Core_pipeline");
+            }
 
             CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = aResourceManager->useDynamicResource<SPipeline>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor, std::move(pipelineDependencies));
             EngineStatusPrintOnError(pipelineObject.result(),  "Material::AssetLoader", "Failed to create pipeline.");

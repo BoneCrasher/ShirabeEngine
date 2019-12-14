@@ -2,46 +2,46 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
-      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
-      <config projectName="shirabedevelopment" targetName="log" />
-      <config projectName="shirabedevelopment" targetName="game" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
-      <config projectName="shirabedevelopment" targetName="mesh" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_material" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
-      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
-      <config projectName="shirabedevelopment" targetName="core" />
-      <config projectName="shirabedevelopment" targetName="crc32generator" />
-      <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
-      <config projectName="shirabedevelopment" targetName="wsi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
       <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
       <config projectName="shirabedevelopment" targetName="resources" />
-      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
-      <config projectName="shirabedevelopment" targetName="math" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
       <config projectName="shirabedevelopment" targetName="INSTALL_os" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="material" />
-      <config projectName="shirabedevelopment" targetName="asset" />
-      <config projectName="shirabedevelopment" targetName="os" />
-      <config projectName="shirabedevelopment" targetName="base" />
-      <config projectName="shirabedevelopment" targetName="shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
-      <config projectName="shirabedevelopment" targetName="graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
       <config projectName="shirabedevelopment" targetName="rendering" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="log" />
+      <config projectName="shirabedevelopment" targetName="utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="game" />
+      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
+      <config projectName="shirabedevelopment" targetName="material" />
+      <config projectName="shirabedevelopment" targetName="crc32generator" />
+      <config projectName="shirabedevelopment" targetName="base" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
+      <config projectName="shirabedevelopment" targetName="core" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
+      <config projectName="shirabedevelopment" targetName="shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="asset" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
+      <config projectName="shirabedevelopment" targetName="mesh" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_material" />
+      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="wsi" />
+      <config projectName="shirabedevelopment" targetName="os" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
       <config projectName="shirabedevelopment" targetName="INSTALL_mesh" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
+      <config projectName="shirabedevelopment" targetName="math" />
+      <config projectName="shirabedevelopment" targetName="graphicsapi" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true">
@@ -265,21 +265,12 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/include/base.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/include/base.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/databuffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/databuffer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/materials/core/core.material" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/core/core.material" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/declaration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/declaration.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cresourcemanager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cresourcemanager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" afterDir="false" />
     </list>
@@ -692,6 +683,9 @@
       <workItem from="1575726097553" duration="26021000" />
       <workItem from="1575920160273" duration="5755000" />
       <workItem from="1575952059624" duration="17724000" />
+      <workItem from="1576167583391" duration="1206000" />
+      <workItem from="1576304313810" duration="6873000" />
+      <workItem from="1576313748831" duration="6531000" />
     </task>
     <servers />
   </component>
@@ -740,13 +734,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/_deploy/linux64/debug/include/material/assetloader.h</url>
-          <line>187</line>
+          <line>193</line>
           <option name="timeStamp" value="80" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp</url>
-          <line>522</line>
-          <option name="timeStamp" value="106" />
+          <url>file://$PROJECT_DIR$/_deploy/linux64/debug/include/material/assetloader.h</url>
+          <line>338</line>
+          <option name="timeStamp" value="131" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/_deploy/linux64/debug/include/material/assetloader.h</url>
+          <line>315</line>
+          <option name="timeStamp" value="153" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

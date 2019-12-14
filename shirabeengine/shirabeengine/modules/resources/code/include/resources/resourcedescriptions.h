@@ -240,6 +240,7 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialPipelineDependencies
         {
+            ResourceId_t              systemUBOPipelineId;
             ResourceId_t              referenceRenderPassId;
             uint32_t                  subpass;
             ResourceId_t              shaderModuleId;

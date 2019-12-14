@@ -1,6 +1,6 @@
 {
-    "uid"                       : 1337,
-    "name"                      : "Standard",
+    "uid"                       : 1042,
+    "name"                      : "Core",
     "signatureFilename"         : 0,
     "baseConfigurationFilename" : 0,
     "stages" :
