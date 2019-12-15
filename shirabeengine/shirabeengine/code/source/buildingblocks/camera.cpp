@@ -82,7 +82,7 @@ namespace engine
 
         CVector3D_t const n_up      = math::normalize(aUp);
         CVector3D_t const n_forward = math::normalize(aForward);
-        CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
+        CVector3D_t const n_right   = math::normalize(math::cross(n_up, n_forward));
 
         CMatrix4x4 const orientation = CMatrix4x4({
             n_right  .x(),   n_right.y(),   n_right.z(), 0.0f,
@@ -157,7 +157,7 @@ namespace engine
             CVector4D_t       const &aBounds,
             double            const &aNear,
             double            const &aFar,
-            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::LH)
+            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
         float const coordinateSystemFactor = ((aCoordinateSystem == ECoordinateSystem::LH) ? 1.0 : -1.0);
 
@@ -200,7 +200,7 @@ namespace engine
             double            const &aNear,
             double            const &aFar,
             double            const &aFovY,
-            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::LH)
+            ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
         float const aspect       =  static_cast<float>(aBounds.size.x()) / static_cast<float>(aBounds.size.y());
         float const fovFactorRad =  ( (static_cast<float>(aFovY) / 2.0f) * static_cast<float>(M_PI / 180.0) );

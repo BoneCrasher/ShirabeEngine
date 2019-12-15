@@ -9,7 +9,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CQuaternion::CQuaternion()
-            : CVector4D_t({ 0, 0, 0, 0 })
+            : CVector4D_t({ 0, 0, 0, 1 })
         {
         }
         //<-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace engine
         CQuaternion::CQuaternion(
                 ValueType_t const &aPhi,
                 CVector3D_t const &aAxis)
-            : CVector4D_t({ aPhi, aAxis.x(), aAxis.y(), aAxis.z() })
+            : CVector4D_t({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
         {}
         //<-----------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace engine
                 ValueType_t const &aAxisX,
                 ValueType_t const &aAxisY,
                 ValueType_t const &aAxisZ)
-            : CVector4D_t({ aPhi, aAxisX, aAxisY, aAxisZ })
+            : CVector4D_t({ aAxisX, aAxisY, aAxisZ, aPhi })
         {
         }
 
@@ -169,7 +169,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CQuaternion::ValueType_t CQuaternion::magnitude() const
         {
-            return static_cast<ValueType_t>(sqrt(w()*w() + x()*x() + y()*y() + z()*z()));
+            return static_cast<ValueType_t>(sqrt(x()*x() + y()*y() + z()*z() + w()*w()));
         }
         //<-----------------------------------------------------------------------------
 
@@ -204,7 +204,7 @@ namespace engine
 
             CQuaternion const q
                     = CQuaternion(
-                        w() / N,
+                        w()  / N,
                         x() / N,
                         y() / N,
                         z() / N

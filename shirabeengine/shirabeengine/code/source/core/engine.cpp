@@ -367,9 +367,19 @@ namespace engine
 
             mScene.addEntity(std::move(barramundi));
 
+            CCamera::SFrustumParameters frustum {};
+            frustum.width             = windowWidth;
+            frustum.height            = windowHeight;
+            frustum.nearPlaneDistance = 0.1;
+            frustum.farPlaneDistance  = 1000.0;
+            frustum.fovY              = static_cast<float>(M_PI) / 4.0f;
+
+            CCamera::SProjectionParameters projection {};
+            projection.projectionType = ECameraProjectionType::Perspective;
+
             mCamera = makeShared<CCamera>(ECameraViewType::FreeCamera
-                                        , CCamera::SFrustumParameters::Default()
-                                        , CCamera::SProjectionParameters::Default());
+                                        , frustum
+                                        , projection);
             mCamera->transform().translate(CVector3D_t({0.0, 0.0, -10.0}));
         }
         catch(std::exception &stde)

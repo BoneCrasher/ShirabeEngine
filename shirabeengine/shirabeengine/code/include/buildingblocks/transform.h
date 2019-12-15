@@ -150,7 +150,7 @@ namespace engine
          */
         SHIRABE_INLINE CVector3D_t forward() const
         {
-            return CQuaternion::eulerFromQuaternion(mLocalRotationQuaternion * CVector3D_t::forward());
+            return (mLocalRotationQuaternion * CVector3D_t::forward()).vector();
         }
 
         /**
@@ -160,7 +160,7 @@ namespace engine
          */
         SHIRABE_INLINE CVector3D_t right() const
         {
-            return CQuaternion::eulerFromQuaternion(mLocalRotationQuaternion * CVector3D_t::right());
+            return (mLocalRotationQuaternion * CVector3D_t::right()).vector();
         }
 
         /**
@@ -170,7 +170,7 @@ namespace engine
          */
         SHIRABE_INLINE CVector3D_t up() const
         {
-            return CQuaternion::eulerFromQuaternion(mLocalRotationQuaternion * CVector3D_t::up());
+            return (mLocalRotationQuaternion * CVector3D_t::up()).vector();
         }
 
         /**

@@ -377,13 +377,12 @@ namespace engine
         static CQuaternion operator*(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)
         {
             // qp = (nq*np - dot(vq, vp)) + (nq*vp + np*vq + cross(vq, vp))ijk
-
-            CQuaternion::ValueType_t w = aQuaternionLHS.w() * aQuaternionLHS.w();
-            CVector3D_t              i =   (aQuaternionRHS.vector() * aQuaternionLHS.w())
-                                         + (aQuaternionRHS.w()      * aQuaternionLHS.vector())
+            CQuaternion::ValueType_t w = (aQuaternionLHS.w() * aQuaternionRHS.w() - dot(aQuaternionLHS.vector(), aQuaternionRHS.vector()));
+            CVector3D_t              v =   (aQuaternionLHS.w() * aQuaternionRHS.vector() )
+                                         + (aQuaternionRHS.w() * aQuaternionLHS.vector())
                                          + cross(aQuaternionLHS.vector(), aQuaternionRHS.vector());
 
-            return CQuaternion(w, i);
+            return CQuaternion(w, v);
         }
 
         /**
@@ -395,12 +394,11 @@ namespace engine
          */
         static CQuaternion operator*(CQuaternion const &aQuaternion, CVector3D_t const &aVector)
         {
-            // qp = (nq*0 - dot(vq, vp)) + (nq*vp + 0*vq + cross(vq, vp))ijk
-            CQuaternion qv = CQuaternion(0, aVector);
-            CQuaternion qw = CQuaternion(aQuaternion);
-            qw.normalize();
+            CQuaternion qv  = CQuaternion(0, aVector);
+            CQuaternion qw  = CQuaternion(aQuaternion);
             CQuaternion iqw = qw.inverse();
-            CQuaternion qv_ = qw * qv * iqw;
+            CQuaternion cqw = qw.conjugate();
+            CQuaternion qv_ = qw * (qv * iqw);
 
             return qv_;
         }
@@ -414,7 +412,6 @@ namespace engine
          */
         static CQuaternion operator*(CVector3D_t const &aVector, CQuaternion const &aQuaternion)
         {
-            // qp = (nq*0 - dot(vq, vp)) + (nq*vp + 0*vq + cross(vq, vp))ijk
             CQuaternion qv = CQuaternion(0, aVector);
             CQuaternion qw = CQuaternion(aQuaternion);
             qw.normalize();
