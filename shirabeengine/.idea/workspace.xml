@@ -265,12 +265,12 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/field.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/field.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/transform.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/transform.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/matrix.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/matrix.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/vector.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/vector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/source/math/quaternion.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/source/math/quaternion.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -683,7 +683,7 @@
       <workItem from="1575952059624" duration="17724000" />
       <workItem from="1576167583391" duration="1206000" />
       <workItem from="1576304313810" duration="6873000" />
-      <workItem from="1576313748831" duration="15316000" />
+      <workItem from="1576313748831" duration="23305000" />
     </task>
     <servers />
   </component>
@@ -751,14 +751,14 @@
           <option name="timeStamp" value="215" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/camera.cpp</url>
-          <line>256</line>
-          <option name="timeStamp" value="218" />
+          <url>file://$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/transform.h</url>
+          <line>172</line>
+          <option name="timeStamp" value="230" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp</url>
-          <line>372</line>
-          <option name="timeStamp" value="219" />
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h</url>
+          <line>404</line>
+          <option name="timeStamp" value="234" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

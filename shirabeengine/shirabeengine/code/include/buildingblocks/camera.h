@@ -211,6 +211,7 @@ namespace engine
 
         SHIRABE_INLINE void update()
         {
+            mTransform.updateWorldTransform(CMatrix4x4::identity());
             createViewMatrix();
             createProjectionMatrix();
         }

@@ -7,7 +7,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform::CTransform()
         : mLocalScale             (CVector3D_t({ 1.0f, 1.0f, 1.0f }))
-        , mLocalRotationQuaternion(CQuaternion( 0.0f, 0.0f, 0.0f, 0.0f ))
+        , mLocalRotationQuaternion(CQuaternion( 1.0f, 0.0f, 0.0f, 0.0f ))
         , mLocalTranslation       (CVector3D_t({ 0.0f, 0.0f, 0.0f }))
         , mCurrentLocalTransform  (CMatrix4x4::identity())
         , mCurrentWorldTransform  (CMatrix4x4::identity())
@@ -27,8 +27,10 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::rotate(CVector3D_t const &aEulerRotation)
     {
-        SHIRABE_UNUSED(aEulerRotation);
+        auto const q = CQuaternion::quaternionFromEuler(aEulerRotation);
+        mLocalRotationQuaternion *= q;
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -39,9 +41,10 @@ namespace engine
     CTransform &CTransform::rotate(CVector3D_t const &aAxis,
                                    float       const &aPhi)
     {
-        SHIRABE_UNUSED(aAxis);
-        SHIRABE_UNUSED(aPhi);
+        auto const q = CQuaternion::quaternionFromAxisAngle(aAxis, aPhi);
+        mLocalRotationQuaternion *= q;
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -51,8 +54,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::rotate(CQuaternion const &aQuaternionRotation)
     {
-        SHIRABE_UNUSED(aQuaternionRotation);
+        mLocalRotationQuaternion *= aQuaternionRotation;
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -62,8 +66,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetRotation(CVector3D_t const &aEulerRotation)
     {
-        SHIRABE_UNUSED(aEulerRotation);
+        mLocalRotationQuaternion = CQuaternion::quaternionFromEuler(aEulerRotation);
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -74,9 +79,9 @@ namespace engine
     CTransform &CTransform::resetRotation(CVector3D_t const &aAxis,
                                           float       const &aPhi)
     {
-        SHIRABE_UNUSED(aAxis);
-        SHIRABE_UNUSED(aPhi);
+        mLocalRotationQuaternion = CQuaternion::quaternionFromAxisAngle(aAxis, aPhi);
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -86,8 +91,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetRotation(CQuaternion const &aQuaternionRotation)
     {
-        SHIRABE_UNUSED(aQuaternionRotation);
+        mLocalRotationQuaternion = aQuaternionRotation;
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -97,8 +103,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::translate(CVector3D_t const &aTranslation)
     {
-        this->mLocalTranslation += aTranslation;
+        mLocalTranslation += aTranslation;
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -108,7 +115,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetTranslation(CVector3D_t const &aTranslation)
     {
-        this->mLocalTranslation = aTranslation;
+        mLocalTranslation = aTranslation;
+
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -118,8 +127,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::scale(float const &aFactor)
     {
-        SHIRABE_UNUSED(aFactor);
+        mLocalScale.scale(aFactor);
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -129,8 +139,11 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::scale(CVector3D_t const &aFactors)
     {
-        SHIRABE_UNUSED(aFactors);
+        mLocalScale.x(mLocalScale.x() * aFactors.x());
+        mLocalScale.y(mLocalScale.y() * aFactors.y());
+        mLocalScale.z(mLocalScale.z() * aFactors.z());
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -140,8 +153,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetScale(float const &aFactor)
     {
-        SHIRABE_UNUSED(aFactor);
+        mLocalScale = {aFactor, aFactor, aFactor};
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -151,8 +165,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetScale(CVector3D_t const &aFactors)
     {
-        SHIRABE_UNUSED(aFactors);
+        mLocalScale = aFactors;
 
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -162,6 +177,11 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::reset()
     {
+        resetScale({1.0f, 1.0f, 1.0f});
+        resetRotation(CQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+        resetTranslation();
+
+        mDirty = true;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
@@ -171,6 +191,24 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CMatrix4x4 const &CTransform::local()
     {
+        if(mDirty)
+        {
+            CMatrix4x4 scale = CMatrix4x4::identity();
+            scale.r00(mLocalScale.x());
+            scale.r11(mLocalScale.y());
+            scale.r22(mLocalScale.z());
+
+            CMatrix4x4 rotation = CQuaternion::rotationMatrixFromQuaternion(mLocalRotationQuaternion);
+
+            CMatrix4x4 translation = CMatrix4x4::identity();
+            translation.r03(mLocalTranslation.x());
+            translation.r13(mLocalTranslation.y());
+            translation.r23(mLocalTranslation.z());
+
+            mCurrentLocalTransform = SMMatrixMultiply(translation, SMMatrixMultiply(rotation, scale));
+            mDirty = false;
+        }
+
         return mCurrentLocalTransform;
     }
     //<-----------------------------------------------------------------------------
@@ -189,9 +227,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CMatrix4x4 const &CTransform::updateWorldTransform(CMatrix4x4 const &aParent)
     {
-        SHIRABE_UNUSED(aParent);
-
-        return mCurrentWorldTransform;
+        return (mCurrentWorldTransform = SMMatrixMultiply(aParent, local()));
     }
     //<-----------------------------------------------------------------------------
 }

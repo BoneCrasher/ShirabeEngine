@@ -245,6 +245,11 @@ namespace engine
                     ValueType_t const &aY,
                     ValueType_t const &aZ);
 
+            static CQuaternion quaternionFromEuler(CVector3D_t const &aEulerVector)
+            {
+                return quaternionFromEuler(aEulerVector.x(), aEulerVector.y(), aEulerVector.z());
+            }
+
         private_methods:
             /**
              * Assign an angle aPhi and three axis components to this quaternion.
@@ -363,6 +368,25 @@ namespace engine
         }
 
         /**
+         * Return the product of two quaternions.
+         *
+         * @param aQuaternionLHS
+         * @param aQuaternionRHS
+         * @return
+         */
+        static CQuaternion operator*(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)
+        {
+            // qp = (nq*np - dot(vq, vp)) + (nq*vp + np*vq + cross(vq, vp))ijk
+
+            CQuaternion::ValueType_t w = aQuaternionLHS.w() * aQuaternionLHS.w();
+            CVector3D_t              i =   (aQuaternionRHS.vector() * aQuaternionLHS.w())
+                                         + (aQuaternionRHS.w()      * aQuaternionLHS.vector())
+                                         + cross(aQuaternionLHS.vector(), aQuaternionRHS.vector());
+
+            return CQuaternion(w, i);
+        }
+
+        /**
          * Return the product of a quaternion and a vector.
          *
          * @param aQuaternion
@@ -372,16 +396,13 @@ namespace engine
         static CQuaternion operator*(CQuaternion const &aQuaternion, CVector3D_t const &aVector)
         {
             // qp = (nq*0 - dot(vq, vp)) + (nq*vp + 0*vq + cross(vq, vp))ijk
+            CQuaternion qv = CQuaternion(0, aVector);
+            CQuaternion qw = CQuaternion(aQuaternion);
+            qw.normalize();
+            CQuaternion iqw = qw.inverse();
+            CQuaternion qv_ = qw * qv * iqw;
 
-            CQuaternion q
-                    = CQuaternion(
-                        -((aQuaternion.x() * aVector.x()) + (aQuaternion.y() * aVector.y()) + (aQuaternion.z() * aVector.z())),
-                        +((aQuaternion.w() * aVector.x()) + (aQuaternion.y() * aVector.z()) - (aQuaternion.z() * aVector.y())),
-                        +((aQuaternion.w() * aVector.y()) + (aQuaternion.z() * aVector.x()) - (aQuaternion.x() * aVector.z())),
-                        +((aQuaternion.w() * aVector.z()) + (aQuaternion.x() * aVector.y()) - (aQuaternion.y() * aVector.x()))
-                        );
-
-            return q;
+            return qv_;
         }
 
         /**
@@ -393,39 +414,14 @@ namespace engine
          */
         static CQuaternion operator*(CVector3D_t const &aVector, CQuaternion const &aQuaternion)
         {
-            // qp = (0*0 - dot(vq, vp)) + (0*vp + 0*vq + cross(vq, vp))ijk
+            // qp = (nq*0 - dot(vq, vp)) + (nq*vp + 0*vq + cross(vq, vp))ijk
+            CQuaternion qv = CQuaternion(0, aVector);
+            CQuaternion qw = CQuaternion(aQuaternion);
+            qw.normalize();
+            CQuaternion iqw = qw.inverse();
+            CQuaternion qv_ = (qw * qv) * iqw;
 
-            CQuaternion q
-                    = CQuaternion(
-                        -((aQuaternion.x() * aVector.x()) + (aQuaternion.y() * aVector.y()) + (aQuaternion.z() * aVector.z())),
-                        +((aQuaternion.w() * aVector.x()) + (aQuaternion.z() * aVector.y()) - (aQuaternion.y() * aVector.z())),
-                        +((aQuaternion.w() * aVector.y()) + (aQuaternion.x() * aVector.z()) - (aQuaternion.z() * aVector.x())),
-                        +((aQuaternion.w() * aVector.z()) + (aQuaternion.y() * aVector.x()) - (aQuaternion.x() * aVector.y()))
-                        );
-
-            return q;
-        }
-
-        /**
-         * Return the product of two quaternions.
-         *
-         * @param aQuaternionLHS
-         * @param aQuaternionRHS
-         * @return
-         */
-        static CQuaternion operator*(CQuaternion const &aQuaternionLHS, CQuaternion const &aQuaternionRHS)
-        {
-            // qp = (nq*np - dot(vq, vp)) + (nq*vp + np*vq + cross(vq, vp))ijk
-
-            CQuaternion q
-                    = CQuaternion(
-                        (aQuaternionLHS.w() * aQuaternionRHS.w()) - (aQuaternionLHS.x() * aQuaternionRHS.x()) - (aQuaternionLHS.y() * aQuaternionRHS.y()) - (aQuaternionLHS.z() * aQuaternionRHS.z()),
-                        (aQuaternionLHS.w() * aQuaternionRHS.x()) + (aQuaternionLHS.x() * aQuaternionRHS.w()) + (aQuaternionLHS.y() * aQuaternionRHS.z()) - (aQuaternionLHS.z() * aQuaternionRHS.y()),
-                        (aQuaternionLHS.w() * aQuaternionRHS.y()) + (aQuaternionLHS.y() * aQuaternionRHS.w()) + (aQuaternionLHS.z() * aQuaternionRHS.x()) - (aQuaternionLHS.x() * aQuaternionRHS.z()),
-                        (aQuaternionLHS.w() * aQuaternionRHS.z()) + (aQuaternionLHS.z() * aQuaternionRHS.w()) + (aQuaternionLHS.x() * aQuaternionRHS.y()) - (aQuaternionLHS.y() * aQuaternionRHS.x())
-                        );
-
-            return q;
+            return qv_;
         }
 
         /**

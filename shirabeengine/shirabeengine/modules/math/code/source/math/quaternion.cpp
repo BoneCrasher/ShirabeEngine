@@ -405,7 +405,7 @@ namespace engine
                 v = CVector3D_t({
                                     rad_to_deg(0.0f),                                    // phi
                                     rad_to_deg((-((ValueType_t)M_PI / 2.0f)*r20 / tmp)), // tau
-                                    rad_to_deg(atan2(-r01, -r20*r02))                    // psi
+                                    rad_to_deg(atan2(-r01, -r20*r02))                 // psi
                                 });
             }
             else

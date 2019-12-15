@@ -134,15 +134,12 @@ namespace engine
              */
             static MatrixType_t identity()
             {
-                MatrixType_t              identity = MatrixType_t();
-                MatrixType_t::ValueType_t *ptr     = identity.ptr();
-
-                for (size_t i = 0; i < NColumnCount; ++i)
-                {
-                    ptr[(i * NColumnCount) + i] = 1;
-                }
-
-				return identity;
+                std::array<ValueType_t, (NRowCount * NColumnCount)> array =
+                       { 1.0, 0.0, 0.0, 0.0
+                       , 0.0, 1.0, 0.0, 0.0
+                       , 0.0, 0.0, 1.0, 0.0
+                       , 0.0, 0.0, 0.0, 1.0 };
+                return array;
 			}
 
             /**
@@ -619,6 +616,15 @@ namespace engine
             CMatrix4x4(CMatrix4x4 const &aOther)
                 : BaseType_t(aOther)
 			{}
+
+            /**
+             * Construct a 4x4 for matrix from another 4x4 matrix.
+             *
+             * @param aOther
+             */
+            CMatrix4x4(CMatrix4x4::MatrixType_t const &aOther)
+                    : BaseType_t(aOther)
+            {}
 
         public_destructors:
             /**
