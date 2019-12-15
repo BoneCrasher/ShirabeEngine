@@ -97,7 +97,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::translate(CVector3D_t const &aTranslation)
     {
-        SHIRABE_UNUSED(aTranslation);
+        this->mLocalTranslation += aTranslation;
 
         return (*this);
     }
@@ -108,8 +108,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CTransform &CTransform::resetTranslation(CVector3D_t const &aTranslation)
     {
-        SHIRABE_UNUSED(aTranslation);
-
+        this->mLocalTranslation = aTranslation;
         return (*this);
     }
     //<-----------------------------------------------------------------------------
