@@ -210,7 +210,8 @@ namespace engine
                 return EEngineStatus::Error;
             }
 
-            memcpy(data, (void*)aDataSource.data(), size);
+            auto input = aDataSource.data();
+            memcpy(data, (void*)input, size);
             vkUnmapMemory(device, gpuBuffer->attachedMemory);
 
 
@@ -435,8 +436,7 @@ namespace engine
         {
             SHIRABE_UNUSED(aSwapChainResourceId);
 
-            SVulkanState     &vkState     = mVulkanEnvironment->getState();
-            SVulkanSwapChain &vkSwapChain = vkState.swapChain;
+            SVulkanState &vkState = mVulkanEnvironment->getState();
 
             uint32_t nextImageIndex = 0;
 
@@ -463,6 +463,8 @@ namespace engine
                     case VkResult::VK_ERROR_OUT_OF_DATE_KHR:
                     case VkResult::VK_SUBOPTIMAL_KHR:
                         mVulkanEnvironment->recreateSwapChain();
+                        swapChain = vkState.swapChain.handle;
+                        semaphore = vkState.swapChain.imageAvailableSemaphore;
                         break;
                     case VkResult::VK_SUCCESS:
                         break;

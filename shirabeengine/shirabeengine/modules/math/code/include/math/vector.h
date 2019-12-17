@@ -42,7 +42,7 @@ namespace engine
             typename vec_type<T, vec_size>::ValueType_t const                           \
             vec_type<T, vec_size>::component() const                                   \
             {                                                                          \
-                return this->mField[index];                                            \
+                return this->const_data().field[index];                                \
             }
         
         /**
@@ -1138,7 +1138,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 1>::x(ValueType_t const &aValue)
         {
-            this->mField[ 0 ] = aValue;
+            this->data().field[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1226,7 +1226,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 2>::x(ValueType_t const &aValue)
         {
-            this->mField[ 0 ] = aValue;
+            this->data().field[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1236,7 +1236,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 2>::y(ValueType_t const &aValue)
         {
-            this->mField[ 1 ] = aValue;
+            this->data().field[ 1 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1347,7 +1347,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 3>::x(ValueType_t const &aValue)
         {
-            this->mField[ 0 ] = aValue;
+            this->data().field[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1357,7 +1357,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 3>::y(ValueType_t const &aValue)
         {
-            this->mField[ 1 ] = aValue;
+            this->data().field[ 1 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1367,7 +1367,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 3>::z(ValueType_t const &aValue)
         {
-            this->mField[ 2 ] = aValue;
+            this->data().field[ 2 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1502,7 +1502,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 4>::x(ValueType_t const &aValue)
         {
-            this->mField[ 0 ] = aValue;
+            this->data().field[ 0 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1512,7 +1512,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 4>::y(ValueType_t const &aValue)
         {
-            this->mField[ 1 ] = aValue;
+            this->data().field[ 1 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1522,7 +1522,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 4>::z(ValueType_t const &aValue)
         {
-            this->mField[ 2 ] = aValue;
+            this->data().field[ 2 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 
@@ -1532,7 +1532,7 @@ namespace engine
         template <typename T>
         void CVectorImpl<T, 4>::w(ValueType_t const &aValue)
         {
-            this->mField[ 3 ] = aValue;
+            this->data().field[ 3 ] = aValue;
         }
         //<-----------------------------------------------------------------------------
 

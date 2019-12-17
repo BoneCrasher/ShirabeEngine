@@ -29,6 +29,17 @@ namespace engine
         #define SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE() \
             static_assert(((TN % TStride) == 0), "Invalid TN and TStride combination.");
 
+        template <typename T, size_t TN>
+        struct SFieldData
+        {
+            SFieldData& operator=(SFieldData const &aOther)
+            {
+                memcpy(field, aOther.field, sizeof(T) * TN);
+                return (*this);
+            }
+
+            T field[TN];
+        };
 
         /**
          * Defines a templated, non-growable field-type to hold certain type of data as
@@ -55,6 +66,7 @@ namespace engine
         public_typedefs:
             using ClassType_t       = CField<T, TByteSize, TN, TStride>;
             using ValueType_t       = T;
+            using FieldDataType_t   = SFieldData<T, TN>;
 
         public_constructors:
             /**
@@ -163,6 +175,9 @@ namespace engine
              */
             T *const ptr();
 
+            FieldDataType_t&       data()            ;
+            FieldDataType_t const& const_data() const;
+
             /**
              * Return the total number of elements in the field.
              *
@@ -204,7 +219,7 @@ namespace engine
             void assign(ClassType_t const & aOther);
 
         protected_members:
-            T mField[TN];
+            SFieldData<T, TN> mData;
         };
         //<-----------------------------------------------------------------------------
 
@@ -232,7 +247,7 @@ namespace engine
             for(typename std::array<T, TN>::value_type const &v : aSource)
             {
                 if(i < TN)
-                    mField[i++] = v;
+                    mData.field[i++] = v;
             }
         }
         //<-----------------------------------------------------------------------------
@@ -272,7 +287,7 @@ namespace engine
             SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
             if (TN > 0 && TN > aIndex)
-                return *(mField + aIndex);
+                return *(mData.field + aIndex);
 
             throw std::out_of_range("Index out of field bounds.");
         }        
@@ -286,7 +301,7 @@ namespace engine
         {
             // Cast to const this, so that we can reuse the const operator[].
             ClassType_t const*const cthis  = static_cast<ClassType_t const*const>(this);
-            ValueType_t const &      cvalue = cthis->operator[](aIndex);
+            ValueType_t const &     cvalue = cthis->operator[](aIndex);
             ValueType_t      &      value  = const_cast<ValueType_t&>(cvalue);
             return value;
         }
@@ -298,7 +313,7 @@ namespace engine
         SHIRABE_FIELD_TEMPLATE_DECL
         bool SHIRABE_FIELD::operator==(ClassType_t const &aOther)
         {
-            int32_t result = memcmp(mField, aOther.mField, (TByteSize * TN));
+            int32_t result = memcmp(mData.field, aOther.mData.field, (TByteSize * TN));
             return (result == 0);
         }
         //<-----------------------------------------------------------------------------
@@ -310,7 +325,7 @@ namespace engine
         void SHIRABE_FIELD::operator+=(ClassType_t const & aOther)
         {
             for(size_t i = 0; i < TN; ++i)
-                mField[i] += aOther[i];
+                mData.field[i] += aOther[i];
         }
         //<-----------------------------------------------------------------------------
 
@@ -321,7 +336,7 @@ namespace engine
         void SHIRABE_FIELD::operator-=(ClassType_t const & aRight)
         {
             for(size_t i = 0; i < TN; ++i)
-                mField[i] -= aRight[i];
+                mData.field[i] -= aRight[i];
         }
         //<-----------------------------------------------------------------------------
 
@@ -332,7 +347,7 @@ namespace engine
         void SHIRABE_FIELD::operator*=(T const aFactor)
         {
             for(size_t i = 0; i < TN; ++i)
-                mField[i] *= aFactor;
+                mData.field[i] *= aFactor;
         }
         //<-----------------------------------------------------------------------------
 
@@ -352,7 +367,7 @@ namespace engine
         SHIRABE_FIELD_TEMPLATE_DECL
         void SHIRABE_FIELD::assign(ClassType_t const & aOther)
         {
-            memcpy(mField, aOther.const_ptr(), (TN * TByteSize));
+            memcpy(&mData.field[0], (void*)aOther.const_ptr(), (TN * TByteSize));
         }
         //<-----------------------------------------------------------------------------
 
@@ -362,7 +377,7 @@ namespace engine
         SHIRABE_FIELD_TEMPLATE_DECL
         T const* const SHIRABE_FIELD::const_ptr() const
         {
-            return &mField[0];
+            return &mData.field[0];
         }
         //<-----------------------------------------------------------------------------
 
@@ -372,7 +387,27 @@ namespace engine
         SHIRABE_FIELD_TEMPLATE_DECL
         T * const SHIRABE_FIELD::ptr()
         {
-            return mField;
+            return mData.field;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        SHIRABE_FIELD_TEMPLATE_DECL
+        typename SHIRABE_FIELD::FieldDataType_t& SHIRABE_FIELD::data()
+        {
+            return mData;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        SHIRABE_FIELD_TEMPLATE_DECL
+        typename SHIRABE_FIELD::FieldDataType_t const& SHIRABE_FIELD::const_data() const
+        {
+            return mData;
         }
         //<-----------------------------------------------------------------------------
 
@@ -418,7 +453,7 @@ namespace engine
                 for (size_t j = 0; j < TStride; ++j)
                 {
                     ss << (((j) == 0) ? "" : ", ");
-                    ss << mField[i + j];
+                    ss << mData.field[i + j];
                 }
 
                 ss << ",\n";

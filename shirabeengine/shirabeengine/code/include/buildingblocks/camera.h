@@ -211,9 +211,10 @@ namespace engine
 
         SHIRABE_INLINE void update()
         {
+            ECoordinateSystem system = ECoordinateSystem::RH;
             mTransform.updateWorldTransform(CMatrix4x4::identity());
-            createViewMatrix();
-            createProjectionMatrix();
+            createViewMatrix(system);
+            createProjectionMatrix(system);
         }
 
     private_methods:

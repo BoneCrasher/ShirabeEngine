@@ -86,6 +86,7 @@ namespace engine
             using ClassType_t           = CMatrix<NRowCount, NColumnCount>                                       ;
             using MatrixType_t          = ClassType_t                                                            ;
             using TransposeMatrixType_t = CMatrix<NColumnCount, NRowCount>                                       ;
+            using MatrixData_t          = typename BaseType_t::FieldDataType_t                                   ;
 
         public_constructors:
             /**
@@ -362,9 +363,10 @@ namespace engine
             : public CMatrix<N, N>
 		{
         public_typedefs:
-            using BaseType_t  =          CMatrix<N, N>          ;
-            using ClassType_t =          CSquareMatrix<N>       ;
-            using ValueType_t = typename BaseType_t::ValueType_t;
+            using BaseType_t   =          CMatrix<N, N>          ;
+            using ClassType_t  =          CSquareMatrix<N>       ;
+            using ValueType_t  = typename BaseType_t::ValueType_t;
+            using MatrixData_t = typename BaseType_t::MatrixData_t;
 
         public_constructors:
             /**
@@ -417,6 +419,7 @@ namespace engine
             using BaseType_t  = CSquareMatrix<2>                ;
             using ClassType_t = CMatrix2x2                      ;
             using ValueType_t = typename BaseType_t::ValueType_t;
+            using MatrixData_t = typename BaseType_t::MatrixData_t;
 
         public_constructors:
             /**
@@ -459,16 +462,16 @@ namespace engine
 
         public_methods:
             // Per-Component read access.
-            ValueType_t const &r00() const { return mField[0]; }
-            ValueType_t const &r01() const { return mField[1]; }
-            ValueType_t const &r10() const { return mField[2]; }
-            ValueType_t const &r11() const { return mField[3]; }
+            ValueType_t const &r00() const { return const_data().field[0]; }
+            ValueType_t const &r01() const { return const_data().field[1]; }
+            ValueType_t const &r10() const { return const_data().field[2]; }
+            ValueType_t const &r11() const { return const_data().field[3]; }
 
             // Per-Component write access.
-            ValueType_t const &r00(ValueType_t const &aValue) { return (mField[0] = aValue); }
-            ValueType_t const &r01(ValueType_t const &aValue) { return (mField[1] = aValue); }
-            ValueType_t const &r10(ValueType_t const &aValue) { return (mField[2] = aValue); }
-            ValueType_t const &r11(ValueType_t const &aValue) { return (mField[3] = aValue); }
+            ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0] = aValue); }
+            ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1] = aValue); }
+            ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[2] = aValue); }
+            ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[3] = aValue); }
 
             /**
              * Calculate the 2x2 matrix's determinant applying the fish-rule.
@@ -495,6 +498,7 @@ namespace engine
             using BaseType_t  = CSquareMatrix<3>       ;
             using ClassType_t = CMatrix3x3             ;
             using ValueType_t = BaseType_t::ValueType_t;
+            using MatrixData_t = typename BaseType_t::MatrixData_t;
 
         public_constructors:
             /**
@@ -537,26 +541,26 @@ namespace engine
 
         public_methods:
             // Per-Component read access.
-            ValueType_t const &r00() const { return mField[0]; }
-            ValueType_t const &r01() const { return mField[1]; }
-            ValueType_t const &r02() const { return mField[2]; }
-            ValueType_t const &r10() const { return mField[3]; }
-            ValueType_t const &r11() const { return mField[4]; }
-            ValueType_t const &r12() const { return mField[5]; }
-            ValueType_t const &r20() const { return mField[6]; }
-            ValueType_t const &r21() const { return mField[7]; }
-            ValueType_t const &r22() const { return mField[8]; }
+            ValueType_t const &r00() const { return const_data().field[0]; }
+            ValueType_t const &r01() const { return const_data().field[1]; }
+            ValueType_t const &r02() const { return const_data().field[2]; }
+            ValueType_t const &r10() const { return const_data().field[3]; }
+            ValueType_t const &r11() const { return const_data().field[4]; }
+            ValueType_t const &r12() const { return const_data().field[5]; }
+            ValueType_t const &r20() const { return const_data().field[6]; }
+            ValueType_t const &r21() const { return const_data().field[7]; }
+            ValueType_t const &r22() const { return const_data().field[8]; }
 
             // Per-Component write access.
-            ValueType_t const &r00(ValueType_t const &aValue) { return (mField[0] = aValue); }
-            ValueType_t const &r01(ValueType_t const &aValue) { return (mField[1] = aValue); }
-            ValueType_t const &r02(ValueType_t const &aValue) { return (mField[2] = aValue); }
-            ValueType_t const &r10(ValueType_t const &aValue) { return (mField[3] = aValue); }
-            ValueType_t const &r11(ValueType_t const &aValue) { return (mField[4] = aValue); }
-            ValueType_t const &r12(ValueType_t const &aValue) { return (mField[5] = aValue); }
-            ValueType_t const &r20(ValueType_t const &aValue) { return (mField[6] = aValue); }
-            ValueType_t const &r21(ValueType_t const &aValue) { return (mField[7] = aValue); }
-            ValueType_t const &r22(ValueType_t const &aValue) { return (mField[8] = aValue); }
+            ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0] = aValue); }
+            ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1] = aValue); }
+            ValueType_t const &r02(ValueType_t const &aValue) { return (data().field[2] = aValue); }
+            ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[3] = aValue); }
+            ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[4] = aValue); }
+            ValueType_t const &r12(ValueType_t const &aValue) { return (data().field[5] = aValue); }
+            ValueType_t const &r20(ValueType_t const &aValue) { return (data().field[6] = aValue); }
+            ValueType_t const &r21(ValueType_t const &aValue) { return (data().field[7] = aValue); }
+            ValueType_t const &r22(ValueType_t const &aValue) { return (data().field[8] = aValue); }
 
             /**
              * Calculate the determinant of this matrix using sarrus' rule.
@@ -583,6 +587,8 @@ namespace engine
             using BaseType_t  = CSquareMatrix<4>       ;
             using ClassType_t = CMatrix4x4             ;
             using ValueType_t = BaseType_t::ValueType_t;
+            using MatrixData_t = BaseType_t::MatrixData_t;
+
 
         public_constructors:
             /**
@@ -634,40 +640,40 @@ namespace engine
 
         public_methods:
             // Per-Component read only access.
-            ValueType_t const &r00() const { return mField[0];  }
-            ValueType_t const &r01() const { return mField[1];  }
-            ValueType_t const &r02() const { return mField[2];  }
-            ValueType_t const &r03() const { return mField[3];  }
-            ValueType_t const &r10() const { return mField[4];  }
-            ValueType_t const &r11() const { return mField[5];  }
-            ValueType_t const &r12() const { return mField[6];  }
-            ValueType_t const &r13() const { return mField[7];  }
-            ValueType_t const &r20() const { return mField[8];  }
-            ValueType_t const &r21() const { return mField[9];  }
-            ValueType_t const &r22() const { return mField[10]; }
-            ValueType_t const &r23() const { return mField[11]; }
-            ValueType_t const &r30() const { return mField[12]; }
-            ValueType_t const &r31() const { return mField[13]; }
-            ValueType_t const &r32() const { return mField[14]; }
-            ValueType_t const &r33() const { return mField[15]; }
+            ValueType_t const &r00() const { return const_data().field[0];  }
+            ValueType_t const &r01() const { return const_data().field[1];  }
+            ValueType_t const &r02() const { return const_data().field[2];  }
+            ValueType_t const &r03() const { return const_data().field[3];  }
+            ValueType_t const &r10() const { return const_data().field[4];  }
+            ValueType_t const &r11() const { return const_data().field[5];  }
+            ValueType_t const &r12() const { return const_data().field[6];  }
+            ValueType_t const &r13() const { return const_data().field[7];  }
+            ValueType_t const &r20() const { return const_data().field[8];  }
+            ValueType_t const &r21() const { return const_data().field[9];  }
+            ValueType_t const &r22() const { return const_data().field[10]; }
+            ValueType_t const &r23() const { return const_data().field[11]; }
+            ValueType_t const &r30() const { return const_data().field[12]; }
+            ValueType_t const &r31() const { return const_data().field[13]; }
+            ValueType_t const &r32() const { return const_data().field[14]; }
+            ValueType_t const &r33() const { return const_data().field[15]; }
 
             // Per-Component write access.
-            ValueType_t const &r00(ValueType_t const &aValue) { return (mField[0]  = aValue); }
-            ValueType_t const &r01(ValueType_t const &aValue) { return (mField[1]  = aValue); }
-            ValueType_t const &r02(ValueType_t const &aValue) { return (mField[2]  = aValue); }
-            ValueType_t const &r03(ValueType_t const &aValue) { return (mField[3]  = aValue); }
-            ValueType_t const &r10(ValueType_t const &aValue) { return (mField[4]  = aValue); }
-            ValueType_t const &r11(ValueType_t const &aValue) { return (mField[5]  = aValue); }
-            ValueType_t const &r12(ValueType_t const &aValue) { return (mField[6]  = aValue); }
-            ValueType_t const &r13(ValueType_t const &aValue) { return (mField[7]  = aValue); }
-            ValueType_t const &r20(ValueType_t const &aValue) { return (mField[8]  = aValue); }
-            ValueType_t const &r21(ValueType_t const &aValue) { return (mField[9]  = aValue); }
-            ValueType_t const &r22(ValueType_t const &aValue) { return (mField[10] = aValue); }
-            ValueType_t const &r23(ValueType_t const &aValue) { return (mField[11] = aValue); }
-            ValueType_t const &r30(ValueType_t const &aValue) { return (mField[12] = aValue); }
-            ValueType_t const &r31(ValueType_t const &aValue) { return (mField[13] = aValue); }
-            ValueType_t const &r32(ValueType_t const &aValue) { return (mField[14] = aValue); }
-            ValueType_t const &r33(ValueType_t const &aValue) { return (mField[15] = aValue); }
+            ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0]  = aValue); }
+            ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1]  = aValue); }
+            ValueType_t const &r02(ValueType_t const &aValue) { return (data().field[2]  = aValue); }
+            ValueType_t const &r03(ValueType_t const &aValue) { return (data().field[3]  = aValue); }
+            ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[4]  = aValue); }
+            ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[5]  = aValue); }
+            ValueType_t const &r12(ValueType_t const &aValue) { return (data().field[6]  = aValue); }
+            ValueType_t const &r13(ValueType_t const &aValue) { return (data().field[7]  = aValue); }
+            ValueType_t const &r20(ValueType_t const &aValue) { return (data().field[8]  = aValue); }
+            ValueType_t const &r21(ValueType_t const &aValue) { return (data().field[9]  = aValue); }
+            ValueType_t const &r22(ValueType_t const &aValue) { return (data().field[10] = aValue); }
+            ValueType_t const &r23(ValueType_t const &aValue) { return (data().field[11] = aValue); }
+            ValueType_t const &r30(ValueType_t const &aValue) { return (data().field[12] = aValue); }
+            ValueType_t const &r31(ValueType_t const &aValue) { return (data().field[13] = aValue); }
+            ValueType_t const &r32(ValueType_t const &aValue) { return (data().field[14] = aValue); }
+            ValueType_t const &r33(ValueType_t const &aValue) { return (data().field[15] = aValue); }
 		};
 
 		// Transposition functions. Will always return copies and leave the passed matrix unchanged.

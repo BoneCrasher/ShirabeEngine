@@ -368,11 +368,11 @@ namespace engine
             mScene.addEntity(std::move(barramundi));
 
             CCamera::SFrustumParameters frustum {};
-            frustum.width             = windowWidth;
-            frustum.height            = windowHeight;
-            frustum.nearPlaneDistance = 0.1;
-            frustum.farPlaneDistance  = 1000.0;
-            frustum.fovY              = static_cast<float>(M_PI) / 4.0f;
+            frustum.width             = 1920;
+            frustum.height            = 1080;
+            frustum.nearPlaneDistance = 0.1f;
+            frustum.farPlaneDistance  = 10.0f;
+            frustum.fovY              = static_cast<float>(M_PI) / 4.0f; // 45 degrees
 
             CCamera::SProjectionParameters projection {};
             projection.projectionType = ECameraProjectionType::Perspective;
@@ -452,7 +452,16 @@ namespace engine
         mTimer.resetTick();
         CLog::Debug(logTag(), "Tick...");
 
+        // JUST A TEST, Remove that stuff...
+        static int16_t counter = 0;
+        counter = (++counter % 360);
+
+        float x = cosf( deg_to_rad(static_cast<float>(counter)) );
+        float y = sinf( deg_to_rad(static_cast<float>(counter)) );
+
+        // mCamera->transform().resetTranslation({ 50.0f * x, 25.0f, 50.0f * y});
         mCamera->update();
+
         mScene.update();
 
         if(mRenderer)
@@ -460,20 +469,15 @@ namespace engine
             Unique<ecws::CEntity> const &core = mScene.findEntity("core");
             ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> coreMaterials = core->getTypedComponentsOfType<ecws::CMaterialComponent>();
             Shared<ecws::CMaterialComponent>                           coreMaterial  = *(coreMaterials.begin());
-            coreMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4>("struct_graphicsData", "primaryCamera.view",       mCamera->view());
-            coreMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4>("struct_graphicsData", "primaryCamera.projection", mCamera->projection());
-
-            // JUST A TEST, Remove that stuff...
-            static int16_t counter = 0;
-            counter = (++counter % 360);
-            static float newHorizontalScale = 0.0f;
-            newHorizontalScale = cosf( (((float) counter) / 180.0f) * M_PIf32 );
+            material::CMaterialConfig &config = coreMaterial->getMutableConfiguration();
+            config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.view",       mCamera->view().const_data());
+            config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.projection", mCamera->projection().const_data());
 
             Unique<ecws::CEntity> const &barramundi = mScene.findEntity("barramundi");
             ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> barramundiMaterials = barramundi->getTypedComponentsOfType<ecws::CMaterialComponent>();
             Shared<ecws::CMaterialComponent>                           barramundiMaterial  = *(barramundiMaterials.begin());
-            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", newHorizontalScale);
-            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.3f * newHorizontalScale);
+            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", x);
+            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", y);
 
             RenderableList renderableCollection {};
             renderableCollection.push_back({ core->name()

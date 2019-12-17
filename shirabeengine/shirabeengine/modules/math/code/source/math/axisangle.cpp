@@ -66,7 +66,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         const CAxisAngle::ValueType_t&CAxisAngle::phi() const
         {
-            return mField[3];
+            return const_data().field[3];
         }
         //<-----------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CAxisAngle::ValueType_t const &CAxisAngle::phi(ValueType_t const &aPhi)
         {
-            return (mField[3] = aPhi);
+            return (data().field[3] = aPhi);
         }
         //<-----------------------------------------------------------------------------
 

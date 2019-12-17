@@ -80,25 +80,19 @@ namespace engine
     {      
         SHIRABE_UNUSED(aCoordinateSystem);
 
-        CVector3D_t const n_up      = math::normalize(aUp);
+        CVector3D_t       n_up      = math::normalize(aUp);
         CVector3D_t const n_forward = math::normalize(aForward);
         CVector3D_t const n_right   = math::normalize(math::cross(n_up, n_forward));
+        n_up = math::normalize(math::cross(n_forward, n_right));
 
-        CMatrix4x4 const orientation = CMatrix4x4({
-            n_right  .x(),   n_right.y(),   n_right.z(), 0.0f,
-            n_up     .x(),      n_up.y(),      n_up.z(), 0.0f,
-            n_forward.x(), n_forward.y(), n_forward.z(), 0.0f,
-            0.0f,          0.0f,          0.0f,          1.0f
+        CMatrix4x4 const view = CMatrix4x4({
+                n_right.x(), n_up.x(), n_forward.x(), -dot(n_right,   aEye),
+                n_right.y(), n_up.y(), n_forward.y(), -dot(n_up,      aEye),
+                n_right.z(), n_up.z(), n_forward.z(), -dot(n_forward, aEye),
+                0.0f,        0.0f,     0.0f,          1.0f
         });
 
-        CMatrix4x4 const translation = CMatrix4x4({
-            1.0f,      0.0f,      0.0f,      -aEye.x(),
-            0.0f,      1.0f,      0.0f,      -aEye.y(),
-            0.0f,      0.0f,      1.0f,      -aEye.z(),
-            0.0f,      0.0f,      0.0f,      1.0f
-        });
-
-        return SMMatrixMultiply(orientation, translation);
+        return view;
     }
     //<-----------------------------------------------------------------------------
 
@@ -123,25 +117,19 @@ namespace engine
     {
         SHIRABE_UNUSED(aCoordinateSystem);
 
-        CVector3D_t const n_up      = math::normalize(aUp);
+        CVector3D_t       n_up      = math::normalize(aUp);
         CVector3D_t const n_forward = math::normalize((aTarget - aEye));
         CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
+        n_up = math::normalize(math::cross(n_right, n_forward));
 
-        CMatrix4x4 const orientation = CMatrix4x4({
-                n_right  .x(),   n_right.y(),   n_right.z(), 0.0f,
-                n_up     .x(),      n_up.y(),      n_up.z(), 0.0f,
-                n_forward.x(), n_forward.y(), n_forward.z(), 0.0f,
-                0.0f,          0.0f,          0.0f,          1.0f
+        CMatrix4x4 const view = CMatrix4x4({
+            n_right.x(), n_up.x(), n_forward.x(), -dot(n_right,   aEye),
+            n_right.y(), n_up.y(), n_forward.y(), -dot(n_up,      aEye),
+            n_right.z(), n_up.z(), n_forward.z(), -dot(n_forward, aEye),
+            0.0f,        0.0f,     0.0f,          1.0f
         });
 
-        CMatrix4x4 const translation = CMatrix4x4({
-                1.0f,      0.0f,      0.0f,      -aEye.x(),
-                0.0f,      1.0f,      0.0f,      -aEye.y(),
-                0.0f,      0.0f,      1.0f,      -aEye.z(),
-                0.0f,      0.0f,      0.0f,      1.0f
-        });
-
-        return SMMatrixMultiply(orientation, translation);
+        return view;
     }
 
     /**
@@ -159,7 +147,7 @@ namespace engine
             double            const &aFar,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
-        float const coordinateSystemFactor = ((aCoordinateSystem == ECoordinateSystem::LH) ? 1.0 : -1.0);
+        float const coordinateSystemFactor = ((ECoordinateSystem::LH == aCoordinateSystem) ? 1.0f : -1.0f);
 
         float const l = aBounds.x();
         float const t = aBounds.y();
@@ -174,12 +162,13 @@ namespace engine
         float const n2     = (2.0f * n);
         float const fn2    = (f * n2);
 
-        CMatrix4x4 const projection = CMatrix4x4({
-            (n2 / width),      0.0f,                0.0f,                                     0.0f,
-            0.0f,              -(n2 / height),      0.0f,                                     0.0f,
-            ((r + l) / width), ((t + b) / height), -((f + n) / depth),                        coordinateSystemFactor,
-            0.0f,              0.0f,               -((fn2 / depth) * coordinateSystemFactor), 0.0f
+        CMatrix4x4 projection = CMatrix4x4({
+            (n2 / width),      0.0f,               0.0f,                                       0.0f,
+            0.0f,              (n2 / height),      ((t + b) / height),                         0.0f,
+            ((r + l) / width), ((t + b) / height), coordinateSystemFactor * ((f + n) / depth), coordinateSystemFactor * 1,
+            0.0f,              0.0f,               -(fn2 / depth),                             10.0f
         });
+        projection.r11(-projection.r11()); // Invert for vulkan
 
         return projection;
     }
@@ -202,15 +191,24 @@ namespace engine
             double            const &aFovY,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
-        float const aspect       =  static_cast<float>(aBounds.size.x()) / static_cast<float>(aBounds.size.y());
-        float const fovFactorRad =  ( (static_cast<float>(aFovY) / 2.0f) * static_cast<float>(M_PI / 180.0) );
-        float const t            =  tan(fovFactorRad) * static_cast<float>(aNear);
-        float const b            = -t;
-        float const r            =  t * aspect;
-        float const l            = -r;
+        float const coordinateSystemFactor = ((ECoordinateSystem::LH == aCoordinateSystem) ? 1.0f : -1.0f);
 
-        CMatrix4x4 const projection = projectionPerspectiveRect(CVector4D_t({ l, t, r, b }), aNear, aFar, aCoordinateSystem);
+        auto const aspect       =  static_cast<float>(aBounds.size.x()) / static_cast<float>(aBounds.size.y());
+        auto const fovFactorRad =  tanf( 0.5f * static_cast<float>(aFovY) );
+
+        auto const f = static_cast<float const>(aFar);
+        auto const n = static_cast<float const>(aNear);
+
+        CMatrix4x4 projection = CMatrix4x4({
+                (1.0f / (aspect * fovFactorRad)), 0.0f,                  0.0f,                                         0.0f,
+                0.0f,                             (1.0f / fovFactorRad), 0.0f,                                         0.0f,
+                0.0f,                             0.0f,                  coordinateSystemFactor * ((f) / (f - n)), coordinateSystemFactor * 1,
+                0.0f,                             0.0f,                  -((f * n) / (f - n)),                  0.0f
+        });
+        projection.r11(-projection.r11()); // Invert for vulkan
+
         return projection;
+        // return projectionPerspectiveRect({ l, t, r, b }, aNear, aFar, aCoordinateSystem);
     }
 
     /**
@@ -262,7 +260,7 @@ namespace engine
         switch(mViewType)
         {
         case ECameraViewType::TargetCamera:
-            mat = lookAt(position, mLookAtTarget, up, aCoordinateSystem);
+            mat = lookAt(position, up, mLookAtTarget, aCoordinateSystem);
             break;
         case ECameraViewType::FreeCamera:
             mat = lookTo(position, up, mTransform.forward());
@@ -283,6 +281,15 @@ namespace engine
         switch(mProjectionParameters.projectionType)
         {
         case ECameraProjectionType::Perspective:
+            mat = projectionPerspectiveRect({
+                                (-0.5f * mFrustumParameters.width),
+                                (-0.5f * mFrustumParameters.height),
+                                ( 0.5f * mFrustumParameters.width),
+                                ( 0.5f * mFrustumParameters.height)
+                        },
+                        static_cast<double>(mFrustumParameters.nearPlaneDistance),
+                        static_cast<double>(mFrustumParameters.farPlaneDistance),
+                        aCoordinateSystem);
             mat = projectionPerspectiveFOV(
                         { 0, 0, mFrustumParameters.width, mFrustumParameters.height },
                         static_cast<double>(mFrustumParameters.nearPlaneDistance),
@@ -293,10 +300,10 @@ namespace engine
         case ECameraProjectionType::Orthographic:
             mat = projectionOrtho(
                         CVector4D_t({
-                            (0.5f * mFrustumParameters.width),
-                            (0.5f * mFrustumParameters.height),
-                            (0.5f * mFrustumParameters.width),
-                            (0.5f * mFrustumParameters.height)
+                            (-0.5f * mFrustumParameters.width),
+                            (-0.5f * mFrustumParameters.height),
+                            ( 0.5f * mFrustumParameters.width),
+                            ( 0.5f * mFrustumParameters.height)
                         }),
                         static_cast<double>(mFrustumParameters.nearPlaneDistance),
                         static_cast<double>(mFrustumParameters.farPlaneDistance),

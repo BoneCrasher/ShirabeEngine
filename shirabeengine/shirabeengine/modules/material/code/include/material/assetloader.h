@@ -248,7 +248,7 @@ namespace engine::material
 
             auto const dataSource =  [data, size] () -> ByteBuffer
             {
-                return { data, size };
+                return ByteBuffer(data, size);
             };
 
             SBufferDescription desc {};
