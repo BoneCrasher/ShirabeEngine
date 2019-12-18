@@ -1,13 +1,14 @@
 #include <ecws/transformcomponent.h>
 #include "ecws/cameracomponent.h"
+#include "ecws/entity.h"
 
 namespace engine::ecws
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CCameraComponent::CCameraComponent()
-        : IComponent()
+    CCameraComponent::CCameraComponent(std::string const &aName)
+        : CComponentBase(aName)
     {
     }
     //<-----------------------------------------------------------------------------
@@ -25,9 +26,10 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     EEngineStatus CCameraComponent::update(CTimer const &aTimer)
     {
-        Shared<ecws::CTransformComponent> const &transformComponent = ...; // getParentEntity()->getComponentsTyped<ecws::CTransformComponent>() ...
-        Shared<CTransform> const &transform = nullptr;
-        mCamera->update(aTimer, *transform);
+        CBoundedCollection<Shared<CTransformComponent>> const  transformComponents = getParentEntity()->getTypedComponentsOfType<ecws::CTransformComponent>();
+        Shared<CTransformComponent>                     const &transformComponent  = *(transformComponents.cbegin());
+
+        mCamera->update(aTimer, transformComponent->getTransform());
 
         return EEngineStatus::Ok;
     }

@@ -340,14 +340,14 @@ namespace engine
                                                                                                , true
                                                                                                , true);
 
-            auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>();
+            auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");
             coreMaterialComponent->setMaterialInstance(core);
 
-            auto coreTransform = makeShared<ecws::CTransformComponent>();
+            auto coreTransform = makeShared<ecws::CTransformComponent>("core_transform");
 
             auto coreEntity = makeUnique<ecws::CEntity>("core");
-            coreEntity->addComponent(coreMaterialComponent);
             coreEntity->addComponent(coreTransform);
+            coreEntity->addComponent(coreMaterialComponent);
 
             mScene.addEntity(std::move(coreEntity));
 
@@ -357,13 +357,11 @@ namespace engine
                                                                                              , util::crc32FromString("materials/standard/standard.material.meta")
                                                                                              , true);
 
-            auto meshComponent = makeShared<ecws::CMeshComponent>();
+            auto meshComponent = makeShared<ecws::CMeshComponent>("barramundi_mesh");
             meshComponent->setMeshInstance(mesh);
-
-            auto materialComponent = makeShared<ecws::CMaterialComponent>();
+            auto materialComponent = makeShared<ecws::CMaterialComponent>("barramundi_material");
             materialComponent->setMaterialInstance(material);
-
-            auto transformComponent = makeShared<ecws::CTransformComponent>();
+            auto transformComponent = makeShared<ecws::CTransformComponent>("barramundi_transform");
 
             auto barramundi = makeUnique<ecws::CEntity>("barramundi");
             barramundi->addComponent(materialComponent);
@@ -382,16 +380,17 @@ namespace engine
             CCamera::SProjectionParameters projection {};
             projection.projectionType = ECameraProjectionType::Perspective;
 
-            Shared<CCamera> camera = makeUnique<CCamera>(ECameraViewType::FreeCamera
+            Shared<CCamera> camera = makeShared<CCamera>(ECameraViewType::FreeCamera
                                         , frustum
                                         , projection);
 
-            auto cameraTransform = makeShared<ecws::CTransformComponent>();
+            auto cameraTransform = makeShared<ecws::CTransformComponent>("primaryCamera_transform");
             cameraTransform->getMutableTransform().translate(CVector3D_t({0.0, 0.0, 2.0}));
-            auto cameraComponent = makeShared<ecws::CCameraComponent>();
+            auto cameraComponent = makeShared<ecws::CCameraComponent>("primaryCamera_camera");
             cameraComponent->setCamera(camera);
             auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
             cameraEntity->addComponent(transformComponent);
+            cameraEntity->addComponent(cameraComponent);
 
             mScene.addEntity(std::move(cameraEntity), "barramundi");
         }
@@ -475,9 +474,10 @@ namespace engine
 
         if(mRenderer)
         {
-            Unique<ecws::CEntity>          const &cameraEntity    = mScene.findEntity("primaryCamera");
-            Shared<ecws::CCameraComponent> const &cameraComponent = *(cameraEntity->getTypedComponentsOfType<ecws::CCameraComponent>().cbegin());
-            Shared<CCamera>                const &camera   = cameraComponent->getCamera();
+            Unique<ecws::CEntity>                                    const &cameraEntity     = mScene.findEntity("primaryCamera");
+            ecws::CBoundedCollection<Shared<ecws::CCameraComponent>>        cameraComponents = cameraEntity->getTypedComponentsOfType<ecws::CCameraComponent>();
+            Shared<ecws::CCameraComponent>                           const &cameraComponent  = *(cameraComponents.cbegin());
+            Shared<CCamera>                                          const &camera           = cameraComponent->getCamera();
 
             Unique<ecws::CEntity> const &core = mScene.findEntity("core");
             ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> coreMaterials = core->getTypedComponentsOfType<ecws::CMaterialComponent>();

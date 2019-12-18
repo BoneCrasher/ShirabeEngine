@@ -2,24 +2,20 @@
 #define __SHIRABE_COMPONENT_MATERIAL_H__
 
 #include <material/declaration.h>
-#include "ecws/icomponent.h"
+#include "ecws/componentbase.h"
 
 namespace engine::ecws
 {
 	class CMaterialComponent
-		: public IComponent
+		: public CComponentBase
 	{
 	public_constructors:
-        CMaterialComponent();
+        CMaterialComponent(std::string const &aName);
 
     public_destructors:
 		~CMaterialComponent() override;
 
 	public_methods:
-	    [[nodiscard]]
-	    SHIRABE_INLINE
-	    std::string const &name() const final { return mName; }
-
 		EEngineStatus update(CTimer const &aTimer) final;
 
 		EEngineStatus setMaterialInstance(Shared<material::CMaterialInstance> aMaterialInstance);
@@ -42,7 +38,6 @@ namespace engine::ecws
         }
 
 	private_members:
-	    std::string                         mName;
 	    Shared<material::CMaterialInstance> mMaterialInstance;
 	};
 

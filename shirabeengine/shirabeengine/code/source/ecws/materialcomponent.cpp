@@ -1,12 +1,13 @@
 #include "ecws/materialcomponent.h"
+#include "ecws/entity.h"
 
 namespace engine::ecws
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CMaterialComponent::CMaterialComponent()
-        : IComponent()
+    CMaterialComponent::CMaterialComponent(std::string const &aName)
+        : CComponentBase(aName)
         //, mMaterialInstance(nullptr)
     {}
     //<-----------------------------------------------------------------------------

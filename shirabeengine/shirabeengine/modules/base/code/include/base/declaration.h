@@ -42,6 +42,7 @@
 #define protected_methods           protected
 #define protected_constants         protected
 #define protected_members           protected
+#define protected_api               protected
 #define private_typedefs            private
 #define private_interfaces          private
 #define private_classes             private

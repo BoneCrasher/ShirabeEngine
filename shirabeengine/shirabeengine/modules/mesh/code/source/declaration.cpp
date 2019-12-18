@@ -129,5 +129,7 @@ namespace engine::mesh
         indices = indicesDesc;
 
         aDeserializer.endObject();
+
+        return true;
     }
 }

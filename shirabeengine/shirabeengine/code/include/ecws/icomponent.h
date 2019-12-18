@@ -157,6 +157,9 @@ namespace engine::ecws
          * @return       Return EEngineStatus::Ok, if successful. An error code otherwise.
          */
         virtual EEngineStatus update(CTimer const &aTimer) = 0;
+
+    protected_api:
+        virtual void setParentEntity(class CEntity const *const aEntity) = 0;
     };
 
     SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IComponent>, IComponent);

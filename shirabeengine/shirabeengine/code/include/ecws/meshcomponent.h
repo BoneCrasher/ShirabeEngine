@@ -3,24 +3,21 @@
 
 #include <mesh/declaration.h>
 
-#include "icomponent.h"
+#include "ecws/componentbase.h"
 
 namespace engine::ecws
 {
 
 	class CMeshComponent
-		: public IComponent
+		: public CComponentBase
 	{
 	public_constructors:
-		CMeshComponent();
+		CMeshComponent(std::string const &aName);
 
     public_destructors:
 		~CMeshComponent() override;
 
     public_methods:
-        [[nodiscard]]
-        SHIRABE_INLINE
-        std::string const &name() const final { return mName; }
 
 		EEngineStatus update(CTimer const &aTimer) override;
 
@@ -37,7 +34,6 @@ namespace engine::ecws
         }
 
 	private:
-        std::string                 mName;
 	    Shared<mesh::CMeshInstance> mMeshInstance;
 	};
 

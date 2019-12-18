@@ -1,12 +1,13 @@
 #include "ecws/transformcomponent.h"
+#include "ecws/entity.h"
 
 namespace engine::ecws
 {
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CTransformComponent::CTransformComponent()
-        : IComponent()
+    CTransformComponent::CTransformComponent(std::string const &aName)
+        : CComponentBase(aName)
         //, mMaterialInstance(nullptr)
     {
     }

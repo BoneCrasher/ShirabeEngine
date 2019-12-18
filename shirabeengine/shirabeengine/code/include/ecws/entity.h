@@ -75,7 +75,7 @@ namespace engine::ecws
          * @tparam TComponent The type of component to enumerate.
          */
         template <typename TComponent>
-        CBoundedCollection<Shared<TComponent>> const getTypedComponentsOfType();
+        CBoundedCollection<Shared<TComponent>> const getTypedComponentsOfType() const;
 
     private_members:
         std::string   mName;
@@ -101,6 +101,7 @@ namespace engine::ecws
             return EEngineStatus::Error;
         }
 
+        aComponent->setParentEntity(this);
         collection.add(aComponent);
         return EEngineStatus::Ok;
     }
@@ -143,7 +144,7 @@ namespace engine::ecws
     //<
     //<-----------------------------------------------------------------------------
     template <typename TComponent>
-    CBoundedCollection<Shared<TComponent>> const CEntity::getTypedComponentsOfType()
+    CBoundedCollection<Shared<TComponent>> const CEntity::getTypedComponentsOfType() const
     {
         std::type_index const index = std::type_index(typeid(TComponent));
         if(mComponents.end() == mComponents.find(index))

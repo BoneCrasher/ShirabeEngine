@@ -2,46 +2,46 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
-      <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
-      <config projectName="shirabedevelopment" targetName="resources" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_os" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
-      <config projectName="shirabedevelopment" targetName="rendering" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
       <config projectName="shirabedevelopment" targetName="log" />
-      <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
       <config projectName="shirabedevelopment" targetName="game" />
-      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
-      <config projectName="shirabedevelopment" targetName="material" />
-      <config projectName="shirabedevelopment" targetName="crc32generator" />
-      <config projectName="shirabedevelopment" targetName="base" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
-      <config projectName="shirabedevelopment" targetName="core" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
       <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
-      <config projectName="shirabedevelopment" targetName="shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="asset" />
       <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
       <config projectName="shirabedevelopment" targetName="mesh" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
       <config projectName="shirabedevelopment" targetName="INSTALL_material" />
-      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
-      <config projectName="shirabedevelopment" targetName="wsi" />
-      <config projectName="shirabedevelopment" targetName="os" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
+      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
+      <config projectName="shirabedevelopment" targetName="core" />
+      <config projectName="shirabedevelopment" targetName="crc32generator" />
+      <config projectName="shirabedevelopment" targetName="utility" />
       <config projectName="shirabedevelopment" targetName="INSTALL_base" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_mesh" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
+      <config projectName="shirabedevelopment" targetName="wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
+      <config projectName="shirabedevelopment" targetName="resources" />
+      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
       <config projectName="shirabedevelopment" targetName="math" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_os" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="asset" />
+      <config projectName="shirabedevelopment" targetName="material" />
+      <config projectName="shirabedevelopment" targetName="os" />
+      <config projectName="shirabedevelopment" targetName="base" />
+      <config projectName="shirabedevelopment" targetName="shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
       <config projectName="shirabedevelopment" targetName="graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="rendering" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_mesh" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true">
@@ -265,12 +265,19 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/transform.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/transform.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/matrix.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/matrix.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/vector.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/vector.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/source/math/quaternion.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/source/math/quaternion.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/cameracomponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/cameracomponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/entity.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/icomponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/icomponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/materialcomponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/materialcomponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/meshcomponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/meshcomponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/ecws/transformcomponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/ecws/transformcomponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/ecws/cameracomponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/ecws/cameracomponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/ecws/materialcomponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/ecws/materialcomponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/ecws/meshcomponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/ecws/meshcomponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/ecws/transformcomponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/ecws/transformcomponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/declaration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/source/declaration.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -304,6 +311,9 @@
     <setting file="file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/vulkanresourcetaskmodule_pipeline.cpp" root0="SKIP_INSPECTION" />
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="OCResolveContextSettings">
+    <option name="configuration" value="0-shirabeengine" />
+  </component>
   <component name="ProjectId" id="1MxwnQZh6ezParMSrxJQc4EvUso" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
@@ -311,7 +321,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.advertisement.text.has.clang-format" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -322,17 +332,17 @@
     <property name="settings.editor.selected.configurable" value="dynamic.analysis.tools.valgrind" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source/common" />
-      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
-      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
       <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes" />
       <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common" />
       <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source/common" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -684,6 +694,7 @@
       <workItem from="1576167583391" duration="1206000" />
       <workItem from="1576304313810" duration="6873000" />
       <workItem from="1576313748831" duration="23305000" />
+      <workItem from="1576682116291" duration="3469000" />
     </task>
     <servers />
   </component>
@@ -746,19 +757,9 @@
           <option name="timeStamp" value="153" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp</url>
-          <line>452</line>
-          <option name="timeStamp" value="215" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/transform.h</url>
           <line>172</line>
           <option name="timeStamp" value="230" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h</url>
-          <line>404</line>
-          <option name="timeStamp" value="234" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

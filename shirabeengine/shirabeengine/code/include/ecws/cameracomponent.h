@@ -1,25 +1,21 @@
 #ifndef __SHIRABE_COMPONENT_CAMERA_H__
 #define __SHIRABE_COMPONENT_CAMERA_H__
 
-#include "ecws/icomponent.h"
+#include "ecws/componentbase.h"
 #include "buildingblocks/camera.h"
 
 namespace engine::ecws
 {
 	class CCameraComponent
-		: public IComponent
+		: public CComponentBase
 	{
 	public_constructors:
-            CCameraComponent();
+            CCameraComponent(std::string const &aName);
 
     public_destructors:
 		~CCameraComponent() override;
 
 	public_methods:
-	    [[nodiscard]]
-	    SHIRABE_INLINE
-	    std::string const &name() const final { return mName; }
-
 		EEngineStatus update(CTimer const &aTimer) final;
 
 		[[nodiscard]]
@@ -37,7 +33,6 @@ namespace engine::ecws
         }
 
 	private_members:
-	    std::string     mName;
 	    Shared<CCamera> mCamera;
 	};
 
