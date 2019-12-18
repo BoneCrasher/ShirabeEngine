@@ -21,5 +21,8 @@ layout (location = 0) out vec4 fragment_color_0;
 
 void main()
 {
-    fragment_color_0 = shader_input.vertex_color; // 0.5 * (gl_FragCoord / vec4(1920, 1080, 1.0, 1.0) + 1.0);
+    vec3 L = vec3(-1.0, -1.0, 1.0);
+    vec3 N = shader_input.vertex_normal;
+    float f = clamp(dot(N, L), 0.0f, 1.0f);
+    fragment_color_0 = f * shader_input.vertex_color;
 } 

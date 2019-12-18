@@ -183,16 +183,49 @@ namespace engine::datastructures
         }
     };
 
+    enum class EDisconnectAllType
+    {
+        Sources,
+        Targets,
+        All
+    };
+
     template <typename TIdType>
     class SHIRABE_LIBRARY_EXPORT CAdjacencyTree
     {
+    public_enums:
+        enum class EOrder
+                : int8_t
+        {
+            RootFirst   = 1
+            , LeafFirst = 2
+        };
+
     public_api:
         bool add       (TIdType const &aId);
         bool remove    (TIdType const &aId);
         bool connect   (TIdType const &aSource, TIdType const &aTarget);
         bool disconnect(TIdType const &aSource, TIdType const &aTarget);
+        bool disconnectMany(TIdType const &aId, EDisconnectAllType const aType = EDisconnectAllType::All);
 
         List_t<TIdType> const getAdjacentFor(TIdType const &aId);
+
+        bool foreachEdgeFromRoot(std::function<bool(TIdType const &aSource, TIdType const &aTarget)> aCallback, TIdType aRoot, EOrder const aOrder = EOrder::RootFirst, bool const aAbortOnFirstError = true)
+        {
+            bool successful = true;
+
+            List_t<Edge_t> const edges = getEdges(aRoot, aOrder);
+            for(Edge_t const &edge : edges)
+            {
+                successful &= aCallback(edge.source, edge.target);
+                if(aAbortOnFirstError && not successful)
+                {
+                    break;
+                }
+            }
+
+            return successful;
+        }
 
     private_structs:
         struct Edge_t
@@ -216,7 +249,17 @@ namespace engine::datastructures
         };
 
     private_api:
-        List_t<Edge_t> const getAllEdges() const
+        List_t<Edge_t> const getEdges(TIdType const &aRoot, EOrder const aOrder = EOrder::RootFirst) const
+        {
+            return getEdgesImpl({ aRoot }, aOrder);
+        };
+
+        List_t<Edge_t> const getAllEdges(EOrder const aOrder = EOrder::RootFirst) const
+        {
+            return getEdgesImpl(mForwardRoots, aOrder);
+        }
+
+        List_t<Edge_t> const getEdgesImpl(List_t<TIdType> const &aRoots, EOrder const aOrder = EOrder::RootFirst) const
         {
             std::vector<Edge_t> edges {};
 
@@ -233,13 +276,22 @@ namespace engine::datastructures
                             continue;
                         }
 
-                        edges.emplace_back({ aId, child }); // Ordering: From child to parent.
-                        getParentEdgeFn(child);
+                        if(EOrder::RootFirst == aOrder)
+                        {
+                            edges.push_back({aId, child}); // Ordering: From child to parent.
+                        }
+
+                        traverseForwardFn(child);
+
+                        if(EOrder::LeafFirst == aOrder)
+                        {
+                            edges.push_back({aId, child}); // Ordering: From child to parent.
+                        }
                     }
                 }
             };
 
-            for(auto const &root : mForwardRoots)
+            for(auto const &root : aRoots)
             {
                 traverseForwardFn(root);
             }
@@ -351,6 +403,36 @@ namespace engine::datastructures
         }
 
         CAdjacencyTreeHelper::removeListEntryIfAdded(mForwardTree[aSource], aTarget);
+        return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    bool CAdjacencyTree<TIdType>::disconnectMany(TIdType            const &aSource,
+                                                 EDisconnectAllType        aType)
+    {
+        if(not CAdjacencyTreeHelper::treeContainsElementFn(mForwardTree, aSource))
+        {
+            return false;
+        }
+
+        if(EDisconnectAllType::All == aType || EDisconnectAllType::Sources == aType)
+        {
+            for(auto &[id, list] : mForwardTree)
+            {
+                CAdjacencyTreeHelper::removeListEntryIfAdded(list, aSource);
+            }
+        }
+
+        if(EDisconnectAllType::All == aType || EDisconnectAllType::Targets == aType)
+        {
+            List_t<TIdType> &children = mForwardTree[aSource];
+            children.clear();
+        }
+
         return true;
     }
     //<-----------------------------------------------------------------------------

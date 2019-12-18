@@ -1,6 +1,7 @@
 #ifndef __SHIRABE_CAMERA_H__
 #define __SHIRABE_CAMERA_H__
 
+#include <core/benchmarking/timer/timer.h>
 #include <math/common.h>
 #include <math/vector.h>
 #include <math/matrix.h>
@@ -174,21 +175,6 @@ namespace engine
             return mLookAtTarget;
         }
 
-        SHIRABE_INLINE CTransform &transform()
-        {
-            return mTransform;
-        }
-
-        /**
-         * Return the current world matrix representation of the underlying transform.
-         *
-         * @return See brief.
-         */
-        SHIRABE_INLINE CMatrix4x4 const&world() const
-        {
-            return mTransform.world();
-        }
-
         /**
          * Return the current view matrix representation of the camera.
          *
@@ -209,11 +195,12 @@ namespace engine
             return mProjectionMatrix;
         }
 
-        SHIRABE_INLINE void update()
+        SHIRABE_INLINE void update(CTimer const &aTimer, CTransform const &aTransform)
         {
+            SHIRABE_UNUSED(aTimer);
+
             ECoordinateSystem system = ECoordinateSystem::RH;
-            mTransform.updateWorldTransform(CMatrix4x4::identity());
-            createViewMatrix(system);
+            createViewMatrix(aTransform, system);
             createProjectionMatrix(system);
         }
 
@@ -223,7 +210,7 @@ namespace engine
          *
          * @param aCoordinateSystem The handedness of the view matrix to be created.
          */
-        void createViewMatrix(ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH);
+        void createViewMatrix(CTransform const &aTransform, ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH);
 
         /**
          * Create a projection matrix representation of the currenct configuration for a given handedness.
@@ -238,7 +225,6 @@ namespace engine
         SProjectionParameters mProjectionParameters;
         CVector3D_t           mLookAtTarget;
 
-        CTransform            mTransform;
         CMatrix4x4            mViewMatrix;
         CMatrix4x4            mProjectionMatrix;
     };

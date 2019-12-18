@@ -2,18 +2,24 @@
 #define __SHIRABE_SCENE_H__
 
 #include <core/benchmarking/timer/timer.h>
+#include <core/datastructures/adjacencytree.h>
 #include <buildingblocks/camera.h>
 #include <ecws/icomponentfactory.h>
 #include <ecws/entity.h>
 
 namespace engine
 {
+    using namespace engine::datastructures;
+
     /**
      * The CScene class wraps all necessary information for a fully functional
      * game scene.
      */
     class CScene
     {
+    public_static_constants:
+        static constexpr char const *sEmptyEntityName = "";
+
     public_constructors:
         /**
          * Default construct an empty scene.
@@ -46,9 +52,9 @@ namespace engine
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        CEngineResult<> update();
+        CEngineResult<> update(CTimer const &aTimer);
 
-        CEngineResult<> addEntity(Unique<ecws::CEntity> aEntity);
+        CEngineResult<> addEntity(Unique<ecws::CEntity> aEntity, std::string const &aParentEntityName = sEmptyEntityName);
 
         CEngineResult<> removeEntity(Unique<ecws::CEntity> aEntity);
 
@@ -77,8 +83,8 @@ namespace engine
         CCamera mPrimaryCamera;
 
         Vector<Unique<ecws::CEntity>> mEntities;
+        CAdjacencyTree<std::string>   mHierarchy;
     };
-
 }
 
 #endif

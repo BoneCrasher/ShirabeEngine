@@ -10,7 +10,6 @@ uniform struct_modelMatrices
 {
     mat4  world;
     mat4  inverseTransposeWorld;
-    float scale[2];
 } modelMatrices;
 
 //
@@ -44,6 +43,6 @@ void main()
     shader_output.vertex_normal   = normal_viewspace;
     shader_output.vertex_tangent  = tangent_viewspace;
     shader_output.vertex_texcoord = vertex_texcoord;
-    shader_output.vertex_color    = vec4(1.0, 0.0, 1.0, 1.0);
+    shader_output.vertex_color    = vec4(1.0f, 1.0f, 1.0f, 1.0);
 
 }

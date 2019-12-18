@@ -100,7 +100,6 @@ namespace engine
 
         // Internals
         CScene                        mScene;
-        Shared<CCamera>               mCamera;
     };
 }
 

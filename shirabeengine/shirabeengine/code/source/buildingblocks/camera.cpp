@@ -15,7 +15,6 @@ namespace engine
         , mFrustumParameters(SFrustumParameters::Default())
         , mProjectionParameters(SProjectionParameters::Default())
         , mLookAtTarget({ 0, 0, 0 })
-        , mTransform()
         , mViewMatrix()
         , mProjectionMatrix()
     { }
@@ -29,7 +28,6 @@ namespace engine
         , mFrustumParameters(aOther.frustumParameters())
         , mProjectionParameters(aOther.projectionParameters())
         , mLookAtTarget(aOther.lookAtTarget())
-        , mTransform(aOther.mTransform)
         , mViewMatrix(aOther.mViewMatrix)
         , mProjectionMatrix(aOther.mProjectionMatrix)
     { }
@@ -46,7 +44,6 @@ namespace engine
         , mFrustumParameters(aFrustumParameters)
         , mProjectionParameters(aProjectionParameters)
         , mLookAtTarget(aLookAt)
-        , mTransform()
         , mViewMatrix()
         , mProjectionMatrix()
     { }
@@ -86,10 +83,10 @@ namespace engine
         n_up = math::normalize(math::cross(n_forward, n_right));
 
         CMatrix4x4 const view = CMatrix4x4({
-                n_right.x(), n_up.x(), n_forward.x(), -dot(n_right,   aEye),
-                n_right.y(), n_up.y(), n_forward.y(), -dot(n_up,      aEye),
-                n_right.z(), n_up.z(), n_forward.z(), -dot(n_forward, aEye),
-                0.0f,        0.0f,     0.0f,          1.0f
+                n_right.x(),         n_up.x(),        -n_forward.x(),        0.0f,
+                n_right.y(),         n_up.y(),        -n_forward.y(),        0.0f,
+                n_right.z(),         n_up.z(),        -n_forward.z(),        0.0f,
+                -dot(n_right, aEye), -dot(n_up,aEye), -dot(n_forward, aEye), 1.0f
         });
 
         return view;
@@ -123,10 +120,10 @@ namespace engine
         n_up = math::normalize(math::cross(n_right, n_forward));
 
         CMatrix4x4 const view = CMatrix4x4({
-            n_right.x(), n_up.x(), n_forward.x(), -dot(n_right,   aEye),
-            n_right.y(), n_up.y(), n_forward.y(), -dot(n_up,      aEye),
-            n_right.z(), n_up.z(), n_forward.z(), -dot(n_forward, aEye),
-            0.0f,        0.0f,     0.0f,          1.0f
+            n_right.x(),         n_up.x(),        -n_forward.x(),        0.0f,
+            n_right.y(),         n_up.y(),        -n_forward.y(),        0.0f,
+            n_right.z(),         n_up.z(),        -n_forward.z(),        0.0f,
+            -dot(n_right, aEye), -dot(n_up,aEye), -dot(n_forward, aEye), 1.0f
         });
 
         return view;
@@ -250,10 +247,10 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    void CCamera::createViewMatrix(ECoordinateSystem const &aCoordinateSystem)
+    void CCamera::createViewMatrix(CTransform const &aTransform, ECoordinateSystem const &aCoordinateSystem)
     {
-        CVector3D_t const position = mTransform.translation();
-        CVector3D_t const up       = mTransform.up();
+        CVector3D_t const position = aTransform.translation();
+        CVector3D_t const up       = aTransform.up();
 
         CMatrix4x4 mat = {};
 
@@ -263,7 +260,7 @@ namespace engine
             mat = lookAt(position, up, mLookAtTarget, aCoordinateSystem);
             break;
         case ECameraViewType::FreeCamera:
-            mat = lookTo(position, up, mTransform.forward());
+            mat = lookTo(position, up, aTransform.forward());
             break;
         }
 

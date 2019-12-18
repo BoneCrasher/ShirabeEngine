@@ -20,6 +20,8 @@
 
 #include "ecws/meshcomponent.h"
 #include "ecws/materialcomponent.h"
+#include "ecws/transformcomponent.h"
+#include "ecws/cameracomponent.h"
 #include <array>
 
 #if defined SHIRABE_PLATFORM_LINUX
@@ -341,8 +343,11 @@ namespace engine
             auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>();
             coreMaterialComponent->setMaterialInstance(core);
 
+            auto coreTransform = makeShared<ecws::CTransformComponent>();
+
             auto coreEntity = makeUnique<ecws::CEntity>("core");
             coreEntity->addComponent(coreMaterialComponent);
+            coreEntity->addComponent(coreTransform);
 
             mScene.addEntity(std::move(coreEntity));
 
@@ -358,14 +363,14 @@ namespace engine
             auto materialComponent = makeShared<ecws::CMaterialComponent>();
             materialComponent->setMaterialInstance(material);
 
-            material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", 1.0f);
-            material->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", 0.5f);
+            auto transformComponent = makeShared<ecws::CTransformComponent>();
 
             auto barramundi = makeUnique<ecws::CEntity>("barramundi");
             barramundi->addComponent(materialComponent);
             barramundi->addComponent(meshComponent);
+            barramundi->addComponent(transformComponent);
 
-            mScene.addEntity(std::move(barramundi));
+            mScene.addEntity(std::move(barramundi), "core");
 
             CCamera::SFrustumParameters frustum {};
             frustum.width             = 1920;
@@ -377,10 +382,18 @@ namespace engine
             CCamera::SProjectionParameters projection {};
             projection.projectionType = ECameraProjectionType::Perspective;
 
-            mCamera = makeShared<CCamera>(ECameraViewType::FreeCamera
+            Shared<CCamera> camera = makeUnique<CCamera>(ECameraViewType::FreeCamera
                                         , frustum
                                         , projection);
-            mCamera->transform().translate(CVector3D_t({0.0, 0.0, -10.0}));
+
+            auto cameraTransform = makeShared<ecws::CTransformComponent>();
+            cameraTransform->getMutableTransform().translate(CVector3D_t({0.0, 0.0, 2.0}));
+            auto cameraComponent = makeShared<ecws::CCameraComponent>();
+            cameraComponent->setCamera(camera);
+            auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
+            cameraEntity->addComponent(transformComponent);
+
+            mScene.addEntity(std::move(cameraEntity), "barramundi");
         }
         catch(std::exception &stde)
         {
@@ -437,7 +450,6 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineResult<> CEngineInstance::update()
     {
-
         if(CheckWindowManagerError(mWindowManager->update()))
         {
                 CLog::Error(logTag(), "Failed to update window manager.");
@@ -459,25 +471,29 @@ namespace engine
         float x = cosf( deg_to_rad(static_cast<float>(counter)) );
         float y = sinf( deg_to_rad(static_cast<float>(counter)) );
 
-        // mCamera->transform().resetTranslation({ 50.0f * x, 25.0f, 50.0f * y});
-        mCamera->update();
-
-        mScene.update();
+        mScene.update(mTimer);
 
         if(mRenderer)
         {
+            Unique<ecws::CEntity>          const &cameraEntity    = mScene.findEntity("primaryCamera");
+            Shared<ecws::CCameraComponent> const &cameraComponent = *(cameraEntity->getTypedComponentsOfType<ecws::CCameraComponent>().cbegin());
+            Shared<CCamera>                const &camera   = cameraComponent->getCamera();
+
             Unique<ecws::CEntity> const &core = mScene.findEntity("core");
             ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> coreMaterials = core->getTypedComponentsOfType<ecws::CMaterialComponent>();
             Shared<ecws::CMaterialComponent>                           coreMaterial  = *(coreMaterials.begin());
             material::CMaterialConfig &config = coreMaterial->getMutableConfiguration();
-            config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.view",       mCamera->view().const_data());
-            config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.projection", mCamera->projection().const_data());
+
+            config.setBufferValue<float>                   ("struct_systemData",   "global.time",              mTimer.total_elapsed());
+            config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.view",       camera->view().const_data());
+            config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.projection", camera->projection().const_data());
 
             Unique<ecws::CEntity> const &barramundi = mScene.findEntity("barramundi");
-            ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> barramundiMaterials = barramundi->getTypedComponentsOfType<ecws::CMaterialComponent>();
-            Shared<ecws::CMaterialComponent>                           barramundiMaterial  = *(barramundiMaterials.begin());
-            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[0]", x);
-            barramundiMaterial->getMutableConfiguration().setBufferValue<float>("struct_modelMatrices", "scale[1]", y);
+            ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>>  barramundiMaterials  = barramundi->getTypedComponentsOfType<ecws::CMaterialComponent>();
+            Shared<ecws::CMaterialComponent>                            barramundiMaterial   = *(barramundiMaterials.begin());
+            ecws::CBoundedCollection<Shared<ecws::CTransformComponent>> barramundiTransforms = barramundi->getTypedComponentsOfType<ecws::CTransformComponent>();
+            Shared<ecws::CTransformComponent>                           barramundiTransform  = *(barramundiTransforms.begin());
+            barramundiMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4::MatrixData_t>("struct_modelMatrices", "world", barramundiTransform->getTransform().world().const_data());
 
             RenderableList renderableCollection {};
             renderableCollection.push_back({ core->name()
