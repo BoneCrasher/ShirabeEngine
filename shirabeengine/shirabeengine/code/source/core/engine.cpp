@@ -389,7 +389,7 @@ namespace engine
             auto cameraComponent = makeShared<ecws::CCameraComponent>("primaryCamera_camera");
             cameraComponent->setCamera(camera);
             auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
-            cameraEntity->addComponent(transformComponent);
+            cameraEntity->addComponent(cameraTransform);
             cameraEntity->addComponent(cameraComponent);
 
             mScene.addEntity(std::move(cameraEntity), "barramundi");
@@ -478,6 +478,7 @@ namespace engine
             ecws::CBoundedCollection<Shared<ecws::CCameraComponent>>        cameraComponents = cameraEntity->getTypedComponentsOfType<ecws::CCameraComponent>();
             Shared<ecws::CCameraComponent>                           const &cameraComponent  = *(cameraComponents.cbegin());
             Shared<CCamera>                                          const &camera           = cameraComponent->getCamera();
+            cameraComponent->update(mTimer);
 
             Unique<ecws::CEntity> const &core = mScene.findEntity("core");
             ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> coreMaterials = core->getTypedComponentsOfType<ecws::CMaterialComponent>();

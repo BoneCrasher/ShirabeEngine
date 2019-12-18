@@ -47,8 +47,15 @@ namespace engine
             Unique<ecws::CEntity> const &source = findEntity(aSource);
             Unique<ecws::CEntity> const &target = findEntity(aTarget);
 
-            Shared<ecws::CTransformComponent> const &sourceTransform = *(source->getTypedComponentsOfType<ecws::CTransformComponent>().cbegin());
-            Shared<ecws::CTransformComponent> const &targetTransform = *(target->getTypedComponentsOfType<ecws::CTransformComponent>().cbegin());
+            ecws::CBoundedCollection<Shared<ecws::CTransformComponent>> const sourceTransforms = source->getTypedComponentsOfType<ecws::CTransformComponent>();
+            ecws::CBoundedCollection<Shared<ecws::CTransformComponent>> const targetTransforms = target->getTypedComponentsOfType<ecws::CTransformComponent>();
+            if(sourceTransforms.empty() || targetTransforms.empty())
+            {
+                return true; // Nothing to be done...
+            }
+
+            Shared<ecws::CTransformComponent> const &sourceTransform = *(sourceTransforms.cbegin());
+            Shared<ecws::CTransformComponent> const &targetTransform = *(targetTransforms.cbegin());
 
             targetTransform->getMutableTransform().updateWorldTransform(sourceTransform->getTransform().world());
 
