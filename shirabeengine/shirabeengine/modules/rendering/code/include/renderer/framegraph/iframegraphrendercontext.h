@@ -31,7 +31,8 @@ namespace engine
 
         public_api:
 
-            virtual CEngineResult<> clearAttachments(std::string const &aRenderPassId) = 0;
+            virtual CEngineResult<> clearAttachments(std::string                     const &aRenderPassId,
+                                                     SFrameGraphAttachmentCollection const &aAttachmentInf) = 0;
 
             /**
              * Begin a pass.

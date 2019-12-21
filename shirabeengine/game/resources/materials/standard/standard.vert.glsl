@@ -28,15 +28,19 @@ out struct_vertexData_full shader_output;
 
 void main()
 {
-    vec4 position = vec4(vertex_position.xyz, 1.0);
-    mat3 view3x3  = mat3(graphicsData.primaryCamera.view);
+    vec3 light_position = vec3(0.0f, 0.0f, 1.0f);
 
-    vec4 position_viewspace  = (graphicsData.primaryCamera.view * position);
-    vec3 normal_viewspace    = (view3x3 * vertex_normal);
-    vec3 tangent_viewspace   = (view3x3 * vertex_tangent.xyz);
+    vec4 position = vec4(vertex_position.xyz, 1.0);
+
+    mat4 view_transform     = (graphicsData.primaryCamera.view * modelMatrices.world);
+    mat3 view_transform_3x3 = mat3(view_transform);
+
+    vec4 position_viewspace  = (view_transform * position);
+    vec3 normal_viewspace    = (view_transform_3x3 * vertex_normal);
+    vec3 tangent_viewspace   = (view_transform_3x3 * light_position); // vertex_tangent.xyz);
     vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace));
 
-    gl_Position = (graphicsData.primaryCamera.projection * graphicsData.primaryCamera.view * position);
+    gl_Position = (graphicsData.primaryCamera.projection * position_viewspace);
     gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
     shader_output.vertex_position = position_viewspace.xyz;

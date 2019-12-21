@@ -126,7 +126,7 @@ namespace engine
         CCamera(ECameraViewType       const &aViewType,
                 SFrustumParameters    const &aFrustumParameters,
                 SProjectionParameters const &aProjectionParameters,
-                CVector3D_t           const &aLookAt = CVector3D_t({ 0.0f, 0.0f, 0.0f }));
+                CVector3D<float>           const &aLookAt = CVector3D<float>({ 0.0f, 0.0f, 0.0f }));
 
     public_destructors:
         /**
@@ -170,7 +170,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CVector3D_t const &lookAtTarget() const
+        SHIRABE_INLINE CVector3D<float> const &lookAtTarget() const
         {
             return mLookAtTarget;
         }
@@ -223,7 +223,7 @@ namespace engine
         ECameraViewType       mViewType;
         SFrustumParameters    mFrustumParameters;
         SProjectionParameters mProjectionParameters;
-        CVector3D_t           mLookAtTarget;
+        CVector3D<float>           mLookAtTarget;
 
         CMatrix4x4            mViewMatrix;
         CMatrix4x4            mProjectionMatrix;

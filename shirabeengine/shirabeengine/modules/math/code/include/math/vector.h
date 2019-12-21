@@ -53,6 +53,11 @@ namespace engine
          */
         template <typename T, std::size_t N>
             class CVectorImpl;
+
+        template <typename    T,
+                  std::size_t N,
+                  typename    TDerived = CVectorImpl<T, N>>
+            class CVector;
         
         /**
          * The specialization CVectorImpl<T, 1> provides the vector implementation for 1D
@@ -82,21 +87,21 @@ namespace engine
              *
              * @param aOther
              */
-            CVectorImpl(ClassType_t const &aOther);
+            explicit CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 1D vector with a 1D field 'aOther'.
              *
              * @param aOther
              */
-            CVectorImpl(BaseType_t const &aOther);
+            explicit CVectorImpl(BaseType_t const &aOther);
 
             /**
              * Initialize this 1D vector with a list of values.
              *
              * @param aInitializer
              */
-            CVectorImpl(std::array<T, 1> const &aInitializer);
+            explicit CVectorImpl(std::array<T, 1> const &aInitializer);
 
             CVectorImpl(std::initializer_list<T> const &aInitializer);
 
@@ -105,7 +110,7 @@ namespace engine
              *
              * @param aX
              */
-            CVectorImpl(ValueType_t const &aX);
+            explicit CVectorImpl(ValueType_t const &aX);
             
         public_methods:
             SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 1, x);
@@ -152,7 +157,7 @@ namespace engine
              *
              * @param aOther
              */
-            CVectorImpl(ClassType_t const &aOther);
+            explicit CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 2D vector with a 2D field 'aOther'.
@@ -166,7 +171,7 @@ namespace engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::array<T, 2> const &aInitializer);
+            explicit CVectorImpl(std::array<T, 2> const &aInitializer);
 
             CVectorImpl(std::initializer_list<T> const &aInitializer);
 
@@ -245,7 +250,7 @@ namespace engine
              *
              * @param aOther
              */
-            CVectorImpl(ClassType_t const &aOther);
+            explicit CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 3D vector with a 3D field 'aOther'.
@@ -259,7 +264,7 @@ namespace engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::array<T, 3> const &aInitializer);
+            explicit CVectorImpl(std::array<T, 3> const &aInitializer);
 
             CVectorImpl(std::initializer_list<T> const &aInitializer);
 
@@ -281,7 +286,7 @@ namespace engine
              * @param aVector2D
              * @param aZ
              */
-            CVectorImpl(
+            explicit CVectorImpl(
                 CVectorImpl<T, 2> const &aVector2D,
                 T                 const &aZ         = T(0)
             );
@@ -317,21 +322,21 @@ namespace engine
              *
              * @return
              */
-            static CVectorImpl<T, 3> forward( );
+            static CVector<T, 3> forward( );
 
             /**
              * Return a 3D vector pointing along and resembling the local y-axis.
              *
              * @return
              */
-            static CVectorImpl<T, 3> right( );
+            static CVector<T, 3> right( );
 
-            /**
+            /**`
              * Return a 3D vector pointing along and resembling the local z-axis.
              *
              * @return
              */
-            static CVectorImpl<T, 3> up( );
+            static CVector<T, 3> up( );
 
             SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(x, y)
             SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D(y, x)
@@ -375,7 +380,7 @@ namespace engine
              *
              * @param aOther
              */
-            CVectorImpl(ClassType_t const &aOther);
+            explicit CVectorImpl(ClassType_t const &aOther);
 
             /**
              * Copy-Initialize this 4D vector with a 4D field 'aOther'.
@@ -389,7 +394,7 @@ namespace engine
              *
              * @param aInitializer
              */
-            CVectorImpl(std::array<T, 4> const &aInitializer);
+            explicit CVectorImpl(std::array<T, 4> const &aInitializer);
 
             CVectorImpl(std::initializer_list<T> const &aInitializer);
 
@@ -414,7 +419,7 @@ namespace engine
              * @param aVector3D
              * @param aW
              */
-            CVectorImpl(
+            explicit CVectorImpl(
                 CVectorImpl<T, 3> const &aVector3D,
                 T                 const &aW         = T(0)
             );
@@ -426,7 +431,7 @@ namespace engine
              * @param aZ
              * @param aW
              */
-            CVectorImpl(
+            explicit CVectorImpl(
                 CVectorImpl<T, 2> const &aVector2D,
                 T                 const &aZ         = T(0),
                 T                 const &aW         = T(0)
@@ -541,7 +546,7 @@ namespace engine
         template <
             typename    T,
             std::size_t N,
-            typename    TDerived = CVectorImpl<T, N>
+            typename    TDerived
         >
         class CVector
             : public TDerived
@@ -560,7 +565,7 @@ namespace engine
             /**
              * Construct this vector from a list of values.
              */
-            CVector(std::array<T, N> const &aValues);
+            explicit CVector(std::array<T, N> const &aValues);
 
             CVector(std::initializer_list<T> const &aInitializer);
 
@@ -569,7 +574,7 @@ namespace engine
              *
              * @param aOther The field to copy from.
              */
-            CVector(BaseType_t const &aOther);
+            explicit CVector(BaseType_t const &aOther);
 
             /**
              * Copy-Initialize this vector from another equally sized and typed vector.
@@ -1375,9 +1380,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 3> CVectorImpl<T, 3>::forward( )
+        CVector<T, 3> CVectorImpl<T, 3>::forward( )
         {
-            return CVectorImpl<T, 3>( 0, 0, 1 );
+            return CVector<T, 3>({ 0, 0, 1 });
         }
         //<-----------------------------------------------------------------------------
 
@@ -1385,9 +1390,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 3> CVectorImpl<T, 3>::right( )
+        CVector<T, 3> CVectorImpl<T, 3>::right( )
         {
-            return CVectorImpl<T, 3>( 1, 0, 0 );
+            return CVector<T, 3>({ 1, 0, 0 });
         }
         //<-----------------------------------------------------------------------------
 
@@ -1395,9 +1400,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        CVectorImpl<T, 3> CVectorImpl<T, 3>::up( )
+        CVector<T, 3> CVectorImpl<T, 3>::up( )
         {
-            return CVectorImpl<T, 3>( 0, 1, 0 );
+            return CVector<T, 3>({ 0, 1, 0 });
         }
         //<-----------------------------------------------------------------------------
 
@@ -1628,22 +1633,22 @@ namespace engine
             return CVector<T, N>(aVector).normalize();
         }
         
-        /**
-         * Convenience type alias for 1D float vectors.
-         */
-        using CVector1D_t = CVector1D<float>;
-        /**
-         * Convenience type alias for 2D float vectors.
-         */
-        using CVector2D_t = CVector2D<float>;
-        /**
-         * Convenience type alias for 3D float vectors.
-         */
-        using CVector3D_t = CVector3D<float>;
-        /**
-         * Convenience type alias for 4D float vectors.
-         */
-        using CVector4D_t = CVector4D<float>;
+        // /**
+        //  * Convenience type alias for 1D float vectors.
+        //  */
+        // using CVector1D_t = CVector1D<float>;
+        // /**
+        //  * Convenience type alias for 2D float vectors.
+        //  */
+        // using CVector2D_t = CVector2D<float>;
+        // /**
+        //  * Convenience type alias for 3D float vectors.
+        //  */
+        // using CVector3D<float> = CVector3D<float>;
+        // /**
+        //  * Convenience type alias for 4D float vectors.
+        //  */
+        // using CVector4D<float> = CVector4D<float>;
 
         #undef SHIRABE_DEFINE_PERMUTATION_ACCESSOR_1D
         #undef SHIRABE_DEFINE_PERMUTATION_ACCESSOR_2D

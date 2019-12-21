@@ -18,7 +18,7 @@ namespace engine
             bool                        enableVSync;
             engine::CVector2D<uint32_t> preferredWindowSize;     // If !_requestFullscreen --> Which size should the window have?
             engine::CVector2D<uint32_t> preferredBackBufferSize; // The size of the backbuffer to be allocated. Will implicitly be truncated to the max size supported by the full primary display
-            engine::CVector4D_t         frustum;                 // frustum(x, y, z, w) --> (near, far, fovX, fovY)
+            engine::CVector4D<float>         frustum;                 // frustum(x, y, z, w) --> (near, far, fovX, fovY)
         };
 
     }

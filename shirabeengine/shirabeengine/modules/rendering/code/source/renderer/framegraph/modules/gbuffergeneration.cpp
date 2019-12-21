@@ -22,6 +22,7 @@ namespace engine
             struct SState
             {
                 SFrameGraphResource gbufferTextureArrayId;
+                SFrameGraphResource depthStencilTextureId;
             };
 
             /**
@@ -63,12 +64,25 @@ namespace engine
                 gbufferDesc.depth          = 1;
                 gbufferDesc.format         = FrameGraphFormat_t::B8G8R8A8_UNORM;
                 gbufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
-                gbufferDesc.arraySize      = 4;
+                gbufferDesc.arraySize      = 3;
                 gbufferDesc.mipLevels      = 1;
-                gbufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
+                gbufferDesc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
+                                             | EFrameGraphResourceUsage::ColorAttachment;
+
+                SFrameGraphTexture depthStencilDesc={ };
+                depthStencilDesc.width          = width;
+                depthStencilDesc.height         = height;
+                depthStencilDesc.depth          = 1;
+                depthStencilDesc.format         = FrameGraphFormat_t::D24_UNORM_S8_UINT;
+                depthStencilDesc.initialState   = EFrameGraphResourceInitState::Clear;
+                depthStencilDesc.arraySize      = 1;
+                depthStencilDesc.mipLevels      = 1;
+                depthStencilDesc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
+                                                  | EFrameGraphResourceUsage::DepthAttachment;
 
                 // Basic underlying output buffer to be linked
                 aOutPassData.state.gbufferTextureArrayId = aBuilder.createTexture("GBuffer Array Texture", gbufferDesc).data();
+                aOutPassData.state.depthStencilTextureId = aBuilder.createTexture("DepthStencil Texture", depthStencilDesc).data();
 
                 // This will create a list of render targets for the texutre array to render to.
                 // They'll be internally created and managed.
@@ -80,18 +94,22 @@ namespace engine
 
                 SFrameGraphWriteTextureFlags write0 = baseFlags,
                                              write1 = baseFlags,
-                                             write2 = baseFlags,
-                                             write3 = baseFlags;
+                                             write2 = baseFlags;
 
                 write0.arraySliceRange.offset = 0;
                 write1.arraySliceRange.offset = 1;
                 write2.arraySliceRange.offset = 2;
-                write3.arraySliceRange.offset = 3;
 
-                aOutPassData.exportData.gbuffer0 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write0).data();
-                aOutPassData.exportData.gbuffer1 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write1).data();
-                aOutPassData.exportData.gbuffer2 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write2).data();
-                aOutPassData.exportData.gbuffer3 = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write3).data();
+                SFrameGraphWriteTextureFlags depthFlags = {};
+                depthFlags.requiredFormat  = depthStencilDesc.format;
+                depthFlags.writeTarget     = EFrameGraphWriteTarget::Depth;
+                depthFlags.arraySliceRange = CRange(0, 1);
+                depthFlags.mipSliceRange   = CRange(0, 1);
+
+                aOutPassData.exportData.gbuffer0     = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write0).data();
+                aOutPassData.exportData.gbuffer1     = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write1).data();
+                aOutPassData.exportData.gbuffer2     = aBuilder.writeAttachment(aOutPassData.state.gbufferTextureArrayId, write2).data();
+                aOutPassData.exportData.depthStencil = aBuilder.writeAttachment(aOutPassData.state.depthStencilTextureId, depthFlags).data();
 
                 // Register all meshes and materials for use.
                 for(SRenderable const &renderable : aRenderableInput.renderableList)

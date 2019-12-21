@@ -42,7 +42,7 @@ namespace engine
          * @param aEulerRotation A 3D vector containing the degree angles to rotate each euler axis around.
          * @return               Return a reference to the rotated transform.
          */
-        CTransform &rotate(CVector3D_t const &aEulerRotation);
+        CTransform &rotate(CVector3D<float> const &aEulerRotation);
 
         /**
          * Rotate the transform around a specific 3D axis and degree angle.
@@ -51,7 +51,7 @@ namespace engine
          * @param aPhi  The degree angle of rotation.
          * @return      Return a reference to the rotated transform.
          */
-        CTransform &rotate(CVector3D_t const &aAxis,
+        CTransform &rotate(CVector3D<float> const &aAxis,
                            float       const &aPhi);
 
         /**
@@ -62,13 +62,20 @@ namespace engine
          */
         CTransform &rotate(CQuaternion const &aQaternionRotation);
 
+        SHIRABE_INLINE
+        CTransform &resetRotation()
+        {
+            mLocalRotationQuaternion = CQuaternion(1, 0, 0, 0);
+            return (*this);
+        }
+
         /**
          * Reset the current rotation to a specific euler rotation vector (Default: 0-rotation).
          *
          * @param aEulerRotation A 3D vector containing the degree angles to rotate each euler axis around.
          * @return               Return a reference to the rotated transform.
          */
-        CTransform &resetRotation(CVector3D_t const &aEulerRotation = CVector3D_t({ 0, 0, 0 }));
+        CTransform &resetRotation(CVector3D<float> const &aEulerRotation);
 
         /**
          * Reste the current rotation to a specific angle rotation around the provided axis.
@@ -77,8 +84,8 @@ namespace engine
          * @param aPhi  The degree angle of rotation.
          * @return      Return a reference to the rotated transform.
          */
-        CTransform &resetRotation(CVector3D_t const &aAxis = CVector3D_t({ 1, 0, 0 }),
-                                  float       const &aPhi  = 0.0f);
+        CTransform &resetRotation(CVector3D<float> const &aAxis,
+                                  float       const &aPhi);
 
         /**
          * Reset the current rotation to a specific quaternion rotation representation.
@@ -86,7 +93,7 @@ namespace engine
          * @param quaternionRotation The quaternion used for rotation.
          * @return                   Return a reference to the rotated transform.
          */
-        CTransform &resetRotation(CQuaternion const &aQuaternionRotation = CQuaternion(1, 0, 0, 0));
+        CTransform &resetRotation(CQuaternion const &aQuaternionRotation);
 
         /**
          * Translate the transform along the current right, up and forward axes.
@@ -94,7 +101,7 @@ namespace engine
          * @param aTranslation
          * @return
          */
-        CTransform &translate(CVector3D_t const &aTranslation);
+        CTransform &translate(CVector3D<float> const &aTranslation);
 
         /**
          * Reset the translation to a specific 3D vector.
@@ -102,7 +109,7 @@ namespace engine
          * @param aTranslation
          * @return
          */
-        CTransform &resetTranslation(CVector3D_t const &aTranslation = CVector3D_t({ 0.0, 0.0, 0.0 }));
+        CTransform &resetTranslation(CVector3D<float> const &aTranslation = CVector3D<float>({ 0.0, 0.0, 0.0 }));
 
         /**
          *
@@ -118,7 +125,7 @@ namespace engine
          * @param aFactors
          * @return
          */
-        CTransform &scale(CVector3D_t const &aFactors);
+        CTransform &scale(CVector3D<float> const &aFactors);
 
         /**
          *
@@ -134,7 +141,7 @@ namespace engine
          * @param aFactors
          * @return
          */
-        CTransform &resetScale(CVector3D_t const &aFactors = CVector3D_t({ 1.0, 1.0, 1.0 }));
+        CTransform &resetScale(CVector3D<float> const &aFactors = CVector3D<float>({ 1.0, 1.0, 1.0 }));
 
         /**
          *
@@ -148,9 +155,9 @@ namespace engine
          *
          * @return
          */
-        SHIRABE_INLINE CVector3D_t forward() const
+        SHIRABE_INLINE CVector3D<float> forward() const
         {
-            return (mLocalRotationQuaternion * CVector3D_t::forward()).vector();
+            return (mLocalRotationQuaternion * CVector3D<float>::forward()).vector();
         }
 
         /**
@@ -158,9 +165,9 @@ namespace engine
          *
          * @return
          */
-        SHIRABE_INLINE CVector3D_t right() const
+        SHIRABE_INLINE CVector3D<float> right() const
         {
-            return (mLocalRotationQuaternion * CVector3D_t::right()).vector();
+            return (mLocalRotationQuaternion * CVector3D<float>::right()).vector();
         }
 
         /**
@@ -168,9 +175,9 @@ namespace engine
          *
          * @return
          */
-        SHIRABE_INLINE CVector3D_t up() const
+        SHIRABE_INLINE CVector3D<float> up() const
         {
-            return (mLocalRotationQuaternion * CVector3D_t::up()).vector();
+            return (mLocalRotationQuaternion * CVector3D<float>::up()).vector();
         }
 
         /**
@@ -192,7 +199,7 @@ namespace engine
          *
          * @return
          */
-        SHIRABE_INLINE CVector3D_t const &localTranslation() const
+        SHIRABE_INLINE CVector3D<float> const &localTranslation() const
         {
             return mLocalTranslation;
         }
@@ -202,7 +209,7 @@ namespace engine
          *
          * @return
          */
-        SHIRABE_INLINE CVector3D_t const translation() const
+        SHIRABE_INLINE CVector3D<float> const translation() const
         {
             return extractTranslationFromMatrix(mCurrentWorldTransform);
         }
@@ -239,9 +246,9 @@ namespace engine
          * @param aMatrix
          * @return
          */
-        SHIRABE_INLINE const CVector3D_t extractTranslationFromMatrix(CMatrix4x4 const &aMatrix) const
+        SHIRABE_INLINE const CVector3D<float> extractTranslationFromMatrix(CMatrix4x4 const &aMatrix) const
         {
-            CVector3D_t const translation = CVector3D_t({
+            CVector3D<float> const translation = CVector3D<float>({
                                                 aMatrix.r03(),
                                                 aMatrix.r13(),
                                                 aMatrix.r23()
@@ -250,13 +257,13 @@ namespace engine
             return translation;
         }
 
-        CVector3D_t      mLocalScale;
+        CVector3D<float>      mLocalScale;
 #ifndef __SHIRABE_USE_QUATERNION_ROTATIONS
-        CVector3D_t      m_localEulerRotation;
+        CVector3D<float>      m_localEulerRotation;
 #else 
         CQuaternion      mLocalRotationQuaternion;
 #endif
-        CVector3D_t      mLocalTranslation;
+        CVector3D<float>      mLocalTranslation;
 
         CMatrix4x4       mCurrentLocalTransform;
         CMatrix4x4       mCurrentWorldTransform;

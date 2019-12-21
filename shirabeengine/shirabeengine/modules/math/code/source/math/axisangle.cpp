@@ -11,7 +11,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CAxisAngle::CAxisAngle()
-            : CVector4D_t({ 0, 0, 0, 0 })
+            : CVector4D<float>({ 0, 0, 0, 0 })
 		{}
         //<-----------------------------------------------------------------------------
 
@@ -19,9 +19,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CAxisAngle::CAxisAngle(
-                CVector3D_t const &aAxis,
+                CVector3D<float> const &aAxis,
                 ValueType_t const &aPhi)
-            : CVector4D_t({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
+            : CVector4D<float>({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
 		{}
         //<-----------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CAxisAngle::CAxisAngle(CAxisAngle const &aOther)
-            : CVector4D_t({ aOther })
+            : CVector4D<float>({ aOther })
         {}
         //<-----------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ namespace engine
                 ValueType_t const &aY,
                 ValueType_t const &aZ,
                 ValueType_t const &aPhi)
-            : CVector4D_t({ aX, aY, aZ, aPhi })
+            : CVector4D<float>({ aX, aY, aZ, aPhi })
 		{}
         //<-----------------------------------------------------------------------------
 
@@ -55,9 +55,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t const CAxisAngle::axis() const
+        CVector3D<float> const CAxisAngle::axis() const
         {
-            return CVector3D_t({ x(), y(), z() });
+            return CVector3D<float>({ x(), y(), z() });
         }
         //<-----------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t const CAxisAngle::axis(
+        CVector3D<float> const CAxisAngle::axis(
                 ValueType_t const &aX,
                 ValueType_t const &aY,
                 ValueType_t const &aZ)
@@ -97,9 +97,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t operator*(
+        CVector3D<float> operator*(
                 CAxisAngle  const &aAxisAngle,
-                CVector3D_t const &aVector)
+                CVector3D<float> const &aVector)
         {
             using Value_t = CAxisAngle::ValueType_t;
 
@@ -107,11 +107,11 @@ namespace engine
 			// v_rot = (cos(phi)*v + sin(phi)*cross(e, v) + (1 - cos(phi))*(dot(e, v)*e)
             Value_t     const cos_phi   = cosf(aAxisAngle.phi());
             Value_t     const sin_phi   = sinf(aAxisAngle.phi());
-            CVector3D_t const e         = aAxisAngle.axis();
+            CVector3D<float> const e         = aAxisAngle.axis();
             Value_t     const dot_e_v   = dot(e, aVector);
-            CVector3D_t const cross_e_v = cross(e, aVector);
+            CVector3D<float> const cross_e_v = cross(e, aVector);
 
-            CVector3D_t const vec = ((cos_phi * aVector) + (sin_phi * cross_e_v) + ((1 - cos_phi) * (dot_e_v * e)));
+            CVector3D<float> const vec = ((cos_phi * aVector) + (sin_phi * cross_e_v) + ((1 - cos_phi) * (dot_e_v * e)));
 
             return vec;
 		}

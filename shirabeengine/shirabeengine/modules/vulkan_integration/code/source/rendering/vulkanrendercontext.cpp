@@ -56,7 +56,7 @@ namespace engine
                 SAttachmentDescription const &desc = description.attachmentDescriptions[k];
                 VkClearAttachment clear {};
                 clear.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT;
-                clear.clearValue      = { 0.5f, 0.5f, 0.5f, 1.0f };
+                clear.clearValue      = desc.clearColor;
                 clear.colorAttachment = k;
 
                 VkClearRect rect {};
@@ -66,7 +66,7 @@ namespace engine
                 rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
 
                 clearAttachments.push_back(clear);
-                clearRects.push_back(rect);
+                clearRects      .push_back(rect);
             }
 
             vkCmdClearAttachments(commandBuffer, clearAttachments.size(), clearAttachments.data(), clearRects.size(), clearRects.data());

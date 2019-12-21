@@ -35,7 +35,7 @@ namespace engine
          * tied to rotation operations in the game engine.
          */
         class CQuaternion
-            : public CVector4D_t
+            : public CVector4D<float>
 		{			
         public_static_functions:
             /**
@@ -55,8 +55,8 @@ namespace engine
              * @return
              */
             static CQuaternion quaternionFromAxisAngle(
-                    CVector3D_t const &aAxis,
-                    ValueType_t const &aPhi);
+                    CVector3D<float> const &aAxis,
+                    ValueType_t      const &aPhi);
 
             /**
              * Extract a rotation vector (xyz) and angle (w) from a quaternion.
@@ -64,14 +64,14 @@ namespace engine
              * @param aQuaternion
              * @return
              */
-            static CVector4D_t axisAngleFromQuaternion(CQuaternion const &aQuaternion);
+            static CVector4D<float> axisAngleFromQuaternion(CQuaternion const &aQuaternion);
             /**
              * Extract the x, y and z euler angles from a quaternion.
              *
              * @param aQuaternion
              * @return
              */
-            static CVector3D_t eulerFromQuaternion(CQuaternion const &aQuaternion);
+            static CVector3D<float> eulerFromQuaternion(CQuaternion const &aQuaternion);
 
             /**
              * Extract a rotation matrix from a quaternion.
@@ -101,15 +101,15 @@ namespace engine
              * @param aAxis
              */
             CQuaternion(
-                    ValueType_t const &aPhi,
-                    CVector3D_t const &aAxis);
+                    ValueType_t      const &aPhi,
+                    CVector3D<float> const &aAxis);
 
             /**
              * Construct a quaternion using an AxisAngle instance.
              *
              * @param aAxisAngle
              */
-            CQuaternion(
+            explicit CQuaternion(
                     CAxisAngle const &aAxisAngle);
 
             /**
@@ -175,9 +175,9 @@ namespace engine
              *
              * @return
              */
-            SHIRABE_INLINE CVector3D_t const vector() const
+            SHIRABE_INLINE CVector3D<float> const vector() const
             {
-                return CVector3D_t({ x(), y(), z() });
+                return CVector3D<float>({ x(), y(), z() });
             }
 
             /**
@@ -230,7 +230,7 @@ namespace engine
              * @param aQuaternion
              * @return
              */
-            static CVector3D_t rotationAxis(CQuaternion const &aQuaternion);
+            static CVector3D<float> rotationAxis(CQuaternion const &aQuaternion);
 
             /**
              * Construct a quaternion from euler angles.
@@ -245,7 +245,7 @@ namespace engine
                     ValueType_t const &aY,
                     ValueType_t const &aZ);
 
-            static CQuaternion quaternionFromEuler(CVector3D_t const &aEulerVector)
+            static CQuaternion quaternionFromEuler(CVector3D<float> const &aEulerVector)
             {
                 return quaternionFromEuler(aEulerVector.x(), aEulerVector.y(), aEulerVector.z());
             }
@@ -289,7 +289,7 @@ namespace engine
          * @param aVector
          * @return
          */
-        CVector3D_t  rotate(CQuaternion const &aQuaternion, CVector3D_t const &aVector);
+        CVector3D<float>  rotate(CQuaternion const &aQuaternion, CVector3D<float> const &aVector);
 
         /**
          * Return the sum of two quaternions.
@@ -378,7 +378,7 @@ namespace engine
         {
             // qp = (nq*np - dot(vq, vp)) + (nq*vp + np*vq + cross(vq, vp))ijk
             CQuaternion::ValueType_t w = (aQuaternionLHS.w() * aQuaternionRHS.w() - dot(aQuaternionLHS.vector(), aQuaternionRHS.vector()));
-            CVector3D_t              v =   (aQuaternionLHS.w() * aQuaternionRHS.vector() )
+            CVector3D<float>         v =   (aQuaternionLHS.w() * aQuaternionRHS.vector() )
                                          + (aQuaternionRHS.w() * aQuaternionLHS.vector())
                                          + cross(aQuaternionLHS.vector(), aQuaternionRHS.vector());
 
@@ -392,12 +392,12 @@ namespace engine
          * @param aVector
          * @return
          */
-        static CQuaternion operator*(CQuaternion const &aQuaternion, CVector3D_t const &aVector)
+        static CQuaternion operator*(CQuaternion const &aQuaternion, CVector3D<float> const &aVector)
         {
             CQuaternion qv  = CQuaternion(0, aVector);
             CQuaternion qw  = CQuaternion(aQuaternion);
             CQuaternion iqw = qw.inverse();
-            CQuaternion cqw = qw.conjugate();
+            // CQuaternion cqw = qw.conjugate();
             CQuaternion qv_ = qw * (qv * iqw);
 
             return qv_;
@@ -410,13 +410,12 @@ namespace engine
          * @param aQuaternion
          * @return
          */
-        static CQuaternion operator*(CVector3D_t const &aVector, CQuaternion const &aQuaternion)
+        static CQuaternion operator*(CVector3D<float> const &aVector, CQuaternion const &aQuaternion)
         {
-            CQuaternion qv = CQuaternion(0, aVector);
-            CQuaternion qw = CQuaternion(aQuaternion);
-            qw.normalize();
+            CQuaternion qv  = CQuaternion(0, aVector);
+            CQuaternion qw  = CQuaternion(aQuaternion);
             CQuaternion iqw = qw.inverse();
-            CQuaternion qv_ = (qw * qv) * iqw;
+            CQuaternion qv_ = qw * (qv * iqw);
 
             return qv_;
         }

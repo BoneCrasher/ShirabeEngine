@@ -12,7 +12,7 @@ namespace engine
          * An AxisAngle is a construct describing a regular rotation axis and a rotation angle around it.
          */
         class CAxisAngle
-                : public CVector4D_t
+                : public CVector4D<float>
         {
         public_constructors:
             /**
@@ -32,7 +32,7 @@ namespace engine
              * @param aPhi
              */
             CAxisAngle(
-                    CVector3D_t const &aAxis,
+                    CVector3D<float> const &aAxis,
                     ValueType_t const &aPhi);
             /**
              * Construct an axis-angle from three axis coefficients and an angle.
@@ -60,7 +60,7 @@ namespace engine
              *
              * @return See brief.
              */
-            CVector3D_t const axis() const;
+            CVector3D<float> const axis() const;
 
             /**
              * Return the angle.
@@ -77,7 +77,7 @@ namespace engine
              * @param aZ
              * @return
              */
-            CVector3D_t const axis(
+            CVector3D<float> const axis(
                     ValueType_t const& aX,
                     ValueType_t const& aY,
                     ValueType_t const& aZ);
@@ -98,9 +98,9 @@ namespace engine
          * @param aVector
          * @return
          */
-        CVector3D_t operator*(
+        CVector3D<float> operator*(
                 CAxisAngle  const &aAxisAngle,
-                CVector3D_t const &aVector);
+                CVector3D<float> const &aVector);
 
     }
 }

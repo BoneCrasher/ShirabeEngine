@@ -101,7 +101,7 @@ namespace engine
                 // Begin a render pass w/ a given framebuffer.
                 // aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
-                aContext->clearAttachments(sRenderPassResourceId);
+                aContext->clearAttachments(sRenderPassResourceId, SFrameGraphAttachmentCollection {});
 
                 return { EEngineStatus::Ok };
             };

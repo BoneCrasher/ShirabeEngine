@@ -17,7 +17,7 @@ namespace engine
                 SFrameGraphResource const &aGbuffer0,
                 SFrameGraphResource const &aGbuffer1,
                 SFrameGraphResource const &aGbuffer2,
-                SFrameGraphResource const &aGbuffer3)
+                SFrameGraphResource const &aDepthStencil)
         {
             /**
              * The SState struct is the internal state of the lighting pass.
@@ -74,10 +74,10 @@ namespace engine
                 readFlags.arraySliceRange = CRange(0, 1);
                 readFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aGbuffer0, readFlags).data();
-                aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aGbuffer1, readFlags).data();
-                aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aGbuffer2, readFlags).data();
-                aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aGbuffer3, readFlags).data();
+                aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aGbuffer0,     readFlags).data();
+                aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aGbuffer1,     readFlags).data();
+                aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aGbuffer2,     readFlags).data();
+                aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aDepthStencil, readFlags).data();
 
                 SFrameGraphWriteTextureFlags writeFlags{ };
                 writeFlags.requiredFormat  = FrameGraphFormat_t::Automatic;

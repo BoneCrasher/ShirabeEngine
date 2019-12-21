@@ -17,7 +17,7 @@ namespace engine
                 SFrameGraphResource const &aGbuffer0,
                 SFrameGraphResource const &aGbuffer1,
                 SFrameGraphResource const &aGbuffer2,
-                SFrameGraphResource const &aGbuffer3,
+                SFrameGraphResource const &aDepthStencil,
                 SFrameGraphResource const &aLightAccumulationBuffer)
         {
             /**
@@ -75,7 +75,7 @@ namespace engine
                 aOutPassData.importData.gbuffer0                = aBuilder.readAttachment(aGbuffer0,                readFlags).data();
                 aOutPassData.importData.gbuffer1                = aBuilder.readAttachment(aGbuffer1,                readFlags).data();
                 aOutPassData.importData.gbuffer2                = aBuilder.readAttachment(aGbuffer2,                readFlags).data();
-                aOutPassData.importData.gbuffer3                = aBuilder.readAttachment(aGbuffer3,                readFlags).data();
+                aOutPassData.importData.gbuffer3                = aBuilder.readAttachment(aDepthStencil,            readFlags).data();
                 aOutPassData.importData.lightAccumulationBuffer = aBuilder.readAttachment(aLightAccumulationBuffer, readFlags).data();
 
                 SFrameGraphWriteTextureFlags writeFlags{ };
@@ -90,8 +90,8 @@ namespace engine
             };
 
             auto const execute = [=] (
-                    SPassData                                 const&aPassData,
-                    CFrameGraphResources                      const&aFrameGraphResources,
+                    SPassData                        const&aPassData,
+                    CFrameGraphResources             const&aFrameGraphResources,
                     Shared<IFrameGraphRenderContext>      &aContext)
                     -> CEngineResult<>
             {

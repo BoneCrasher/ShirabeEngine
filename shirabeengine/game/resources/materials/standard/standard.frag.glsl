@@ -21,8 +21,8 @@ layout (location = 0) out vec4 fragment_color_0;
 
 void main()
 {
-    vec3 L = vec3(-1.0, -1.0, 1.0);
-    vec3 N = shader_input.vertex_normal;
-    float f = clamp(dot(N, L), 0.0f, 1.0f);
+    vec3 L = normalize(shader_input.vertex_tangent - shader_input.vertex_position); // Hack
+    vec3 N = normalize(shader_input.vertex_normal);
+    float f = clamp(5 * dot(N, L), 0.0f, 1.0f);
     fragment_color_0 = f * shader_input.vertex_color;
 } 

@@ -1276,7 +1276,7 @@ Possible candidates:
   engine::CCamera::CCamera()
 Possible candidates:
   engine::CCamera::CCamera(CCamera const &aOther)
-  engine::CCamera::CCamera(ECameraViewType const &aViewType, SFrustumParameters const &aFrustumParameters, SProjectionParameters const &aProjectionParameters, CVector3D_t const &aLookAt=CVector3D_t({ 0.0f, 0.0f, 0.0f }))
+  engine::CCamera::CCamera(ECameraViewType const &aViewType, SFrustumParameters const &aFrustumParameters, SProjectionParameters const &aProjectionParameters, CVector3D<float> const &aLookAt=CVector3D<float>({ 0.0f, 0.0f, 0.0f }))
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/buildingblocks/camera.cpp:58: warning: documented symbol `engine::CCamera::~CCamera' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/buildingblocks/camera.cpp:255: warning: documented symbol `void engine::CCamera::createViewMatrix' was not declared or defined.
@@ -1290,7 +1290,7 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/buildingblocks/transform.cpp:28: warning: no matching class member found for 
   CTransform & engine::CTransform::rotate(const engine::math::CVector< float > &aEulerRotation)
 Possible candidates:
-  CTransform & engine::CTransform::rotate(CVector3D_t const &aAxis, float const &aPhi)
+  CTransform & engine::CTransform::rotate(CVector3D<float> const &aAxis, float const &aPhi)
   CTransform & engine::CTransform::rotate(CQuaternion const &aQaternionRotation)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/core/engine.cpp:86: warning: documented symbol `engine::CEngineInstance::CEngineInstance' was not declared or defined.
@@ -1709,7 +1709,7 @@ Possible candidates:
   engine::math::CAxisAngle::CAxisAngle()
 Possible candidates:
   engine::math::CAxisAngle::CAxisAngle(CAxisAngle const &aOther)
-  engine::math::CAxisAngle::CAxisAngle(CVector3D_t const &aAxis, ValueType_t const &aPhi)
+  engine::math::CAxisAngle::CAxisAngle(CVector3D<float> const &aAxis, ValueType_t const &aPhi)
   engine::math::CAxisAngle::CAxisAngle(ValueType_t const &aX, ValueType_t const &aY, ValueType_t const &aZ, ValueType_t const &aPhi)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/source/math/axisangle.cpp:51: warning: documented symbol `engine::math::CAxisAngle::~CAxisAngle' was not declared or defined.
@@ -1717,7 +1717,7 @@ Possible candidates:
   engine::math::CQuaternion::CQuaternion()
 Possible candidates:
   engine::math::CQuaternion::CQuaternion(CQuaternion const &aOther)
-  engine::math::CQuaternion::CQuaternion(ValueType_t const &aPhi, CVector3D_t const &aAxis)
+  engine::math::CQuaternion::CQuaternion(ValueType_t const &aPhi, CVector3D<float> const &aAxis)
   engine::math::CQuaternion::CQuaternion(CAxisAngle const &aAxisAngle)
   engine::math::CQuaternion::CQuaternion(ValueType_t const &aPhi, ValueType_t const &aAxisX, ValueType_t const &aAxisY, ValueType_t const &aAxisZ)
 

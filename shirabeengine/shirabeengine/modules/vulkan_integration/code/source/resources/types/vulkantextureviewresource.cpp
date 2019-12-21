@@ -69,10 +69,23 @@ namespace engine::vulkan
         VkImage vkImage = textureResource->imageHandle; // TODO
         // VkDeviceMemory const vkDeviceMemory = texture->imageMemory; // TODO: Required?
 
+        auto const isDepthStencilImageOp = [](EFormat const aFormat) -> bool
+        {
+            switch(aFormat)
+            {
+                case EFormat::D24_UNORM_S8_UINT:
+                case EFormat::D32_FLOAT:
+                case EFormat::D32_FLOAT_S8X24_UINT:
+                    return true;
+                default:
+                    return false;
+            }
+        };
+
         VkImageViewCreateInfo vkImageViewCreateInfo ={ };
         vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         vkImageViewCreateInfo.format                          = CVulkanDeviceCapsHelper::convertFormatToVk(aDescription.textureFormat);
-        vkImageViewCreateInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT; // TODO: Care about the specific aspect bits here in more detail.
+        vkImageViewCreateInfo.subresourceRange.aspectMask     = isDepthStencilImageOp(aDescription.textureFormat) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
         vkImageViewCreateInfo.subresourceRange.baseArrayLayer = aDescription.arraySlices.offset;
         vkImageViewCreateInfo.subresourceRange.layerCount     = static_cast<uint32_t>(aDescription.arraySlices.length);
         vkImageViewCreateInfo.subresourceRange.baseMipLevel   = aDescription.mipMapSlices.offset;

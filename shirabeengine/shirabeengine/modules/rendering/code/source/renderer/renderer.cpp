@@ -208,7 +208,7 @@ namespace engine
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
-                        gbufferExportData.gbuffer3).data();
+                        gbufferExportData.depthStencil).data();
 
             // Compositing
             CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
@@ -219,7 +219,7 @@ namespace engine
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
-                        gbufferExportData.gbuffer3,
+                        gbufferExportData.depthStencil,
                         lightingExportData.lightAccumulationBuffer).data();
 
             graphBuilder.setOutputTextureResourceId(compositingExportData.output.resourceId);

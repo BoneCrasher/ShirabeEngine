@@ -2,13 +2,15 @@
 
 namespace engine
 {
+    using namespace math;
+
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
     CTransform::CTransform()
-        : mLocalScale             (CVector3D_t({ 1.0f, 1.0f, 1.0f }))
+        : mLocalScale             (CVector3D<float>({ 1.0f, 1.0f, 1.0f }))
         , mLocalRotationQuaternion(CQuaternion( 1.0f, 0.0f, 0.0f, 0.0f ))
-        , mLocalTranslation       (CVector3D_t({ 0.0f, 0.0f, 0.0f }))
+        , mLocalTranslation       (CVector3D<float>({ 0.0f, 0.0f, 0.0f }))
         , mCurrentLocalTransform  (CMatrix4x4::identity())
         , mCurrentWorldTransform  (CMatrix4x4::identity())
         , mDirty                  (true)
@@ -25,7 +27,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::rotate(CVector3D_t const &aEulerRotation)
+    CTransform &CTransform::rotate(CVector3D<float> const &aEulerRotation)
     {
         auto const q = CQuaternion::quaternionFromEuler(aEulerRotation);
         mLocalRotationQuaternion *= q;
@@ -38,7 +40,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::rotate(CVector3D_t const &aAxis,
+    CTransform &CTransform::rotate(CVector3D<float> const &aAxis,
                                    float       const &aPhi)
     {
         auto const q = CQuaternion::quaternionFromAxisAngle(aAxis, aPhi);
@@ -64,7 +66,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::resetRotation(CVector3D_t const &aEulerRotation)
+    CTransform &CTransform::resetRotation(CVector3D<float> const &aEulerRotation)
     {
         mLocalRotationQuaternion = CQuaternion::quaternionFromEuler(aEulerRotation);
 
@@ -76,7 +78,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::resetRotation(CVector3D_t const &aAxis,
+    CTransform &CTransform::resetRotation(CVector3D<float> const &aAxis,
                                           float       const &aPhi)
     {
         mLocalRotationQuaternion = CQuaternion::quaternionFromAxisAngle(aAxis, aPhi);
@@ -101,7 +103,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::translate(CVector3D_t const &aTranslation)
+    CTransform &CTransform::translate(CVector3D<float> const &aTranslation)
     {
         mLocalTranslation += aTranslation;
 
@@ -113,7 +115,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::resetTranslation(CVector3D_t const &aTranslation)
+    CTransform &CTransform::resetTranslation(CVector3D<float> const &aTranslation)
     {
         mLocalTranslation = aTranslation;
 
@@ -137,7 +139,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::scale(CVector3D_t const &aFactors)
+    CTransform &CTransform::scale(CVector3D<float> const &aFactors)
     {
         mLocalScale.x(mLocalScale.x() * aFactors.x());
         mLocalScale.y(mLocalScale.y() * aFactors.y());
@@ -163,7 +165,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CTransform &CTransform::resetScale(CVector3D_t const &aFactors)
+    CTransform &CTransform::resetScale(CVector3D<float> const &aFactors)
     {
         mLocalScale = aFactors;
 
@@ -205,7 +207,7 @@ namespace engine
             translation.r13(mLocalTranslation.y());
             translation.r23(mLocalTranslation.z());
 
-            mCurrentLocalTransform = SMMatrixMultiply(translation, SMMatrixMultiply(rotation, scale));
+            mCurrentLocalTransform = scale * rotation * translation;
             mDirty = false;
         }
 
@@ -227,7 +229,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CMatrix4x4 const &CTransform::updateWorldTransform(CMatrix4x4 const &aParent)
     {
-        return (mCurrentWorldTransform = SMMatrixMultiply(aParent, local()));
+        return (mCurrentWorldTransform = SMMatrixMultiply(local(), aParent));
     }
     //<-----------------------------------------------------------------------------
 }

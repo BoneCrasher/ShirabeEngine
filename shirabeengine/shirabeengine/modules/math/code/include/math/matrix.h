@@ -632,6 +632,7 @@ namespace engine
                     : BaseType_t(aOther)
             {}
 
+
         public_destructors:
             /**
              * Destroy and run
@@ -715,6 +716,19 @@ namespace engine
         CMatrix2x2 SMMatrixMultiply(CMatrix2x2 const &aLHS, CMatrix2x2 const &aRHS);
         CMatrix3x3 SMMatrixMultiply(CMatrix3x3 const &aLHS, CMatrix3x3 const &aRHS);
         CMatrix4x4 SMMatrixMultiply(CMatrix4x4 const &aLHS, CMatrix4x4 const &aRHS);
+
+        static CMatrix2x2 operator *(CMatrix2x2 const &aLHS, CMatrix2x2 const &aRHS)
+        {
+            return SMMatrixMultiply(aLHS, aRHS);
+        }
+        static CMatrix3x3 operator *(CMatrix3x3 const &aLHS, CMatrix3x3 const &aRHS)
+        {
+            return SMMatrixMultiply(aLHS, aRHS);
+        }
+        static CMatrix4x4 operator *(CMatrix4x4 const &aLHS, CMatrix4x4 const &aRHS)
+        {
+            return SMMatrixMultiply(aLHS, aRHS);
+        }
 	}
 }
 

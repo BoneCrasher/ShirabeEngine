@@ -103,9 +103,12 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::clearAttachments(std::string const &aRenderPassId)
+    CEngineResult<> CFrameGraphRenderContext::clearAttachments(std::string                     const &aRenderPassId,
+                                                               SFrameGraphAttachmentCollection const &aAttachmentInfo)
     {
         Shared<SRenderPass> renderPass = getUsedResourceTyped<SRenderPass>(aRenderPassId);
+
+
 
         EEngineStatus const status = mGraphicsAPIRenderContext->clearAttachments(renderPass->getGpuApiResourceHandle());
         if(CheckEngineError(status))
@@ -349,7 +352,6 @@ namespace engine::framegraph
                 attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::DONT_CARE : EAttachmentLoadOp::LOAD;
                 attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                 attachmentDesc.format         = textureView.format;
-
 
                 bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
                 bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);

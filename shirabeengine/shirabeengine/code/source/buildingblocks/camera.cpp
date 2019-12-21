@@ -39,7 +39,7 @@ namespace engine
     CCamera::CCamera(ECameraViewType       const &aViewType,
                      SFrustumParameters    const &aFrustumParameters,
                      SProjectionParameters const &aProjectionParameters,
-                     CVector3D_t           const &aLookAt)
+                     CVector3D<float>           const &aLookAt)
         : mViewType(aViewType)
         , mFrustumParameters(aFrustumParameters)
         , mProjectionParameters(aProjectionParameters)
@@ -70,16 +70,16 @@ namespace engine
      * @return                  Return the view matrix created.
      */
     static CMatrix4x4 lookTo(
-            CVector3D_t       const &aEye,
-            CVector3D_t       const &aUp,
-            CVector3D_t       const &aForward,
+            CVector3D<float>       const &aEye,
+            CVector3D<float>       const &aUp,
+            CVector3D<float>       const &aForward,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {      
         SHIRABE_UNUSED(aCoordinateSystem);
 
-        CVector3D_t       n_up      = math::normalize(aUp);
-        CVector3D_t const n_forward = math::normalize(aForward);
-        CVector3D_t const n_right   = math::normalize(math::cross(n_up, n_forward));
+        CVector3D<float>       n_up      = math::normalize(aUp);
+        CVector3D<float> const n_forward = math::normalize(aForward);
+        CVector3D<float> const n_right   = math::normalize(math::cross(n_up, n_forward));
         n_up = math::normalize(math::cross(n_forward, n_right));
 
         CMatrix4x4 const view = CMatrix4x4({
@@ -107,16 +107,16 @@ namespace engine
      * @return                  Return the view matrix created.
      */
     static CMatrix4x4 lookAt(
-            CVector3D_t       const &aEye,
-            CVector3D_t       const &aUp,
-            CVector3D_t       const &aTarget,
+            CVector3D<float>       const &aEye,
+            CVector3D<float>       const &aUp,
+            CVector3D<float>       const &aTarget,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
         SHIRABE_UNUSED(aCoordinateSystem);
 
-        CVector3D_t       n_up      = math::normalize(aUp);
-        CVector3D_t const n_forward = math::normalize((aTarget - aEye));
-        CVector3D_t const n_right   = math::normalize(math::cross(n_forward, n_up));
+        CVector3D<float>       n_up      = math::normalize(aUp);
+        CVector3D<float> const n_forward = math::normalize((aTarget - aEye));
+        CVector3D<float> const n_right   = math::normalize(math::cross(n_forward, n_up));
         n_up = math::normalize(math::cross(n_right, n_forward));
 
         CMatrix4x4 const view = CMatrix4x4({
@@ -139,7 +139,7 @@ namespace engine
      * @return                   A projection matrix in the requested handedness.
      */
     static CMatrix4x4 projectionPerspectiveRect(
-            CVector4D_t       const &aBounds,
+            CVector4D<float>       const &aBounds,
             double            const &aNear,
             double            const &aFar,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
@@ -219,7 +219,7 @@ namespace engine
      * @return                   The projection matrix in the given handedness.
      */
     static CMatrix4x4 projectionOrtho(
-            CVector4D_t       const &aBounds,
+            CVector4D<float>       const &aBounds,
             double            const &aNear,
             double            const &aFar,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
@@ -249,8 +249,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     void CCamera::createViewMatrix(CTransform const &aTransform, ECoordinateSystem const &aCoordinateSystem)
     {
-        CVector3D_t const position = aTransform.translation();
-        CVector3D_t const up       = aTransform.up();
+        CVector3D<float> const position = aTransform.translation();
+        CVector3D<float> const up       = aTransform.up();
 
         CMatrix4x4 mat = {};
 
@@ -296,7 +296,7 @@ namespace engine
             break;
         case ECameraProjectionType::Orthographic:
             mat = projectionOrtho(
-                        CVector4D_t({
+                        CVector4D<float>({
                             (-0.5f * mFrustumParameters.width),
                             (-0.5f * mFrustumParameters.height),
                             ( 0.5f * mFrustumParameters.width),

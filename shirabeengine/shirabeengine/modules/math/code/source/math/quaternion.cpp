@@ -9,7 +9,7 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CQuaternion::CQuaternion()
-            : CVector4D_t({ 0, 0, 0, 1 })
+            : CVector4D<float>({ 0, 0, 0, 1 })
         {
         }
         //<-----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CQuaternion::CQuaternion(CQuaternion const &aOther)
-            : CVector4D_t(aOther)
+            : CVector4D<float>(aOther)
         {
         }
         //<-----------------------------------------------------------------------------
@@ -36,8 +36,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CQuaternion::CQuaternion(
                 ValueType_t const &aPhi,
-                CVector3D_t const &aAxis)
-            : CVector4D_t({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
+                CVector3D<float> const &aAxis)
+            : CVector4D<float>({ aAxis.x(), aAxis.y(), aAxis.z(), aPhi })
         {}
         //<-----------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace engine
                 ValueType_t const &aAxisX,
                 ValueType_t const &aAxisY,
                 ValueType_t const &aAxisZ)
-            : CVector4D_t({ aAxisX, aAxisY, aAxisZ, aPhi })
+            : CVector4D<float>({ aAxisX, aAxisY, aAxisZ, aPhi })
         {
         }
 
@@ -134,12 +134,12 @@ namespace engine
             ValueType_t const phiProduct        = (this->w() * aOther.w());
             ValueType_t const axisDotProduct    = dot(this->vector(), aOther.vector());
 
-            CVector3D_t const scaledThisVector  = this->vector() * aOther.w();
-            CVector3D_t const scaledOtherVecotr = this->w()      * aOther.vector();
-            CVector3D_t const crossVector       = cross(this->vector(), aOther.vector());
+            CVector3D<float> const scaledThisVector  = this->vector() * aOther.w();
+            CVector3D<float> const scaledOtherVecotr = this->w()      * aOther.vector();
+            CVector3D<float> const crossVector       = cross(this->vector(), aOther.vector());
 
             ValueType_t const scale  = (phiProduct - axisDotProduct);
-            CVector3D_t const vector = (scaledThisVector + scaledOtherVecotr) + crossVector;
+            CVector3D<float> const vector = (scaledThisVector + scaledOtherVecotr) + crossVector;
 
             assign(scale, vector.x(), vector.y(), vector.z());
 
@@ -226,17 +226,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t CQuaternion::rotationAxis(CQuaternion const &aQuaternion)
+        CVector3D<float> CQuaternion::rotationAxis(CQuaternion const &aQuaternion)
         {
             // Threshold to allow for rounding errors.
             static constexpr ValueType_t const TOLERANCE = 0.005f;
 
-            CVector3D_t const vector = aQuaternion.vector();
+            CVector3D<float> const vector = aQuaternion.vector();
             ValueType_t const m      = vector.length();
 
             if(m <= TOLERANCE)
             {
-                return CVector3D_t();
+                return CVector3D<float>();
             }
             else
             {
@@ -349,7 +349,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CQuaternion CQuaternion::quaternionFromAxisAngle(
-                CVector3D_t const &aAxis,
+                CVector3D<float> const &aAxis,
                 ValueType_t const &aPhi)
         {
             ValueType_t const hsin = sinf(aPhi / 2.0f);
@@ -369,9 +369,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t CQuaternion::eulerFromQuaternion(CQuaternion const &aQuaternion)
+        CVector3D<float> CQuaternion::eulerFromQuaternion(CQuaternion const &aQuaternion)
         {
-            CVector3D_t v {};
+            CVector3D<float> v {};
 
             ValueType_t const aQuaternion00saQuaternion = aQuaternion.scalar()     * aQuaternion.scalar();
             ValueType_t const aQuaternion11saQuaternion = aQuaternion.vector().x() * aQuaternion.vector().x();
@@ -402,7 +402,7 @@ namespace engine
                 r02 = 2 * ((aQuaternion.vector().x() * aQuaternion.vector().z()) +
                            (aQuaternion.scalar()     * aQuaternion.vector().y()));
 
-                v = CVector3D_t({
+                v = CVector3D<float>({
                                     rad_to_deg(0.0f),                                    // phi
                                     rad_to_deg((-((ValueType_t)M_PI / 2.0f)*r20 / tmp)), // tau
                                     rad_to_deg(atan2(-r01, -r20*r02))                 // psi
@@ -410,7 +410,7 @@ namespace engine
             }
             else
             {
-                v = CVector3D_t({
+                v = CVector3D<float>({
                                     rad_to_deg(atan2(r21, r22)), // phi
                                     rad_to_deg(asin(-r20)),      // tau
                                     rad_to_deg(atan2(r10, r00))  // psi
@@ -446,7 +446,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector4D_t CQuaternion::axisAngleFromQuaternion(CQuaternion const &aQuaternion)
+        CVector4D<float> CQuaternion::axisAngleFromQuaternion(CQuaternion const &aQuaternion)
         {
             CQuaternion p = aQuaternion;
 
@@ -471,8 +471,8 @@ namespace engine
                 z = p.z() / sqrtOneMinusScalarSq;
             }
 
-            CVector4D_t const v
-                    = CVector4D_t({
+            CVector4D<float> const v
+                    = CVector4D<float>({
                                       x,
                                       y,
                                       z,
@@ -497,9 +497,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CVector3D_t rotate(
+        CVector3D<float> rotate(
                 CQuaternion const &aQuaternion,
-                CVector3D_t const &aVector)
+                CVector3D<float> const &aVector)
         {
             CQuaternion const p = CQuaternion(0.0f, aVector);
 
