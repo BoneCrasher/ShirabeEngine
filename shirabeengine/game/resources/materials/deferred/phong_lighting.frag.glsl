@@ -24,6 +24,9 @@ layout (location = 0) out vec4 fragment_light_0;
 void main()
 {
     vec4 diffuse = subpassLoad(gbuffer0);
+    vec4 normal  = subpassLoad(gbuffer1);
+    vec4 other   = subpassLoad(gbuffer2);
+    vec4 depth   = subpassLoad(depth);
 
     fragment_light_0 = diffuse; // Just forward...
 } 

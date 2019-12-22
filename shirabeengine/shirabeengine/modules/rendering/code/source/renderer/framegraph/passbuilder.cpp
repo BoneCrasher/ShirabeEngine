@@ -528,7 +528,7 @@ namespace engine
                                                                                                             adjustedMipSliceRange,
                                                                                                             mode);
 
-                if(not duplicateViewIdQuery.successful())
+                if(not duplicateViewIdQuery.successful() && not (EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId == duplicateViewIdQuery.result()))
                 {
                     return { duplicateViewIdQuery.result() };
                 }

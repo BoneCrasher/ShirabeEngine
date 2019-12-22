@@ -259,8 +259,8 @@ namespace engine
             std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
             std::vector<VkDescriptorImageInfo>  descriptorSetWriteAttachmentImageInfos {};
 
-            descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
-            descriptorSetWriteBufferInfos.resize(aGpuInputAttachmentTextureViewHandles.size());
+            descriptorSetWriteBufferInfos         .resize(aGpuBufferHandles.size());
+            descriptorSetWriteAttachmentImageInfos.resize(aGpuInputAttachmentTextureViewHandles.size());
 
             uint64_t        writeCounter           = 0;
             uint64_t        bufferCounter          = 0;
@@ -310,7 +310,7 @@ namespace engine
                                 imageInfo.imageView   = view->handle;
                                 imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                                 imageInfo.sampler     = VK_NULL_HANDLE;
-                                descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter];
+                                descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter] = imageInfo;
 
                                 VkWriteDescriptorSet descriptorWrite = {};
                                 descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
