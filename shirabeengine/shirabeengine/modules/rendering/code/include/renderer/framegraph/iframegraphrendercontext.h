@@ -31,8 +31,7 @@ namespace engine
 
         public_api:
 
-            virtual CEngineResult<> clearAttachments(std::string                     const &aRenderPassId,
-                                                     SFrameGraphAttachmentCollection const &aAttachmentInf) = 0;
+            virtual CEngineResult<> clearAttachments(std::string const &aRenderPassId) = 0;
 
             /**
              * Begin a pass.
@@ -435,6 +434,8 @@ namespace engine
              */
             virtual CEngineResult<> render(SFrameGraphMesh     const &aMesh,
                                            SFrameGraphMaterial const &aMaterial) = 0;
+
+            virtual CEngineResult<> drawFullscreenQuadWithMaterial(SFrameGraphMaterial const &aMaterial) = 0;
         };
 
     }

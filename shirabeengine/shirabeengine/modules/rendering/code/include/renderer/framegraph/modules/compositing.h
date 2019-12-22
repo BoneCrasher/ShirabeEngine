@@ -37,6 +37,8 @@ namespace engine
                 SFrameGraphResource gbuffer2;
                 SFrameGraphResource depth;
                 SFrameGraphResource lightAccumulationBuffer;
+
+                SFrameGraphMaterial material;
             };
 
             /**

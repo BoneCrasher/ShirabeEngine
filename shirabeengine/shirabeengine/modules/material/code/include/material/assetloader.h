@@ -32,7 +32,7 @@ namespace engine::material
     {
         using namespace resources;
 
-        bool const isCoreMaterial = ("core" == aMaterialName);
+        bool const isCoreMaterial = ("Core" == aMaterialName);
 
         SMaterialPipelineDescriptor pipelineDescriptor     {};
         SShaderModuleDescriptor     shaderModuleDescriptor {};
@@ -55,7 +55,7 @@ namespace engine::material
         pipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
         pipelineDescriptor.rasterizerState.polygonMode               = VkPolygonMode::VK_POLYGON_MODE_FILL;
         pipelineDescriptor.rasterizerState.lineWidth                 = 1.0f;
-        pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = isCoreMaterial ? VK_TRUE : VK_FALSE;
+        pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_FALSE; // isCoreMaterial ? VK_TRUE : VK_FALSE;
         pipelineDescriptor.rasterizerState.depthClampEnable          = VK_FALSE;
         pipelineDescriptor.rasterizerState.depthBiasEnable           = VK_FALSE;
         pipelineDescriptor.rasterizerState.depthBiasSlopeFactor      = 0.0f;

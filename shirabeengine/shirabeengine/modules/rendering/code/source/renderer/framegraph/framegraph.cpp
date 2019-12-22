@@ -303,11 +303,12 @@ namespace engine
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(not copy.empty())
             {
-                aRenderContext->beginPass();
-
                 PassUID_t                    const passUID  = copy.top();
                 Shared<CPassBase>            const pass     = mPasses.at(passUID);
                 Unique<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
+
+                aRenderContext->beginPass();
+                aRenderContext->clearAttachments(sRenderPassResourceId);
 
                 CEngineResult<> executed = pass->execute(mResourceData, aRenderContext);
                 if(not executed.successful())

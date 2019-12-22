@@ -46,6 +46,8 @@ namespace engine
             [[nodiscard]]
             GpuApiHandle_t getGpuApiResourceHandle() const final;
 
+            std::optional<TDependencies> const &getCurrentDependencies() const { return mDependencies; }
+
             virtual EEngineStatus load(Dependencies_t const &aDependencies) = 0;
 
             virtual EEngineStatus unload() = 0;
@@ -67,14 +69,16 @@ namespace engine
         protected_methods:
             EEngineStatus loadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
             {
+                mDependencies = aDependencies;
+
                 return (mLoader) ? mLoader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
             }
             EEngineStatus unloadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
             {
+                mDependencies.reset();
+
                 return (mUnloader) ? mUnloader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
             }
-
-            std::optional<TDependencies> const &getCurrentDependencies() const { return mDependencies; }
             void resetCurrentDependencies() { mDependencies.reset(); }
 
         private_members:

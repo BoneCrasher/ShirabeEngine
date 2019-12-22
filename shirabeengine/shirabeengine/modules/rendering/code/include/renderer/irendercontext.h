@@ -27,7 +27,7 @@ namespace engine
 
         public_api:
 
-            virtual EEngineStatus clearAttachments(GpuApiHandle_t const &aRenderPassId) = 0;
+            virtual EEngineStatus clearAttachments(GpuApiHandle_t const &aRenderPassId, uint32_t const &aCurrentSubpassIndex) = 0;
 
             /**
              * Begin a subpass.
@@ -66,7 +66,10 @@ namespace engine
 
             virtual EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) = 0;
 
-            virtual EEngineStatus updateResourceBindings(GpuApiHandle_t const &aGpuMaterialHandle, std::vector<GpuApiHandle_t> const &aGpuBufferHandles) = 0;
+            virtual EEngineStatus updateResourceBindings(  GpuApiHandle_t              const &aGpuMaterialHandle
+                                                         , std::vector<GpuApiHandle_t> const &aGpuBufferHandles
+                                                         , std::vector<GpuApiHandle_t> const &aGpuInputAttachmentTextureViewHandles
+                                                         , std::vector<GpuApiHandle_t> const &aGpuTextureViewHandles) = 0;
 
             /**
              * Put the current internal command buffer into recording mode.
@@ -167,6 +170,8 @@ namespace engine
             virtual EEngineStatus render(SRenderable const &aRenderable) = 0;
 
             virtual EEngineStatus drawIndex(uint32_t const aIndexCount) = 0;
+
+            virtual EEngineStatus drawQuad() = 0;
 
 
         };

@@ -254,7 +254,7 @@ namespace engine::vulkan
         VkPipeline pipelineHandle = VK_NULL_HANDLE;
         {
             VkResult const result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipelineHandle);
-            if( VkResult::VK_SUCCESS!=result )
+            if( VkResult::VK_SUCCESS != result )
             {
                 CLog::Error(logTag(), "Failed to create pipeline. Result {}", result);
                 return {EEngineStatus::Error};

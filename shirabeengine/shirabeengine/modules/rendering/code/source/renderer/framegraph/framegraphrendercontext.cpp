@@ -103,12 +103,11 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::clearAttachments(std::string                     const &aRenderPassId,
-                                                               SFrameGraphAttachmentCollection const &aAttachmentInfo)
+    CEngineResult<> CFrameGraphRenderContext::clearAttachments(std::string const &aRenderPassId)
     {
         Shared<SRenderPass> renderPass = getUsedResourceTyped<SRenderPass>(aRenderPassId);
 
-        EEngineStatus const status = mGraphicsAPIRenderContext->clearAttachments(renderPass->getGpuApiResourceHandle());
+        EEngineStatus const status = mGraphicsAPIRenderContext->clearAttachments(renderPass->getGpuApiResourceHandle(), mCurrentSubpass);
         if(CheckEngineError(status))
         {
             // ...
@@ -992,7 +991,9 @@ namespace engine::framegraph
         dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
         EEngineStatus const status = material->load(dependencies);
 
-        std::vector<GpuApiHandle_t> gpuBufferIds {};
+        std::vector<GpuApiHandle_t> gpuBufferIds                     {};
+        std::vector<GpuApiHandle_t> gpuInputAttachmentTextureViewIds {};
+        std::vector<GpuApiHandle_t> gpuTextureViewIds                {};
 
         for(auto const &buffer : material->bufferResources)
         {
@@ -1000,7 +1001,24 @@ namespace engine::framegraph
             gpuBufferIds.push_back(buffer->getGpuApiResourceHandle());
         }
 
-        mGraphicsAPIRenderContext->updateResourceBindings(material->pipelineResource->getGpuApiResourceHandle(), gpuBufferIds);
+        Shared<SRenderPass>             renderPass      = std::static_pointer_cast<SRenderPass>(getUsedResource(aRenderPassHandle));
+        SRenderPassDescription   const &renderPassDesc  = renderPass->getDescription();
+        SRenderPassDependencies  const &renderPassDeps = *(renderPass->getCurrentDependencies());
+
+        SSubpassDescription const &subPassDesc = renderPassDesc.subpassDescriptions.at(mCurrentSubpass);
+        for(auto const &inputAttachment : subPassDesc.inputAttachments)
+        {
+            uint32_t     const &attachmentIndex           = inputAttachment.attachment;
+            ResourceId_t const &attachementResourceHandle = renderPassDeps.attachmentTextureViews.at(attachmentIndex);
+
+            Shared<STextureView> attachmentTextureView = std::static_pointer_cast<STextureView>(getUsedResource(attachementResourceHandle));
+            gpuInputAttachmentTextureViewIds.push_back(attachmentTextureView->getGpuApiResourceHandle());
+        }
+
+        mGraphicsAPIRenderContext->updateResourceBindings(  material->pipelineResource->getGpuApiResourceHandle()
+                                                          , gpuBufferIds
+                                                          , gpuInputAttachmentTextureViewIds
+                                                          , gpuTextureViewIds);
 
         auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
         return result;
@@ -1049,6 +1067,24 @@ namespace engine::framegraph
             unbindMesh     (aMesh);
             unloadMeshAsset(aMesh);
         }
+
+        unbindMaterial     (aMaterial);
+        unloadMaterialAsset(aMaterial);
+
+        return EEngineStatus::Ok;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+
+    CEngineResult<> CFrameGraphRenderContext::drawFullscreenQuadWithMaterial(SFrameGraphMaterial const &aMaterial)
+    {
+        loadMaterialAsset(aMaterial);
+        bindMaterial(aMaterial, mCurrentRenderPassHandle);
+
+        mGraphicsAPIRenderContext->drawQuad();
 
         unbindMaterial     (aMaterial);
         unloadMaterialAsset(aMaterial);

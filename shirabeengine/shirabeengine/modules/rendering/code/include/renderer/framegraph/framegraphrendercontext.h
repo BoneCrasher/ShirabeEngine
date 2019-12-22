@@ -61,8 +61,7 @@ namespace engine
             // IFrameGraphRenderContext implementation
             //
 
-            CEngineResult<> clearAttachments(std::string                     const &aRenderPassId,
-                                             SFrameGraphAttachmentCollection const &aAttachmentInfo) final;
+            CEngineResult<> clearAttachments(std::string const &aRenderPassId) final;
 
             /**
              * Begin a pass.
@@ -446,6 +445,8 @@ namespace engine
              */
             CEngineResult<> render(SFrameGraphMesh     const &aMesh,
                                    SFrameGraphMaterial const &aMaterial) override;
+
+            CEngineResult<> drawFullscreenQuadWithMaterial(SFrameGraphMaterial const &aMaterial) override;
 
         public_constructors:
             /**

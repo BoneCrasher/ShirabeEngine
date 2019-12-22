@@ -1,4 +1,5 @@
 #include "renderer/framegraph/modules/compositing.h"
+#include <util/crc32.h>
 
 namespace engine
 {
@@ -92,6 +93,9 @@ namespace engine
 
                 aOutPassData.exportData.output = aBuilder.writeAttachment(aOutPassData.state.compositingBufferId, writeFlags).data();
 
+                SFrameGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong_lighting.material.meta")).data();
+                aOutPassData.importData.material = material;
+
                 return { EEngineStatus::Ok };
             };
 
@@ -101,11 +105,16 @@ namespace engine
                     Shared<IFrameGraphRenderContext>      &aContext)
                     -> CEngineResult<>
             {
-                SHIRABE_UNUSED(aPassData);
-                SHIRABE_UNUSED(aFrameGraphResources);
-                SHIRABE_UNUSED(aContext);
-
                 CLog::Verbose(logTag(), "Compositing");
+
+                auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(aPassData.importData.material.resourceId);
+                if(CheckEngineError(result) || nullptr == materialPointer)
+                {
+                    CLog::Error(logTag(), "Failed to fetch material for id {}", aPassData.importData.material.resourceId);
+                    return  EEngineStatus::Error;
+                }
+
+                aContext->drawFullscreenQuadWithMaterial(*materialPointer);
 
                 return { EEngineStatus::Ok };
             };

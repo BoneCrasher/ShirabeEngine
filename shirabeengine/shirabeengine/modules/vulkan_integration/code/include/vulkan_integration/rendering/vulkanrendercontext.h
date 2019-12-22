@@ -45,7 +45,7 @@ namespace engine
             // IRenderContext implementation
             //
 
-            EEngineStatus clearAttachments(GpuApiHandle_t const &aRenderPassId) final;
+            EEngineStatus clearAttachments(GpuApiHandle_t const &aRenderPassId, uint32_t const &aCurrentSubpassIndex) final;
 
             /**
              * Begin a subpass.
@@ -84,7 +84,10 @@ namespace engine
 
             EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) final;
 
-            EEngineStatus updateResourceBindings(GpuApiHandle_t const &aGpuMaterialHandle, std::vector<GpuApiHandle_t> const &aGpuBufferHandles) final;
+            EEngineStatus updateResourceBindings(  GpuApiHandle_t              const &aGpuMaterialHandle
+                                                 , std::vector<GpuApiHandle_t> const &aGpuBufferHandles
+                                                 , std::vector<GpuApiHandle_t> const &aGpuInputAttachmentTextureViewHandles
+                                                 , std::vector<GpuApiHandle_t> const &aGpuTextureViewHandles) final;
 
             /**
              * Put the current internal command buffer into recording mode.
@@ -186,6 +189,8 @@ namespace engine
             EEngineStatus render(SRenderable const &aRenderable) final;
 
             EEngineStatus drawIndex(uint32_t const aIndexCount) final;
+
+            EEngineStatus drawQuad() final;
 
         private_members:
             Shared<CVulkanEnvironment>     mVulkanEnvironment;

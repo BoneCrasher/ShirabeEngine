@@ -19,21 +19,21 @@
       <config projectName="shirabedevelopment" targetName="core" />
       <config projectName="shirabedevelopment" targetName="crc32generator" />
       <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
       <config projectName="shirabedevelopment" targetName="wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
       <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
       <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
       <config projectName="shirabedevelopment" targetName="resources" />
       <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
       <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
       <config projectName="shirabedevelopment" targetName="math" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
       <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
       <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
       <config projectName="shirabedevelopment" targetName="INSTALL_os" />
       <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="material" />
       <config projectName="shirabedevelopment" targetName="asset" />
+      <config projectName="shirabedevelopment" targetName="material" />
       <config projectName="shirabedevelopment" targetName="os" />
       <config projectName="shirabedevelopment" targetName="base" />
       <config projectName="shirabedevelopment" targetName="shirabeengine" />
@@ -265,32 +265,23 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.vert.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/camera.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/camera.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/camera.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/materials/extended/extended.materialinstance" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/matrix.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/matrix.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/include/math/quaternion.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/math/code/source/math/quaternion.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/math/code/source/math/quaternion.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/compositing.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/compositing.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/lighting.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/lighting.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gfxapicommon.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gfxapicommon.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourceobject.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourceobject.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanrenderpassresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanrenderpassresource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanmaterialpipelineresource.cpp" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -327,6 +318,11 @@
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectId" id="1MxwnQZh6ezParMSrxJQc4EvUso" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -355,18 +351,6 @@
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager" selected="CMake Application.INSTALL_game">
     <configuration name="INSTALL_asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_asset" CONFIG_NAME="Debug">
@@ -618,6 +602,18 @@
       <item itemvalue="CMake Application.INSTALL_shirabe_shader_precompiler" />
     </list>
   </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
   <component name="StructureViewFactory">
     <option name="ACTIVE_ACTIONS" value=",KIND" />
   </component>
@@ -709,7 +705,10 @@
       <workItem from="1576685837746" duration="1198000" />
       <workItem from="1576919836714" duration="2429000" />
       <workItem from="1576922824239" duration="18083000" />
-      <workItem from="1577014588941" duration="6648000" />
+      <workItem from="1577014588941" duration="19319000" />
+      <workItem from="1577051605871" duration="202000" />
+      <workItem from="1577051824905" duration="38000" />
+      <workItem from="1577051966838" duration="2199000" />
     </task>
     <servers />
   </component>
@@ -743,6 +742,52 @@
       </map>
     </option>
   </component>
+  <component name="WindowStateProjectService">
+    <state width="632" height="466" key="DebuggerActiveHint" timestamp="1577054130873">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="632" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577054130873" />
+    <state width="1365" height="11" key="GridCell.Tab.0.bottom" timestamp="1577053897947">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577053897947" />
+    <state width="1365" height="11" key="GridCell.Tab.0.center" timestamp="1577053897946">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577053897946" />
+    <state width="1365" height="11" key="GridCell.Tab.0.left" timestamp="1577053897946">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577053897946" />
+    <state width="1365" height="11" key="GridCell.Tab.0.right" timestamp="1577053897947">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577053897947" />
+    <state width="1365" height="11" key="GridCell.Tab.1.bottom" timestamp="1577053901992">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577053901992" />
+    <state width="1365" height="11" key="GridCell.Tab.1.center" timestamp="1577053901992">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577053901992" />
+    <state width="1365" height="11" key="GridCell.Tab.1.left" timestamp="1577053901992">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577053901992" />
+    <state width="1365" height="11" key="GridCell.Tab.1.right" timestamp="1577053901992">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state width="1365" height="11" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577053901992" />
+    <state x="685" y="256" width="540" height="524" key="StructurePopup" timestamp="1577052812893">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state x="685" y="256" width="540" height="524" key="StructurePopup/0.0.1920.1044@0.0.1920.1044" timestamp="1577052812893" />
+    <state x="637" y="255" width="645" height="538" key="find.popup" timestamp="1577053861741">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state x="637" y="255" width="645" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577053861741" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -773,8 +818,18 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp</url>
-          <line>368</line>
+          <line>367</line>
           <option name="timeStamp" value="182" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h</url>
+          <line>229</line>
+          <option name="timeStamp" value="258" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp</url>
+          <line>118</line>
+          <option name="timeStamp" value="262" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

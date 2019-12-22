@@ -340,35 +340,36 @@ namespace engine
                                                                                                , true
                                                                                                , true);
 
+            auto const &[phongMaterialLoadResult, phong] = mMaterialLoader->loadMaterialInstance(mAssetStorage
+                                                                                               , util::crc32FromString("materials/deferred/phong_lighting.material.meta")
+                                                                                               , true);
+
+            auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage
+                                                                                               , util::crc32FromString("materials/standard/standard.material.meta")
+                                                                                               , true);
+
+            auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage
+                                                                                       , util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
+
+            auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");
             auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");
             coreMaterialComponent->setMaterialInstance(core);
-
-            auto coreTransform = makeShared<ecws::CTransformComponent>("core_transform");
 
             auto coreEntity = makeUnique<ecws::CEntity>("core");
             coreEntity->addComponent(coreTransform);
             coreEntity->addComponent(coreMaterialComponent);
 
-            mScene.addEntity(std::move(coreEntity));
-
-            auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage
-                                                                                     , util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
-            auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage
-                                                                                             , util::crc32FromString("materials/standard/standard.material.meta")
-                                                                                             , true);
-
-            auto meshComponent = makeShared<ecws::CMeshComponent>("barramundi_mesh");
-            meshComponent->setMeshInstance(mesh);
-            auto materialComponent = makeShared<ecws::CMaterialComponent>("barramundi_material");
-            materialComponent->setMaterialInstance(material);
             auto transformComponent = makeShared<ecws::CTransformComponent>("barramundi_transform");
+            auto meshComponent      = makeShared<ecws::CMeshComponent>("barramundi_mesh");
+            auto materialComponent  = makeShared<ecws::CMaterialComponent>("barramundi_material");
+            meshComponent    ->setMeshInstance(mesh);
+            materialComponent->setMaterialInstance(material);
 
             auto barramundi = makeUnique<ecws::CEntity>("barramundi");
             barramundi->addComponent(materialComponent);
             barramundi->addComponent(meshComponent);
             barramundi->addComponent(transformComponent);
 
-            mScene.addEntity(std::move(barramundi), "core");
 
             CCamera::SFrustumParameters frustum {};
             frustum.width             = 1920;
@@ -385,14 +386,18 @@ namespace engine
                                         , projection);
 
             auto cameraTransform = makeShared<ecws::CTransformComponent>("primaryCamera_transform");
-            cameraTransform->getMutableTransform().translate(CVector3D<float>({0.0, 0.1, -1.0}));
             auto cameraComponent = makeShared<ecws::CCameraComponent>("primaryCamera_camera");
             cameraComponent->setCamera(camera);
+
             auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
             cameraEntity->addComponent(cameraTransform);
             cameraEntity->addComponent(cameraComponent);
 
+            mScene.addEntity(std::move(barramundi), "core");
+            mScene.addEntity(std::move(coreEntity));
             mScene.addEntity(std::move(cameraEntity), "barramundi");
+
+            cameraTransform->getMutableTransform().translate(CVector3D<float>({0.0, 0.1, -1.0}));
         }
         catch(std::exception &stde)
         {

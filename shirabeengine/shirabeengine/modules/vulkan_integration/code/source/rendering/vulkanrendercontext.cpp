@@ -41,7 +41,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::clearAttachments(GpuApiHandle_t const &aRenderPassId)
+        EEngineStatus CVulkanRenderContext::clearAttachments(GpuApiHandle_t const &aRenderPassId, uint32_t const &aCurrentSubpassIndex)
         {
             SVulkanState    &state        = mVulkanEnvironment->getState();
             VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
@@ -51,22 +51,36 @@ namespace engine
 
             std::vector<VkClearRect>       clearRects       {};
             std::vector<VkClearAttachment> clearAttachments {};
-            for(std::size_t k=0; k<description.attachmentDescriptions.size(); ++k)
+
+            SSubpassDescription const &subpassDesc = description.subpassDescriptions.at(aCurrentSubpassIndex);
+            for(std::size_t k=0; k<subpassDesc.colorAttachments.size(); ++k)
             {
-                SAttachmentDescription const &desc = description.attachmentDescriptions[k];
+                SAttachmentReference   const &ref  = subpassDesc.colorAttachments[k];
+                SAttachmentDescription const &desc = description.attachmentDescriptions[ref.attachment];
+
                 VkClearAttachment clear {};
                 clear.colorAttachment = k;
+                clear.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+                clear.clearValue      = desc.clearColor;
 
-                if(desc.isColorAttachment)
-                {
-                    clear.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                    clear.clearValue = desc.clearColor;
-                }
-                else if(desc.isDepthAttachment)
-                {
-                    clear.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-                    clear.clearValue = desc.clearColor;
-                }
+                VkClearRect rect {};
+                rect.baseArrayLayer = 0;
+                rect.layerCount     = 1;
+                rect.rect.offset    = { 0, 0 };
+                rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
+
+                clearAttachments.push_back(clear);
+                clearRects      .push_back(rect);
+            }
+
+            for(std::size_t k=0; k<subpassDesc.depthStencilAttachments.size(); ++k)
+            {
+                SAttachmentReference   const &ref  = subpassDesc.depthStencilAttachments[k];
+                SAttachmentDescription const &desc = description.attachmentDescriptions[ref.attachment];
+
+                VkClearAttachment clear {};
+                clear.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+                clear.clearValue = desc.clearColor;
 
                 VkClearRect rect {};
                 rect.baseArrayLayer = 0;
@@ -231,7 +245,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::updateResourceBindings(GpuApiHandle_t const &aGpuMaterialHandle, std::vector<GpuApiHandle_t> const &aGpuBufferHandles)
+        EEngineStatus CVulkanRenderContext::updateResourceBindings(  GpuApiHandle_t const              &aGpuMaterialHandle
+                                                                   , std::vector<GpuApiHandle_t> const &aGpuBufferHandles
+                                                                   , std::vector<GpuApiHandle_t> const &aGpuInputAttachmentTextureViewHandles
+                                                                   , std::vector<GpuApiHandle_t> const &aGpuTextureViewHandles)
         {
             VkDevice device = mVulkanEnvironment->getLogicalDevice();
 
@@ -240,10 +257,14 @@ namespace engine
 
             std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
             std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
-            descriptorSetWrites          .resize(aGpuBufferHandles.size());
-            descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
+            std::vector<VkDescriptorImageInfo>  descriptorSetWriteAttachmentImageInfos {};
 
-            uint64_t        writeCounter = 0;
+            descriptorSetWriteBufferInfos.resize(aGpuBufferHandles.size());
+            descriptorSetWriteBufferInfos.resize(aGpuInputAttachmentTextureViewHandles.size());
+
+            uint64_t        writeCounter           = 0;
+            uint64_t        bufferCounter          = 0;
+            uint64_t        inputAttachmentCounter = 0;
             uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
 
             for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
@@ -253,31 +274,62 @@ namespace engine
                 {
                     VkDescriptorSetLayoutBinding const binding = setBindings[j];
 
-                    if(binding.descriptorType != VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+                    switch(binding.descriptorType)
                     {
-                        continue; // Only supporting UBOs for now...
+                        case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+                            {
+                                auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[bufferCounter]);
+
+                                VkDescriptorBufferInfo bufferInfo = {};
+                                bufferInfo.buffer = buffer->handle;
+                                bufferInfo.offset = 0;
+                                bufferInfo.range  = buffer->getCurrentDescriptor()->createInfo.size;
+                                descriptorSetWriteBufferInfos[bufferCounter] = bufferInfo;
+
+                                VkWriteDescriptorSet descriptorWrite = {};
+                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                descriptorWrite.pNext            = nullptr;
+                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                                descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstBinding       = binding.binding;
+                                descriptorWrite.dstArrayElement  = 0;
+                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                                descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[bufferCounter++]);
+                                descriptorWrite.pImageInfo       = nullptr; // Optional
+                                descriptorWrite.pTexelBufferView = nullptr;
+
+                                descriptorSetWrites.push_back(descriptorWrite);
+                                //descriptorSetWrites[writeCounter++] = descriptorWrite;
+                            }
+                            break;
+                        case VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+                            {
+                                auto const *const view = mResourceStorage->extract<CVulkanTextureViewResource>(aGpuInputAttachmentTextureViewHandles[inputAttachmentCounter]);
+
+                                VkDescriptorImageInfo imageInfo {};
+                                imageInfo.imageView   = view->handle;
+                                imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                imageInfo.sampler     = VK_NULL_HANDLE;
+                                descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter];
+
+                                VkWriteDescriptorSet descriptorWrite = {};
+                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                descriptorWrite.pNext            = nullptr;
+                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+                                descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstBinding       = binding.binding;
+                                descriptorWrite.dstArrayElement  = 0;
+                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                                descriptorWrite.pBufferInfo      = nullptr;
+                                descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter++]); // Optional
+                                descriptorWrite.pTexelBufferView = nullptr;
+                                // descriptorSetWrites[writeCounter++] = descriptorWrite;
+                                descriptorSetWrites.push_back(descriptorWrite);
+                            }
+                            break;
+                        default:
+                            break;
                     }
-
-                    auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[writeCounter]);
-
-                    VkDescriptorBufferInfo bufferInfo = {};
-                    bufferInfo.buffer = buffer->handle;
-                    bufferInfo.offset = 0;
-                    bufferInfo.range  = buffer->getCurrentDescriptor()->createInfo.size;
-                    descriptorSetWriteBufferInfos[writeCounter] = bufferInfo;
-
-                    VkWriteDescriptorSet descriptorWrite = {};
-                    descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                    descriptorWrite.pNext            = nullptr;
-                    descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                    descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
-                    descriptorWrite.dstBinding       = binding.binding;
-                    descriptorWrite.dstArrayElement  = 0;
-                    descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                    descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[writeCounter]);
-                    descriptorWrite.pImageInfo       = nullptr; // Optional
-                    descriptorWrite.pTexelBufferView = nullptr;
-                    descriptorSetWrites[writeCounter++] = descriptorWrite;
                 }
             }
 
@@ -672,7 +724,21 @@ namespace engine
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
-            vkCmdDrawIndexed(vkCommandBuffer, aIndexCount, 1, 0, 0, 0); // Single triangle for now.
+            vkCmdDrawIndexed(vkCommandBuffer, aIndexCount, 1, 0, 0, 0);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::drawQuad()
+        {
+            SVulkanState     &vkState        = mVulkanEnvironment->getState();
+            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+
+            vkCmdDraw(vkCommandBuffer, 4, 1, 0, 0);
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
     }
