@@ -438,6 +438,22 @@ namespace engine
 
             return q;
         }
+
+        static CQuaternion operator*(CMatrix4x4 const &aLHS, CQuaternion const &aRHS)
+        {
+            CMatrix4x4::ValueType_t result[4];
+            __shirabe_math__matrix_multiply<CMatrix4x4::ValueType_t, 4, 4, 1>(aLHS.const_ptr(), aRHS.const_ptr(), result);
+            CQuaternion q(result[3], result[0], result[1], result[2]);
+            return q;
+        }
+
+        static CQuaternion operator*(CQuaternion const &aLHS, CMatrix4x4 const &aRHS)
+        {
+            CMatrix4x4::ValueType_t result[4];
+            __shirabe_math__matrix_multiply<CMatrix4x4::ValueType_t, 1, 4, 4>(aLHS.const_ptr(), aRHS.const_ptr(), result);
+            CQuaternion q(result[3], result[0], result[1], result[2]);
+            return q;
+        }
     }
 }
 

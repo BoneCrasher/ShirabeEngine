@@ -124,6 +124,9 @@ namespace engine
             EImageLayout       initialLayout;
             EImageLayout       finalLayout;
             VkClearValue       clearColor;
+            bool               isColorAttachment;
+            bool               isDepthAttachment;
+            bool               isInputAttachment;
         };
 
         struct SAttachmentReference

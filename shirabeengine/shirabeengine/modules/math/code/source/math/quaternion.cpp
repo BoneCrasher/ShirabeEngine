@@ -437,7 +437,10 @@ namespace engine
             ValueType_t const r33 = 1 - (2 * (aQuaternion.x() * aQuaternion.x())) - (2 * (aQuaternion.y() * aQuaternion.y()));
             ValueType_t const r44 = 1.0;
 
-            CMatrix4x4 mat = CMatrix4x4({ r11, r12, r13, 0.0, r21, r22, r23, 0.0, r31, r32, r33, 0.0, 0.0, 0.0, 0.0, r44 });
+            CMatrix4x4 mat = CMatrix4x4({ r11, r12, r13, 0.0,
+                                                   r21, r22, r23, 0.0,
+                                                   r31, r32, r33, 0.0,
+                                                   0.0, 0.0, 0.0, r44 });
 
             return mat;
         }

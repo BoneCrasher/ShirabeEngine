@@ -243,8 +243,9 @@ namespace engine
              */
             CEngineResult<> initializeRenderPassAndFrameBuffer(
                     Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    std::string                               const &aRenderPassId,
-                    std::string                               const &aFrameBufferId);
+                    std::vector<PassUID_t>           const &aPassExecutionOrder,
+                    std::string                      const &aRenderPassId,
+                    std::string                      const &aFrameBufferId);
 
             /**
              * Bind all automatic resources required for execution.

@@ -74,10 +74,16 @@ namespace engine
                 readFlags.arraySliceRange = CRange(0, 1);
                 readFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aGbuffer0,     readFlags).data();
-                aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aGbuffer1,     readFlags).data();
-                aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aGbuffer2,     readFlags).data();
-                aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aDepthStencil, readFlags).data();
+                SFrameGraphReadTextureFlags depthReadFlags{ };
+                depthReadFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
+                depthReadFlags.readSource      = EFrameGraphReadSource::Depth;
+                depthReadFlags.arraySliceRange = CRange(0, 1);
+                depthReadFlags.mipSliceRange   = CRange(0, 1);
+
+                aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aGbuffer0,     readFlags     ).data();
+                aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aGbuffer1,     readFlags     ).data();
+                aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aGbuffer2,     readFlags     ).data();
+                aOutPassData.importData.depth    = aBuilder.readAttachment(aDepthStencil, depthReadFlags).data();
 
                 SFrameGraphWriteTextureFlags writeFlags{ };
                 writeFlags.requiredFormat  = FrameGraphFormat_t::Automatic;

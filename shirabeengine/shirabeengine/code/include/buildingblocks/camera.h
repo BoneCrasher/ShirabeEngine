@@ -199,7 +199,7 @@ namespace engine
         {
             SHIRABE_UNUSED(aTimer);
 
-            ECoordinateSystem system = ECoordinateSystem::RH;
+            ECoordinateSystem system = ECoordinateSystem::LH;
             createViewMatrix(aTransform, system);
             createProjectionMatrix(system);
         }

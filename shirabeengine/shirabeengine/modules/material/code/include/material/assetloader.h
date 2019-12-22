@@ -32,6 +32,8 @@ namespace engine::material
     {
         using namespace resources;
 
+        bool const isCoreMaterial = ("core" == aMaterialName);
+
         SMaterialPipelineDescriptor pipelineDescriptor     {};
         SShaderModuleDescriptor     shaderModuleDescriptor {};
         Vector<SBufferDescription>  bufferDescriptions     {};
@@ -50,10 +52,10 @@ namespace engine::material
         pipelineDescriptor.rasterizerState.pNext                     = nullptr;
         pipelineDescriptor.rasterizerState.flags                     = 0;
         pipelineDescriptor.rasterizerState.cullMode                  = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
-        pipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_CLOCKWISE;
+        pipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
         pipelineDescriptor.rasterizerState.polygonMode               = VkPolygonMode::VK_POLYGON_MODE_FILL;
         pipelineDescriptor.rasterizerState.lineWidth                 = 1.0f;
-        pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_FALSE;
+        pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = isCoreMaterial ? VK_TRUE : VK_FALSE;
         pipelineDescriptor.rasterizerState.depthClampEnable          = VK_FALSE;
         pipelineDescriptor.rasterizerState.depthBiasEnable           = VK_FALSE;
         pipelineDescriptor.rasterizerState.depthBiasSlopeFactor      = 0.0f;
@@ -93,19 +95,22 @@ namespace engine::material
         {
             if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT == stageKey)
             {
+                std::vector<SStageInput> stageInputs(stage.inputs);
+                std::sort(stageInputs.begin(), stageInputs.end(), [] (SStageInput const &aLHS, SStageInput const &aRHS) -> bool { return aLHS.location < aRHS.location; });
+
                 for(std::size_t k=0; k<stage.inputs.size(); ++k)
                 {
-                    SStageInput const &input = stage.inputs.at(k);
+                    SStageInput const &input = stageInputs.at(k);
 
                     // This number has to be equal to the VkVertexInputBindingDescription::binding index which data should be taken from!
                     VkVertexInputBindingDescription binding;
-                    binding.binding   = k;
+                    binding.binding   = input.location;
                     binding.stride    = (input.type->byteSize * input.type->vectorSize);
                     binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
                     VkVertexInputAttributeDescription attribute;
                     attribute.binding  = k;
-                    attribute.location = k;
+                    attribute.location = input.location;
                     attribute.offset   = 0;
                     attribute.format   = (8 == binding.stride)
                                          ? VkFormat::VK_FORMAT_R32G32_SFLOAT

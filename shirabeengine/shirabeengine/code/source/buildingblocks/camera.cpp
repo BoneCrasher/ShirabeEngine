@@ -74,8 +74,8 @@ namespace engine
             CVector3D<float>       const &aUp,
             CVector3D<float>       const &aForward,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
-    {      
-        SHIRABE_UNUSED(aCoordinateSystem);
+    {
+        float const coordinateSystemFactor = ((ECoordinateSystem::LH == aCoordinateSystem) ? 1.0f : -1.0f);
 
         CVector3D<float>       n_up      = math::normalize(aUp);
         CVector3D<float> const n_forward = math::normalize(aForward);
@@ -83,10 +83,10 @@ namespace engine
         n_up = math::normalize(math::cross(n_forward, n_right));
 
         CMatrix4x4 const view = CMatrix4x4({
-                n_right.x(),         n_up.x(),        -n_forward.x(),        0.0f,
-                n_right.y(),         n_up.y(),        -n_forward.y(),        0.0f,
-                n_right.z(),         n_up.z(),        -n_forward.z(),        0.0f,
-                -dot(n_right, aEye), -dot(n_up,aEye), -dot(n_forward, aEye), 1.0f
+                n_right.x(),         n_up.x(),         coordinateSystemFactor * n_forward.x(),        0.0f,
+                n_right.y(),         n_up.y(),         coordinateSystemFactor * n_forward.y(),        0.0f,
+                n_right.z(),         n_up.z(),         coordinateSystemFactor * n_forward.z(),        0.0f,
+                -dot(n_right, aEye), -dot(n_up,aEye), -dot(n_forward, aEye),                          1.0f
         });
 
         return view;
@@ -112,7 +112,7 @@ namespace engine
             CVector3D<float>       const &aTarget,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
-        SHIRABE_UNUSED(aCoordinateSystem);
+        float const coordinateSystemFactor = ((ECoordinateSystem::LH == aCoordinateSystem) ? 1.0f : -1.0f);
 
         CVector3D<float>       n_up      = math::normalize(aUp);
         CVector3D<float> const n_forward = math::normalize((aTarget - aEye));
@@ -120,10 +120,10 @@ namespace engine
         n_up = math::normalize(math::cross(n_right, n_forward));
 
         CMatrix4x4 const view = CMatrix4x4({
-            n_right.x(),         n_up.x(),        -n_forward.x(),        0.0f,
-            n_right.y(),         n_up.y(),        -n_forward.y(),        0.0f,
-            n_right.z(),         n_up.z(),        -n_forward.z(),        0.0f,
-            -dot(n_right, aEye), -dot(n_up,aEye), -dot(n_forward, aEye), 1.0f
+            n_right.x(),         n_up.x(),        coordinateSystemFactor * n_forward.x(),        0.0f,
+            n_right.y(),         n_up.y(),        coordinateSystemFactor * n_forward.y(),        0.0f,
+            n_right.z(),         n_up.z(),        coordinateSystemFactor * n_forward.z(),        0.0f,
+            -dot(n_right, aEye), -dot(n_up,aEye), -dot(n_forward, aEye),                         1.0f
         });
 
         return view;
@@ -163,7 +163,7 @@ namespace engine
             (n2 / width),      0.0f,               0.0f,                                       0.0f,
             0.0f,              (n2 / height),      ((t + b) / height),                         0.0f,
             ((r + l) / width), ((t + b) / height), coordinateSystemFactor * ((f + n) / depth), coordinateSystemFactor * 1,
-            0.0f,              0.0f,               -(fn2 / depth),                             10.0f
+            0.0f,              0.0f,               -(fn2 / depth),                             0.0f
         });
         projection.r11(-projection.r11()); // Invert for vulkan
 
@@ -199,8 +199,8 @@ namespace engine
         CMatrix4x4 projection = CMatrix4x4({
                 (1.0f / (aspect * fovFactorRad)), 0.0f,                  0.0f,                                         0.0f,
                 0.0f,                             (1.0f / fovFactorRad), 0.0f,                                         0.0f,
-                0.0f,                             0.0f,                  coordinateSystemFactor * ((f) / (f - n)), coordinateSystemFactor * 1,
-                0.0f,                             0.0f,                  -((f * n) / (f - n)),                  0.0f
+                0.0f,                             0.0f,                  coordinateSystemFactor * ((f + n) / (f - n)), coordinateSystemFactor * 1,
+                0.0f,                             0.0f,                  -((2.0f * f * n) / (f - n)),                  0.0f
         });
         projection.r11(-projection.r11()); // Invert for vulkan
 
@@ -224,7 +224,7 @@ namespace engine
             double            const &aFar,
             ECoordinateSystem const &aCoordinateSystem = ECoordinateSystem::RH)
     {
-        float const coordinateSystemFactor =  ((aCoordinateSystem == ECoordinateSystem::LH) ? 1.0 : -1.0);
+        float const coordinateSystemFactor =  ((ECoordinateSystem::LH == aCoordinateSystem) ? 1.0f : -1.0f);
 
         float const l = aBounds.x();
         float const t = aBounds.y();

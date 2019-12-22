@@ -283,6 +283,27 @@ namespace meshes
 
         indexBuffer = indices;
 
+        #define WRITE_CLEARTEXT_ATTRIBUTES_FILE 1
+        #if WRITE_CLEARTEXT_ATTRIBUTES_FILE == 1
+        auto const writeBufferToString = [](std::vector<uint8_t> const &buffer, uint8_t const componentCount, std::string const &name, std::stringstream &ss)
+        {
+            uint8_t counter = 0;
+            ss << "\n" << name << ":\n";
+            for( uint64_t k = 0; k < buffer.size(); k += 4 )
+            {
+                ss << *(( float * ) (buffer.data() + k)) << (counter < (componentCount-1) ? "," : "\n");
+
+                counter = (++counter) % componentCount;
+            }
+        };
+        std::stringstream ss {};
+        writeBufferToString(positions,     3, "Positions", ss);
+        writeBufferToString(normals,       3, "Normals",   ss);
+        writeBufferToString(tangents,      4, "Tangents",  ss);
+        writeBufferToString(uvcoordinates, 2, "Texcoords", ss);
+        engine::writeFile(std::filesystem::path(outputAttributeBufferPathAbs).concat(".cleartext"), ss.str());
+        #endif
+
         engine::writeFile(outputAttributeBufferPathAbs, attributeBuffer);
         engine::writeFile(outputIndexBufferPathAbs,     indexBuffer);
 

@@ -36,8 +36,8 @@ void main()
     mat3 view_transform_3x3 = mat3(view_transform);
 
     vec4 position_viewspace  = (view_transform * position);
-    vec3 normal_viewspace    = (view_transform_3x3 * vertex_normal);
-    vec3 tangent_viewspace   = (view_transform_3x3 * light_position); // vertex_tangent.xyz);
+    vec3 normal_viewspace    = normalize(view_transform_3x3 * vertex_normal);
+    vec3 tangent_viewspace   = normalize(view_transform_3x3 * light_position); // vertex_tangent.xyz);
     vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace));
 
     gl_Position = (graphicsData.primaryCamera.projection * position_viewspace);

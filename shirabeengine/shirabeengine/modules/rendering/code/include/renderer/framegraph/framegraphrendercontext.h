@@ -142,6 +142,7 @@ namespace engine
              */
             CEngineResult<> createRenderPass(
                     std::string                     const &aRenderPassId,
+                    std::vector<PassUID_t>          const &aPassExecutionOrder,
                     SFrameGraphAttachmentCollection const &aAttachmentInfo,
                     CFrameGraphMutableResources     const &aFrameGraphResources) override;
 
@@ -166,6 +167,7 @@ namespace engine
              */
             CEngineResult<> bindRenderPass(std::string                     const &aRenderPassId,
                                            std::string                     const &aFrameBufferId,
+                                           std::vector<PassUID_t>          const &aPassExecutionOrder,
                                            SFrameGraphAttachmentCollection const &aAttachmentInfo,
                                            CFrameGraphMutableResources     const &aFrameGraphResources) override;
 

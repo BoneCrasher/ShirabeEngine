@@ -108,8 +108,6 @@ namespace engine::framegraph
     {
         Shared<SRenderPass> renderPass = getUsedResourceTyped<SRenderPass>(aRenderPassId);
 
-
-
         EEngineStatus const status = mGraphicsAPIRenderContext->clearAttachments(renderPass->getGpuApiResourceHandle());
         if(CheckEngineError(status))
         {
@@ -242,6 +240,7 @@ namespace engine::framegraph
      */
     CEngineResult<> CFrameGraphRenderContext::createRenderPass(
             std::string                     const &aRenderPassId,
+            std::vector<PassUID_t>          const &aPassExecutionOrder,
             SFrameGraphAttachmentCollection const &aAttachmentInfo,
             CFrameGraphMutableResources     const &aFrameGraphResources)
     {
@@ -288,8 +287,13 @@ namespace engine::framegraph
         renderPassDesc.name = aRenderPassId;
 
         // Traverse all referenced attachmentments foreach pass.
-        for(auto const &[passUID, attachmentResourceIndexList] : aAttachmentInfo.getAttachmentPassAssignment())
+
+        // The attachements need to be sorted in such order, as they are going to be executed.
+        auto const &assignment = aAttachmentInfo.getAttachmentPassAssignment();
+        for(auto const &passUid : aPassExecutionOrder)
         {
+            std::vector<uint64_t> const &attachmentResourceIndexList = assignment.at(passUid);
+
             SSubpassDescription subpassDesc = {};
             for(auto const &index : attachmentResourceIndexList)
             {
@@ -346,10 +350,12 @@ namespace engine::framegraph
                 // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
                 SAttachmentDescription attachmentDesc = {};
                 attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
-                attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
+                attachmentDesc.loadOp         = EAttachmentLoadOp ::CLEAR;
+                attachmentDesc.storeOp        = EAttachmentStoreOp::DONT_CARE;
+                attachmentDesc.stencilLoadOp  = EAttachmentLoadOp ::DONT_CARE;
+                attachmentDesc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
                 attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                 attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
-                attachmentDesc.loadOp         = (EImageLayout::UNDEFINED == attachmentDesc.initialLayout) ? EAttachmentLoadOp::DONT_CARE : EAttachmentLoadOp::LOAD;
                 attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
                 attachmentDesc.format         = textureView.format;
 
@@ -362,15 +368,25 @@ namespace engine::framegraph
 
                 if(isColorAttachment)
                 {
-                    attachmentDesc.loadOp      = EAttachmentLoadOp::CLEAR;
-                    attachmentDesc.clearColor  = { 0.0f, 0.0f, 0.0f, 1.0f };
+                    attachmentDesc.loadOp            = EAttachmentLoadOp ::CLEAR;
+                    attachmentDesc.storeOp           = EAttachmentStoreOp::STORE;
+                    attachmentDesc.stencilLoadOp     = EAttachmentLoadOp ::DONT_CARE;
+                    attachmentDesc.stencilStoreOp    = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.clearColor.color  = { 0.0f, 0.0f, 0.0f, 1.0f };
+                    attachmentDesc.isColorAttachment = true;
                     attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
                     subpassDesc.colorAttachments.push_back(attachmentReference);
                 }
                 else if(isDepthAttachment)
                 {
-                    attachmentDesc.loadOp      = EAttachmentLoadOp::CLEAR;
-                    attachmentDesc.clearColor  = { 0.0f, 0.0f, 0.0f, 1.0f };
+                    attachmentDesc.loadOp                  = EAttachmentLoadOp ::CLEAR;
+                    attachmentDesc.storeOp                 = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.stencilLoadOp           = EAttachmentLoadOp ::DONT_CARE;
+                    attachmentDesc.stencilStoreOp          = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.format                  = EFormat::D24_UNORM_S8_UINT;
+                    attachmentDesc.finalLayout             = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                    attachmentDesc.clearColor.depthStencil = { 1.0f, 0 };
+                    attachmentDesc.isDepthAttachment       = true;
 
                     if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
                     {
@@ -385,8 +401,12 @@ namespace engine::framegraph
                 }
                 else if(isInputAttachment)
                 {
-                    attachmentDesc.loadOp      = EAttachmentLoadOp::LOAD;
-                    attachmentReference.layout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
+                    attachmentDesc.loadOp            = EAttachmentLoadOp::LOAD;
+                    attachmentDesc.storeOp           = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.stencilLoadOp     = EAttachmentLoadOp ::DONT_CARE;
+                    attachmentDesc.stencilStoreOp    = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.isInputAttachment = true;
+                    attachmentReference.layout       = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
                     subpassDesc.inputAttachments.push_back(attachmentReference);
                 }
                 renderPassDesc.attachmentDescriptions.push_back(attachmentDesc);
@@ -472,6 +492,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::bindRenderPass(std::string                     const &aRenderPassId,
                                                              std::string                     const &aFrameBufferId,
+                                                             std::vector<PassUID_t>          const &aPassExecutionOrder,
                                                              SFrameGraphAttachmentCollection const &aAttachmentInfo,
                                                              CFrameGraphMutableResources     const &aFrameGraphResources
                                                              )
@@ -484,8 +505,12 @@ namespace engine::framegraph
         SRenderPassDependencies renderPassDependencies {};
 
         FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementResourceIds();
-        for(auto const &[passUID, attachmentResourceIndexList] : aAttachmentInfo.getAttachmentPassAssignment())
+
+        auto const &assignment = aAttachmentInfo.getAttachmentPassAssignment();
+        for(auto const &passUid : aPassExecutionOrder)
         {
+            std::vector<uint64_t> const &attachmentResourceIndexList = assignment.at(passUid);
+
             SSubpassDescription subpassDesc = {};
             for(auto const &index : attachmentResourceIndexList)
             {

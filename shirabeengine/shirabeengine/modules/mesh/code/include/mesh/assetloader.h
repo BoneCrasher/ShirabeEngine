@@ -125,7 +125,7 @@ namespace engine::mesh
             offsets.resize(4);
             for(uint64_t k=0; k<4; ++k)
             {
-                offsets[k] = dataFile.attributes[k].offset;
+                offsets[k] = dataFile.attributes[k].offset * dataFile.attributes[k].bytesPerSample;
             }
             meshDescriptor.offsets = offsets;
 

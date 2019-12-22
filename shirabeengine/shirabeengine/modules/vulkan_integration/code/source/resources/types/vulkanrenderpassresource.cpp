@@ -68,7 +68,6 @@ namespace engine::vulkan
                 VkAttachmentReference vkAttachmentReference {};
                 vkAttachmentReference.attachment = ref.attachment;
                 vkAttachmentReference.layout     = static_cast<VkImageLayout>(ref.layout);
-
                 colorAttachmentReferences.push_back(vkAttachmentReference);
             }
 
@@ -81,18 +80,42 @@ namespace engine::vulkan
                 depthAttachmentReferences.push_back(vkAttachmentReference);
             }
 
-            inputAttachmentReferenceList.push_back(inputAttachmentReferences);
-            colorAttachmentReferenceList.push_back(colorAttachmentReferences);
-            depthAttachmentReferenceList.push_back(depthAttachmentReferences);
+            if(not inputAttachmentReferences.empty())
+            {
+                inputAttachmentReferenceList.push_back(inputAttachmentReferences);
+            }
+            if(not colorAttachmentReferences.empty())
+            {
+                colorAttachmentReferenceList.push_back(colorAttachmentReferences);
+            }
+            if(not depthAttachmentReferences.empty())
+            {
+                depthAttachmentReferenceList.push_back(depthAttachmentReferences);
+            }
 
             VkSubpassDescription vkSubpassDesc{};
             vkSubpassDesc.pipelineBindPoint       = VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
-            vkSubpassDesc.pInputAttachments       = inputAttachmentReferenceList.back().data();
-            vkSubpassDesc.inputAttachmentCount    = static_cast<uint32_t>(inputAttachmentReferenceList.back().size());
-            vkSubpassDesc.pColorAttachments       = colorAttachmentReferenceList.back().data();
-            vkSubpassDesc.colorAttachmentCount    = static_cast<uint32_t>(colorAttachmentReferenceList.back().size());
-            vkSubpassDesc.pDepthStencilAttachment = depthAttachmentReferenceList.back().data();
-            vkSubpassDesc.flags = 0;
+            vkSubpassDesc.pInputAttachments       = nullptr;
+            vkSubpassDesc.inputAttachmentCount    = 0;
+            vkSubpassDesc.pColorAttachments       = nullptr;
+            vkSubpassDesc.colorAttachmentCount    = 0;
+            vkSubpassDesc.pDepthStencilAttachment = nullptr;
+            vkSubpassDesc.flags                   = 0;
+
+            if(not inputAttachmentReferences.empty())
+            {
+                vkSubpassDesc.pInputAttachments    = inputAttachmentReferenceList.back().data();
+                vkSubpassDesc.inputAttachmentCount = static_cast<uint32_t>(inputAttachmentReferenceList.back().size());
+            }
+            if(not colorAttachmentReferences.empty())
+            {
+                vkSubpassDesc.pColorAttachments    = colorAttachmentReferenceList.back().data();
+                vkSubpassDesc.colorAttachmentCount = static_cast<uint32_t>(colorAttachmentReferenceList.back().size());
+            }
+            if(not depthAttachmentReferences.empty())
+            {
+                vkSubpassDesc.pDepthStencilAttachment = depthAttachmentReferenceList.back().data();
+            }
 
             vkSubpassDescriptions.push_back(vkSubpassDesc);
         }

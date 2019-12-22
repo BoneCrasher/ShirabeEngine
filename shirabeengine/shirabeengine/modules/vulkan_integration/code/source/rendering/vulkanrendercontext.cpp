@@ -55,9 +55,18 @@ namespace engine
             {
                 SAttachmentDescription const &desc = description.attachmentDescriptions[k];
                 VkClearAttachment clear {};
-                clear.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT;
-                clear.clearValue      = desc.clearColor;
                 clear.colorAttachment = k;
+
+                if(desc.isColorAttachment)
+                {
+                    clear.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                    clear.clearValue = desc.clearColor;
+                }
+                else if(desc.isDepthAttachment)
+                {
+                    clear.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+                    clear.clearValue = desc.clearColor;
+                }
 
                 VkClearRect rect {};
                 rect.baseArrayLayer = 0;

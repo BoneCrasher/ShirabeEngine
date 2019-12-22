@@ -34,7 +34,7 @@ namespace engine
                 SFrameGraphResource gbuffer0;
                 SFrameGraphResource gbuffer1;
                 SFrameGraphResource gbuffer2;
-                SFrameGraphResource gbuffer3;
+                SFrameGraphResource depth;
             };
 
             /**

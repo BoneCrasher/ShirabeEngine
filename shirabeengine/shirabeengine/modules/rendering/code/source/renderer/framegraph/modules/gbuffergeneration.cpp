@@ -148,7 +148,7 @@ namespace engine
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
-                // aRenderContext->clearAttachments("DefaultRenderPass");
+                aRenderContext->clearAttachments("DefaultRenderPass", SFrameGraphAttachmentCollection {});
 
                 for(SRenderableResources const &renderableResources : aPassData.importData.renderables)
                 {

@@ -385,7 +385,7 @@ namespace engine
                                         , projection);
 
             auto cameraTransform = makeShared<ecws::CTransformComponent>("primaryCamera_transform");
-            cameraTransform->getMutableTransform().translate(CVector3D<float>({0.0, 0.0, 1.0}));
+            cameraTransform->getMutableTransform().translate(CVector3D<float>({0.0, 0.1, -1.0}));
             auto cameraComponent = makeShared<ecws::CCameraComponent>("primaryCamera_camera");
             cameraComponent->setCamera(camera);
             auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
@@ -475,7 +475,7 @@ namespace engine
         Shared<ecws::CMaterialComponent>                            barramundiMaterial   = *(barramundiMaterials.begin());
         ecws::CBoundedCollection<Shared<ecws::CTransformComponent>> barramundiTransforms = barramundi->getTypedComponentsOfType<ecws::CTransformComponent>();
         Shared<ecws::CTransformComponent>                           barramundiTransform  = *(barramundiTransforms.begin());
-        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, 0.01f * counter, 0.0f}));
+        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, deg_to_rad((float)mTimer.total_elapsed() * 180), 0.0f}));
         barramundiMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4::MatrixData_t>("struct_modelMatrices", "world", barramundiTransform->getTransform().world().const_data());
 
         Unique<ecws::CEntity>                                    const &cameraEntity     = mScene.findEntity("primaryCamera");

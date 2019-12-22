@@ -259,6 +259,16 @@ namespace engine
         {
             assert(aRenderContext != nullptr);
 
+            std::vector<PassUID_t> executionOrder {};
+            {
+                std::stack<PassUID_t> copy = mPassExecutionOrder;
+                while(not copy.empty())
+                {
+                    executionOrder.push_back(copy.top());
+                    copy.pop();
+                }
+            }
+
             if(EGraphMode::Graphics == mGraphMode)
             {
                 if(mRenderToBackBuffer)
@@ -266,7 +276,7 @@ namespace engine
                     aRenderContext->bindSwapChain(sSwapChainResourceId);
                 }
 
-                CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, sRenderPassResourceId, sFrameBufferResourceId);
+                CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, executionOrder, sRenderPassResourceId, sFrameBufferResourceId);
                 if(not setUpRenderPassAndFrameBuffer.successful())
                 {
                     return setUpRenderPassAndFrameBuffer;
@@ -287,7 +297,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, mResourceData.getAttachments(), mResourceData);
+                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, executionOrder, mResourceData.getAttachments(), mResourceData);
             }
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
@@ -295,7 +305,7 @@ namespace engine
             {
                 aRenderContext->beginPass();
 
-                PassUID_t                             const passUID  = copy.top();
+                PassUID_t                    const passUID  = copy.top();
                 Shared<CPassBase>            const pass     = mPasses.at(passUID);
                 Unique<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
 
@@ -461,6 +471,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeRenderPassAndFrameBuffer(
                 Shared<IFrameGraphRenderContext>       &aRenderContext,
+                std::vector<PassUID_t>           const &aPassExecutionOrder,
                 std::string                      const &aRenderPassId,
                 std::string                      const &aFrameBufferId)
         {
@@ -478,7 +489,7 @@ namespace engine
                 return initialization;
             }
 
-            CEngineResult<> const renderPassCreation = aRenderContext->createRenderPass(aRenderPassId, attachments, mResourceData);
+            CEngineResult<> const renderPassCreation = aRenderContext->createRenderPass(aRenderPassId, aPassExecutionOrder, attachments, mResourceData);
             EngineStatusPrintOnError(renderPassCreation.result(), logTag(), "Failed to create render pass.");
 
             CEngineResult<> const frameBufferCreation = aRenderContext->createFrameBuffer(aFrameBufferId, aRenderPassId);
