@@ -736,7 +736,7 @@ namespace engine
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
-            vkCmdDraw(vkCommandBuffer, 4, 1, 0, 0);
+            vkCmdDraw(vkCommandBuffer, 6, 1, 0, 0);
 
             return EEngineStatus::Ok;
         }

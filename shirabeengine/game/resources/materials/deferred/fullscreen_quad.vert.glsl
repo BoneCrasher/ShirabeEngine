@@ -10,19 +10,21 @@ void main()
     switch(gl_VertexIndex)
     {
         case 0:
-            gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);
             //texcoord    = gl_Position.xy;
             break;
         case 1:
-            gl_Position = vec4(0.0, -1.0, 0.0, 1.0);
+        case 4:
+            gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
             //texcoord    = gl_Position.xy;
             break;
         case 2:
-            gl_Position = vec4(1.0f, 0.0, 0.0, 1.0);
+        case 3:
+            gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
             //texcoord    = gl_Position.xy;
             break;
-        case 3:
-            gl_Position = vec4(1.0f, 1.0, 0.0, 1.0);
+        case 5:
+            gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
            // texcoord    = gl_Position.xy;
             break;
     }
