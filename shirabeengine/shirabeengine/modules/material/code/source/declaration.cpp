@@ -359,8 +359,6 @@ namespace engine::material
         std::function<void(std::pair<VkPipelineStageFlagBits const, SMaterialStage> const &)> iterateStages = nullptr;
         iterateStages = [&] (std::pair<VkPipelineStageFlagBits const, SMaterialStage> const &aStage) -> void
         {
-
-
             VkPipelineStageFlagBits const  key   = aStage.first;
             SMaterialStage          const &stage = aStage.second;
 
@@ -400,8 +398,8 @@ namespace engine::material
             aSerializer.endObject();
         };
         std::for_each(this->stages.cbegin(), this->stages.cend(), iterateStages);
-
         aSerializer.endArray();
+
         aSerializer.endObject();
 
         return true;

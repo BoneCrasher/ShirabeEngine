@@ -58,6 +58,11 @@ function read_arguments
 
 read_arguments $@
 
+# 
+# Clean output directory entirely!
+#
+rm -rf ./data/output/resources
+
 #
 # Process all materials
 #

@@ -265,18 +265,10 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/deferred/fullscreen_quad.vert.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/deferred/phong_lighting.frag.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/deferred/phong_lighting.material" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/compositing.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/compositing.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/gbuffergeneration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/gbuffergeneration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/lighting.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/lighting.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/materials/extraction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/materials/extraction.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/shirabe_process_resources.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tools/shirabe_process_resources.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -348,7 +340,7 @@
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.INSTALL_game">
+  <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
     <configuration name="INSTALL_asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_asset" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -706,7 +698,7 @@
       <workItem from="1577051824905" duration="38000" />
       <workItem from="1577051966838" duration="3788000" />
       <workItem from="1577105431194" duration="1833000" />
-      <workItem from="1577130101964" duration="4493000" />
+      <workItem from="1577130101964" duration="6646000" />
     </task>
     <servers />
   </component>
@@ -741,50 +733,50 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state width="793" height="466" key="DebuggerActiveHint" timestamp="1577133657408">
+    <state width="793" height="466" key="DebuggerActiveHint" timestamp="1577136668772">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577133657408" />
-    <state width="1333" height="231" key="GridCell.Tab.0.bottom" timestamp="1577134845746">
+    <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577136668772" />
+    <state width="1318" height="308" key="GridCell.Tab.0.bottom" timestamp="1577136972133">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1333" height="231" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845746" />
-    <state width="1333" height="231" key="GridCell.Tab.0.center" timestamp="1577134845745">
+    <state width="1318" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
+    <state width="1318" height="308" key="GridCell.Tab.0.center" timestamp="1577136972132">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1333" height="231" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845745" />
-    <state width="1333" height="231" key="GridCell.Tab.0.left" timestamp="1577134845745">
+    <state width="1318" height="308" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
+    <state width="1318" height="308" key="GridCell.Tab.0.left" timestamp="1577136972132">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1333" height="231" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845745" />
-    <state width="1333" height="231" key="GridCell.Tab.0.right" timestamp="1577134845746">
+    <state width="1318" height="308" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
+    <state width="1318" height="308" key="GridCell.Tab.0.right" timestamp="1577136972133">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1333" height="231" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845746" />
-    <state width="1334" height="231" key="GridCell.Tab.1.bottom" timestamp="1577134845684">
+    <state width="1318" height="308" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
+    <state width="1319" height="308" key="GridCell.Tab.1.bottom" timestamp="1577136972052">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1334" height="231" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845684" />
-    <state width="1334" height="231" key="GridCell.Tab.1.center" timestamp="1577134845684">
+    <state width="1319" height="308" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
+    <state width="1319" height="308" key="GridCell.Tab.1.center" timestamp="1577136972051">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1334" height="231" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845684" />
-    <state width="1334" height="231" key="GridCell.Tab.1.left" timestamp="1577134845684">
+    <state width="1319" height="308" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
+    <state width="1319" height="308" key="GridCell.Tab.1.left" timestamp="1577136972051">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1334" height="231" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845684" />
-    <state width="1334" height="231" key="GridCell.Tab.1.right" timestamp="1577134845684">
+    <state width="1319" height="308" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
+    <state width="1319" height="308" key="GridCell.Tab.1.right" timestamp="1577136972052">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1334" height="231" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577134845684" />
+    <state width="1319" height="308" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
     <state x="685" y="256" width="540" height="524" key="StructurePopup" timestamp="1577052812893">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="685" y="256" width="540" height="524" key="StructurePopup/0.0.1920.1044@0.0.1920.1044" timestamp="1577052812893" />
-    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577105491037">
+    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577136941085">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577105491037" />
+    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577136941085" />
     <state x="623" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1577130303459">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>

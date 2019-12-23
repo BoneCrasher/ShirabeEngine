@@ -512,8 +512,6 @@ namespace materials
                     materialExtracted.sampledImages.push_back(image);
                 }
 
-                materialExtracted.sampledImages.push_back(image);
-
                 CLog::Debug(logTag(),
                             "\nSampledImage: "
                             "\n  ID:              {}"
