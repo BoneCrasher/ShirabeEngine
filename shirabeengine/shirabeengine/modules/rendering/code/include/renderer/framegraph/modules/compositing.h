@@ -35,6 +35,7 @@ namespace engine
                 SFrameGraphResource gbuffer0;
                 SFrameGraphResource gbuffer1;
                 SFrameGraphResource gbuffer2;
+                SFrameGraphResource gbuffer3;
                 SFrameGraphResource depth;
                 SFrameGraphResource lightAccumulationBuffer;
 
@@ -70,6 +71,7 @@ namespace engine
                     SFrameGraphResource const &aGbuffer1,
                     SFrameGraphResource const &aGbuffer2,
                     SFrameGraphResource const &aGbuffer3,
+                    SFrameGraphResource const &aDepthStencil,
                     SFrameGraphResource const &aLightAccumulationBuffer);
         };
 

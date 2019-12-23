@@ -341,8 +341,11 @@ namespace engine
                                                                                                , true);
 
             auto const &[phongMaterialLoadResult, phong] = mMaterialLoader->loadMaterialInstance(mAssetStorage
-                                                                                               , util::crc32FromString("materials/deferred/phong_lighting.material.meta")
+                                                                                               , util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta")
                                                                                                , true);
+            auto const &[compositingMaterialLoadResult, compositing] = mMaterialLoader->loadMaterialInstance(mAssetStorage
+                                                                                                 , util::crc32FromString("materials/deferred/compositing/compositing.material.meta")
+                                                                                                 , true);
 
             auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage
                                                                                                , util::crc32FromString("materials/standard/standard.material.meta")
@@ -498,7 +501,7 @@ namespace engine
         config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.view",       camera->view().const_data());
         config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.projection", camera->projection().const_data());
 
-        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, deg_to_rad((float)mTimer.total_elapsed() * 180), 0.0f}));
+        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, deg_to_rad((float)mTimer.total_elapsed() * 90), 0.0f}));
         barramundiMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4::MatrixData_t>("struct_modelMatrices", "world", barramundiTransform->getTransform().world().const_data());
 
         if(mRenderer)

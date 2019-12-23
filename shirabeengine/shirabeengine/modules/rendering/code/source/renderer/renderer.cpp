@@ -140,7 +140,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CRenderer::updateBuffer(GpuApiHandle_t const &aBufferId, ByteBuffer aData)
         {
-            mGpuApiRenderContext->transferBufferData(aData, aBufferId);
+            return mGpuApiRenderContext->transferBufferData(aData, aBufferId);
         }
         //<-----------------------------------------------------------------------------
 
@@ -208,6 +208,7 @@ namespace engine
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
+                        gbufferExportData.gbuffer3,
                         gbufferExportData.depthStencil).data();
 
             // Compositing
@@ -219,6 +220,7 @@ namespace engine
                         gbufferExportData.gbuffer0,
                         gbufferExportData.gbuffer1,
                         gbufferExportData.gbuffer2,
+                        gbufferExportData.gbuffer3,
                         gbufferExportData.depthStencil,
                         lightingExportData.lightAccumulationBuffer).data();
 

@@ -18,6 +18,7 @@ namespace engine
                 SFrameGraphResource const &aGbuffer0,
                 SFrameGraphResource const &aGbuffer1,
                 SFrameGraphResource const &aGbuffer2,
+                SFrameGraphResource const &aGbuffer3,
                 SFrameGraphResource const &aDepthStencil,
                 SFrameGraphResource const &aLightAccumulationBuffer)
         {
@@ -82,6 +83,7 @@ namespace engine
                 aOutPassData.importData.gbuffer0                = aBuilder.readAttachment(aGbuffer0,                readFlags     ).data();
                 aOutPassData.importData.gbuffer1                = aBuilder.readAttachment(aGbuffer1,                readFlags     ).data();
                 aOutPassData.importData.gbuffer2                = aBuilder.readAttachment(aGbuffer2,                readFlags     ).data();
+                aOutPassData.importData.gbuffer3                = aBuilder.readAttachment(aGbuffer3,                readFlags     ).data();
                 aOutPassData.importData.depth                   = aBuilder.readAttachment(aDepthStencil,            depthReadFlags).data();
                 aOutPassData.importData.lightAccumulationBuffer = aBuilder.readAttachment(aLightAccumulationBuffer, readFlags     ).data();
 
@@ -93,7 +95,7 @@ namespace engine
 
                 aOutPassData.exportData.output = aBuilder.writeAttachment(aOutPassData.state.compositingBufferId, writeFlags).data();
 
-                SFrameGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong_lighting.material.meta")).data();
+                SFrameGraphMaterial const &material = aBuilder.useMaterial("compositing", util::crc32FromString("materials/deferred/compositing/compositing.material.meta")).data();
                 aOutPassData.importData.material = material;
 
                 return { EEngineStatus::Ok };

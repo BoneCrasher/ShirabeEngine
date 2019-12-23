@@ -1,0 +1,21 @@
+{
+    "uid"                       : 1002,
+    "name"                      : "compositing",
+    "signatureFilename"         : 0,
+    "baseConfigurationFilename" : 0,
+    "stages" :
+        {
+            "vertex"             :
+                { 
+                    "glslSourceFilename" : "fullscreen_quad.vert.glsl"
+                },
+            "tess_control_point" : null,
+            "tess_evaluation"    : null,
+            "geometry"           : null,
+            "fragment"           : 
+                {
+                    "glslSourceFilename" : "compositing.frag.glsl"
+                },
+            "compute"            : null
+        }
+}

@@ -20,14 +20,12 @@ in struct_vertexData_full shader_input;
 layout (location = 0) out vec4 fragment_color_0;
 layout (location = 1) out vec4 fragment_color_1;
 layout (location = 2) out vec4 fragment_color_2;
+layout (location = 3) out vec4 fragment_color_3;
 
 void main()
 {
-    vec3 L = normalize(shader_input.vertex_tangent - shader_input.vertex_position); // Hack
-    vec3 N = normalize(shader_input.vertex_normal);
-    float f = dot(N, L);
-
-    fragment_color_0 = clamp(f, 0.0f, 1.0f) * shader_input.vertex_color;
-    fragment_color_1 = vec4(0.5f * (shader_input.vertex_normal + 1.0f), 1.0);
-    fragment_color_2 = clamp(f, 0.0f, 1.0f) * shader_input.vertex_color;
+    fragment_color_0 = vec4(shader_input.vertex_position.xyz, 1.0);
+    fragment_color_1 = vec4(shader_input.vertex_normal,       1.0);
+    fragment_color_2 = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    fragment_color_3 = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 } 

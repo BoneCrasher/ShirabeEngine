@@ -34,7 +34,10 @@ namespace engine
                 SFrameGraphResource gbuffer0;
                 SFrameGraphResource gbuffer1;
                 SFrameGraphResource gbuffer2;
+                SFrameGraphResource gbuffer3;
                 SFrameGraphResource depth;
+
+                SFrameGraphMaterial material;
             };
 
             /**
@@ -64,7 +67,8 @@ namespace engine
                     SFrameGraphResource const &aGbuffer0,
                     SFrameGraphResource const &aGbuffer1,
                     SFrameGraphResource const &aGbuffer2,
-                    SFrameGraphResource const &aGbuffer3);
+                    SFrameGraphResource const &aGbuffer4,
+                    SFrameGraphResource const &aDepthStencil);
 
         };
 
