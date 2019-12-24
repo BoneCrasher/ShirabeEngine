@@ -3,9 +3,11 @@
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
       <config projectName="shirabedevelopment" targetName="INSTALL_game" />
+      <config projectName="shirabedevelopment" targetName="textures" />
       <config projectName="shirabedevelopment" targetName="log" />
       <config projectName="shirabedevelopment" targetName="game" />
       <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_textures" />
       <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
       <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
       <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
@@ -265,9 +267,7 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -304,6 +304,9 @@
     <setting file="file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/vulkanresourcetaskmodule_pipeline.cpp" root0="SKIP_INSPECTION" />
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="OCResolveContextSettings">
+    <option name="configuration" value="0-Debug-textures" />
+  </component>
   <component name="ProjectId" id="1MxwnQZh6ezParMSrxJQc4EvUso" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -316,7 +319,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.advertisement.text.has.clang-format" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/modules" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -327,17 +330,17 @@
     <property name="settings.editor.selected.configurable" value="dynamic.analysis.tools.valgrind" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes" />
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common" />
-      <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
-      <recent name="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source/common" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabeengine/modules" />
+      <recent name="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes" />
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common" />
+      <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
@@ -422,6 +425,11 @@
       </method>
     </configuration>
     <configuration name="INSTALL_shirabeengine" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_shirabeengine" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="INSTALL_textures" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_textures" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -531,6 +539,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="textures" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="textures" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="utility" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="utility" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -581,6 +594,8 @@
       <item itemvalue="CMake Application.rendering" />
       <item itemvalue="CMake Application.INSTALL_resources" />
       <item itemvalue="CMake Application.resources" />
+      <item itemvalue="CMake Application.INSTALL_textures" />
+      <item itemvalue="CMake Application.textures" />
       <item itemvalue="CMake Application.INSTALL_utility" />
       <item itemvalue="CMake Application.utility" />
       <item itemvalue="CMake Application.INSTALL_vulkan_integration" />
@@ -698,7 +713,7 @@
       <workItem from="1577051824905" duration="38000" />
       <workItem from="1577051966838" duration="3788000" />
       <workItem from="1577105431194" duration="1833000" />
-      <workItem from="1577130101964" duration="12822000" />
+      <workItem from="1577130101964" duration="22628000" />
     </task>
     <servers />
   </component>
@@ -733,6 +748,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
+    <state x="694" y="269" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1577188271486">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state x="694" y="269" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1044@0.0.1920.1044" timestamp="1577188271486" />
     <state width="793" height="466" key="DebuggerActiveHint" timestamp="1577136668772">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
@@ -781,11 +800,15 @@
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="685" y="256" width="540" height="524" key="StructurePopup/0.0.1920.1044@0.0.1920.1044" timestamp="1577052812893" />
-    <state x="854" y="256" width="1706" height="542" key="find.popup" timestamp="1577168453632">
+    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577193886017">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577193886017" />
+    <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577168453632" />
+    <state x="944" y="240" width="672" height="677" key="run.anything.popup" timestamp="1577174357674">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
-    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577136941085" />
-    <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577168453632" />
+    <state x="944" y="240" width="672" height="677" key="run.anything.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577174357674" />
     <state x="623" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1577130303459">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>

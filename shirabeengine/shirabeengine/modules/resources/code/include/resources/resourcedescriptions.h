@@ -58,10 +58,10 @@ namespace engine
         {
         public_members:
             std::string                      name;
-            STextureInfo                     textureInfo;
+            asset::STextureInfo              textureInfo;
             EResourceUsage                   cpuGpuUsage;
             core::CBitField<EBufferBinding>  gpuBinding;
-            Vector<CResourceDataSource>      initialData;
+            Vector<DataSourceAccessor_t>     initialData;
         };
 
         struct

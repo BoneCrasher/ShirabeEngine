@@ -17,6 +17,7 @@ add_subdirectory(modules/graphicsapi)
 add_subdirectory(modules/rendering)
 add_subdirectory(modules/vulkan_integration)
 add_subdirectory(modules/asset)
+add_subdirectory(modules/textures)
 add_subdirectory(modules/material)
 add_subdirectory(modules/mesh)
 
@@ -43,7 +44,9 @@ set(
         resources
         rendering
         graphicsapi
+		textures
         material
+		mesh
         vulkan_integration
         asset)
 
