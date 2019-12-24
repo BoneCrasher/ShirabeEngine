@@ -255,11 +255,11 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialDescriptor
         {
-            std::string                    name;
-            SMaterialPipelineDescriptor    pipelineDescriptor;
-            SShaderModuleDescriptor        shaderModuleDescriptor;
-            Vector<SBufferDescription>     uniformBufferDescriptors;
-            Map<std::string, ResourceId_t> sampledImageAssignment;
+            std::string                 name;
+            SMaterialPipelineDescriptor pipelineDescriptor;
+            SShaderModuleDescriptor     shaderModuleDescriptor;
+            Vector<SBufferDescription>  uniformBufferDescriptors;
+            Vector<ResourceId_t>        sampledImages;
         };
 
         struct

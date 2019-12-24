@@ -324,16 +324,22 @@ namespace engine::material
             bool const includeSystemBuffers =  (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == master->name());
             auto [derivationSuccessful, pipelineDescription, shaderModuleDescription, bufferDescriptions] = deriveResourceDescriptions(aAssetStorage, master->name(), master->signature(), instance->config(), includeSystemBuffers);
 
-            //master->setPipelineDescription    (pipelineDescription);
-            //master->setShaderModuleDescription(shaderModuleDescription);
-            //master->setBufferDescriptions     (bufferDescriptions);
+            Vector<SSampledImage> sampledImages = signature.sampledImages;
+            std::sort(sampledImages.begin(), sampledImages.end(), [] (SSampledImage const &aLHS, SSampledImage const &aRHS) -> bool { return (aLHS.binding < aRHS.binding); });
+
+            Vector<ResourceId_t>  sampledImageResources {};
+            for(auto const &sampledImage : sampledImages)
+            {
+                ResourceId_t const &resourceId = config.getSampledImageAssignment().at(sampledImage.name);
+                sampledImageResources.push_back(resourceId);
+            }
 
             SMaterialDescriptor materialDescriptor {};
             materialDescriptor.name                     = aResourceId;
             materialDescriptor.pipelineDescriptor       = pipelineDescription;
             materialDescriptor.shaderModuleDescriptor   = shaderModuleDescription;
             materialDescriptor.uniformBufferDescriptors = bufferDescriptions;
-            materialDescriptor.sampledImageAssignment   = config.getSampledImageAssignment();
+            materialDescriptor.sampledImages            = sampledImageResources;
 
             std::vector<std::string> pipelineDependencies {};
 

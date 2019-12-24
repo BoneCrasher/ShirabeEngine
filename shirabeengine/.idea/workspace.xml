@@ -267,12 +267,8 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -702,7 +698,7 @@
       <workItem from="1577051824905" duration="38000" />
       <workItem from="1577051966838" duration="3788000" />
       <workItem from="1577105431194" duration="1833000" />
-      <workItem from="1577130101964" duration="11082000" />
+      <workItem from="1577130101964" duration="12822000" />
     </task>
     <servers />
   </component>
@@ -741,38 +737,46 @@
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577136668772" />
-    <state width="1318" height="308" key="GridCell.Tab.0.bottom" timestamp="1577136972133">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.0.bottom" timestamp="1577171136583">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
-    <state width="1318" height="308" key="GridCell.Tab.0.center" timestamp="1577136972132">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.0.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
+    <state width="1769" height="185" key="GridCell.Tab.0.center" timestamp="1577171136583">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
-    <state width="1318" height="308" key="GridCell.Tab.0.left" timestamp="1577136972132">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.0.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
+    <state width="1769" height="185" key="GridCell.Tab.0.left" timestamp="1577171136582">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
-    <state width="1318" height="308" key="GridCell.Tab.0.right" timestamp="1577136972133">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.0.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136582" />
+    <state width="1769" height="185" key="GridCell.Tab.0.right" timestamp="1577171136583">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
-    <state width="1319" height="308" key="GridCell.Tab.1.bottom" timestamp="1577136972052">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.0.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
+    <state width="1769" height="185" key="GridCell.Tab.1.bottom" timestamp="1577171136584">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
-    <state width="1319" height="308" key="GridCell.Tab.1.center" timestamp="1577136972051">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.1.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136584" />
+    <state width="1769" height="185" key="GridCell.Tab.1.center" timestamp="1577171136583">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
-    <state width="1319" height="308" key="GridCell.Tab.1.left" timestamp="1577136972051">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.1.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
+    <state width="1769" height="185" key="GridCell.Tab.1.left" timestamp="1577171136583">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
-    <state width="1319" height="308" key="GridCell.Tab.1.right" timestamp="1577136972052">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1769" height="185" key="GridCell.Tab.1.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
+    <state width="1769" height="185" key="GridCell.Tab.1.right" timestamp="1577171136583">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
+    <state width="1769" height="185" key="GridCell.Tab.1.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
     <state x="685" y="256" width="540" height="524" key="StructurePopup" timestamp="1577052812893">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
@@ -802,17 +806,17 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/_deploy/linux64/debug/include/material/assetloader.h</url>
-          <line>193</line>
+          <line>194</line>
           <option name="timeStamp" value="80" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/_deploy/linux64/debug/include/material/assetloader.h</url>
-          <line>338</line>
+          <line>346</line>
           <option name="timeStamp" value="131" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/_deploy/linux64/debug/include/material/assetloader.h</url>
-          <line>315</line>
+          <line>316</line>
           <option name="timeStamp" value="153" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">

@@ -1015,7 +1015,7 @@ namespace engine::framegraph
             gpuInputAttachmentTextureViewIds.push_back(attachmentTextureView->getGpuApiResourceHandle());
         }
 
-        for(auto const &[sampledImageSlotId, sampledImageResourceId] : material->getDescription().sampledImageAssignment)
+        for(auto const &sampledImageResourceId : material->getDescription().sampledImages)
         {
             Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
             if(nullptr != sampledImageTexture)
@@ -1065,7 +1065,7 @@ namespace engine::framegraph
     {
         Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
 
-        for(auto const &[sampledImageSlotId, sampledImageResourceId] : material->getDescription().sampledImageAssignment)
+        for(auto const &sampledImageResourceId : material->getDescription().sampledImages)
         {
             Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
             if(nullptr != sampledImageTexture)
