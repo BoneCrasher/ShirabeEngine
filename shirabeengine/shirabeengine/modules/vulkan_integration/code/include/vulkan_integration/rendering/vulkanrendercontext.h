@@ -84,10 +84,10 @@ namespace engine
 
             EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) final;
 
-            EEngineStatus updateResourceBindings(  GpuApiHandle_t              const &aGpuMaterialHandle
-                                                 , std::vector<GpuApiHandle_t> const &aGpuBufferHandles
-                                                 , std::vector<GpuApiHandle_t> const &aGpuInputAttachmentTextureViewHandles
-                                                 , std::vector<GpuApiHandle_t> const &aGpuTextureViewHandles) final;
+            EEngineStatus updateResourceBindings(  GpuApiHandle_t                    const &aGpuMaterialHandle
+                                                 , std::vector<GpuApiHandle_t>       const &aGpuBufferHandles
+                                                 , std::vector<GpuApiHandle_t>       const &aGpuInputAttachmentTextureViewHandles
+                                                 , std::vector<SSampledImageBinding> const &aGpuTextureViewHandles) final;
 
             /**
              * Put the current internal command buffer into recording mode.

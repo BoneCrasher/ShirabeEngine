@@ -227,7 +227,7 @@ namespace engine
             EEngineStatus unload() override
             {
                 std::optional<SRenderPassDependencies> const &dependencies = getCurrentDependencies();
-                if(false == dependencies.has_value())
+                if(not dependencies.has_value())
                 {
                     return EEngineStatus::Error;
                 }
@@ -260,7 +260,7 @@ namespace engine
             EEngineStatus unload() override
             {
                 std::optional<SFrameBufferDependencies> const &dependencies = getCurrentDependencies();
-                if(false == dependencies.has_value())
+                if(not dependencies.has_value())
                 {
                     return EEngineStatus::Error;
                 }
@@ -383,9 +383,9 @@ namespace engine
         {
             using CResourceObject<SMaterialDescriptor, SMaterialDependencies>::CResourceObject;
 
-            Shared<SPipeline>       pipelineResource;
-            Shared<SShaderModule>   shaderModuleResource;
-            Vector<Shared<SBuffer>> bufferResources;
+            Shared<SPipeline>              pipelineResource;
+            Shared<SShaderModule>          shaderModuleResource;
+            Vector<Shared<SBuffer>>        bufferResources;
 
             SHIRABE_INLINE
             EEngineStatus load(SMaterialDependencies const &aDependencies) override

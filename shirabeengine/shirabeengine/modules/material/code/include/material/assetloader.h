@@ -34,9 +34,10 @@ namespace engine::material
 
         bool const isCoreMaterial = ("Core" == aMaterialName);
 
-        SMaterialPipelineDescriptor pipelineDescriptor     {};
-        SShaderModuleDescriptor     shaderModuleDescriptor {};
-        Vector<SBufferDescription>  bufferDescriptions     {};
+        SMaterialPipelineDescriptor     pipelineDescriptor     {};
+        SShaderModuleDescriptor         shaderModuleDescriptor {};
+        Vector<SBufferDescription>      bufferDescriptions     {};
+
         pipelineDescriptor    .name = fmt::format("{}_{}", aMaterialName, "pipeline");
         shaderModuleDescriptor.name = fmt::format("{}_{}", aMaterialName, "shadermodule");
 
@@ -332,6 +333,7 @@ namespace engine::material
             materialDescriptor.pipelineDescriptor       = pipelineDescription;
             materialDescriptor.shaderModuleDescriptor   = shaderModuleDescription;
             materialDescriptor.uniformBufferDescriptors = bufferDescriptions;
+            materialDescriptor.sampledImageAssignment   = config.getSampledImageAssignment();
 
             std::vector<std::string> pipelineDependencies {};
 

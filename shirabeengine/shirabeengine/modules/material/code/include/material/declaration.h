@@ -763,6 +763,7 @@ namespace engine
             using BufferValueIndex_t = Map<std::string, Shared<SBufferMember>>;
             using BufferIndex_t      = Map<std::string, BufferValueIndex_t>;
             using BufferData_t       = Map<std::string, Shared<void>>;
+            using SampledImageMap_t  = Map<std::string, resources::ResourceId_t>;
 
         public_static_functions:
             static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers = false);
@@ -884,6 +885,21 @@ namespace engine
                     std::string const &aFieldName,
                     TDataType   const &aFieldValue);
 
+            SHIRABE_INLINE void setSampledImage(std::string const &aSlotId, resources::ResourceId_t const &aSampledImageResourceId)
+            {
+                if(mSampledImageIndex.end() == std::find(mSampledImageIndex.begin(), mSampledImageIndex.end(), [&](std::string const &aCmp) -> bool { return (aCmp == aSlotId); }))
+                {
+                    return;
+                }
+
+                mSampledImageMap[aSlotId] = aSampledImageResourceId;
+            }
+
+            SHIRABE_INLINE SampledImageMap_t const &getSampledImageAssignment() const
+            {
+                return mSampledImageMap;
+            }
+
             /**
              * @brief acceptSerializer
              * @param aSerializer
@@ -938,8 +954,11 @@ namespace engine
             }
 
         private_members:
-            BufferIndex_t mBufferIndex;
-            BufferData_t  mData;
+            BufferIndex_t       mBufferIndex;
+            BufferData_t        mData;
+            Vector<std::string> mSampledImageIndex;
+            SampledImageMap_t   mSampledImageMap;
+
         };
         //<-----------------------------------------------------------------------------
 

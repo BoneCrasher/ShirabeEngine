@@ -265,10 +265,14 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/materials/extraction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/materials/extraction.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/source/declaration.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/shirabe_process_resources.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tools/shirabe_process_resources.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -698,7 +702,7 @@
       <workItem from="1577051824905" duration="38000" />
       <workItem from="1577051966838" duration="3788000" />
       <workItem from="1577105431194" duration="1833000" />
-      <workItem from="1577130101964" duration="6646000" />
+      <workItem from="1577130101964" duration="11082000" />
     </task>
     <servers />
   </component>
@@ -773,10 +777,11 @@
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="685" y="256" width="540" height="524" key="StructurePopup/0.0.1920.1044@0.0.1920.1044" timestamp="1577052812893" />
-    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577136941085">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state x="854" y="256" width="1706" height="542" key="find.popup" timestamp="1577168453632">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577136941085" />
+    <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577168453632" />
     <state x="623" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1577130303459">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
@@ -814,11 +819,6 @@
           <url>file://$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp</url>
           <line>367</line>
           <option name="timeStamp" value="182" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h</url>
-          <line>229</line>
-          <option name="timeStamp" value="258" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

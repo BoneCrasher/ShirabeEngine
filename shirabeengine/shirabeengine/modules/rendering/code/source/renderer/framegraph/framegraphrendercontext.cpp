@@ -991,9 +991,9 @@ namespace engine::framegraph
         dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
         EEngineStatus const status = material->load(dependencies);
 
-        std::vector<GpuApiHandle_t> gpuBufferIds                     {};
-        std::vector<GpuApiHandle_t> gpuInputAttachmentTextureViewIds {};
-        std::vector<GpuApiHandle_t> gpuTextureViewIds                {};
+        std::vector<GpuApiHandle_t>       gpuBufferIds                     {};
+        std::vector<GpuApiHandle_t>       gpuInputAttachmentTextureViewIds {};
+        std::vector<SSampledImageBinding> gpuTextureViewIds                {};
 
         for(auto const &buffer : material->bufferResources)
         {
@@ -1015,6 +1015,39 @@ namespace engine::framegraph
             gpuInputAttachmentTextureViewIds.push_back(attachmentTextureView->getGpuApiResourceHandle());
         }
 
+        for(auto const &[sampledImageSlotId, sampledImageResourceId] : material->getDescription().sampledImageAssignment)
+        {
+            Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
+            if(nullptr != sampledImageTexture)
+            {
+                STextureViewDescription desc {};
+                desc.name                 = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
+                desc.subjacentTextureInfo = sampledImageTexture->getDescription().textureInfo;
+                desc.arraySlices          = { 0, 1 };
+                desc.mipMapSlices         = { 0, 1 };
+                desc.textureFormat        = EFormat::Automatic;
+
+                auto const [result, viewData] = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, { sampledImageResourceId });
+                if(CheckEngineError(result))
+                {
+                    // ...
+                    break;
+                }
+
+                Shared<STextureView> view = std::static_pointer_cast<STextureView>(viewData);
+
+                STextureViewDependencies deps {};
+                deps.subjacentTextureId = sampledImageResourceId;
+                view->load(deps);
+
+                SSampledImageBinding binding {};
+                binding.image     = sampledImageTexture->getGpuApiResourceHandle();
+                binding.imageView = view->getGpuApiResourceHandle();
+
+                gpuTextureViewIds.push_back(binding);
+            }
+        }
+
         mGraphicsAPIRenderContext->updateResourceBindings(  material->pipelineResource->getGpuApiResourceHandle()
                                                           , gpuBufferIds
                                                           , gpuInputAttachmentTextureViewIds
@@ -1030,9 +1063,22 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
     {
-        Shared<ILogicalResourceObject> pipeline = getUsedResource(aMaterial.readableName);
+        Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
 
-        auto const result = mGraphicsAPIRenderContext->unbindPipeline(pipeline->getGpuApiResourceHandle());
+        for(auto const &[sampledImageSlotId, sampledImageResourceId] : material->getDescription().sampledImageAssignment)
+        {
+            Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
+            if(nullptr != sampledImageTexture)
+            {
+                std::string    const viewId = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
+                Shared<STextureView> view   = std::static_pointer_cast<STextureView>(getUsedResource(viewId));
+
+                view->unload();
+                mResourceManager->discardResource(viewId);
+            }
+        }
+
+        auto const result = mGraphicsAPIRenderContext->unbindPipeline(material->pipelineResource->getGpuApiResourceHandle());
         return result;
     }
     //<-----------------------------------------------------------------------------

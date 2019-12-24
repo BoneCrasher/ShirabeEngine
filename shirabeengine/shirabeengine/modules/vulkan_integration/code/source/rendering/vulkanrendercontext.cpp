@@ -245,10 +245,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::updateResourceBindings(  GpuApiHandle_t const              &aGpuMaterialHandle
-                                                                   , std::vector<GpuApiHandle_t> const &aGpuBufferHandles
-                                                                   , std::vector<GpuApiHandle_t> const &aGpuInputAttachmentTextureViewHandles
-                                                                   , std::vector<GpuApiHandle_t> const &aGpuTextureViewHandles)
+        EEngineStatus CVulkanRenderContext::updateResourceBindings(  GpuApiHandle_t const                    &aGpuMaterialHandle
+                                                                   , std::vector<GpuApiHandle_t>       const &aGpuBufferHandles
+                                                                   , std::vector<GpuApiHandle_t>       const &aGpuInputAttachmentTextureViewHandles
+                                                                   , std::vector<SSampledImageBinding> const &aGpuTextureViewHandles)
         {
             VkDevice device = mVulkanEnvironment->getLogicalDevice();
 
@@ -258,13 +258,16 @@ namespace engine
             std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
             std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
             std::vector<VkDescriptorImageInfo>  descriptorSetWriteAttachmentImageInfos {};
+            std::vector<VkDescriptorImageInfo>  descriptorSetWriteImageInfos {};
 
             descriptorSetWriteBufferInfos         .resize(aGpuBufferHandles.size());
             descriptorSetWriteAttachmentImageInfos.resize(aGpuInputAttachmentTextureViewHandles.size());
+            descriptorSetWriteImageInfos          .resize(aGpuTextureViewHandles.size());
 
             uint64_t        writeCounter           = 0;
             uint64_t        bufferCounter          = 0;
             uint64_t        inputAttachmentCounter = 0;
+            uint64_t        inputImageCounter      = 0;
             uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
 
             for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
@@ -322,6 +325,33 @@ namespace engine
                                 descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
                                 descriptorWrite.pBufferInfo      = nullptr;
                                 descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter++]); // Optional
+                                descriptorWrite.pTexelBufferView = nullptr;
+                                // descriptorSetWrites[writeCounter++] = descriptorWrite;
+                                descriptorSetWrites.push_back(descriptorWrite);
+                            }
+                            break;
+                        case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                            {
+                                auto const &imageBinding = aGpuTextureViewHandles[inputImageCounter];
+                                auto const *const view  = mResourceStorage->extract<CVulkanTextureViewResource>(imageBinding.imageView);
+                                auto const *const image = mResourceStorage->extract<CVulkanTextureResource>    (imageBinding.image);
+
+                                VkDescriptorImageInfo imageInfo {};
+                                imageInfo.imageView   = view->handle;
+                                imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                imageInfo.sampler     = image->attachedSampler;
+                                descriptorSetWriteAttachmentImageInfos[inputImageCounter] = imageInfo;
+
+                                VkWriteDescriptorSet descriptorWrite = {};
+                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                descriptorWrite.pNext            = nullptr;
+                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                                descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstBinding       = binding.binding;
+                                descriptorWrite.dstArrayElement  = 0;
+                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                                descriptorWrite.pBufferInfo      = nullptr;
+                                descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputImageCounter++]); // Optional
                                 descriptorWrite.pTexelBufferView = nullptr;
                                 // descriptorSetWrites[writeCounter++] = descriptorWrite;
                                 descriptorSetWrites.push_back(descriptorWrite);

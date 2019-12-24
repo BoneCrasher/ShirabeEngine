@@ -17,6 +17,12 @@ namespace engine
         using resources::GpuApiHandle_t;
         // using namespace engine::resources;
 
+        struct SSampledImageBinding
+        {
+            GpuApiHandle_t imageView;
+            GpuApiHandle_t image;
+        };
+
         /**
          * The IRenderContext interface describes rendering operations supported in
          * order to generate a command buffer.
@@ -66,10 +72,10 @@ namespace engine
 
             virtual EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) = 0;
 
-            virtual EEngineStatus updateResourceBindings(  GpuApiHandle_t              const &aGpuMaterialHandle
-                                                         , std::vector<GpuApiHandle_t> const &aGpuBufferHandles
-                                                         , std::vector<GpuApiHandle_t> const &aGpuInputAttachmentTextureViewHandles
-                                                         , std::vector<GpuApiHandle_t> const &aGpuTextureViewHandles) = 0;
+            virtual EEngineStatus updateResourceBindings(  GpuApiHandle_t                    const &aGpuMaterialHandle
+                                                         , std::vector<GpuApiHandle_t>       const &aGpuBufferHandles
+                                                         , std::vector<GpuApiHandle_t>       const &aGpuInputAttachmentTextureViewHandles
+                                                         , std::vector<SSampledImageBinding> const &aGpuTextureViewHandles) = 0;
 
             /**
              * Put the current internal command buffer into recording mode.
