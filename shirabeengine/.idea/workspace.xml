@@ -267,8 +267,27 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/meshes/barramundi/BarramundiFish_baseColor.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/meshes/barramundi/BarramundiFish_normal.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/meshes/barramundi/BarramundiFish_occlusionRoughnessMetallic.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes/meshprocessor.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/asset/code/include/asset/assettypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/asset/code/include/asset/assettypes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/asset/code/source/assettypes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/asset/code/source/assettypes.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/asset/code/source/filesystemassetdatasource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/asset/code/source/filesystemassetdatasource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/databuffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/databuffer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/helpers.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/helpers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/source/helpers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/source/helpers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/graphicsapi/code/include/graphicsapi/definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/graphicsapi/code/include/graphicsapi/definitions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/textures/code/include/textures/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/textures/code/include/textures/declaration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/textures/code/source/declaration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/textures/code/source/declaration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/textures/code/source/loader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/textures/code/source/loader.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanshadermoduleresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanshadermoduleresource.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -304,9 +323,6 @@
     <setting file="file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/vulkanresourcetaskmodule_pipeline.cpp" root0="SKIP_INSPECTION" />
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
-  <component name="OCResolveContextSettings">
-    <option name="configuration" value="0-Debug-textures" />
-  </component>
   <component name="ProjectId" id="1MxwnQZh6ezParMSrxJQc4EvUso" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -319,7 +335,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.advertisement.text.has.clang-format" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/modules" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/build_extension/thirdparty" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -336,11 +352,11 @@
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include" />
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules" />
       <recent name="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/meshes" />
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include/common" />
-      <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
@@ -713,7 +729,7 @@
       <workItem from="1577051824905" duration="38000" />
       <workItem from="1577051966838" duration="3788000" />
       <workItem from="1577105431194" duration="1833000" />
-      <workItem from="1577130101964" duration="22628000" />
+      <workItem from="1577130101964" duration="32367000" />
     </task>
     <servers />
   </component>
@@ -752,67 +768,73 @@
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="694" y="269" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1044@0.0.1920.1044" timestamp="1577188271486" />
-    <state width="793" height="466" key="DebuggerActiveHint" timestamp="1577136668772">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state width="1851" height="469" key="DebuggerActiveHint" timestamp="1577266626900">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577136668772" />
-    <state width="1769" height="185" key="GridCell.Tab.0.bottom" timestamp="1577171136583">
+    <state width="1851" height="469" key="DebuggerActiveHint/0.0.4480.1050@0.0.4480.1050" timestamp="1577266626900" />
+    <state width="2514" height="413" key="GridCell.Tab.0.bottom" timestamp="1577266855230">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
-    <state width="1769" height="185" key="GridCell.Tab.0.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
-    <state width="1769" height="185" key="GridCell.Tab.0.center" timestamp="1577171136583">
+    <state width="2514" height="413" key="GridCell.Tab.0.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
+    <state width="2514" height="413" key="GridCell.Tab.0.center" timestamp="1577266855230">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
-    <state width="1769" height="185" key="GridCell.Tab.0.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
-    <state width="1769" height="185" key="GridCell.Tab.0.left" timestamp="1577171136582">
+    <state width="2514" height="413" key="GridCell.Tab.0.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
+    <state width="2514" height="413" key="GridCell.Tab.0.left" timestamp="1577266855230">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
-    <state width="1769" height="185" key="GridCell.Tab.0.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136582" />
-    <state width="1769" height="185" key="GridCell.Tab.0.right" timestamp="1577171136583">
+    <state width="2514" height="413" key="GridCell.Tab.0.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
+    <state width="2514" height="413" key="GridCell.Tab.0.right" timestamp="1577266855230">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1318" height="308" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
-    <state width="1769" height="185" key="GridCell.Tab.0.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
-    <state width="1769" height="185" key="GridCell.Tab.1.bottom" timestamp="1577171136584">
+    <state width="2514" height="413" key="GridCell.Tab.0.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
+    <state width="2514" height="413" key="GridCell.Tab.1.bottom" timestamp="1577266857161">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
-    <state width="1769" height="185" key="GridCell.Tab.1.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136584" />
-    <state width="1769" height="185" key="GridCell.Tab.1.center" timestamp="1577171136583">
+    <state width="2514" height="413" key="GridCell.Tab.1.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857161" />
+    <state width="2514" height="413" key="GridCell.Tab.1.center" timestamp="1577266857160">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
-    <state width="1769" height="185" key="GridCell.Tab.1.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
-    <state width="1769" height="185" key="GridCell.Tab.1.left" timestamp="1577171136583">
+    <state width="2514" height="413" key="GridCell.Tab.1.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857160" />
+    <state width="2514" height="413" key="GridCell.Tab.1.left" timestamp="1577266857160">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
-    <state width="1769" height="185" key="GridCell.Tab.1.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
-    <state width="1769" height="185" key="GridCell.Tab.1.right" timestamp="1577171136583">
+    <state width="2514" height="413" key="GridCell.Tab.1.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857160" />
+    <state width="2514" height="413" key="GridCell.Tab.1.right" timestamp="1577266857160">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state width="1319" height="308" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
-    <state width="1769" height="185" key="GridCell.Tab.1.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577171136583" />
+    <state width="2514" height="413" key="GridCell.Tab.1.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857160" />
     <state x="685" y="256" width="540" height="524" key="StructurePopup" timestamp="1577052812893">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="685" y="256" width="540" height="524" key="StructurePopup/0.0.1920.1044@0.0.1920.1044" timestamp="1577052812893" />
-    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577193886017">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state x="854" y="256" width="1706" height="542" key="find.popup" timestamp="1577264783274">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577193886017" />
-    <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577168453632" />
+    <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577264783274" />
+    <state x="1025" y="167" key="refactoring.ChangeSignatureDialog" timestamp="1577266956252">
+      <screen x="0" y="0" width="4480" height="1050" />
+    </state>
+    <state x="1025" y="167" key="refactoring.ChangeSignatureDialog/0.0.4480.1050@0.0.4480.1050" timestamp="1577266956252" />
     <state x="944" y="240" width="672" height="677" key="run.anything.popup" timestamp="1577174357674">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state x="944" y="240" width="672" height="677" key="run.anything.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577174357674" />
-    <state x="623" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1577130303459">
-      <screen x="0" y="0" width="1920" height="1044" />
+    <state x="1454" y="231" width="1568" height="682" key="search.everywhere.popup" timestamp="1577262061610">
+      <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state x="623" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577130303459" />
+    <state x="1454" y="231" width="1568" height="682" key="search.everywhere.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577262061610" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -40,6 +40,7 @@
 
 #include "materials/materialprocessor.h"
 #include "meshes/meshprocessor.h"
+#include "textures/textureprocessor.h"
 
 using namespace engine;
 using namespace engine::material;
@@ -244,6 +245,7 @@ public_methods:
                                                               ".material"
                                                             , ".materialinstance"
                                                             , ".gltf"
+                                                            , ".texture"
                                                        };
             if(validExtensions.end() == std::find(validExtensions.begin(), validExtensions.end(), extension))
             {
@@ -323,6 +325,15 @@ public_methods:
                     continue;
                 }
             }
+            else if(".texture" == extension)
+            {
+                auto const &[result, code] = texture::processTexture(file, mConfig);
+                if(EResult::Success != code)
+                {
+                    CLog::Error(logTag(), "Failed to process texture file w/ name {}", file.string());
+                    continue;
+                }
+            }
             else
             {
                 continue; // ...
@@ -346,6 +357,7 @@ public_methods:
                 std::filesystem::path const stemExtension = filePath.stem().extension();
                 if(".material" == stemExtension) a.type = asset::EAssetType::Material;
                 if(".mesh"     == stemExtension) a.type = asset::EAssetType::Mesh;
+                if(".texture"  == stemExtension) a.type = asset::EAssetType::Texture;
 
                 a.subtype = asset::EAssetSubtype::Meta;
                 a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
@@ -395,6 +407,14 @@ public_methods:
             else if(".datafile" == extension)
             {
                 a.type    = asset::EAssetType::Mesh;
+                a.subtype = asset::EAssetSubtype::DataFile;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".texturedata" == extension)
+            {
+                a.type    = asset::EAssetType::Texture;
                 a.subtype = asset::EAssetSubtype::DataFile;
                 a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
                 a.id      = asset::assetIdFromUri(a.uri);

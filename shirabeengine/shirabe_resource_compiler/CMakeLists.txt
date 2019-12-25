@@ -15,9 +15,11 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEMATERIAL
         SHIRABEMODULEMESH
+        SHIRABEMODULETEXTURES
         SPIRVCROSS
         SPIRVTOOLS
-        GLSLANG)
+        GLSLANG
+        STBI)
 
 include(project_setup)
 
@@ -32,5 +34,6 @@ add_dependencies(shirabe_resource_compiler INSTALL_resources)
 add_dependencies(shirabe_resource_compiler INSTALL_graphicsapi)
 add_dependencies(shirabe_resource_compiler INSTALL_material)
 add_dependencies(shirabe_resource_compiler INSTALL_mesh)
+add_dependencies(shirabe_resource_compiler INSTALL_textures)
 
 install(DIRECTORY ${SHIRABE_WORKSPACE_ROOT_DIR}/tools DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin USE_SOURCE_PERMISSIONS)

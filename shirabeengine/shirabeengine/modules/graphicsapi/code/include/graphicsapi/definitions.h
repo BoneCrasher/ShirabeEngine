@@ -220,7 +220,9 @@ namespace engine
             uint32_t
                     width,  // 0 - Undefined
                     height, // At least 1
-                    depth;  // At least 1
+                    depth,  // At least 1
+                    channels,
+                    bitsPerChannel;
             EFormat
                     format;
             uint16_t

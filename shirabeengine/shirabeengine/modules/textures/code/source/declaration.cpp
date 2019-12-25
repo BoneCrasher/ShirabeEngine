@@ -1,5 +1,4 @@
 ﻿#include "textures/declaration.h"
-#include "textures/serialization.h"
 #include <util/documents/json.h>
 #include <graphicsapi/definitions.h>
 
@@ -126,6 +125,63 @@ namespace engine::textures
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    bool STextureFile::acceptSerializer(documents::IJSONSerializer<STextureFile> &aSerializer) const
+    {
+        aSerializer.beginObject(name);
+
+        aSerializer.writeValue("uid",  uid);
+        aSerializer.writeValue("name", name);
+
+        aSerializer.beginArray("textureSourceFilenames");
+        for(auto const &assetUID : textureSourceFilenames)
+        {
+            aSerializer.beginObject("");
+            aSerializer.writeValue("filename", assetUID);
+            aSerializer.endObject();
+        }
+        aSerializer.endArray();
+
+        aSerializer.endObject();
+
+        return true;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    bool STextureFile::acceptDeserializer(documents::IJSONDeserializer<STextureFile> &aDeserializer)
+    {
+        aDeserializer.readValue("uid",                       uid);
+        aDeserializer.readValue("name",                      name);
+
+        Vector<std::filesystem::path> textureFilenames {};
+        uint32_t            filenameCount    = 0;
+        aDeserializer.beginArray("textureSourceFilenames", filenameCount);
+        for( uint32_t k=0; k < filenameCount; ++k)
+        {
+            aDeserializer.beginObject(k);
+
+            std::string filename {};
+            aDeserializer.readValue("filename", filename);
+            std::filesystem::path p = ( std::filesystem::path(".") / filename).lexically_normal();
+            textureFilenames.push_back(p);
+
+            aDeserializer.endObject();
+        }
+        aDeserializer.endArray();
+        textureSourceFilenames = textureFilenames;
+
+        aDeserializer.endObject();
+
+        return true;
+    }
+
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
     bool STextureMeta::acceptSerializer(documents::IJSONSerializer<STextureMeta> &aSerializer) const
     {
         aSerializer.beginObject(name);
@@ -139,6 +195,8 @@ namespace engine::textures
         aSerializer.writeValue("width",                 textureInfo.width);
         aSerializer.writeValue("height",                textureInfo.height);
         aSerializer.writeValue("depth",                 textureInfo.depth);
+        aSerializer.writeValue("channels",              textureInfo.channels);
+        aSerializer.writeValue("bitsPerChannel",        textureInfo.bitsPerChannel);
         aSerializer.writeValue("format",                formatString);
         aSerializer.writeValue("arraySize",             textureInfo.arraySize);
         aSerializer.writeValue("mipLevels",             textureInfo.mipLevels);
@@ -146,14 +204,7 @@ namespace engine::textures
         aSerializer.writeValue("multisampling_size",    textureInfo.multisampling.size);
         aSerializer.endObject();
 
-        aSerializer.beginArray("binaryFilenameAssetUIDs");
-        for(auto const &assetUID : imageLayersBinaryUids)
-        {
-            aSerializer.beginObject("");
-            aSerializer.writeValue("assetUID", assetUID);
-            aSerializer.endObject();
-        }
-        aSerializer.endArray();
+        aSerializer.writeValue("binaryFilenameAssetUID", imageLayersBinaryUid);
 
         aSerializer.endObject();
 
@@ -170,11 +221,13 @@ namespace engine::textures
         aDeserializer.readValue("name",                      name);
 
         std::string formatString = "";
-        
+
         aDeserializer.beginObject("textureInfo");
         aDeserializer.readValue("width",                 textureInfo.width);
         aDeserializer.readValue("height",                textureInfo.height);
         aDeserializer.readValue("depth",                 textureInfo.depth);
+        aDeserializer.readValue("channels",              textureInfo.channels);
+        aDeserializer.readValue("bitsPerChannel",        textureInfo.bitsPerChannel);
         aDeserializer.readValue("format",                formatString);
         aDeserializer.readValue("arraySize",             textureInfo.arraySize);
         aDeserializer.readValue("mipLevels",             textureInfo.mipLevels);
@@ -183,24 +236,9 @@ namespace engine::textures
         aDeserializer.endObject();
 
         textureInfo.format = fromFormatString(formatString);
-        
-        Vector<asset::AssetId_t> assetUIDs {};
 
-        uint32_t assetCount = 0;
-        aDeserializer.beginArray("binaryFilenameAssetUIDs", assetCount);
-        for(uint32_t k=0; k<assetCount; ++k)
-        {
-            aDeserializer.beginObject(k);
+        aDeserializer.readValue("binaryFilenameAssetUID", imageLayersBinaryUid);
 
-            asset::AssetId_t assetUID = 0;
-            aDeserializer.readValue("assetUID", assetUID);
-            assetUIDs.push_back(assetUID);
-
-            aDeserializer.endObject();
-        }
-        aDeserializer.endArray();
-
-        imageLayersBinaryUids = assetUIDs;
         aDeserializer.endObject();
 
         return true;

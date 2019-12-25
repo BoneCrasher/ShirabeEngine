@@ -50,8 +50,8 @@ namespace engine::vulkan
 
             // We need to convert from a regular 8-bit data buffer to uint32 words of SPIR-V.
             // TODO: Refactor the asset system to permit loading 32-bit buffers...
-            std::vector<signed char> const &srcData      = data.dataVector();
-            uint32_t const                  srcDataSize  = srcData.size();
+            std::vector<uint8_t> const &srcData      = data.dataVector();
+            uint32_t const              srcDataSize  = srcData.size();
 
             std::vector<uint32_t> convData {};
             convData.resize( srcDataSize / 4 );

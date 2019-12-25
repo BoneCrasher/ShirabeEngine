@@ -97,28 +97,30 @@ namespace engine
         /**
          * The STextureInfo struct describes general texture attributes.
          */
-        struct SHIRABE_TEST_EXPORT STextureInfo
-        {
-        public_constructors:
-            STextureInfo();
-
-        public_methods:
-            void assignTextureInfoParameters(STextureInfo const&other);
-
-        public_members:
-            uint32_t
-                    width,  // 0 - Undefined
-                    height, // At least 1
-                    depth;  // At least 1
-            EFormat
-                    format;
-            uint16_t
-                    arraySize; // At least 1 (basically everything is a vector...)
-            uint16_t
-                    mipLevels;
-            SMultisapmling
-                    multisampling;
-        };
+        //struct SHIRABE_TEST_EXPORT STextureInfo
+        //{
+        //public_constructors:
+        //    STextureInfo();
+//
+        //public_methods:
+        //    void assignTextureInfoParameters(STextureInfo const&other);
+//
+        //public_members:
+        //    uint32_t
+        //            width,  // 0 - Undefined
+        //            height, // At least 1
+        //            depth,  // At least 1
+        //            channels,
+        //            bitsPerChannel;
+        //    EFormat
+        //            format;
+        //    uint16_t
+        //            arraySize; // At least 1 (basically everything is a vector...)
+        //    uint16_t
+        //            mipLevels;
+        //    SMultisapmling
+        //            multisampling;
+        //};
 
         /**
          * The STextureAsset struct describes any kind of engine texture asset

@@ -1,0 +1,9 @@
+{
+    "uid"                    : 1005,
+    "name"                   : "BarramundiFish_baseColor",
+    "textureSourceFilenames" : [
+        {
+            "filename" : "BarramundiFish_baseColor.png"
+        }
+    ]
+}

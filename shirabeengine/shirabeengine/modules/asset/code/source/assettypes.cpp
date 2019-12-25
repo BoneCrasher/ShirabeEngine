@@ -25,30 +25,30 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        STextureInfo::STextureInfo()
-                : width(0)
-                  , height(1)
-                  , depth(1)
-                  , format(EFormat::Undefined)
-                  , arraySize(1)
-                  , mipLevels(1)
-                  , multisampling()
-        {}
+        //STextureInfo::STextureInfo()
+        //        : width(0)
+        //          , height(1)
+        //          , depth(1)
+        //          , format(EFormat::Undefined)
+        //          , arraySize(1)
+        //          , mipLevels(1)
+        //          , multisampling()
+        //{}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void STextureInfo::assignTextureInfoParameters(STextureInfo const &aOther)
-        {
-            width         = aOther.width;
-            height        = aOther.height;
-            depth         = aOther.depth;
-            format        = aOther.format;
-            arraySize     = aOther.arraySize;
-            mipLevels     = aOther.mipLevels;
-            multisampling = aOther.multisampling;
-        }
+        //void STextureInfo::assignTextureInfoParameters(STextureInfo const &aOther)
+        //{
+        //    width         = aOther.width;
+        //    height        = aOther.height;
+        //    depth         = aOther.depth;
+        //    format        = aOther.format;
+        //    arraySize     = aOther.arraySize;
+        //    mipLevels     = aOther.mipLevels;
+        //    multisampling = aOther.multisampling;
+        //}
         //<-----------------------------------------------------------------------------
     }
 

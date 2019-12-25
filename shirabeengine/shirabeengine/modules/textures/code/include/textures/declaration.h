@@ -34,7 +34,84 @@ namespace engine
 
     namespace textures
     {
+        /**
+         * The SMaterialIndex describes all necessary data for a basic material composition
+         * in the engine.
+         * The specific implementation will be provided in files referenced by the stages member.
+         */
+        struct STextureFile
+                : engine::serialization::ISerializable<documents::IJSONSerializer<STextureFile>>
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<STextureFile>>
+        {
+        public_constructors:
+            SHIRABE_INLINE
+            STextureFile()
+                    : serialization::ISerializable<documents::IJSONSerializer<STextureFile>>()
+                      , serialization::IDeserializable<documents::IJSONDeserializer<STextureFile>>()
+                      , uid                   (0 )
+                      , name                  ({})
+                      , textureSourceFilenames(0)
+            {}
 
+            SHIRABE_INLINE
+            STextureFile(STextureFile const &aOther)
+                    : serialization::ISerializable<documents::IJSONSerializer<STextureFile>>()
+                      , serialization::IDeserializable<documents::IJSONDeserializer<STextureFile>>()
+                      , uid                   (aOther.uid                  )
+                      , name                  (aOther.name                 )
+                      , textureSourceFilenames(aOther.textureSourceFilenames)
+            {}
+
+            SHIRABE_INLINE
+            STextureFile(STextureFile &&aOther) noexcept
+                    : serialization::ISerializable<documents::IJSONSerializer<STextureFile>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<STextureFile>>()
+                    , uid                   (aOther.uid                             )
+                    , name                  (std::move(aOther.name                  ))
+                    , textureSourceFilenames(std::move(aOther.textureSourceFilenames))
+            {}
+
+        public_operators:
+            SHIRABE_INLINE
+            STextureFile &operator=(STextureFile const &aOther)
+            {
+                uid                    = aOther.uid;
+                name                   = aOther.name;
+                textureSourceFilenames = aOther.textureSourceFilenames;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            STextureFile &operator=(STextureFile &&aOther) noexcept
+            {
+                uid                    = aOther.uid;
+                name                   = std::move(aOther.name);
+                textureSourceFilenames = aOther.textureSourceFilenames;
+
+                return (*this);
+            }
+
+        public_members:
+            uint64_t                      uid;
+            std::string                   name;
+            Vector<std::filesystem::path> textureSourceFilenames;
+
+        public_methods:
+            /**
+             * @brief acceptSerializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptSerializer(documents::IJSONSerializer<STextureFile> &aSerializer) const final;
+
+            /**
+             * @brief acceptDeserializer
+             * @param aSerializer
+             * @return
+             */
+            bool acceptDeserializer(documents::IJSONDeserializer<STextureFile> &aDeserializer) final;
+        };
 
         /**
          * The SMaterialIndex describes all necessary data for a basic material composition
@@ -50,36 +127,36 @@ namespace engine
             STextureMeta()
                     : serialization::ISerializable<documents::IJSONSerializer<STextureMeta>>()
                     , serialization::IDeserializable<documents::IJSONDeserializer<STextureMeta>>()
-                    , uid                  (0 )
-                    , name                 ({})
-                    , imageLayersBinaryUids(0 )
+                    , uid                 (0 )
+                    , name                ({})
+                    , imageLayersBinaryUid(0 )
             {}
 
             SHIRABE_INLINE
             STextureMeta(STextureMeta const &aOther)
                     : serialization::ISerializable<documents::IJSONSerializer<STextureMeta>>()
                     , serialization::IDeserializable<documents::IJSONDeserializer<STextureMeta>>()
-                    , uid                  (aOther.uid                  )
-                    , name                 (aOther.name                 )
-                    , imageLayersBinaryUids(aOther.imageLayersBinaryUids)
+                    , uid                 (aOther.uid                  )
+                    , name                (aOther.name                 )
+                    , imageLayersBinaryUid(aOther.imageLayersBinaryUid)
             {}
 
             SHIRABE_INLINE
             STextureMeta(STextureMeta &&aOther) noexcept
                     : serialization::ISerializable<documents::IJSONSerializer<STextureMeta>>()
                     , serialization::IDeserializable<documents::IJSONDeserializer<STextureMeta>>()
-                    , uid                  (aOther.uid                  )
-                    , name                 (std::move(aOther.name       ))
-                    , imageLayersBinaryUids(aOther.imageLayersBinaryUids)
+                    , uid                 (aOther.uid                  )
+                    , name                (std::move(aOther.name       ))
+                    , imageLayersBinaryUid(aOther.imageLayersBinaryUid)
             {}
 
         public_operators:
             SHIRABE_INLINE
             STextureMeta &operator=(STextureMeta const &aOther)
             {
-                uid                   = aOther.uid;
-                name                  = aOther.name;
-                imageLayersBinaryUids = aOther.imageLayersBinaryUids;
+                uid                  = aOther.uid;
+                name                 = aOther.name;
+                imageLayersBinaryUid = aOther.imageLayersBinaryUid;
 
                 return (*this);
             }
@@ -87,18 +164,18 @@ namespace engine
             SHIRABE_INLINE
             STextureMeta &operator=(STextureMeta &&aOther) noexcept
             {
-                uid                   = aOther.uid;
-                name                  = std::move(aOther.name);
-                imageLayersBinaryUids = aOther.imageLayersBinaryUids;
+                uid                  = aOther.uid;
+                name                 = std::move(aOther.name);
+                imageLayersBinaryUid = aOther.imageLayersBinaryUid;
 
                 return (*this);
             }
 
         public_members:
-            uint64_t                 uid;
-            std::string              name;
-            asset::STextureInfo      textureInfo;
-            Vector<asset::AssetId_t> imageLayersBinaryUids;
+            uint64_t            uid;
+            std::string         name;
+            asset::STextureInfo textureInfo;
+            asset::AssetId_t    imageLayersBinaryUid;
 
         public_methods:
             /**
@@ -127,8 +204,8 @@ namespace engine
         {
             public_constructors:
                 SHIRABE_INLINE
-                explicit CTextureInstance(  std::string              const &aName
-                                          , Vector<asset::AssetId_t> const &aImageLayersBinaryAssetUIDs)
+                explicit CTextureInstance(  std::string      const &aName
+                                          , asset::AssetId_t const &aImageLayersBinaryAssetUIDs)
                     : mName                      ( aName )
                     , mImageLayersBinaryAssetUids(aImageLayersBinaryAssetUIDs)
                 {}
@@ -166,15 +243,15 @@ namespace engine
                 }
 
                 SHIRABE_INLINE
-                Vector<asset::AssetId_t> const imageLayersBinaryAssetUids() const
+                asset::AssetId_t const imageLayersBinaryAssetUid() const
                 {
                     return mImageLayersBinaryAssetUids;
                 }
 
         private_members:
-            std::string              mName;
-            asset::STextureInfo      mTextureInfo;
-            Vector<asset::AssetId_t> mImageLayersBinaryAssetUids;
+            std::string         mName;
+            asset::STextureInfo mTextureInfo;
+            asset::AssetId_t    mImageLayersBinaryAssetUids;
         };
 
 

@@ -249,7 +249,7 @@ namespace engine::material
                 continue;
             }
 
-            auto  const *const data = static_cast<int8_t const *const>(bufferDataFetch.data());
+            auto  const *const data = static_cast<uint8_t const *const>(bufferDataFetch.data());
             std::size_t  const size = uniformBuffer.location.length;
 
             auto const dataSource =  [data, size] () -> ByteBuffer

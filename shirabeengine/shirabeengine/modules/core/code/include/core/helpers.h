@@ -89,7 +89,7 @@ namespace engine
      * @param aFileName Filename of the file to read.
      * @return          See brief.
      */
-    std::vector<signed char> readFileBytes(std::string const &aFileName);
+    std::vector<uint8_t> readFileBytes(std::string const &aFileName);
 
     /**
      * Write a string to a file.

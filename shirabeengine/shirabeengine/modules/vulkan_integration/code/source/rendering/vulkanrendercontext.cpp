@@ -755,6 +755,8 @@ namespace engine
             VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
 
             vkCmdDrawIndexed(vkCommandBuffer, aIndexCount, 1, 0, 0, 0);
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 

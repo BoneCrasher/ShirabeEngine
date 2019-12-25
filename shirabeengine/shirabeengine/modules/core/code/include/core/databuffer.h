@@ -2,6 +2,7 @@
 #define __SHIRABE_CORE_DATABUFFER_H__
 
 #include <vector>
+#include <functional>
 #include <cstdint>
 #include <base/declaration.h>
 
@@ -40,6 +41,10 @@ namespace engine {
                 //free(const_cast<T*>(mRawData));
             }
         };
+
+    public_operators:
+        CDataBuffer<T> &operator=(CDataBuffer<T> const &aOther);
+        CDataBuffer<T> &operator=(CDataBuffer<T>      &&aOther);
 
     public_methods:
         /**
@@ -180,10 +185,36 @@ namespace engine {
     {}
     //<-----------------------------------------------------------------------------
 
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename T>
+    CDataBuffer<T>& CDataBuffer<T>::operator=(CDataBuffer<T> const &aOther)
+    {
+        mVectorData = aOther.mVectorData;
+        mRawData    = aOther.mRawData;
+        mSize       = aOther.mSize;
+        mUseRawData = aOther.mUseRawData;
+
+        return (*this);
+    }
+
+    template <typename T>
+    CDataBuffer<T>& CDataBuffer<T>::operator=(CDataBuffer<T> &&aOther)
+    {
+        mVectorData = std::move(aOther.mVectorData);
+        mRawData    = std::move(aOther.mRawData);
+        mSize       = std::move(aOther.mSize);
+        mUseRawData = std::move(aOther.mUseRawData);
+
+        return (*this);
+    }
+    //<-----------------------------------------------------------------------------
+
     /**
      *
      */
-    using ByteBuffer = CDataBuffer<int8_t>;
+    using ByteBuffer = CDataBuffer<uint8_t>;
 
     using DataSourceAccessor_t = std::function<ByteBuffer()>;
 }

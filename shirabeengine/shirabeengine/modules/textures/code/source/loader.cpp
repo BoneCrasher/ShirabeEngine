@@ -7,7 +7,6 @@
 #include <util/documents/json.h>
 
 #include "textures/declaration.h"
-#include "textures/serialization.h"
 #include "textures/loader.h"
 
 
@@ -124,7 +123,7 @@ namespace engine
                 static uint64_t sInstanceIndex = 0;
                 std::string instanceName = fmt::format("{}_instance_{}", metaData.name, ++sInstanceIndex);
 
-                instance = makeShared<CTextureInstance>(metaData.name, metaData.imageLayersBinaryUids);
+                instance = makeShared<CTextureInstance>(metaData.name, metaData.imageLayersBinaryUid);
                 mInstantiatedInstances[aAssetId] = instance;
             }
 

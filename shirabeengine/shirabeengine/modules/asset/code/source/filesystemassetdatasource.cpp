@@ -18,7 +18,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<ByteBuffer> CFileSystemAssetDataSource::readAsset(std::filesystem::path const &aPath)
         {
-            std::vector<signed char> fileContents = readFileBytes(aPath);
+            std::vector<uint8_t> fileContents = readFileBytes(aPath);
             if(fileContents.empty())
             {
                 return { EEngineStatus::Error };

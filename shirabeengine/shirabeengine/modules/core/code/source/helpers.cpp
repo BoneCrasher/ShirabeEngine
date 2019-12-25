@@ -61,7 +61,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::vector<signed char> readFileBytes(std::string const &aFileName)
+    std::vector<uint8_t> readFileBytes(std::string const &aFileName)
     {
         bool const fileExists = std::filesystem::exists(aFileName);
         if(not fileExists)
@@ -76,8 +76,8 @@ namespace engine
             return {};
         }
 
-        std::vector<signed char> inputData((std::istreambuf_iterator<char>(inputFileStream)),
-                                            std::istreambuf_iterator<char>());
+        std::vector<uint8_t> inputData((std::istreambuf_iterator<char>(inputFileStream)),
+                                   std::istreambuf_iterator<char>());
 
         return inputData;
     }
