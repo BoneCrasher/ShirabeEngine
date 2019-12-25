@@ -190,15 +190,13 @@ namespace texture
         }
     }
 
-    STextureCollectionLoadInfo __loadTexturesFromFiles(std::vector<std::filesystem::path> const &aFilenames)
-    {
-        STextureCollectionLoadInfo infos {};
+    STextureCollectionLoadInfo __loadTexturesFromFiles(std::vector<std::filesystem::path> const &aFilenames) {
+        STextureCollectionLoadInfo infos{};
         infos.inputs.resize(aFilenames.size());
 
-        for(std::size_t k=0; k<aFilenames.size(); ++k)
-        {
+        for (std::size_t k = 0; k < aFilenames.size(); ++k) {
             std::filesystem::path const &fn = aFilenames.at(k);
-            infos.inputs.emplace(infos.inputs.begin() + k, __loadTextureFromFile(fn));
+            infos.inputs[k] = __loadTextureFromFile(fn);
         }
 
         // Post processing.
@@ -206,24 +204,27 @@ namespace texture
         // Step 1
         // The sizes, component counts and bits per channel are required to match!
         bool totalMatch = true;
-        STextureLoadInfo const &previous = *infos.inputs.begin();
-        for(std::size_t k=0; k<infos.inputs.size(); ++k)
+        if (1 < infos.inputs.size())
         {
-            if(0 == k) continue;
-
-            STextureLoadInfo const &current = infos.inputs.at(k);
-
-            bool const match = (previous.meta.format         == current.meta.format         &&
-                                previous.meta.width          == current.meta.width          &&
-                                previous.meta.height         == current.meta.height         &&
-                                previous.meta.depth          == current.meta.depth          &&
-                                previous.meta.arraySize      == current.meta.arraySize      &&
-                                previous.meta.mipLevels      == current.meta.mipLevels      &&
-                                previous.meta.channels       == current.meta.channels       &&
-                                previous.meta.bitsPerChannel == current.meta.bitsPerChannel);
-            if(not (totalMatch &= match))
+            STextureLoadInfo const &previous = *infos.inputs.begin();
+            for(std::size_t k=0; k<infos.inputs.size(); ++k)
             {
-                break;
+                if(0 == k) continue;
+
+                STextureLoadInfo const &current = infos.inputs.at(k);
+
+                bool const match = (previous.meta.format         == current.meta.format         &&
+                                    previous.meta.width          == current.meta.width          &&
+                                    previous.meta.height         == current.meta.height         &&
+                                    previous.meta.depth          == current.meta.depth          &&
+                                    previous.meta.arraySize      == current.meta.arraySize      &&
+                                    previous.meta.mipLevels      == current.meta.mipLevels      &&
+                                    previous.meta.channels       == current.meta.channels       &&
+                                    previous.meta.bitsPerChannel == current.meta.bitsPerChannel);
+                if(not (totalMatch &= match))
+                {
+                    break;
+                }
             }
         }
 
