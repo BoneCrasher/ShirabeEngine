@@ -31,32 +31,28 @@ namespace engine::textures
                 return nullptr;
             }
 
-            Vector<DataSourceAccessor_t> initialData {};
-            for(auto const &assetUid : instance->imageLayersBinaryAssetUids())
+            Shared<CTextureInstance> textureInstance = instance;
+
+            DataSourceAccessor_t initialData = [=]() -> ByteBuffer
             {
-                DataSourceAccessor_t dataAccessor = [=]() -> ByteBuffer
+                asset::AssetID_t const uid = textureInstance->imageLayersBinaryAssetUid();
+
+                auto const[result, buffer] = aAssetStorage->loadAssetData(uid);
+                if( CheckEngineError(result))
                 {
-                    asset::AssetID_t const uid = assetUid; // asset::assetIdFromUri(stageSpirVFilename);
+                    CLog::Error("DataSourceAccessor_t::Texture", "Failed to load texture asset data. Result: {}", result);
+                    return {};
+                }
 
-                    auto const[result, buffer] = aAssetStorage->loadAssetData(uid);
-                    if( CheckEngineError(result))
-                    {
-                        CLog::Error("DataSourceAccessor_t::Texture", "Failed to load texture asset data. Result: {}", result);
-                        return {};
-                    }
-
-                    return buffer;
-                };
-
-                initialData.push_back(dataAccessor);
-            }
+                return buffer;
+            };
 
             STextureDescription textureDescription {};
             textureDescription.name        = instance->name();
             textureDescription.textureInfo = instance->textureInfo();
             textureDescription.cpuGpuUsage = EResourceUsage::CPU_InitConst_GPU_Read;
             textureDescription.gpuBinding  = EBufferBinding::TextureInput;
-            textureDescription.initialData = initialData;
+            textureDescription.initialData = { initialData };
 
             CEngineResult<Shared<ILogicalResourceObject>> textureObject = aResourceManager->useDynamicResource<STexture>(textureDescription.name, textureDescription);
             EngineStatusPrintOnError(textureObject.result(),  "Texture::AssetLoader", "Failed to load texture.");

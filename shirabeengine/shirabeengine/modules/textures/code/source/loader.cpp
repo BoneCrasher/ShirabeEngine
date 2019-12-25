@@ -123,7 +123,7 @@ namespace engine
                 static uint64_t sInstanceIndex = 0;
                 std::string instanceName = fmt::format("{}_instance_{}", metaData.name, ++sInstanceIndex);
 
-                instance = makeShared<CTextureInstance>(metaData.name, metaData.imageLayersBinaryUid);
+                instance = makeShared<CTextureInstance>(metaData.name, metaData.textureInfo, metaData.imageLayersBinaryUid);
                 mInstantiatedInstances[aAssetId] = instance;
             }
 

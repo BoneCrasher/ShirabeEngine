@@ -660,7 +660,7 @@ namespace engine
             public_constructors:
                 CDeserializationResult();
 
-                CDeserializationResult(T const &aResult);
+                explicit CDeserializationResult(T const &aResult);
 
             public_destructors:
                 virtual ~CDeserializationResult() = default;

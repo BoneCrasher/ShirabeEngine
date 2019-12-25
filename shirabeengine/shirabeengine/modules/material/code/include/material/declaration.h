@@ -888,7 +888,7 @@ namespace engine
             SHIRABE_INLINE void setSampledImage(std::string const &aSlotId, resources::ResourceId_t const &aSampledImageResourceId)
             {
                 auto const it = std::find_if(mSampledImageIndex.begin(), mSampledImageIndex.end(), [&](std::string const &aCmp) -> bool { return (aCmp == aSlotId); });
-                if(mSampledImageIndex.end() == it)
+                if(mSampledImageIndex.end() != it)
                 {
                     return;
                 }

@@ -9,9 +9,11 @@
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
 #include <renderer/irenderer.h>
+
 #include <resources/cresourcemanager.h>
 #include <material/loader.h>
 #include <mesh/loader.h>
+#include <textures/loader.h>
 
 #include <vulkan_integration/vulkanenvironment.h>
 
@@ -24,6 +26,7 @@
 #endif
 
 #include "buildingblocks/scene.h"
+#include "../../../modules/textures/code/include/textures/loader.h"
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 
@@ -37,6 +40,7 @@ namespace engine
     using namespace engine::vulkan;
     using material::CMaterialLoader;
     using mesh::CMeshLoader;
+    using textures::CTextureLoader;
 
     /**
      * @brief The CEngineInstance class
@@ -93,6 +97,7 @@ namespace engine
         Shared<CResourceManager>      mResourceManager;
         Shared<CMaterialLoader>       mMaterialLoader;
         Shared<CMeshLoader>           mMeshLoader;
+        Shared<CTextureLoader>        mTextureLoader;
 
         // Rendering
         Shared<CVulkanEnvironment>    mVulkanEnvironment;

@@ -129,6 +129,7 @@ namespace engine
                     , serialization::IDeserializable<documents::IJSONDeserializer<STextureMeta>>()
                     , uid                 (0 )
                     , name                ({})
+                    , textureInfo         ({})
                     , imageLayersBinaryUid(0 )
             {}
 
@@ -138,6 +139,7 @@ namespace engine
                     , serialization::IDeserializable<documents::IJSONDeserializer<STextureMeta>>()
                     , uid                 (aOther.uid                  )
                     , name                (aOther.name                 )
+                    , textureInfo         (aOther.textureInfo)
                     , imageLayersBinaryUid(aOther.imageLayersBinaryUid)
             {}
 
@@ -147,7 +149,8 @@ namespace engine
                     , serialization::IDeserializable<documents::IJSONDeserializer<STextureMeta>>()
                     , uid                 (aOther.uid                  )
                     , name                (std::move(aOther.name       ))
-                    , imageLayersBinaryUid(aOther.imageLayersBinaryUid)
+                    , textureInfo         (aOther.textureInfo          )
+                    , imageLayersBinaryUid(aOther.imageLayersBinaryUid )
             {}
 
         public_operators:
@@ -156,6 +159,7 @@ namespace engine
             {
                 uid                  = aOther.uid;
                 name                 = aOther.name;
+                textureInfo          = aOther.textureInfo;
                 imageLayersBinaryUid = aOther.imageLayersBinaryUid;
 
                 return (*this);
@@ -166,6 +170,7 @@ namespace engine
             {
                 uid                  = aOther.uid;
                 name                 = std::move(aOther.name);
+                textureInfo          = aOther.textureInfo;
                 imageLayersBinaryUid = aOther.imageLayersBinaryUid;
 
                 return (*this);
@@ -204,16 +209,19 @@ namespace engine
         {
             public_constructors:
                 SHIRABE_INLINE
-                explicit CTextureInstance(  std::string      const &aName
-                                          , asset::AssetId_t const &aImageLayersBinaryAssetUIDs)
-                    : mName                      ( aName )
-                    , mImageLayersBinaryAssetUids(aImageLayersBinaryAssetUIDs)
+                explicit CTextureInstance(  std::string         const &aName
+                                          , asset::STextureInfo const &aTextureInfo
+                                          , asset::AssetId_t    const &aImageLayersBinaryAssetUIDs)
+                    : mName                     ( aName )
+                    , mTextureInfo              ( aTextureInfo )
+                    , mImageLayersBinaryAssetUid(aImageLayersBinaryAssetUIDs)
                 {}
 
                 SHIRABE_INLINE
                 explicit CTextureInstance(CTextureInstance &&aOther)
-                    : mName                      (std::move(aOther.mName))
-                    , mImageLayersBinaryAssetUids(aOther.mImageLayersBinaryAssetUids)
+                    : mName                     (std::move(aOther.mName))
+                    , mTextureInfo              (aOther.mTextureInfo)
+                    , mImageLayersBinaryAssetUid(aOther.mImageLayersBinaryAssetUid)
                 {}
 
             public_destructors:
@@ -223,8 +231,9 @@ namespace engine
                 SHIRABE_INLINE
                 CTextureInstance &operator=(CTextureInstance &&aOther)
                 {
-                    mName                       = std::move(aOther.mName);
-                    mImageLayersBinaryAssetUids = aOther.mImageLayersBinaryAssetUids;
+                    mName                      = std::move(aOther.mName);
+                    mTextureInfo               = aOther.mTextureInfo;
+                    mImageLayersBinaryAssetUid = aOther.mImageLayersBinaryAssetUid;
 
                     return (*this);
                 }
@@ -245,13 +254,13 @@ namespace engine
                 SHIRABE_INLINE
                 asset::AssetId_t const imageLayersBinaryAssetUid() const
                 {
-                    return mImageLayersBinaryAssetUids;
+                    return mImageLayersBinaryAssetUid;
                 }
 
         private_members:
             std::string         mName;
             asset::STextureInfo mTextureInfo;
-            asset::AssetId_t    mImageLayersBinaryAssetUids;
+            asset::AssetId_t    mImageLayersBinaryAssetUid;
         };
 
 

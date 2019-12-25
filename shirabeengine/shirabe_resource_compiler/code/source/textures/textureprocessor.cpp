@@ -248,7 +248,7 @@ namespace texture
         std::filesystem::path const &textureID  = aTextureFile.stem();
 
         std::filesystem::path const outputPath                      = ( parentPath)                                                                      .lexically_normal();
-        std::filesystem::path const outputMetaFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".mesh.meta"))  ).lexically_normal();
+        std::filesystem::path const outputMetaFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".texture.meta"))  ).lexically_normal();
         std::filesystem::path const outputDataFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".texturedata"))).lexically_normal();
         std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / aConfig.outputPath / outputPath                 ).lexically_normal();
         std::filesystem::path const outputMetaFilePathAbs           = (std::filesystem::current_path() / aConfig.outputPath / outputMetaFilePath         ).lexically_normal();

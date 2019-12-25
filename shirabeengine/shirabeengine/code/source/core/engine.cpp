@@ -10,6 +10,8 @@
 #include <material/assetloader.h>
 #include <mesh/loader.h>
 #include <mesh/assetloader.h>
+#include <textures/loader.h>
+#include <textures/assetloader.h>
 #include <resources/agpuapiresourceobjectfactory.h>
 #include <util/crc32.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>
@@ -35,6 +37,7 @@
 
 #include <material/assetloader.h>
 #include "core/engine.h"
+#include "../../../modules/textures/code/include/textures/loader.h"
 
 namespace engine
 {
@@ -266,6 +269,7 @@ namespace engine
 
             mMeshLoader     = makeShared<mesh::CMeshLoader>();
             mMaterialLoader = makeShared<material::CMaterialLoader>();
+            mTextureLoader  = makeShared<textures::CTextureLoader>();
 
             Unique<CGpuApiResourceObjectFactory> gpuApiResourceFactory = nullptr;
 
@@ -291,6 +295,7 @@ namespace engine
             // manager->addAssetLoader<SMesh>(...);
             manager->addAssetLoader<SMaterial>(material::getAssetLoader(manager, mAssetStorage, mMaterialLoader));
             manager->addAssetLoader<SMesh>    (mesh    ::getAssetLoader(manager, mAssetStorage, mMeshLoader));
+            manager->addAssetLoader<STexture> (textures::getAssetLoader(manager, mAssetStorage, mTextureLoader));
             mResourceManager = manager;
 
             return { EEngineStatus::Ok };
@@ -353,6 +358,12 @@ namespace engine
 
             auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage
                                                                                        , util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
+
+            auto const &[textureResult,     texture]     = mTextureLoader->loadInstance(mAssetStorage
+                                                                                       , util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
+
+            material->getMutableConfiguration().setSampledImage("diffuseTexture", texture->name());
+
 
             auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");
             auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");

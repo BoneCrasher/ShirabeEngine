@@ -369,7 +369,7 @@ namespace engine::material
 
             if(not includeSystemBuffers)
             {
-                pipelineDependencies.push_back("Core_pipeline");
+                pipelineDependencies.emplace_back("Core_pipeline");
             }
 
             CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = aResourceManager->useDynamicResource<SPipeline>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor, std::move(pipelineDependencies));
