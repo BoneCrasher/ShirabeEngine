@@ -19,7 +19,12 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(IVkFrameContext);
 
         public_api:
+            virtual VkQueue getGraphicsQueue() = 0;
             virtual VkQueue getTransferQueue() = 0;
+            virtual VkQueue getPresentQueue()  = 0;
+
+            virtual VkCommandBuffer getGraphicsCommandBuffer() = 0;
+            virtual VkCommandBuffer getTransferCommandBuffer() = 0;
         };
 
     }

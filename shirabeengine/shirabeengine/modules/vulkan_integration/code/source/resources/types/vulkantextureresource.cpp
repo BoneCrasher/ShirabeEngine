@@ -224,8 +224,20 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::load()
     {
-        CResourceDataSource const &dataSource = getCurrentDescriptor()->initialData[0];
-        ByteBuffer          const &data       = dataSource.getData();
+        VkDevice device = getVkContext()->getLogicalDevice();
+
+        STextureDescription const &desc = *getCurrentDescriptor();
+
+        if(not desc.initialData.empty())
+        {
+            CResourceDataSource const &dataSource = desc.initialData[0];
+            ByteBuffer          const &data       = dataSource.getData();
+
+            void *mappedData = nullptr;
+            vkMapMemory(device, this->stagingBufferMemory, 0, data.size(), 0, &mappedData);
+            memcpy(mappedData, data.data(), data.size());
+            vkUnmapMemory(device, this->stagingBufferMemory);
+        }
 
         return { EEngineStatus::Ok };
     }
@@ -236,7 +248,6 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::unload()
     {
-        vkDestroyBuffer(getVkContext()->getLogicalDevice(), this->stagingBuffer, nullptr);
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
@@ -290,11 +301,11 @@ namespace engine::vulkan
         region.imageOffset = {0, 0, 0};
         region.imageExtent = { textureDesc.textureInfo.width, textureDesc.textureInfo.height, 1 };
 
-        // vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
-        //                        , this->stagingBuffer
-        //                        , this->imageHandle
-        //                        , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-        //                        , 1, &region);
+        vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
+                               , this->stagingBuffer
+                               , this->imageHandle
+                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                               , 1, &region);
 
         return { EEngineStatus::Ok };
     }
