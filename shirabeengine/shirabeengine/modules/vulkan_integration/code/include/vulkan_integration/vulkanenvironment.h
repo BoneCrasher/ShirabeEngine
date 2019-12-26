@@ -156,6 +156,8 @@ namespace engine::vulkan
     private_members:
         SVulkanState                   mVkState;
         Shared<CGpuApiResourceStorage> mResourceStorage;
+
+        Shared<IVkFrameContext> mCurrentFrameContext;
     };
 
 }

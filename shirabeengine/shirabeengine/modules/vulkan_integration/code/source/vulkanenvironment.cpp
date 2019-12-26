@@ -59,6 +59,9 @@ namespace engine::vulkan
     //<
     //<-----------------------------------------------------------------------------
     CVulkanEnvironment::CVulkanEnvironment()
+        : mVkState            ({})
+        , mResourceStorage    (nullptr)
+        , mCurrentFrameContext(nullptr)
     {}
     //<-----------------------------------------------------------------------------
 
@@ -128,9 +131,9 @@ namespace engine::vulkan
         vkEnumerateInstanceExtensionProperties(nullptr, &instanceExtensionCount, supportedExtensions.data());
 
         std::set<std::string> extensionsCopy(extensions.begin(), extensions.end());
-        for(VkExtensionProperties const&extensions : supportedExtensions)
+        for(VkExtensionProperties const&ext : supportedExtensions)
         {
-            extensionsCopy.erase(extensions.extensionName);
+            extensionsCopy.erase(ext.extensionName);
         }
 
         if(!extensionsCopy.empty())
@@ -1006,7 +1009,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     Shared<IVkFrameContext> CVulkanEnvironment::getVkCurrentFrameContext()
     {
-        return nullptr;
+        return mCurrentFrameContext;
     }
     //<-----------------------------------------------------------------------------
 

@@ -14,6 +14,38 @@ namespace engine
     {
         using namespace engine::rendering;
 
+        class CVulkanFrameContext
+            : public IVkFrameContext
+        {
+        public_structs:
+            struct SFrameContextData
+            {
+                VkQueue graphicsQueue;
+                VkQueue transferQueue;
+                VkQueue presentQueue;
+
+                VkCommandBuffer graphicsCommandBuffer;
+                VkCommandBuffer transferCommandBuffer;
+            };
+
+        public_constructors:
+            SHIRABE_INLINE
+            explicit CVulkanFrameContext(SFrameContextData const &aData)
+                : mData(aData)
+            { };
+
+        public_api:
+            SHIRABE_INLINE VkQueue getGraphicsQueue() final { return mData.graphicsQueue; }
+            SHIRABE_INLINE VkQueue getTransferQueue() final { return mData.transferQueue; }
+            SHIRABE_INLINE VkQueue getPresentQueue () final { return mData.presentQueue; }
+
+            VkCommandBuffer getGraphicsCommandBuffer() final { return mData.graphicsCommandBuffer; }
+            VkCommandBuffer getTransferCommandBuffer() final { return mData.transferCommandBuffer; }
+
+        private_members:
+            SFrameContextData mData;
+        };
+
         /**
          * The CVulkanRenderContext class implements the IRenderContext for
          * the vulkan API.
