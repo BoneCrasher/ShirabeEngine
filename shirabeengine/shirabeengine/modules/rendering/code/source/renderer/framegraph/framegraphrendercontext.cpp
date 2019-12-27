@@ -1020,6 +1020,9 @@ namespace engine::framegraph
             Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
             if(nullptr != sampledImageTexture)
             {
+                sampledImageTexture->load({});
+                sampledImageTexture->transfer();
+
                 STextureViewDescription desc {};
                 desc.name                 = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
                 desc.subjacentTextureInfo = sampledImageTexture->getDescription().textureInfo;

@@ -284,6 +284,11 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::transfer()
     {
+        if(mTransferred)
+        {
+            return EEngineStatus::Ok;
+        }
+
         Shared<IVkFrameContext> frameContext = getVkContext()->getVkCurrentFrameContext();
 
         VkBufferImageCopy region {};

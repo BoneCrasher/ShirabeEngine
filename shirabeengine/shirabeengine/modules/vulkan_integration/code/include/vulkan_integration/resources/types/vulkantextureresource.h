@@ -46,6 +46,8 @@ namespace engine
             CEngineResult<> transfer() final;
 
         public_members:
+            
+
             VkBuffer       stagingBuffer;
             VkDeviceMemory stagingBufferMemory;
             VkImage        imageHandle;

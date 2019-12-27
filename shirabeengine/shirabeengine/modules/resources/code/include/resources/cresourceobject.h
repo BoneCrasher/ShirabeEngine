@@ -60,6 +60,7 @@ namespace engine
             {
                 mLoader = aLoader;
             }
+
             SHIRABE_INLINE
             void setGpuApiResourceUnloader(std::function<EEngineStatus(Dependencies_t  const &, std::vector<ResourceId_t> &&)> const &aUnloader)
             {
@@ -73,12 +74,14 @@ namespace engine
 
                 return (mLoader) ? mLoader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
             }
+
             EEngineStatus unloadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
             {
                 mDependencies.reset();
 
                 return (mUnloader) ? mUnloader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
             }
+
             void resetCurrentDependencies() { mDependencies.reset(); }
 
         private_members:
