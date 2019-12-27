@@ -27,11 +27,29 @@ namespace engine
         static Unique<CResourceGpuApiResourceObjectCreator<TLogicalResource>> makeCreator(Shared<IVkGlobalContext> aContext)
         {
             return makeUnique<CResourceGpuApiResourceObjectCreator<TLogicalResource>>(
-                    [aContext] (GpuApiHandle_t const &aHandle) -> Shared<TGpuApiResource>
+                [aContext] (GpuApiHandle_t const &aHandle) -> std::tuple<Shared<TGpuApiResource>, SGpuApiOps<TLogicalResource>>
+                {
+                    Shared<TGpuApiResource> resource = makeShared<TGpuApiResource>(aContext, aHandle);
+
+                    SGpuApiOps<TLogicalResource> ops {};
+                    ops.initialize   = [resource] ( typename TLogicalResource::Descriptor_t   const &
+                                                  , typename TLogicalResource::Dependencies_t const &
+                                                  , GpuApiResourceDependencies_t              const &) -> CEngineResult<> {};
+                    ops.deinitialize = [resource] () -> CEngineResult<> {};
+
+                    if constexpr(std::is_base_of_v<ILoadableGpuApiResourceObject, TGpuApiResource>)
                     {
-                        Shared<TGpuApiResource> resource = makeShared<TGpuApiResource>(aContext, aHandle);
-                        return resource;
-                    });
+                        ops.load   = [resource] () -> CEngineResult<> { return resource->load();   };
+                        ops.unload = [resource] () -> CEngineResult<> { return resource->unload(); };
+                    }
+
+                    if constexpr(std::is_base_of_v<ITransferrableGpuApiResourceObject, TGpuApiResource>)
+                    {
+                        ops.transfer = [resource] () -> CEngineResult<> { return resource->transfer(); };
+                    }
+
+                    return { resource, ops };
+                });
         }
         //<-----------------------------------------------------------------------------
 

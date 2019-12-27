@@ -20,11 +20,80 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        template <typename TReturn, typename... TArgs>
+        std::function<TReturn(TArgs...)> makeNoOp()
+        {
+            return [] (TArgs...) -> TReturn {};
+        }
+
+        template <typename TDescriptor, typename TDependencies>
+        struct SLogicalOps
+        {
+            using InitializeFn_t =
+                std::function<CEngineResult<>(TDependencies const &)>;
+            using LoadFn_t =
+                std::function<CEngineResult<>()>;
+            using TransferFn_t =
+                std::function<CEngineResult<>()>;
+            using UnloadFn_t =
+                std::function<CEngineResult<>()>;
+            using DeinitializeFn_t =
+                std::function<CEngineResult<>(TDependencies const &)>;
+
+            SLogicalOps() = default;
+
+            SHIRABE_INLINE
+            SLogicalOps(SLogicalOps const &aOther)
+                    : initialize  (aOther.initialize  )
+                    , load        (aOther.load        )
+                    , transfer    (aOther.transfer    )
+                    , unload      (aOther.unload      )
+                    , deinitialize(aOther.deinitialize)
+            { }
+
+            SHIRABE_INLINE
+            SLogicalOps &operator=(SLogicalOps const &aOther)
+            {
+                if(&aOther != this)
+                {
+                    initialize   = aOther.initialize;
+                    load         = aOther.load;
+                    transfer     = aOther.transfer;
+                    unload       = aOther.unload;
+                    deinitialize = aOther.deinitialize;
+                }
+
+                return (*this);
+            }
+
+            static SLogicalOps DefaultOps()
+            {
+                SLogicalOps ops {};
+                ops.initialize   = makeNoOp<CEngineResult<>, TDependencies const &>();
+                ops.load         = makeNoOp<CEngineResult<>>();
+                ops.transfer     = makeNoOp<CEngineResult<>>();
+                ops.unload       = makeNoOp<CEngineResult<>>();
+                ops.deinitialize = makeNoOp<CEngineResult<>, TDependencies const &>();
+                return ops;
+            }
+
+            InitializeFn_t   initialize;
+            LoadFn_t         load;
+            TransferFn_t     transfer;
+            UnloadFn_t       unload;
+            DeinitializeFn_t deinitialize;
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         template <typename TDescription, typename TDependencies>
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT CResourceObject
             : public ILogicalResourceObject
+            , public SLogicalOps<TDescription, TDependencies>
         {
             friend class CResourceManager;
 
@@ -48,51 +117,21 @@ namespace engine
 
             std::optional<TDependencies> const &getCurrentDependencies() const { return mDependencies; }
 
-            virtual EEngineStatus load(Dependencies_t const &aDependencies) = 0;
-
-            virtual EEngineStatus unload() = 0;
-
         private_api:
             void setGpuApiResourceHandle(GpuApiHandle_t const &aHandle) final;
 
-            SHIRABE_INLINE
-            void setGpuApiResourceLoader  (std::function<EEngineStatus(Dependencies_t  const &, std::vector<ResourceId_t> &&)> const &aLoader)
+            void setLogicalOps(SLogicalOps<TDescription, TDependencies> const &aOps)
             {
-                mLoader = aLoader;
-            }
-
-            SHIRABE_INLINE
-            void setGpuApiResourceUnloader(std::function<EEngineStatus(Dependencies_t  const &, std::vector<ResourceId_t> &&)> const &aUnloader)
-            {
-                mUnloader = aUnloader;
+                SLogicalOps<TDescription, TDependencies>::operator=(aOps);
             }
 
         protected_methods:
-            EEngineStatus loadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
-            {
-                mDependencies = aDependencies;
-
-                return (mLoader) ? mLoader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
-            }
-
-            EEngineStatus unloadGpuApiResource(TDependencies const &aDependencies, std::vector<ResourceId_t> &&aResolvedDependencies)
-            {
-                mDependencies.reset();
-
-                return (mUnloader) ? mUnloader(aDependencies, std::move(aResolvedDependencies)) : EEngineStatus::Error;
-            }
-
-            void resetCurrentDependencies() { mDependencies.reset(); }
-
         private_members:
             TDescription  const                                     mDescription;
             std::optional<TDependencies>                            mDependencies;
 
             GpuApiHandle_t                                          mGpuApiResourceHandle;
             IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
-
-            std::function<EEngineStatus(TDependencies const &, std::vector<ResourceId_t> &&)> mLoader;
-            std::function<EEngineStatus(TDependencies const &, std::vector<ResourceId_t> &&)> mUnloader;
         };
 
         //<-----------------------------------------------------------------------------
@@ -102,12 +141,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TDescription, typename TDependencies>
         CResourceObject<TDescription, TDependencies>::CResourceObject(const TDescription &aDescription)
-            : mDescription(aDescription)
+            : ILogicalResourceObject()
+            , SLogicalOps<TDescription, TDependencies>(SLogicalOps<TDescription, TDependencies>::DefaultOps())
+            , mDescription(aDescription)
             , mDependencies()
             , mGpuApiResourceHandle()
             , mStateObserver()
-            , mLoader()
-            , mUnloader()
         {}
         //<-----------------------------------------------------------------------------
         //

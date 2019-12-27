@@ -64,11 +64,11 @@ namespace engine
             CEngineResult<> destroy() final;
 
             // ILoadableGpuApiResourceObject
-            CEngineResult<> load()     final;
-            CEngineResult<> unload()   final;
+            CEngineResult<> load()     const final;
+            CEngineResult<> unload()   const final;
 
             // ITransferrableGpuApiResourceObject
-            CEngineResult<> transfer() final;
+            CEngineResult<> transfer() const final;
 
         public_members:
             VkBuffer       handle;

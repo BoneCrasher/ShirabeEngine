@@ -39,8 +39,8 @@ namespace engine
             CEngineResult<> destroy() final;
 
             // ILoadableGpuApiResourceObject
-            CEngineResult<> load()     final;
-            CEngineResult<> unload()   final;
+            CEngineResult<> load()   const final;
+            CEngineResult<> unload() const final;
 
         public_members:
             std::unordered_map<VkShaderStageFlags, VkShaderModule> handles;

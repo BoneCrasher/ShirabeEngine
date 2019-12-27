@@ -420,7 +420,7 @@ namespace engine::framegraph
         // renderPassDesc.attachmentTextureViews  = textureViewIds;
 
         {
-            CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc, {});
+            CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
             if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
             {
                 return {EEngineStatus::Ok};
@@ -467,7 +467,7 @@ namespace engine::framegraph
             frameBufferDependencies.push_back(renderPassDesc.name);
             // frameBufferDependencies.insert(frameBufferDependencies.end(), textureViewIds.begin(), textureViewIds.end());
 
-            CEngineResult<Shared<ILogicalResourceObject>> status = mResourceManager->useDynamicResource<SFrameBuffer>(frameBufferDesc.name, frameBufferDesc, std::move(frameBufferDependencies));
+            CEngineResult<Shared<ILogicalResourceObject>> status = mResourceManager->useDynamicResource<SFrameBuffer>(frameBufferDesc.name, frameBufferDesc);
             if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == status.result())
             {
                 return EEngineStatus::Ok;
@@ -529,7 +529,7 @@ namespace engine::framegraph
             }
         }
 
-        EEngineStatus const renderPassLoaded = renderPass->load(renderPassDependencies); // Make sure the resource is loaded before it is used in a command...
+        EEngineStatus const renderPassLoaded = renderPass->initialize(renderPassDependencies).result(); // Make sure the resource is loaded before it is used in a command...
         EngineStatusPrintOnError(renderPassLoaded, logTag(), "Failed to load renderpass in backend.");
         SHIRABE_RETURN_RESULT_ON_ERROR(renderPassLoaded);
 
@@ -538,7 +538,7 @@ namespace engine::framegraph
         frameBufferDependencies.attachmentExtent       = renderPassDesc.attachmentExtent;
         frameBufferDependencies.attachmentTextureViews = renderPassDependencies.attachmentTextureViews;
 
-        EEngineStatus const frameBufferLoaded = frameBuffer->load(frameBufferDependencies);
+        EEngineStatus const frameBufferLoaded = frameBuffer->initialize(frameBufferDependencies).result();
         EngineStatusPrintOnError(frameBufferLoaded, logTag(), "Failed to load framebuffer in backend.");
         SHIRABE_RETURN_RESULT_ON_ERROR(renderPassLoaded);
 
@@ -711,18 +711,18 @@ namespace engine::framegraph
         desc.arraySlices          = aView.arraySliceRange;
         desc.mipMapSlices         = aView.mipSliceRange;
 
-        CEngineResult<Shared<ILogicalResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, {aTexture.readableName });
+        CEngineResult<Shared<ILogicalResourceObject>> textureViewObject = mResourceManager->useDynamicResource<STextureView>(desc.name, desc);
         EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
 
         registerUsedResource(desc.name, textureViewObject.data());
 
         Shared<STexture> texture = getUsedResourceTyped<STexture>(aTexture.readableName);
-        texture->load({});
+        texture->initialize({}).result();
 
         STextureViewDependencies dependencies {};
         dependencies.subjacentTextureId = aTexture.readableName;
         Shared<STextureView> textureView = getUsedResourceTyped<STextureView>(aView.readableName);
-        textureView->load(dependencies);
+        textureView->initialize(dependencies).result();
 
         return textureViewObject.result();
     }
@@ -862,7 +862,7 @@ namespace engine::framegraph
         // createInfo.format = "...";
         // createInfo.range  = "...";
 
-        CEngineResult<Shared<ILogicalResourceObject>> bufferViewObject = mResourceManager->useDynamicResource<SBufferView>(desc.name, desc, {aBuffer.readableName });
+        CEngineResult<Shared<ILogicalResourceObject>> bufferViewObject = mResourceManager->useDynamicResource<SBufferView>(desc.name, desc);
         EngineStatusPrintOnError(bufferViewObject.result(), logTag(), "Failed to create buffer view.");
 
         return bufferViewObject.result();
@@ -936,7 +936,7 @@ namespace engine::framegraph
         Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
 
         SMeshDependencies dependencies {};
-        EEngineStatus const status = mesh->load(dependencies);
+        EEngineStatus const status = mesh->initialize(dependencies).result();
 
         Shared<SBuffer> attributeBuffer = mesh->vertexDataBufferResource;
         Shared<SBuffer> indexBuffer     = mesh->indexBufferResource;
@@ -989,7 +989,16 @@ namespace engine::framegraph
         dependencies.pipelineDependencies.referenceRenderPassId = aRenderPassHandle;
         dependencies.pipelineDependencies.subpass               = mCurrentSubpass;
         dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
-        EEngineStatus const status = material->load(dependencies);
+
+        for(auto const &buffer : material->bufferResources)
+        {
+            buffer->initialize({});
+        }
+        material->shaderModuleResource->initialize({});
+        material->pipelineResource    ->initialize(dependencies.pipelineDependencies);
+
+
+        EEngineStatus const status = material->initialize(dependencies).result();
 
         std::vector<GpuApiHandle_t>       gpuBufferIds                     {};
         std::vector<GpuApiHandle_t>       gpuInputAttachmentTextureViewIds {};
@@ -1020,8 +1029,8 @@ namespace engine::framegraph
             Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
             if(nullptr != sampledImageTexture)
             {
-                sampledImageTexture->load({});
-                sampledImageTexture->transfer();
+                sampledImageTexture->initialize({}); // No-Op if loaded already...
+                sampledImageTexture->transfer();     // No-Op if transferred already...
 
                 STextureViewDescription desc {};
                 desc.name                 = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
@@ -1030,7 +1039,7 @@ namespace engine::framegraph
                 desc.mipMapSlices         = { 0, 1 };
                 desc.textureFormat        = EFormat::Automatic;
 
-                auto const [result, viewData] = mResourceManager->useDynamicResource<STextureView>(desc.name, desc, { sampledImageResourceId });
+                auto const [result, viewData] = mResourceManager->useDynamicResource<STextureView>(desc.name, desc);
                 if(CheckEngineError(result))
                 {
                     // ...
@@ -1041,7 +1050,7 @@ namespace engine::framegraph
 
                 STextureViewDependencies deps {};
                 deps.subjacentTextureId = sampledImageResourceId;
-                view->load(deps);
+                view->initialize(deps);
 
                 SSampledImageBinding binding {};
                 binding.image     = sampledImageTexture->getGpuApiResourceHandle();

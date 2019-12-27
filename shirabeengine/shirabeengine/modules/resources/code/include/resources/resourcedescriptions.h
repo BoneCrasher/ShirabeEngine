@@ -25,7 +25,14 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SNoDependencies {};
+            SHIRABE_TEST_EXPORT SNoDependencies {
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                return {};
+            }
+        };
 
         struct
             [[nodiscard]]
@@ -50,6 +57,12 @@ namespace engine
             SHIRABE_TEST_EXPORT SBufferViewDependencies
         {
             ResourceId_t bufferId;
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                return { bufferId };
+            }
         };
 
         struct
@@ -82,6 +95,12 @@ namespace engine
             SHIRABE_TEST_EXPORT STextureViewDependencies
         {
             ResourceId_t  subjacentTextureId;
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                return { subjacentTextureId };
+            }
         };
 
         struct
@@ -162,6 +181,12 @@ namespace engine
             SHIRABE_LIBRARY_EXPORT SRenderPassDependencies
         {
             std::vector<ResourceId_t> attachmentTextureViews;
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                return std::vector<ResourceId_t>(attachmentTextureViews);
+            }
         };
 
         struct
@@ -180,6 +205,19 @@ namespace engine
             ResourceId_t              referenceRenderPassId; // Used as a template to create a compatible framebuffer
             VkExtent3D                attachmentExtent;
             std::vector<ResourceId_t> attachmentTextureViews;
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                std::vector<ResourceId_t> dependencies {};
+                dependencies.push_back(referenceRenderPassId);
+                for(auto const &view : attachmentTextureViews)
+                {
+                    dependencies.push_back(view);
+                }
+
+                return dependencies;
+            }
         };
 
         struct
@@ -249,6 +287,19 @@ namespace engine
             ResourceId_t              shaderModuleId;
             std::vector<ResourceId_t> bufferViewIds;
             std::vector<ResourceId_t> textureViewIds;
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                std::vector<ResourceId_t> dependencies {};
+                dependencies.push_back(referenceRenderPassId);
+                for(auto const &buffer : bufferViewIds)
+                {
+                    dependencies.push_back(buffer);
+                }
+
+                return dependencies;
+            }
         };
 
         struct
@@ -267,7 +318,6 @@ namespace engine
             SHIRABE_TEST_EXPORT SMaterialDependencies
         {
             SMaterialPipelineDependencies pipelineDependencies;
-            // No dependencies structs required for shader module and buffers (yet...)
         };
 
         struct

@@ -334,10 +334,12 @@ namespace engine::vulkan
                 {
                     VkQueueFamilyProperties const &properties = vkQueueFamilies.at(k);
 
-                    bool enoughQueues     = (properties.queueCount > 0);
-                    bool supportsGraphics = (properties.queueFlags & VK_QUEUE_GRAPHICS_BIT);
-                    bool supportsCompute  = (properties.queueFlags & VK_QUEUE_COMPUTE_BIT);
-                    bool supportsTransfer = (properties.queueFlags & VK_QUEUE_TRANSFER_BIT);
+                    bool enoughQueues             = (properties.queueCount > 0);
+                    bool supportsGraphics         = (properties.queueFlags & VK_QUEUE_GRAPHICS_BIT);
+                    bool supportsCompute          = (properties.queueFlags & VK_QUEUE_COMPUTE_BIT);
+                    bool supportsTransfer         = (properties.queueFlags & VK_QUEUE_TRANSFER_BIT);
+                    bool isExclusiveComputeQueue  = (properties.queueFlags == VK_QUEUE_TRANSFER_BIT);
+                    bool isExclusiveTransferQueue = (properties.queueFlags == VK_QUEUE_TRANSFER_BIT);
 
                     // TODO: Perform check for transfer only queue family, so that we can speed up transfer ops!
 
@@ -359,6 +361,10 @@ namespace engine::vulkan
                         supportingQueueFamilies.computeQueueFamilyIndices.push_back(k);
                     if(supportsTransfer)
                         supportingQueueFamilies.transferQueueFamilyIndices.push_back(k);
+                    if(isExclusiveComputeQueue)
+                        supportingQueueFamilies.exclusiveComputeQueueFamilyIndices.push_back(k);
+                    if(isExclusiveTransferQueue)
+                        supportingQueueFamilies.exclusiveTransferQueueFamilyIndices.push_back(k);
                 }
 
                 if(supportingQueueFamilies.supportingQueueFamilyIndices.empty())
@@ -603,7 +609,7 @@ namespace engine::vulkan
         VkSwapchainKHR vkSwapChain = VK_NULL_HANDLE;
 
         // Should give us triple buffering with fallback to double buffering...
-        uint32_t swapChainImageCount = (vkSurfaceCapabilities.minImageCount + 1);
+        uint32_t swapChainImageCount = 2; // (vkSurfaceCapabilities.minImageCount + 1);
         if(vkSurfaceCapabilities.maxImageCount > 0)
         {
             // We have a limited amount of images possible. Clamp!
@@ -896,7 +902,7 @@ namespace engine::vulkan
             CLog::Error(logTag(), CString::format("CVulkanError (VkResult: {}):\n{}", ve.vulkanResult(), ve.what()));
             return EEngineStatus::Error;
         }
-        catch(std::exception const stde)
+        catch(std::exception const &stde)
         {
             CLog::Error(logTag(), stde.what());
             return EEngineStatus::Error;
@@ -952,12 +958,26 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
+    VkQueue CVulkanEnvironment::getTransferQueue()
+    {
+        SVulkanPhysicalDevice const&physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
+
+        VkQueue queue = VK_NULL_HANDLE;
+        vkGetDeviceQueue(getLogicalDevice(), physicalDevice.queueFamilies.transferQueueFamilyIndices.at(0), 0, &queue);
+
+        return queue;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
     VkQueue CVulkanEnvironment::getGraphicsQueue()
     {
         SVulkanPhysicalDevice const&physicalDevice = mVkState.supportedPhysicalDevices.at(mVkState.selectedPhysicalDevice);
 
         VkQueue queue = VK_NULL_HANDLE;
-        vkGetDeviceQueue(mVkState.selectedLogicalDevice, physicalDevice.queueFamilies.graphicsQueueFamilyIndices.at(0), 0, &queue);
+        vkGetDeviceQueue(getLogicalDevice(), physicalDevice.queueFamilies.graphicsQueueFamilyIndices.at(0), 0, &queue);
 
         return queue;
     }
@@ -977,7 +997,7 @@ namespace engine::vulkan
         }
         else
         {
-            vkGetDeviceQueue(mVkState.selectedLogicalDevice, physicalDevice.queueFamilies.presentQueueFamilyIndices.at(0), 0, &queue);
+            vkGetDeviceQueue(getLogicalDevice(), physicalDevice.queueFamilies.presentQueueFamilyIndices.at(0), 0, &queue);
         }
 
         return queue;
@@ -1001,6 +1021,30 @@ namespace engine::vulkan
     SVulkanState &CVulkanEnvironment::getState()
     {
         return mVkState;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    CEngineResult<Shared<IVkFrameContext>> CVulkanEnvironment::beginGraphicsFrame()
+    {
+        if(nullptr == mCurrentFrameContext)
+        {
+            CVulkanFrameContext::SFrameContextData data {};
+
+            mCurrentFrameContext = makeShared<CVulkanFrameContext>(data);
+        }
+
+        return { EEngineStatus::Ok, getVkCurrentFrameContext() };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    CEngineResult<> CVulkanEnvironment::endGraphicsFrame() {
+        return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
 

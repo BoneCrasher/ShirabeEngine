@@ -10,6 +10,39 @@ namespace engine::vulkan
     using engine::wsi::CWindowHandleWrapper;
     using engine::graphicsapi::EFormat;
 
+
+    class CVulkanFrameContext
+            : public IVkFrameContext
+    {
+    public_structs:
+        struct SFrameContextData
+        {
+            VkQueue graphicsQueue;
+            VkQueue transferQueue;
+            VkQueue presentQueue;
+
+            VkCommandBuffer graphicsCommandBuffer;
+            VkCommandBuffer transferCommandBuffer;
+        };
+
+    public_constructors:
+        SHIRABE_INLINE
+        explicit CVulkanFrameContext(SFrameContextData const &aData)
+                : mData(aData)
+        { };
+
+    public_api:
+        SHIRABE_INLINE VkQueue getGraphicsQueue() final { return mData.graphicsQueue; }
+        SHIRABE_INLINE VkQueue getTransferQueue() final { return mData.transferQueue; }
+        SHIRABE_INLINE VkQueue getPresentQueue () final { return mData.presentQueue; }
+
+        VkCommandBuffer getGraphicsCommandBuffer() final { return mData.graphicsCommandBuffer; }
+        VkCommandBuffer getTransferCommandBuffer() final { return mData.transferCommandBuffer; }
+
+    private_members:
+        SFrameContextData mData;
+    };
+
     /**
      * The CVulkanEnvironment class encapsulates all vulkan API related
      * base state & information required to use the graphics card and the
@@ -61,6 +94,13 @@ namespace engine::vulkan
         }
 
         /**
+         * Return the currently selected transfer queue, if any.
+         *
+         * @return A graphics queue, if available or VK_NULL_HANDLE.
+         */
+        VkQueue getTransferQueue();
+
+        /**
          * Return the currently selected graphics queue, if any.
          *
          * @return A graphics queue, if available or VK_NULL_HANDLE.
@@ -104,6 +144,9 @@ namespace engine::vulkan
          * Try to recreate the swapchain with the last known configuration.
          */
         void recreateSwapChain();
+
+        CEngineResult<Shared<IVkFrameContext>> beginGraphicsFrame();
+        CEngineResult<>                        endGraphicsFrame();
 
     public_api:
         Shared<IVkFrameContext> getVkCurrentFrameContext() final;

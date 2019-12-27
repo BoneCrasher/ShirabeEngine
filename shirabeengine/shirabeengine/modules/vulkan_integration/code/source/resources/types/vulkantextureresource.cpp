@@ -10,6 +10,21 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    CVulkanTextureResource::CVulkanTextureResource(  Shared<IVkGlobalContext>         aVkContext
+                                                   , resources::GpuApiHandle_t const &aHandle)
+        : CVkApiResource<STexture>(std::move(aVkContext), aHandle)
+        , stagingBuffer      (VK_NULL_HANDLE)
+        , stagingBufferMemory(VK_NULL_HANDLE)
+        , imageHandle        (VK_NULL_HANDLE)
+        , imageMemory        (VK_NULL_HANDLE)
+        , attachedSampler    (VK_NULL_HANDLE)
+        , mIsTransferred     (false)
+    {}
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanTextureResource::create(  STextureDescription          const &aDescription
                                                    , SNoDependencies              const &aDependencies
                                                    , GpuApiResourceDependencies_t const &aResolvedDependencies)
@@ -222,7 +237,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::load()
+    CEngineResult<> CVulkanTextureResource::load() const
     {
         VkDevice device = getVkContext()->getLogicalDevice();
 
@@ -246,7 +261,39 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::unload()
+    CEngineResult<> CVulkanTextureResource::transfer() const
+    {
+        Shared<IVkFrameContext> frameContext = getVkContext()->getVkCurrentFrameContext();
+
+        VkBufferImageCopy region {};
+        region.bufferOffset      = 0;
+        region.bufferRowLength   = 0;
+        region.bufferImageHeight = 0;
+
+        region.imageSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.mipLevel       = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount     = 1;
+
+        STextureDescription const textureDesc = *getCurrentDescriptor();
+
+        region.imageOffset = {0, 0, 0};
+        region.imageExtent = { textureDesc.textureInfo.width, textureDesc.textureInfo.height, 1 };
+
+        vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
+                               , this->stagingBuffer
+                               , this->imageHandle
+                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                               , 1, &region);
+
+        return { EEngineStatus::Ok };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    CEngineResult<> CVulkanTextureResource::unload() const
     {
         return { EEngineStatus::Ok };
     }
@@ -274,43 +321,6 @@ namespace engine::vulkan
         vkDestroyBuffer (vkLogicalDevice, vkBuffer,       nullptr);
 
         setResourceState(EGpuApiResourceState::Discarded);
-
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanTextureResource::transfer()
-    {
-        if(mTransferred)
-        {
-            return EEngineStatus::Ok;
-        }
-
-        Shared<IVkFrameContext> frameContext = getVkContext()->getVkCurrentFrameContext();
-
-        VkBufferImageCopy region {};
-        region.bufferOffset      = 0;
-        region.bufferRowLength   = 0;
-        region.bufferImageHeight = 0;
-
-        region.imageSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
-        region.imageSubresource.mipLevel       = 0;
-        region.imageSubresource.baseArrayLayer = 0;
-        region.imageSubresource.layerCount     = 1;
-
-        STextureDescription const textureDesc = *getCurrentDescriptor();
-
-        region.imageOffset = {0, 0, 0};
-        region.imageExtent = { textureDesc.textureInfo.width, textureDesc.textureInfo.height, 1 };
-
-        vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
-                               , this->stagingBuffer
-                               , this->imageHandle
-                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-                               , 1, &region);
 
         return { EEngineStatus::Ok };
     }

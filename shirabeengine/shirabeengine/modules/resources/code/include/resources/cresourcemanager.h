@@ -52,8 +52,7 @@ namespace engine {
             // requires std::is_base_of_v<ILogicalResourceObject, TResource>
             CEngineResult<Shared<ILogicalResourceObject>> useDynamicResource(
                       ResourceId_t                     const &aResourceId
-                    , typename TResource::Descriptor_t const &aDescriptor
-                    , std::vector<ResourceId_t>             &&aDependencies = {});
+                    , typename TResource::Descriptor_t const &aDescriptor);
 
             CEngineResult<Shared<ILogicalResourceObject>> useAssetResource(  ResourceId_t const &aResourceId
                                                                            , AssetId_t    const &aAssetResourceId);
@@ -182,8 +181,7 @@ namespace engine {
         template <typename TResource>
         CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useDynamicResource(
                   ResourceId_t                     const &aResourceId
-                , typename TResource::Descriptor_t const &aDescriptor
-                , std::vector<ResourceId_t>             &&aStaticDependencies)
+                , typename TResource::Descriptor_t const &aDescriptor)
         {
             CEngineResult<Shared<ILogicalResourceObject>> result = {EEngineStatus::Error, nullptr };
 
@@ -193,47 +191,52 @@ namespace engine {
                 return { EEngineStatus::Ok, alreadyFoundIt->second };
             }
 
-            // Static dependencies
-            insertDependencies(mResourceTree, aResourceId, std::move(aStaticDependencies));
+            auto const [handle, ops] = mGpuApiResourceObjectFactory->create<TResource>();
+
+            GpuApiHandle_t        gpuApiResourceId = handle;
+            SGpuApiOps<TResource> gpuApiOps        = ops;
+
+            SLogicalOps< typename TResource::Descriptor_t
+                       , typename TResource::Dependencies_t> logicalResourceOps {};
+
+            //
+            // Wrap the gpu api resource operations with dependency resolving operations.
+            //
+            logicalResourceOps.initialize =
+                    [aResourceId, aDescriptor, gpuApiResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
+            {
+                Vector<ResourceId_t> resolveDependenciesList = aDependencies.resolve();
+
+                insertDependencies(mResourceTree, aResourceId, std::move(resolveDependenciesList));
+                auto dependenciesResolved = getGpuApiDependencies(aResourceId);
+
+                CEngineResult<> const result = gpuApiOps.initialize(aDescriptor, aDependencies, dependenciesResolved);
+
+                return result.result();
+            };
+            logicalResourceOps.deinitialize =
+                    [aResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
+            {
+                CEngineResult<> const result = gpuApiOps.deinitialize();
+
+                Vector<ResourceId_t> resolveDependenciesList = aDependencies.resolve();
+                removeDependencies(mResourceTree, aResourceId, std::move(resolveDependenciesList));
+
+                return result.result();
+            };
+            logicalResourceOps.load     = [gpuApiOps] () -> CEngineResult<> { return gpuApiOps.load();     };
+            logicalResourceOps.unload   = [gpuApiOps] () -> CEngineResult<> { return gpuApiOps.unload();   };
+            logicalResourceOps.transfer = [gpuApiOps] () -> CEngineResult<> { return gpuApiOps.transfer(); };
 
             Shared<ILogicalResourceObject> resource         = makeShared<TResource>(aDescriptor);
             auto                           resourceObject   = std::static_pointer_cast<CResourceObject<typename TResource::Descriptor_t, typename TResource::Dependencies_t>>(resource);
-            GpuApiHandle_t                 gpuApiResourceId = mGpuApiResourceObjectFactory->create<TResource>();
-            resource->setGpuApiResourceHandle(gpuApiResourceId);
-
-            auto const loader = [aResourceId, aDescriptor, gpuApiResourceId, this] (typename TResource::Dependencies_t const &aDependencies, std::vector<ResourceId_t> &&aDynamicDependencies) -> EEngineStatus
-            {
-                insertDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
-                auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-
-                Shared<IGpuApiResourceObject>            gpuResourceObject   = mGpuApiResourceObjectFactory->get(gpuApiResourceId);
-                Shared<AGpuApiResourceObject<TResource>> resourceObjectTyped = std::static_pointer_cast<AGpuApiResourceObject<TResource>>(gpuResourceObject);
-                CEngineResult<> const result = resourceObjectTyped->create(aDescriptor, aDependencies, dependenciesResolved);
-                return result.result();
-            };
-
-            auto const unloader = [&, this] (typename TResource::Dependencies_t const &aDependencies, std::vector<ResourceId_t> &&aDynamicDependencies) -> EEngineStatus
-            {
-                SHIRABE_UNUSED(aDependencies);
-
-                auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-                CEngineResult<> const result = mGpuApiResourceObjectFactory->get(gpuApiResourceId)->destroy();
-                removeDependencies(mResourceTree, aResourceId, std::move(aDynamicDependencies));
-                return result.result();
-            };
-
-            resourceObject->setGpuApiResourceLoader(loader);
-            resourceObject->setGpuApiResourceUnloader(unloader);
+            resource      ->setGpuApiResourceHandle(gpuApiResourceId);
+            resourceObject->setLogicalOps(logicalResourceOps);
 
             storeResourceObject(aResourceId, resource);
 
             return { EEngineStatus::Ok, resource };
         }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
         //<-----------------------------------------------------------------------------
     }
 }

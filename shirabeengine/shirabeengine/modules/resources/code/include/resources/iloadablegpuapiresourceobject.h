@@ -39,8 +39,8 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(ILoadableGpuApiResourceObject);
 
         public_api:
-            virtual CEngineResult<> load()   = 0;
-            virtual CEngineResult<> unload() = 0;
+            virtual CEngineResult<> load()   const = 0;
+            virtual CEngineResult<> unload() const = 0;
         };
         //<-----------------------------------------------------------------------------
     }

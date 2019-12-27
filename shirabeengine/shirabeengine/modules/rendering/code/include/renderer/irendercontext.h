@@ -72,6 +72,8 @@ namespace engine
 
             virtual EEngineStatus transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle) = 0;
 
+            virtual EEngineStatus transferImageData(GpuApiHandle_t const &aTextureResourceHandle) = 0;
+
             virtual EEngineStatus updateResourceBindings(  GpuApiHandle_t                    const &aGpuMaterialHandle
                                                          , std::vector<GpuApiHandle_t>       const &aGpuBufferHandles
                                                          , std::vector<GpuApiHandle_t>       const &aGpuInputAttachmentTextureViewHandles

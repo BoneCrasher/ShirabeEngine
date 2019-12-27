@@ -39,7 +39,8 @@ namespace engine
             SHIRABE_DECLARE_INTERFACE(ITransferrableGpuApiResourceObject);
 
         public_api:
-            virtual CEngineResult<> transfer() = 0;
+            [[nodiscard]]
+            virtual CEngineResult<> transfer() const = 0;
         };
         //<-----------------------------------------------------------------------------
     }

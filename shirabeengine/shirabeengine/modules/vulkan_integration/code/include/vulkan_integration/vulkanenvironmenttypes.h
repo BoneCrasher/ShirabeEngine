@@ -35,6 +35,8 @@ namespace engine::vulkan
         std::vector<uint32_t> computeQueueFamilyIndices;
         std::vector<uint32_t> transferQueueFamilyIndices;
         std::vector<uint32_t> presentQueueFamilyIndices;
+        std::vector<uint32_t> exclusiveComputeQueueFamilyIndices;
+        std::vector<uint32_t> exclusiveTransferQueueFamilyIndices;
     };
 
     /**

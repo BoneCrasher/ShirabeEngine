@@ -143,7 +143,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferResource::load()
+    CEngineResult<> CVulkanBufferResource::load() const
     {
         SBufferDescription const description = *getCurrentDescriptor();
         if(nullptr != description.dataSource)
@@ -165,7 +165,16 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferResource::unload()
+    CEngineResult<> CVulkanBufferResource::transfer() const
+    {
+        return { EEngineStatus::Ok };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    CEngineResult<> CVulkanBufferResource::unload() const
     {
         return { EEngineStatus::Ok };
     }
@@ -185,15 +194,6 @@ namespace engine::vulkan
 
         setResourceState(EGpuApiResourceState::Discarded);
 
-        return { EEngineStatus::Ok };
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanBufferResource::transfer()
-    {
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------

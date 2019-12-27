@@ -90,7 +90,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanShaderModuleResource::load()
+    CEngineResult<> CVulkanShaderModuleResource::load() const
     {
         return { EEngineStatus::Ok };
     }
@@ -99,7 +99,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanShaderModuleResource::unload()
+    CEngineResult<> CVulkanShaderModuleResource::unload() const
     {
         return { EEngineStatus::Ok };
     }

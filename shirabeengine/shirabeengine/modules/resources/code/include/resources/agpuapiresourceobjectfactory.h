@@ -21,6 +21,43 @@ namespace engine
 
         class CResourceManager;
 
+        template <typename TResource>
+        struct SGpuApiOps
+        {
+            using InitializeFn_t =
+                std::function<CEngineResult<>(   typename TResource::Descriptor_t   const &
+                                               , typename TResource::Dependencies_t const &
+                                               , GpuApiResourceDependencies_t       const &)>;
+            using LoadFn_t =
+                std::function<CEngineResult<>()>;
+            using TransferFn_t =
+                std::function<CEngineResult<>()>;
+            using UnloadFn_t =
+                std::function<CEngineResult<>()>;
+            using DeinitializeFn_t =
+                std::function<CEngineResult<>()>;
+
+            static SGpuApiOps DefaultOps()
+            {
+                SGpuApiOps ops {};
+                ops.initialize   = makeNoOp<CEngineResult<>
+                                           , typename TResource::Descriptor_t   const &
+                                           , typename TResource::Dependencies_t const &
+                                           , GpuApiResourceDependencies_t       const &>();
+                ops.load         = makeNoOp<CEngineResult<>>();
+                ops.transfer     = makeNoOp<CEngineResult<>>();
+                ops.unload       = makeNoOp<CEngineResult<>>();
+                ops.deinitialize = makeNoOp<CEngineResult<>>();
+                return ops;
+            }
+
+            InitializeFn_t   initialize;
+            LoadFn_t         load;
+            TransferFn_t     transfer;
+            UnloadFn_t       unload;
+            DeinitializeFn_t deinitialize;
+        };
+
         class SHIRABE_LIBRARY_EXPORT IResourceObjectCreatorBase
         {
         SHIRABE_DECLARE_INTERFACE(IResourceObjectCreatorBase);
@@ -46,7 +83,7 @@ namespace engine
             TOutputResourceType create(TArgs &&...aArgs)
             {
                 return (nullptr == mFn)
-                       ? nullptr
+                       ? TOutputResourceType {}
                        : mFn(std::forward<TArgs>(aArgs)...);
             }
 
@@ -56,10 +93,10 @@ namespace engine
 
         template <typename TResource>
         class SHIRABE_LIBRARY_EXPORT CResourceGpuApiResourceObjectCreator
-            : public CResourceObjectCreator<TResource, Shared<IGpuApiResourceObject>, GpuApiHandle_t const &>
+            : public CResourceObjectCreator<TResource, std::tuple<Shared<IGpuApiResourceObject>, SGpuApiOps<TResource>>, GpuApiHandle_t const &>
         {
         public_constructors:
-            using CResourceObjectCreator<TResource, Shared<IGpuApiResourceObject>, GpuApiHandle_t const &>::CResourceObjectCreator;
+            using CResourceObjectCreator<TResource, std::tuple<Shared<IGpuApiResourceObject>, SGpuApiOps<TResource>>, GpuApiHandle_t const &>::CResourceObjectCreator;
         };
 
         class SHIRABE_LIBRARY_EXPORT CGpuApiResourceObjectFactory
@@ -95,7 +132,7 @@ namespace engine
 
         private_methods:
             template <typename T>
-            GpuApiHandle_t create()
+            std::tuple<GpuApiHandle_t, SGpuApiOps<T>> create()
             {
                 std::type_info const &typeInfo = typeid(T);
 
@@ -103,7 +140,7 @@ namespace engine
                 if(mCreators.end() == entry)
                 {
                     //throw std::runtime_error("You cunt! I can't load this type");
-                    return GpuApiHandle_t {};
+                    return { GpuApiHandle_t {}, SGpuApiOps<T>::DefaultOps() };
                 }
 
                 Shared<IGpuApiResourceObject>             gpuApiObject = nullptr;
@@ -113,11 +150,12 @@ namespace engine
                 if(nullptr != creator)
                 {
                     GpuApiHandle_t const handle = mResourceUidGenerator->generate();
-                    gpuApiObject = std::move(creator->create(handle));
+                    auto [object, ops] = creator->create(handle);
+                    gpuApiObject = std::move(object);
 
                     mResourceStorage->add(handle, gpuApiObject);
 
-                    return handle;
+                    return { handle, ops };
                 }
 
                 return {};

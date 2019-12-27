@@ -29,7 +29,8 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CVulkanTextureResource);
 
         public_constructors:
-            using CVkApiResource<STexture>::CVkApiResource;
+            explicit CVulkanTextureResource(  Shared<IVkGlobalContext>         aVkContext
+                                            , resources::GpuApiHandle_t const &aHandle);
 
         public_methods:
             // AGpuApiResourceObject
@@ -39,20 +40,23 @@ namespace engine
             CEngineResult<> destroy()  final;
 
             // ILoadableGpuApiResourceObject
-            CEngineResult<> load()     final;
-            CEngineResult<> unload()   final;
+            CEngineResult<> load()   const final;
+            CEngineResult<> unload() const final;
 
             // ITransferrableGpuApiResourceObject
-            CEngineResult<> transfer() final;
+            [[nodiscard]]
+            CEngineResult<> transfer() const final;
 
         public_members:
-            
 
             VkBuffer       stagingBuffer;
             VkDeviceMemory stagingBufferMemory;
             VkImage        imageHandle;
             VkDeviceMemory imageMemory;
             VkSampler      attachedSampler;
+
+        private_members:
+            bool mIsTransferred;
         };
     }
 }

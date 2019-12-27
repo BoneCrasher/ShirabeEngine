@@ -245,6 +245,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::transferImageData(GpuApiHandle_t const &aTextureResourceHandle)
+        {
+            auto *const texture = mResourceStorage->extract<CVulkanTextureResource>(aTextureResourceHandle);
+            return texture->transfer().result();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         EEngineStatus CVulkanRenderContext::updateResourceBindings(  GpuApiHandle_t const                    &aGpuMaterialHandle
                                                                    , std::vector<GpuApiHandle_t>       const &aGpuBufferHandles
                                                                    , std::vector<GpuApiHandle_t>       const &aGpuInputAttachmentTextureViewHandles
