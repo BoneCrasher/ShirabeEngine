@@ -80,7 +80,8 @@ namespace engine
              * @return                    EEngineStatus::Ok if successful.
              * @return                    EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> bindSwapChain(std::string const &aSwapChainId) = 0;
+            virtual CEngineResult<> beginGraphicsFrame() = 0;
+            virtual CEngineResult<> endGraphicsFrame  () = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
@@ -100,7 +101,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> beginCommandBuffer() = 0;
+            virtual CEngineResult<> beginFrameCommandBuffers() = 0;
 
             /**
              * Put the internal command buffer into non-recording state.
@@ -108,7 +109,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> commitCommandBuffer() = 0;
+            virtual CEngineResult<> commitFrameCommandBuffers() = 0;
 
             //
             // FrameBuffer & RenderPass

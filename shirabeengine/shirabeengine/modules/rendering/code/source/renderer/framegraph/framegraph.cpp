@@ -271,10 +271,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                if(mRenderToBackBuffer)
-                {
-                    aRenderContext->bindSwapChain(sSwapChainResourceId);
-                }
+                aRenderContext->beginGraphicsFrame();
 
                 CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, executionOrder, sRenderPassResourceId, sFrameBufferResourceId);
                 if(not setUpRenderPassAndFrameBuffer.successful())
@@ -293,7 +290,7 @@ namespace engine
             }
 
             // In any case...
-            aRenderContext->beginCommandBuffer();
+            aRenderContext->beginFrameCommandBuffers();
 
             if(EGraphMode::Graphics == mGraphMode)
             {
@@ -347,14 +344,12 @@ namespace engine
             }
 
             // In any case...
-            aRenderContext->commitCommandBuffer();
+            aRenderContext->commitFrameCommandBuffers();
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                if(mRenderToBackBuffer)
-                {
-                    aRenderContext->present();
-                }
+                aRenderContext->present();
+                aRenderContext->endGraphicsFrame();
 
                 CEngineResult<> const cleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
                 if(not cleanedUpRenderPassAndFrameBuffer.successful())

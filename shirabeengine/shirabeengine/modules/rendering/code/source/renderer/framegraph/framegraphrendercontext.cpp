@@ -180,12 +180,20 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)
+    CEngineResult<> CFrameGraphRenderContext::beginGraphicsFrame()
     {
-        //Shared<ILogicalResourceObject> source = getUsedResource(aSwapChainId);
-        SHIRABE_UNUSED(aSwapChainId);
+        CEngineResult<> const status = mGraphicsAPIRenderContext->beginGraphicsFrame();
 
-        CEngineResult<> const status = mGraphicsAPIRenderContext->bindSwapChain(GpuApiHandle_t{});
+        return status;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    CEngineResult<> CFrameGraphRenderContext::endGraphicsFrame()
+    {
+        CEngineResult<> const status = mGraphicsAPIRenderContext->endGraphicsFrame();
 
         return status;
     }
@@ -205,9 +213,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::beginCommandBuffer()
+    CEngineResult<> CFrameGraphRenderContext::beginFrameCommandBuffers()
     {
-        CEngineResult<> const status = mGraphicsAPIRenderContext->beginGraphicsCommandBuffer();
+        CEngineResult<> const status = mGraphicsAPIRenderContext->beginFrameCommandBuffers();
 
         return status;
     }
@@ -216,9 +224,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::commitCommandBuffer()
+    CEngineResult<> CFrameGraphRenderContext::commitFrameCommandBuffers()
     {
-        CEngineResult<> const status = mGraphicsAPIRenderContext->commitGraphicsCommandBuffer();
+        CEngineResult<> const status = mGraphicsAPIRenderContext->commitFrameCommandBuffers();
 
         return status;
     }

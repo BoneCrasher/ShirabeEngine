@@ -214,7 +214,7 @@ namespace engine
      * result type EEngineStatus.
      */
     template <typename TData = void>
-    class CEngineResult
+    class [[nodiscard]] CEngineResult
         : public AResult<EEngineStatus, TData>
     {
     public_constructors:

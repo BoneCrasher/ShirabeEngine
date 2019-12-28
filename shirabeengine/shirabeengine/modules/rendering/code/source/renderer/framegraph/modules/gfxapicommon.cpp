@@ -95,9 +95,9 @@ namespace engine
                 CLog::Verbose(logTag(), "PrePass");
 
                 // Fetch the next backbuffer image and make it available to the resource manager.
-                // aContext->bindSwapChain(aPassData.importData.backBufferInput);
+                // aContext->beginGraphicsFrame(aPassData.importData.backBufferInput);
                 // Begin a command buffer.
-                aContext->beginCommandBuffer();
+                aContext->beginFrameCommandBuffers();
                 // Begin a render pass w/ a given framebuffer.
                 // aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
@@ -197,7 +197,7 @@ namespace engine
 
                 // aContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
                 aContext->copyImageToBackBuffer(texture);
-                aContext->commitCommandBuffer();
+                aContext->commitFrameCommandBuffers();
                 aContext->present();
 
                 return { EEngineStatus::Ok };

@@ -63,8 +63,6 @@ namespace engine::vulkan
               , selectedPresentMode()
               , swapChainImages()
               , currentSwapChainImageIndex(0)
-              , imageAvailableSemaphore(VK_NULL_HANDLE)
-              , renderCompletedSemaphore(VK_NULL_HANDLE)
               , requestedBackBufferSize()
               , requestedFormat(VkFormat::VK_FORMAT_R8G8B8A8_UNORM)
               , colorSpace(VkColorSpaceKHR::VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)

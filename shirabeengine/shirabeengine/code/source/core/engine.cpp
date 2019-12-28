@@ -240,6 +240,8 @@ namespace engine
                              displayDesc.bounds,
                              requiredFormat,
                              VK_COLORSPACE_SRGB_NONLINEAR_KHR);
+
+                mVulkanEnvironment->initializeRecordingAndSubmission();
             }
 
             return { EEngineStatus::Ok };

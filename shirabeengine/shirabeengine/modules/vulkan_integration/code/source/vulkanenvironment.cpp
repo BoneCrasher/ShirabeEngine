@@ -2,12 +2,14 @@
 
 #include <functional>
 #include <set>
+#include <thread>
 
 #include <platform/platform.h>
 #include <base/string.h>
 #include <graphicsapi/definitions.h>
 #include <resources/resourcetypes.h>
 #include <os/applicationenvironment.h>
+#include <thread>
 #include "vulkan_integration/vulkanimport.h"
 #include "vulkan_integration/vulkanenvironment.h"
 #include "vulkan_integration/vulkandevicecapabilities.h"
@@ -330,9 +332,9 @@ namespace engine::vulkan
 
                 SVulkanQueueFamilyRegistry supportingQueueFamilies{};
 
-                for(uint32_t k=0; k<vkQueueFamilyCount; ++k)
+                for(uint32_t j=0; j<vkQueueFamilyCount; ++j)
                 {
-                    VkQueueFamilyProperties const &properties = vkQueueFamilies.at(k);
+                    VkQueueFamilyProperties const &properties = vkQueueFamilies.at(j);
 
                     bool enoughQueues             = (properties.queueCount > 0);
                     bool supportsGraphics         = (properties.queueFlags & VK_QUEUE_GRAPHICS_BIT);
@@ -354,17 +356,35 @@ namespace engine::vulkan
                     }
 
                     // Store queue family in common lists and specific lists
-                    supportingQueueFamilies.supportingQueueFamilyIndices.push_back(k);
+                    supportingQueueFamilies.supportingQueueFamilyIndices.push_back(j);
                     if(supportsGraphics)
-                        supportingQueueFamilies.graphicsQueueFamilyIndices.push_back(k);
+                        supportingQueueFamilies.graphicsQueueFamilyIndices.push_back(j);
                     if(supportsCompute)
-                        supportingQueueFamilies.computeQueueFamilyIndices.push_back(k);
+                        supportingQueueFamilies.computeQueueFamilyIndices.push_back(j);
                     if(supportsTransfer)
-                        supportingQueueFamilies.transferQueueFamilyIndices.push_back(k);
+                        supportingQueueFamilies.transferQueueFamilyIndices.push_back(j);
                     if(isExclusiveComputeQueue)
-                        supportingQueueFamilies.exclusiveComputeQueueFamilyIndices.push_back(k);
+                    {
+                        supportingQueueFamilies.exclusiveComputeQueueFamilyIndices.push_back(j);
+                        supportingQueueFamilies.computeQueueFamilyIndices.erase(
+                            std::remove_if( supportingQueueFamilies.computeQueueFamilyIndices.begin()
+                                          , supportingQueueFamilies.computeQueueFamilyIndices.end()
+                                          , [j] (uint32_t const &aIndex) -> bool { return (j == aIndex); }
+                            )
+                            , supportingQueueFamilies.computeQueueFamilyIndices.end()
+                        );
+                    }
                     if(isExclusiveTransferQueue)
-                        supportingQueueFamilies.exclusiveTransferQueueFamilyIndices.push_back(k);
+                    {
+                        supportingQueueFamilies.exclusiveTransferQueueFamilyIndices.push_back(j);
+                        supportingQueueFamilies.graphicsQueueFamilyIndices.erase(
+                            std::remove_if( supportingQueueFamilies.graphicsQueueFamilyIndices.begin()
+                                          , supportingQueueFamilies.graphicsQueueFamilyIndices.end()
+                                          , [j] (uint32_t const &aIndex) -> bool { return (j == aIndex); }
+                            )
+                            , supportingQueueFamilies.graphicsQueueFamilyIndices.end()
+                        );
+                    }
                 }
 
                 if(supportingQueueFamilies.supportingQueueFamilyIndices.empty())
@@ -609,7 +629,7 @@ namespace engine::vulkan
         VkSwapchainKHR vkSwapChain = VK_NULL_HANDLE;
 
         // Should give us triple buffering with fallback to double buffering...
-        uint32_t swapChainImageCount = 2; // (vkSurfaceCapabilities.minImageCount + 1);
+        uint32_t swapChainImageCount = (vkSurfaceCapabilities.minImageCount + 1);
         if(vkSurfaceCapabilities.maxImageCount > 0)
         {
             // We have a limited amount of images possible. Clamp!
@@ -641,13 +661,13 @@ namespace engine::vulkan
         std::vector<uint32_t> supportedGraphicsQueueFamilyIndices{};
 
         VkBool32 supported = VK_FALSE;
-        for(uint32_t k=0; k<queueFamilies.graphicsQueueFamilyIndices.size(); ++k)
+        for(std::size_t k=0; k<queueFamilies.graphicsQueueFamilyIndices.size(); ++k)
         {
-            uint32_t const index  = queueFamilies.graphicsQueueFamilyIndices.at(k);
-            VkResult const result = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, index, vkSurface, &supported);
-            if(VkResult::VK_SUCCESS != result)
+            uint32_t const index   = queueFamilies.graphicsQueueFamilyIndices.at(k);
+            VkResult const result2 = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, index, vkSurface, &supported);
+            if(VkResult::VK_SUCCESS != result2)
             {
-                throw CVulkanError("Failed to check for surface support.", result);
+                throw CVulkanError("Failed to check for surface support.", result2);
             }
 
             if(VK_TRUE == supported)
@@ -684,47 +704,17 @@ namespace engine::vulkan
         vkGetSwapchainImagesKHR(mVkState.selectedLogicalDevice, vkSwapChain, &createdSwapChainImageCount, swapChainImages.data());
 
         //
-        // Finally: Create an image availability and render completed semaphore to access the swapchain images for rendering operations.
-        //
-        VkSemaphore vkImageAvailableSemaphore = VK_NULL_HANDLE;
-
-        VkSemaphoreCreateInfo vkImageAvailableSemaphoreCreateInfo{};
-        vkImageAvailableSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        vkImageAvailableSemaphoreCreateInfo.pNext = nullptr;
-        vkImageAvailableSemaphoreCreateInfo.flags = 0;
-
-        result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkImageAvailableSemaphoreCreateInfo, nullptr, &vkImageAvailableSemaphore);
-        if(VkResult::VK_SUCCESS != result)
-        {
-            throw CVulkanError("Cannot create image availability semaphore for the swapchain.", result);
-        }
-
-        VkSemaphore vkRenderCompletedSemaphore = VK_NULL_HANDLE;
-
-        VkSemaphoreCreateInfo vkRenderCompletedSemaphoreCreateInfo{};
-        vkRenderCompletedSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        vkRenderCompletedSemaphoreCreateInfo.pNext = nullptr;
-        vkRenderCompletedSemaphoreCreateInfo.flags = 0;
-
-        result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkRenderCompletedSemaphoreCreateInfo, nullptr, &vkRenderCompletedSemaphore);
-        if(VkResult::VK_SUCCESS != result)
-        {
-            throw CVulkanError("Cannot create image availability semaphore for the swapchain.", result);
-        }
-
-        //
         // PRESENT QUEUES
         //
         std::vector<uint32_t> const &supportingQueueFamilyIndices = vkPhysicalDevice.queueFamilies.supportingQueueFamilyIndices;
-
-        for(uint32_t k=0; k<supportingQueueFamilyIndices.size(); ++k)
+        for(std::size_t j=0; j<supportingQueueFamilyIndices.size(); ++j)
         {
-            uint32_t const &familyIndex = supportingQueueFamilyIndices.at(k);
+            uint32_t const &familyIndex = supportingQueueFamilyIndices.at(j);
 
             VkBool32 isPresentingSupported = VK_FALSE;
 
-            VkResult const result = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, familyIndex, vkSurface, &isPresentingSupported);
-            if(VK_SUCCESS != result)
+            VkResult const result2 = vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice.handle, familyIndex, vkSurface, &isPresentingSupported);
+            if(VK_SUCCESS != result2)
             {
                 continue;
             }
@@ -747,8 +737,6 @@ namespace engine::vulkan
         swapChain.selectedPresentMode      = vkSelectedPresentMode;
         swapChain.swapChainImages          = swapChainImages;
         swapChain.handle                   = vkSwapChain;
-        swapChain.imageAvailableSemaphore  = vkImageAvailableSemaphore;
-        swapChain.renderCompletedSemaphore = vkRenderCompletedSemaphore;
 
         mVkState.swapChain = swapChain;
 
@@ -779,28 +767,50 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    void CVulkanEnvironment::createCommandPool()
+    void CVulkanEnvironment::createCommandPools()
     {
         SVulkanState          &vkState        = getState();
         SVulkanPhysicalDevice &physicalDevice = vkState.supportedPhysicalDevices[vkState.selectedPhysicalDevice];
 
         std::vector<uint32_t> graphicsQueueIndices = physicalDevice.queueFamilies.graphicsQueueFamilyIndices;
-
-        VkCommandPoolCreateInfo vkCommandPoolCreateInfo = {};
-        vkCommandPoolCreateInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        vkCommandPoolCreateInfo.pNext            = nullptr;
-        vkCommandPoolCreateInfo.queueFamilyIndex = graphicsQueueIndices.at(0);
-        vkCommandPoolCreateInfo.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-        VkCommandPool vkCommandPool = VK_NULL_HANDLE;
-
-        VkResult result = vkCreateCommandPool(vkState.selectedLogicalDevice, &vkCommandPoolCreateInfo, nullptr, &vkCommandPool);
-        if(VK_SUCCESS != result)
+        std::vector<uint32_t> transferQueueIndices = physicalDevice.queueFamilies.exclusiveTransferQueueFamilyIndices;
+        if(transferQueueIndices.empty())
         {
-            throw CVulkanError("Cannot create command pool.", result);
+            transferQueueIndices = physicalDevice.queueFamilies.transferQueueFamilyIndices;
         }
 
-        vkState.commandPool = vkCommandPool;
+        auto const createCommandPool = [&] (std::vector<uint32_t> const &queueIndices) -> VkCommandPool
+        {
+            VkCommandPoolCreateInfo vkCommandPoolCreateInfo = {};
+            vkCommandPoolCreateInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+            vkCommandPoolCreateInfo.pNext            = nullptr;
+            vkCommandPoolCreateInfo.queueFamilyIndex = queueIndices.at(0);
+            vkCommandPoolCreateInfo.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+            VkCommandPool vkCommandPool = VK_NULL_HANDLE;
+
+            VkResult result = vkCreateCommandPool(vkState.selectedLogicalDevice, &vkCommandPoolCreateInfo, nullptr, &vkCommandPool);
+            if(VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create command pool.", result);
+            }
+        };
+
+        vkState.commandPools.resize(sAspectCount);
+        vkState.commandPools[sTransferAspectIndex] = createCommandPool(transferQueueIndices);
+        vkState.commandPools[sGraphicsAspectIndex] = createCommandPool(graphicsQueueIndices);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    void CVulkanEnvironment::destroyCommandPools()
+    {
+        for(VkCommandPool &pool : getState().commandPools)
+        {
+            vkDestroyCommandPool(getLogicalDevice(), pool, nullptr);
+        }
     }
     //<-----------------------------------------------------------------------------
 
@@ -813,20 +823,32 @@ namespace engine::vulkan
 
         destroyCommandBuffers();
 
-        vkState.commandBuffers.resize(aBufferCount);
+        //
+        // For each swapchain image there'll be a graphics command buffer and a transfer command buffer,
+        // submitted in order: transfer -> graphics
+        //
+        vkState.commandBuffers.resize(sAspectCount);
+        vkState.commandBuffers[sTransferAspectIndex].resize(aBufferCount);
+        vkState.commandBuffers[sGraphicsAspectIndex].resize(aBufferCount);
 
-        VkCommandBufferAllocateInfo vkCommandBufferAllocateInfo = {};
-        vkCommandBufferAllocateInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        vkCommandBufferAllocateInfo.pNext              = nullptr;
-        vkCommandBufferAllocateInfo.commandPool        = vkState.commandPool;
-        vkCommandBufferAllocateInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        vkCommandBufferAllocateInfo.commandBufferCount = static_cast<uint32_t>(vkState.commandBuffers.size());
-
-        VkResult const result = vkAllocateCommandBuffers(vkState.selectedLogicalDevice, &vkCommandBufferAllocateInfo, vkState.commandBuffers.data());
-        if (VkResult::VK_SUCCESS != result)
+        auto const createCommandBuffers = [&] (uint32_t const &aIndex) -> void
         {
-            throw CVulkanError("Cannot create command buffer(s).", result);
-        }
+            VkCommandBufferAllocateInfo vkCommandBufferAllocateInfo = {};
+            vkCommandBufferAllocateInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            vkCommandBufferAllocateInfo.pNext              = nullptr;
+            vkCommandBufferAllocateInfo.commandPool        = vkState.commandPools[aIndex];
+            vkCommandBufferAllocateInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            vkCommandBufferAllocateInfo.commandBufferCount = aBufferCount;
+
+            VkResult const result = vkAllocateCommandBuffers(vkState.selectedLogicalDevice, &vkCommandBufferAllocateInfo, vkState.commandBuffers[aIndex].data());
+            if (VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create command buffer(s).", result);
+            }
+        };
+
+        createCommandBuffers(sTransferAspectIndex);
+        createCommandBuffers(sGraphicsAspectIndex);
     }
     //<-----------------------------------------------------------------------------
 
@@ -837,18 +859,105 @@ namespace engine::vulkan
     {
         SVulkanState &vkState = getState();
 
-        // Cleanup the old command buffers, if any.
-        bool const hasCommandBuffers = not vkState.commandBuffers.empty();
-        if(hasCommandBuffers)
+        auto const destroyBuffers = [&] (uint32_t const &aAspect) -> void
         {
-            vkFreeCommandBuffers(
-                        vkState.selectedLogicalDevice,
-                        vkState.commandPool,
-                        static_cast<uint32_t>(vkState.commandBuffers.size()),
-                        vkState.commandBuffers.data());
-        }
+            // Cleanup the old command buffers, if any.
+            bool const hasCommandBuffers = (not vkState.commandBuffers.empty() && not vkState.commandBuffers.at(aAspect).empty());
+            if(hasCommandBuffers)
+            {
+                vkFreeCommandBuffers(
+                            vkState.selectedLogicalDevice,
+                            vkState.commandPools[aAspect],
+                            static_cast<uint32_t>(vkState.commandBuffers.at(aAspect).size()),
+                            vkState.commandBuffers.at(aAspect).data());
+            }
 
-        vkState.commandBuffers.clear();
+            vkState.commandBuffers.at(aAspect).clear();
+        };
+
+        destroyBuffers(sGraphicsAspectIndex);
+        destroyBuffers(sTransferAspectIndex);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    void CVulkanEnvironment::recreateSemaphores(uint32_t const &aBufferCount)
+    {
+        SVulkanState &state = getState();
+        state.imageAvailableSemaphores   .resize(aBufferCount);
+        state.transferCompletedSemaphores.resize(aBufferCount);
+        state.renderCompletedSemaphores  .resize(aBufferCount);
+
+        for(uint32_t k=0; k<aBufferCount; ++k)
+        {
+            //
+            // Finally: Create an image availability and render completed semaphore to access the swapchain images for rendering operations.
+            //
+            VkSemaphore vkImageAvailableSemaphore    = VK_NULL_HANDLE;
+            VkSemaphore vkTransferCompletedSemaphore = VK_NULL_HANDLE;
+            VkSemaphore vkRenderCompletedSemaphore   = VK_NULL_HANDLE;
+
+            VkSemaphoreCreateInfo vkImageAvailableSemaphoreCreateInfo{};
+            vkImageAvailableSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkImageAvailableSemaphoreCreateInfo.pNext = nullptr;
+            vkImageAvailableSemaphoreCreateInfo.flags = 0;
+
+            VkResult result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkImageAvailableSemaphoreCreateInfo, nullptr, &vkImageAvailableSemaphore);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create image availability semaphore for the swapchain.", result);
+            }
+
+            VkSemaphoreCreateInfo vkTransferCompletedSemaphoreCreateInfo{};
+            vkTransferCompletedSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkTransferCompletedSemaphoreCreateInfo.pNext = nullptr;
+            vkTransferCompletedSemaphoreCreateInfo.flags = 0;
+
+            result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkTransferCompletedSemaphoreCreateInfo, nullptr, &vkTransferCompletedSemaphore);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create transfer completed semaphore for the swapchain.", result);
+            }
+
+            VkSemaphoreCreateInfo vkRenderCompletedSemaphoreCreateInfo{};
+            vkRenderCompletedSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkRenderCompletedSemaphoreCreateInfo.pNext = nullptr;
+            vkRenderCompletedSemaphoreCreateInfo.flags = 0;
+
+            result = vkCreateSemaphore(mVkState.selectedLogicalDevice, &vkRenderCompletedSemaphoreCreateInfo, nullptr, &vkRenderCompletedSemaphore);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                throw CVulkanError("Cannot create render completed semaphore for the swapchain.", result);
+            }
+
+            state.imageAvailableSemaphores   [k] = vkImageAvailableSemaphore;
+            state.transferCompletedSemaphores[k] = vkTransferCompletedSemaphore;
+            state.renderCompletedSemaphores  [k] = vkRenderCompletedSemaphore;
+        }
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    void CVulkanEnvironment::destroySemaphores()
+    {
+        SVulkanState &state = getState();
+
+        for(VkSemaphore s : state.renderCompletedSemaphores)
+        {
+            vkDestroySemaphore(getLogicalDevice(), s, nullptr);
+        }
+        for(VkSemaphore s : state.transferCompletedSemaphores)
+        {
+            vkDestroySemaphore(getLogicalDevice(), s, nullptr);
+        }
+        for(VkSemaphore s : state.imageAvailableSemaphores)
+        {
+            vkDestroySemaphore(getLogicalDevice(), s, nullptr);
+        }
     }
     //<-----------------------------------------------------------------------------
 
@@ -862,9 +971,7 @@ namespace engine::vulkan
         VkDevice         &logicalDevice = vkState.selectedLogicalDevice;
         SVulkanSwapChain &swapChain     = vkState.swapChain;
 
-        vkDestroySemaphore   (logicalDevice, swapChain.imageAvailableSemaphore,  nullptr);
-        vkDestroySemaphore   (logicalDevice, swapChain.renderCompletedSemaphore, nullptr);
-        vkDestroySwapchainKHR(logicalDevice, swapChain.handle,                   nullptr);
+        vkDestroySwapchainKHR(logicalDevice, swapChain.handle, nullptr);
 
         swapChain.capabilities             = {};
         swapChain.supportedFormats         = {};
@@ -874,8 +981,6 @@ namespace engine::vulkan
         swapChain.selectedPresentMode      = {};
         swapChain.swapChainImages          = {};
         swapChain.handle                   = VK_NULL_HANDLE;
-        swapChain.imageAvailableSemaphore  = VK_NULL_HANDLE;
-        swapChain.renderCompletedSemaphore = VK_NULL_HANDLE;
     }
     //<-----------------------------------------------------------------------------
 
@@ -885,6 +990,8 @@ namespace engine::vulkan
     EEngineStatus CVulkanEnvironment::initialize(SApplicationEnvironment        const &aApplicationEnvironment
                                                , Shared<CGpuApiResourceStorage>       &aStorage)
     {
+        SHIRABE_UNUSED(aApplicationEnvironment);
+
         try {
             mResourceStorage = aStorage;
 
@@ -892,8 +999,6 @@ namespace engine::vulkan
             createVulkanInstance("ShirabeEngine Demo");
             determinePhysicalDevices();
             selectPhysicalDevice(0);
-            createCommandPool();
-            recreateCommandBuffers(1);
 
             return status;
         }
@@ -916,6 +1021,28 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    void CVulkanEnvironment::initializeRecordingAndSubmission()
+    {
+        createCommandPools();
+        recreateCommandBuffers(mVkState.swapChain.swapChainImages.size());
+        recreateSemaphores(mVkState.swapChain.swapChainImages.size());
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-------------------------------------EEngineStatus----------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    void CVulkanEnvironment::deinitializeRecordingAndSubmission()
+    {
+        destroySemaphores();
+        destroyCommandBuffers();
+        destroyCommandPools();
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
     EEngineStatus CVulkanEnvironment::deinitialize()
@@ -924,9 +1051,8 @@ namespace engine::vulkan
         vkDeviceWaitIdle(mVkState.selectedLogicalDevice);
 
         // Destroy command buffers and pool
-        destroyCommandBuffers();
-        vkDestroyCommandPool(mVkState.selectedLogicalDevice, mVkState.commandPool, nullptr);
-        mVkState.commandPool = VK_NULL_HANDLE;
+
+        deinitializeRecordingAndSubmission();
 
         // Swapchain
         destroySwapChain();
@@ -1027,14 +1153,93 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    EEngineStatus CVulkanEnvironment::bindSwapChain()
+    {
+        SVulkanState &vkState = getState();
+
+        uint32_t nextImageIndex = 0;
+
+        VkDevice       device    = vkState.selectedLogicalDevice;
+        VkSwapchainKHR swapChain = vkState.swapChain.handle;
+        VkSemaphore    semaphore = vkState.imageAvailableSemaphores.back();
+        uint64_t const timeout   =  std::numeric_limits<uint64_t>::max();
+
+        VkResult result = VK_SUCCESS;
+
+        do
+        {
+            result =
+                    vkAcquireNextImageKHR(
+                            device,
+                            swapChain,
+                            timeout,
+                            semaphore,
+                            VK_NULL_HANDLE,
+                            &nextImageIndex);
+
+            switch(result)
+            {
+                case VkResult::VK_ERROR_OUT_OF_DATE_KHR:
+                case VkResult::VK_SUBOPTIMAL_KHR:
+                    recreateSwapChain();
+                    swapChain = vkState.swapChain.handle;
+                    semaphore = vkState.imageAvailableSemaphores.back();
+                    break;
+                case VkResult::VK_TIMEOUT:
+                case VkResult::VK_NOT_READY:
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    break;
+                case VkResult::VK_SUCCESS:
+                    break;
+                default:
+                    throw CVulkanError("Failed to execute 'vkAcquireNextImageKHR'", result);
+            }
+
+        }
+        while(VkResult::VK_SUCCESS != result);
+
+        vkState.swapChain.currentSwapChainImageIndex = nextImageIndex;
+
+        // VkImage      &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
+        // Shared<void>  resource = Shared<void>(static_cast<void*>(&image), [] (void*) {});
+
+        return EEngineStatus::Ok;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
     CEngineResult<Shared<IVkFrameContext>> CVulkanEnvironment::beginGraphicsFrame()
     {
-        if(nullptr == mCurrentFrameContext)
+        if(nullptr != mCurrentFrameContext)
         {
-            CVulkanFrameContext::SFrameContextData data {};
-
-            mCurrentFrameContext = makeShared<CVulkanFrameContext>(data);
+            return { EEngineStatus::Error };
         }
+
+        SVulkanState &state = getState();
+
+        //
+        // Move all semaphores to the left, in order to pick the next valid one from the back.
+        //
+        std::rotate(state.imageAvailableSemaphores   .begin(), state.imageAvailableSemaphores   .begin() + 1, state.imageAvailableSemaphores   .end());
+        std::rotate(state.transferCompletedSemaphores.begin(), state.transferCompletedSemaphores.begin() + 1, state.transferCompletedSemaphores.end());
+        std::rotate(state.renderCompletedSemaphores  .begin(), state.renderCompletedSemaphores  .begin() + 1, state.renderCompletedSemaphores  .end());
+
+        bindSwapChain(); // Will derive the currentSwapChainImageIndex;
+
+
+        VkCommandBuffer transferCmdBuffer = state.commandBuffers.at(sTransferAspectIndex).at(state.swapChain.currentSwapChainImageIndex);
+        VkCommandBuffer graphicsCmdBuffer = state.commandBuffers.at(sGraphicsAspectIndex).at(state.swapChain.currentSwapChainImageIndex);
+
+        CVulkanFrameContext::SFrameContextData data {};
+        data.graphicsCommandBuffer      = graphicsCmdBuffer;
+        data.transferCommandBuffer      = transferCmdBuffer;
+        data.imageAvailableSemaphore    = state.imageAvailableSemaphores   .back();
+        data.transferCompletedSemaphore = state.transferCompletedSemaphores.back();
+        data.renderCompletedSemaphore   = state.renderCompletedSemaphores  .back();
+
+        mCurrentFrameContext = makeShared<CVulkanFrameContext>(data);
 
         return { EEngineStatus::Ok, getVkCurrentFrameContext() };
     }
@@ -1044,6 +1249,9 @@ namespace engine::vulkan
     //
     //<-----------------------------------------------------------------------------
     CEngineResult<> CVulkanEnvironment::endGraphicsFrame() {
+
+        mCurrentFrameContext = nullptr;
+
         return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------

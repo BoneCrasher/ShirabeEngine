@@ -44,7 +44,7 @@ namespace engine
         EEngineStatus CVulkanRenderContext::clearAttachments(GpuApiHandle_t const &aRenderPassId, uint32_t const &aCurrentSubpassIndex)
         {
             SVulkanState    &state        = mVulkanEnvironment->getState();
-            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
+            VkCommandBuffer commandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
             auto                   const *const renderPass = mResourceStorage->extract<CVulkanRenderPassResource>(aRenderPassId);
             SRenderPassDescription const       &description = *(renderPass->getCurrentDescriptor());
@@ -112,7 +112,7 @@ namespace engine
         EEngineStatus CVulkanRenderContext::endSubpass()
         {
             SVulkanState    &state        = mVulkanEnvironment->getState();
-            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkCommandBuffer commandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
             vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -148,8 +148,8 @@ namespace engine
 
             SVulkanState &state = mVulkanEnvironment->getState();
 
-            VkCommandBuffer vkCommandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex);
-            VkImage         swapChainImage  = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
+            VkCommandBuffer commandBuffer  = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+            VkImage         swapChainImage = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
 
             VkImageMemoryBarrier vkImageMemoryBarrier {};
             vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -168,7 +168,7 @@ namespace engine
             vkImageMemoryBarrier.subresourceRange.layerCount     = 1;
 
             // Create pipeline barrier on swap chain image to move it to correct format.
-            vkCmdPipelineBarrier(vkCommandBuffer,
+            vkCmdPipelineBarrier(commandBuffer,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
                                  VkDependencyFlagBits   ::VK_DEPENDENCY_BY_REGION_BIT,
@@ -196,7 +196,7 @@ namespace engine
             vkRegion.dstSubresource = vkSubresourceLayers;
             vkRegion.extent         = vkExtent;
 
-            vkCmdCopyImage(vkCommandBuffer,
+            vkCmdCopyImage(commandBuffer,
                            texture->imageHandle,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                            swapChainImage,
@@ -381,22 +381,29 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::beginGraphicsCommandBuffer()
+        EEngineStatus CVulkanRenderContext::beginFrameCommandBuffers()
         {
             SVulkanState &state = mVulkanEnvironment->getState();
 
-            VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
-            vkCommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            vkCommandBufferBeginInfo.pNext = nullptr;
-            vkCommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-            VkCommandBuffer commandBuffer = state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
-
-            VkResult const result = vkBeginCommandBuffer(commandBuffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
-            if(VkResult::VK_SUCCESS != result)
+            auto const begin = [&] (VkCommandBuffer const &buffer) -> void
             {
-                throw CVulkanError("Failed to begin command buffer.", result);
-            }
+                VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
+                vkCommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+                vkCommandBufferBeginInfo.pNext = nullptr;
+                vkCommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+                VkResult const result = vkBeginCommandBuffer(buffer, &vkCommandBufferBeginInfo); // The command structure potentially changes. Recreate always.
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    throw CVulkanError("Failed to begin command buffer.", result);
+                }
+            };
+
+            VkCommandBuffer transferCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
+            VkCommandBuffer graphicsCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+            begin(transferCommandBuffer);
+            begin(graphicsCommandBuffer);
 
             return EEngineStatus::Ok;
         }
@@ -405,11 +412,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::commitGraphicsCommandBuffer()
+        EEngineStatus CVulkanRenderContext::commitFrameCommandBuffers()
         {
             SVulkanState &vkState = mVulkanEnvironment->getState();
-            VkCommandBuffer vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
-            VkImage         swapChainImage  = vkState.swapChain.swapChainImages.at(vkState.swapChain.currentSwapChainImageIndex);
+
+            VkCommandBuffer transferCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
+            VkCommandBuffer graphicsCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+            VkImage swapChainImage = vkState.swapChain.swapChainImages.at(vkState.swapChain.currentSwapChainImageIndex);
 
             //
             // Make sure the swap chain is presentable.
@@ -431,7 +441,7 @@ namespace engine
             vkImageMemoryBarrier.subresourceRange.layerCount     = 1;
 
             // Create pipeline barrier on swap chain image to move it to correct format.
-            vkCmdPipelineBarrier(vkCommandBuffer,
+            vkCmdPipelineBarrier(graphicsCommandBuffer,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                  VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                  VkDependencyFlagBits   ::VK_DEPENDENCY_BY_REGION_BIT,
@@ -439,11 +449,17 @@ namespace engine
                                  0, nullptr,
                                  1, &vkImageMemoryBarrier);
 
-            VkResult const result = vkEndCommandBuffer(vkCommandBuffer); // The commandbuffers and swapchain count currently match
-            if(VkResult::VK_SUCCESS != result)
+            auto const end = [&] (VkCommandBuffer const &buffer) -> void
             {
-                throw CVulkanError("Failed to record and commit command buffer.", result);
-            }
+                VkResult const result = vkEndCommandBuffer(buffer); // The commandbuffers and swapchain count currently match
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    throw CVulkanError("Failed to record and commit command buffer.", result);
+                }
+            };
+
+            end(graphicsCommandBuffer);
+            end(transferCommandBuffer);
 
             return EEngineStatus::Ok;
         }
@@ -490,7 +506,7 @@ namespace engine
             vkRenderPassBeginInfo.clearValueCount   = clearValues.size();
             vkRenderPassBeginInfo.pClearValues      = clearValues.data();
 
-            vkCmdBeginRenderPass(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex), &vkRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdBeginRenderPass(mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(), &vkRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
             return EEngineStatus::Ok;
         }
@@ -524,7 +540,7 @@ namespace engine
 
             SVulkanState &state = mVulkanEnvironment->getState();
 
-            vkCmdEndRenderPass(state.commandBuffers.at(state.swapChain.currentSwapChainImageIndex));
+            vkCmdEndRenderPass(mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer());
 
             return EEngineStatus::Ok;
         }
@@ -533,61 +549,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindSwapChain(GpuApiHandle_t const &aSwapChainResourceId)
+        EEngineStatus CVulkanRenderContext::beginGraphicsFrame()
         {
-            SHIRABE_UNUSED(aSwapChainResourceId);
+            return mVulkanEnvironment->beginGraphicsFrame().result();
+        }
+        //<-----------------------------------------------------------------------------
 
-            SVulkanState &vkState = mVulkanEnvironment->getState();
-
-            uint32_t nextImageIndex = 0;
-
-            VkDevice       device    = vkState.selectedLogicalDevice;
-            VkSwapchainKHR swapChain = vkState.swapChain.handle;
-            VkSemaphore    semaphore = vkState.swapChain.imageAvailableSemaphore;
-            uint64_t const timeout   =  std::numeric_limits<uint64_t>::max();
-
-            VkResult result = VK_SUCCESS;
-
-            do
-            {
-                result =
-                    vkAcquireNextImageKHR(
-                        device,
-                        swapChain,
-                        timeout,
-                        semaphore,
-                        VK_NULL_HANDLE,
-                        &nextImageIndex);
-
-                switch(result)
-                {
-                    case VkResult::VK_ERROR_OUT_OF_DATE_KHR:
-                    case VkResult::VK_SUBOPTIMAL_KHR:
-                        mVulkanEnvironment->recreateSwapChain();
-                        swapChain = vkState.swapChain.handle;
-                        semaphore = vkState.swapChain.imageAvailableSemaphore;
-                        break;
-                    case VkResult::VK_SUCCESS:
-                        break;
-                    default:
-                        throw CVulkanError("Failed to execute 'vkAcquireNextImageKHR'", result);
-                }
-
-            }
-            while(VkResult::VK_SUCCESS != result);
-
-            // if(VkResult::VK_SUCCESS != result)
-            // {
-            //    CLog::Error(logTag(), CString::format("AquireNextImageKHR failed with VkResult: {}", result));
-            //    throw CVulkanError("Failed to execute 'vkAcquireNextImageKHR'.", result);
-            // }
-
-            vkState.swapChain.currentSwapChainImageIndex = nextImageIndex;
-
-            // VkImage      &image    = vkSwapChain.swapChainImages.at(static_cast<uint64_t>(nextImageIndex));
-            // Shared<void>  resource = Shared<void>(static_cast<void*>(&image), [] (void*) {});
-
-            return EEngineStatus::Ok;
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        EEngineStatus CVulkanRenderContext::endGraphicsFrame()
+        {
+            return mVulkanEnvironment->endGraphicsFrame().result();
         }
         //<-----------------------------------------------------------------------------
 
@@ -598,60 +571,95 @@ namespace engine
         {
             SVulkanState &vkState = mVulkanEnvironment->getState();
 
-            VkQueue presentQueue  = mVulkanEnvironment->getPresentQueue();
+            VkQueue transferQueue = mVulkanEnvironment->getTransferQueue();
             VkQueue graphicsQueue = mVulkanEnvironment->getGraphicsQueue();
+            VkQueue presentQueue  = mVulkanEnvironment->getPresentQueue();
 
-            VkCommandBuffer vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            Shared<IVkFrameContext> const &frameContext = mVulkanEnvironment->getVkCurrentFrameContext();
 
-            VkSwapchainKHR swapChains[]       = { vkState.swapChain.handle                   };
-            VkSemaphore    waitSemaphores[]   = { vkState.swapChain.imageAvailableSemaphore  };
-            VkSemaphore    signalSemaphores[] = { vkState.swapChain.renderCompletedSemaphore };
+            VkCommandBuffer const &transferCommandBuffer      = frameContext->getTransferCommandBuffer();
+            VkCommandBuffer const &graphicsCommandBuffer      = frameContext->getGraphicsCommandBuffer();
+            VkSemaphore     const &imageAvailableSemaphore    = frameContext->getImageAvailableSemaphore();
+            VkSemaphore     const &transferCompletedSemaphore = frameContext->getTransferCompletedSemaphore();
+            VkSemaphore     const &renderCompletedSemaphore   = frameContext->getRenderCompletedSemaphore();
 
             VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT };
 
-            VkSubmitInfo vkSubmitInfo {};
-            vkSubmitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            vkSubmitInfo.pNext                = nullptr;
-            vkSubmitInfo.waitSemaphoreCount   = 1;
-            vkSubmitInfo.pWaitSemaphores      = waitSemaphores;
-            vkSubmitInfo.pWaitDstStageMask    = waitStages;
-            vkSubmitInfo.commandBufferCount   = 1;
-            vkSubmitInfo.pCommandBuffers      = &vkCommandBuffer;
-            vkSubmitInfo.signalSemaphoreCount = 1;
-            vkSubmitInfo.pSignalSemaphores    = signalSemaphores;
-
-            VkResult result = vkQueueSubmit(graphicsQueue, 1, &vkSubmitInfo, VK_NULL_HANDLE);
-            if(VkResult::VK_SUCCESS != result)
             {
-                throw CVulkanError("Failed to execute 'vkQueueSubmit'", result);
+                VkSemaphore    waitSemaphores[]   = { imageAvailableSemaphore };
+                VkSemaphore    signalSemaphores[] = { transferCompletedSemaphore };
+
+                VkSubmitInfo vkSubmitInfo {};
+                vkSubmitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                vkSubmitInfo.pNext                = nullptr;
+                vkSubmitInfo.waitSemaphoreCount   = 1;
+                vkSubmitInfo.pWaitSemaphores      = waitSemaphores;
+                vkSubmitInfo.pWaitDstStageMask    = waitStages;
+                vkSubmitInfo.commandBufferCount   = 1;
+                vkSubmitInfo.pCommandBuffers      = &transferCommandBuffer;
+                vkSubmitInfo.signalSemaphoreCount = 1;
+                vkSubmitInfo.pSignalSemaphores    = signalSemaphores;
+
+                VkResult result = vkQueueSubmit(transferQueue, 1, &vkSubmitInfo, VK_NULL_HANDLE);
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    throw CVulkanError("Failed to execute 'vkQueueSubmit' on transfer queue", result);
+                }
             }
 
-            VkPresentInfoKHR vkPresentInfo {};
-            vkPresentInfo.sType              =  VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-            vkPresentInfo.pNext              =  nullptr;
-            vkPresentInfo.waitSemaphoreCount =  1;
-            vkPresentInfo.pWaitSemaphores    =  signalSemaphores;
-            vkPresentInfo.swapchainCount     =  1;
-            vkPresentInfo.pSwapchains        =  swapChains;
-            vkPresentInfo.pImageIndices      = &(vkState.swapChain.currentSwapChainImageIndex);
-            vkPresentInfo.pResults           =  nullptr;
-
-            result = vkQueuePresentKHR(presentQueue, &vkPresentInfo);
-            switch(result)
             {
-                case VkResult::VK_ERROR_OUT_OF_DATE_KHR:
-                case VkResult::VK_SUBOPTIMAL_KHR:
-                    mVulkanEnvironment->recreateSwapChain();
-                    break;
-                case VkResult::VK_SUCCESS:
-                    break;
-                default:
-                    throw CVulkanError("Failed to execute 'vkQueuePresentKHR'", result);
+                VkSemaphore    waitSemaphores[]   = { transferCompletedSemaphore };
+                VkSemaphore    signalSemaphores[] = { renderCompletedSemaphore  };
+
+                VkSubmitInfo vkSubmitInfo {};
+                vkSubmitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                vkSubmitInfo.pNext                = nullptr;
+                vkSubmitInfo.waitSemaphoreCount   = 1;
+                vkSubmitInfo.pWaitSemaphores      = waitSemaphores;
+                vkSubmitInfo.pWaitDstStageMask    = waitStages;
+                vkSubmitInfo.commandBufferCount   = 1;
+                vkSubmitInfo.pCommandBuffers      = &graphicsCommandBuffer;
+                vkSubmitInfo.signalSemaphoreCount = 1;
+                vkSubmitInfo.pSignalSemaphores    = signalSemaphores;
+
+                VkResult result = vkQueueSubmit(graphicsQueue, 1, &vkSubmitInfo, VK_NULL_HANDLE);
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    throw CVulkanError("Failed to execute 'vkQueueSubmit' on graphics queueu", result);
+                }
+            }
+
+            {
+                VkSwapchainKHR swapChains[]       = { vkState.swapChain.handle };
+                VkSemaphore    waitSemaphores[]   = { renderCompletedSemaphore };
+
+                VkPresentInfoKHR vkPresentInfo {};
+                vkPresentInfo.sType              =  VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+                vkPresentInfo.pNext              =  nullptr;
+                vkPresentInfo.waitSemaphoreCount =  1;
+                vkPresentInfo.pWaitSemaphores    =  waitSemaphores;
+                vkPresentInfo.swapchainCount     =  1;
+                vkPresentInfo.pSwapchains        =  swapChains;
+                vkPresentInfo.pImageIndices      = &(vkState.swapChain.currentSwapChainImageIndex);
+                vkPresentInfo.pResults           =  nullptr;
+
+                VkResult result = vkQueuePresentKHR(presentQueue, &vkPresentInfo);
+                switch(result)
+                {
+                    case VkResult::VK_ERROR_OUT_OF_DATE_KHR:
+                    case VkResult::VK_SUBOPTIMAL_KHR:
+                        mVulkanEnvironment->recreateSwapChain();
+                        break;
+                    case VkResult::VK_SUCCESS:
+                        break;
+                    default:
+                        throw CVulkanError("Failed to execute 'vkQueuePresentKHR'", result);
+                }
             }
 
             // Temporary workaround to avoid memory depletion from GPU workloads using validation layers.
             // Implement better synchronization and throttling, once ready.
-            result = vkQueueWaitIdle(presentQueue);
+            VkResult result = vkQueueWaitIdle(presentQueue);
             if(VK_SUCCESS != result)
             {
                 // throw CVulkanError("Failed to execute 'vkQueueWaitIdle' for temporary synchronization implementation", result);
@@ -667,7 +675,7 @@ namespace engine
         EEngineStatus CVulkanRenderContext::bindAttributeAndIndexBuffers(GpuApiHandle_t const &aAttributeBufferId, GpuApiHandle_t const &aIndexBufferId, Vector<VkDeviceSize> aOffsets)
         {
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
-            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex);
+            VkCommandBuffer  vkCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
             auto const *const attributeBuffer = mVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aAttributeBufferId);
             auto const *const indexBuffer     = mVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aIndexBufferId);
@@ -693,7 +701,7 @@ namespace engine
         EEngineStatus CVulkanRenderContext::bindPipeline(GpuApiHandle_t const &aPipelineUID)
         {
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
-            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkCommandBuffer  vkCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
 
             auto const *const pipeline = mVulkanEnvironment->getResourceStorage()->extract<CVulkanPipelineResource>(aPipelineUID);
             if(nullptr == pipeline)
@@ -762,7 +770,7 @@ namespace engine
         EEngineStatus CVulkanRenderContext::drawIndex(uint32_t const aIndexCount)
         {
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
-            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkCommandBuffer  vkCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
 
             vkCmdDrawIndexed(vkCommandBuffer, aIndexCount, 1, 0, 0, 0);
 
@@ -776,7 +784,7 @@ namespace engine
         EEngineStatus CVulkanRenderContext::drawQuad()
         {
             SVulkanState     &vkState        = mVulkanEnvironment->getState();
-            VkCommandBuffer  vkCommandBuffer = vkState.commandBuffers.at(vkState.swapChain.currentSwapChainImageIndex); // The commandbuffers and swapchain count currently match
+            VkCommandBuffer  vkCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
 
             vkCmdDraw(vkCommandBuffer, 6, 1, 0, 0);
 

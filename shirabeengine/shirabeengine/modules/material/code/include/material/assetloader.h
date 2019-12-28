@@ -372,7 +372,7 @@ namespace engine::material
                 pipelineDependencies.emplace_back("Core_pipeline");
             }
 
-            CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = aResourceManager->useDynamicResource<SPipeline>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor, std::move(pipelineDependencies));
+            CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = aResourceManager->useDynamicResource<SPipeline>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor);
             EngineStatusPrintOnError(pipelineObject.result(),  "Material::AssetLoader", "Failed to create pipeline.");
 
             Shared<SPipeline> pipeline = std::static_pointer_cast<SPipeline>(pipelineObject.data());

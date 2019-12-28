@@ -15,7 +15,7 @@ namespace engine
      * reducing the amount of exception throwing and out parameter usage.
      */
     template <typename TResult, typename TData>
-    class AResult
+    class [[nodiscard]] AResult
     {
         template <typename T>
         friend T std::get();

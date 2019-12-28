@@ -17,12 +17,11 @@ namespace engine::vulkan
     public_structs:
         struct SFrameContextData
         {
-            VkQueue graphicsQueue;
-            VkQueue transferQueue;
-            VkQueue presentQueue;
-
             VkCommandBuffer graphicsCommandBuffer;
             VkCommandBuffer transferCommandBuffer;
+            VkSemaphore     imageAvailableSemaphore;
+            VkSemaphore     transferCompletedSemaphore;
+            VkSemaphore     renderCompletedSemaphore;
         };
 
     public_constructors:
@@ -32,12 +31,17 @@ namespace engine::vulkan
         { };
 
     public_api:
-        SHIRABE_INLINE VkQueue getGraphicsQueue() final { return mData.graphicsQueue; }
-        SHIRABE_INLINE VkQueue getTransferQueue() final { return mData.transferQueue; }
-        SHIRABE_INLINE VkQueue getPresentQueue () final { return mData.presentQueue; }
-
+        SHIRABE_INLINE
         VkCommandBuffer getGraphicsCommandBuffer() final { return mData.graphicsCommandBuffer; }
+        SHIRABE_INLINE
         VkCommandBuffer getTransferCommandBuffer() final { return mData.transferCommandBuffer; }
+
+        SHIRABE_INLINE
+        VkSemaphore getImageAvailableSemaphore()    final { return mData.imageAvailableSemaphore; }
+        SHIRABE_INLINE
+        VkSemaphore getTransferCompletedSemaphore() final { return mData.transferCompletedSemaphore; }
+        SHIRABE_INLINE
+        VkSemaphore getRenderCompletedSemaphore()   final { return mData.renderCompletedSemaphore; }
 
     private_members:
         SFrameContextData mData;
@@ -145,8 +149,14 @@ namespace engine::vulkan
          */
         void recreateSwapChain();
 
+        void initializeRecordingAndSubmission();
+        void deinitializeRecordingAndSubmission();
+
+        [[nodiscard]]
         CEngineResult<Shared<IVkFrameContext>> beginGraphicsFrame();
-        CEngineResult<>                        endGraphicsFrame();
+
+        [[nodiscard]]
+        CEngineResult<> endGraphicsFrame();
 
     public_api:
         Shared<IVkFrameContext> getVkCurrentFrameContext() final;
@@ -185,11 +195,19 @@ namespace engine::vulkan
          */
         void selectPhysicalDevice(uint32_t const &aDeviceIndex);
 
-        void createCommandPool();
+        void createCommandPools();
+
+        void destroyCommandPools();
 
         void recreateCommandBuffers(uint32_t const &aBufferCount);
 
         void destroyCommandBuffers();
+
+        void recreateSemaphores(uint32_t const &aBufferCount);
+
+        void destroySemaphores();
+
+        EEngineStatus bindSwapChain();
 
         /**
          * Cleanup all swapchain resources.

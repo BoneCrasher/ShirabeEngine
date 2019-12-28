@@ -74,13 +74,15 @@ namespace engine::vulkan
         VkPresentModeKHR                selectedPresentMode;
         std::vector<VkImage>            swapChainImages;
         uint32_t                        currentSwapChainImageIndex;
-        VkSemaphore                     imageAvailableSemaphore;
-        VkSemaphore                     renderCompletedSemaphore;
         // Creation config
         math::CRect                     requestedBackBufferSize;
         VkFormat                        requestedFormat;
         VkColorSpaceKHR                 colorSpace;
     };
+
+    static constexpr const uint32_t sAspectCount         = 2;
+    static constexpr const uint32_t sTransferAspectIndex = 0;
+    static constexpr const uint32_t sGraphicsAspectIndex = 1;
 
     /**
      * The SVulkanState struct describes all relevant vulkan API data
@@ -115,8 +117,11 @@ namespace engine::vulkan
         // Swap Chain
         SVulkanSwapChain              swapChain;
         // Command Pool & Buffer
-        VkCommandPool                 commandPool;
-        std::vector<VkCommandBuffer>  commandBuffers;
+        std::vector<VkCommandPool>                commandPools;
+        std::vector<std::vector<VkCommandBuffer>> commandBuffers;
+        std::vector<VkSemaphore>                  transferCompletedSemaphores;
+        std::vector<VkSemaphore>                  imageAvailableSemaphores;
+        std::vector<VkSemaphore>                  renderCompletedSemaphores;
     };
 
     /**

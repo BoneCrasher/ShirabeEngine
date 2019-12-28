@@ -318,6 +318,12 @@ namespace engine
             SHIRABE_TEST_EXPORT SMaterialDependencies
         {
             SMaterialPipelineDependencies pipelineDependencies;
+
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                return {};
+            }
         };
 
         struct
@@ -338,6 +344,11 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMeshDependencies
         {
+            SHIRABE_INLINE
+            Vector<ResourceId_t> const resolve() const
+            {
+                return {};
+            }
         };
 
     }

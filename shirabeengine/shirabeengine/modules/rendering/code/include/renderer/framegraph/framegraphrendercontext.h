@@ -104,7 +104,8 @@ namespace engine
              * @return                    EEngineStatus::Ok if successful.
              * @return                    EEngineStatus::Error otherwise.
              */
-            CEngineResult<> bindSwapChain(std::string const &aSwapChainId) override;
+            CEngineResult<> beginGraphicsFrame() override;
+            CEngineResult<> endGraphicsFrame() override;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.
@@ -120,7 +121,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            CEngineResult<> beginCommandBuffer() override;
+            CEngineResult<> beginFrameCommandBuffers() override;
 
             /**
              * Put the internal command buffer into non-recording state.
@@ -128,7 +129,7 @@ namespace engine
              * @return EEngineStatus::Ok if successful.
              * @return EEngineStatus::Error otherwise.
              */
-            CEngineResult<> commitCommandBuffer() override;
+            CEngineResult<> commitFrameCommandBuffers() override;
 
             /**
              * Create a framebuffer and render pass including subpasses for the provided attachment info.

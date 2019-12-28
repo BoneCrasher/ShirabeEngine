@@ -85,7 +85,7 @@ namespace engine
              * @return EEngineStatus::Ok, if successful.
              * @return EEngineStatus::Error, on any error.
              */
-            virtual EEngineStatus beginGraphicsCommandBuffer() = 0;
+            virtual EEngineStatus beginFrameCommandBuffers() = 0;
 
             /**
              * Stop recording in the current internal command buffer.
@@ -93,7 +93,7 @@ namespace engine
              * @return EEngineStatus::Ok, if successful.
              * @return EEngineStatus::Error, on any error.
              */
-            virtual EEngineStatus commitGraphicsCommandBuffer() = 0;
+            virtual EEngineStatus commitFrameCommandBuffers() = 0;
 
             /**
              * Bind the framebuffer and render pass with the provided ids, if found.
@@ -125,7 +125,8 @@ namespace engine
              * @param  aSwapChainResourceId The resource id by which the swapchain should be inserted into the resource backend.
              * @return                      EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            virtual EEngineStatus bindSwapChain(GpuApiHandle_t const &aSwapChainResourceId) = 0;
+            virtual EEngineStatus beginGraphicsFrame() = 0;
+            virtual EEngineStatus endGraphicsFrame() = 0;
 
             /**
              * Commit all changes and present the rendered content in the backbuffer to screen.

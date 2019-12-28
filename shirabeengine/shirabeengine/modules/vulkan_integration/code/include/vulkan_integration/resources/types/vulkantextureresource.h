@@ -34,13 +34,17 @@ namespace engine
 
         public_methods:
             // AGpuApiResourceObject
-            CEngineResult<> create(  STextureDescription          const &aDescription
+            [[nodiscard]]
+            CEngineResult<> create(  STextureDescription          const &aDescriptionmVkState
                                    , SNoDependencies              const &aDependencies
                                    , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
+            [[nodiscard]]
             CEngineResult<> destroy()  final;
 
             // ILoadableGpuApiResourceObject
+            [[nodiscard]]
             CEngineResult<> load()   const final;
+            [[nodiscard]]
             CEngineResult<> unload() const final;
 
             // ITransferrableGpuApiResourceObject
