@@ -233,10 +233,11 @@ namespace engine
                 return EEngineStatus::Error;
             }
 
-            auto input = aDataSource.data();
-            memcpy(data, (void*)input, size);
-            vkUnmapMemory(device, gpuBuffer->attachedMemory);
-
+            if(nullptr != data) {
+                auto input = aDataSource.data();
+                memcpy(data, (void *) input, size);
+                vkUnmapMemory(device, gpuBuffer->attachedMemory);
+            }
 
             return EEngineStatus::Ok;
         }
@@ -342,7 +343,19 @@ namespace engine
                             break;
                         case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
                             {
+                                if(aGpuTextureViewHandles.size() <= inputImageCounter)
+                                {
+                                    continue;
+                                }
+
                                 auto const &imageBinding = aGpuTextureViewHandles[inputImageCounter];
+
+                                if(   (resources::GpuApiHandle_t)0 == imageBinding.imageView
+                                   || (resources::GpuApiHandle_t)0 == imageBinding.image)
+                                {
+                                    continue;
+                                }
+
                                 auto const *const view  = mResourceStorage->extract<CVulkanTextureViewResource>(imageBinding.imageView);
                                 auto const *const image = mResourceStorage->extract<CVulkanTextureResource>    (imageBinding.image);
 

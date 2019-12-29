@@ -330,7 +330,14 @@ namespace engine::material
             Vector<ResourceId_t>  sampledImageResources {};
             for(auto const &sampledImage : sampledImages)
             {
-                ResourceId_t const &resourceId = config.getSampledImageAssignment().at(sampledImage.name);
+                CMaterialConfig::SampledImageMap_t const &assignment = config.getSampledImageAssignment();
+                if(assignment.end() == assignment.find(sampledImage.name))
+                {
+                    sampledImageResources.push_back(ResourceId_t {}); // Fill gaps...
+                    continue;
+                }
+
+                ResourceId_t const &resourceId = assignment.at(sampledImage.name);
                 sampledImageResources.push_back(resourceId);
             }
 

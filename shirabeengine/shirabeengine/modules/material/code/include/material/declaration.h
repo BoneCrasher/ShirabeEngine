@@ -759,7 +759,7 @@ namespace engine
                 , public engine::serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>
         {
 
-        private_typedefs:
+        public_typedefs:
             using BufferValueIndex_t = Map<std::string, Shared<SBufferMember>>;
             using BufferIndex_t      = Map<std::string, BufferValueIndex_t>;
             using BufferData_t       = Map<std::string, Shared<void>>;

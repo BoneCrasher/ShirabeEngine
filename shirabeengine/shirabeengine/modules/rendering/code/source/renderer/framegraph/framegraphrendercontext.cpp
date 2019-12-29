@@ -1065,6 +1065,10 @@ namespace engine::framegraph
 
                 gpuTextureViewIds.push_back(binding);
             }
+            else
+            {
+                gpuTextureViewIds.push_back( {}); // Fill gaps
+            }
         }
 
         mGraphicsAPIRenderContext->updateResourceBindings(  material->pipelineResource->getGpuApiResourceHandle()
