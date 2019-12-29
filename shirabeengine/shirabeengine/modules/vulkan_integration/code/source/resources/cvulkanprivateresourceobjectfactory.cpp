@@ -32,10 +32,14 @@ namespace engine
                     Shared<TGpuApiResource> resource = makeShared<TGpuApiResource>(aContext, aHandle);
 
                     SGpuApiOps<TLogicalResource> ops {};
-                    ops.initialize   = [resource] ( typename TLogicalResource::Descriptor_t   const &
-                                                  , typename TLogicalResource::Dependencies_t const &
-                                                  , GpuApiResourceDependencies_t              const &) -> CEngineResult<> {};
-                    ops.deinitialize = [resource] () -> CEngineResult<> {};
+                    ops.initialize   = [resource] ( typename TLogicalResource::Descriptor_t   const &aDescriptor
+                                                  , typename TLogicalResource::Dependencies_t const &aDependencies
+                                                  , GpuApiResourceDependencies_t              const &aResolvedDependencies) -> CEngineResult<> {
+                        return resource->create(aDescriptor, aDependencies, aResolvedDependencies);
+                    };
+                    ops.deinitialize = [resource] () -> CEngineResult<> {
+                        return resource->destroy();
+                    };
 
                     if constexpr(std::is_base_of_v<ILoadableGpuApiResourceObject, TGpuApiResource>)
                     {

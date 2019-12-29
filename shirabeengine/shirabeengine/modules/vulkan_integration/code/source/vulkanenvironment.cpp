@@ -741,7 +741,7 @@ namespace engine::vulkan
         mVkState.swapChain = swapChain;
 
         // Now also recreate the command buffers, one foreach swap chain to ensure proper async rendering
-        recreateCommandBuffers(createdSwapChainImageCount); // TBDiscussed: How to permit compute and graphics pipelines in parallel.
+        // recreateCommandBuffers(createdSwapChainImageCount); // TBDiscussed: How to permit compute and graphics pipelines in parallel.
     }
     //<-----------------------------------------------------------------------------
 
@@ -794,6 +794,8 @@ namespace engine::vulkan
             {
                 throw CVulkanError("Cannot create command pool.", result);
             }
+
+            return vkCommandPool;
         };
 
         vkState.commandPools.resize(sAspectCount);
@@ -870,9 +872,9 @@ namespace engine::vulkan
                             vkState.commandPools[aAspect],
                             static_cast<uint32_t>(vkState.commandBuffers.at(aAspect).size()),
                             vkState.commandBuffers.at(aAspect).data());
-            }
 
-            vkState.commandBuffers.at(aAspect).clear();
+                vkState.commandBuffers.at(aAspect).clear();
+            }
         };
 
         destroyBuffers(sGraphicsAspectIndex);
