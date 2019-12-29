@@ -13,10 +13,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CPassBuilder::CPassBuilder(
                 PassUID_t                   const &aPassUID,
-                Shared<CPassBase>         aPass,
+                Shared<CPassBase>                  aPass,
                 CFrameGraphMutableResources       &aOutResourceData)
             : mPassUID             (aPassUID                         )
-            , mPass                (aPass                            )
+            , mPass                (std::move(aPass                 ))
             , mResourceData        (aOutResourceData                 )
             , mAttachmentCollection(aOutResourceData.getAttachments())
         {}

@@ -72,7 +72,7 @@ namespace engine
              */
             CPassBuilder(
                     PassUID_t                   const &aPassUID,
-                    Shared<CPassBase>         aPass,
+                    Shared<CPassBase>                  aPass,
                     CFrameGraphMutableResources       &aOutResourceData);
 
         public_methods:

@@ -297,6 +297,11 @@ namespace engine
                 aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, executionOrder, mResourceData.getAttachments(), mResourceData);
             }
 
+            // The subsequent data is used to properly derive layout transitions between attachment reads/writes.
+            SFrameGraphAttachmentCollection  const &attachments               = mResourceData.getAttachments();
+            Vector<FrameGraphResourceId_t>   const &attachmentResourceIds     = attachments  .getAttachementResourceIds();
+            Map<PassUID_t, Vector<uint64_t>> const &attachmentPassAssignments = attachments  .getAttachmentPassAssignment();
+
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(not copy.empty())
             {
@@ -305,6 +310,17 @@ namespace engine
                 Unique<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
 
                 aRenderContext->beginPass();
+
+                Vector<uint64_t> const &attachmentPassAssignment = attachmentPassAssignments.at(passUID);
+                for(auto const &index : attachmentPassAssignment)
+                {
+                    FrameGraphResourceId_t const  attachmentResourceId = attachmentResourceIds.at(index);
+                    SFrameGraphResource    const &attachmentResource   = *(mResourceData.getMutable<SFrameGraphResource>(attachmentResourceId).data());
+                    SFrameGraphResource    const &parentResource       = *(mResourceData.getMutable<SFrameGraphResource>(attachmentResource.parentResource).data());
+
+                    
+                }
+
                 aRenderContext->clearAttachments(sRenderPassResourceId);
 
                 CEngineResult<> executed = pass->execute(mResourceData, aRenderContext);
