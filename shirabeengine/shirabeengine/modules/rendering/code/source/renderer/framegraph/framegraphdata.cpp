@@ -292,20 +292,16 @@ namespace engine
         {
             uint64_t imageViewIndex = 0;
 
-            auto const it = std::find(  mAttachmentImageResourceIds.begin()
-                    , mAttachmentImageResourceIds.end()
-                    , aImageResourceID);
-            if(mAttachmentImageResourceIds.end() == it)
-            {
-                mAttachmentImageResourceIds.push_back(aImageResourceID);
-            }
-
             auto const it2 = std::find(  mAttachmentImageViewResourceIds.begin()
-                    , mAttachmentImageViewResourceIds.end()
-                    , aImageViewResourceID);
+                                       , mAttachmentImageViewResourceIds.end()
+                                       , aImageViewResourceID);
             if(mAttachmentImageViewResourceIds.end() == it2)
             {
-                mAttachmentImageViewResourceIds.push_back(aImageResourceID);
+                mAttachmentImageViewResourceIds.push_back(aImageViewResourceID);
+                mAttachmentImageResourceIds    .push_back(aImageResourceID);
+
+                mViewToImageAssignment[aImageViewResourceID] = (mAttachmentImageResourceIds.size() - 1);
+
                 imageViewIndex = (mAttachmentImageViewResourceIds.size() - 1);
             }
             else
@@ -313,7 +309,6 @@ namespace engine
                 imageViewIndex = std::distance(mAttachmentImageViewResourceIds.begin(), it2);
             }
 
-            mViewToImageAssignment[aImageViewResourceID] = aImageResourceID;
             mAttachmentPassAssignment[aPassUID].push_back(imageViewIndex);
 
             return imageViewIndex;

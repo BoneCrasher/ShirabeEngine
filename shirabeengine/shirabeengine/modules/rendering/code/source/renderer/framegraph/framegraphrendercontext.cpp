@@ -291,9 +291,6 @@ namespace engine::framegraph
         };
         //<-----------------------------------------------------------------------------
 
-        // List of resource ids of the attachments.
-        FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementImageResourceIds();
-
         // Each element in the frame buffer is required to have the same dimensions.
         // These variables will store the first sizes encountered and will validate
         // against them for any subsequent size, to make sure that the attachments
@@ -318,6 +315,8 @@ namespace engine::framegraph
         auto const &viewToImageAssignment = aAttachmentInfo.getAttachmentViewToImageAssignment();
         auto const &passToViewAssignment  = aAttachmentInfo.getAttachmentPassToViewAssignment();
 
+        uint64_t alreadyProcessedAttachmentsFlags = 0;
+
         SRenderPassDescription renderPassDesc = {};
         renderPassDesc.name = aRenderPassId;
         renderPassDesc.attachmentDescriptions.resize(imageResourceIdList.size());
@@ -329,7 +328,7 @@ namespace engine::framegraph
             SSubpassDescription subpassDesc = {};
             for(auto const &index : attachmentResourceIndexList)
             {
-                FrameGraphResourceId_t const &resourceId = attachmentResources.at(index);
+                FrameGraphResourceId_t const &resourceId = viewResourceIdList.at(index);
 
                 CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
                 if(not textureViewFetch.successful())
@@ -377,42 +376,23 @@ namespace engine::framegraph
                 // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
                 // textureViewIds.push_back(textureView.readableName);
 
-                uint64_t const attachmentIndex = renderPassDesc.attachmentDescriptions.size();
-
-                // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
-                SAttachmentDescription attachmentDesc = {};
-                attachmentDesc.stencilLoadOp  = attachmentDesc.loadOp;
-                attachmentDesc.loadOp         = EAttachmentLoadOp ::CLEAR;
-                attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
-                attachmentDesc.stencilLoadOp  = EAttachmentLoadOp ::CLEAR;
-                attachmentDesc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
-                attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
-                attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
-                attachmentDesc.stencilStoreOp = attachmentDesc.storeOp;
-                attachmentDesc.format         = textureView.format;
-
-                bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
-                bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
-                bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
+                uint32_t const attachmentIndex = viewToImageAssignment.at(textureView.resourceId);
 
                 SAttachmentReference attachmentReference {};
                 attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);
 
+                bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
+                bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
+                bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
+
                 if(isColorAttachment)
                 {
-                    attachmentDesc.clearColor.color  = { 0.0f, 0.0f, 0.0f, 1.0f };
-                    attachmentDesc.isColorAttachment = true;
-
                     attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
 
                     subpassDesc.colorAttachments.push_back(attachmentReference);
                 }
                 else if(isDepthAttachment)
                 {
-                    attachmentDesc.format                  = EFormat::D24_UNORM_S8_UINT;
-                    attachmentDesc.clearColor.depthStencil = { 1.0f, 0 };
-                    attachmentDesc.isDepthAttachment       = true;
-
                     if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
                     {
                         attachmentReference.layout = EImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -426,20 +406,35 @@ namespace engine::framegraph
                 }
                 else if(isInputAttachment)
                 {
-                    attachmentDesc.isInputAttachment = true;
-
-                    attachmentReference.layout       = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
+                    attachmentReference.layout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
 
                     subpassDesc.inputAttachments.push_back(attachmentReference);
                 }
 
-                uint32_t const imageIndex = std::distance(  imageResourceIdList.begin()
-                                                          , std::find_if( imageResourceIdList.begin()
-                                                                        , imageResourceIdList.end()
-                                                                        , [textureView] (FrameGraphResourceId_t const &aCmp) -> bool {
-                                                                              return (aCmp == textureView.subjacentResource);
-                                                                          }));
-                renderPassDesc.attachmentDescriptions[imageIndex] = attachmentDesc;
+                // Easy way to handle 64 simultaneous image resources.
+                if(0 == (alreadyProcessedAttachmentsFlags & (1u << attachmentIndex)))
+                {
+                    // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
+                    SAttachmentDescription attachmentDesc = {};
+                    attachmentDesc.loadOp         = EAttachmentLoadOp ::CLEAR;
+                    attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
+                    attachmentDesc.stencilLoadOp  = EAttachmentLoadOp ::CLEAR;
+                    attachmentDesc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
+                    attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
+                    attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
+                    attachmentDesc.format         = texture.format;
+
+                    if(texture.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment))
+                    {
+                        attachmentDesc.clearColor.color = {0.0f, 0.0f, 0.0f, 1.0f};
+                    }
+                    else if(texture.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment))
+                    {
+                        attachmentDesc.clearColor.depthStencil = {1.0f, 0};
+                    }
+
+                    renderPassDesc.attachmentDescriptions[attachmentIndex] = attachmentDesc;
+                }
             }
 
             renderPassDesc.subpassDescriptions.push_back(subpassDesc);
@@ -534,7 +529,7 @@ namespace engine::framegraph
 
         SRenderPassDependencies renderPassDependencies {};
 
-        FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementImageResourceIds();
+        FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementImageViewResourceIds();
 
         auto const &assignment = aAttachmentInfo.getAttachmentPassToViewAssignment();
         for(auto const &passUid : aPassExecutionOrder)

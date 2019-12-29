@@ -423,13 +423,13 @@ namespace engine
              *
              * @return See brief.
              */
-            Vector<FrameGraphResourceId_t>                      const &getAttachementImageResourceIds()     const { return mAttachmentImageResourceIds;     }
-            Vector<FrameGraphResourceId_t>                      const &getAttachementImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
-            Vector<uint64_t>                                    const &getColorAttachments()                const { return mColorAttachments;               }
-            Vector<uint64_t>                                    const &getDepthAttachments()                const { return mDepthAttachments;               }
-            Vector<uint64_t>                                    const &getInputAttachments()                const { return mInputAttachments;               }
-            Map<PassUID_t, Vector<uint64_t>>                    const &getAttachmentPassToViewAssignment()  const { return mAttachmentPassAssignment;       }
-            Map<FrameGraphResourceId_t, FrameGraphResourceId_t> const &getAttachmentViewToImageAssignment() const { return mViewToImageAssignment;          }
+            Vector<FrameGraphResourceId_t>        const &getAttachementImageResourceIds()     const { return mAttachmentImageResourceIds;     }
+            Vector<FrameGraphResourceId_t>        const &getAttachementImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
+            Vector<uint64_t>                      const &getColorAttachments()                const { return mColorAttachments;               }
+            Vector<uint64_t>                      const &getDepthAttachments()                const { return mDepthAttachments;               }
+            Vector<uint64_t>                      const &getInputAttachments()                const { return mInputAttachments;               }
+            Map<PassUID_t, Vector<uint64_t>>      const &getAttachmentPassToViewAssignment()  const { return mAttachmentPassAssignment;       }
+            Map<FrameGraphResourceId_t, uint64_t> const &getAttachmentViewToImageAssignment() const { return mViewToImageAssignment;          }
 
         private_methods:
 
@@ -456,7 +456,7 @@ namespace engine
                 mInputAttachments;
             Map<PassUID_t, Vector<uint64_t>>
                 mAttachmentPassAssignment;
-            Map<FrameGraphResourceId_t, FrameGraphResourceId_t>
+            Map<FrameGraphResourceId_t, uint64_t>
                 mViewToImageAssignment;
         };
 

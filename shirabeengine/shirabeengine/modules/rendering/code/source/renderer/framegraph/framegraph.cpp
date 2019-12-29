@@ -292,14 +292,16 @@ namespace engine
             // In any case...
             aRenderContext->beginFrameCommandBuffers();
 
+            SFrameGraphAttachmentCollection const &attachmentCollection = mResourceData.getAttachments();
+
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, executionOrder, mResourceData.getAttachments(), mResourceData);
+                aRenderContext->bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, executionOrder, attachmentCollection, mResourceData);
             }
 
             // The subsequent data is used to properly derive layout transitions between attachment reads/writes.
             SFrameGraphAttachmentCollection  const &attachments               = mResourceData.getAttachments();
-            Vector<FrameGraphResourceId_t>   const &attachmentResourceIds     = attachments.getAttachementImageResourceIds();
+            Vector<FrameGraphResourceId_t>   const &attachmentResourceIds     = attachments.getAttachementImageViewResourceIds();
             Map<PassUID_t, Vector<uint64_t>> const &attachmentPassAssignments = attachments.getAttachmentPassToViewAssignment();
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
@@ -314,11 +316,90 @@ namespace engine
                 Vector<uint64_t> const &attachmentPassAssignment = attachmentPassAssignments.at(passUID);
                 for(auto const &index : attachmentPassAssignment)
                 {
-                    FrameGraphResourceId_t const  attachmentResourceId = attachmentResourceIds.at(index);
-                    SFrameGraphResource    const &attachmentResource   = *(mResourceData.getMutable<SFrameGraphResource>(attachmentResourceId).data());
-                    SFrameGraphResource    const &parentResource       = *(mResourceData.getMutable<SFrameGraphResource>(attachmentResource.parentResource).data());
+                    FrameGraphResourceId_t      const  attachmentResourceId = attachmentResourceIds.at(index);
+                    Shared<SFrameGraphResource> const &attachmentResource   = (mResourceData.getMutable<SFrameGraphResource>(attachmentResourceId).data());
+                    Shared<SFrameGraphResource> const &parentResource       = (mResourceData.getMutable<SFrameGraphResource>(attachmentResource->parentResource).data());
+                    Shared<SFrameGraphResource> const &subjacentResource    = (mResourceData.getMutable<SFrameGraphResource>(attachmentResource->subjacentResource).data());
 
 
+                    //<-----------------------------------------------------------------------------
+                    // Helper function to find attachment indices in index lists.
+                    //<-----------------------------------------------------------------------------
+                    auto const findAttachmentRelationFn = [] (Vector<FrameGraphResourceId_t> const &aResourceIdIndex,
+                                                              Vector<uint64_t>               const &aRelationIndices,
+                                                              uint64_t                       const &aIndex)            -> bool
+                    {
+                        auto const predicate = [&] (uint64_t const &aTestIndex) -> bool
+                        {
+                            return ( (aResourceIdIndex.size() > aTestIndex) and (aIndex == aResourceIdIndex.at(aTestIndex)) );
+                        };
+
+                        auto const &iterator = std::find_if(aRelationIndices.begin(), aRelationIndices.end(), predicate);
+
+                        return (aRelationIndices.end() != iterator);
+                    };
+                    //<-----------------------------------------------------------------------------
+
+                    if(EFrameGraphResourceType::Texture == parentResource->type && EFrameGraphResourceType::TextureView == attachmentResource->type)
+                    {
+                        Shared<SFrameGraphTexture>     texture     = std::static_pointer_cast<SFrameGraphTexture>    (parentResource);
+                        Shared<SFrameGraphTextureView> textureView = std::static_pointer_cast<SFrameGraphTextureView>(attachmentResource);
+
+                        bool const isColorAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getColorAttachments(), textureView->resourceId);
+                        bool const isDepthAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getDepthAttachments(), textureView->resourceId);
+                        bool const isInputAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getInputAttachments(), textureView->resourceId);
+
+                        VkImageAspectFlags aspectFlags = 0;
+                        if(isColorAttachment || isInputAttachment) aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+                        if(isDepthAttachment) aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+                        VkImageLayout targetLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                        if(isColorAttachment) targetLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                        if(isDepthAttachment) targetLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        if(isInputAttachment) targetLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+                        aRenderContext->performImageLayoutTransfer(  *texture
+                                                                   , textureView->arraySliceRange
+                                                                   , textureView->mipSliceRange
+                                                                   , aspectFlags
+                                                                   , VK_IMAGE_LAYOUT_UNDEFINED
+                                                                   , targetLayout);
+                    }
+                    else if(EFrameGraphResourceType::TextureView == parentResource->type && EFrameGraphResourceType::TextureView == attachmentResource->type)
+                    {
+                        Shared<SFrameGraphTexture>     texture      = std::static_pointer_cast<SFrameGraphTexture>    (subjacentResource);
+                        Shared<SFrameGraphTextureView> textureView0 = std::static_pointer_cast<SFrameGraphTextureView>(parentResource);
+                        Shared<SFrameGraphTextureView> textureView1 = std::static_pointer_cast<SFrameGraphTextureView>(attachmentResource);
+
+                        bool const sourceIsColorAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getColorAttachments(), textureView0->resourceId);
+                        bool const sourceIsDepthAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getDepthAttachments(), textureView0->resourceId);
+                        bool const sourceIsInputAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getInputAttachments(), textureView0->resourceId);
+
+                        bool const targetIsColorAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getColorAttachments(), textureView1->resourceId);
+                        bool const targetIsDepthAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getDepthAttachments(), textureView1->resourceId);
+                        bool const targetIsInputAttachment = findAttachmentRelationFn(attachmentCollection.getAttachementImageViewResourceIds(), attachmentCollection.getInputAttachments(), textureView1->resourceId);
+
+                        VkImageAspectFlags aspectFlags = 0;
+                        if(sourceIsColorAttachment) aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+                        if(sourceIsDepthAttachment || targetIsDepthAttachment) aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+                        VkImageLayout sourceLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                        if(sourceIsColorAttachment) sourceLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                        if(sourceIsDepthAttachment) sourceLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        if(sourceIsInputAttachment) sourceLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+                        VkImageLayout targetLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                        if(targetIsColorAttachment) targetLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                        if(targetIsDepthAttachment) targetLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        if(targetIsInputAttachment) targetLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+                        aRenderContext->performImageLayoutTransfer(*texture
+                                                                  , textureView1->arraySliceRange
+                                                                  , textureView1->mipSliceRange
+                                                                  , aspectFlags
+                                                                  , sourceLayout
+                                                                  , targetLayout);
+                    }
                 }
 
                 aRenderContext->clearAttachments(sRenderPassResourceId);
@@ -491,7 +572,7 @@ namespace engine
             std::vector<Shared<SFrameGraphTextureView>> textureViewReferences{};
 
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
-            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageResourceIds();
+            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageViewResourceIds();
 
             // Make sure that all texture views and their subjacent textures are created upfront!
             CEngineResult<> const initialization = initializeResources(aRenderContext, attachmentResourceIds);

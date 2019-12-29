@@ -635,11 +635,11 @@ namespace engine
             {
                 if(isColorAttachment)
                 {
-                    mAttachmentCollection.addColorAttachment(mPassUID, data.resourceId);
+                    mAttachmentCollection.addColorAttachment(mPassUID, data.subjacentResource, data.resourceId);
                 }
                 else if(isDepthAttachment)
                 {
-                    mAttachmentCollection.addDepthAttachment(mPassUID, data.resourceId);
+                    mAttachmentCollection.addDepthAttachment(mPassUID, data.subjacentResource, data.resourceId);
                 }
             }
 
@@ -666,7 +666,7 @@ namespace engine
 
             if(not CheckEngineError(result))
             {
-                mAttachmentCollection.addInputAttachment(mPassUID, data.resourceId);
+                mAttachmentCollection.addInputAttachment(mPassUID, data.subjacentResource, data.resourceId);
             }
 
             return { result, data };
