@@ -376,13 +376,7 @@ namespace engine
         public_constructors:
             SFrameGraphAttachmentCollection() = default;
 
-            explicit SHIRABE_INLINE SFrameGraphAttachmentCollection(SFrameGraphAttachmentCollection const &aOther)
-                : mAttachmentResourceIds(aOther.mAttachmentResourceIds)
-                , mColorAttachments(aOther.mColorAttachments)
-                , mDepthAttachments(aOther.mDepthAttachments)
-                , mInputAttachments(aOther.mInputAttachments)
-                , mAttachmentPassAssignment(aOther.mAttachmentPassAssignment)
-            { }
+            explicit SHIRABE_INLINE SFrameGraphAttachmentCollection(SFrameGraphAttachmentCollection const &aOther) = default;
 
         public_methods:
             /**
@@ -395,7 +389,8 @@ namespace engine
              */
             void addInputAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aResourceID);
+                    FrameGraphResourceId_t const &aImageResourceID,
+                    FrameGraphResourceId_t const &aImageViewResourceID);
 
             /**
              * Add a color attachment to the collection and register it
@@ -407,7 +402,8 @@ namespace engine
              */
             void addColorAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aResourceID);
+                    FrameGraphResourceId_t const &aImageResourceID,
+                    FrameGraphResourceId_t const &aImageViewResourceID);
 
             /**
              * Add a depth attachment to the collection and register it
@@ -419,28 +415,49 @@ namespace engine
              */
             void addDepthAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aResourceID);
+                    FrameGraphResourceId_t const &aImageResourceID,
+                    FrameGraphResourceId_t const &aImageViewResourceID);
 
             /**
              * Return the list of attachment resource ids.
              *
              * @return See brief.
              */
-            Vector<FrameGraphResourceId_t>   const &getAttachementResourceIds()   const { return mAttachmentResourceIds;    }
-            Vector<uint64_t>                 const &getColorAttachments()         const { return mColorAttachments;         }
-            Vector<uint64_t>                 const &getDepthAttachments()         const { return mDepthAttachments;         }
-            Vector<uint64_t>                 const &getInputAttachments()         const { return mInputAttachments;         }
-            Map<PassUID_t, Vector<uint64_t>> const &getAttachmentPassAssignment() const { return mAttachmentPassAssignment; }
+            Vector<FrameGraphResourceId_t>                      const &getAttachementImageResourceIds()     const { return mAttachmentImageResourceIds;     }
+            Vector<FrameGraphResourceId_t>                      const &getAttachementImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
+            Vector<uint64_t>                                    const &getColorAttachments()                const { return mColorAttachments;               }
+            Vector<uint64_t>                                    const &getDepthAttachments()                const { return mDepthAttachments;               }
+            Vector<uint64_t>                                    const &getInputAttachments()                const { return mInputAttachments;               }
+            Map<PassUID_t, Vector<uint64_t>>                    const &getAttachmentPassToViewAssignment()  const { return mAttachmentPassAssignment;       }
+            Map<FrameGraphResourceId_t, FrameGraphResourceId_t> const &getAttachmentViewToImageAssignment() const { return mViewToImageAssignment;          }
+
+        private_methods:
+
+            /**
+             * Add an input attachment to the collection and register it
+             * for the given pass.
+             *
+             * @param aPassUID    The pass UID of the pass, which will access the attachment.
+             * @param aResourceID The resourceUID of the texture view, which will serve as an
+             *                    attachment.
+             */
+            uint32_t addAttachment(
+                    PassUID_t              const &aPassUID,
+                    FrameGraphResourceId_t const &aImageResourceID,
+                    FrameGraphResourceId_t const &aImageViewResourceID);
 
         private_members:
             Vector<FrameGraphResourceId_t>
-                mAttachmentResourceIds;
+                mAttachmentImageResourceIds,
+                mAttachmentImageViewResourceIds;
             Vector<uint64_t>
                 mColorAttachments,
                 mDepthAttachments,
                 mInputAttachments;
             Map<PassUID_t, Vector<uint64_t>>
                 mAttachmentPassAssignment;
+            Map<FrameGraphResourceId_t, FrameGraphResourceId_t>
+                mViewToImageAssignment;
         };
 
         /**

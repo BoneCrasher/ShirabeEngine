@@ -299,8 +299,8 @@ namespace engine
 
             // The subsequent data is used to properly derive layout transitions between attachment reads/writes.
             SFrameGraphAttachmentCollection  const &attachments               = mResourceData.getAttachments();
-            Vector<FrameGraphResourceId_t>   const &attachmentResourceIds     = attachments  .getAttachementResourceIds();
-            Map<PassUID_t, Vector<uint64_t>> const &attachmentPassAssignments = attachments  .getAttachmentPassAssignment();
+            Vector<FrameGraphResourceId_t>   const &attachmentResourceIds     = attachments.getAttachementImageResourceIds();
+            Map<PassUID_t, Vector<uint64_t>> const &attachmentPassAssignments = attachments.getAttachmentPassToViewAssignment();
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(not copy.empty())
@@ -318,7 +318,7 @@ namespace engine
                     SFrameGraphResource    const &attachmentResource   = *(mResourceData.getMutable<SFrameGraphResource>(attachmentResourceId).data());
                     SFrameGraphResource    const &parentResource       = *(mResourceData.getMutable<SFrameGraphResource>(attachmentResource.parentResource).data());
 
-                    
+
                 }
 
                 aRenderContext->clearAttachments(sRenderPassResourceId);
@@ -491,7 +491,7 @@ namespace engine
             std::vector<Shared<SFrameGraphTextureView>> textureViewReferences{};
 
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
-            FrameGraphResourceIdList        const &attachmentResourceIds = attachments  .getAttachementResourceIds();
+            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageResourceIds();
 
             // Make sure that all texture views and their subjacent textures are created upfront!
             CEngineResult<> const initialization = initializeResources(aRenderContext, attachmentResourceIds);
@@ -520,7 +520,7 @@ namespace engine
                 std::string                      const &aFrameBufferId)
         {
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
-            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementResourceIds();
+            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageResourceIds();
 
             CEngineResult<> const frameBufferDestruction = aRenderContext->destroyFrameBuffer(aFrameBufferId);
             EngineStatusPrintOnError(frameBufferDestruction.result(), logTag(), "Failed to destroy frame buffer.");

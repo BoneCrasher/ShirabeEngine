@@ -285,15 +285,51 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        uint32_t SFrameGraphAttachmentCollection::addAttachment(
+                PassUID_t              const &aPassUID,
+                FrameGraphResourceId_t const &aImageResourceID,
+                FrameGraphResourceId_t const &aImageViewResourceID)
+        {
+            uint64_t imageViewIndex = 0;
+
+            auto const it = std::find(  mAttachmentImageResourceIds.begin()
+                    , mAttachmentImageResourceIds.end()
+                    , aImageResourceID);
+            if(mAttachmentImageResourceIds.end() == it)
+            {
+                mAttachmentImageResourceIds.push_back(aImageResourceID);
+            }
+
+            auto const it2 = std::find(  mAttachmentImageViewResourceIds.begin()
+                    , mAttachmentImageViewResourceIds.end()
+                    , aImageViewResourceID);
+            if(mAttachmentImageViewResourceIds.end() == it2)
+            {
+                mAttachmentImageViewResourceIds.push_back(aImageResourceID);
+                imageViewIndex = (mAttachmentImageViewResourceIds.size() - 1);
+            }
+            else
+            {
+                imageViewIndex = std::distance(mAttachmentImageViewResourceIds.begin(), it2);
+            }
+
+            mViewToImageAssignment[aImageViewResourceID] = aImageResourceID;
+            mAttachmentPassAssignment[aPassUID].push_back(imageViewIndex);
+
+            return imageViewIndex;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         void SFrameGraphAttachmentCollection::addInputAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aResourceID)
+                FrameGraphResourceId_t const &aImageResourceID,
+                FrameGraphResourceId_t const &aImageViewResourceID)
         {
-            mAttachmentResourceIds.push_back(aResourceID);
-
-            uint64_t const index = (mAttachmentResourceIds.size() - 1);
-            mInputAttachments.push_back(index);
-            mAttachmentPassAssignment[aPassUID].push_back(index);
+            uint32_t const imageViewIndex = addAttachment(aPassUID, aImageResourceID, aImageViewResourceID);
+            mInputAttachments.push_back(imageViewIndex);
         }
         //<-----------------------------------------------------------------------------
 
@@ -302,13 +338,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void SFrameGraphAttachmentCollection::addColorAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aResourceID)
+                FrameGraphResourceId_t const &aImageResourceID,
+                FrameGraphResourceId_t const &aImageViewResourceID)
         {
-            mAttachmentResourceIds.push_back(aResourceID);
-
-            uint64_t const index = (mAttachmentResourceIds.size() - 1);
-            mColorAttachments.push_back(index);
-            mAttachmentPassAssignment[aPassUID].push_back(index);
+            uint32_t const imageViewIndex = addAttachment(aPassUID, aImageResourceID, aImageViewResourceID);
+            mColorAttachments.push_back(imageViewIndex);
         }
         //<-----------------------------------------------------------------------------
 
@@ -317,13 +351,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void SFrameGraphAttachmentCollection::addDepthAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aResourceID)
+                FrameGraphResourceId_t const &aImageResourceID,
+                FrameGraphResourceId_t const &aImageViewResourceID)
         {
-            mAttachmentResourceIds.push_back(aResourceID);
-
-            uint64_t const index = (mAttachmentResourceIds.size() - 1);
-            mDepthAttachments.push_back(index);
-            mAttachmentPassAssignment[aPassUID].push_back(index);
+            uint32_t const imageViewIndex = addAttachment(aPassUID, aImageResourceID, aImageViewResourceID);
+            mDepthAttachments.push_back(imageViewIndex);
         }
         //<-----------------------------------------------------------------------------
 
