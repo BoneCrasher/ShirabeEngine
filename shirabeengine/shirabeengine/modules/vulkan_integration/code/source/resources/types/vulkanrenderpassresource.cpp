@@ -120,6 +120,23 @@ namespace engine::vulkan
             vkSubpassDescriptions.push_back(vkSubpassDesc);
         }
 
+        std::vector<VkSubpassDependency> subpassDependencies {};
+        subpassDependencies.resize(aDescription.subpassDependencies.size());
+        for(std::size_t k=0; k<subpassDependencies.size(); ++k)
+        {
+            SSubpassDependency const &dep = aDescription.subpassDependencies[k];
+
+            VkSubpassDependency subpassDependency {};
+            subpassDependency.srcSubpass      = dep.srcPass;
+            subpassDependency.srcStageMask    = dep.srcStage;
+            subpassDependency.srcAccessMask   = dep.srcAccess;
+            subpassDependency.dstSubpass      = dep.dstPass;
+            subpassDependency.dstStageMask    = dep.dstStage;
+            subpassDependency.dstAccessMask   = dep.dstAccess;
+            subpassDependency.dependencyFlags = dep.dependencyFlags;
+            subpassDependencies[k] = subpassDependency;
+        }
+
         VkRenderPassCreateInfo vkRenderPassCreateInfo ={ };
         vkRenderPassCreateInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         vkRenderPassCreateInfo.pNext           = nullptr;
@@ -127,8 +144,8 @@ namespace engine::vulkan
         vkRenderPassCreateInfo.subpassCount    = static_cast<uint32_t>(vkSubpassDescriptions.size());
         vkRenderPassCreateInfo.pAttachments    = vkAttachmentDescriptions.data();
         vkRenderPassCreateInfo.attachmentCount = static_cast<uint32_t>(vkAttachmentDescriptions.size());
-        vkRenderPassCreateInfo.pDependencies   = nullptr;
-        vkRenderPassCreateInfo.dependencyCount = 0;
+        vkRenderPassCreateInfo.pDependencies   = subpassDependencies.data();
+        vkRenderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
         vkRenderPassCreateInfo.flags           = 0;
 
         VkRenderPass vkRenderPass = VK_NULL_HANDLE;

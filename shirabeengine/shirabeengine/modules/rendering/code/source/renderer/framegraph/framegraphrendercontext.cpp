@@ -321,11 +321,34 @@ namespace engine::framegraph
         renderPassDesc.name = aRenderPassId;
         renderPassDesc.attachmentDescriptions.resize(imageResourceIdList.size());
 
-        for(auto const &passUid : aPassExecutionOrder)
+        std::array<SSubpassDependency, 2> initialDependencies = {};
+        initialDependencies[0].srcPass   = VK_SUBPASS_EXTERNAL;
+        initialDependencies[0].dstPass   = 0;
+        initialDependencies[0].srcStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        initialDependencies[0].srcAccess = VK_ACCESS_MEMORY_READ_BIT;
+        initialDependencies[0].dstStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        initialDependencies[0].dstAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
+                                         | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        initialDependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+        initialDependencies[1].srcPass   = VK_SUBPASS_EXTERNAL;
+        initialDependencies[1].dstPass   = 0;
+        initialDependencies[1].srcStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        initialDependencies[1].srcAccess = VK_ACCESS_MEMORY_READ_BIT;
+        initialDependencies[1].dstStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        initialDependencies[1].dstAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+                                         | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+        initialDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+        renderPassDesc.subpassDependencies.push_back(initialDependencies[0]);
+        renderPassDesc.subpassDependencies.push_back(initialDependencies[1]);
+
+        for(std::size_t k=0; k<aPassExecutionOrder.size(); ++k)
         {
+            PassUID_t const passUid = aPassExecutionOrder[k];
+
             std::vector<uint64_t> const &attachmentResourceIndexList = passToViewAssignment.at(passUid);
 
             SSubpassDescription subpassDesc = {};
+
             for(auto const &index : attachmentResourceIndexList)
             {
                 FrameGraphResourceId_t const &resourceId = viewResourceIdList.at(index);
@@ -338,6 +361,16 @@ namespace engine::framegraph
                 }
 
                 SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+
+                CEngineResult<Shared<SFrameGraphTextureView> const> const &parentTextureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(textureView.parentResource);
+                if(not parentTextureViewFetch.successful())
+                {
+                    CLog::Error(logTag(), CString::format("Fetching parent texture view  w/ id {} failed.", textureView.parentResource));
+                    return { EEngineStatus::ResourceError_NotFound };
+                }
+
+                // If the parent texture view is null, the parent is a texture object.
+                Shared<SFrameGraphTextureView> const &parentTextureView = (parentTextureViewFetch.data());
 
                 CEngineResult<Shared<SFrameGraphTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(textureView.subjacentResource);
                 if(not textureFetch.successful())
@@ -381,14 +414,52 @@ namespace engine::framegraph
                 SAttachmentReference attachmentReference {};
                 attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);
 
+                SSubpassDependency dependency = {};
+                dependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+                dependency.srcPass         = (k - 1);
+                dependency.dstPass         = k;
+
                 bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
                 bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
                 bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
 
+                if(nullptr != parentTextureView)
+                {
+                    bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
+                    bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
+                    bool const isParentInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), parentTextureView->resourceId);
+
+                    if( 0 < k )
+                    {
+                        if(isParentColorAttachment)
+                        {
+                            dependency.srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                            dependency.srcAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                        }
+                        else if(isParentDepthAttachment)
+                        {
+                            dependency.srcStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+                            dependency.srcAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+                        }
+                        else if(isParentInputAttachment)
+                        {
+                            dependency.srcStage  = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                            dependency.srcAccess = VK_ACCESS_SHADER_WRITE_BIT;
+                        }
+                        else
+                        {
+                            // We hit a texture parent...
+                            dependency.srcStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+                            dependency.srcAccess = VK_ACCESS_MEMORY_READ_BIT;
+                        }
+                    }
+                }
+
                 if(isColorAttachment)
                 {
                     attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
-
+                    dependency.dstStage        = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                    dependency.dstAccess       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
                     subpassDesc.colorAttachments.push_back(attachmentReference);
                 }
                 else if(isDepthAttachment)
@@ -402,12 +473,15 @@ namespace engine::framegraph
                         attachmentReference.layout = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
                     }
 
+                    dependency.dstStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+                    dependency.dstAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
                     subpassDesc.depthStencilAttachments.push_back(attachmentReference);
                 }
                 else if(isInputAttachment)
                 {
                     attachmentReference.layout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
-
+                    dependency.dstStage  = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                    dependency.dstAccess = VK_ACCESS_SHADER_READ_BIT;
                     subpassDesc.inputAttachments.push_back(attachmentReference);
                 }
 
@@ -435,10 +509,35 @@ namespace engine::framegraph
 
                     renderPassDesc.attachmentDescriptions[attachmentIndex] = attachmentDesc;
                 }
+
+                if(0 < k)
+                {
+                    renderPassDesc.subpassDependencies.push_back(dependency);
+                }
             }
 
             renderPassDesc.subpassDescriptions.push_back(subpassDesc);
         }
+
+        std::array<SSubpassDependency, 2> finalDependencies = {};
+        finalDependencies[0].srcPass   = 0;
+        finalDependencies[0].dstPass   = VK_SUBPASS_EXTERNAL;
+        finalDependencies[0].srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        finalDependencies[0].srcAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
+                                       | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        finalDependencies[0].dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        finalDependencies[0].dstAccess = VK_ACCESS_MEMORY_READ_BIT;
+        finalDependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+        finalDependencies[1].srcPass   = 0;
+        finalDependencies[1].dstPass   = VK_SUBPASS_EXTERNAL;
+        finalDependencies[1].srcStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        finalDependencies[1].srcAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+                                       | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+        finalDependencies[1].dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        finalDependencies[1].dstAccess = VK_ACCESS_MEMORY_READ_BIT;
+        finalDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+        renderPassDesc.subpassDependencies.push_back(finalDependencies[0]);
+        renderPassDesc.subpassDependencies.push_back(finalDependencies[1]);
 
         renderPassDesc.attachmentExtent.width  = width;
         renderPassDesc.attachmentExtent.height = height;

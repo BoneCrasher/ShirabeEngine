@@ -133,6 +133,18 @@ namespace engine
             bool        depthClipEnabled;
         };
 
+        struct SSubpassDependency
+        {
+            uint32_t             srcPass
+                               , dstPass;
+            VkPipelineStageFlags srcStage
+                               , dstStage;
+            VkAccessFlags        srcAccess
+                               , dstAccess;
+            VkDependencyFlags    dependencyFlags;
+
+        };
+
         struct SAttachmentDescription
         {
             EFormat            format;
@@ -174,6 +186,7 @@ namespace engine
             VkExtent3D                          attachmentExtent;
             std::vector<SAttachmentDescription> attachmentDescriptions;
             std::vector<SSubpassDescription>    subpassDescriptions;
+            std::vector<SSubpassDependency>     subpassDependencies;
         };
 
         struct
