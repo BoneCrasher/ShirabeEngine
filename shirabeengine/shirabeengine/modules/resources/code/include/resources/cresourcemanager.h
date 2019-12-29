@@ -205,6 +205,20 @@ namespace engine {
             logicalResourceOps.initialize =
                     [aResourceId, aDescriptor, gpuApiResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
             {
+                Shared<ILogicalResourceObject> logicalResourceObject = getResourceObject(aResourceId);
+                if(nullptr == logicalResourceObject)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                Shared<TResource> resourceObject = std::static_pointer_cast<TResource>(logicalResourceObject);
+                if(nullptr == resourceObject)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                resourceObject->setCurrentDependencies(aDependencies);
+
                 Vector<ResourceId_t> resolveDependenciesList = aDependencies.resolve();
 
                 insertDependencies(mResourceTree, aResourceId, std::move(resolveDependenciesList));

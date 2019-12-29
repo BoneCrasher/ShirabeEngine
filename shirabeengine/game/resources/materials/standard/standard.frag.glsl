@@ -2,9 +2,9 @@
 #extension GL_GOOGLE_include_directive : require
 #include "base.glsl"
 
-layout(set = 2, binding = 0) uniform sampler2D diffuseTexture;
-layout(set = 2, binding = 1) uniform sampler2D specularReflectanceGlossTexture;
-layout(set = 2, binding = 2) uniform sampler2D normalTexture;
+layout(set = 3, binding = 0) uniform sampler2D diffuseTexture;
+layout(set = 3, binding = 1) uniform sampler2D specularReflectanceGlossTexture;
+layout(set = 3, binding = 2) uniform sampler2D normalTexture;
 
 // Input
 layout (location = 0)

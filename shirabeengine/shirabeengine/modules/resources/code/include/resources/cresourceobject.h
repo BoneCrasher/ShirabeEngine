@@ -125,6 +125,11 @@ namespace engine
                 SLogicalOps<TDescription, TDependencies>::operator=(aOps);
             }
 
+            void setCurrentDependencies(TDependencies const &aDependencies)
+            {
+                mDependencies = aDependencies;
+            }
+
         protected_methods:
         private_members:
             TDescription  const                                     mDescription;

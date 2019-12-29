@@ -60,6 +60,13 @@ namespace engine
             virtual CEngineResult<> copyImage(SFrameGraphTexture const &aSourceImage,
                                               SFrameGraphTexture const &aTargetImage) = 0;
 
+            virtual EEngineStatus performImageLayoutTransfer(  SFrameGraphTexture const &aImageHandle
+                                                             , CRange             const &aArrayRange
+                                                             , CRange             const &aMipRange
+                                                             , VkImageAspectFlags const &aAspectFlags
+                                                             , VkImageLayout      const &aSourceLayout
+                                                             , VkImageLayout      const &aTargetLayout) = 0;
+
             /**
              * Copy the content of an image to the backbuffer.
              *

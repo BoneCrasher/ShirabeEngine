@@ -113,7 +113,7 @@ namespace engine
             bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find(aId));
             if(hasObjectForId)
             {
-                mResourceObjects.at(aId);
+                return mResourceObjects.at(aId);
             }
 
             return nullptr;

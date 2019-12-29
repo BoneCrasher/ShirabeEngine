@@ -165,6 +165,28 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    EEngineStatus CFrameGraphRenderContext::performImageLayoutTransfer(  SFrameGraphTexture const &aImageHandle
+                                                                       , CRange             const &aArrayRange
+                                                                       , CRange             const &aMipRange
+                                                                       , VkImageAspectFlags const &aAspectFlags
+                                                                       , VkImageLayout      const &aSourceLayout
+                                                                       , VkImageLayout      const &aTargetLayout)
+    {
+        Shared<ILogicalResourceObject> source = getUsedResource(aImageHandle.readableName);
+        CEngineResult<> const status = mGraphicsAPIRenderContext->performImageLayoutTransfer( source->getGpuApiResourceHandle()
+                                                                                             , aArrayRange
+                                                                                             , aMipRange
+                                                                                             , aAspectFlags
+                                                                                             , aSourceLayout
+                                                                                             , aTargetLayout);
+
+        return status.result();
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId)
@@ -381,6 +403,8 @@ namespace engine::framegraph
                     attachmentDesc.stencilStoreOp    = EAttachmentStoreOp::DONT_CARE;
                     attachmentDesc.clearColor.color  = { 0.0f, 0.0f, 0.0f, 1.0f };
                     attachmentDesc.isColorAttachment = true;
+                    attachmentDesc.initialLayout     = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
+                    attachmentDesc.finalLayout       = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
                     attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
                     subpassDesc.colorAttachments.push_back(attachmentReference);
                 }
@@ -391,6 +415,7 @@ namespace engine::framegraph
                     attachmentDesc.stencilLoadOp           = EAttachmentLoadOp ::DONT_CARE;
                     attachmentDesc.stencilStoreOp          = EAttachmentStoreOp::DONT_CARE;
                     attachmentDesc.format                  = EFormat::D24_UNORM_S8_UINT;
+                    attachmentDesc.initialLayout           = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
                     attachmentDesc.finalLayout             = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
                     attachmentDesc.clearColor.depthStencil = { 1.0f, 0 };
                     attachmentDesc.isDepthAttachment       = true;
@@ -413,6 +438,8 @@ namespace engine::framegraph
                     attachmentDesc.stencilLoadOp     = EAttachmentLoadOp ::DONT_CARE;
                     attachmentDesc.stencilStoreOp    = EAttachmentStoreOp::DONT_CARE;
                     attachmentDesc.isInputAttachment = true;
+                    attachmentDesc.initialLayout     = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
+                    attachmentDesc.finalLayout       = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
                     attachmentReference.layout       = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
                     subpassDesc.inputAttachments.push_back(attachmentReference);
                 }
@@ -948,6 +975,9 @@ namespace engine::framegraph
 
         Shared<SBuffer> attributeBuffer = mesh->vertexDataBufferResource;
         Shared<SBuffer> indexBuffer     = mesh->indexBufferResource;
+        attributeBuffer->initialize({});
+        indexBuffer    ->initialize({});
+
         mGraphicsAPIRenderContext->transferBufferData(attributeBuffer->getDescription().dataSource(), attributeBuffer->getGpuApiResourceHandle());
         mGraphicsAPIRenderContext->transferBufferData(indexBuffer    ->getDescription().dataSource(), indexBuffer    ->getGpuApiResourceHandle());
 

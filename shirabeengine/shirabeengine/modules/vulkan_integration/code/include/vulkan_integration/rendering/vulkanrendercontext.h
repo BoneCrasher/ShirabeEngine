@@ -73,6 +73,13 @@ namespace engine
             EEngineStatus copyImage(GpuApiHandle_t const &aSourceImageId,
                                     GpuApiHandle_t const &aTargetImageId) final;
 
+            EEngineStatus performImageLayoutTransfer(  GpuApiHandle_t     const &aImageHandle
+                                                     , CRange             const &aArrayRange
+                                                     , CRange             const &aMipRange
+                                                     , VkImageAspectFlags const &aAspectFlags
+                                                     , VkImageLayout      const &aSourceLayout
+                                                     , VkImageLayout      const &aTargetLayout) final;
+
             /**
              * Copy one image to the current backbuffer.
              * This will incorporate explicit image memory barriers.
