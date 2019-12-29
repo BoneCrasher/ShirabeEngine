@@ -209,7 +209,7 @@ namespace engine
 
         Shared<CGpuApiResourceStorage> gpuApiResourceStorage = makeShared<CGpuApiResourceStorage>();
 
-        auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
+        auto const fnCreateDefaultGFXAPI = [&, gpuApiResourceStorage, this] () -> CEngineResult<>
         {
             if(EGFXAPI::Vulkan == gfxApi)
             {

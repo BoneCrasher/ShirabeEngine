@@ -213,6 +213,7 @@ namespace engine::vulkan
         }
 
         std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos {};
+
         auto const *const shaderModule = getVkContext()->getResourceStorage()->extract<CVulkanShaderModuleResource>(aResolvedDependencies.at(aDependencies.shaderModuleId));
         for(auto const &[stage, dataAccessor] : shaderModule->getCurrentDescriptor()->shaderStages)
         {

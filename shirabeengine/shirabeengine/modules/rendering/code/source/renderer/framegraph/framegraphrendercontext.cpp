@@ -1005,7 +1005,6 @@ namespace engine::framegraph
         material->shaderModuleResource->initialize({});
         material->pipelineResource    ->initialize(dependencies.pipelineDependencies);
 
-
         EEngineStatus const status = material->initialize(dependencies).result();
 
         std::vector<GpuApiHandle_t>       gpuBufferIds                     {};

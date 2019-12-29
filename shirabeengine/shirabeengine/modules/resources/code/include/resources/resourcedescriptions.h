@@ -292,10 +292,17 @@ namespace engine
             Vector<ResourceId_t> const resolve() const
             {
                 std::vector<ResourceId_t> dependencies {};
+                dependencies.push_back(systemUBOPipelineId);
                 dependencies.push_back(referenceRenderPassId);
+                dependencies.push_back(shaderModuleId);
+
                 for(auto const &buffer : bufferViewIds)
                 {
                     dependencies.push_back(buffer);
+                }
+                for(auto const &texture : textureViewIds)
+                {
+                    dependencies.push_back(texture);
                 }
 
                 return dependencies;

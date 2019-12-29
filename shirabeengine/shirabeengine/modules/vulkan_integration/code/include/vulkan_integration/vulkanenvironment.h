@@ -71,7 +71,7 @@ namespace engine::vulkan
          * @return                        EEngineStatus::Ok, if successful. An error code otherwise.
          */
         EEngineStatus initialize(SApplicationEnvironment        const &aApplicationEnvironment
-                               , Shared<CGpuApiResourceStorage>       &aStorage);
+                               , Shared<CGpuApiResourceStorage>        aStorage);
 
         /**
          * Stop and clean up all vulkan API related functionality.
