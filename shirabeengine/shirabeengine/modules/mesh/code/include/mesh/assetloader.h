@@ -123,9 +123,13 @@ namespace engine::mesh
 
             Vector<VkDeviceSize> offsets;
             offsets.resize(4);
+
+            VkDeviceSize currentOffset = 0;
             for(uint64_t k=0; k<4; ++k)
             {
-                offsets[k] = dataFile.attributes[k].offset * dataFile.attributes[k].bytesPerSample;
+                offsets[k] = currentOffset;
+                VkDeviceSize length = (dataFile.attributes[k].length * dataFile.attributes[k].bytesPerSample);
+                currentOffset += length;
             }
             meshDescriptor.offsets = offsets;
 

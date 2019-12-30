@@ -52,6 +52,8 @@ namespace engine::textures
             textureDescription.textureInfo = instance->textureInfo();
             textureDescription.cpuGpuUsage = EResourceUsage::CPU_InitConst_GPU_Read;
             textureDescription.gpuBinding  = EBufferBinding::TextureInput;
+            textureDescription.gpuBinding.set(EBufferBinding::CopyTarget);
+
             textureDescription.initialData = { initialData };
 
             CEngineResult<Shared<ILogicalResourceObject>> textureObject = aResourceManager->useDynamicResource<STexture>(textureDescription.name, textureDescription);

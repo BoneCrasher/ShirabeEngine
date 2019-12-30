@@ -32,7 +32,7 @@ void main()
     vec4  depth                       = subpassLoad(depth);
     vec4  lightAccumulation           = subpassLoad(lightAccumulation);
 
-    vec4 C = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    vec4 C = other_0;
 
     fragment_final_0 = vec4(lightAccumulation.r * C.rgb, 1.0f); // Just forward...
 } 

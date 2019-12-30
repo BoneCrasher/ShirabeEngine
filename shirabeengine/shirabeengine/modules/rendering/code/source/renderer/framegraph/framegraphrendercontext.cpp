@@ -291,6 +291,24 @@ namespace engine::framegraph
         };
         //<-----------------------------------------------------------------------------
 
+        auto const addIfNotAddedYet = [] (Vector<SSubpassDependency> &aDependencies, SSubpassDependency const &aToBeInserted) -> void
+        {
+            for(auto const &dep : aDependencies)
+            {
+                if(   dep.srcPass   == aToBeInserted.srcPass
+                   && dep.srcStage  == aToBeInserted.srcStage
+                   && dep.srcAccess == aToBeInserted.srcAccess
+                   && dep.dstPass   == aToBeInserted.dstPass
+                   && dep.dstStage  == aToBeInserted.dstStage
+                   && dep.dstAccess == aToBeInserted.dstAccess)
+                {
+                    return;
+                }
+            }
+
+            aDependencies.push_back(aToBeInserted);
+        };
+
         // Each element in the frame buffer is required to have the same dimensions.
         // These variables will store the first sizes encountered and will validate
         // against them for any subsequent size, to make sure that the attachments
@@ -324,7 +342,7 @@ namespace engine::framegraph
         std::array<SSubpassDependency, 2> initialDependencies = {};
         initialDependencies[0].srcPass   = VK_SUBPASS_EXTERNAL;
         initialDependencies[0].dstPass   = 0;
-        initialDependencies[0].srcStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        initialDependencies[0].srcStage  = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         initialDependencies[0].srcAccess = VK_ACCESS_MEMORY_READ_BIT;
         initialDependencies[0].dstStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         initialDependencies[0].dstAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
@@ -332,14 +350,14 @@ namespace engine::framegraph
         initialDependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
         initialDependencies[1].srcPass   = VK_SUBPASS_EXTERNAL;
         initialDependencies[1].dstPass   = 0;
-        initialDependencies[1].srcStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        initialDependencies[1].srcStage  = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         initialDependencies[1].srcAccess = VK_ACCESS_MEMORY_READ_BIT;
         initialDependencies[1].dstStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         initialDependencies[1].dstAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
                                          | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
         initialDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-        renderPassDesc.subpassDependencies.push_back(initialDependencies[0]);
-        renderPassDesc.subpassDependencies.push_back(initialDependencies[1]);
+        addIfNotAddedYet(renderPassDesc.subpassDependencies, initialDependencies[0]);
+        addIfNotAddedYet(renderPassDesc.subpassDependencies, initialDependencies[1]);
 
         for(std::size_t k=0; k<aPassExecutionOrder.size(); ++k)
         {
@@ -423,11 +441,16 @@ namespace engine::framegraph
                 bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
                 bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
 
-                if(nullptr != parentTextureView)
+                if(nullptr != parentTextureView && EFrameGraphResourceType::TextureView == parentTextureView->type)
                 {
                     bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
                     bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
                     bool const isParentInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), parentTextureView->resourceId);
+
+                    dependency.srcPass = std::distance(aPassExecutionOrder.begin(), std::find_if( aPassExecutionOrder.begin()
+                                                                                                     , aPassExecutionOrder.end()
+                                                                                                     , [&parentTextureView] (PassUID_t const &aUid) -> bool
+                                                                                                       { return (aUid == parentTextureView->assignedPassUID); }));
 
                     if( 0 < k )
                     {
@@ -453,6 +476,12 @@ namespace engine::framegraph
                             dependency.srcAccess = VK_ACCESS_MEMORY_READ_BIT;
                         }
                     }
+                }
+                else if(nullptr != parentTextureView && EFrameGraphResourceType::Texture == parentTextureView->type)
+                {
+                    dependency.srcPass   = VK_SUBPASS_EXTERNAL;
+                    dependency.srcStage  = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                    dependency.srcAccess = VK_ACCESS_MEMORY_READ_BIT;
                 }
 
                 if(isColorAttachment)
@@ -491,20 +520,26 @@ namespace engine::framegraph
                     // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
                     SAttachmentDescription attachmentDesc = {};
                     attachmentDesc.loadOp         = EAttachmentLoadOp ::CLEAR;
-                    attachmentDesc.storeOp        = EAttachmentStoreOp::STORE;
+                    attachmentDesc.storeOp        = EAttachmentStoreOp::DONT_CARE;
                     attachmentDesc.stencilLoadOp  = EAttachmentLoadOp ::CLEAR;
                     attachmentDesc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
                     attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                     attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
                     attachmentDesc.format         = texture.format;
 
-                    if(texture.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment))
+                    if(isColorAttachment)
                     {
+                        attachmentDesc.storeOp          = EAttachmentStoreOp::STORE;
                         attachmentDesc.clearColor.color = {0.0f, 0.0f, 0.0f, 1.0f};
                     }
-                    else if(texture.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment))
+                    else if(isDepthAttachment)
                     {
                         attachmentDesc.clearColor.depthStencil = {1.0f, 0};
+                    }
+                    else
+                    {
+                        attachmentDesc.loadOp        = EAttachmentLoadOp::LOAD;
+                        attachmentDesc.initialLayout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
                     }
 
                     renderPassDesc.attachmentDescriptions[attachmentIndex] = attachmentDesc;
@@ -512,7 +547,7 @@ namespace engine::framegraph
 
                 if(0 < k)
                 {
-                    renderPassDesc.subpassDependencies.push_back(dependency);
+                    addIfNotAddedYet(renderPassDesc.subpassDependencies, dependency);
                 }
             }
 
@@ -520,7 +555,7 @@ namespace engine::framegraph
         }
 
         std::array<SSubpassDependency, 2> finalDependencies = {};
-        finalDependencies[0].srcPass   = 0;
+        finalDependencies[0].srcPass   = (aPassExecutionOrder.size() - 1);
         finalDependencies[0].dstPass   = VK_SUBPASS_EXTERNAL;
         finalDependencies[0].srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         finalDependencies[0].srcAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
@@ -528,7 +563,7 @@ namespace engine::framegraph
         finalDependencies[0].dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
         finalDependencies[0].dstAccess = VK_ACCESS_MEMORY_READ_BIT;
         finalDependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-        finalDependencies[1].srcPass   = 0;
+        finalDependencies[1].srcPass   = (aPassExecutionOrder.size() - 1);
         finalDependencies[1].dstPass   = VK_SUBPASS_EXTERNAL;
         finalDependencies[1].srcStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         finalDependencies[1].srcAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
@@ -536,8 +571,9 @@ namespace engine::framegraph
         finalDependencies[1].dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
         finalDependencies[1].dstAccess = VK_ACCESS_MEMORY_READ_BIT;
         finalDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-        renderPassDesc.subpassDependencies.push_back(finalDependencies[0]);
-        renderPassDesc.subpassDependencies.push_back(finalDependencies[1]);
+
+        addIfNotAddedYet(renderPassDesc.subpassDependencies, finalDependencies[0]);
+        addIfNotAddedYet(renderPassDesc.subpassDependencies, finalDependencies[1]);
 
         renderPassDesc.attachmentExtent.width  = width;
         renderPassDesc.attachmentExtent.height = height;
@@ -650,7 +686,12 @@ namespace engine::framegraph
                 SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
 
                 // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
-                renderPassDependencies.attachmentTextureViews.push_back(textureView.readableName);
+                if(renderPassDependencies.attachmentTextureViews.end() == std::find_if( renderPassDependencies.attachmentTextureViews.begin()
+                                                                                      , renderPassDependencies.attachmentTextureViews.end()
+                                                                                      , [textureView] (std::string const &aViewId) -> bool { return (aViewId == textureView.readableName); }))
+                {
+                    renderPassDependencies.attachmentTextureViews.push_back(textureView.readableName);
+                }
             }
         }
 
@@ -1151,12 +1192,16 @@ namespace engine::framegraph
             gpuInputAttachmentTextureViewIds.push_back(attachmentTextureView->getGpuApiResourceHandle());
         }
 
-        for(auto const &sampledImageResourceId : material->getDescription().sampledImages)
+        for(auto const &sampledImageAssetId : material->getDescription().sampledImages)
         {
-            Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
+            std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
+
+            Shared<ILogicalResourceObject> logicalTexture      = mResourceManager->useAssetResource(sampledImageResourceId, sampledImageAssetId).data();
+            Shared<STexture>               sampledImageTexture = std::static_pointer_cast<STexture>(logicalTexture);
             if(nullptr != sampledImageTexture)
             {
                 sampledImageTexture->initialize({}); // No-Op if loaded already...
+                sampledImageTexture->load();
                 sampledImageTexture->transfer();     // No-Op if transferred already...
 
                 STextureViewDescription desc {};
@@ -1164,7 +1209,7 @@ namespace engine::framegraph
                 desc.subjacentTextureInfo = sampledImageTexture->getDescription().textureInfo;
                 desc.arraySlices          = { 0, 1 };
                 desc.mipMapSlices         = { 0, 1 };
-                desc.textureFormat        = EFormat::Automatic;
+                desc.textureFormat        = sampledImageTexture->getDescription().textureInfo.format;
 
                 auto const [result, viewData] = mResourceManager->useDynamicResource<STextureView>(desc.name, desc);
                 if(CheckEngineError(result))
@@ -1208,8 +1253,10 @@ namespace engine::framegraph
     {
         Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
 
-        for(auto const &sampledImageResourceId : material->getDescription().sampledImages)
+        for(auto const &sampledImageAssetId : material->getDescription().sampledImages)
         {
+            std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
+
             Shared<STexture> sampledImageTexture = std::static_pointer_cast<STexture>(getUsedResource(sampledImageResourceId));
             if(nullptr != sampledImageTexture)
             {

@@ -364,7 +364,7 @@ namespace engine
             auto const &[textureResult,     texture]     = mTextureLoader->loadInstance(mAssetStorage
                                                                                        , util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
 
-            material->getMutableConfiguration().setSampledImage("diffuseTexture", texture->name());
+            material->getMutableConfiguration().setSampledImage("diffuseTexture", util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
 
 
             auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");

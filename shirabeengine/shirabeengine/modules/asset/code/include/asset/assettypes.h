@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <string>
 #include <filesystem>
-#include <vulkan/vulkan.h>
 
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>

@@ -267,28 +267,17 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/materials/deferred/compositing/compositing.frag.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/deferred/compositing/compositing.frag.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/game/resources/materials/standard/standard.frag.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/asset/code/include/asset/assettypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/asset/code/include/asset/assettypes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/declaration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourceobject.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourceobject.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/iloadablegpuapiresourceobject.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/iloadablegpuapiresourceobject.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/itransferrablegpuapiresourceobject.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/itransferrablegpuapiresourceobject.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcetypes.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/ivkglobalcontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/ivkglobalcontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanbufferresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanbufferresource.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanshadermoduleresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanshadermoduleresource.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkantextureresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkantextureresource.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/vulkanenvironment.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/vulkanenvironment.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/vulkanenvironmenttypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/vulkanenvironmenttypes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/textures/code/include/textures/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/textures/code/include/textures/assetloader.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/cvulkanprivateresourceobjectfactory.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/cvulkanprivateresourceobjectfactory.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanbufferresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanbufferresource.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanshadermoduleresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanshadermoduleresource.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkantextureresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkantextureresource.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/vulkanenvironment.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/vulkanenvironment.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -360,7 +349,7 @@
       <recent name="$PROJECT_DIR$/shirabeengine/code/include/ecws" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.INSTALL_shirabe_resource_compiler">
+  <component name="RunManager" selected="CMake Application.INSTALL_game">
     <configuration name="INSTALL_asset" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="shirabedevelopment" TARGET_NAME="INSTALL_asset" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -731,7 +720,8 @@
       <workItem from="1577051966838" duration="3788000" />
       <workItem from="1577105431194" duration="1833000" />
       <workItem from="1577130101964" duration="32367000" />
-      <workItem from="1577428223470" duration="20646000" />
+      <workItem from="1577428223470" duration="21122000" />
+      <workItem from="1577693764342" duration="15248000" />
     </task>
     <servers />
   </component>
@@ -770,50 +760,50 @@
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="694" y="269" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1044@0.0.1920.1044" timestamp="1577188271486" />
-    <state width="1851" height="469" key="DebuggerActiveHint" timestamp="1577266626900">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="793" height="466" key="DebuggerActiveHint" timestamp="1577713060055">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577136668772" />
+    <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577713060055" />
     <state width="1851" height="469" key="DebuggerActiveHint/0.0.4480.1050@0.0.4480.1050" timestamp="1577266626900" />
-    <state width="2514" height="413" key="GridCell.Tab.0.bottom" timestamp="1577266855230">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.0.bottom" timestamp="1577712957334">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1318" height="308" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
+    <state width="1874" height="426" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577712957334" />
     <state width="2514" height="413" key="GridCell.Tab.0.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="2514" height="413" key="GridCell.Tab.0.center" timestamp="1577266855230">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.0.center" timestamp="1577712957333">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1318" height="308" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
+    <state width="1874" height="426" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577712957333" />
     <state width="2514" height="413" key="GridCell.Tab.0.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="2514" height="413" key="GridCell.Tab.0.left" timestamp="1577266855230">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.0.left" timestamp="1577712957333">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1318" height="308" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972132" />
+    <state width="1874" height="426" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577712957333" />
     <state width="2514" height="413" key="GridCell.Tab.0.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="2514" height="413" key="GridCell.Tab.0.right" timestamp="1577266855230">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.0.right" timestamp="1577712957334">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1318" height="308" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972133" />
+    <state width="1874" height="426" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577712957334" />
     <state width="2514" height="413" key="GridCell.Tab.0.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="2514" height="413" key="GridCell.Tab.1.bottom" timestamp="1577266857161">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.1.bottom" timestamp="1577712962561">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1319" height="308" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
+    <state width="1874" height="426" key="GridCell.Tab.1.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577712962561" />
     <state width="2514" height="413" key="GridCell.Tab.1.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857161" />
-    <state width="2514" height="413" key="GridCell.Tab.1.center" timestamp="1577266857160">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.1.center" timestamp="1577712962560">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1319" height="308" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
+    <state width="1874" height="426" key="GridCell.Tab.1.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577712962560" />
     <state width="2514" height="413" key="GridCell.Tab.1.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857160" />
-    <state width="2514" height="413" key="GridCell.Tab.1.left" timestamp="1577266857160">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.1.left" timestamp="1577712962560">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1319" height="308" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972051" />
+    <state width="1874" height="426" key="GridCell.Tab.1.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577712962560" />
     <state width="2514" height="413" key="GridCell.Tab.1.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857160" />
-    <state width="2514" height="413" key="GridCell.Tab.1.right" timestamp="1577266857160">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state width="1874" height="426" key="GridCell.Tab.1.right" timestamp="1577712962560">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1319" height="308" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577136972052" />
+    <state width="1874" height="426" key="GridCell.Tab.1.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577712962560" />
     <state width="2514" height="413" key="GridCell.Tab.1.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577266857160" />
     <state x="685" y="256" width="540" height="524" key="StructurePopup" timestamp="1577052812893">
       <screen x="0" y="0" width="1920" height="1044" />
@@ -823,11 +813,11 @@
       <screen x="0" y="0" width="2560" height="1050" />
     </state>
     <state x="944" y="167" width="670" height="718" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.2560.1050/2560.0.1920.1080@0.0.2560.1050" timestamp="1577429330004" />
-    <state x="366" y="255" width="1442" height="539" key="find.popup" timestamp="1577472365162">
+    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577710945353">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="366" y="255" width="1442" height="539" key="find.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1577472365162" />
-    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577193886017" />
+    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577710945353" />
     <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577264783274" />
     <state x="1025" y="167" key="refactoring.ChangeSignatureDialog" timestamp="1577266956252">
       <screen x="0" y="0" width="4480" height="1050" />
@@ -853,7 +843,7 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/vulkanenvironment.h</url>
-          <line>159</line>
+          <line>169</line>
           <option name="timeStamp" value="73" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -873,8 +863,18 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp</url>
-          <line>367</line>
+          <line>486</line>
           <option name="timeStamp" value="182" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabe_resource_compiler/code/source/meshes/meshprocessor.cpp</url>
+          <line>352</line>
+          <option name="timeStamp" value="233" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp</url>
+          <line>751</line>
+          <option name="timeStamp" value="237" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

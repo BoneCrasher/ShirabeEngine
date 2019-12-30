@@ -763,7 +763,7 @@ namespace engine
             using BufferValueIndex_t = Map<std::string, Shared<SBufferMember>>;
             using BufferIndex_t      = Map<std::string, BufferValueIndex_t>;
             using BufferData_t       = Map<std::string, Shared<void>>;
-            using SampledImageMap_t  = Map<std::string, resources::ResourceId_t>;
+            using SampledImageMap_t  = Map<std::string, asset::AssetId_t>;
 
         public_static_functions:
             static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers = false);
@@ -885,7 +885,7 @@ namespace engine
                     std::string const &aFieldName,
                     TDataType   const &aFieldValue);
 
-            SHIRABE_INLINE void setSampledImage(std::string const &aSlotId, resources::ResourceId_t const &aSampledImageResourceId)
+            SHIRABE_INLINE void setSampledImage(std::string const &aSlotId, asset::AssetId_t const &aSampledImageResourceId)
             {
                 auto const it = std::find_if(mSampledImageIndex.begin(), mSampledImageIndex.end(), [&](std::string const &aCmp) -> bool { return (aCmp == aSlotId); });
                 if(mSampledImageIndex.end() != it)

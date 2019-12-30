@@ -18,8 +18,10 @@ layout (location = 3) out vec4 fragment_color_3;
 
 void main()
 {
+    vec4 diffuse = texture(diffuseTexture, shader_input.vertex_texcoord.xy);
+
     fragment_color_0 = vec4(shader_input.vertex_position.xyz, 1.0);
     fragment_color_1 = vec4(shader_input.vertex_normal,       1.0);
-    fragment_color_2 = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    fragment_color_2 = diffuse;
     fragment_color_3 = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 } 

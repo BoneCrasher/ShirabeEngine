@@ -12,6 +12,7 @@
 #include <core/enginetypehelper.h>
 #include <core/databuffer.h>
 #include <core/bitfield.h>
+#include <asset/assettypes.h>
 #include <graphicsapi/definitions.h>
 #include "resources/resourcedatasource.h"
 
@@ -326,11 +327,11 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialDescriptor
         {
-            std::string                 name;
-            SMaterialPipelineDescriptor pipelineDescriptor;
-            SShaderModuleDescriptor     shaderModuleDescriptor;
-            Vector<SBufferDescription>  uniformBufferDescriptors;
-            Vector<ResourceId_t>        sampledImages;
+            std::string                        name;
+            SMaterialPipelineDescriptor        pipelineDescriptor;
+            SShaderModuleDescriptor            shaderModuleDescriptor;
+            Vector<SBufferDescription>         uniformBufferDescriptors;
+            Vector<asset::AssetId_t>           sampledImages;
         };
 
         struct

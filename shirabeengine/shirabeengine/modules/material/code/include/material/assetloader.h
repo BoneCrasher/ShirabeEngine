@@ -327,18 +327,19 @@ namespace engine::material
             Vector<SSampledImage> sampledImages = signature.sampledImages;
             std::sort(sampledImages.begin(), sampledImages.end(), [] (SSampledImage const &aLHS, SSampledImage const &aRHS) -> bool { return (aLHS.binding < aRHS.binding); });
 
-            Vector<ResourceId_t>  sampledImageResources {};
+            Vector<asset::AssetId_t>  sampledImageResources {};
             for(auto const &sampledImage : sampledImages)
             {
                 CMaterialConfig::SampledImageMap_t const &assignment = config.getSampledImageAssignment();
                 if(assignment.end() == assignment.find(sampledImage.name))
                 {
-                    sampledImageResources.push_back(ResourceId_t {}); // Fill gaps...
+                    sampledImageResources.push_back(asset::AssetId_t {}); // Fill gaps...
                     continue;
                 }
 
-                ResourceId_t const &resourceId = assignment.at(sampledImage.name);
-                sampledImageResources.push_back(resourceId);
+                asset::AssetId_t const &assetId = assignment.at(sampledImage.name);
+
+                sampledImageResources.push_back( assetId );
             }
 
             SMaterialDescriptor materialDescriptor {};

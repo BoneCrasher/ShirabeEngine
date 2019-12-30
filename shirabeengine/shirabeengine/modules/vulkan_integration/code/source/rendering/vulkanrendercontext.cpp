@@ -402,12 +402,16 @@ namespace engine
 
                                 auto const *const view  = mResourceStorage->extract<CVulkanTextureViewResource>(imageBinding.imageView);
                                 auto const *const image = mResourceStorage->extract<CVulkanTextureResource>    (imageBinding.image);
+                                if(nullptr == view || nullptr == image)
+                                {
+                                    continue;
+                                }
 
                                 VkDescriptorImageInfo imageInfo {};
                                 imageInfo.imageView   = view->handle;
                                 imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                                 imageInfo.sampler     = image->attachedSampler;
-                                descriptorSetWriteAttachmentImageInfos[inputImageCounter] = imageInfo;
+                                descriptorSetWriteImageInfos[inputImageCounter] = imageInfo;
 
                                 VkWriteDescriptorSet descriptorWrite = {};
                                 descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -418,7 +422,7 @@ namespace engine
                                 descriptorWrite.dstArrayElement  = 0;
                                 descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
                                 descriptorWrite.pBufferInfo      = nullptr;
-                                descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputImageCounter++]); // Optional
+                                descriptorWrite.pImageInfo       = &(descriptorSetWriteImageInfos[inputImageCounter++]); // Optional
                                 descriptorWrite.pTexelBufferView = nullptr;
                                 // descriptorSetWrites[writeCounter++] = descriptorWrite;
                                 descriptorSetWrites.push_back(descriptorWrite);
