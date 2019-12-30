@@ -44,12 +44,18 @@ namespace engine
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT EGpuApiResourceState
         {
-            Unknown = 0
-            , Unavailable
-            , Loading
-            , Loaded
-            , Discarded
-            , Error
+              Unknown     = 0
+            , Unavailable = 1
+            , Creating    = 2
+            , Created     = 4
+            , Loading     = 8
+            , Loaded      = 16
+            , Transferred = 32
+            , Unloading   = 64
+            , Unloaded    = 128
+            , Discarding  = 256
+            , Discarded   = 512
+            , Error       = 1024
         };
         //<-----------------------------------------------------------------------------
 
