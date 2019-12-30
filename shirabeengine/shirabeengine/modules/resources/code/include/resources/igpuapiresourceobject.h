@@ -44,18 +44,19 @@ namespace engine
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT EGpuApiResourceState
         {
-              Unknown     = 0
-            , Unavailable = 1
-            , Creating    = 2
-            , Created     = 4
-            , Loading     = 8
-            , Loaded      = 16
-            , Transferred = 32
-            , Unloading   = 64
-            , Unloaded    = 128
-            , Discarding  = 256
-            , Discarded   = 512
-            , Error       = 1024
+              Unknown      = 0
+            , Unavailable  = 1
+            , Creating     = 2
+            , Created      = 4
+            , Loading      = 8
+            , Loaded       = 16
+            , Transferring = 32
+            , Transferred  = 64
+            , Unloading    = 128
+            , Unloaded     = 256
+            , Discarding   = 512
+            , Discarded    = 1024
+            , Error        = 2048
         };
         //<-----------------------------------------------------------------------------
 
@@ -69,20 +70,10 @@ namespace engine
             friend class CResourceManager;
 
             SHIRABE_DECLARE_INTERFACE(IGpuApiResourceObject);
-
-        public_typedefs:
-            using ObservableState_t = CSubject<EGpuApiResourceState>;
-
         public_api:
             virtual resources::GpuApiHandle_t const getHandle() = 0;
 
-            // virtual CEngineResult<> create(GpuApiResourceDependencies_t const &aDependencies) = 0;
-            virtual CEngineResult<> destroy()                                                 = 0;
-
-            [[nodiscard]]
-            virtual EGpuApiResourceState getResourceState() const = 0;
-
-            virtual Shared<ObservableState_t> observableState() = 0;
+            virtual CEngineResult<> destroy() = 0;
         };
         //<-----------------------------------------------------------------------------
 

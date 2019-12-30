@@ -72,6 +72,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CResourceManager::discardResource(ResourceId_t const &aResourceId)
         {
+            return EEngineStatus::Ok;
             auto iterator = mResourceObjects.find(aResourceId);
             if(mResourceObjects.end() != iterator)
             {

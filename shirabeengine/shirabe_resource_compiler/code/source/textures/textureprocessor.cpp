@@ -89,13 +89,14 @@ namespace texture
             bool is16bit = stbi_is_16_bit(fn.c_str());
             bool isHDR   = stbi_is_hdr(fn.c_str());
 
-            int   w   = 0
-            , h   = 0
-            , c   = 0;
+            int   w     = 0
+                , h     = 0
+                , c     = 0
+                , req_c = 4;
 
             if(not (is16bit || isHDR))
             {
-                stbi_uc* stbuc = stbi_load(fn.c_str(), &w, &h, &c, 4);
+                stbi_uc* stbuc = stbi_load(fn.c_str(), &w, &h, &c, req_c);
                 if(nullptr == stbuc)
                 {
                     char const *reason = stbi_failure_reason();
@@ -105,7 +106,7 @@ namespace texture
 
                 loadInfo.meta.width          = w;
                 loadInfo.meta.height         = h;
-                loadInfo.meta.channels       = c;
+                loadInfo.meta.channels       = req_c;
                 loadInfo.meta.bitsPerChannel = 8;
                 loadInfo.meta.depth          = 1;
                 loadInfo.meta.arraySize      = 1;
@@ -113,7 +114,7 @@ namespace texture
                 loadInfo.meta.format         = asset::EFormat::R8G8B8A8_UNORM;
 
                 std::vector<uint8_t> data {};
-                data.resize((w * h * c * sizeof(uint8_t)));
+                data.resize((w * h * req_c * sizeof(uint8_t)));
                 memcpy(data.data(), stbuc, data.size());
 
                 std::size_t const size = data.size();
@@ -124,7 +125,7 @@ namespace texture
             }
             else if(is16bit)
             {
-                stbi_us* stbuc = stbi_load_16(fn.c_str(), &w, &h, &c, 4);
+                stbi_us* stbuc = stbi_load_16(fn.c_str(), &w, &h, &c, req_c);
                 if(nullptr == stbuc)
                 {
                     char const *reason = stbi_failure_reason();
@@ -135,7 +136,7 @@ namespace texture
 
                 loadInfo.meta.width          = w;
                 loadInfo.meta.height         = h;
-                loadInfo.meta.channels       = c;
+                loadInfo.meta.channels       = req_c;
                 loadInfo.meta.bitsPerChannel = 16;
                 loadInfo.meta.depth          = 1;
                 loadInfo.meta.arraySize      = 1;
@@ -143,7 +144,7 @@ namespace texture
                 loadInfo.meta.format         = asset::EFormat::R16G16B16A16_UNORM;
 
                 std::vector<uint8_t> data {};
-                data.resize((w * h * c * sizeof(uint16_t)));
+                data.resize((w * h * req_c * sizeof(uint16_t)));
                 memcpy(data.data(), stbuc, data.size());
 
                 std::size_t const size = data.size();
@@ -154,7 +155,7 @@ namespace texture
             }
             else
             {
-                float* stbuc = stbi_loadf(fn.c_str(), &w, &h, &c, 4);
+                float* stbuc = stbi_loadf(fn.c_str(), &w, &h, &c, req_c);
                 if(nullptr == stbuc)
                 {
                     char const *reason = stbi_failure_reason();
@@ -165,7 +166,7 @@ namespace texture
 
                 loadInfo.meta.width          = w;
                 loadInfo.meta.height         = h;
-                loadInfo.meta.channels       = c;
+                loadInfo.meta.channels       = req_c;
                 loadInfo.meta.bitsPerChannel = 32;
                 loadInfo.meta.depth          = 1;
                 loadInfo.meta.arraySize      = 1;
@@ -173,7 +174,7 @@ namespace texture
                 loadInfo.meta.format         = asset::EFormat::R32G32B32A32_FLOAT;
 
                 std::vector<uint8_t> data {};
-                data.resize((w * h * c * sizeof(float)));
+                data.resize((w * h * req_c * sizeof(float)));
                 memcpy(data.data(), stbuc, data.size());
 
                 std::size_t const size = data.size();

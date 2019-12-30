@@ -745,12 +745,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::destroyFrameBuffer(std::string const &aFrameBufferId)
     {
-        CEngineResult<> destruction = mResourceManager->discardResource(aFrameBufferId);
-        EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy frame buffer.");
-
-        return destruction;
-
-        // return EEngineStatus::Ok;
+        Shared<SFrameBuffer> frameBuffer = getUsedResourceTyped<SFrameBuffer>(aFrameBufferId);
+        frameBuffer->unload();
+        return frameBuffer->deinitialize(*(frameBuffer->getCurrentDependencies()));
     }
     //<-----------------------------------------------------------------------------
 
@@ -759,10 +756,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::destroyRenderPass(std::string const &aRenderPassId)
     {
-        CEngineResult<> destruction = mResourceManager->discardResource(aRenderPassId);
-        EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to destroy render pass.");
-
-        return destruction;
+        Shared<SRenderPass> renderPass = getUsedResourceTyped<SRenderPass>(aRenderPassId);
+        renderPass->unload();
+        return renderPass->deinitialize(*(renderPass->getCurrentDependencies()));
 
         // return EEngineStatus::Ok;
     }
@@ -855,9 +851,9 @@ namespace engine::framegraph
     {
         CLog::Verbose(logTag(), CString::format("Texture:\n{}", convert_to_string(aTexture)));
 
-        CEngineResult<> status = mResourceManager->discardResource(aTexture.readableName);
-
-        return status;
+        Shared<STexture> resource = getUsedResourceTyped<STexture>(aTexture.readableName);
+        resource->unload();
+        return resource->deinitialize(*(resource->getCurrentDependencies()));
     }
     //<-----------------------------------------------------------------------------
 
@@ -944,10 +940,9 @@ namespace engine::framegraph
     {
         CLog::Verbose(logTag(), CString::format("TextureView:\n{}", convert_to_string(aView)));
 
-        CEngineResult<> status = EEngineStatus::Ok;
-        status = mResourceManager->discardResource(aView.readableName);
-
-        return status;
+        Shared<STextureView> resource = getUsedResourceTyped<STextureView>(aView.readableName);
+        resource->unload();
+        return resource->deinitialize(*(resource->getCurrentDependencies()));
     }
     //<-----------------------------------------------------------------------------
 
@@ -1002,10 +997,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::destroyBuffer(SFrameGraphBuffer const &aBuffer)
     {
-        CEngineResult<> status = EEngineStatus::Ok;
-        status = mResourceManager->discardResource(aBuffer.readableName);
-
-        return status;
+        Shared<SBuffer> resource = getUsedResourceTyped<SBuffer>(aBuffer.readableName);
+        resource->unload();
+        return resource->deinitialize(*(resource->getCurrentDependencies()));
     }
     //<-----------------------------------------------------------------------------
 
@@ -1060,8 +1054,9 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::destroyBufferView(SFrameGraphBufferView const &aBufferView)
     {
-        SHIRABE_UNUSED(aBufferView);
-        return EEngineStatus::Ok;
+        Shared<SBufferView> resource = getUsedResourceTyped<SBufferView>(aBufferView.readableName);
+        resource->unload();
+        return resource->deinitialize(*(resource->getCurrentDependencies()));
     }
     //<-----------------------------------------------------------------------------
 
@@ -1264,7 +1259,7 @@ namespace engine::framegraph
                 Shared<STextureView> view   = std::static_pointer_cast<STextureView>(getUsedResource(viewId));
 
                 view->unload();
-                mResourceManager->discardResource(viewId);
+                view->deinitialize(*(view->getCurrentDependencies()));
             }
         }
 

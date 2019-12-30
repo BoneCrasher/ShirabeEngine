@@ -19,6 +19,7 @@ struct struct_vertexData_full
     vec3 vertex_position;
     vec3 vertex_normal;
     vec3 vertex_tangent;
+    vec3 vertex_bitangent;
     vec2 vertex_texcoord;
 };
 
@@ -81,3 +82,8 @@ uniform Reserved
     mat4   _UNUSED5;
 }
 reserved;
+
+vec3 unpack_normal(vec3 aInput)
+{
+    return ((2.0f * aInput) - 1.0f);
+}

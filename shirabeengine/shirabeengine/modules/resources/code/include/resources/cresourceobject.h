@@ -132,11 +132,10 @@ namespace engine
 
         protected_methods:
         private_members:
-            TDescription  const                                     mDescription;
-            std::optional<TDependencies>                            mDependencies;
+            TDescription  const          mDescription;
+            std::optional<TDependencies> mDependencies;
 
-            GpuApiHandle_t                                          mGpuApiResourceHandle;
-            IGpuApiResourceObject::ObservableState_t::ObserverPtr_t mStateObserver;
+            GpuApiHandle_t               mGpuApiResourceHandle;
         };
 
         //<-----------------------------------------------------------------------------
@@ -151,7 +150,6 @@ namespace engine
             , mDescription(aDescription)
             , mDependencies()
             , mGpuApiResourceHandle()
-            , mStateObserver()
         {}
         //<-----------------------------------------------------------------------------
         //

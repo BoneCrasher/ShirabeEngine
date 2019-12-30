@@ -14,5 +14,6 @@ void main()
     shader_output.vertex_position = vec3(0.0, 0.0,  0.0);
     shader_output.vertex_normal   = vec3(1.0, 0.0,  0.0);
     shader_output.vertex_tangent  = vec3(0.0, 0.0, -1.0);
+    shader_output.vertex_tangent  = vec3(1.0, 0.0,  0.0);
     shader_output.vertex_texcoord = vec2(0.0, 0.0);
 }

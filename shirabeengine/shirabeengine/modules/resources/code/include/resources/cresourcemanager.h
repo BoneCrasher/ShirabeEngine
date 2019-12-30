@@ -74,6 +74,32 @@ namespace engine {
 
             void removeResourceObject(ResourceId_t const &aId);
 
+            SHIRABE_INLINE
+            bool addResourceState( ResourceId_t         const &aId
+                                 , EGpuApiResourceState const  aState)
+            {
+                if(mGpuApiResourceStates.end() != mGpuApiResourceStates.find(aId))
+                {
+                    return true;
+                }
+
+                mGpuApiResourceStates.insert({ aId, core::CBitField<EGpuApiResourceState>(aState) });
+                return true;
+            }
+
+            SHIRABE_INLINE
+            core::CBitField<EGpuApiResourceState> &getResourceState(ResourceId_t const &aId)
+            {
+                addResourceState(aId, EGpuApiResourceState::Unknown);
+                return mGpuApiResourceStates.at(aId);
+            }
+
+            SHIRABE_INLINE
+            void removeResourceState(ResourceId_t const &aId)
+            {
+                mGpuApiResourceStates.erase(aId);
+            }
+
             GpuApiResourceDependencies_t getGpuApiDependencies(ResourceId_t const &aId);
 
         private_members:
@@ -83,6 +109,7 @@ namespace engine {
             std::unordered_map<std::type_index, Shared<IResourceObjectCreatorBase>> mAssetLoaders;
 
             std::unordered_map<ResourceId_t, Shared<ILogicalResourceObject>>        mResourceObjects;
+            std::unordered_map<ResourceId_t, core::CBitField<EGpuApiResourceState>> mGpuApiResourceStates;
             CAdjacencyTree<ResourceId_t>                                            mResourceTree;
         };
         //<-----------------------------------------------------------------------------
@@ -199,12 +226,20 @@ namespace engine {
             SLogicalOps< typename TResource::Descriptor_t
                        , typename TResource::Dependencies_t> logicalResourceOps {};
 
+            using namespace core;
+
             //
             // Wrap the gpu api resource operations with dependency resolving operations.
             //
             logicalResourceOps.initialize =
                     [aResourceId, aDescriptor, gpuApiResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
             {
+                if(getResourceState(aResourceId).checkAny(EGpuApiResourceState::Creating | EGpuApiResourceState::Created))
+                {
+                    return EEngineStatus::Ok;
+                }
+                getResourceState(aResourceId).set(EGpuApiResourceState::Creating);
+
                 Shared<ILogicalResourceObject> logicalResourceObject = getResourceObject(aResourceId);
                 if(nullptr == logicalResourceObject)
                 {
@@ -226,21 +261,88 @@ namespace engine {
 
                 CEngineResult<> const result = gpuApiOps.initialize(aDescriptor, aDependencies, dependenciesResolved);
 
+                getResourceState(aResourceId).reset(EGpuApiResourceState::Created);
+
                 return result.result();
             };
             logicalResourceOps.deinitialize =
                     [aResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
             {
+                if(not getResourceState(aResourceId).check(EGpuApiResourceState::Unloaded))
+                {
+                    return EEngineStatus::Error;
+                }
+
+                if(getResourceState(aResourceId).checkAny(EGpuApiResourceState::Discarding | EGpuApiResourceState::Discarded))
+                {
+                    return EEngineStatus::Ok;
+                }
+                getResourceState(aResourceId).set(EGpuApiResourceState::Discarding);
+
                 CEngineResult<> const result = gpuApiOps.deinitialize();
 
                 Vector<ResourceId_t> resolveDependenciesList = aDependencies.resolve();
                 removeDependencies(mResourceTree, aResourceId, std::move(resolveDependenciesList));
 
+                getResourceState(aResourceId).reset(EGpuApiResourceState::Discarded);
+
                 return result.result();
             };
-            logicalResourceOps.load     = [gpuApiOps] () -> CEngineResult<> { return gpuApiOps.load();     };
-            logicalResourceOps.unload   = [gpuApiOps] () -> CEngineResult<> { return gpuApiOps.unload();   };
-            logicalResourceOps.transfer = [gpuApiOps] () -> CEngineResult<> { return gpuApiOps.transfer(); };
+            logicalResourceOps.load = [gpuApiOps, aResourceId, this] () -> CEngineResult<>
+            {
+                if(not getResourceState(aResourceId).check(EGpuApiResourceState::Created))
+                {
+                    return EEngineStatus::Error;
+                }
+
+                if(getResourceState(aResourceId).checkAny(EGpuApiResourceState::Loading | EGpuApiResourceState::Loaded))
+                {
+                    return EEngineStatus::Ok;
+                }
+                getResourceState(aResourceId).set(EGpuApiResourceState::Loading);
+
+                CEngineResult<> const result = gpuApiOps.load();
+
+                getResourceState(aResourceId).unset(EGpuApiResourceState::Loading);
+                getResourceState(aResourceId).set  (EGpuApiResourceState::Loaded);
+            };
+            logicalResourceOps.unload = [gpuApiOps, aResourceId, this] () -> CEngineResult<>
+            {
+                if(not getResourceState(aResourceId).check(EGpuApiResourceState::Loaded))
+                {
+                    return EEngineStatus::Error;
+                }
+
+                if(getResourceState(aResourceId).checkAny(EGpuApiResourceState::Unloading | EGpuApiResourceState::Unloaded))
+                {
+                    return EEngineStatus::Ok;
+                }
+                getResourceState(aResourceId).set(EGpuApiResourceState::Unloading);
+
+                CEngineResult<> const result = gpuApiOps.unload();
+
+                getResourceState(aResourceId).unset(EGpuApiResourceState::Loading | EGpuApiResourceState::Loaded);
+                getResourceState(aResourceId).unset(EGpuApiResourceState::Unloading);
+                getResourceState(aResourceId).set  (EGpuApiResourceState::Unloaded);
+            };
+            logicalResourceOps.transfer= [gpuApiOps, aResourceId, this] () -> CEngineResult<>
+            {
+                if(not getResourceState(aResourceId).check(EGpuApiResourceState::Loaded))
+                {
+                    return EEngineStatus::Error;
+                }
+
+                if(getResourceState(aResourceId).checkAny(EGpuApiResourceState::Transferring | EGpuApiResourceState::Transferred))
+                {
+                    return EEngineStatus::Ok;
+                }
+                getResourceState(aResourceId).set(EGpuApiResourceState::Transferring);
+
+                CEngineResult<> const result = gpuApiOps.transfer();
+
+                getResourceState(aResourceId).unset(EGpuApiResourceState::Transferring);
+                getResourceState(aResourceId).set  (EGpuApiResourceState::Transferred);
+            };
 
             Shared<ILogicalResourceObject> resource         = makeShared<TResource>(aDescriptor);
             auto                           resourceObject   = std::static_pointer_cast<CResourceObject<typename TResource::Descriptor_t, typename TResource::Dependencies_t>>(resource);

@@ -60,16 +60,6 @@ namespace engine::vulkan
                                                   , GpuApiResourceDependencies_t const &aResolvedDependencies)
 
     {
-        SHIRABE_UNUSED(aResolvedDependencies);
-
-        if(EGpuApiResourceState::Loaded == getResourceState()
-           || EGpuApiResourceState::Loading == getResourceState())
-        {
-            return EEngineStatus::Ok;
-        }
-
-        setResourceState(EGpuApiResourceState::Loading);
-
         CVkApiResource<SBuffer>::create(aDescription, aDependencies, aResolvedDependencies);
 
         Shared<IVkGlobalContext> vkContext = getVkContext();
@@ -131,11 +121,6 @@ namespace engine::vulkan
         this->handle         = buffer;
         this->attachedMemory = memory;
 
-        // getVkContext()->registerDebugObjectName((uint64_t)this->handle,         VK_OBJECT_TYPE_BUFFER, aDescription.name);
-        // getVkContext()->registerDebugObjectName((uint64_t)this->attachedMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_Memory");
-
-        setResourceState(EGpuApiResourceState::Loaded);
-
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
@@ -191,8 +176,6 @@ namespace engine::vulkan
 
         vkFreeMemory   (vkLogicalDevice, vkDeviceMemory, nullptr);
         vkDestroyBuffer(vkLogicalDevice, vkBuffer, nullptr);
-
-        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

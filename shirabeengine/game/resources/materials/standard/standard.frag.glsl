@@ -3,8 +3,8 @@
 #include "base.glsl"
 
 layout(set = 3, binding = 0) uniform sampler2D diffuseTexture;
-layout(set = 3, binding = 1) uniform sampler2D specularReflectanceGlossTexture;
-layout(set = 3, binding = 2) uniform sampler2D normalTexture;
+layout(set = 3, binding = 1) uniform sampler2D normalTexture;
+layout(set = 3, binding = 2) uniform sampler2D specularReflectanceGlossTexture;
 
 // Input
 layout (location = 0)
@@ -18,10 +18,25 @@ layout (location = 3) out vec4 fragment_color_3;
 
 void main()
 {
-    vec4 diffuse = texture(diffuseTexture, shader_input.vertex_texcoord.xy);
+    vec3 normal_viewspace    = normalize(shader_input.vertex_normal);
+    vec3 tangent_viewspace   = normalize(shader_input.vertex_tangent);
+    vec3 bitangent_viewspace = normalize(shader_input.vertex_bitangent);
 
-    fragment_color_0 = vec4(shader_input.vertex_position.xyz, 1.0);
-    fragment_color_1 = vec4(shader_input.vertex_normal,       1.0);
+    mat3 tnb = mat3(tangent_viewspace, bitangent_viewspace, normal_viewspace);
+
+    vec4 diffuse = texture(diffuseTexture, shader_input.vertex_texcoord.xy);
+    vec4 normal  = texture(normalTexture,  shader_input.vertex_texcoord.xy);
+
+    vec3 normal_unpacked_tangent_space = unpack_normal(normal.xyz);
+    vec3 normal_unpacked_viewspace     = tnb * normal_unpacked_tangent_space;
+
+    normal_unpacked_viewspace = normalize(normal_unpacked_viewspace);
+
+    float f_spec     = 0.8f;
+    float f_spec_exp = 32.0f;
+
+    fragment_color_0 = vec4(shader_input.vertex_position.xyz,  f_spec);
+    fragment_color_1 = vec4(normal_unpacked_viewspace,         f_spec_exp);
     fragment_color_2 = diffuse;
     fragment_color_3 = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 } 

@@ -14,14 +14,6 @@ namespace engine::vulkan
                                                       , SBufferViewDependencies      const &aDependencies
                                                       , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
-        if(EGpuApiResourceState::Loaded == getResourceState()
-           || EGpuApiResourceState::Loading == getResourceState())
-        {
-            return EEngineStatus::Ok;
-        }
-
-        setResourceState(EGpuApiResourceState::Loading);
-
         CVkApiResource<SBufferView>::create(aDescription, aDependencies, aResolvedDependencies);
 
         GpuApiHandle_t        const bufferGpuApiId = aResolvedDependencies.at(aDependencies.bufferId);
@@ -48,8 +40,6 @@ namespace engine::vulkan
 
         getVkContext()->registerDebugObjectName((uint64_t)this->handle, VK_OBJECT_TYPE_BUFFER_VIEW, aDescription.name);
 
-        setResourceState(EGpuApiResourceState::Loaded);
-
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
@@ -63,8 +53,6 @@ namespace engine::vulkan
         VkDevice     vkLogicalDevice = getVkContext()->getLogicalDevice();
 
         vkDestroyBufferView(vkLogicalDevice, vkBufferView, nullptr);
-
-        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

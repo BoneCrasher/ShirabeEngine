@@ -28,8 +28,6 @@ out struct_vertexData_full shader_output;
 
 void main()
 {
-    vec3 light_position = vec3(0.0f, 0.0f, 1.0f);
-
     vec4 position = vec4(vertex_position.xyz, 1.0);
 
     mat4 view_transform     = (graphicsData.primaryCamera.view * modelMatrices.world);
@@ -37,16 +35,17 @@ void main()
 
     vec4 position_viewspace  = (view_transform * position);
     vec3 normal_viewspace    = normalize(view_transform_3x3 * vertex_normal);
-    vec3 tangent_viewspace   = normalize(view_transform_3x3 * light_position); // vertex_tangent.xyz);
-    vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace));
+    vec3 tangent_viewspace   = normalize(view_transform_3x3 * vertex_tangent.xyz);
+    vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace) * vertex_tangent.w);
 
-    gl_Position = (graphicsData.primaryCamera.projection * position_viewspace);
-    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
+    gl_Position   = (graphicsData.primaryCamera.projection * position_viewspace);
+    // gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
-    shader_output.vertex_position = position_viewspace.xyz;
-    shader_output.vertex_normal   = normal_viewspace;
-    shader_output.vertex_tangent  = tangent_viewspace;
-    shader_output.vertex_texcoord = vertex_texcoord;
-    shader_output.vertex_color    = vec4(1.0f, 1.0f, 1.0f, 1.0);
+    shader_output.vertex_position  = position_viewspace.xyz;
+    shader_output.vertex_normal    = normal_viewspace;
+    shader_output.vertex_tangent   = tangent_viewspace;
+    shader_output.vertex_bitangent = bitangent_viewspace;
+    shader_output.vertex_texcoord  = vertex_texcoord;
+    shader_output.vertex_color     = vec4(1.0f, 1.0f, 1.0f, 1.0);
 
 }

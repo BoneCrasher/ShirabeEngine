@@ -62,7 +62,7 @@ namespace engine
                 lightAccBufferDesc.width          = gbufferTexture.width;
                 lightAccBufferDesc.height         = gbufferTexture.height;
                 lightAccBufferDesc.depth          = 1;
-                lightAccBufferDesc.format         = FrameGraphFormat_t::R32_FLOAT;
+                lightAccBufferDesc.format         = FrameGraphFormat_t::R32G32B32A32_FLOAT;
                 lightAccBufferDesc.mipLevels      = 1;
                 lightAccBufferDesc.arraySize      = 1;
                 lightAccBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;

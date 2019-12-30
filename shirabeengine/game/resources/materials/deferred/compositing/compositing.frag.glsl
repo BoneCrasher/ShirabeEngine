@@ -27,12 +27,12 @@ void main()
 {
     vec4  position_specular_intensity = subpassLoad(gbuffer0);
     vec4  normal_specular_exponent    = subpassLoad(gbuffer1);
-    vec4  other_0                     = subpassLoad(gbuffer2);
+    vec4  diffuse                     = subpassLoad(gbuffer2);
     vec4  other_1                     = subpassLoad(gbuffer3);
     vec4  depth                       = subpassLoad(depth);
     vec4  lightAccumulation           = subpassLoad(lightAccumulation);
 
-    vec4 C = other_0;
-
-    fragment_final_0 = vec4(lightAccumulation.r * C.rgb, 1.0f); // Just forward...
+    vec3 final = clamp((lightAccumulation.a * diffuse.rgb) + lightAccumulation.rgb, 0.0f, 1.0f);
+    // vec3 final = clamp(lightAccumulation.rgb, 0.0f, 1.0f);
+    fragment_final_0 = vec4(final, 1.0f); // Just forward...
 } 

@@ -32,14 +32,6 @@ namespace engine::vulkan
         SHIRABE_UNUSED(aDependencies);
         SHIRABE_UNUSED(aResolvedDependencies);
 
-        if(EGpuApiResourceState::Loaded == getResourceState()
-           || EGpuApiResourceState::Loading == getResourceState())
-        {
-            return EEngineStatus::Ok;
-        }
-
-        setResourceState(EGpuApiResourceState::Loading);
-
         CVkApiResource<STexture>::create(aDescription, aDependencies, aResolvedDependencies);
 
         /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
@@ -217,8 +209,6 @@ namespace engine::vulkan
         // getVkContext()->registerDebugObjectName((uint64_t)this->stagingBuffer,       VK_OBJECT_TYPE_BUFFER,        std::string(aDescription.name) + "_StagingBuffer");
         // getVkContext()->registerDebugObjectName((uint64_t)this->stagingBufferMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, std::string(aDescription.name) + "_StagingBufferMemory");
 
-        setResourceState(EGpuApiResourceState::Loaded);
-
         return { EEngineStatus::Ok };
 
         fail:
@@ -227,8 +217,6 @@ namespace engine::vulkan
         vkDestroySampler(vkLogicalDevice, vkSampler,             nullptr);
         vkDestroyBuffer (vkLogicalDevice, vkStagingBuffer,       nullptr);
         vkFreeMemory    (vkLogicalDevice, vkStagingBufferMemory, nullptr);
-
-        setResourceState(EGpuApiResourceState::Error);
 
         return { EEngineStatus::Error };
     }
@@ -319,8 +307,6 @@ namespace engine::vulkan
         vkDestroyImage  (vkLogicalDevice, vkImage,        nullptr);
         vkFreeMemory    (vkLogicalDevice, vkBufferMemory, nullptr);
         vkDestroyBuffer (vkLogicalDevice, vkBuffer,       nullptr);
-
-        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

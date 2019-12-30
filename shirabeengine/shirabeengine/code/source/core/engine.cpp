@@ -363,8 +363,11 @@ namespace engine
 
             auto const &[textureResult,     texture]     = mTextureLoader->loadInstance(mAssetStorage
                                                                                        , util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
+            auto const &[texture2Result,     texture2]     = mTextureLoader->loadInstance(mAssetStorage
+                                                                                        , util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
 
             material->getMutableConfiguration().setSampledImage("diffuseTexture", util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
+            material->getMutableConfiguration().setSampledImage("normalTexture", util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
 
 
             auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");
@@ -514,7 +517,7 @@ namespace engine
         config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.view",       camera->view().const_data());
         config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.projection", camera->projection().const_data());
 
-        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, deg_to_rad((float)mTimer.total_elapsed() * 90), 0.0f}));
+        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, deg_to_rad((float)mTimer.total_elapsed() * 90.0f * 0.25f), 0.0f}));
         barramundiMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4::MatrixData_t>("struct_modelMatrices", "world", barramundiTransform->getTransform().world().const_data());
 
         if(mRenderer)

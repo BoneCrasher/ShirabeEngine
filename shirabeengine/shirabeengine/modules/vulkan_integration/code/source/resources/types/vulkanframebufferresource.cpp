@@ -15,14 +15,6 @@ namespace engine::vulkan
                                                        , SFrameBufferDependencies     const &aDependencies
                                                        , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {
-        if(EGpuApiResourceState::Loaded == getResourceState()
-           || EGpuApiResourceState::Loading == getResourceState())
-        {
-            return EEngineStatus::Ok;
-        }
-
-        setResourceState(EGpuApiResourceState::Loading);
-
         CVkApiResource<SFrameBuffer>::create(aDescription, aDependencies, aResolvedDependencies);
 
         auto const *const renderPass = getVkContext()->getResourceStorage()->extract<CVulkanRenderPassResource>(aResolvedDependencies.at(aDependencies.referenceRenderPassId));
@@ -56,8 +48,6 @@ namespace engine::vulkan
 
         this->handle = vkFrameBuffer;
 
-        setResourceState(EGpuApiResourceState::Loaded);
-
         return { EEngineStatus::Ok };
     }
     //<-----------------------------------------------------------------------------
@@ -68,8 +58,6 @@ namespace engine::vulkan
     CEngineResult<> CVulkanFrameBufferResource::destroy()
     {
         vkDestroyFramebuffer(getVkContext()->getLogicalDevice(), this->handle, nullptr);
-
-        setResourceState(EGpuApiResourceState::Discarded);
 
         return { EEngineStatus::Ok };
     }

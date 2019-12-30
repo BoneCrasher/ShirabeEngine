@@ -7,6 +7,7 @@
 
 #include <platform/platform.h>
 #include <core/patterns/observer.h>
+#include <core/bitfield.h>
 
 #include "resources/igpuapiresourceobject.h"
 #include "cgpuapiresourcestorage.h"
@@ -39,17 +40,9 @@ namespace engine
             virtual CEngineResult<> create(  typename TResource::Descriptor_t   const &aDescription
                                            , typename TResource::Dependencies_t const &aDependencies
                                            , GpuApiResourceDependencies_t       const &aResolvedDependencies);
-            virtual CEngineResult<> destroy();
-
-            Shared<ObservableState_t> observableState() final;
+            virtual CEngineResult<> destroy() override;
 
         public_methods:
-            [[nodiscard]]
-            SHIRABE_INLINE EGpuApiResourceState getResourceState() const final
-            {
-                return mState;
-            }
-
             SHIRABE_INLINE std::optional<typename TResource::Descriptor_t> const &getCurrentDescriptor() const
             {
                 return mDescriptor;
@@ -61,12 +54,6 @@ namespace engine
             }
 
         protected_methods:
-            SHIRABE_INLINE void setResourceState(EGpuApiResourceState const &aState)
-            {
-                mState = aState;
-                // observableState()->notify(makeSharedFromThis(this), mState);
-            };
-
             SHIRABE_INLINE void setCurrentDescriptor(typename TResource::Descriptor_t const &aDescriptor)
             {
                 mDescriptor = aDescriptor;
@@ -80,9 +67,6 @@ namespace engine
         private_members:
             std::optional<typename TResource::Descriptor_t>   mDescriptor;
             std::optional<typename TResource::Dependencies_t> mDependencies;
-
-            Shared<ObservableState_t>  mObservableState;
-            EGpuApiResourceState       mState;
         };
 
         //<-----------------------------------------------------------------------------
@@ -94,8 +78,6 @@ namespace engine
         AGpuApiResourceObject<TResource>::AGpuApiResourceObject()
             : mDescriptor()
             , mDependencies()
-            , mObservableState(makeShared<CSubject<EGpuApiResourceState>>())
-            , mState          (EGpuApiResourceState::Unknown)
         { }
         //<-----------------------------------------------------------------------------
 
@@ -126,16 +108,6 @@ namespace engine
             mDescriptor.reset();
 
             return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        template <typename TResource>
-        Shared<IGpuApiResourceObject::ObservableState_t> AGpuApiResourceObject<TResource>::observableState()
-        {
-            return mObservableState;
         }
         //<-----------------------------------------------------------------------------
     }

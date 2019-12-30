@@ -20,22 +20,34 @@ layout(input_attachment_index = 4, set = 2, binding = 4) uniform subpassInput de
 // in vec2 texcoord;
 
 // Output
-layout (location = 0) out float fragment_light_0;
+layout (location = 0) out vec4 fragment_light_0;
 
 void main()
 {
-    vec4 position_specular_intensity = subpassLoad(gbuffer0);
-    vec4 normal_specular_exponent    = subpassLoad(gbuffer1);
-    vec4 other_0                     = subpassLoad(gbuffer2);
-    vec4 other_1                     = subpassLoad(gbuffer3);
-    vec4 depth                       = subpassLoad(depth);
+    vec4 position_f_spec   = subpassLoad(gbuffer0);
+    vec4 normal_f_spec_exp = subpassLoad(gbuffer1);
+    vec4 diffuse           = subpassLoad(gbuffer2);
+    vec4 other_1           = subpassLoad(gbuffer3);
+    vec4 depth             = subpassLoad(depth);
 
-    vec3  C = vec3(1.0f, 1.0f, 1.0f);
-    vec3  E = vec3(0.0f, 0.0f, 0.0f);
-    vec3  L = vec3(0.0f, 0.0f, -1.0f); // normalize(E - position_specular_intensity.xyz);
-    vec3  N = normalize(normal_specular_exponent.xyz);
-    float f = dot(L, N);
+    vec3  N = normalize(normal_f_spec_exp.xyz);
+
+    vec3  E = vec3(0.0f,  0.0f,  0.0f);
+    vec3  L = vec3(0.0f,  1.0f,  -0.5f);
+    // vec3  L = vec3(0.0f,  0.0f,  -1.0f);
+    vec3  V = -position_f_spec.xyz;
+    vec3  R = -normalize(reflect(L, N));
+
+    float f_lambert  = dot(normalize(L), N);
+    vec3  I_specular = vec3(1.0f, 1.0f, 1.0f);
+    float f_specular = 0.0f;
+
+    if(0.0f < f_lambert)
+    {
+        f_specular = clamp(dot(R, V), 0.0f, 1.0f);
+        f_specular = position_f_spec.a * pow(f_specular, normal_f_spec_exp.a + 0.0001f);
+    }
 
     // fragment_light_0 = vec4( clamp((f * C), 0.0f, 1.0f), 1.0f );
-    fragment_light_0 = clamp(f, 0.0f, 1.0f);
+    fragment_light_0 = vec4( clamp(f_specular * I_specular, 0.0f, 1.0f), clamp(f_lambert, 0.0f, 1.0f));
 } 

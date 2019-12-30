@@ -189,6 +189,22 @@ namespace engine
              * @return
              */
             bool check(CBitField<TEnum> const&aCBitField) const;
+            /**
+             * @brief check
+             * @param aValue
+             * @return
+             */
+            bool checkAny(TEnum const&aValue) const;
+
+            /**
+             * @brief check
+             * @param aCBitField
+             * @return
+             */
+            bool checkAny(CBitField<TEnum> const&aCBitField) const;
+
+            bool reset(TEnum const &aValue);
+            bool reset(CBitField<TEnum> const &aBitfield);
 
             /**
              * @brief value
@@ -343,6 +359,46 @@ namespace engine
         bool CBitField<TEnum>::check(CBitField<TEnum> const&bf) const
         {
             return ((mCBitField & bf.value()) == bf.value());
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
+        bool CBitField<TEnum>::checkAny(TEnum const&e) const
+        {
+            return ((mCBitField & CBitField<TEnum>::getValue(e)) > 0);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
+        bool CBitField<TEnum>::checkAny(CBitField<TEnum> const&bf) const
+        {
+            return ((mCBitField & bf.value()) > 0);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
+        bool CBitField<TEnum>::reset(TEnum const &aValue)
+        {
+            mCBitField = CBitField<TEnum>::getValue(aValue);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TEnum>
+        bool CBitField<TEnum>::reset(CBitField<TEnum> const &aBitfield)
+        {
+            mCBitField = aBitfield.value();
         }
         //<-----------------------------------------------------------------------------
 
