@@ -93,37 +93,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        bool CResourceManager::storeResourceObject(ResourceId_t     const &aId
-                                                   , SResourceState const &aObject)
-        {
-            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
-            if(not hasObjectForId)
-            {
-                mResourceObjects[aId] = aObject;
-            }
-
-            return (not hasObjectForId);
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        std::optional<SResourceState> CResourceManager::getResourceObject(ResourceId_t const &aId)
-        {
-            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
-            if(hasObjectForId)
-            {
-                return mResourceObjects.at(aId);
-            }
-
-            return {};
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
         void CResourceManager::removeResourceObject(ResourceId_t const &aId)
         {
             bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find(aId));

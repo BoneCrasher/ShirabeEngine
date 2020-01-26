@@ -36,15 +36,13 @@ namespace engine::resources
      * The SResourceState struct groups a logical resource, an optional gpu api
      * resource and it's current load state.
      */
-    template <typename TLogicalResource, typename TGpuApiResource>
+    template <typename TLogicalResource>
     struct SHIRABE_LIBRARY_EXPORT SResourceState
     {
-        Shared<TLogicalResource>              logicalResource;
-        Shared<TGpuApiResource>               gpuApiResource;
+        TLogicalResource                      logicalResource;
+        Shared<IGpuApiResourceObject>         gpuApiResource;
         core::CBitField<EGpuApiResourceState> state;
     };
-
-
 
     /**
      *
@@ -67,17 +65,17 @@ namespace engine::resources
         CEngineResult<> addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader);
 
         template <typename TResource>
-        // requires std::is_base_of_v<ILogicalResourceObject, TResource>
-        CEngineResult<Shared<ILogicalResourceObject>> useDynamicResource( ResourceId_t                     const &aResourceId
-                                                                        , typename TResource::Descriptor_t const &aDescriptor);
+        CEngineResult<SResourceState<TResource>> useDynamicResource( ResourceId_t                     const &aResourceId
+                                                                   , typename TResource::Descriptor_t const &aDescriptor);
 
-        CEngineResult<Shared<ILogicalResourceObject>> useAssetResource(  ResourceId_t const &aResourceId
-                                                                       , AssetId_t    const &aAssetResourceId);
+        template <typename TResource>
+        CEngineResult<SResourceState<TResource>> useAssetResource(  ResourceId_t const &aResourceId
+                                                                  , AssetId_t    const &aAssetResourceId);
 
-        SHIRABE_INLINE
-        std::optional<SResourceState> getResource(ResourceId_t const &aId)
+        template <typename TLogicalResource>
+        std::optional<SResourceState<TLogicalResource>> getResource(ResourceId_t const &aId)
         {
-            return getResourceObject(aId);
+            return getResourceObject<TLogicalResource>(aId);
         }
 
         CEngineResult<> discardResource(ResourceId_t const &aResourceId);
@@ -90,10 +88,30 @@ namespace engine::resources
         CEngineResult<Shared<ILogicalResourceObject>> genericAssetLoading(ResourceId_t const &aResourceId
                                                                         , AssetId_t    const &aAssetResourceId);
 
-        bool storeResourceObject(ResourceId_t     const &aId
-                                 , SResourceState const &aObject);
+        template <typename TLogicalResource>
+        bool storeResourceObject(ResourceId_t                     const &aId
+                               , SResourceState<TLogicalResource> const &aObject)
+        {
+            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
+            if(not hasObjectForId)
+            {
+                mResourceObjects[aId] = aObject;
+            }
 
-        std::optional<SResourceState> getResourceObject(ResourceId_t const &aId);
+            return (not hasObjectForId);
+        }
+
+        template <typename TLogicalResource>
+        std::optional<SResourceState<TLogicalResource>> getResourceObject(ResourceId_t const &aId)
+        {
+            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
+            if(hasObjectForId)
+            {
+                return mResourceObjects.at(aId);
+            }
+
+            return {};
+        }
 
         void removeResourceObject(ResourceId_t const &aId);
 
@@ -103,6 +121,7 @@ namespace engine::resources
         Unique<CGpuApiResourceObjectFactory>                                    mGpuApiResourceObjectFactory;
         Shared<asset::IAssetStorage>                                            mAssetStorage;
         std::unordered_map<std::type_index, Shared<IResourceObjectCreatorBase>> mAssetLoaders;
+
 
         std::unordered_map<ResourceId_t, SResourceState>                        mResourceObjects;
         CAdjacencyTree<ResourceId_t>                                            mResourceTree;

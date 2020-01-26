@@ -5,44 +5,44 @@
       <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
       <config projectName="shirabedevelopment" targetName="resources" />
       <config projectName="shirabedevelopment" targetName="INSTALL_core" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
-      <config projectName="shirabedevelopment" targetName="rendering" />
-      <config projectName="shirabedevelopment" targetName="textures" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
-      <config projectName="shirabedevelopment" targetName="log" />
       <config projectName="shirabedevelopment" targetName="INSTALL_os" />
-      <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
       <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
+      <config projectName="shirabedevelopment" targetName="log" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
+      <config projectName="shirabedevelopment" targetName="utility" />
+      <config projectName="shirabedevelopment" targetName="crc32generator" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
       <config projectName="shirabedevelopment" targetName="game" />
       <config projectName="shirabedevelopment" targetName="vulkan_integration" />
-      <config projectName="shirabedevelopment" targetName="material" />
-      <config projectName="shirabedevelopment" targetName="crc32generator" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_textures" />
       <config projectName="shirabedevelopment" targetName="base" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
       <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
       <config projectName="shirabedevelopment" targetName="core" />
       <config projectName="shirabedevelopment" targetName="INSTALL_math" />
       <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
       <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
       <config projectName="shirabedevelopment" targetName="shirabeengine" />
       <config projectName="shirabedevelopment" targetName="asset" />
       <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_textures" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
       <config projectName="shirabedevelopment" targetName="mesh" />
       <config projectName="shirabedevelopment" targetName="INSTALL_material" />
+      <config projectName="shirabedevelopment" targetName="math" />
       <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
       <config projectName="shirabedevelopment" targetName="wsi" />
-      <config projectName="shirabedevelopment" targetName="os" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
+      <config projectName="shirabedevelopment" targetName="rendering" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
       <config projectName="shirabedevelopment" targetName="INSTALL_mesh" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="material" />
+      <config projectName="shirabedevelopment" targetName="os" />
       <config projectName="shirabedevelopment" targetName="INSTALL_game" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
-      <config projectName="shirabedevelopment" targetName="math" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="textures" />
       <config projectName="shirabedevelopment" targetName="graphicsapi" />
     </generated>
   </component>
@@ -268,12 +268,9 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/stl_container_helpers.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/stl_container_helpers.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cresourcemanager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cresourcemanager.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -562,49 +559,49 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="CMake Application.crc32generator" />
+      <item itemvalue="CMake Application.INSTALL_asset" />
+      <item itemvalue="CMake Application.INSTALL_base" />
+      <item itemvalue="CMake Application.INSTALL_core" />
       <item itemvalue="CMake Application.INSTALL_crc32generator" />
-      <item itemvalue="CMake Application.game" />
       <item itemvalue="CMake Application.INSTALL_game" />
+      <item itemvalue="CMake Application.INSTALL_graphicsapi" />
+      <item itemvalue="CMake Application.INSTALL_log" />
+      <item itemvalue="CMake Application.INSTALL_material" />
+      <item itemvalue="CMake Application.INSTALL_math" />
+      <item itemvalue="CMake Application.INSTALL_mesh" />
+      <item itemvalue="CMake Application.INSTALL_os" />
+      <item itemvalue="CMake Application.INSTALL_platform" />
+      <item itemvalue="CMake Application.INSTALL_rendering" />
+      <item itemvalue="CMake Application.INSTALL_resources" />
+      <item itemvalue="CMake Application.INSTALL_shirabe_resource_compiler" />
+      <item itemvalue="CMake Application.INSTALL_shirabe_shader_precompiler" />
+      <item itemvalue="CMake Application.INSTALL_shirabeengine" />
+      <item itemvalue="CMake Application.INSTALL_textures" />
+      <item itemvalue="CMake Application.INSTALL_utility" />
+      <item itemvalue="CMake Application.INSTALL_vulkan_integration" />
+      <item itemvalue="CMake Application.INSTALL_wsi" />
+      <item itemvalue="CMake Application.asset" />
+      <item itemvalue="CMake Application.base" />
+      <item itemvalue="CMake Application.core" />
+      <item itemvalue="CMake Application.crc32generator" />
+      <item itemvalue="CMake Application.game" />
+      <item itemvalue="CMake Application.graphicsapi" />
+      <item itemvalue="CMake Application.log" />
+      <item itemvalue="CMake Application.material" />
+      <item itemvalue="CMake Application.math" />
+      <item itemvalue="CMake Application.mesh" />
+      <item itemvalue="CMake Application.os" />
+      <item itemvalue="CMake Application.rendering" />
+      <item itemvalue="CMake Application.resources" />
       <item itemvalue="CMake Application.shirabe_game_copy_resources" />
       <item itemvalue="CMake Application.shirabe_game_precopy" />
       <item itemvalue="CMake Application.shirabe_game_process_resources" />
-      <item itemvalue="CMake Application.INSTALL_shirabe_resource_compiler" />
       <item itemvalue="CMake Application.shirabe_resource_compiler" />
-      <item itemvalue="CMake Application.INSTALL_shirabeengine" />
       <item itemvalue="CMake Application.shirabeengine" />
-      <item itemvalue="CMake Application.asset" />
-      <item itemvalue="CMake Application.INSTALL_asset" />
-      <item itemvalue="CMake Application.base" />
-      <item itemvalue="CMake Application.INSTALL_base" />
-      <item itemvalue="CMake Application.core" />
-      <item itemvalue="CMake Application.INSTALL_core" />
-      <item itemvalue="CMake Application.graphicsapi" />
-      <item itemvalue="CMake Application.INSTALL_graphicsapi" />
-      <item itemvalue="CMake Application.INSTALL_log" />
-      <item itemvalue="CMake Application.log" />
-      <item itemvalue="CMake Application.INSTALL_material" />
-      <item itemvalue="CMake Application.material" />
-      <item itemvalue="CMake Application.INSTALL_math" />
-      <item itemvalue="CMake Application.math" />
-      <item itemvalue="CMake Application.INSTALL_mesh" />
-      <item itemvalue="CMake Application.mesh" />
-      <item itemvalue="CMake Application.INSTALL_os" />
-      <item itemvalue="CMake Application.os" />
-      <item itemvalue="CMake Application.INSTALL_platform" />
-      <item itemvalue="CMake Application.INSTALL_rendering" />
-      <item itemvalue="CMake Application.rendering" />
-      <item itemvalue="CMake Application.INSTALL_resources" />
-      <item itemvalue="CMake Application.resources" />
-      <item itemvalue="CMake Application.INSTALL_textures" />
       <item itemvalue="CMake Application.textures" />
-      <item itemvalue="CMake Application.INSTALL_utility" />
       <item itemvalue="CMake Application.utility" />
-      <item itemvalue="CMake Application.INSTALL_vulkan_integration" />
       <item itemvalue="CMake Application.vulkan_integration" />
-      <item itemvalue="CMake Application.INSTALL_wsi" />
       <item itemvalue="CMake Application.wsi" />
-      <item itemvalue="CMake Application.INSTALL_shirabe_shader_precompiler" />
     </list>
   </component>
   <component name="ServiceViewManager">
@@ -719,6 +716,7 @@
       <workItem from="1577428223470" duration="21122000" />
       <workItem from="1577693764342" duration="29376000" />
       <workItem from="1580017360179" duration="6165000" />
+      <workItem from="1580026601946" duration="1006000" />
     </task>
     <servers />
   </component>
