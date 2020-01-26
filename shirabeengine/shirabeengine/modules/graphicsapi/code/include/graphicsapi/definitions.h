@@ -194,7 +194,7 @@ namespace engine
          * The SMultisapmling struct describes multisampling properties for various gfxapi
          * related components in the system.
          */
-        struct SMultisapmling
+        struct SMultisampling
         {
         public_members:
             uint8_t
@@ -229,7 +229,7 @@ namespace engine
                     arraySize; // At least 1 (basically everything is a vector...)
             uint16_t
                     mipLevels;
-            SMultisapmling
+            SMultisampling
                     multisampling;
         };
 

@@ -331,7 +331,7 @@ namespace engine
             CEngineResult<> creation = { EEngineStatus::Ok };
 
             mTimer.initialize();
-            mTimer.setTickDeltaMilliseconds(1000.0 / 60.0);
+            // mTimer.setTickDeltaMilliseconds(1000.0 / 60.0);
 
             creation = fnCreatePlatformWindowSystem();
             creation = fnCreateDefaultGFXAPI();

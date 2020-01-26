@@ -92,18 +92,18 @@ namespace engine
                 CMutableAccessor(CGraph *aGraph);
 
             public_methods:
-                AdjacencyListMap_t<PassUID_t>                         &mutablePassAdjacency();
-                std::stack<PassUID_t>                                 &mutablePassExecutionOrder();
-                FrameGraphResourceIdList                              &mutableResources();
-                CFrameGraphMutableResources                           &mutableResourceData();
+                AdjacencyListMap_t<PassUID_t> &mutablePassAdjacency();
+                std::stack<PassUID_t>         &mutablePassExecutionOrder();
+                FrameGraphResourceIdList      &mutableResources();
+                CFrameGraphMutableResources   &mutableResourceData();
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
                 AdjacencyListMap_t<FrameGraphResourceId_t>            &mutableResourceAdjacency();
                 std::stack<FrameGraphResourceId_t>                    &mutableResourceOrder();
                 AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> &mutablePassToResourceAdjacency();
 #endif                
-                EGraphMode                                            &mutableGraphMode();
-                bool                                                  &mutableRenderToBackBuffer();
-                FrameGraphResourceId_t                                &mutableOutputTextureResourceId();
+                EGraphMode                    &mutableGraphMode();
+                bool                          &mutableRenderToBackBuffer();
+                FrameGraphResourceId_t        &mutableOutputTextureResourceId();
 
                 /**
                  * Create a new pass of type TPass given a uid and name.
@@ -186,7 +186,7 @@ namespace engine
              *
              * @return True, if successfully executed. False otherwise.
              */
-            CEngineResult<> execute(Shared<IFrameGraphRenderContext>&);
+            CEngineResult<> execute(SFrameGraphRenderContext &aRenderContext);
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
@@ -230,8 +230,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeResources(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    FrameGraphResourceIdList                  const &aResourceIds);
+                    SFrameGraphRenderContext       &aRenderContext,
+                    FrameGraphResourceIdList const &aResourceIds);
 
             /**
              * Initialize all subpasses, the render pass and the framebuffer.
@@ -242,10 +242,10 @@ namespace engine
              * @return               True, if successful. False, otherwise.
              */
             CEngineResult<> initializeRenderPassAndFrameBuffer(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    std::vector<PassUID_t>           const &aPassExecutionOrder,
-                    std::string                      const &aRenderPassId,
-                    std::string                      const &aFrameBufferId);
+                    SFrameGraphRenderContext       &aRenderContext,
+                    std::vector<PassUID_t>   const &aPassExecutionOrder,
+                    std::string              const &aRenderPassId,
+                    std::string              const &aFrameBufferId);
 
             /**
              * Bind all automatic resources required for execution.
@@ -255,8 +255,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> bindResources(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    FrameGraphResourceIdList                  const &aResourceIds);
+                    SFrameGraphRenderContext       &aRenderContext,
+                    FrameGraphResourceIdList const &aResourceIds);
 
             /**
              * Unbind all automatic resources required for execution.
@@ -266,8 +266,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> unbindResources(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    FrameGraphResourceIdList                  const &aResourceIds);
+                    SFrameGraphRenderContext       &aRenderContext,
+                    FrameGraphResourceIdList const &aResourceIds);
 
             /**
              * Deinitialize all subpasses, the render pass and the framebuffer.
@@ -278,9 +278,9 @@ namespace engine
              * @return               True, if successful. False, otherwise.
              */
             CEngineResult<> deinitializeRenderPassAndFrameBuffer(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    std::string                               const &aRenderPassId,
-                    std::string                               const &aFrameBufferId);
+                    SFrameGraphRenderContext       &aRenderContext,
+                    std::string              const &aRenderPassId,
+                    std::string              const &aFrameBufferId);
 
             /**
              * Deinitialize all resources required for execution.
@@ -290,8 +290,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeResources(
-                    Shared<IFrameGraphRenderContext>      &aRenderContext,
-                    FrameGraphResourceIdList                  const&aResourceIds);
+                    SFrameGraphRenderContext       &aRenderContext,
+                    FrameGraphResourceIdList const &aResourceIds);
 
             /**
              * Initialize a texture for execution.
@@ -301,8 +301,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeTexture(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    Shared<SFrameGraphTexture>       const &aTexture);
+                    SFrameGraphRenderContext         &aRenderContext,
+                    Shared<SFrameGraphTexture> const &aTexture);
 
             /**
              * Initialize a texture view for execution.
@@ -313,25 +313,23 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeTextureView(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    Shared<SFrameGraphTexture>       const &aTexture,
-                    Shared<SFrameGraphTextureView>   const &aTextureView);
+                    SFrameGraphRenderContext             &aRenderContext,
+                    Shared<SFrameGraphTexture>     const &aTexture,
+                    Shared<SFrameGraphTextureView> const &aTextureView);
             /**
              * Initialize a buffer for execution.
              *
              * @param renderContext
              * @return
              */
-            CEngineResult<> initializeBuffer(
-                    Shared<IFrameGraphRenderContext> &aRenderContext);
+            CEngineResult<> initializeBuffer(SFrameGraphRenderContext &aRenderContext);
 
             /**
              * Initialize a buffer view for execution
              * @param renderContext
              * @return
              */
-            CEngineResult<> initializeBufferView(
-                    Shared<IFrameGraphRenderContext> &aRenderContext);
+            CEngineResult<> initializeBufferView(SFrameGraphRenderContext &aRenderContext);
 
             /**
              * Deinitialize a texture for execution.
@@ -341,8 +339,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeTexture(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    Shared<SFrameGraphTexture>       const &aTexture);
+                    SFrameGraphRenderContext         &aRenderContext,
+                    Shared<SFrameGraphTexture> const &aTexture);
 
             /**
              * Deinitialize a texture view for execution.
@@ -353,9 +351,9 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeTextureView(
-                    Shared<IFrameGraphRenderContext>       &aRenderContext,
-                    Shared<SFrameGraphTexture>       const &aTexture,
-                    Shared<SFrameGraphTextureView>   const &aTextureView);
+                    SFrameGraphRenderContext             &aRenderContext,
+                    Shared<SFrameGraphTexture>     const &aTexture,
+                    Shared<SFrameGraphTextureView> const &aTextureView);
 
             /**
              * Deinitialize a buffer view for execution.
@@ -363,16 +361,14 @@ namespace engine
              * @param renderContext
              * @return
              */
-            CEngineResult<> deinitializeBufferView(
-                    Shared<IFrameGraphRenderContext> &aRenderContext);
+            CEngineResult<> deinitializeBufferView(SFrameGraphRenderContext &aRenderContext);
             /**
              * Deinitialize a buffer view for execution.
              *
              * @param renderContext
              * @return
              */
-            CEngineResult<> deinitializeBuffer(
-                    Shared<IFrameGraphRenderContext> &aRenderContext);
+            CEngineResult<> deinitializeBuffer(SFrameGraphRenderContext &aRenderContext);
 
             /**
              * Add a new pass to this graph.

@@ -45,7 +45,7 @@ void main()
     if(0.0f < f_lambert)
     {
         f_specular = clamp(dot(R, V), 0.0f, 1.0f);
-        f_specular = position_f_spec.a * pow(f_specular, normal_f_spec_exp.a + 0.0001f);
+        f_specular = ((normal_f_spec_exp.a + 2.0f) / (2.0f * 3.14152f)) * position_f_spec.a * pow(f_specular, normal_f_spec_exp.a + 1.0f);
     }
 
     // fragment_light_0 = vec4( clamp((f * C), 0.0f, 1.0f), 1.0f );

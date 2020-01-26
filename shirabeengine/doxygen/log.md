@@ -2998,7 +2998,7 @@ Generating docs for compound engine::gfxapi::SMaterialVertexAttributeDescription
 Generating docs for compound engine::gfxapi::SMaterialVertexInputBinding...
 Generating docs for compound engine::gfxapi::SMaterialVertexInputState...
 Generating docs for compound engine::gfxapi::SMaterialViewPortState...
-Generating docs for compound engine::gfxapi::SMultisapmling...
+Generating docs for compound engine::gfxapi::SMultisampling...
 Generating docs for compound engine::gfxapi::SSubpassDescription...
 Generating docs for compound engine::gfxapi::STextureInfo...
 Generating docs for compound engine::gfxapi::SViewPort...
@@ -4026,7 +4026,7 @@ Generating XML output for class documentation::test_doxygen::test_cpp::Enum/home
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:83: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::beginGraphicsFrame(std::string const &aSwapChainId)=0 are not documented:
   parameter 'aSwapChainId'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:343: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:349: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:349: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::readMeshAsset(SFrameGraphMesh const &aMesh)=0 are not documented:
   parameter 'aMesh'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:352: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh)=0
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:358: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh)=0 are not documented:
@@ -4332,7 +4332,7 @@ Generating XML output for class engine::gfxapi::SMaterialVertexAttributeDescript
 Generating XML output for class engine::gfxapi::SMaterialVertexInputBinding
 Generating XML output for class engine::gfxapi::SMaterialVertexInputState
 Generating XML output for class engine::gfxapi::SMaterialViewPortState
-Generating XML output for class engine::gfxapi::SMultisapmling
+Generating XML output for class engine::gfxapi::SMultisampling
 Generating XML output for class engine::material::SNamedResource
 Generating XML output for class engine::os::SOSDisplayDescriptor
 Generating XML output for class engine::framegraph::SPassResourceConstraint
