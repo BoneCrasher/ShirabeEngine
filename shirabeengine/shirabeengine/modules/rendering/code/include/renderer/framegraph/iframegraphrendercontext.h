@@ -365,7 +365,7 @@ namespace engine
              * @return            EEngineStatus::Ok if successful.
              * @return            EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> loadMeshAsset(SFrameGraphMesh const &aMesh) = 0;
+            virtual CEngineResult<> readMeshAsset(SFrameGraphMesh const &aMesh) = 0;
 
             /**
              * Unload a mesh asset from the graphics API.
@@ -376,6 +376,7 @@ namespace engine
              */
             virtual CEngineResult<> unloadMeshAsset(SFrameGraphMesh const &aMesh) = 0;
 
+            virtual CEngineResult<> initializeMesdfkjasfjff
             /**
              * Bind a mesh asset using the asset manager into the graphics API.
              *

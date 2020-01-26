@@ -117,7 +117,7 @@ namespace engine
         //            arraySize; // At least 1 (basically everything is a vector...)
         //    uint16_t
         //            mipLevels;
-        //    SMultisapmling
+        //    SMultisampling
         //            multisampling;
         //};
 

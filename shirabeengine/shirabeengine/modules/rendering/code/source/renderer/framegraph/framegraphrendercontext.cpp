@@ -1063,7 +1063,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)
+    CEngineResult<> CFrameGraphRenderContext::readMeshAsset(SFrameGraphMesh const &aMesh)
     {
         CEngineResult<Shared<ILogicalResourceObject>> meshObject = mResourceManager->useAssetResource(aMesh.readableName, aMesh.meshAssetId);
         if(CheckEngineError(meshObject.result()))
@@ -1197,7 +1197,30 @@ namespace engine::framegraph
             {
                 sampledImageTexture->initialize({}); // No-Op if loaded already...
                 sampledImageTexture->load();
+
+                if(sampledImageTexture->getDescription().gpuBinding.check(EBufferBinding::TextureInput))
+                {
+                    mGraphicsAPIRenderContext->performImageLayoutTransfer(
+                            sampledImageTexture->getGpuApiResourceHandle()
+                            , CRange(0, 1)
+                            , CRange(0, 1)
+                            , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
+                            , VK_IMAGE_LAYOUT_UNDEFINED
+                            , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+                }
+                // TODO: Determine load state of texture resource and determine, whether transfer is needed.
                 sampledImageTexture->transfer();     // No-Op if transferred already...
+
+                if(sampledImageTexture->getDescription().gpuBinding.check(EBufferBinding::TextureInput))
+                {
+                    mGraphicsAPIRenderContext->performImageLayoutTransfer(
+                            sampledImageTexture->getGpuApiResourceHandle()
+                            , CRange(0, 1)
+                            , CRange(0, 1)
+                            , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
+                            , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                            , VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                }
 
                 STextureViewDescription desc {};
                 desc.name                 = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
@@ -1291,7 +1314,7 @@ namespace engine::framegraph
 
         if(EFrameGraphResourceType::Undefined != aMesh.type)
         {
-            loadMeshAsset(aMesh);
+            readMeshAsset(aMesh);
             bindMesh     (aMesh);
             Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
             mGraphicsAPIRenderContext->drawIndex(mesh->getDescription().indexSampleCount);

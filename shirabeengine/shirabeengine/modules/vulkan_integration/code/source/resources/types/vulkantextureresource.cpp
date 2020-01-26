@@ -87,6 +87,7 @@ namespace engine::vulkan
         if(aDescription.gpuBinding.check(EBufferBinding::CopyTarget))
         {
             imageUsage |= VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+            layout      = VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         }
         if(aDescription.gpuBinding.check(EBufferBinding::ColorAttachment))
         {

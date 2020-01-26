@@ -197,7 +197,8 @@ namespace engine
                         continue;
                     }
 
-                    aRenderContext->render(*meshPointer, *materialPointer);
+                    CEngineResult<> const renderOk = aRenderContext->render(*meshPointer, *materialPointer);
+                    return renderOk;
                 }
 
                 return { EEngineStatus::Ok };

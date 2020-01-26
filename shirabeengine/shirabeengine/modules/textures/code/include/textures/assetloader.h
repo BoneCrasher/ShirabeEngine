@@ -47,11 +47,13 @@ namespace engine::textures
                 return buffer;
             };
 
+            using core::operator|; // bitwise concat of enum class...
+
             STextureDescription textureDescription {};
             textureDescription.name        = instance->name();
             textureDescription.textureInfo = instance->textureInfo();
             textureDescription.cpuGpuUsage = EResourceUsage::CPU_InitConst_GPU_Read;
-            textureDescription.gpuBinding  = EBufferBinding::TextureInput;
+            textureDescription.gpuBinding  = EBufferBinding::TextureInput | EBufferBinding::CopyTarget;
             textureDescription.gpuBinding.set(EBufferBinding::CopyTarget);
 
             textureDescription.initialData = { initialData };
