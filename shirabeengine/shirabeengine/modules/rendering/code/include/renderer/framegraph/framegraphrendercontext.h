@@ -36,17 +36,11 @@ namespace engine
         using namespace engine::resources;
         using namespace engine::rendering;
 
-        struct SHIRABE_LIBRARY_EXPORT SResourceState
-        {
-            ? logicalResource;
-            ? gpuApiResource;
-            EGpuApiResourceState state;
-        };
-
         struct SHIRABE_LIBRARY_EXPORT SFrameGraphRenderContextState
         {
-            std::vector<SResourceState> resources;
-            std::unordered_map<FrameGraphResourceIadf;kjlaa
+            std::vector<ResourceId_t>     mReferencedResources;
+            // Shared<CVulkanBufferResource> mCurrentAttributeBuffer;
+            // Shared<CVulkanBufferResource> mCurrentIndexBuffer;
         };
 
         struct SHIRABE_LIBRARY_EXPORT SFrameGraphRenderContext
@@ -83,14 +77,14 @@ namespace engine
             /**
              *
              */
-            std::function<EEngineStatus()>                   beginGraphicsFrame;
-            std::function<EEngineStatus()>                   endGraphicsFrame;
-            std::function<EEngineStatus()>                   beginPass;
-            std::function<EEngineStatus()>                   endPass;
-            std::function<EEngineStatus()>                   beginFrameCommandBuffers;
-            std::function<EEngineStatus()>                   endFrameCommandBuffers;
-            std::function<EEngineStatus(std::string const&)> clearAttachments;
-            std::function<EEngineStatus()>                   present;
+            std::function<EEngineStatus()>                                    beginGraphicsFrame;
+            std::function<EEngineStatus()>                                    endGraphicsFrame;
+            std::function<EEngineStatus()>                                    beginPass;
+            std::function<EEngineStatus()>                                    endPass;
+            std::function<EEngineStatus()>                                    beginFrameCommandBuffers;
+            std::function<EEngineStatus()>                                    endFrameCommandBuffers;
+            std::function<EEngineStatus(std::string const&, uint32_t const&)> clearAttachments;
+            std::function<EEngineStatus()>                                    present;
 
             /**
              *
@@ -197,7 +191,7 @@ namespace engine
             // IFrameGraphRenderContext implementation
             //
 
-            CEngineResult<> clearAttachments(std::string const &aRenderPassId) final;
+            CEngineResult<> clearAttachments(std::string const &aRenderPassId, uint32_t const &aCurrentSubpassIndex) final;
 
             /**
              * Begin a pass.

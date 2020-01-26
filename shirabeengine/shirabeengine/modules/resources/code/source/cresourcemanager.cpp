@@ -93,31 +93,31 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        bool CResourceManager::storeResourceObject(ResourceId_t                      const &aId
-                                                   , Shared <ILogicalResourceObject> const &aObject)
+        bool CResourceManager::storeResourceObject(ResourceId_t     const &aId
+                                                   , SResourceState const &aObject)
         {
-            bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find( aId));
-            if(false == hasObjectForId)
+            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
+            if(not hasObjectForId)
             {
                 mResourceObjects[aId] = aObject;
             }
 
-            return (false == hasObjectForId);
+            return (not hasObjectForId);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        Shared<ILogicalResourceObject> CResourceManager::getResourceObject(ResourceId_t const &aId)
+        std::optional<SResourceState> CResourceManager::getResourceObject(ResourceId_t const &aId)
         {
-            bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find(aId));
+            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
             if(hasObjectForId)
             {
                 return mResourceObjects.at(aId);
             }
 
-            return nullptr;
+            return {};
         }
         //<-----------------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ namespace engine
             auto const adjacent = mResourceTree.getAdjacentFor(aId);
             for(auto const &dependencyId : adjacent)
             {
-                Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId);
+                Shared<ILogicalResourceObject> logicalResource = mResourceObjects.at(dependencyId).logicalResource;
                 dependencies.insert({ dependencyId, logicalResource->getGpuApiResourceHandle() });
             }
             return dependencies;

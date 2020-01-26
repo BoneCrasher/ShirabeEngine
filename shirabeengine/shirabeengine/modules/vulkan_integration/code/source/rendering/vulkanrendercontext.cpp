@@ -4,6 +4,9 @@
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 
+#include <renderer/framegraph/framegraphrendercontext.h>
+#include <resources/cresourcemanager.h>
+
 #include <thread>
 #include <base/string.h>
 
@@ -11,171 +14,160 @@ namespace engine
 {
     namespace vulkan
     {
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------        
-        bool CVulkanRenderContext::initialize(Shared<CVulkanEnvironment>     const &aVulkanEnvironment
-                                            , Shared<CGpuApiResourceStorage> const &aResourceStorage)
+        using namespace framegraph;
+
+        framegraph::SFrameGraphRenderContext CreateRenderContextForVulkan(Shared<CVulkanEnvironment> aVulkanEnvironment
+                                                                        , Shared<CResourceManager>   aResourceManager)
         {
-            assert(nullptr != aVulkanEnvironment);
-            assert(nullptr != aResourceStorage);
+            framegraph::SFrameGraphRenderContext context {};
 
-            mVulkanEnvironment = aVulkanEnvironment;
-            mResourceStorage   = aResourceStorage;
-
-            return true;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        bool CVulkanRenderContext::deinitialize()
-        {
-            mVulkanEnvironment = nullptr;
-
-            return true;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::clearAttachments(GpuApiHandle_t const &aRenderPassId, uint32_t const &aCurrentSubpassIndex)
-        {
-            SVulkanState    &state        = mVulkanEnvironment->getState();
-            VkCommandBuffer commandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-
-            auto                   const *const renderPass = mResourceStorage->extract<CVulkanRenderPassResource>(aRenderPassId);
-            SRenderPassDescription const       &description = *(renderPass->getCurrentDescriptor());
-
-            std::vector<VkClearRect>       clearRects       {};
-            std::vector<VkClearAttachment> clearAttachments {};
-
-            SSubpassDescription const &subpassDesc = description.subpassDescriptions.at(aCurrentSubpassIndex);
-            for(std::size_t k=0; k<subpassDesc.colorAttachments.size(); ++k)
+            context.clearAttachments = [=] (std::string const &aRenderPassId, uint32_t const &aCurrentSubpassIndex) -> EEngineStatus
             {
-                SAttachmentReference   const &ref  = subpassDesc.colorAttachments[k];
-                SAttachmentDescription const &desc = description.attachmentDescriptions[ref.attachment];
+                SVulkanState    &state        = aVulkanEnvironment->getState();
+                VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
-                VkClearAttachment clear {};
-                clear.colorAttachment = k;
-                clear.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
-                clear.clearValue      = desc.clearColor;
+                std::optional<SResourceState> resource = aResourceManager->getResource(aRenderPassId);
+                if(not resource.has_value())
+                {
+                    return EEngineStatus::Error;
+                }
 
-                VkClearRect rect {};
-                rect.baseArrayLayer = 0;
-                rect.layerCount     = 1;
-                rect.rect.offset    = { 0, 0 };
-                rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
+                auto                          renderPass  = std::static_pointer_cast<SRenderPass>(resource->logicalResource);
+                SRenderPassDescription const &description = renderPass->getDescription();
 
-                clearAttachments.push_back(clear);
-                clearRects      .push_back(rect);
-            }
+                std::vector<VkClearRect>       clearRects       {};
+                std::vector<VkClearAttachment> clearAttachments {};
 
-            for(std::size_t k=0; k<subpassDesc.depthStencilAttachments.size(); ++k)
+                SSubpassDescription const &subpassDesc = description.subpassDescriptions.at(aCurrentSubpassIndex);
+                for(std::size_t k=0; k<subpassDesc.colorAttachments.size(); ++k)
+                {
+                    SAttachmentReference   const &ref  = subpassDesc.colorAttachments[k];
+                    SAttachmentDescription const &desc = description.attachmentDescriptions[ref.attachment];
+
+                    VkClearAttachment clear {};
+                    clear.colorAttachment = k;
+                    clear.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+                    clear.clearValue      = desc.clearColor;
+
+                    VkClearRect rect {};
+                    rect.baseArrayLayer = 0;
+                    rect.layerCount     = 1;
+                    rect.rect.offset    = { 0, 0 };
+                    rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
+
+                    clearAttachments.push_back(clear);
+                    clearRects      .push_back(rect);
+                }
+
+                for(std::size_t k=0; k<subpassDesc.depthStencilAttachments.size(); ++k)
+                {
+                    SAttachmentReference   const &ref  = subpassDesc.depthStencilAttachments[k];
+                    SAttachmentDescription const &desc = description.attachmentDescriptions[ref.attachment];
+
+                    VkClearAttachment clear {};
+                    clear.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+                    clear.clearValue = desc.clearColor;
+
+                    VkClearRect rect {};
+                    rect.baseArrayLayer = 0;
+                    rect.layerCount     = 1;
+                    rect.rect.offset    = { 0, 0 };
+                    rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
+
+                    clearAttachments.push_back(clear);
+                    clearRects      .push_back(rect);
+                }
+
+                vkCmdClearAttachments(commandBuffer, clearAttachments.size(), clearAttachments.data(), clearRects.size(), clearRects.data());
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.beginPass = [=] () -> EEngineStatus
             {
-                SAttachmentReference   const &ref  = subpassDesc.depthStencilAttachments[k];
-                SAttachmentDescription const &desc = description.attachmentDescriptions[ref.attachment];
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
 
-                VkClearAttachment clear {};
-                clear.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-                clear.clearValue = desc.clearColor;
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.endPass = [=] () -> EEngineStatus
+            {
+                SVulkanState    &state        = aVulkanEnvironment->getState();
+                VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
-                VkClearRect rect {};
-                rect.baseArrayLayer = 0;
-                rect.layerCount     = 1;
-                rect.rect.offset    = { 0, 0 };
-                rect.rect.extent    = { description.attachmentExtent.width,  description.attachmentExtent.height };
+                vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
 
-                clearAttachments.push_back(clear);
-                clearRects      .push_back(rect);
-            }
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
 
-            vkCmdClearAttachments(commandBuffer, clearAttachments.size(), clearAttachments.data(), clearRects.size(), clearRects.data());
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.copyImage = [=] (SFrameGraphTexture const &aSourceImageId,
+                                     SFrameGraphTexture const &aTargetImageId) -> EEngineStatus
+            {
+                SHIRABE_UNUSED(aSourceImageId);
+                SHIRABE_UNUSED(aTargetImageId);
 
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::beginSubpass()
-        {
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
 
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::endSubpass()
-        {
-            SVulkanState    &state        = mVulkanEnvironment->getState();
-            VkCommandBuffer commandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.performImageLayoutTransfer = [=] (  SFrameGraphTexture const &aImageHandle
+                                                      , CRange             const &aArrayRange
+                                                      , CRange             const &aMipRange
+                                                      , VkImageAspectFlags const &aAspectFlags
+                                                      , VkImageLayout      const &aSourceLayout
+                                                      , VkImageLayout      const &aTargetLayout) -> EEngineStatus
+            {
+                SVulkanState &state = aVulkanEnvironment->getState();
 
-            vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
+                VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+                std::optional<SResourceState> resource = aResourceManager->getResource(aImageHandle.readableName);
+                if(not resource.has_value())
+                {
+                    return EEngineStatus::Error;
+                }
 
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
+                auto    texture = std::static_pointer_cast<STexture>(resource->logicalResource);
+                VkImage image   = texture->...;
 
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
+                VkImageMemoryBarrier vkImageMemoryBarrier {};
+                vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+                vkImageMemoryBarrier.pNext                           = nullptr;
+                vkImageMemoryBarrier.srcAccessMask                   = VK_ACCESS_TRANSFER_WRITE_BIT;
+                vkImageMemoryBarrier.dstAccessMask                   = 0;
+                vkImageMemoryBarrier.oldLayout                       = aSourceLayout;
+                vkImageMemoryBarrier.newLayout                       = aTargetLayout;
+                vkImageMemoryBarrier.srcQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
+                vkImageMemoryBarrier.dstQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
+                vkImageMemoryBarrier.image                           = image;
+                vkImageMemoryBarrier.subresourceRange.aspectMask     = aAspectFlags;
+                vkImageMemoryBarrier.subresourceRange.baseMipLevel   = aMipRange.offset;
+                vkImageMemoryBarrier.subresourceRange.levelCount     = aMipRange.length;
+                vkImageMemoryBarrier.subresourceRange.baseArrayLayer = aArrayRange.offset;
+                vkImageMemoryBarrier.subresourceRange.layerCount     = aArrayRange.length;
 
-        EEngineStatus CVulkanRenderContext::copyImage(GpuApiHandle_t const &aSourceImageId,
-                                                      GpuApiHandle_t const &aTargetImageId)
-        {
-            SHIRABE_UNUSED(aSourceImageId);
-            SHIRABE_UNUSED(aTargetImageId);
+                // Create pipeline barrier on swap chain image to move it to correct format.
+                vkCmdPipelineBarrier(commandBuffer,
+                                     VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                     VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                     VkDependencyFlagBits   ::VK_DEPENDENCY_BY_REGION_BIT,
+                                     0, nullptr,
+                                     0, nullptr,
+                                     1, &vkImageMemoryBarrier);
 
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::performImageLayoutTransfer(  GpuApiHandle_t     const &aImageHandle
-                                                                       , CRange             const &aArrayRange
-                                                                       , CRange             const &aMipRange
-                                                                       , VkImageAspectFlags const &aAspectFlags
-                                                                       , VkImageLayout      const &aSourceLayout
-                                                                       , VkImageLayout      const &aTargetLayout)
-        {
-            SVulkanState &state = mVulkanEnvironment->getState();
-
-            VkCommandBuffer commandBuffer  = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-            VkImage         image          = mVulkanEnvironment->getResourceStorage()->extract<CVulkanTextureResource>(aImageHandle)->imageHandle;
-
-            VkImageMemoryBarrier vkImageMemoryBarrier {};
-            vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-            vkImageMemoryBarrier.pNext                           = nullptr;
-            vkImageMemoryBarrier.srcAccessMask                   = VK_ACCESS_TRANSFER_WRITE_BIT;
-            vkImageMemoryBarrier.dstAccessMask                   = 0;
-            vkImageMemoryBarrier.oldLayout                       = aSourceLayout;
-            vkImageMemoryBarrier.newLayout                       = aTargetLayout;
-            vkImageMemoryBarrier.srcQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
-            vkImageMemoryBarrier.dstQueueFamilyIndex             = VK_QUEUE_FAMILY_IGNORED;
-            vkImageMemoryBarrier.image                           = image;
-            vkImageMemoryBarrier.subresourceRange.aspectMask     = aAspectFlags;
-            vkImageMemoryBarrier.subresourceRange.baseMipLevel   = aMipRange.offset;
-            vkImageMemoryBarrier.subresourceRange.levelCount     = aMipRange.length;
-            vkImageMemoryBarrier.subresourceRange.baseArrayLayer = aArrayRange.offset;
-            vkImageMemoryBarrier.subresourceRange.layerCount     = aArrayRange.length;
-
-            // Create pipeline barrier on swap chain image to move it to correct format.
-            vkCmdPipelineBarrier(commandBuffer,
-                                 VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                 VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                 VkDependencyFlagBits   ::VK_DEPENDENCY_BY_REGION_BIT,
-                                 0, nullptr,
-                                 0, nullptr,
-                                 1, &vkImageMemoryBarrier);
-
-            return EEngineStatus::Ok;
-        }
+                return EEngineStatus::Ok;
+            };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

@@ -2,48 +2,48 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
-      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
-      <config projectName="shirabedevelopment" targetName="textures" />
-      <config projectName="shirabedevelopment" targetName="log" />
-      <config projectName="shirabedevelopment" targetName="game" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_textures" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
-      <config projectName="shirabedevelopment" targetName="mesh" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_material" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
-      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
-      <config projectName="shirabedevelopment" targetName="core" />
-      <config projectName="shirabedevelopment" targetName="crc32generator" />
-      <config projectName="shirabedevelopment" targetName="utility" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
-      <config projectName="shirabedevelopment" targetName="wsi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
       <config projectName="shirabedevelopment" targetName="INSTALL_vulkan_integration" />
       <config projectName="shirabedevelopment" targetName="resources" />
-      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
-      <config projectName="shirabedevelopment" targetName="math" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_os" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="material" />
-      <config projectName="shirabedevelopment" targetName="asset" />
-      <config projectName="shirabedevelopment" targetName="os" />
-      <config projectName="shirabedevelopment" targetName="base" />
-      <config projectName="shirabedevelopment" targetName="shirabeengine" />
-      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
-      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
-      <config projectName="shirabedevelopment" targetName="graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_core" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_base" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_copy_resources" />
       <config projectName="shirabedevelopment" targetName="rendering" />
+      <config projectName="shirabedevelopment" targetName="textures" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_graphicsapi" />
+      <config projectName="shirabedevelopment" targetName="log" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_os" />
+      <config projectName="shirabedevelopment" targetName="utility" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_utility" />
+      <config projectName="shirabedevelopment" targetName="game" />
+      <config projectName="shirabedevelopment" targetName="vulkan_integration" />
+      <config projectName="shirabedevelopment" targetName="material" />
+      <config projectName="shirabedevelopment" targetName="crc32generator" />
+      <config projectName="shirabedevelopment" targetName="base" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_crc32generator" />
+      <config projectName="shirabedevelopment" targetName="core" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_math" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_wsi" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_platform" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_process_resources" />
+      <config projectName="shirabedevelopment" targetName="shirabeengine" />
+      <config projectName="shirabedevelopment" targetName="asset" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_rendering" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_textures" />
+      <config projectName="shirabedevelopment" targetName="mesh" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_material" />
+      <config projectName="shirabedevelopment" targetName="shirabe_resource_compiler" />
+      <config projectName="shirabedevelopment" targetName="wsi" />
+      <config projectName="shirabedevelopment" targetName="os" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_asset" />
       <config projectName="shirabedevelopment" targetName="INSTALL_mesh" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_log" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_resources" />
+      <config projectName="shirabedevelopment" targetName="INSTALL_game" />
+      <config projectName="shirabedevelopment" targetName="shirabe_game_precopy" />
+      <config projectName="shirabedevelopment" targetName="math" />
+      <config projectName="shirabedevelopment" targetName="graphicsapi" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true">
@@ -268,6 +268,12 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/stl_container_helpers.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/base/code/include/base/stl_container_helpers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cresourcemanager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cresourcemanager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -711,7 +717,8 @@
       <workItem from="1577105431194" duration="1833000" />
       <workItem from="1577130101964" duration="32367000" />
       <workItem from="1577428223470" duration="21122000" />
-      <workItem from="1577693764342" duration="28632000" />
+      <workItem from="1577693764342" duration="29376000" />
+      <workItem from="1580017360179" duration="6165000" />
     </task>
     <servers />
   </component>
@@ -759,25 +766,25 @@
     </state>
     <state width="793" height="466" key="DebuggerActiveHint/0.0.1920.1044@0.0.1920.1044" timestamp="1577731933934" />
     <state width="1851" height="469" key="DebuggerActiveHint/0.0.4480.1050@0.0.4480.1050" timestamp="1577266626900" />
-    <state width="1874" height="363" key="GridCell.Tab.0.bottom" timestamp="1577741131628">
+    <state width="1874" height="266" key="GridCell.Tab.0.bottom" timestamp="1577741633983">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1874" height="363" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577741131628" />
+    <state width="1874" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1044@0.0.1920.1044" timestamp="1577741633983" />
     <state width="2514" height="413" key="GridCell.Tab.0.bottom/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="1874" height="363" key="GridCell.Tab.0.center" timestamp="1577741131628">
+    <state width="1874" height="266" key="GridCell.Tab.0.center" timestamp="1577741633982">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1874" height="363" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577741131628" />
+    <state width="1874" height="266" key="GridCell.Tab.0.center/0.0.1920.1044@0.0.1920.1044" timestamp="1577741633982" />
     <state width="2514" height="413" key="GridCell.Tab.0.center/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="1874" height="363" key="GridCell.Tab.0.left" timestamp="1577741131628">
+    <state width="1874" height="266" key="GridCell.Tab.0.left" timestamp="1577741633982">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1874" height="363" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577741131628" />
+    <state width="1874" height="266" key="GridCell.Tab.0.left/0.0.1920.1044@0.0.1920.1044" timestamp="1577741633982" />
     <state width="2514" height="413" key="GridCell.Tab.0.left/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
-    <state width="1874" height="363" key="GridCell.Tab.0.right" timestamp="1577741131628">
+    <state width="1874" height="266" key="GridCell.Tab.0.right" timestamp="1577741633983">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state width="1874" height="363" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577741131628" />
+    <state width="1874" height="266" key="GridCell.Tab.0.right/0.0.1920.1044@0.0.1920.1044" timestamp="1577741633983" />
     <state width="2514" height="413" key="GridCell.Tab.0.right/0.0.4480.1050@0.0.4480.1050" timestamp="1577266855230" />
     <state width="1874" height="363" key="GridCell.Tab.1.bottom" timestamp="1577741131629">
       <screen x="0" y="0" width="1920" height="1044" />
@@ -811,11 +818,11 @@
       <screen x="0" y="0" width="2560" height="1050" />
     </state>
     <state x="944" y="167" width="670" height="718" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.2560.1050/2560.0.1920.1080@0.0.2560.1050" timestamp="1577429330004" />
-    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1577733067357">
+    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1580021383527">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="366" y="255" width="1442" height="539" key="find.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1577472365162" />
-    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1577733067357" />
+    <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1580021383527" />
     <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577264783274" />
     <state x="1025" y="167" key="refactoring.ChangeSignatureDialog" timestamp="1577266956252">
       <screen x="0" y="0" width="4480" height="1050" />

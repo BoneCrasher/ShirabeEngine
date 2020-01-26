@@ -74,5 +74,11 @@ namespace engine
     {
         return CMapEmplacer<TContainer>(aContainer);
     }
+
+    template <typename TContainer, typename K>
+    static bool assoc_container_contains(TContainer const &aContainer, K const &aKey)
+    {
+        return (aContainer.end() != aContainer.find(aKey));
+    }
 }
 #endif // STL_CONTAINER_HELPERS_H
