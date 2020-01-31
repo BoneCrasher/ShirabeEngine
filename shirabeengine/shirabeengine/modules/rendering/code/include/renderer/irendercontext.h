@@ -17,12 +17,6 @@ namespace engine
         using resources::GpuApiHandle_t;
         // using namespace engine::resources;
 
-        struct SSampledImageBinding
-        {
-            GpuApiHandle_t imageView;
-            GpuApiHandle_t image;
-        };
-
         /**
          * The IRenderContext interface describes rendering operations supported in
          * order to generate a command buffer.

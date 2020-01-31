@@ -61,6 +61,14 @@ namespace engine::resources
         ~CResourceManager() = default;
 
     public_methods:
+
+        /**
+         * Add an asset loader instance for a given type TResource
+         *
+         * @tparam TResource
+         * @param aLoader
+         * @return
+         */
         template <typename TResource>
         CEngineResult<> addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader);
 

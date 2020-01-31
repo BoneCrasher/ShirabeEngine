@@ -16,9 +16,49 @@ namespace engine
     {
         using namespace framegraph;
 
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        EEngineStatus transferBufferData(VkDevice aDevice, ByteBuffer const &aDataSource, VkDeviceMemory const &aBufferMemory)
+        {
+            VkDeviceSize     const offset = 0;
+            VkDeviceSize     const size   = aDataSource.size();
+            VkMemoryMapFlags const flags  = 0;
+
+            void *data = nullptr;
+            VkResult const result = vkMapMemory(aDevice, aBufferMemory, offset, size, flags, &data);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                CLog::Error(logTag(), "Failed to map vulkan buffer w/ handle {}", aGpuBufferHandle);
+                return EEngineStatus::Error;
+            }
+
+            if(nullptr != data) {
+                auto input = aDataSource.data();
+                memcpy(data, (void *) input, size);
+                vkUnmapMemory(aDevice, aBufferMemory);
+            }
+
+            return EEngineStatus::Ok;
+        }
+
+        namespace local
+        {
+            SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphRenderContext);
+        }
+
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         framegraph::SFrameGraphRenderContext CreateRenderContextForVulkan(Shared<CVulkanEnvironment> aVulkanEnvironment
                                                                         , Shared<CResourceManager>   aResourceManager)
         {
+            using namespace local;
+
             framegraph::SFrameGraphRenderContext context {};
 
             context.clearAttachments = [=] (std::string const &aRenderPassId, uint32_t const &aCurrentSubpassIndex) -> EEngineStatus
@@ -26,14 +66,14 @@ namespace engine
                 SVulkanState    &state        = aVulkanEnvironment->getState();
                 VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
-                std::optional<SResourceState> resource = aResourceManager->getResource(aRenderPassId);
+                std::optional<SResourceState<SRenderPass>> resource = aResourceManager->getResource<SRenderPass>(aRenderPassId);
                 if(not resource.has_value())
                 {
                     return EEngineStatus::Error;
                 }
 
-                auto                          renderPass  = std::static_pointer_cast<SRenderPass>(resource->logicalResource);
-                SRenderPassDescription const &description = renderPass->getDescription();
+                SRenderPass            const &renderPass  = resource->logicalResource;
+                SRenderPassDescription const &description = renderPass.getDescription();
 
                 std::vector<VkClearRect>       clearRects       {};
                 std::vector<VkClearAttachment> clearAttachments {};
@@ -132,14 +172,19 @@ namespace engine
                 SVulkanState &state = aVulkanEnvironment->getState();
 
                 VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-                std::optional<SResourceState> resource = aResourceManager->getResource(aImageHandle.readableName);
+                std::optional<SResourceState<STexture>> resource = aResourceManager->getResource<STexture>(aImageHandle.readableName);
                 if(not resource.has_value())
                 {
                     return EEngineStatus::Error;
                 }
 
-                auto    texture = std::static_pointer_cast<STexture>(resource->logicalResource);
-                VkImage image   = texture->...;
+                STexture const &texture = resource->logicalResource;
+                if(not resource->gpuApiResource)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                VkImage image = std::static_pointer_cast<CVulkanTextureResource>(resource->gpuApiResource)->imageHandle;
 
                 VkImageMemoryBarrier vkImageMemoryBarrier {};
                 vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -173,19 +218,25 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::copyToBackBuffer(GpuApiHandle_t const &aSourceImageId)
+        context.copyImageToBackBuffer = [=] (SFrameGraphTexture const &aSourceImageId) -> EEngineStatus
         {
-            auto const *const texture = mVulkanEnvironment->getResourceStorage()->extract<CVulkanTextureResource>(aSourceImageId);
-            if(nullptr == texture)
+            SVulkanState &state = aVulkanEnvironment->getState();
+
+            VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+            VkImage         swapChainImage = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
+
+            std::optional<SResourceState<STexture>> resource = aResourceManager->getResource<STexture>(aSourceImageId.readableName);
+            if(not resource.has_value())
             {
-                CLog::Error(logTag(), "Failed to fetch copy source image '{}'.", aSourceImageId);
                 return EEngineStatus::Error;
             }
 
-            SVulkanState &state = mVulkanEnvironment->getState();
-
-            VkCommandBuffer commandBuffer  = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-            VkImage         swapChainImage = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
+            STexture const &texture = resource->logicalResource;
+            if(not resource->gpuApiResource)
+            {
+                return EEngineStatus::Error;
+            }
+            VkImage image = std::static_pointer_cast<CVulkanTextureResource>(resource->gpuApiResource)->imageHandle;
 
             VkImageMemoryBarrier vkImageMemoryBarrier {};
             vkImageMemoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -233,7 +284,7 @@ namespace engine
             vkRegion.extent         = vkExtent;
 
             vkCmdCopyImage(commandBuffer,
-                           texture->imageHandle,
+                           image,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                            swapChainImage,
                            VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -241,66 +292,38 @@ namespace engine
                            &vkRegion);
 
             return EEngineStatus::Ok;
-        }
+        };
+
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::transferBufferData(ByteBuffer const &aDataSource, GpuApiHandle_t const &aGpuBufferHandle)
+        context.updateMaterial = [=] (  SFrameGraphMaterial                 const &aMaterialHandle
+                                      , std::vector<SFrameGraphBuffer>      const &aGpuBufferHandles
+                                      , std::vector<SFrameGraphTextureView> const &aGpuInputAttachmentTextureViewHandles
+                                      , std::vector<SSampledImageBinding>   const &aGpuTextureViewHandles)
         {
-            auto const *const gpuBuffer = mVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aGpuBufferHandle);
-            if(nullptr == gpuBuffer)
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+            SVulkanState &state = aVulkanEnvironment->getState();
+
+            VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+            std::optional<SResourceState<SPipeline>> resource = aResourceManager->getResource<SPipeline>(aMaterialHandle.readableName);
+            if(not resource.has_value())
             {
                 return EEngineStatus::Error;
             }
 
-            VkDevice device = mVulkanEnvironment->getLogicalDevice();
-
-            VkDeviceSize     const offset = 0;
-            VkDeviceSize     const size   = aDataSource.size();
-            VkMemoryMapFlags const flags  = 0;
-
-            void *data = nullptr;
-            VkResult const result = vkMapMemory(device, gpuBuffer->attachedMemory, offset, size, flags, &data);
-            if(VkResult::VK_SUCCESS != result)
+            if(not resource->gpuApiResource)
             {
-                CLog::Error(logTag(), "Failed to map vulkan buffer w/ handle {}", aGpuBufferHandle);
                 return EEngineStatus::Error;
             }
 
-            if(nullptr != data) {
-                auto input = aDataSource.data();
-                memcpy(data, (void *) input, size);
-                vkUnmapMemory(device, gpuBuffer->attachedMemory);
-            }
-
-            return EEngineStatus::Ok;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::transferImageData(GpuApiHandle_t const &aTextureResourceHandle)
-        {
-            auto *const texture = mResourceStorage->extract<CVulkanTextureResource>(aTextureResourceHandle);
-            return texture->transfer().result();
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::updateResourceBindings(  GpuApiHandle_t const                    &aGpuMaterialHandle
-                                                                   , std::vector<GpuApiHandle_t>       const &aGpuBufferHandles
-                                                                   , std::vector<GpuApiHandle_t>       const &aGpuInputAttachmentTextureViewHandles
-                                                                   , std::vector<SSampledImageBinding> const &aGpuTextureViewHandles)
-        {
-            VkDevice device = mVulkanEnvironment->getLogicalDevice();
-
-            auto                       *const pipeline           = mResourceStorage->extract<CVulkanPipelineResource>(aGpuMaterialHandle);
-            SMaterialPipelineDescriptor const pipelineDescriptor = *(pipeline->getCurrentDescriptor());
+            SPipeline                       const &pipeline           = resource->logicalResource;
+            Shared<CVulkanPipelineResource> const  gpuPipeline        = std::static_pointer_cast<CVulkanPipelineResource>(resource->gpuApiResource);
+            SMaterialPipelineDescriptor     const &pipelineDescriptor = pipeline.getDescription();
 
             std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
             std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
@@ -328,7 +351,7 @@ namespace engine
                     {
                         case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
                             {
-                                auto const *const buffer = mResourceStorage->extract<CVulkanBufferResource>(aGpuBufferHandles[bufferCounter]);
+                                auto const *const buffer = aVulkanEnvironment->getResourceStorage()->extract<CVulkanBufferResource>(aGpuBufferHandles[bufferCounter]);
 
                                 VkDescriptorBufferInfo bufferInfo = {};
                                 bufferInfo.buffer = buffer->handle;
@@ -340,7 +363,7 @@ namespace engine
                                 descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                                 descriptorWrite.pNext            = nullptr;
                                 descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                                descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstSet           = gpuPipeline->descriptorSets[startSetIndex + k];
                                 descriptorWrite.dstBinding       = binding.binding;
                                 descriptorWrite.dstArrayElement  = 0;
                                 descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
@@ -354,7 +377,7 @@ namespace engine
                             break;
                         case VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
                             {
-                                auto const *const view = mResourceStorage->extract<CVulkanTextureViewResource>(aGpuInputAttachmentTextureViewHandles[inputAttachmentCounter]);
+                                auto const *const view = aVulkanEnvironment->getResourceStorage()->extract<CVulkanTextureViewResource>(aGpuInputAttachmentTextureViewHandles[inputAttachmentCounter]);
 
                                 VkDescriptorImageInfo imageInfo {};
                                 imageInfo.imageView   = view->handle;
@@ -366,7 +389,7 @@ namespace engine
                                 descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                                 descriptorWrite.pNext            = nullptr;
                                 descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-                                descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstSet           = gpuPipeline->descriptorSets[startSetIndex + k];
                                 descriptorWrite.dstBinding       = binding.binding;
                                 descriptorWrite.dstArrayElement  = 0;
                                 descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
@@ -392,8 +415,8 @@ namespace engine
                                     continue;
                                 }
 
-                                auto const *const view  = mResourceStorage->extract<CVulkanTextureViewResource>(imageBinding.imageView);
-                                auto const *const image = mResourceStorage->extract<CVulkanTextureResource>    (imageBinding.image);
+                                auto const *const view  = aVulkanEnvironment->getResourceStorage()->extract<CVulkanTextureViewResource>(imageBinding.imageView);
+                                auto const *const image = aVulkanEnvironment->getResourceStorage()->extract<CVulkanTextureResource>    (imageBinding.image);
                                 if(nullptr == view || nullptr == image)
                                 {
                                     continue;
@@ -409,7 +432,7 @@ namespace engine
                                 descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                                 descriptorWrite.pNext            = nullptr;
                                 descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                                descriptorWrite.dstSet           = pipeline->descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstSet           = gpuPipeline->descriptorSets[startSetIndex + k];
                                 descriptorWrite.dstBinding       = binding.binding;
                                 descriptorWrite.dstArrayElement  = 0;
                                 descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
@@ -428,15 +451,15 @@ namespace engine
 
             vkUpdateDescriptorSets(device, descriptorSetWrites.size(), descriptorSetWrites.data(), 0, nullptr);
             return EEngineStatus::Ok;
-        }
+        };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::beginFrameCommandBuffers()
+        context.beginFrameCommandBuffers = [=] () -> EEngineStatus
         {
-            SVulkanState &state = mVulkanEnvironment->getState();
+            SVulkanState &state = aVulkanEnvironment->getState();
 
             auto const begin = [&] (VkCommandBuffer const &buffer) -> void
             {
@@ -452,25 +475,25 @@ namespace engine
                 }
             };
 
-            VkCommandBuffer transferCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
-            VkCommandBuffer graphicsCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+            VkCommandBuffer transferCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
+            VkCommandBuffer graphicsCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
             begin(transferCommandBuffer);
             begin(graphicsCommandBuffer);
 
             return EEngineStatus::Ok;
-        }
+        };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::commitFrameCommandBuffers()
+        context.endFrameCommandBuffers = [=] () -> EEngineStatus
         {
-            SVulkanState &vkState = mVulkanEnvironment->getState();
+            SVulkanState &vkState = aVulkanEnvironment->getState();
 
-            VkCommandBuffer transferCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
-            VkCommandBuffer graphicsCommandBuffer = mVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+            VkCommandBuffer transferCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
+            VkCommandBuffer graphicsCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
             VkImage swapChainImage = vkState.swapChain.swapChainImages.at(vkState.swapChain.currentSwapChainImageIndex);
 
@@ -515,17 +538,344 @@ namespace engine
             end(transferCommandBuffer);
 
             return EEngineStatus::Ok;
-        }
+        };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CVulkanRenderContext::bindRenderPass(GpuApiHandle_t const &aRenderPassId,
-                                                           GpuApiHandle_t const &aFrameBufferId)
+        context.bindRenderPass = [=] (std::string                     const &aRenderPassId,
+                                      std::string                     const &aFrameBufferId,
+                                      std::vector<PassUID_t>          const &aPassExecutionOrder,
+                                      SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                                      CFrameGraphMutableResources     const &aFrameGraphResources ) -> EEngineStatus
         {
-            auto const *const renderPass  = mVulkanEnvironment->getResourceStorage()->extract<CVulkanRenderPassResource>(aRenderPassId);
-            auto const *const frameBuffer = mVulkanEnvironment->getResourceStorage()->extract<CVulkanFrameBufferResource>(aFrameBufferId);
+            auto const *const renderPass  = aVulkanEnvironment->getResourceStorage()->extract<CVulkanRenderPassResource>(aRenderPassId);
+            auto const *const frameBuffer = aVulkanEnvironment->getResourceStorage()->extract<CVulkanFrameBufferResource>(aFrameBufferId);
+
+            //<-----------------------------------------------------------------------------
+            // Helper function to find attachment indices in index lists.
+            //<-----------------------------------------------------------------------------
+            auto const findAttachmentRelationFn = [] (Vector<FrameGraphResourceId_t> const &aResourceIdIndex,
+                                                      Vector<uint64_t>               const &aRelationIndices,
+                                                      uint64_t                       const &aIndex)            -> bool
+            {
+                auto const predicate = [&] (uint64_t const &aTestIndex) -> bool
+                {
+                    return ( (aResourceIdIndex.size() > aTestIndex) and (aIndex == aResourceIdIndex.at(aTestIndex)) );
+                };
+
+                auto const &iterator = std::find_if(aRelationIndices.begin(), aRelationIndices.end(), predicate);
+
+                return (aRelationIndices.end() != iterator);
+            };
+            //<-----------------------------------------------------------------------------
+
+            auto const addIfNotAddedYet = [] (Vector<SSubpassDependency> &aDependencies, SSubpassDependency const &aToBeInserted) -> void
+            {
+                for(auto const &dep : aDependencies)
+                {
+                    if(   dep.srcPass      == aToBeInserted.srcPass
+                          && dep.srcStage  == aToBeInserted.srcStage
+                          && dep.srcAccess == aToBeInserted.srcAccess
+                          && dep.dstPass   == aToBeInserted.dstPass
+                          && dep.dstStage  == aToBeInserted.dstStage
+                          && dep.dstAccess == aToBeInserted.dstAccess)
+                    {
+                        return;
+                    }
+                }
+
+                aDependencies.push_back(aToBeInserted);
+            };
+
+            // Each element in the frame buffer is required to have the same dimensions.
+            // These variables will store the first sizes encountered and will validate
+            // against them for any subsequent size, to make sure that the attachments
+            // to be bound are valid.
+            int32_t width  = -1,
+                    height = -1,
+                    layers = -1;
+
+            // This list will store the readable names of the texture views created upfront, so that the
+            // framebuffer can bind to it.
+            // std::vector<std::string> textureViewIds = {};
+
+            //
+            // The derivation of whether something is an input/color/depth attachment or not is most likely broken.
+
+            //<-----------------------------------------------------------------------------
+            // Begin the render pass derivation
+            //<-----------------------------------------------------------------------------
+
+            auto const &imageResourceIdList   = aAttachmentInfo.getAttachementImageResourceIds();
+            auto const &viewResourceIdList    = aAttachmentInfo.getAttachementImageViewResourceIds();
+            auto const &viewToImageAssignment = aAttachmentInfo.getAttachmentViewToImageAssignment();
+            auto const &passToViewAssignment  = aAttachmentInfo.getAttachmentPassToViewAssignment();
+
+            uint64_t alreadyProcessedAttachmentsFlags = 0;
+
+            SRenderPassDescription renderPassDesc = {};
+            renderPassDesc.name = aRenderPassId;
+            renderPassDesc.attachmentDescriptions.resize(imageResourceIdList.size());
+
+            std::array<SSubpassDependency, 2> initialDependencies = {};
+            initialDependencies[0].srcPass         = VK_SUBPASS_EXTERNAL;
+            initialDependencies[0].dstPass         = 0;
+            initialDependencies[0].srcStage        = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            initialDependencies[0].srcAccess       = VK_ACCESS_MEMORY_READ_BIT;
+            initialDependencies[0].dstStage        = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            initialDependencies[0].dstAccess       = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
+                                                   | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            initialDependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+            initialDependencies[1].srcPass         = VK_SUBPASS_EXTERNAL;
+            initialDependencies[1].dstPass         = 0;
+            initialDependencies[1].srcStage        = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            initialDependencies[1].srcAccess       = VK_ACCESS_MEMORY_READ_BIT;
+            initialDependencies[1].dstStage        = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+            initialDependencies[1].dstAccess       = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+                                                   | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+            initialDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+            addIfNotAddedYet(renderPassDesc.subpassDependencies, initialDependencies[0]);
+            addIfNotAddedYet(renderPassDesc.subpassDependencies, initialDependencies[1]);
+
+            for(std::size_t k=0; k<aPassExecutionOrder.size(); ++k)
+            {
+                PassUID_t const passUid = aPassExecutionOrder[k];
+
+                std::vector<uint64_t> const &attachmentResourceIndexList = passToViewAssignment.at(passUid);
+
+                SSubpassDescription subpassDesc = {};
+
+                for(auto const &index : attachmentResourceIndexList)
+                {
+                    FrameGraphResourceId_t const &resourceId = viewResourceIdList.at(index);
+
+                    CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                    if(not textureViewFetch.successful())
+                    {
+                        CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
+                        return EEngineStatus::ResourceError_NotFound;
+                    }
+
+                    SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+
+                    CEngineResult<Shared<SFrameGraphTextureView> const> const &parentTextureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(textureView.parentResource);
+                    if(not parentTextureViewFetch.successful())
+                    {
+                        CLog::Error(logTag(), CString::format("Fetching parent texture view  w/ id {} failed.", textureView.parentResource));
+                        return EEngineStatus::ResourceError_NotFound;
+                    }
+
+                    // If the parent texture view is null, the parent is a texture object.
+                    Shared<SFrameGraphTextureView> const &parentTextureView = (parentTextureViewFetch.data());
+
+                    CEngineResult<Shared<SFrameGraphTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(textureView.subjacentResource);
+                    if(not textureFetch.successful())
+                    {
+                        CLog::Error(logTag(), CString::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
+                        return EEngineStatus::ResourceError_NotFound;
+                    }
+
+                    SFrameGraphTexture const &texture = *(textureFetch.data());
+
+                    // Validation first!
+                    bool dimensionsValid = true;
+                    if(0 > width)
+                    {
+                        width  = static_cast<int32_t>(texture.width);
+                        height = static_cast<int32_t>(texture.height);
+                        layers = textureView.arraySliceRange.length;
+
+                        dimensionsValid = (0 < width and 0 < height and 0 < layers);
+                    }
+                    else
+                    {
+                        bool const validWidth  = (width  == static_cast<int32_t>(texture.width));
+                        bool const validHeight = (height == static_cast<int32_t>(texture.height));
+                        bool const validLayers = (layers == static_cast<int32_t>(textureView.arraySliceRange.length));
+
+                        dimensionsValid = (validWidth and validHeight and validLayers);
+                    }
+
+                    if(not dimensionsValid)
+                    {
+                        EngineStatusPrintOnError(EEngineStatus::FrameGraph_RenderContext_AttachmentDimensionsInvalid, logTag(), "Invalid image view dimensions for frame buffer creation.");
+                        return { EEngineStatus::Error };
+                    }
+
+                    // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
+                    // textureViewIds.push_back(textureView.readableName);
+
+                    uint32_t const attachmentIndex = viewToImageAssignment.at(textureView.resourceId);
+
+                    SAttachmentReference attachmentReference {};
+                    attachmentReference.attachment = static_cast<uint32_t>(attachmentIndex);
+
+                    SSubpassDependency dependency = {};
+                    dependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+                    dependency.srcPass         = (k - 1);
+                    dependency.dstPass         = k;
+
+                    bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
+                    bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
+                    bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
+
+                    if(nullptr != parentTextureView && EFrameGraphResourceType::TextureView == parentTextureView->type)
+                    {
+                        bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
+                        bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
+                        bool const isParentInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), parentTextureView->resourceId);
+
+                        dependency.srcPass = std::distance(aPassExecutionOrder.begin(), std::find_if( aPassExecutionOrder.begin()
+                                                                                                      , aPassExecutionOrder.end()
+                                                                                                      , [&parentTextureView] (PassUID_t const &aUid) -> bool
+                                { return (aUid == parentTextureView->assignedPassUID); }));
+
+                        if( 0 < k )
+                        {
+                            if(isParentColorAttachment)
+                            {
+                                dependency.srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                                dependency.srcAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                            }
+                            else if(isParentDepthAttachment)
+                            {
+                                dependency.srcStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+                                dependency.srcAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+                            }
+                            else if(isParentInputAttachment)
+                            {
+                                dependency.srcStage  = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                                dependency.srcAccess = VK_ACCESS_SHADER_WRITE_BIT;
+                            }
+                            else
+                            {
+                                // We hit a texture parent...
+                                dependency.srcStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+                                dependency.srcAccess = VK_ACCESS_MEMORY_READ_BIT;
+                            }
+                        }
+                    }
+                    else if(nullptr != parentTextureView && EFrameGraphResourceType::Texture == parentTextureView->type)
+                    {
+                        dependency.srcPass   = VK_SUBPASS_EXTERNAL;
+                        dependency.srcStage  = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                        dependency.srcAccess = VK_ACCESS_MEMORY_READ_BIT;
+                    }
+
+                    if(isColorAttachment)
+                    {
+                        attachmentReference.layout = EImageLayout::COLOR_ATTACHMENT_OPTIMAL;
+                        dependency.dstStage        = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                        dependency.dstAccess       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                        subpassDesc.colorAttachments.push_back(attachmentReference);
+                    }
+                    else if(isDepthAttachment)
+                    {
+                        if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
+                        {
+                            attachmentReference.layout = EImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+                        }
+                        else
+                        {
+                            attachmentReference.layout = EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                        }
+
+                        dependency.dstStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+                        dependency.dstAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+                        subpassDesc.depthStencilAttachments.push_back(attachmentReference);
+                    }
+                    else if(isInputAttachment)
+                    {
+                        attachmentReference.layout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
+                        dependency.dstStage  = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                        dependency.dstAccess = VK_ACCESS_SHADER_READ_BIT;
+                        subpassDesc.inputAttachments.push_back(attachmentReference);
+                    }
+
+                    // Easy way to handle 64 simultaneous image resources.
+                    if(0 == (alreadyProcessedAttachmentsFlags & (1u << attachmentIndex)))
+                    {
+                        // For the choice of image layouts, check: https://www.saschawillems.de/?p=3055
+                        SAttachmentDescription attachmentDesc = {};
+                        attachmentDesc.loadOp         = EAttachmentLoadOp ::CLEAR;
+                        attachmentDesc.storeOp        = EAttachmentStoreOp::DONT_CARE;
+                        attachmentDesc.stencilLoadOp  = EAttachmentLoadOp ::CLEAR;
+                        attachmentDesc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
+                        attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
+                        attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
+                        attachmentDesc.format         = texture.format;
+
+                        if(isColorAttachment)
+                        {
+                            attachmentDesc.storeOp          = EAttachmentStoreOp::STORE;
+                            attachmentDesc.clearColor.color = {0.0f, 0.0f, 0.0f, 1.0f};
+                        }
+                        else if(isDepthAttachment)
+                        {
+                            attachmentDesc.clearColor.depthStencil = {1.0f, 0};
+                        }
+                        else
+                        {
+                            attachmentDesc.loadOp        = EAttachmentLoadOp::LOAD;
+                            attachmentDesc.initialLayout = EImageLayout::SHADER_READ_ONLY_OPTIMAL;
+                        }
+
+                        renderPassDesc.attachmentDescriptions[attachmentIndex] = attachmentDesc;
+                    }
+
+                    if(0 < k)
+                    {
+                        addIfNotAddedYet(renderPassDesc.subpassDependencies, dependency);
+                    }
+                }
+
+                renderPassDesc.subpassDescriptions.push_back(subpassDesc);
+            }
+
+            std::array<SSubpassDependency, 2> finalDependencies = {};
+            finalDependencies[0].srcPass   = (aPassExecutionOrder.size() - 1);
+            finalDependencies[0].dstPass   = VK_SUBPASS_EXTERNAL;
+            finalDependencies[0].srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            finalDependencies[0].srcAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
+                                             | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            finalDependencies[0].dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+            finalDependencies[0].dstAccess = VK_ACCESS_MEMORY_READ_BIT;
+            finalDependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+            finalDependencies[1].srcPass   = (aPassExecutionOrder.size() - 1);
+            finalDependencies[1].dstPass   = VK_SUBPASS_EXTERNAL;
+            finalDependencies[1].srcStage  = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+            finalDependencies[1].srcAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+                                             | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+            finalDependencies[1].dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+            finalDependencies[1].dstAccess = VK_ACCESS_MEMORY_READ_BIT;
+            finalDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+            addIfNotAddedYet(renderPassDesc.subpassDependencies, finalDependencies[0]);
+            addIfNotAddedYet(renderPassDesc.subpassDependencies, finalDependencies[1]);
+
+            renderPassDesc.attachmentExtent.width  = width;
+            renderPassDesc.attachmentExtent.height = height;
+            renderPassDesc.attachmentExtent.depth  = layers;
+            // renderPassDesc.attachmentTextureViews  = textureViewIds;
+
+            {
+                CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = mResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
+                if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
+                {
+                    return {EEngineStatus::Ok};
+                }
+                else if( not (EEngineStatus::Ok==renderPassObject.result()))
+                {
+                    EngineStatusPrintOnError(renderPassObject.result(), logTag(), "Failed to create render pass.");
+                    return {renderPassObject.result()};
+                }
+
+                registerUsedResource(renderPassDesc.name, renderPassObject.data());
+
+                mCurrentRenderPassHandle = renderPassDesc.name;
+            }
 
             if(nullptr == frameBuffer)
             {
