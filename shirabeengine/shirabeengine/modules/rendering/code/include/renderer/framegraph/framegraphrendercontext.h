@@ -49,8 +49,7 @@ namespace engine
         struct SHIRABE_LIBRARY_EXPORT SFrameGraphRenderContextState
         {
             std::vector<ResourceId_t> mReferencedResources;
-            // Shared<CVulkanBufferResource> mCurrentAttributeBuffer;
-            // Shared<CVulkanBufferResource> mCurrentIndexBuffer;
+
         };
 
         struct SHIRABE_LIBRARY_EXPORT SFrameGraphRenderContext
