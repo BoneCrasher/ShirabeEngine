@@ -27,7 +27,6 @@ namespace engine
         public_api:
             virtual VkDevice                       getLogicalDevice()         = 0;
             virtual VkPhysicalDevice               getPhysicalDevice()        = 0;
-            virtual Shared<CGpuApiResourceStorage> getResourceStorage()       = 0;
 
             virtual Shared<IVkFrameContext>        getVkCurrentFrameContext() = 0;
 

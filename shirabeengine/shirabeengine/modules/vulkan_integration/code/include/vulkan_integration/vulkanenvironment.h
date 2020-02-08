@@ -164,8 +164,6 @@ namespace engine::vulkan
         VkDevice         getLogicalDevice()  final;
         VkPhysicalDevice getPhysicalDevice() final;
 
-        Shared<CGpuApiResourceStorage> getResourceStorage() final;
-
     private_methods:
         /**
          * Create and initialize the vulkan instance, including determinition of all
