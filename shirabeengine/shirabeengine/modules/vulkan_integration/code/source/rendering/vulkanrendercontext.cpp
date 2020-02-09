@@ -1416,70 +1416,6 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.bindMesh = [=] (SFrameGraphMesh const &aMesh) -> EEngineStatus
-            {
-                SVulkanState     &vkState        = aVulkanEnvironment->getState();
-                VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-
-                auto const [success, logical, gpu, gpuState] = fetchResource<SMesh, CVkApiResource<SMesh>>(aResourceManager, aMesh.readableName, true);
-                if(not success)
-                {
-                    return EEngineStatus::Error;
-                }
-
-                SMesh const &logicalMeshResource = *logical;
-
-                SMeshDependencies dependencies {};
-                EEngineStatus const status = logicalMeshResource.initialize(dependencies).result();
-
-                auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, logicalMeshResource.vertexDataBufferResource->getDescription().name, false);
-                if(not success1)
-                {
-                    return EEngineStatus::Error;
-                }
-
-                SBuffer               const &logicalAttributeBufferResource = *logical1;
-                CVulkanBufferResource const &gpuApiAttributeBufferResource  = *gpu1;
-
-                auto const [success2, logical2, gpu2, gpuState2] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, logicalMeshResource.indexBufferResource->getDescription().name, false);
-                if(not success2)
-                {
-                    return EEngineStatus::Error;
-                }
-
-                SBuffer               const &logicalIndexBufferResource = *logical2;
-                CVulkanBufferResource const &gpuApiIndexBufferResource  = *gpu2;
-
-                logicalAttributeBufferResource.initialize({});
-                logicalIndexBufferResource    .initialize({});
-
-                transferBufferData(aVulkanEnvironment->getLogicalDevice(), logicalAttributeBufferResource.getDescription().dataSource(), gpuApiAttributeBufferResource.attachedMemory);
-                transferBufferData(aVulkanEnvironment->getLogicalDevice(), logicalIndexBufferResource    .getDescription().dataSource(), gpuApiIndexBufferResource.attachedMemory);
-
-                std::vector<VkBuffer> buffers = {   gpuApiAttributeBufferResource.handle
-                                                  , gpuApiAttributeBufferResource.handle
-                                                  , gpuApiAttributeBufferResource.handle
-                                                  , gpuApiAttributeBufferResource.handle };
-
-                vkCmdBindVertexBuffers(vkCommandBuffer, 0, buffers.size(), buffers.data(), logicalMeshResource.getDescription().offsets.data());
-                vkCmdBindIndexBuffer(vkCommandBuffer, gpuApiIndexBufferResource.handle, 0, VkIndexType::VK_INDEX_TYPE_UINT16);
-
-                return EEngineStatus::Ok;
-            };
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            context.unbindMesh = [=] (SFrameGraphMesh const &aMesh) -> EEngineStatus
-            {
-                return EEngineStatus::Ok;
-            };
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
             context.bindPipeline = [=] (ResourceId_t const &aPipelineUID) -> EEngineStatus
             {
                 SVulkanState     &vkState        = aVulkanEnvironment->getState();
@@ -1549,6 +1485,216 @@ namespace engine
                     CLog::Error(logTag(), "Cannot use material asset {} with id {}", aMesh.readableName, aMesh.meshAssetId);
                     return meshObject.result();
                 }
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.bindMesh = [=] (SFrameGraphMesh const &aMesh) -> EEngineStatus
+            {
+                SVulkanState     &vkState        = aVulkanEnvironment->getState();
+                VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+                auto const [success, logical, gpu, gpuState] = fetchResource<SMesh, CVkApiResource<SMesh>>(aResourceManager, aMesh.readableName, true);
+                if(not success)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                SMesh const &logicalMeshResource = *logical;
+
+                SMeshDependencies dependencies {};
+                EEngineStatus const status = logicalMeshResource.initialize(dependencies).result();
+
+                auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, logicalMeshResource.vertexDataBufferResource->getDescription().name, false);
+                if(not success1)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                SBuffer               const &logicalAttributeBufferResource = *logical1;
+                CVulkanBufferResource const &gpuApiAttributeBufferResource  = *gpu1;
+
+                auto const [success2, logical2, gpu2, gpuState2] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, logicalMeshResource.indexBufferResource->getDescription().name, false);
+                if(not success2)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                SBuffer               const &logicalIndexBufferResource = *logical2;
+                CVulkanBufferResource const &gpuApiIndexBufferResource  = *gpu2;
+
+                logicalAttributeBufferResource.initialize({});
+                logicalIndexBufferResource    .initialize({});
+
+                transferBufferData(aVulkanEnvironment->getLogicalDevice(), logicalAttributeBufferResource.getDescription().dataSource(), gpuApiAttributeBufferResource.attachedMemory);
+                transferBufferData(aVulkanEnvironment->getLogicalDevice(), logicalIndexBufferResource    .getDescription().dataSource(), gpuApiIndexBufferResource.attachedMemory);
+
+                std::vector<VkBuffer> buffers = {   gpuApiAttributeBufferResource.handle
+                        , gpuApiAttributeBufferResource.handle
+                        , gpuApiAttributeBufferResource.handle
+                        , gpuApiAttributeBufferResource.handle };
+
+                vkCmdBindVertexBuffers(vkCommandBuffer, 0, buffers.size(), buffers.data(), logicalMeshResource.getDescription().offsets.data());
+                vkCmdBindIndexBuffer(vkCommandBuffer, gpuApiIndexBufferResource.handle, 0, VkIndexType::VK_INDEX_TYPE_UINT16);
+
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.unbindMesh = [=] (SFrameGraphMesh const &aMesh) -> EEngineStatus
+            {
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.readMaterialAsset = [=] (SFrameGraphMaterial const &aMaterial) -> EEngineStatus
+            {
+                CEngineResult<Shared<ILogicalResourceObject>> materialObject = aResourceManager->useAssetResource<SMaterial>(aMaterial.readableName, aMaterial.materialAssetId);
+                if(CheckEngineError(materialObject.result()))
+                {
+                    CLog::Error(logTag(), "Cannot use material asset {} with id {}", aMaterial.readableName, aMaterial.materialAssetId);
+                    return materialObject.result();
+                }
+
+                return materialObject.result();
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.bindMaterial = [=] (SFrameGraphMaterial const &aMaterial) -> EEngineStatus
+            {
+                auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SMaterial, CVkApiResource<SMaterial>>(aResourceManager, aMaterial.readableName, false);
+                if(not success1)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                SMaterial             const &logicalMaterialResource = *logical1;
+                SMaterialDependencies const &materialDependencies    = *(logicalMaterialResource.getCurrentDependencies());
+
+                SMaterialDependencies dependencies {};
+                dependencies.pipelineDependencies.systemUBOPipelineId   = "Core_pipeline";
+                dependencies.pipelineDependencies.referenceRenderPassId = materialDependencies.pipelineDependencies.referenceRenderPassId;
+                dependencies.pipelineDependencies.subpass               = mCurrentSubpass;
+                dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
+
+                for(auto const &buffer : material->bufferResources)
+                {
+                    buffer->initialize({});
+                }
+                material->shaderModuleResource->initialize({});
+                material->pipelineResource    ->initialize(dependencies.pipelineDependencies);
+
+                EEngineStatus const status = material->initialize(dependencies).result();
+
+                std::vector<GpuApiHandle_t>       gpuBufferIds                     {};
+                std::vector<GpuApiHandle_t>       gpuInputAttachmentTextureViewIds {};
+                std::vector<SSampledImageBinding> gpuTextureViewIds                {};
+
+                for(auto const &buffer : material->bufferResources)
+                {
+                    mGraphicsAPIRenderContext->transferBufferData(buffer->getDescription().dataSource(), buffer->getGpuApiResourceHandle());
+                    gpuBufferIds.push_back(buffer->getGpuApiResourceHandle());
+                }
+
+                Shared<SRenderPass>             renderPass      = std::static_pointer_cast<SRenderPass>(getUsedResource(aRenderPassHandle));
+                SRenderPassDescription   const &renderPassDesc  = renderPass->getDescription();
+                SRenderPassDependencies  const &renderPassDeps = *(renderPass->getCurrentDependencies());
+
+                SSubpassDescription const &subPassDesc = renderPassDesc.subpassDescriptions.at(mCurrentSubpass);
+                for(auto const &inputAttachment : subPassDesc.inputAttachments)
+                {
+                    uint32_t     const &attachmentIndex           = inputAttachment.attachment;
+                    ResourceId_t const &attachementResourceHandle = renderPassDeps.attachmentTextureViews.at(attachmentIndex);
+
+                    Shared<STextureView> attachmentTextureView = std::static_pointer_cast<STextureView>(getUsedResource(attachementResourceHandle));
+                    gpuInputAttachmentTextureViewIds.push_back(attachmentTextureView->getGpuApiResourceHandle());
+                }
+
+                for(auto const &sampledImageAssetId : material->getDescription().sampledImages)
+                {
+                    std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
+
+                    Shared<ILogicalResourceObject> logicalTexture      = mResourceManager->useAssetResource(sampledImageResourceId, sampledImageAssetId).data();
+                    Shared<STexture>               sampledImageTexture = std::static_pointer_cast<STexture>(logicalTexture);
+                    if(nullptr != sampledImageTexture)
+                    {
+                        sampledImageTexture->initialize({}); // No-Op if loaded already...
+                        sampledImageTexture->load();
+
+                        if(sampledImageTexture->getDescription().gpuBinding.check(EBufferBinding::TextureInput))
+                        {
+                            mGraphicsAPIRenderContext->performImageLayoutTransfer(
+                                    sampledImageTexture->getGpuApiResourceHandle()
+                                    , CRange(0, 1)
+                                    , CRange(0, 1)
+                                    , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
+                                    , VK_IMAGE_LAYOUT_UNDEFINED
+                                    , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+                        }
+                        // TODO: Determine load state of texture resource and determine, whether transfer is needed.
+                        sampledImageTexture->transfer();     // No-Op if transferred already...
+
+                        if(sampledImageTexture->getDescription().gpuBinding.check(EBufferBinding::TextureInput))
+                        {
+                            mGraphicsAPIRenderContext->performImageLayoutTransfer(
+                                    sampledImageTexture->getGpuApiResourceHandle()
+                                    , CRange(0, 1)
+                                    , CRange(0, 1)
+                                    , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
+                                    , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                                    , VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                        }
+
+                        STextureViewDescription desc {};
+                        desc.name                 = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
+                        desc.subjacentTextureInfo = sampledImageTexture->getDescription().textureInfo;
+                        desc.arraySlices          = { 0, 1 };
+                        desc.mipMapSlices         = { 0, 1 };
+                        desc.textureFormat        = sampledImageTexture->getDescription().textureInfo.format;
+
+                        auto const [result, viewData] = mResourceManager->useDynamicResource<STextureView>(desc.name, desc);
+                        if(CheckEngineError(result))
+                        {
+                            // ...
+                            break;
+                        }
+
+                        Shared<STextureView> view = std::static_pointer_cast<STextureView>(viewData);
+
+                        STextureViewDependencies deps {};
+                        deps.subjacentTextureId = sampledImageResourceId;
+                        view->initialize(deps);
+
+                        SSampledImageBinding binding {};
+                        binding.image     = sampledImageTexture->getGpuApiResourceHandle();
+                        binding.imageView = view->getGpuApiResourceHandle();
+
+                        gpuTextureViewIds.push_back(binding);
+                    }
+                    else
+                    {
+                        gpuTextureViewIds.push_back( {}); // Fill gaps
+                    }
+                }
+
+                mGraphicsAPIRenderContext->updateResourceBindings(  material->pipelineResource->getGpuApiResourceHandle()
+                        , gpuBufferIds
+                        , gpuInputAttachmentTextureViewIds
+                        , gpuTextureViewIds);
+
+                auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
+                return result;
             };
             //<-----------------------------------------------------------------------------
 

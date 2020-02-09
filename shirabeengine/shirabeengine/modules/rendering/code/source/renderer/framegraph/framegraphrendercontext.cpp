@@ -20,25 +20,6 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
-    {
-        CEngineResult<Shared<ILogicalResourceObject>> materialObject = mResourceManager->useAssetResource(aMaterial.readableName, aMaterial.materialAssetId);
-        if(CheckEngineError(materialObject.result()))
-        {
-            CLog::Error(logTag(), "Cannot use material asset {} with id {}", aMaterial.readableName, aMaterial.materialAssetId);
-            return materialObject.result();
-        }
-
-        Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(materialObject.data());
-        registerUsedResource(aMaterial.readableName, material);
-
-        return materialObject.result();
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial
                                                            , std::string       const &aRenderPassHandle)
     {
