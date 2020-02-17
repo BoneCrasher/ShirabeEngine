@@ -19,6 +19,7 @@ namespace engine
         using core::IUIDGenerator;
         using core::CSequenceUIDGenerator;
 
+        template <typename... TResources>
         class CResourceManager;
 
         template <typename TResource>

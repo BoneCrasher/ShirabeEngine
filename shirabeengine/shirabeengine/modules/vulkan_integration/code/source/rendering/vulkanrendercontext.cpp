@@ -101,8 +101,12 @@ namespace engine
 
             framegraph::SFrameGraphRenderContext context {};
 
-            context.clearAttachments = [=] (std::string const &aRenderPassId, uint32_t const &aCurrentSubpassIndex) -> EEngineStatus
+            context.clearAttachments = [=] (SFrameGraphRenderContextState       &aState
+                                          , std::string                   const &aRenderPassId
+                                          , uint32_t                      const &aCurrentSubpassIndex) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState    &state        = aVulkanEnvironment->getState();
                 VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
@@ -166,8 +170,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.beginPass = [=] () -> EEngineStatus
+            context.beginPass = [=] (SFrameGraphRenderContextState &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
@@ -175,12 +181,15 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.endPass = [=] () -> EEngineStatus
+            context.endPass = [=] (SFrameGraphRenderContextState &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState    &state        = aVulkanEnvironment->getState();
                 VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
                 vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
+                ++(aState.currentSubpassIndex);
 
                 return EEngineStatus::Ok;
             };
@@ -189,9 +198,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.copyImage = [=] (SFrameGraphTexture const &aSourceImageId,
-                                     SFrameGraphTexture const &aTargetImageId) -> EEngineStatus
+            context.copyImage = [=] (SFrameGraphRenderContextState       &aState,
+                                     SFrameGraphTexture            const &aSourceImageId,
+                                     SFrameGraphTexture            const &aTargetImageId) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
                 SHIRABE_UNUSED(aSourceImageId);
                 SHIRABE_UNUSED(aTargetImageId);
 
@@ -202,13 +213,16 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.performImageLayoutTransfer = [=] (  SFrameGraphTexture const &aImageHandle
-                                                      , CRange             const &aArrayRange
-                                                      , CRange             const &aMipRange
-                                                      , VkImageAspectFlags const &aAspectFlags
-                                                      , VkImageLayout      const &aSourceLayout
-                                                      , VkImageLayout      const &aTargetLayout) -> EEngineStatus
+            context.performImageLayoutTransfer = [=] (SFrameGraphRenderContextState       &aState
+                                                    , SFrameGraphTexture            const &aImageHandle
+                                                    , CRange                        const &aArrayRange
+                                                    , CRange                        const &aMipRange
+                                                    , VkImageAspectFlags            const &aAspectFlags
+                                                    , VkImageLayout                 const &aSourceLayout
+                                                    , VkImageLayout                 const &aTargetLayout) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState &state = aVulkanEnvironment->getState();
 
                 VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
@@ -256,8 +270,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.copyImageToBackBuffer = [=] (SFrameGraphTexture const &aSourceImageId) -> EEngineStatus
+            context.copyImageToBackBuffer = [=] (SFrameGraphRenderContextState const &aState
+                                               , SFrameGraphTexture            const &aSourceImageId) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState &state = aVulkanEnvironment->getState();
 
                 VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
@@ -335,14 +352,16 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.updateMaterial = [=] (  SFrameGraphMaterial                 const &aMaterialHandle
-                                          , std::vector<SFrameGraphBuffer>      const &aGpuBufferHandles
-                                          , std::vector<SFrameGraphTextureView> const &aGpuInputAttachmentTextureViewHandles
-                                          , std::vector<SSampledImageBinding>   const &aGpuTextureViewHandles)
+            context.updateMaterial = [=] (SFrameGraphRenderContextState       const &aState
+                                        , SFrameGraphMaterial                 const &aMaterialHandle
+                                        , std::vector<SFrameGraphBuffer>      const &aGpuBufferHandles
+                                        , std::vector<SFrameGraphTextureView> const &aGpuInputAttachmentTextureViewHandles
+                                        , std::vector<SSampledImageBinding>   const &aGpuTextureViewHandles)
             {
-                VkDevice device = aVulkanEnvironment->getLogicalDevice();
+                SHIRABE_UNUSED(aState);
 
-                SVulkanState &state = aVulkanEnvironment->getState();
+                VkDevice      device = aVulkanEnvironment->getLogicalDevice();
+                SVulkanState &state  = aVulkanEnvironment->getState();
 
                 VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
@@ -514,8 +533,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.beginFrameCommandBuffers = [=] () -> EEngineStatus
+            context.beginFrameCommandBuffers = [=] (SFrameGraphRenderContextState const &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState &state = aVulkanEnvironment->getState();
 
                 auto const begin = [&] (VkCommandBuffer const &buffer) -> void
@@ -545,8 +566,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.endFrameCommandBuffers = [=] () -> EEngineStatus
+            context.endFrameCommandBuffers = [=] (SFrameGraphRenderContextState const &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState &vkState = aVulkanEnvironment->getState();
 
                 VkCommandBuffer transferCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
@@ -597,12 +620,14 @@ namespace engine
                 return EEngineStatus::Ok;
             };
 
-            context.createRenderPass = [=] (
-                    std::string                     const &aRenderPassId,
-                    std::vector<PassUID_t>          const &aPassExecutionOrder,
-                    SFrameGraphAttachmentCollection const &aAttachmentInfo,
-                    CFrameGraphMutableResources     const &aFrameGraphResources) -> EEngineStatus
+            context.createRenderPass = [=] (SFrameGraphRenderContextState   const &aState,
+                                            std::string                     const &aRenderPassId,
+                                            std::vector<PassUID_t>          const &aPassExecutionOrder,
+                                            SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                                            CFrameGraphMutableResources     const &aFrameGraphResources) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 //<-----------------------------------------------------------------------------
                 // Helper function to find attachment indices in index lists.
                 //<-----------------------------------------------------------------------------
@@ -934,12 +959,15 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.bindRenderPass = [=] (std::string                     const &aRenderPassId,
+            context.bindRenderPass = [=] (SFrameGraphRenderContextState   const &aState,
+                                          std::string                     const &aRenderPassId,
                                           std::string                     const &aFrameBufferId,
                                           std::vector<PassUID_t>          const &aPassExecutionOrder,
                                           SFrameGraphAttachmentCollection const &aAttachmentInfo,
                                           CFrameGraphMutableResources     const &aFrameGraphResources ) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success, logical, gpu, gpuState] = fetchResource<SRenderPass, CVulkanRenderPassResource>(aResourceManager, aRenderPassId, false);
                 if(not success)
                 {
@@ -949,7 +977,7 @@ namespace engine
                 SRenderPass               const &logicalRenderPassResource = *logical;
                 CVulkanRenderPassResource const &gpuApiRenderPassResource  = *gpu;
 
-                auto const [success2, logical2, gpu2, gpuState2] = fetchResource<SFrameBuffer, CVulkanFrameBufferResource>(aResourceManager, aRenderPassId, false);
+                auto const [success2, logical2, gpu2, gpuState2] = fetchResource<SFrameBuffer, CVulkanFrameBufferResource>(aResourceManager, aFrameBufferId, false);
                 if(not success2)
                 {
                     return EEngineStatus::Error;
@@ -1035,9 +1063,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.unbindRenderPass = [=] (std::string const &aFrameBufferId,
-                                            std::string const &aRenderPassId) -> EEngineStatus
+            context.unbindRenderPass = [=] (SFrameGraphRenderContextState       &aState
+                                          , std::string                 const &aFrameBufferId
+                                          , std::string                 const &aRenderPassId) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
                 SHIRABE_UNUSED(aFrameBufferId);
                 SHIRABE_UNUSED(aRenderPassId);
 
@@ -1046,8 +1076,11 @@ namespace engine
                 return EEngineStatus::Ok;
             };
 
-            context.destroyFrameBuffer = [=] (std::string const &aFrameBufferId) -> EEngineStatus
+            context.destroyFrameBuffer = [=] (SFrameGraphRenderContextState       &aState
+                                            , std::string                   const &aFrameBufferId) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success2, logical2, gpu2, gpuState2] = fetchResource<SFrameBuffer, CVulkanFrameBufferResource>(aResourceManager, aFrameBufferId, false);
                 if(not success2)
                 {
@@ -1064,8 +1097,11 @@ namespace engine
             //<-----------------------------------F------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyRenderPass = [=] (std::string const &aRenderPassId) -> EEngineStatus
+            context.destroyRenderPass = [=] (SFrameGraphRenderContextState       &aState
+                                           , std::string                   const &aRenderPassId) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success, logical, gpu, gpuState] = fetchResource<SRenderPass, CVulkanRenderPassResource>(aResourceManager, aRenderPassId, false);
                 if(not success)
                 {
@@ -1082,8 +1118,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.beginGraphicsFrame = [=] () -> EEngineStatus
+            context.beginGraphicsFrame = [=] (SFrameGraphRenderContextState &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 return aVulkanEnvironment->beginGraphicsFrame().result();
             };
             //<-----------------------------------------------------------------------------
@@ -1091,8 +1129,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.endGraphicsFrame = [=] () -> EEngineStatus
+            context.endGraphicsFrame = [=] (SFrameGraphRenderContextState &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 return aVulkanEnvironment->endGraphicsFrame().result();
             };
             //<-----------------------------------------------------------------------------
@@ -1100,8 +1140,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.present = [=] () -> EEngineStatus
+            context.present = [=] (SFrameGraphRenderContextState &aState) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState &vkState = aVulkanEnvironment->getState();
 
                 VkQueue transferQueue = aVulkanEnvironment->getTransferQueue();
@@ -1205,8 +1247,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.createTexture = [=] (SFrameGraphTexture const &aTexture) -> EEngineStatus
+            context.createTexture = [=] (SFrameGraphRenderContextState       &aState
+                                       , SFrameGraphTexture            const &aTexture) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 STextureDescription desc = {};
                 desc.name        = aTexture.readableName;
                 desc.textureInfo = static_cast<graphicsapi::STextureInfo>(aTexture);
@@ -1248,8 +1293,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyTexture = [=] (SFrameGraphTexture const &aTexture) -> EEngineStatus
+            context.destroyTexture = [=] (SFrameGraphRenderContextState       &aState
+                                        , SFrameGraphTexture            const &aTexture) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success, logical, gpu, gpuState] = fetchResource<STexture, CVulkanTextureResource>(aResourceManager, aTexture.readableName, false);
                 if(not success)
                 {
@@ -1267,8 +1315,9 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.createTextureView = [=] (SFrameGraphTexture     const &aTexture,
-                                             SFrameGraphTextureView const &aView) -> EEngineStatus
+            context.createTextureView = [=] (SFrameGraphRenderContextState       &aState
+                                           , SFrameGraphTexture            const &aTexture
+                                           , SFrameGraphTextureView        const &aView) -> EEngineStatus
             {
 
                 STextureViewDescription desc = { };
@@ -1310,8 +1359,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyTextureView = [=] (SFrameGraphTextureView const &aTextureView) -> EEngineStatus
+            context.destroyTextureView = [=] (SFrameGraphRenderContextState       &aState
+                                            , SFrameGraphTextureView        const &aTextureView) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success, logical, gpu, gpuState] = fetchResource<STextureView, CVulkanTextureViewResource>(aResourceManager, aTextureView.readableName, false);
                 if(not success)
                 {
@@ -1329,8 +1381,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.createBuffer = [=] (SFrameGraphBuffer const &aBuffer) -> EEngineStatus
+            context.createBuffer = [=] (SFrameGraphRenderContextState       &aState
+                                      , SFrameGraphBuffer             const &aBuffer) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SBufferDescription desc = { };
                 desc.name = aBuffer.readableName;
 
@@ -1355,8 +1410,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyBuffer = [=] (SFrameGraphBuffer const &aBuffer) -> EEngineStatus
+            context.destroyBuffer = [=] (SFrameGraphRenderContextState       &aState
+                                       , SFrameGraphBuffer             const &aBuffer) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success, logical, gpu, gpuState] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, aBuffer.readableName, false);
                 if(not success)
                 {
@@ -1374,9 +1432,12 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.createBufferView = [=] (SFrameGraphBuffer     const &aBuffer
-                                          , SFrameGraphBufferView const &aView) -> EEngineStatus
+            context.createBufferView = [=] (SFrameGraphRenderContextState       &aState
+                                          , SFrameGraphBuffer             const &aBuffer
+                                          , SFrameGraphBufferView         const &aView) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SBufferViewDescription desc = { };
                 desc.name = aBuffer.readableName;
 
@@ -1397,8 +1458,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyBufferView = [=] (SFrameGraphBufferView const &aView) -> EEngineStatus
+            context.destroyBufferView = [=] (SFrameGraphRenderContextState       &aState
+                                           , SFrameGraphBufferView         const &aView) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 auto const [success, logical, gpu, gpuState] = fetchResource<SBufferView, CVulkanBufferViewResource>(aResourceManager, aView.readableName, false);
                 if(not success)
                 {
@@ -1416,8 +1480,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.bindPipeline = [=] (ResourceId_t const &aPipelineUID) -> EEngineStatus
+            context.bindPipeline = [=] (SFrameGraphRenderContextState       &aState
+                                      , ResourceId_t                  const &aPipelineUID) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState     &vkState        = aVulkanEnvironment->getState();
                 VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
 
@@ -1447,8 +1514,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.unbindPipeline = [=] (ResourceId_t const &aPipelineUID) -> EEngineStatus
+            context.unbindPipeline = [=] (SFrameGraphRenderContextState       &aState
+                                        , ResourceId_t                  const &aPipelineUID) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
                 SHIRABE_UNUSED(aPipelineUID);
                 return EEngineStatus::Ok;
             };
@@ -1457,8 +1526,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.bindResource = [=] (ResourceId_t const &aId) -> EEngineStatus
+            context.bindResource = [=] (SFrameGraphRenderContextState       &aState
+                                      , ResourceId_t                  const &aId) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 CLog::Verbose(logTag(), CString::format("Binding resource with id {}", aId));
                 return EEngineStatus::Ok;
             };
@@ -1467,7 +1539,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.unbindResource = [=] (ResourceId_t const &aId) -> EEngineStatus
+            context.unbindResource = [=] (SFrameGraphRenderContextState       &aState
+                                        , ResourceId_t                  const &aId) -> EEngineStatus
             {
                 CLog::Verbose(logTag(), CString::format("Unbinding resource with id {}", aId));
                 return EEngineStatus::Ok;
@@ -1491,8 +1564,11 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.bindMesh = [=] (SFrameGraphMesh const &aMesh) -> EEngineStatus
+            context.bindMesh = [=] (SFrameGraphRenderContextState       &aState
+                                  , SFrameGraphMesh               const &aMesh) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+
                 SVulkanState     &vkState        = aVulkanEnvironment->getState();
                 VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
@@ -1546,8 +1622,12 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.unbindMesh = [=] (SFrameGraphMesh const &aMesh) -> EEngineStatus
+            context.unbindMesh = [=] (SFrameGraphRenderContextState        &aState
+                                    , SFrameGraphMesh                const &aMesh) -> EEngineStatus
             {
+                SHIRABE_UNUSED(aState);
+                SHIRABE_UNUSED(aMesh);
+
                 return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
@@ -1555,7 +1635,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.readMaterialAsset = [=] (SFrameGraphMaterial const &aMaterial) -> EEngineStatus
+            context.readMaterialAsset = [=] (SFrameGraphRenderContextState       &aState
+                                           , SFrameGraphMaterial           const &aMaterial) -> EEngineStatus
             {
                 CEngineResult<Shared<ILogicalResourceObject>> materialObject = aResourceManager->useAssetResource<SMaterial>(aMaterial.readableName, aMaterial.materialAssetId);
                 if(CheckEngineError(materialObject.result()))
@@ -1571,8 +1652,12 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.bindMaterial = [=] (SFrameGraphMaterial const &aMaterial) -> EEngineStatus
+            context.bindMaterial = [=] (SFrameGraphRenderContextState       &aState
+                                      , SFrameGraphMaterial           const &aMaterial
+                                      , ResourceId_t                  const &aRenderPassId) -> EEngineStatus
             {
+                VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
                 auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SMaterial, CVkApiResource<SMaterial>>(aResourceManager, aMaterial.readableName, false);
                 if(not success1)
                 {
@@ -1585,43 +1670,54 @@ namespace engine
                 SMaterialDependencies dependencies {};
                 dependencies.pipelineDependencies.systemUBOPipelineId   = "Core_pipeline";
                 dependencies.pipelineDependencies.referenceRenderPassId = materialDependencies.pipelineDependencies.referenceRenderPassId;
-                dependencies.pipelineDependencies.subpass               = mCurrentSubpass;
-                dependencies.pipelineDependencies.shaderModuleId        = material->shaderModuleResource->getDescription().name;
+                dependencies.pipelineDependencies.subpass               = aState.currentSubpassIndex;
+                dependencies.pipelineDependencies.shaderModuleId        = logicalMaterialResource.shaderModuleResource->getDescription().name;
 
-                for(auto const &buffer : material->bufferResources)
+                for(auto const &buffer : logicalMaterialResource.bufferResources)
                 {
                     buffer->initialize({});
                 }
-                material->shaderModuleResource->initialize({});
-                material->pipelineResource    ->initialize(dependencies.pipelineDependencies);
+                logicalMaterialResource.shaderModuleResource->initialize({});
+                logicalMaterialResource.pipelineResource    ->initialize(dependencies.pipelineDependencies);
 
-                EEngineStatus const status = material->initialize(dependencies).result();
+                EEngineStatus const status = logicalMaterialResource.initialize(dependencies).result();
 
-                std::vector<GpuApiHandle_t>       gpuBufferIds                     {};
-                std::vector<GpuApiHandle_t>       gpuInputAttachmentTextureViewIds {};
-                std::vector<SSampledImageBinding> gpuTextureViewIds                {};
+                std::vector<SFrameGraphBuffer>       gpuBufferIds                     {};
+                std::vector<SFrameGraphTextureView>  gpuInputAttachmentTextureViewIds {};
+                std::vector<SSampledImageBinding>    gpuTextureViewIds                {};
 
-                for(auto const &buffer : material->bufferResources)
+                for(auto const &buffer : logicalMaterialResource.bufferResources)
                 {
-                    mGraphicsAPIRenderContext->transferBufferData(buffer->getDescription().dataSource(), buffer->getGpuApiResourceHandle());
+                    auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, buffer->getDescription().name, false);
+                    if(not success1)
+                    {
+                        continue;
+                    }
+
+                    CVulkanBufferResource const &gpuBuffer = *gpu1;
+                    transferBufferData(device, buffer->getDescription().dataSource(), gpuBuffer.attachedMemory);
                     gpuBufferIds.push_back(buffer->getGpuApiResourceHandle());
                 }
 
-                Shared<SRenderPass>             renderPass      = std::static_pointer_cast<SRenderPass>(getUsedResource(aRenderPassHandle));
-                SRenderPassDescription   const &renderPassDesc  = renderPass->getDescription();
-                SRenderPassDependencies  const &renderPassDeps = *(renderPass->getCurrentDependencies());
+                auto const [rpsuccess, rplogical, rpgpu, rpgpustate] = fetchResource<SRenderPass, CVulkanRenderPassResource>(aResourceManager, aRenderPassId, false);
 
-                SSubpassDescription const &subPassDesc = renderPassDesc.subpassDescriptions.at(mCurrentSubpass);
+                SRenderPass              const &renderPass     = *rplogical;
+                SRenderPassDescription   const &renderPassDesc = renderPass.getDescription();
+                SRenderPassDependencies  const &renderPassDeps = *(renderPass.getCurrentDependencies());
+
+                SSubpassDescription const &subPassDesc = renderPassDesc.subpassDescriptions.at(aState.currentSubpassIndex);
                 for(auto const &inputAttachment : subPassDesc.inputAttachments)
                 {
                     uint32_t     const &attachmentIndex           = inputAttachment.attachment;
                     ResourceId_t const &attachementResourceHandle = renderPassDeps.attachmentTextureViews.at(attachmentIndex);
 
-                    Shared<STextureView> attachmentTextureView = std::static_pointer_cast<STextureView>(getUsedResource(attachementResourceHandle));
-                    gpuInputAttachmentTextureViewIds.push_back(attachmentTextureView->getGpuApiResourceHandle());
+                    auto const [tvsuccess, tvlogical, tvgpu, tvgpustate] = fetchResource<STextureView, CVulkanTextureResource>(aResourceManager, attachementResourceHandle, false);
+
+                    STextureView const &textureView = *tvlogical;
+                    gpuInputAttachmentTextureViewIds.push_back(textureView.getGpuApiResourceHandle());
                 }
 
-                for(auto const &sampledImageAssetId : material->getDescription().sampledImages)
+                for(auto const &sampledImageAssetId : logicalMaterialResource.getDescription().sampledImages)
                 {
                     std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
 
@@ -1657,7 +1753,7 @@ namespace engine
                         }
 
                         STextureViewDescription desc {};
-                        desc.name                 = fmt::format("{}_{}_view", material->getDescription().name, sampledImageTexture->getDescription().name);
+                        desc.name                 = fmt::format("{}_{}_view", logicalMaterialResource.getDescription().name, sampledImageTexture->getDescription().name);
                         desc.subjacentTextureInfo = sampledImageTexture->getDescription().textureInfo;
                         desc.arraySlices          = { 0, 1 };
                         desc.mipMapSlices         = { 0, 1 };
@@ -1688,12 +1784,12 @@ namespace engine
                     }
                 }
 
-                mGraphicsAPIRenderContext->updateResourceBindings(  material->pipelineResource->getGpuApiResourceHandle()
+                context.updateMaterial( logicalMaterialResource.pipelineResource->getGpuApiResourceHandle()
                         , gpuBufferIds
                         , gpuInputAttachmentTextureViewIds
                         , gpuTextureViewIds);
 
-                auto const result = mGraphicsAPIRenderContext->bindPipeline(material->pipelineResource->getGpuApiResourceHandle());
+                auto const result = bindPipeline(logicalMaterialResource.pipelineResource->getGpuApiResourceHandle());
                 return result;
             };
             //<-----------------------------------------------------------------------------

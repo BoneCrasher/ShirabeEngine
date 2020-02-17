@@ -6,12 +6,14 @@
 #define __SHIRABEDEVELOPMENT_CRESOURCEMANAGER_H__
 
 #include <typeindex>
+#include <variant>
 #include <base/stl_container_helpers.h>
 #include <platform/platform.h>
 #include <graphicsapi/definitions.h>
 #include <asset/assettypes.h>
 #include <asset/assetstorage.h>
 #include <core/datastructures/adjacencytree.h>
+#include <core/threading/looper.h>
 #include <base/stl_container_helpers.h>
 #include "resources/cresourceobject.h"
 #include "resources/agpuapiresourceobject.h"
@@ -36,26 +38,37 @@ namespace engine::resources
      * The SResourceState struct groups a logical resource, an optional gpu api
      * resource and it's current load state.
      */
-    template <typename TLogicalResource>
+    template <typename TLogicalResource, typename TGpuApiResource>
     struct SHIRABE_LIBRARY_EXPORT SResourceState
     {
-        TLogicalResource                      logicalResource;
-        Shared<IGpuApiResourceObject>         gpuApiResource;
-        core::CBitField<EGpuApiResourceState> state;
+        using ResourceState_t   = core::CBitField<EGpuApiResourceState>;
+        using LogicalResource_t = TLogicalResource;
+        using GpuApiResource_t  = TGpuApiResource;
+        using Descriptor_t      = typename LogicalResource_t::Descriptor_t;
+        using Dependencies_t    = typename LogicalResource_t::Dependencies_t;
+        using GpuApiHandles_t   = typename GpuApiResource_t ::Handles_t;
+
+        Descriptor_t    description;
+        Dependencies_t  dependencies;
+        GpuApiHandles_t gpuApiHandles;
+        ResourceState_t loadState;
     };
 
     /**
      *
      */
+    template <typename... TResources>
     class
         [[nodiscard]]
         SHIRABE_LIBRARY_EXPORT CResourceManager
     {
         SHIRABE_DECLARE_LOG_TAG(CResourceManager);
 
+    private_typedefs:
+        using ResourceVariants_t = std::variant<TResources...>;
+
     public_constructors:
-        explicit CResourceManager(Unique<CGpuApiResourceObjectFactory> aPrivateResourceObjectFactory
-                                , Shared<asset::IAssetStorage>         aAssetStorage);
+        CResourceManager();
 
     public_destructors:
         ~CResourceManager() = default;
@@ -73,32 +86,47 @@ namespace engine::resources
         CEngineResult<> addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader);
 
         template <typename TResource>
-        CEngineResult<SResourceState<TResource>> useDynamicResource( ResourceId_t                     const &aResourceId
-                                                                   , typename TResource::Descriptor_t const &aDescriptor);
+        CEngineResult<std::optional<TResource>> useDynamicResource(ResourceId_t                     const &aResourceId
+                                                                 , typename TResource::Descriptor_t const &aDescriptor);
 
         template <typename TResource>
-        CEngineResult<SResourceState<TResource>> useAssetResource(  ResourceId_t const &aResourceId
-                                                                  , AssetId_t    const &aAssetResourceId);
+        CEngineResult<std::optional<TResource>> useAssetResource(ResourceId_t const &aResourceId
+                                                               , AssetId_t    const &aAssetResourceId);
 
-        template <typename TLogicalResource>
-        std::optional<SResourceState<TLogicalResource>> getResource(ResourceId_t const &aId)
+        template <typename TResource>
+        std::optional<TResource> getResource(ResourceId_t const &aId)
         {
-            return getResourceObject<TLogicalResource>(aId);
+            return getResourceObject<TResource>(aId);
         }
 
-        CEngineResult<> discardResource(ResourceId_t const &aResourceId);
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> discardResource(ResourceId_t const &aResourceId, TArgs &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> initializeResource(ResourceId_t                       const &aResourceId
+                                         , typename TResource::Dependencies_t const &aDependencies
+                                         , TArgs                                &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> deinitializeResource(ResourceId_t                       const &aResourceId
+                                           , typename TResource::Dependencies_t const &aDependencies
+                                           , TArgs                                &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> transferResource(ResourceId_t const &aResourceId
+                                       , TArgs          &&...aArgs);
 
     private_methods:
         template <typename TResource>
         Shared<CResourceFromAssetResourceObjectCreator<TResource>> getLoader();
 
         template <typename TResource>
-        CEngineResult<Shared<ILogicalResourceObject>> genericAssetLoading(ResourceId_t const &aResourceId
-                                                                        , AssetId_t    const &aAssetResourceId);
+        CEngineResult<std::optional<TResource>> genericAssetLoading(ResourceId_t const &aResourceId
+                                                                  , AssetId_t    const &aAssetResourceId);
 
-        template <typename TLogicalResource>
-        bool storeResourceObject(ResourceId_t                     const &aId
-                               , SResourceState<TLogicalResource> const &aObject)
+        template <typename TResource>
+        bool storeResourceObject(ResourceId_t const &aId
+                               , TResource    const &aObject)
         {
             bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
             if(not hasObjectForId)
@@ -109,38 +137,55 @@ namespace engine::resources
             return (not hasObjectForId);
         }
 
-        template <typename TLogicalResource>
-        std::optional<SResourceState<TLogicalResource>> getResourceObject(ResourceId_t const &aId)
+        void removeResourceObject(ResourceId_t const &aId)
+        {
+            bool const hasObjectForId = (mResourceObjects.end() != mResourceObjects.find(aId));
+            if(hasObjectForId)
+            {
+                mResourceObjects.erase(aId);
+            }
+        }
+
+        template <typename TResource>
+        std::optional<TResource> getResourceObject(ResourceId_t const &aId)
         {
             bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
             if(hasObjectForId)
             {
-                return mResourceObjects.at(aId);
+                ResourceVariants_t &variant = mResourceObjects.at(aId);
+                return std::get<TResource>(variant);
             }
 
             return {};
         }
 
-        void removeResourceObject(ResourceId_t const &aId);
-
-        GpuApiResourceDependencies_t getGpuApiDependencies(ResourceId_t const &aId);
-
     private_members:
-        Unique<CGpuApiResourceObjectFactory>                                    mGpuApiResourceObjectFactory;
-        Shared<asset::IAssetStorage>                                            mAssetStorage;
+        engine::threading::CLooper<EEngineStatus> mResourceThreadLooper;
+
         std::unordered_map<std::type_index, Shared<IResourceObjectCreatorBase>> mAssetLoaders;
 
-
-        std::unordered_map<ResourceId_t, SResourceState>                        mResourceObjects;
-        CAdjacencyTree<ResourceId_t>                                            mResourceTree;
+        std::unordered_map<ResourceId_t, ResourceVariants_t> mResourceObjects;
+        CAdjacencyTree<ResourceId_t>                         mResourceTree;
     };
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    CResourceManager<TResources...>::CResourceManager()
+            : mAssetLoaders               ()
+            , mResourceObjects            ()
+            , mResourceTree               ()
+    { }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
     template <typename TResource>
-    CEngineResult<> CResourceManager::addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader)
+    CEngineResult<> CResourceManager<TResources...>::addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader)
     {
         std::type_index const index = std::type_index(typeid(TResource));
 
@@ -158,8 +203,9 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    template <typename... TResources>
     template <typename TResource>
-    Shared<CResourceFromAssetResourceObjectCreator<TResource>> CResourceManager::getLoader()
+    Shared<CResourceFromAssetResourceObjectCreator<TResource>> CResourceManager<TResources...>::getLoader()
     {
         static Shared<CResourceFromAssetResourceObjectCreator<TResource>> sEmptyLoader = nullptr;
 
@@ -178,9 +224,11 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    template <typename... TResources>
     template <typename TResource>
-    CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::genericAssetLoading(  ResourceId_t const &aResourceId
-                                                                                        , AssetId_t    const &aAssetResourceId)
+    CEngineResult<std::optional<TResource>>
+        CResourceManager<TResources...>::genericAssetLoading(ResourceId_t const &aResourceId
+                                                           , AssetId_t    const &aAssetResourceId)
     {
         Shared<CResourceFromAssetResourceObjectCreator<TResource>> const &loader = getLoader<TResource>();
         if(nullptr == loader)
@@ -196,43 +244,20 @@ namespace engine::resources
 
         storeResourceObject(aResourceId, { resourceObject, { nullptr }, EGpuApiResourceState::Unloaded });
 
-        return { EEngineStatus::Ok, resourceObject };
+        return { EEngineStatus::Ok, { resourceObject }};
     }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    static void insertDependencies(CAdjacencyTree<ResourceId_t> &aTree, ResourceId_t const &aResourceId, std::vector<ResourceId_t> &&aDependencies)
-    {
-        // Add static dependencies
-        aTree.add(aResourceId);
-        for(auto const &dependency : aDependencies)
-        {
-            aTree.add    (dependency);
-            aTree.connect(aResourceId, dependency);
-        }
-    }
-
-    static void removeDependencies(CAdjacencyTree<ResourceId_t> &aTree, ResourceId_t const &aResourceId, std::vector<ResourceId_t> &&aDependencies)
-    {
-        // Add static dependencies
-        for(auto const &dependency : aDependencies)
-        {
-            aTree.disconnect(aResourceId, dependency);
-        }
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
     template <typename TResource>
-    CEngineResult<Shared<ILogicalResourceObject>> CResourceManager::useDynamicResource(
+    CEngineResult<std::optional<TResource>> CResourceManager<TResources...>::useDynamicResource(
               ResourceId_t                     const &aResourceId
             , typename TResource::Descriptor_t const &aDescriptor)
     {
-        CEngineResult<Shared<ILogicalResourceObject>> result = {EEngineStatus::Error, nullptr };
+        CEngineResult<std::optional<TResource>> result = {EEngineStatus::Error, {} };
 
         auto const alreadyFoundIt = mResourceObjects.find(aResourceId);
         if(mResourceObjects.end() != mResourceObjects.find(aResourceId))
@@ -240,170 +265,250 @@ namespace engine::resources
             return { EEngineStatus::Ok, alreadyFoundIt->second.logicalResource };
         }
 
-        auto const [handle, ops] = mGpuApiResourceObjectFactory->create<TResource>();
-
-        GpuApiHandle_t        gpuApiResourceId = handle;
-        SGpuApiOps<TResource> gpuApiOps        = ops;
-
-        SLogicalOps< typename TResource::Descriptor_t
-                   , typename TResource::Dependencies_t> logicalResourceOps {};
-
-        using namespace core;
-
         //
         // Wrap the gpu api resource operations with dependency resolving operations.
         //
-        logicalResourceOps.initialize =
-                [aResourceId, aDescriptor, gpuApiResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
-        {
-            std::optional<SResourceState> resource = getResourceObject(aResourceId);
-            if(not resource.has_value())
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(resource->state.checkAny(EGpuApiResourceState::Creating | EGpuApiResourceState::Created))
-            {
-                return EEngineStatus::Ok;
-            }
-            resource->state.set(EGpuApiResourceState::Creating);
-
-            Shared<ILogicalResourceObject> logicalResourceObject = resource->logicalResource;
-            if(nullptr == logicalResourceObject)
-            {
-                return EEngineStatus::Error;
-            }
-
-            Shared<TResource> resourceObject = std::static_pointer_cast<TResource>(logicalResourceObject);
-            if(nullptr == resourceObject)
-            {
-                return EEngineStatus::Error;
-            }
-
-            resourceObject->setCurrentDependencies(aDependencies);
-
-            Vector<ResourceId_t> resolveDependenciesList = aDependencies.resolve();
-
-            insertDependencies(mResourceTree, aResourceId, std::move(resolveDependenciesList));
-            auto dependenciesResolved = getGpuApiDependencies(aResourceId);
-
-            CEngineResult<> const result = gpuApiOps.initialize(aDescriptor, aDependencies, dependenciesResolved);
-
-            resource->state.reset(EGpuApiResourceState::Created);
-
-            return result.result();
-        };
-        logicalResourceOps.deinitialize =
-                [aResourceId, gpuApiOps, this] (typename TResource::Dependencies_t const &aDependencies) -> CEngineResult<>
-        {
-            std::optional<SResourceState> resource = getResourceObject(aResourceId);
-            if(not resource.has_value())
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(not resource->state.check(EGpuApiResourceState::Unloaded))
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(resource->state.checkAny(EGpuApiResourceState::Discarding | EGpuApiResourceState::Discarded))
-            {
-                return EEngineStatus::Ok;
-            }
-            resource->state.set(EGpuApiResourceState::Discarding);
-
-            CEngineResult<> const result = gpuApiOps.deinitialize();
-
-            Vector<ResourceId_t> resolveDependenciesList = aDependencies.resolve();
-            removeDependencies(mResourceTree, aResourceId, std::move(resolveDependenciesList));
-
-            resource->state.reset(EGpuApiResourceState::Discarded);
-
-            return result.result();
-        };
-        logicalResourceOps.load = [gpuApiOps, aResourceId, this] () -> CEngineResult<>
-        {
-            std::optional<SResourceState> resource = getResourceObject(aResourceId);
-            if(not resource.has_value())
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(not resource->state.check(EGpuApiResourceState::Created))
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(resource->state.checkAny(EGpuApiResourceState::Loading | EGpuApiResourceState::Loaded))
-            {
-                return EEngineStatus::Ok;
-            }
-            resource->state.set(EGpuApiResourceState::Loading);
-
-            CEngineResult<> const result = gpuApiOps.load();
-
-            resource->state.unset(EGpuApiResourceState::Loading);
-            resource->state.set  (EGpuApiResourceState::Loaded);
-        };
-        logicalResourceOps.unload = [gpuApiOps, aResourceId, this] () -> CEngineResult<>
-        {
-            std::optional<SResourceState> resource = getResourceObject(aResourceId);
-            if(not resource.has_value())
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(not resource->state.check(EGpuApiResourceState::Loaded))
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(resource->state.checkAny(EGpuApiResourceState::Unloading | EGpuApiResourceState::Unloaded))
-            {
-                return EEngineStatus::Ok;
-            }
-            resource->state.set(EGpuApiResourceState::Unloading);
-
-            CEngineResult<> const result = gpuApiOps.unload();
-
-            resource->state.unset(EGpuApiResourceState::Loading | EGpuApiResourceState::Loaded);
-            resource->state.unset(EGpuApiResourceState::Unloading);
-            resource->state.set  (EGpuApiResourceState::Unloaded);
-        };
-        logicalResourceOps.transfer= [gpuApiOps, aResourceId, this] () -> CEngineResult<>
-        {
-            std::optional<SResourceState> resource = getResourceObject(aResourceId);
-            if(not resource.has_value())
-            {
-                return EEngineStatus::Error;
-            }
-            
-            if(not resource->state.check(EGpuApiResourceState::Loaded))
-            {
-                return EEngineStatus::Error;
-            }
-
-            if(resource->state.checkAny(EGpuApiResourceState::Transferring | EGpuApiResourceState::Transferred))
-            {
-                return EEngineStatus::Ok;
-            }
-            resource->state.set(EGpuApiResourceState::Transferring);
-
-            CEngineResult<> const result = gpuApiOps.transfer();
-
-            resource->state.unset(EGpuApiResourceState::Transferring);
-            resource->state.set  (EGpuApiResourceState::Transferred);
-        };
 
         Shared<ILogicalResourceObject> resource         = makeShared<TResource>(aDescriptor);
         auto                           resourceObject   = std::static_pointer_cast<CResourceObject<typename TResource::Descriptor_t, typename TResource::Dependencies_t>>(resource);
-        resource      ->setGpuApiResourceHandle(gpuApiResourceId);
-        resourceObject->setLogicalOps(logicalResourceOps);
 
         storeResourceObject(aResourceId, { resource, nullptr, EGpuApiResourceState::Unloaded });
 
         return { EEngineStatus::Ok, resource };
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource>
+    CEngineResult<std::optional<TResource>> CResourceManager<TResources...>::useAssetResource(ResourceId_t const &aResourceId
+                                                                                            , AssetId_t    const &aAssetResourceId)
+    {
+        std::optional<TResource> object = getResourceObject(aResourceId);
+        if(object.has_value())
+        {
+            return { EEngineStatus::Ok, object };
+        }
+
+        return genericAssetLoading<TResource>(aResourceId, aAssetResourceId);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<> CResourceManager<TResources...>::discardResource(ResourceId_t const &aResourceId, TArgs &&...aArgs)
+    {
+        auto iterator = mResourceObjects.find(aResourceId);
+        if(mResourceObjects.end() != iterator)
+        {
+            TResource &resource = std::get<TResource>(*iterator);
+            if(EGpuApiResourceState::Discarded != resource.state)
+            {
+                EEngineStatus const deinitResult = deinitializeResource(aResourceId, resource.dependencies, std::forward<TArgs>(aArgs)...);
+                if(CheckEngineError(deinitResult))
+                {
+                    CLog::Error(logTag(), "Failed to deinitialize resource with ID '{}'", aResourceId);
+                    return EEngineStatus::Error;
+                }
+            }
+
+            removeResourceObject(aResourceId);
+            return EEngineStatus::Ok;
+        }
+
+        return EEngineStatus::ResourceError_NotFound;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<> CResourceManager<TResources...>::initializeResource(ResourceId_t                      const &aResourceId
+                                                                     , typename TResource::Dependencies_t const &aDependencies
+                                                                     , TArgs                                &&...aArgs)
+    {
+        using namespace core;
+
+        std::optional<TResource> resource = getResourceObject<TResource>(aResourceId);
+        // Resource available?
+        if(not resource.has_value())
+        {
+            resource->state.set(EGpuApiResourceState::Error);
+            return EEngineStatus::Error;
+        }
+
+        // Resource is being created and/or loaded.
+        if(resource->state.checkAny(EGpuApiResourceState::Creating
+                                  | EGpuApiResourceState::Created
+                                  | EGpuApiResourceState::Loading
+                                  | EGpuApiResourceState::Loaded))
+        {
+            return EEngineStatus::Ok;
+        }
+
+        // Run asynchronously
+        mResourceThreadLooper.getDispatcher().post([=] () -> EEngineStatus
+        {
+            if(not resource->state.checkAny(EGpuApiResourceState::Creating
+                                          | EGpuApiResourceState::Created))
+            {
+                resource->state.set(EGpuApiResourceState::Creating);
+
+                EEngineStatus const initResult = TResource::GpuApiResource_t::initialize(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+                if(not CheckEngineError(initResult))
+                {
+                    resource->state.set(EGpuApiResourceState::Error);
+                    return initResult;
+                }
+
+                resource->dependencies = aDependencies;
+                resource->state.reset(EGpuApiResourceState::Created);
+            }
+
+            if(not resource->state.checkAny(EGpuApiResourceState::Loading
+                                          | EGpuApiResourceState::Loaded))
+            {
+                resource->state.set(EGpuApiResourceState::Loading);
+
+                EEngineStatus const loadResult = TResource::GpuApiResource_t::load(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+                if(not CheckEngineError(loadResult))
+                {
+                    resource->state.set(EGpuApiResourceState::Error);
+                    return loadResult;
+                }
+
+                resource->state.unset(EGpuApiResourceState::Loading);
+                resource->state.set(EGpuApiResourceState::Loaded);
+            }
+
+            return EEngineStatus::Ok;
+        });
+
+        return EEngineStatus::Ok;
+    };
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<> CResourceManager<TResources...>::deinitializeResource(ResourceId_t                       const &aResourceId
+                                                                        , typename TResource::Dependencies_t const &aDependencies
+                                                                        , TArgs                                &&...aArgs)
+    {
+        using namespace core;
+
+        std::optional<TResource> resource = getResourceObject(aResourceId);
+        // Resource available?
+        if(not resource.has_value())
+        {
+            resource->state.set(EGpuApiResourceState::Error);
+            return EEngineStatus::Error;
+        }
+
+        // Resource is not being created or loaded?
+        if(resource->state.checkAny(EGpuApiResourceState::Creating
+                                  | EGpuApiResourceState::Loading))
+        {
+            resource->state.set(EGpuApiResourceState::Error);
+            return EEngineStatus::Error;
+        }
+
+        // Resource is created or loaded?
+        if(not resource->state.checkAny(EGpuApiResourceState::Created)
+        || not resource->state.checkAny(EGpuApiResourceState::Loaded))
+        {
+            resource->state.set(EGpuApiResourceState::Error);
+            return EEngineStatus::Ok;
+        }
+
+        // In any case:
+        resource->state.unset(EGpuApiResourceState::Transferred);
+
+        if(not resource->state.checkAny(EGpuApiResourceState::Unloading
+                                      | EGpuApiResourceState::Unloaded))
+        {
+            resource->state.set(EGpuApiResourceState::Unloading);
+
+            EEngineStatus const unloadResult = TResource::GpuApiResource_t::unload(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+            if(not CheckEngineError(unloadResult))
+            {
+                resource->state.set(EGpuApiResourceState::Error);
+                return unloadResult;
+            }
+
+            resource->state.unset(EGpuApiResourceState::Unloading | EGpuApiResourceState::Loaded);
+            resource->state.set  (EGpuApiResourceState::Unloaded);
+        }
+
+        if(not resource->state.checkAny(EGpuApiResourceState::Discarding
+                                      | EGpuApiResourceState::Discarded))
+        {
+            resource->state.reset(EGpuApiResourceState::Discarding);
+
+            EEngineStatus const deinitResult = TResource::GpuApiResource_t::deinitialize(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+            if(not CheckEngineError(deinitResult))
+            {
+                return deinitResult;
+            }
+
+            resource->state.unset(EGpuApiResourceState::Discarding | EGpuApiResourceState::Created);
+            resource->state.reset(EGpuApiResourceState::Discarded);
+        }
+
+        return EEngineStatus::Ok;
+    };
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<> CResourceManager<TResources...>::transferResource(ResourceId_t const &aResourceId
+                                                                    , TArgs          &&...aArgs)
+    {
+        using namespace core;
+
+        std::optional<TResource> resource = getResourceObject(aResourceId);
+        // Resource available?
+        if(not resource.has_value())
+        {
+            resource->state.set(EGpuApiResourceState::Error);
+            return EEngineStatus::Error;
+        }
+
+        // Resource is created or loaded?
+        if(not resource->state.checkAny(EGpuApiResourceState::Loaded))
+        {
+            resource->state.set(EGpuApiResourceState::Error);
+            return EEngineStatus::Error;
+        }
+
+        if(not resource->state.checkAny(EGpuApiResourceState::Transferring
+                                      | EGpuApiResourceState::Transferred))
+        {
+            resource->state.set(EGpuApiResourceState::Transferring);
+
+            EEngineStatus const transferResult = TResource::GpuApiResource_t::transfer(std::forward<TArgs>(aArgs)...);
+            if(not CheckEngineError(transferResult))
+            {
+                return transferResult;
+            }
+
+            resource->state.unset(EGpuApiResourceState::Transferring);
+            resource->state.set  (EGpuApiResourceState::Transferred);
+        }
+
+        return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
 }

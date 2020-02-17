@@ -65,7 +65,7 @@ namespace engine
                  *
                  * @param aOther
                  */
-                CTask(CTask&& aOther)
+                CTask(CTask&& aOther) noexcept
                     : mPriority(aOther.mPriority)
                     , mTask(std::move(aOther.mTask))
                 {}
@@ -77,7 +77,7 @@ namespace engine
                  * @param aOther
                  * @return
                  */
-                CTask& operator=(CTask&& aOther)
+                CTask& operator=(CTask&& aOther) noexcept
                 {
                     mPriority = aOther.mPriority;
                     mTask     = std::move(aOther.mTask);
@@ -96,7 +96,7 @@ namespace engine
                 /**
                  * Implicit bool conversion to check for validity.
                  */
-                operator bool()
+                explicit operator bool()
                 {
                     return mTask.valid();
                 }
@@ -107,6 +107,7 @@ namespace engine
                  *
                  * @return
                  */
+                [[nodiscard]]
                 SHIRABE_INLINE ETaskPriority const &priority() const
                 {
                     return mPriority;
