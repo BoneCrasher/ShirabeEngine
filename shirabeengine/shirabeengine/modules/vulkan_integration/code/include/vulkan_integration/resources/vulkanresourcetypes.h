@@ -5,7 +5,7 @@
 #ifndef __SHIRABEDEVELOPMENT_VULKANRESOURCETYPES_H__
 #define __SHIRABEDEVELOPMENT_VULKANRESOURCETYPES_H__
 
-#include "vulkan_integration/cvkapiresource.h"
+#include <resources/cresourcemanager.h>
 
 namespace engine
 {

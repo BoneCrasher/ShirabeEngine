@@ -5,7 +5,6 @@
 #include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 
 #include <renderer/framegraph/framegraphrendercontext.h>
-#include <resources/cresourcemanager.h>
 
 #include <thread>
 #include <base/string.h>
@@ -15,24 +14,25 @@ namespace engine
     namespace vulkan
     {
         using namespace framegraph;
+        using engine::resources::VulkanResourceManager_t;
 
         template <typename T>
         using OptRef_t = std::optional<std::reference_wrapper<T>>;
 
         template <typename TLogical, typename TGpuApi>
-        using FetchResult_t = std::tuple<bool, OptRef_t<TLogical>, OptRef_t<TGpuApi>, core::CBitField<EGpuApiResourceState>>;
+        using FetchResult_t = std::tuple<bool, SResourceState<TLogical, TGpuApi>, core::CBitField<EGpuApiResourceState>>;
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         template <typename TLogical, typename TGpuApi>
-        FetchResult_t<TLogical, TGpuApi> fetchResource(Shared<CResourceManager> const &aResourceManager
-                                                     , ResourceId_t             const &aResourceId
-                                                     , bool                     const  aGpuResourceMayBeNull = true)
+        FetchResult_t<TLogical, TGpuApi> fetchResource(Shared<VulkanResourceManager_t> const &aResourceManager
+                                                     , ResourceId_t                    const &aResourceId
+                                                     , bool                            const  aGpuResourceMayBeNull = true)
         {
             static FetchResult_t<TLogical, TGpuApi> const sInvalid = { false, {}, {}, EGpuApiResourceState::Error };
 
-            std::optional<SResourceState<TLogical>> resource = aResourceManager->getResource<TLogical>(aResourceId);
+            std::optional<SResourceState<TLogical, TGpuApi>> resource = aResourceManager->getResource<SResourceState<TLogical, TGpuApi>>(aResourceId);
             if(not resource.has_value())
             {
                 return sInvalid;
