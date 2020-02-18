@@ -730,8 +730,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTexture(
-                SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphTexture>       const &aTexture)
+                SFrameGraphRenderContext         &aRenderContext,
+                Shared<SFrameGraphTexture> const &aTexture)
         {
             CEngineResult<> initialization = EEngineStatus::Ok;
 

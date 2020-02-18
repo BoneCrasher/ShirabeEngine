@@ -53,6 +53,9 @@ namespace engine::resources
         GpuApiHandles_t gpuApiHandles;
         ResourceState_t loadState;
     };
+    
+    template <typename TResource>
+    using FetchedResource_t = std::optional<std::reference_wrapper<TResource>>;
 
     /**
      *
@@ -86,20 +89,22 @@ namespace engine::resources
         CEngineResult<> addAssetLoader(Shared<CResourceFromAssetResourceObjectCreator<TResource>> aLoader);
 
         template <typename TResource>
-        CEngineResult<std::optional<TResource>> useDynamicResource(ResourceId_t                     const &aResourceId
-                                                                 , typename TResource::Descriptor_t const &aDescriptor);
+        CEngineResult<FetchedResource_t<TResource>> useDynamicResource(ResourceId_t                     const &aResourceId
+                                                                     , typename TResource::Descriptor_t const &aDescriptor);
 
         template <typename TResource>
-        CEngineResult<std::optional<TResource>> useAssetResource(ResourceId_t const &aResourceId
-                                                               , AssetId_t    const &aAssetResourceId);
+        CEngineResult<FetchedResource_t<TResource>> useAssetResource(ResourceId_t const &aResourceId
+                                                                   , AssetId_t    const &aAssetResourceId);
 
         template <typename TResource>
-        std::optional<TResource> getResource(ResourceId_t const &aId)
+        SHIRABE_INLINE
+        FetchedResource_t<TResource> getResource(ResourceId_t const &aId)
         {
             return getResourceObject<TResource>(aId);
         }
 
         template <typename TResource, typename... TArgs>
+        SHIRABE_INLINE
         CEngineResult<> discardResource(ResourceId_t const &aResourceId, TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
@@ -116,13 +121,26 @@ namespace engine::resources
         CEngineResult<> transferResource(ResourceId_t const &aResourceId
                                        , TArgs          &&...aArgs);
 
+        template <typename TResource>
+        FetchedResource_t<TResource> getResourceObject(ResourceId_t const &aId)
+        {
+            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
+            if(hasObjectForId)
+            {
+                ResourceVariants_t &variant = mResourceObjects.at(aId);
+                return std::get<TResource>(variant);
+            }
+
+            return {};
+        }
+
     private_methods:
         template <typename TResource>
         Shared<CResourceFromAssetResourceObjectCreator<TResource>> getLoader();
 
         template <typename TResource>
-        CEngineResult<std::optional<TResource>> genericAssetLoading(ResourceId_t const &aResourceId
-                                                                  , AssetId_t    const &aAssetResourceId);
+        CEngineResult<FetchedResource_t<TResource>> genericAssetLoading(ResourceId_t const &aResourceId
+                                                                      , AssetId_t    const &aAssetResourceId);
 
         template <typename TResource>
         bool storeResourceObject(ResourceId_t const &aId
@@ -144,19 +162,6 @@ namespace engine::resources
             {
                 mResourceObjects.erase(aId);
             }
-        }
-
-        template <typename TResource>
-        std::optional<TResource> getResourceObject(ResourceId_t const &aId)
-        {
-            bool const hasObjectForId = assoc_container_contains(mResourceObjects, aId);
-            if(hasObjectForId)
-            {
-                ResourceVariants_t &variant = mResourceObjects.at(aId);
-                return std::get<TResource>(variant);
-            }
-
-            return {};
         }
 
     private_members:
@@ -226,7 +231,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource>
-    CEngineResult<std::optional<TResource>>
+    CEngineResult<FetchedResource_t<TResource>>
         CResourceManager<TResources...>::genericAssetLoading(ResourceId_t const &aResourceId
                                                            , AssetId_t    const &aAssetResourceId)
     {
@@ -253,11 +258,11 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource>
-    CEngineResult<std::optional<TResource>> CResourceManager<TResources...>::useDynamicResource(
+    CEngineResult<FetchedResource_t<TResource>> CResourceManager<TResources...>::useDynamicResource(
               ResourceId_t                     const &aResourceId
             , typename TResource::Descriptor_t const &aDescriptor)
     {
-        CEngineResult<std::optional<TResource>> result = {EEngineStatus::Error, {} };
+        CEngineResult<FetchedResource_t<TResource>> result = {EEngineStatus::Error, {} };
 
         auto const alreadyFoundIt = mResourceObjects.find(aResourceId);
         if(mResourceObjects.end() != mResourceObjects.find(aResourceId))
@@ -283,10 +288,10 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource>
-    CEngineResult<std::optional<TResource>> CResourceManager<TResources...>::useAssetResource(ResourceId_t const &aResourceId
+    CEngineResult<FetchedResource_t<TResource>> CResourceManager<TResources...>::useAssetResource(ResourceId_t const &aResourceId
                                                                                             , AssetId_t    const &aAssetResourceId)
     {
-        std::optional<TResource> object = getResourceObject(aResourceId);
+        FetchedResource_t<TResource> object = getResourceObject(aResourceId);
         if(object.has_value())
         {
             return { EEngineStatus::Ok, object };
@@ -336,7 +341,7 @@ namespace engine::resources
     {
         using namespace core;
 
-        std::optional<TResource> resource = getResourceObject<TResource>(aResourceId);
+        FetchedResource_t<TResource> resource = getResourceObject<TResource>(aResourceId);
         // Resource available?
         if(not resource.has_value())
         {
@@ -361,7 +366,7 @@ namespace engine::resources
             {
                 resource->state.set(EGpuApiResourceState::Creating);
 
-                EEngineStatus const initResult = TResource::GpuApiResource_t::initialize(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const initResult = TResource::GpuApiResource_t::initialize(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(initResult))
                 {
                     resource->state.set(EGpuApiResourceState::Error);
@@ -377,7 +382,7 @@ namespace engine::resources
             {
                 resource->state.set(EGpuApiResourceState::Loading);
 
-                EEngineStatus const loadResult = TResource::GpuApiResource_t::load(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const loadResult = TResource::GpuApiResource_t::load(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(loadResult))
                 {
                     resource->state.set(EGpuApiResourceState::Error);
@@ -406,7 +411,7 @@ namespace engine::resources
     {
         using namespace core;
 
-        std::optional<TResource> resource = getResourceObject(aResourceId);
+        FetchedResource_t<TResource> resource = getResourceObject(aResourceId);
         // Resource available?
         if(not resource.has_value())
         {
@@ -438,7 +443,7 @@ namespace engine::resources
         {
             resource->state.set(EGpuApiResourceState::Unloading);
 
-            EEngineStatus const unloadResult = TResource::GpuApiResource_t::unload(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const unloadResult = TResource::GpuApiResource_t::unload(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(unloadResult))
             {
                 resource->state.set(EGpuApiResourceState::Error);
@@ -454,7 +459,7 @@ namespace engine::resources
         {
             resource->state.reset(EGpuApiResourceState::Discarding);
 
-            EEngineStatus const deinitResult = TResource::GpuApiResource_t::deinitialize(resource.descriptor, aDependencies, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const deinitResult = TResource::GpuApiResource_t::deinitialize(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(deinitResult))
             {
                 return deinitResult;
@@ -478,7 +483,7 @@ namespace engine::resources
     {
         using namespace core;
 
-        std::optional<TResource> resource = getResourceObject(aResourceId);
+        FetchedResource_t<TResource> resource = getResourceObject(aResourceId);
         // Resource available?
         if(not resource.has_value())
         {
@@ -498,7 +503,7 @@ namespace engine::resources
         {
             resource->state.set(EGpuApiResourceState::Transferring);
 
-            EEngineStatus const transferResult = TResource::GpuApiResource_t::transfer(std::forward<TArgs>(aArgs)...);
+            EEngineStatus const transferResult = TResource::GpuApiResource_t::transfer(resource.descriptor, resource.dependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(transferResult))
             {
                 return transferResult;

@@ -20,25 +20,15 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        class CVulkanPipelineResource
-                : public CVkApiResource<SPipeline>
+        struct SVulkanPipelineResource
         {
-            SHIRABE_DECLARE_LOG_TAG(CVulkanPipelineResource);
-
-        public_constructors:
-            using CVkApiResource<SPipeline>::CVkApiResource;
-
-        public_methods:
-            CEngineResult<> create(  SMaterialPipelineDescriptor   const &aDescription
-                                   , SMaterialPipelineDependencies const &aDependencies
-                                   , GpuApiResourceDependencies_t  const &aResolvedDependencies) final;
-            CEngineResult<> destroy()  final;
-
-        public_members:
-            VkPipeline                   pipeline;
-            VkPipelineLayout             pipelineLayout;
-            VkDescriptorPool             descriptorPool;
-            std::vector<VkDescriptorSet> descriptorSets;
+            struct Handles_t
+            {
+                VkPipeline                   pipeline;
+                VkPipelineLayout             pipelineLayout;
+                VkDescriptorPool             descriptorPool;
+                std::vector<VkDescriptorSet> descriptorSets;
+            };
         };
     }
 }

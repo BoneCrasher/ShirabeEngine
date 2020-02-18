@@ -21,46 +21,16 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        class CVulkanTextureResource
-                : public CVkApiResource<STexture>
-                , public ILoadableGpuApiResourceObject
-                , public ITransferrableGpuApiResourceObject
+        struct SVulkanTextureResource
         {
-            SHIRABE_DECLARE_LOG_TAG(CVulkanTextureResource);
-
-        public_constructors:
-            explicit CVulkanTextureResource(  Shared<IVkGlobalContext>         aVkContext
-                                            , resources::GpuApiHandle_t const &aHandle);
-
-        public_methods:
-            // AGpuApiResourceObject
-            [[nodiscard]]
-            CEngineResult<> create(  STextureDescription          const &aDescriptionmVkState
-                                   , SNoDependencies              const &aDependencies
-                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
-            [[nodiscard]]
-            CEngineResult<> destroy()  final;
-
-            // ILoadableGpuApiResourceObject
-            [[nodiscard]]
-            CEngineResult<> load()   const final;
-            [[nodiscard]]
-            CEngineResult<> unload() const final;
-
-            // ITransferrableGpuApiResourceObject
-            [[nodiscard]]
-            CEngineResult<> transfer() const final;
-
-        public_members:
-
-            VkBuffer       stagingBuffer;
-            VkDeviceMemory stagingBufferMemory;
-            VkImage        imageHandle;
-            VkDeviceMemory imageMemory;
-            VkSampler      attachedSampler;
-
-        private_members:
-            bool mIsTransferred;
+            struct Handles_t
+            {
+                VkBuffer       stagingBuffer;
+                VkDeviceMemory stagingBufferMemory;
+                VkImage        imageHandle;
+                VkDeviceMemory imageMemory;
+                VkSampler      attachedSampler;
+            };
         };
     }
 }

@@ -22,17 +22,26 @@ namespace engine
 {
     namespace resources
     {
+        using TextureResourceState_t      = SResourceState<STexture,      SVulkanTextureResource>;
+        using TextureViewResourceState_t  = SResourceState<STextureView,  SVulkanTextureViewResource>;
+        using BufferResourceState_t       = SResourceState<SBuffer,       SVulkanBufferResource>;
+        using BufferViewResourceState_t   = SResourceState<SBufferView,   CVulkanBufferViewResource>;
+        using RenderPassResourceState_t   = SResourceState<SRenderPass,   CVulkanRenderPassResource>;
+        using FrameBufferResourceState_t  = SResourceState<SFrameBuffer,  CVulkanFrameBufferResource>;
+        using ShaderModuleResourceState_t = SResourceState<SShaderModule, CVulkanShaderModuleResource>;
+        using PipelineResourceState_t     = SResourceState<SPipeline,     SVulkanPipelineResource>;
+
         using VulkanResourceManager_t =
                 CResourceManager<
                     // List of supported resource states...
-                      SResourceState<STexture,      CVulkanTextureResource>
-                    , SResourceState<STextureView,  CVulkanTextureViewResource>
-                    , SResourceState<SBuffer,       CVulkanBufferResource>
-                    , SResourceState<SBufferView,   CVulkanBufferViewResource>
-                    , SResourceState<SRenderPass,   CVulkanRenderPassResource>
-                    , SResourceState<SFrameBuffer,  CVulkanFrameBufferResource>
-                    , SResourceState<SShaderModule, CVulkanShaderModuleResource>
-                    , SResourceState<SPipeline,     CVulkanPipelineResource>
+                      TextureResourceState_t
+                    , TextureViewResourceState_t
+                    , BufferResourceState_t
+                    , BufferViewResourceState_t
+                    , RenderPassResourceState_t
+                    , FrameBufferResourceState_t
+                    , ShaderModuleResourceState_t
+                    , PipelineResourceState_t
                 >;
     }
 

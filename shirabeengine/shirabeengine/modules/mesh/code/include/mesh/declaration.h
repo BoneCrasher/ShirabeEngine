@@ -129,7 +129,7 @@ namespace engine
          */
         struct SMeshDataFile
                 : engine::serialization::ISerializable<documents::IJSONSerializer<SMeshDataFile>>
-                  , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMeshDataFile>>
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMeshDataFile>>
         {
         public_constructors:
             SHIRABE_INLINE

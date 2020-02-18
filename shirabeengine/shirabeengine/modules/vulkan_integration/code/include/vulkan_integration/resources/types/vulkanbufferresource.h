@@ -46,33 +46,12 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        class CVulkanBufferResource
-            : public CVkApiResource<SBuffer>
-            , public ILoadableGpuApiResourceObject
-            , public ITransferrableGpuApiResourceObject
+        struct SVulkanBufferResource
         {
-            SHIRABE_DECLARE_LOG_TAG(CVulkanBufferResource);
-
-        public_constructors:
-            using CVkApiResource<SBuffer>::CVkApiResource;
-
-        public_methods:
-            // AGpuApiResourceObject
-            CEngineResult<> create(  SBufferDescription           const &aDescription
-                                   , SNoDependencies              const &aDependencies
-                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
-            CEngineResult<> destroy() final;
-
-            // ILoadableGpuApiResourceObject
-            CEngineResult<> load()     const final;
-            CEngineResult<> unload()   const final;
-
-            // ITransferrableGpuApiResourceObject
-            CEngineResult<> transfer() const final;
-
-        public_members:
-            VkBuffer       handle;
-            VkDeviceMemory attachedMemory;
+            struct Handles_t {
+                VkBuffer       handle;
+                VkDeviceMemory attachedMemory;
+            };
         };
     }
 }
