@@ -19,22 +19,12 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        class CVulkanRenderPassResource
-                : public CVkApiResource<SRenderPass>
+        struct SVulkanRenderPassResource
         {
-            SHIRABE_DECLARE_LOG_TAG(CVulkanRenderPassResource);
-
-        public_constructors:
-            using CVkApiResource<SRenderPass>::CVkApiResource;
-
-        public_methods:
-            CEngineResult<> create(  SRenderPassDescription       const &aDescription
-                                   , SRenderPassDependencies      const &aDependencies
-                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
-            CEngineResult<> destroy()  final;
-
-        public_members:
-            VkRenderPass handle;
+            struct Handles_t
+            {
+                VkRenderPass handle;
+            };
         };
     }
 }

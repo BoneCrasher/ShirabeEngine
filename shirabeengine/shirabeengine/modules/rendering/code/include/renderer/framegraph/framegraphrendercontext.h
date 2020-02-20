@@ -15,6 +15,7 @@ namespace engine
 {
     namespace resources
     {
+        template <typename... TResources>
         class CResourceManager;
     }
 

@@ -22,28 +22,12 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        class CVulkanShaderModuleResource
-            : public CVkApiResource<SShaderModule>
-            , public ILoadableGpuApiResourceObject
+        struct SVulkanShaderModuleResource
         {
-            SHIRABE_DECLARE_LOG_TAG(CVulkanShaderModuleResource);
-
-        public_constructors:
-            using CVkApiResource<SShaderModule>::CVkApiResource;
-
-        public_methods:
-            // AGpuApiResourceObject
-            CEngineResult<> create(  SShaderModuleDescriptor      const &aDescription
-                                   , SNoDependencies              const &aDependencies
-                                   , GpuApiResourceDependencies_t const &aResolvedDependencies) final;
-            CEngineResult<> destroy() final;
-
-            // ILoadableGpuApiResourceObject
-            CEngineResult<> load()   const final;
-            CEngineResult<> unload() const final;
-
-        public_members:
-            std::unordered_map<VkShaderStageFlags, VkShaderModule> handles;
+            struct Handles_t
+            {
+                std::unordered_map<VkShaderStageFlags, VkShaderModule> handles;
+            };
         };
     }
 }

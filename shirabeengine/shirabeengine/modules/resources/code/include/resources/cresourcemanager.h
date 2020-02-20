@@ -336,8 +336,8 @@ namespace engine::resources
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<> CResourceManager<TResources...>::initializeResource(ResourceId_t                      const &aResourceId
-                                                                     , typename TResource::Dependencies_t const &aDependencies
-                                                                     , TArgs                                &&...aArgs)
+                                                                      , typename TResource::Dependencies_t const &aDependencies
+                                                                      , TArgs                                &&...aArgs)
     {
         using namespace core;
 
@@ -345,15 +345,15 @@ namespace engine::resources
         // Resource available?
         if(not resource.has_value())
         {
-            resource->state.set(EGpuApiResourceState::Error);
+            resource->loadState.set(EGpuApiResourceState::Error);
             return EEngineStatus::Error;
         }
 
         // Resource is being created and/or loaded.
-        if(resource->state.checkAny(EGpuApiResourceState::Creating
-                                  | EGpuApiResourceState::Created
-                                  | EGpuApiResourceState::Loading
-                                  | EGpuApiResourceState::Loaded))
+        if(resource->loadState.checkAny(EGpuApiResourceState::Creating
+                                      | EGpuApiResourceState::Created
+                                      | EGpuApiResourceState::Loading
+                                      | EGpuApiResourceState::Loaded))
         {
             return EEngineStatus::Ok;
         }
@@ -361,36 +361,36 @@ namespace engine::resources
         // Run asynchronously
         mResourceThreadLooper.getDispatcher().post([=] () -> EEngineStatus
         {
-            if(not resource->state.checkAny(EGpuApiResourceState::Creating
-                                          | EGpuApiResourceState::Created))
+            if(not resource->loadState.checkAny(EGpuApiResourceState::Creating
+                                              | EGpuApiResourceState::Created))
             {
-                resource->state.set(EGpuApiResourceState::Creating);
+                resource->loadState.set(EGpuApiResourceState::Creating);
 
                 EEngineStatus const initResult = TResource::GpuApiResource_t::initialize(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(initResult))
                 {
-                    resource->state.set(EGpuApiResourceState::Error);
+                    resource->loadState.set(EGpuApiResourceState::Error);
                     return initResult;
                 }
 
                 resource->dependencies = aDependencies;
-                resource->state.reset(EGpuApiResourceState::Created);
+                resource->loadState.reset(EGpuApiResourceState::Created);
             }
 
-            if(not resource->state.checkAny(EGpuApiResourceState::Loading
-                                          | EGpuApiResourceState::Loaded))
+            if(not resource->loadState.checkAny(EGpuApiResourceState::Loading
+                                              | EGpuApiResourceState::Loaded))
             {
-                resource->state.set(EGpuApiResourceState::Loading);
+                resource->loadState.set(EGpuApiResourceState::Loading);
 
                 EEngineStatus const loadResult = TResource::GpuApiResource_t::load(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(loadResult))
                 {
-                    resource->state.set(EGpuApiResourceState::Error);
+                    resource->loadState.set(EGpuApiResourceState::Error);
                     return loadResult;
                 }
 
-                resource->state.unset(EGpuApiResourceState::Loading);
-                resource->state.set(EGpuApiResourceState::Loaded);
+                resource->loadState.unset(EGpuApiResourceState::Loading);
+                resource->loadState.set(EGpuApiResourceState::Loaded);
             }
 
             return EEngineStatus::Ok;
@@ -415,49 +415,49 @@ namespace engine::resources
         // Resource available?
         if(not resource.has_value())
         {
-            resource->state.set(EGpuApiResourceState::Error);
+            resource->loadState.set(EGpuApiResourceState::Error);
             return EEngineStatus::Error;
         }
 
         // Resource is not being created or loaded?
-        if(resource->state.checkAny(EGpuApiResourceState::Creating
-                                  | EGpuApiResourceState::Loading))
+        if(resource->loadState.checkAny(EGpuApiResourceState::Creating
+                                      | EGpuApiResourceState::Loading))
         {
-            resource->state.set(EGpuApiResourceState::Error);
+            resource->loadState.set(EGpuApiResourceState::Error);
             return EEngineStatus::Error;
         }
 
         // Resource is created or loaded?
-        if(not resource->state.checkAny(EGpuApiResourceState::Created)
-        || not resource->state.checkAny(EGpuApiResourceState::Loaded))
+        if(not resource->loadState.checkAny(EGpuApiResourceState::Created)
+        || not resource->loadState.checkAny(EGpuApiResourceState::Loaded))
         {
-            resource->state.set(EGpuApiResourceState::Error);
+            resource->loadState.set(EGpuApiResourceState::Error);
             return EEngineStatus::Ok;
         }
 
         // In any case:
-        resource->state.unset(EGpuApiResourceState::Transferred);
+        resource->loadState.unset(EGpuApiResourceState::Transferred);
 
-        if(not resource->state.checkAny(EGpuApiResourceState::Unloading
-                                      | EGpuApiResourceState::Unloaded))
+        if(not resource->loadState.checkAny(EGpuApiResourceState::Unloading
+                                          | EGpuApiResourceState::Unloaded))
         {
-            resource->state.set(EGpuApiResourceState::Unloading);
+            resource->loadState.set(EGpuApiResourceState::Unloading);
 
             EEngineStatus const unloadResult = TResource::GpuApiResource_t::unload(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(unloadResult))
             {
-                resource->state.set(EGpuApiResourceState::Error);
+                resource->loadState.set(EGpuApiResourceState::Error);
                 return unloadResult;
             }
 
-            resource->state.unset(EGpuApiResourceState::Unloading | EGpuApiResourceState::Loaded);
-            resource->state.set  (EGpuApiResourceState::Unloaded);
+            resource->loadState.unset(EGpuApiResourceState::Unloading | EGpuApiResourceState::Loaded);
+            resource->loadState.set  (EGpuApiResourceState::Unloaded);
         }
 
-        if(not resource->state.checkAny(EGpuApiResourceState::Discarding
+        if(not resource->loadState.checkAny(EGpuApiResourceState::Discarding
                                       | EGpuApiResourceState::Discarded))
         {
-            resource->state.reset(EGpuApiResourceState::Discarding);
+            resource->loadState.reset(EGpuApiResourceState::Discarding);
 
             EEngineStatus const deinitResult = TResource::GpuApiResource_t::deinitialize(resource.descriptor, aDependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(deinitResult))
@@ -465,8 +465,8 @@ namespace engine::resources
                 return deinitResult;
             }
 
-            resource->state.unset(EGpuApiResourceState::Discarding | EGpuApiResourceState::Created);
-            resource->state.reset(EGpuApiResourceState::Discarded);
+            resource->loadState.unset(EGpuApiResourceState::Discarding | EGpuApiResourceState::Created);
+            resource->loadState.reset(EGpuApiResourceState::Discarded);
         }
 
         return EEngineStatus::Ok;
@@ -487,21 +487,21 @@ namespace engine::resources
         // Resource available?
         if(not resource.has_value())
         {
-            resource->state.set(EGpuApiResourceState::Error);
+            resource->loadState.set(EGpuApiResourceState::Error);
             return EEngineStatus::Error;
         }
 
         // Resource is created or loaded?
-        if(not resource->state.checkAny(EGpuApiResourceState::Loaded))
+        if(not resource->loadState.checkAny(EGpuApiResourceState::Loaded))
         {
-            resource->state.set(EGpuApiResourceState::Error);
+            resource->loadState.set(EGpuApiResourceState::Error);
             return EEngineStatus::Error;
         }
 
-        if(not resource->state.checkAny(EGpuApiResourceState::Transferring
+        if(not resource->loadState.checkAny(EGpuApiResourceState::Transferring
                                       | EGpuApiResourceState::Transferred))
         {
-            resource->state.set(EGpuApiResourceState::Transferring);
+            resource->loadState.set(EGpuApiResourceState::Transferring);
 
             EEngineStatus const transferResult = TResource::GpuApiResource_t::transfer(resource.descriptor, resource.dependencies, resource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(transferResult))
@@ -509,8 +509,8 @@ namespace engine::resources
                 return transferResult;
             }
 
-            resource->state.unset(EGpuApiResourceState::Transferring);
-            resource->state.set  (EGpuApiResourceState::Transferred);
+            resource->loadState.unset(EGpuApiResourceState::Transferring);
+            resource->loadState.set  (EGpuApiResourceState::Transferred);
         }
 
         return EEngineStatus::Ok;

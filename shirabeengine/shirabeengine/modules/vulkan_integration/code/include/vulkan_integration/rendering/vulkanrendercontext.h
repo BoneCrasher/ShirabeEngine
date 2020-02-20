@@ -17,6 +17,8 @@
 #include "vulkan_integration/resources/types/vulkanframebufferresource.h"
 #include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 #include "vulkan_integration/resources/types/vulkanshadermoduleresource.h"
+#include "vulkan_integration/resources/types/vulkanmeshresource.h"
+#include "vulkan_integration/resources/types/vulkanmaterialresource.h"
 
 namespace engine
 {
@@ -25,11 +27,13 @@ namespace engine
         using TextureResourceState_t      = SResourceState<STexture,      SVulkanTextureResource>;
         using TextureViewResourceState_t  = SResourceState<STextureView,  SVulkanTextureViewResource>;
         using BufferResourceState_t       = SResourceState<SBuffer,       SVulkanBufferResource>;
-        using BufferViewResourceState_t   = SResourceState<SBufferView,   CVulkanBufferViewResource>;
-        using RenderPassResourceState_t   = SResourceState<SRenderPass,   CVulkanRenderPassResource>;
-        using FrameBufferResourceState_t  = SResourceState<SFrameBuffer,  CVulkanFrameBufferResource>;
-        using ShaderModuleResourceState_t = SResourceState<SShaderModule, CVulkanShaderModuleResource>;
+        using BufferViewResourceState_t   = SResourceState<SBufferView,   SVulkanBufferViewResource>;
+        using RenderPassResourceState_t   = SResourceState<SRenderPass,   SVulkanRenderPassResource>;
+        using FrameBufferResourceState_t  = SResourceState<SFrameBuffer,  SVulkanFrameBufferResource>;
+        using ShaderModuleResourceState_t = SResourceState<SShaderModule, SVulkanShaderModuleResource>;
         using PipelineResourceState_t     = SResourceState<SPipeline,     SVulkanPipelineResource>;
+        using MeshResourceState_t         = SResourceState<SMesh,         SVulkanMeshResource>;
+        using MaterialResourceState_t     = SResourceState<SMaterial,     SVulkanMaterialResource>;
 
         using VulkanResourceManager_t =
                 CResourceManager<

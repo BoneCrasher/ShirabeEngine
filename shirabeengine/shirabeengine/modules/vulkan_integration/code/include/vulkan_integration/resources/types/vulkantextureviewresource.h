@@ -19,7 +19,7 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SulkanTextureViewResource
+        struct SVulkanTextureViewResource
         {
             struct Handles_t
             {
