@@ -57,10 +57,10 @@ namespace engine
              * @return             EEngineStatus::Ok if successful.
              * @return             EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> copyImage(SFrameGraphTexture const &aSourceImage,
-                                              SFrameGraphTexture const &aTargetImage) = 0;
+            virtual CEngineResult<> copyImage(SFrameGraphDynamicTexture const &aSourceImage,
+                                              SFrameGraphDynamicTexture const &aTargetImage) = 0;
 
-            virtual EEngineStatus performImageLayoutTransfer(  SFrameGraphTexture const &aImageHandle
+            virtual EEngineStatus performImageLayoutTransfer(SFrameGraphDynamicTexture const &aImageHandle
                                                              , CRange             const &aArrayRange
                                                              , CRange             const &aMipRange
                                                              , VkImageAspectFlags const &aAspectFlags
@@ -74,7 +74,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId) = 0;
+            virtual CEngineResult<> copyImageToBackBuffer(SFrameGraphDynamicTexture const &aSourceImageId) = 0;
 
             //
             // SwapChain and Presentation
@@ -221,7 +221,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> importTexture(SFrameGraphTexture const &aTexture) = 0;
+            virtual CEngineResult<> importTexture(SFrameGraphDynamicTexture const &aTexture) = 0;
 
             /**
              * Create a texture in the graphics API for use within render operations.
@@ -230,7 +230,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> createTexture(SFrameGraphTexture const &aTexture) = 0;
+            virtual CEngineResult<> createTexture(SFrameGraphDynamicTexture const &aTexture) = 0;
 
             /**
              * Destroy a texture in the system.
@@ -239,7 +239,7 @@ namespace engine
              * @return         EEngineStatus::Ok if successful.
              * @return         EEngineStatus::Error otherwise.
              */
-            virtual CEngineResult<> destroyTexture(SFrameGraphTexture const &aTexture) = 0;
+            virtual CEngineResult<> destroyTexture(SFrameGraphDynamicTexture const &aTexture) = 0;
 
             /**
              * Create a texture view for a precreated texture for use within render operations.
@@ -250,7 +250,7 @@ namespace engine
              * @return         EEngineStatus::Error otherwise.
              */
             virtual CEngineResult<> createTextureView(
-                    SFrameGraphTexture     const &aTexture,
+                    SFrameGraphDynamicTexture     const &aTexture,
                     SFrameGraphTextureView const &aView) = 0;
 
             /**

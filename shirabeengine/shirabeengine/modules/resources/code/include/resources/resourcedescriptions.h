@@ -331,7 +331,7 @@ namespace engine
             SMaterialPipelineDescriptor        pipelineDescriptor;
             SShaderModuleDescriptor            shaderModuleDescriptor;
             Vector<SBufferDescription>         uniformBufferDescriptors;
-            Vector<asset::AssetId_t>           sampledImages;
+            Vector<ResourceId_t>               sampledImages;
         };
 
         struct

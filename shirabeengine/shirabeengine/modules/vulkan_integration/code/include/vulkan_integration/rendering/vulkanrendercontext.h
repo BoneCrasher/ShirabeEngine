@@ -46,6 +46,8 @@ namespace engine
                     , FrameBufferResourceState_t
                     , ShaderModuleResourceState_t
                     , PipelineResourceState_t
+                    , MeshResourceState_t
+                    , MaterialResourceState_t
                 >;
     }
 

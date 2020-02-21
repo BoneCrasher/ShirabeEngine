@@ -47,16 +47,16 @@ namespace engine
                     SPassData    &aOutPassData)
                     -> CEngineResult<>
             {
-                auto gbufferTextureFetch = aGraphBuilder.getResources().get<SFrameGraphTexture>(aGbuffer0.subjacentResource);
+                auto gbufferTextureFetch = aGraphBuilder.getResources().get<SFrameGraphDynamicTexture>(aGbuffer0.subjacentResource);
                 if(not gbufferTextureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch gbuffer texure.");
                     return { EEngineStatus::Error };
                 }
 
-                SFrameGraphTexture gbufferTexture = *(gbufferTextureFetch.data());
+                SFrameGraphDynamicTexture gbufferTexture = *(gbufferTextureFetch.data());
 
-                SFrameGraphTexture compositingBufferDesc ={ };
+                SFrameGraphDynamicTexture compositingBufferDesc ={ };
                 compositingBufferDesc.width          = gbufferTexture.width;
                 compositingBufferDesc.height         = gbufferTexture.height;
                 compositingBufferDesc.depth          = 1;

@@ -289,7 +289,7 @@ namespace engine::resources
     template <typename... TResources>
     template <typename TResource>
     CEngineResult<FetchedResource_t<TResource>> CResourceManager<TResources...>::useAssetResource(ResourceId_t const &aResourceId
-                                                                                            , AssetId_t    const &aAssetResourceId)
+                                                                                                , AssetId_t    const &aAssetResourceId)
     {
         FetchedResource_t<TResource> object = getResourceObject(aResourceId);
         if(object.has_value())

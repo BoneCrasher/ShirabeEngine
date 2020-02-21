@@ -27,10 +27,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassBuilder::createTexture(
                 std::string        const &aName,
-                SFrameGraphTexture const &aDescriptor)
+                SFrameGraphDynamicTexture const &aDescriptor)
         {
             // Basic abstract descriptor of resources being used.
-            SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
+            SFrameGraphDynamicTexture &resource = mResourceData.spawnResource<SFrameGraphDynamicTexture>();
             resource.assignTextureParameters(aDescriptor);
             resource.assignedPassUID     = mPassUID;
             resource.parentResource      = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
@@ -50,9 +50,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassBuilder::importTexture(
                 std::string        const &aName,
-                SFrameGraphTexture const &aDescriptor)
+                SFrameGraphDynamicTexture const &aDescriptor)
         {
-            SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
+            SFrameGraphDynamicTexture &resource = mResourceData.spawnResource<SFrameGraphDynamicTexture>();
             resource.assignTextureParameters(aDescriptor);
             resource.assignedPassUID     = mPassUID;
             resource.parentResource      = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
@@ -122,7 +122,7 @@ namespace engine
 
             if(EFrameGraphResourceType::TextureView == aSourceResource.type)
             {
-                CEngineResult<Shared<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.subjacentResource);
+                CEngineResult<Shared<SFrameGraphDynamicTexture> const> subjacentFetch = aResourceData.get<SFrameGraphDynamicTexture>(aSourceResource.subjacentResource);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(not subjacentFetch.successful())
                 {
@@ -140,8 +140,8 @@ namespace engine
                 }
 #endif
 
-                SFrameGraphTexture     const &subjacent = *(subjacentFetch.data());
-                SFrameGraphTextureView const &parent    = *(parentFetch.data());
+                SFrameGraphDynamicTexture     const &subjacent = *(subjacentFetch.data());
+                SFrameGraphTextureView const        &parent    = *(parentFetch.data());
 
                 aAdjustedArraySliceRange.offset = (parent.arraySliceRange.offset + aArraySliceRange.offset);
                 aAdjustedMipSliceRange.offset   = (parent.mipSliceRange.offset   + aMipSliceRange.offset);
@@ -166,14 +166,14 @@ namespace engine
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
             else // Texture
             {
-                CEngineResult<Shared<SFrameGraphTexture> const> subjacentFetch = aResourceData.get<SFrameGraphTexture>(aSourceResource.resourceId);
+                CEngineResult<Shared<SFrameGraphDynamicTexture> const> subjacentFetch = aResourceData.get<SFrameGraphDynamicTexture>(aSourceResource.resourceId);
                 if(not subjacentFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Subjacent resource handle w/ id {} is empty.", aSourceResource.subjacentResource));
                     return { EEngineStatus::Error };
                 }
 
-                SFrameGraphTexture const &subjacent = *(subjacentFetch.data());
+                SFrameGraphDynamicTexture const &subjacent = *(subjacentFetch.data());
 
                 bool const arraySliceRangeOutOfBounds = ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.arraySize);
                 bool const mipSliceRangeOutOfBounds   = ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length))   > subjacent.mipLevels);
@@ -550,7 +550,7 @@ namespace engine
 
             if(not duplicateFound)
             {
-                auto const &[result, texture] = mResourceData.getMutable<SFrameGraphTexture>(subjacentResourceId);
+                auto const &[result, texture] = mResourceData.getMutable<SFrameGraphDynamicTexture>(subjacentResourceId);
                 if(CheckEngineError(result))
                 {
                     return { result };

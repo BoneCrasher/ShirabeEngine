@@ -359,7 +359,7 @@ namespace engine
                     return {sourceResourceFetch.result()};
                 }
 
-                CEngineResult<Shared<SFrameGraphTexture>> parentResourceFetch = mResourceData.get<SFrameGraphTexture>(sourceResourceFetch.data()->subjacentResource);
+                CEngineResult<Shared<SFrameGraphDynamicTexture>> parentResourceFetch = mResourceData.get<SFrameGraphDynamicTexture>(sourceResourceFetch.data()->subjacentResource);
                 if(not parentResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));
@@ -402,9 +402,9 @@ namespace engine
             {
                 CEngineResult<Shared<SFrameGraphResource>> subjacentFetch;
 
-                Shared<SFrameGraphResource>    subjacent   = nullptr;
-                Shared<SFrameGraphTexture>     texture     = nullptr;
-                Shared<SFrameGraphTextureView> textureView = nullptr;
+                Shared<SFrameGraphResource>       subjacent   = nullptr;
+                Shared<SFrameGraphDynamicTexture> texture     = nullptr;
+                Shared<SFrameGraphTextureView>    textureView = nullptr;
 
                 auto it = mInstantiatedResources.end();
 
@@ -413,7 +413,7 @@ namespace engine
                 {
                 case EFrameGraphResourceType::Texture:
                 {
-                    texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
+                    texture = std::static_pointer_cast<SFrameGraphDynamicTexture>(resource);
 
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
                     if(mInstantiatedResources.end() == it)
@@ -442,7 +442,7 @@ namespace engine
                     }
 
                     subjacent   = subjacentFetch.data();
-                    texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
+                    texture     = std::static_pointer_cast<SFrameGraphDynamicTexture>(subjacent);
                     textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);                    
 
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), textureView->resourceId);
@@ -497,8 +497,8 @@ namespace engine
                 std::string                      const &aRenderPassId,
                 std::string                      const &aFrameBufferId)
         {
-            std::vector<Shared<SFrameGraphTexture>>     textureReferences{};
-            std::vector<Shared<SFrameGraphTextureView>> textureViewReferences{};
+            std::vector<Shared<SFrameGraphDynamicTexture>> textureReferences{};
+            std::vector<Shared<SFrameGraphTextureView>>    textureViewReferences{};
 
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
             FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageViewResourceIds();
@@ -636,16 +636,16 @@ namespace engine
                 CEngineResult<> deinitialized = { EEngineStatus::Ok };
 
                 Shared<SFrameGraphResource>    resource    = mResourceData.getMutable<SFrameGraphResource>(aId).data();
-                Shared<SFrameGraphResource>    subjacent   = nullptr;
-                Shared<SFrameGraphTexture>     texture     = nullptr;
-                Shared<SFrameGraphTextureView> textureView = nullptr;
+                Shared<SFrameGraphResource>       subjacent   = nullptr;
+                Shared<SFrameGraphDynamicTexture> texture     = nullptr;
+                Shared<SFrameGraphTextureView>    textureView = nullptr;
 
                 switch(resource->type)
                 {
                 case EFrameGraphResourceType::Texture:
                     //if(aIncludeSubjacent)
                     //{
-                    //    texture = std::static_pointer_cast<SFrameGraphTexture>(resource);
+                    //    texture = std::static_pointer_cast<SFrameGraphDynamicTexture>(resource);
 //
                     //    if(not texture->isExternalResource and resource->referenceCount == 0)
                     //    {
@@ -678,7 +678,7 @@ namespace engine
                         }
 
                         subjacent   = subjacentFetch.data();
-                        texture     = std::static_pointer_cast<SFrameGraphTexture>(subjacent);
+                        texture     = std::static_pointer_cast<SFrameGraphDynamicTexture>(subjacent);
                         textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 
                         deinitialized = deinitializeTextureView(aRenderContext, texture, textureView);
@@ -731,7 +731,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTexture(
                 SFrameGraphRenderContext         &aRenderContext,
-                Shared<SFrameGraphTexture> const &aTexture)
+                Shared<SFrameGraphDynamicTexture> const &aTexture)
         {
             CEngineResult<> initialization = EEngineStatus::Ok;
 
@@ -751,7 +751,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTextureView(
                 SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphTexture>       const &aTexture,
+                Shared<SFrameGraphDynamicTexture>       const &aTexture,
                 Shared<SFrameGraphTextureView>   const &aTextureView)
         {
             bool const isForwardedOrAccepted =
@@ -774,7 +774,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeTextureView(
                 SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphTexture>       const &aTexture,
+                Shared<SFrameGraphDynamicTexture>       const &aTexture,
                 Shared<SFrameGraphTextureView>   const &aTextureView)
         {
             SHIRABE_UNUSED(aTexture);
@@ -799,7 +799,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeTexture(
                 SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphTexture>       const &aTexture)
+                Shared<SFrameGraphDynamicTexture>       const &aTexture)
         {
             SHIRABE_UNUSED(aRenderContext);
 

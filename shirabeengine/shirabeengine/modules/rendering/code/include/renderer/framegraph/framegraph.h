@@ -302,7 +302,7 @@ namespace engine
              */
             CEngineResult<> initializeTexture(
                     SFrameGraphRenderContext         &aRenderContext,
-                    Shared<SFrameGraphTexture> const &aTexture);
+                    Shared<SFrameGraphDynamicTexture> const &aTexture);
 
             /**
              * Initialize a texture view for execution.
@@ -314,7 +314,7 @@ namespace engine
              */
             CEngineResult<> initializeTextureView(
                     SFrameGraphRenderContext             &aRenderContext,
-                    Shared<SFrameGraphTexture>     const &aTexture,
+                    Shared<SFrameGraphDynamicTexture>     const &aTexture,
                     Shared<SFrameGraphTextureView> const &aTextureView);
             /**
              * Initialize a buffer for execution.
@@ -340,7 +340,7 @@ namespace engine
              */
             CEngineResult<> deinitializeTexture(
                     SFrameGraphRenderContext         &aRenderContext,
-                    Shared<SFrameGraphTexture> const &aTexture);
+                    Shared<SFrameGraphDynamicTexture> const &aTexture);
 
             /**
              * Deinitialize a texture view for execution.
@@ -352,7 +352,7 @@ namespace engine
              */
             CEngineResult<> deinitializeTextureView(
                     SFrameGraphRenderContext             &aRenderContext,
-                    Shared<SFrameGraphTexture>     const &aTexture,
+                    Shared<SFrameGraphDynamicTexture>     const &aTexture,
                     Shared<SFrameGraphTextureView> const &aTextureView);
 
             /**

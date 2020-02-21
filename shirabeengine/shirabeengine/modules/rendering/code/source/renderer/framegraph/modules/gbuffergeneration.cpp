@@ -60,7 +60,7 @@ namespace engine
                     height = displayDesc.bounds.size.y();
                 }
 
-                SFrameGraphTexture gbuffer0Desc={ };
+                SFrameGraphDynamicTexture gbuffer0Desc ={ };
                 gbuffer0Desc.width              = width;
                 gbuffer0Desc.height             = height;
                 gbuffer0Desc.depth              = 1;
@@ -70,7 +70,7 @@ namespace engine
                 gbuffer0Desc.mipLevels          = 1;
                 gbuffer0Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
                                                   | EFrameGraphResourceUsage::ColorAttachment;
-                SFrameGraphTexture gbuffer1Desc={ };
+                SFrameGraphDynamicTexture gbuffer1Desc ={ };
                 gbuffer1Desc.width              = width;
                 gbuffer1Desc.height             = height;
                 gbuffer1Desc.depth              = 1;
@@ -80,7 +80,7 @@ namespace engine
                 gbuffer1Desc.mipLevels          = 1;
                 gbuffer1Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
                                                   | EFrameGraphResourceUsage::ColorAttachment;
-                SFrameGraphTexture gbuffer2And3Desc={ };
+                SFrameGraphDynamicTexture gbuffer2And3Desc ={ };
                 gbuffer2And3Desc.width          = width;
                 gbuffer2And3Desc.height         = height;
                 gbuffer2And3Desc.depth          = 1;
@@ -91,7 +91,7 @@ namespace engine
                 gbuffer2And3Desc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
                                                   | EFrameGraphResourceUsage::ColorAttachment;
 
-                SFrameGraphTexture depthStencilDesc={ };
+                SFrameGraphDynamicTexture depthStencilDesc ={ };
                 depthStencilDesc.width          = width;
                 depthStencilDesc.height         = height;
                 depthStencilDesc.depth          = 1;

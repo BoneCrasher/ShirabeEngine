@@ -192,9 +192,9 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.copyImage = [=] (SFrameGraphRenderContextState       &aState,
-                                     SFrameGraphTexture            const &aSourceImageId,
-                                     SFrameGraphTexture            const &aTargetImageId) -> EEngineStatus
+            context.copyImage = [=](SFrameGraphRenderContextState       &aState,
+                                     SFrameGraphDynamicTexture            const &aSourceImageId,
+                                     SFrameGraphDynamicTexture            const &aTargetImageId) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
                 SHIRABE_UNUSED(aSourceImageId);
@@ -208,7 +208,7 @@ namespace engine
             //
             //<-----------------------------------------------------------------------------
             context.performImageLayoutTransfer = [=] (SFrameGraphRenderContextState       &aState
-                                                    , SFrameGraphTexture            const &aImageHandle
+                                                    , SFrameGraphDynamicTexture            const &aImageHandle
                                                     , CRange                        const &aArrayRange
                                                     , CRange                        const &aMipRange
                                                     , VkImageAspectFlags            const &aAspectFlags
@@ -263,8 +263,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //<
             //<-----------------------------------------------------------------------------
-            context.copyImageToBackBuffer = [=] (SFrameGraphRenderContextState const &aState
-                                               , SFrameGraphTexture            const &aSourceImageId) -> EEngineStatus
+            context.copyImageToBackBuffer = [=](SFrameGraphRenderContextState const &aState
+                                               , SFrameGraphDynamicTexture            const &aSourceImageId) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -336,191 +336,6 @@ namespace engine
                                1,
                                &vkRegion);
 
-                return EEngineStatus::Ok;
-            };
-
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            context.updateMaterial = [=] (SFrameGraphRenderContextState       const &aState
-                                        , SFrameGraphMaterial                 const &aMaterialHandle
-                                        , std::vector<SFrameGraphBuffer>      const &aGpuBufferHandles
-                                        , std::vector<SFrameGraphTextureView> const &aGpuInputAttachmentTextureViewHandles
-                                        , std::vector<SSampledImageBinding>   const &aGpuTextureViewHandles)
-            {
-                SHIRABE_UNUSED(aState);
-
-                VkDevice      device = aVulkanEnvironment->getLogicalDevice();
-                SVulkanState &state  = aVulkanEnvironment->getState();
-
-                VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-
-                auto const [success, resource] = fetchResource<PipelineResourceState_t>(aResourceManager, aMaterialHandle.readableName);
-                if(not success)
-                {
-                    return EEngineStatus::Error;
-                }
-
-                PipelineResourceState_t &pipeline = *resource;
-
-                SMaterialPipelineDescriptor const &pipelineDescriptor = pipeline.description;
-
-                std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
-                std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
-                std::vector<VkDescriptorImageInfo>  descriptorSetWriteAttachmentImageInfos {};
-                std::vector<VkDescriptorImageInfo>  descriptorSetWriteImageInfos {};
-
-                descriptorSetWriteBufferInfos         .resize(aGpuBufferHandles.size());
-                descriptorSetWriteAttachmentImageInfos.resize(aGpuInputAttachmentTextureViewHandles.size());
-                descriptorSetWriteImageInfos          .resize(aGpuTextureViewHandles.size());
-
-                uint64_t        writeCounter           = 0;
-                uint64_t        bufferCounter          = 0;
-                uint64_t        inputAttachmentCounter = 0;
-                uint64_t        inputImageCounter      = 0;
-                uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
-
-                for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
-                {
-                    std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
-                    for(std::size_t j=0; j<setBindings.size(); ++j)
-                    {
-                        VkDescriptorSetLayoutBinding const binding = setBindings[j];
-
-                        switch(binding.descriptorType)
-                        {
-                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-                                {
-                                    auto const [success, resource] = fetchResource<BufferResourceState_t >(aResourceManager, aGpuBufferHandles[bufferCounter].readableName);
-                                    if(not success)
-                                    {
-                                        return EEngineStatus::Error;
-                                    }
-
-                                    BufferResourceState_t buffer = *resource;
-
-                                    VkDescriptorBufferInfo bufferInfo = {};
-                                    bufferInfo.buffer = buffer.gpuApiHandles.handle;
-                                    bufferInfo.offset = 0;
-                                    bufferInfo.range  = buffer.description.createInfo.size;
-                                    descriptorSetWriteBufferInfos[bufferCounter] = bufferInfo;
-
-                                    VkWriteDescriptorSet descriptorWrite = {};
-                                    descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                    descriptorWrite.pNext            = nullptr;
-                                    descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                                    descriptorWrite.dstSet           = pipeline.gpuApiHandles.descriptorSets[startSetIndex + k];
-                                    descriptorWrite.dstBinding       = binding.binding;
-                                    descriptorWrite.dstArrayElement  = 0;
-                                    descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                                    descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[bufferCounter++]);
-                                    descriptorWrite.pImageInfo       = nullptr; // Optional
-                                    descriptorWrite.pTexelBufferView = nullptr;
-
-                                    descriptorSetWrites.push_back(descriptorWrite);
-                                    //descriptorSetWrites[writeCounter++] = descriptorWrite;
-                                }
-                                break;
-                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
-                                {
-                                    auto const [success, resource] = fetchResource<TextureViewResourceState_t >(aResourceManager, aGpuInputAttachmentTextureViewHandles[inputAttachmentCounter].readableName);
-                                    if(not success)
-                                    {
-                                        return EEngineStatus::Error;
-                                    }
-
-                                    TextureViewResourceState_t &textureView = *resource;
-
-                                    VkDescriptorImageInfo imageInfo {};
-                                    imageInfo.imageView   = textureView.gpuApiHandles.handle;
-                                    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                                    imageInfo.sampler     = VK_NULL_HANDLE;
-                                    descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter] = imageInfo;
-
-                                    VkWriteDescriptorSet descriptorWrite = {};
-                                    descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                    descriptorWrite.pNext            = nullptr;
-                                    descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-                                    descriptorWrite.dstSet           = pipeline.gpuApiHandles.descriptorSets[startSetIndex + k];
-                                    descriptorWrite.dstBinding       = binding.binding;
-                                    descriptorWrite.dstArrayElement  = 0;
-                                    descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                                    descriptorWrite.pBufferInfo      = nullptr;
-                                    descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter++]); // Optional
-                                    descriptorWrite.pTexelBufferView = nullptr;
-                                    // descriptorSetWrites[writeCounter++] = descriptorWrite;
-                                    descriptorSetWrites.push_back(descriptorWrite);
-                                }
-                                break;
-                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-                                {
-                                    if(aGpuTextureViewHandles.size() <= inputImageCounter)
-                                    {
-                                        continue;
-                                    }
-
-                                    auto const &imageBinding = aGpuTextureViewHandles[inputImageCounter];
-
-                                    if(   (resources::GpuApiHandle_t)0 == imageBinding.imageView
-                                       || (resources::GpuApiHandle_t)0 == imageBinding.image)
-                                    {
-                                        continue;
-                                    }
-
-                                    OptRef_t<TextureViewResourceState_t> textureViewOpt {};
-                                    OptRef_t<TextureResourceState_t>     textureOpt     {};
-
-                                    {
-                                        auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, aGpuTextureViewHandles[inputImageCounter].image.readableName);
-                                        if(not success)
-                                        {
-                                            return EEngineStatus::Error;
-                                        }
-                                        textureViewOpt = resource;
-                                    }
-
-                                    {
-                                        auto [success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, aGpuTextureViewHandles[inputImageCounter].imageView.readableName);
-                                        if(not success)
-                                        {
-                                            return EEngineStatus::Error;
-                                        }
-                                        textureOpt = resource;
-                                    }
-
-                                    TextureViewResourceState_t &textureView = *textureViewOpt;
-                                    TextureResourceState_t     &texture     = *textureOpt;
-
-                                    VkDescriptorImageInfo imageInfo {};
-                                    imageInfo.imageView   = textureView.gpuApiHandles.handle;
-                                    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                                    imageInfo.sampler     = texture.gpuApiHandles.attachedSampler;
-                                    descriptorSetWriteImageInfos[inputImageCounter] = imageInfo;
-
-                                    VkWriteDescriptorSet descriptorWrite = {};
-                                    descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                    descriptorWrite.pNext            = nullptr;
-                                    descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                                    descriptorWrite.dstSet           = pipeline.gpuApiHandles.descriptorSets[startSetIndex + k];
-                                    descriptorWrite.dstBinding       = binding.binding;
-                                    descriptorWrite.dstArrayElement  = 0;
-                                    descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                                    descriptorWrite.pBufferInfo      = nullptr;
-                                    descriptorWrite.pImageInfo       = &(descriptorSetWriteImageInfos[inputImageCounter++]); // Optional
-                                    descriptorWrite.pTexelBufferView = nullptr;
-                                    // descriptorSetWrites[writeCounter++] = descriptorWrite;
-                                    descriptorSetWrites.push_back(descriptorWrite);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-
-                vkUpdateDescriptorSets(device, descriptorSetWrites.size(), descriptorSetWrites.data(), 0, nullptr);
                 return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
@@ -740,14 +555,14 @@ namespace engine
                         // If the parent texture view is null, the parent is a texture object.
                         Shared<SFrameGraphTextureView> const &parentTextureView = (parentTextureViewFetch.data());
 
-                        CEngineResult<Shared<SFrameGraphTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphTexture>(textureView.subjacentResource);
+                        CEngineResult < Shared < SFrameGraphDynamicTexture > const> const &textureFetch = aFrameGraphResources.get<SFrameGraphDynamicTexture>(textureView.subjacentResource);
                         if(not textureFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
                             return EEngineStatus::ResourceError_NotFound;
                         }
 
-                        SFrameGraphTexture const &texture = *(textureFetch.data());
+                        SFrameGraphDynamicTexture const &texture = *(textureFetch.data());
 
                         // Validation first!
                         bool dimensionsValid = true;
@@ -1243,8 +1058,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.createTexture = [=] (SFrameGraphRenderContextState       &aState
-                                       , SFrameGraphTexture            const &aTexture) -> EEngineStatus
+            context.createTexture = [=](SFrameGraphRenderContextState       &aState
+                                       , SFrameGraphDynamicTexture            const &aTexture) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -1289,8 +1104,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyTexture = [=] (SFrameGraphRenderContextState       &aState
-                                        , SFrameGraphTexture            const &aTexture) -> EEngineStatus
+            context.destroyTexture = [=](SFrameGraphRenderContextState       &aState
+                                        , SFrameGraphDynamicTexture            const &aTexture) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -1314,7 +1129,7 @@ namespace engine
             //
             //<-----------------------------------------------------------------------------
             context.createTextureView = [=] (SFrameGraphRenderContextState       &aState
-                                           , SFrameGraphTexture            const &aTexture
+                                           , SFrameGraphDynamicTexture            const &aTexture
                                            , SFrameGraphTextureView        const &aView) -> EEngineStatus
             {
                 STextureViewDescription desc = { };
@@ -1759,6 +1574,67 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
+            auto const configureInputAssembly = [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+            {
+                aPipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+                aPipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
+                aPipelineDescriptor.inputAssemblyState.flags                  = 0;
+                aPipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+                aPipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
+            };
+
+            auto const configureRasterizer = [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+            {
+                aPipelineDescriptor.rasterizerState.sType                     = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+                aPipelineDescriptor.rasterizerState.pNext                     = nullptr;
+                aPipelineDescriptor.rasterizerState.flags                     = 0;
+                aPipelineDescriptor.rasterizerState.cullMode                  = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
+                aPipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
+                aPipelineDescriptor.rasterizerState.polygonMode               = VkPolygonMode::VK_POLYGON_MODE_FILL;
+                aPipelineDescriptor.rasterizerState.lineWidth                 = 1.0f;
+                aPipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_FALSE; // isCoreMaterial ? VK_TRUE : VK_FALSE;
+                aPipelineDescriptor.rasterizerState.depthClampEnable          = VK_FALSE;
+                aPipelineDescriptor.rasterizerState.depthBiasEnable           = VK_FALSE;
+                aPipelineDescriptor.rasterizerState.depthBiasSlopeFactor      = 0.0f;
+                aPipelineDescriptor.rasterizerState.depthBiasConstantFactor   = 0.0f;
+                aPipelineDescriptor.rasterizerState.depthBiasClamp            = 0.0f;
+            };
+
+            auto const configureMultisampler = [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+            {
+                aPipelineDescriptor.multiSampler.sType                        = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+                aPipelineDescriptor.multiSampler.pNext                        = nullptr;
+                aPipelineDescriptor.multiSampler.flags                        = 0;
+                aPipelineDescriptor.multiSampler.sampleShadingEnable          = VK_FALSE;
+                aPipelineDescriptor.multiSampler.rasterizationSamples         = VK_SAMPLE_COUNT_1_BIT;
+                aPipelineDescriptor.multiSampler.minSampleShading             = 1.0f;
+                aPipelineDescriptor.multiSampler.pSampleMask                  = nullptr;
+                aPipelineDescriptor.multiSampler.alphaToCoverageEnable        = VK_FALSE;
+                aPipelineDescriptor.multiSampler.alphaToOneEnable             = VK_FALSE;
+            };
+
+            auto const configureDepthStencil = [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+            {
+                aPipelineDescriptor.depthStencilState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+                aPipelineDescriptor.depthStencilState.pNext                 = nullptr;
+                aPipelineDescriptor.depthStencilState.flags                 = 0;
+                aPipelineDescriptor.depthStencilState.depthTestEnable       = VK_TRUE;
+                aPipelineDescriptor.depthStencilState.depthWriteEnable      = VK_TRUE;
+                aPipelineDescriptor.depthStencilState.depthCompareOp        = VkCompareOp::VK_COMPARE_OP_LESS;
+                aPipelineDescriptor.depthStencilState.stencilTestEnable     = VK_FALSE;
+                aPipelineDescriptor.depthStencilState.front.passOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
+                aPipelineDescriptor.depthStencilState.front.failOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
+                aPipelineDescriptor.depthStencilState.front.depthFailOp     = VkStencilOp::VK_STENCIL_OP_KEEP;
+                aPipelineDescriptor.depthStencilState.front.compareOp       = VkCompareOp::VK_COMPARE_OP_ALWAYS;
+                aPipelineDescriptor.depthStencilState.front.compareMask     = 0;
+                aPipelineDescriptor.depthStencilState.front.writeMask       = 0;
+                aPipelineDescriptor.depthStencilState.front.reference       = 0;
+                aPipelineDescriptor.depthStencilState.back                  = aPipelineDescriptor.depthStencilState.front;
+                aPipelineDescriptor.depthStencilState.depthBoundsTestEnable = VK_FALSE;
+                aPipelineDescriptor.depthStencilState.minDepthBounds        = 0.0f;
+                aPipelineDescriptor.depthStencilState.maxDepthBounds        = 1.0f;
+            };
+
             context.readMaterialAsset = [=] (SFrameGraphRenderContextState       &aState
                                            , SFrameGraphMaterial           const &aMaterial) -> EEngineStatus
             {
@@ -1780,63 +1656,19 @@ namespace engine
 
                 bool const includeSystemBuffers =  (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == master->name());
 
-                SMaterialPipelineDescriptor     pipelineDescriptor     {};
-                SShaderModuleDescriptor         shaderModuleDescriptor {};
-                Vector<SBufferDescription>      bufferDescriptions     {};
+                SMaterialPipelineDescriptor pipelineDescriptor     {};
+                SShaderModuleDescriptor     shaderModuleDescriptor {};
+                Vector<SBufferDescription>  bufferDescriptions     {};
 
                 pipelineDescriptor    .name = fmt::format("{}_{}", materialName, "pipeline");
                 shaderModuleDescriptor.name = fmt::format("{}_{}", materialName, "shadermodule");
 
-                pipelineDescriptor.includesSystemBuffers                     = includeSystemBuffers;
+                pipelineDescriptor.includesSystemBuffers = includeSystemBuffers;
 
-                pipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-                pipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
-                pipelineDescriptor.inputAssemblyState.flags                  = 0;
-                pipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-                pipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
-
-                pipelineDescriptor.rasterizerState.sType                     = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-                pipelineDescriptor.rasterizerState.pNext                     = nullptr;
-                pipelineDescriptor.rasterizerState.flags                     = 0;
-                pipelineDescriptor.rasterizerState.cullMode                  = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
-                pipelineDescriptor.rasterizerState.frontFace                 = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
-                pipelineDescriptor.rasterizerState.polygonMode               = VkPolygonMode::VK_POLYGON_MODE_FILL;
-                pipelineDescriptor.rasterizerState.lineWidth                 = 1.0f;
-                pipelineDescriptor.rasterizerState.rasterizerDiscardEnable   = VK_FALSE; // isCoreMaterial ? VK_TRUE : VK_FALSE;
-                pipelineDescriptor.rasterizerState.depthClampEnable          = VK_FALSE;
-                pipelineDescriptor.rasterizerState.depthBiasEnable           = VK_FALSE;
-                pipelineDescriptor.rasterizerState.depthBiasSlopeFactor      = 0.0f;
-                pipelineDescriptor.rasterizerState.depthBiasConstantFactor   = 0.0f;
-                pipelineDescriptor.rasterizerState.depthBiasClamp            = 0.0f;
-
-                pipelineDescriptor.multiSampler.sType                        = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-                pipelineDescriptor.multiSampler.pNext                        = nullptr;
-                pipelineDescriptor.multiSampler.flags                        = 0;
-                pipelineDescriptor.multiSampler.sampleShadingEnable          = VK_FALSE;
-                pipelineDescriptor.multiSampler.rasterizationSamples         = VK_SAMPLE_COUNT_1_BIT;
-                pipelineDescriptor.multiSampler.minSampleShading             = 1.0f;
-                pipelineDescriptor.multiSampler.pSampleMask                  = nullptr;
-                pipelineDescriptor.multiSampler.alphaToCoverageEnable        = VK_FALSE;
-                pipelineDescriptor.multiSampler.alphaToOneEnable             = VK_FALSE;
-
-                pipelineDescriptor.depthStencilState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-                pipelineDescriptor.depthStencilState.pNext                   = nullptr;
-                pipelineDescriptor.depthStencilState.flags                   = 0;
-                pipelineDescriptor.depthStencilState.depthTestEnable         = VK_TRUE;
-                pipelineDescriptor.depthStencilState.depthWriteEnable        = VK_TRUE;
-                pipelineDescriptor.depthStencilState.depthCompareOp          = VkCompareOp::VK_COMPARE_OP_LESS;
-                pipelineDescriptor.depthStencilState.stencilTestEnable       = VK_FALSE;
-                pipelineDescriptor.depthStencilState.front.passOp            = VkStencilOp::VK_STENCIL_OP_KEEP;
-                pipelineDescriptor.depthStencilState.front.failOp            = VkStencilOp::VK_STENCIL_OP_KEEP;
-                pipelineDescriptor.depthStencilState.front.depthFailOp       = VkStencilOp::VK_STENCIL_OP_KEEP;
-                pipelineDescriptor.depthStencilState.front.compareOp         = VkCompareOp::VK_COMPARE_OP_ALWAYS;
-                pipelineDescriptor.depthStencilState.front.compareMask       = 0;
-                pipelineDescriptor.depthStencilState.front.writeMask         = 0;
-                pipelineDescriptor.depthStencilState.front.reference         = 0;
-                pipelineDescriptor.depthStencilState.back                    = pipelineDescriptor.depthStencilState.front;
-                pipelineDescriptor.depthStencilState.depthBoundsTestEnable   = VK_FALSE;
-                pipelineDescriptor.depthStencilState.minDepthBounds          = 0.0f;
-                pipelineDescriptor.depthStencilState.maxDepthBounds          = 1.0f;
+                configureInputAssembly(pipelineDescriptor);
+                configureRasterizer   (pipelineDescriptor);
+                configureMultisampler (pipelineDescriptor);
+                configureDepthStencil (pipelineDescriptor);
 
                 for(auto const &[stageKey, stage] : signature.stages)
                 {
@@ -2069,12 +1901,6 @@ namespace engine
                 materialDescriptor.sampledImages            = sampledImageResources;
 
                 std::vector<std::string> pipelineDependencies {};
-
-                CEngineResult<OptRef_t<ShaderModuleResourceState_t>> shaderModuleObject = aResourceManager->useDynamicResource<ShaderModuleResourceState_t>(materialDescriptor.shaderModuleDescriptor.name, materialDescriptor.shaderModuleDescriptor);
-                EngineStatusPrintOnError(shaderModuleObject.result(),  "Material::AssetLoader", "Failed to create shader module.");
-
-                // ...
-                Shared<SShaderModule> shaderModule = std::static_pointer_cast<SShaderModule>(shaderModuleObject.data());
                 pipelineDependencies.push_back(materialDescriptor.shaderModuleDescriptor.name);
 
                 std::vector<Shared<SBuffer>> buffers(materialDescriptor.uniformBufferDescriptors.size());
@@ -2094,16 +1920,289 @@ namespace engine
                     pipelineDependencies.emplace_back("Core_pipeline");
                 }
 
-                CEngineResult<Shared<ILogicalResourceObject>> pipelineObject = aResourceManager->useDynamicResource<SPipeline>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor);
+                CEngineResult<OptRef_t<ShaderModuleResourceState_t>> shaderModuleObject = aResourceManager->useDynamicResource<ShaderModuleResourceState_t>(materialDescriptor.shaderModuleDescriptor.name, materialDescriptor.shaderModuleDescriptor);
+                EngineStatusPrintOnError(shaderModuleObject.result(),  "Material::AssetLoader", "Failed to create shader module.");
+
+                CEngineResult<OptRef_t<PipelineResourceState_t>> pipelineObject = aResourceManager->useDynamicResource<PipelineResourceState_t>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor);
                 EngineStatusPrintOnError(pipelineObject.result(),  "Material::AssetLoader", "Failed to create pipeline.");
 
-                Shared<SPipeline> pipeline = std::static_pointer_cast<SPipeline>(pipelineObject.data());
+                CEngineResult<OptRef_t<MaterialResourceState_t>> materialObject = aResourceManager->useDynamicResource<MaterialResourceState_t>(materialDescriptor.name, materialDescriptor);
+                EngineStatusPrintOnError(materialObject.result(),  "Material::AssetLoader", "Failed to create material.");
+            };
+            //<-----------------------------------------------------------------------------
 
-                CEngineResult<Shared<ILogicalResourceObject>> materialObject = aResourceManager->useDynamicResource<SMaterial>(materialDescriptor.name, materialDescriptor);
-                Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(materialObject.data());
-                material->pipelineResource     = pipeline;
-                material->shaderModuleResource = shaderModule;
-                material->bufferResources      = std::move(buffers);
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.initializeMaterial = [=] (SFrameGraphRenderContextState       &aState
+                                              , SFrameGraphMaterial           const &aMaterial
+                                              , ResourceId_t                  const &aRenderPassId) -> EEngineStatus
+            {
+                OptRef_t<MaterialResourceState_t> materialOpt {};
+                {
+                    auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aMaterial.readableName);
+                    if(not success)
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    materialOpt = resource;
+                }
+                MaterialResourceState_t &material = *materialOpt;
+
+                SMaterialPipelineDependencies pipelineDependencies {};
+                pipelineDependencies.systemUBOPipelineId   = "Core_pipeline";
+                pipelineDependencies.referenceRenderPassId = aRenderPassId;
+                pipelineDependencies.subpass               = aState.currentSubpassIndex;
+                pipelineDependencies.shaderModuleId        = material.description.shaderModuleDescriptor.name;
+
+                for(auto const &buffer : material.description.uniformBufferDescriptors)
+                {
+                    SNoDependencies dependencies {};
+
+                    CEngineResult<> const bufferInitialization = aResourceManager->initializeResource<BufferResourceState_t>(buffer.name, dependencies, aVulkanEnvironment);
+                    EngineStatusPrintOnError(bufferInitialization.result(), logTag(), "Failed to initialize buffer.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(bufferInitialization.result());
+                }
+
+                CEngineResult<> const shaderModuleInitialization = aResourceManager->initializeResource<ShaderModuleResourceState_t>(material.description.shaderModuleDescriptor.name, {}, aVulkanEnvironment);
+                EngineStatusPrintOnError(shaderModuleInitialization.result(), logTag(), "Failed to initialize shader module.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(shaderModuleInitialization.result());
+
+                CEngineResult<> const pipelineInitialization = aResourceManager->initializeResource<PipelineResourceState_t>(material.description.pipelineDescriptor.name, pipelineDependencies, aVulkanEnvironment);
+                EngineStatusPrintOnError(pipelineInitialization.result(), logTag(), "Failed to initialize pipeline.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(pipelineInitialization.result());
+
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.transferMaterial = [=] (SFrameGraphRenderContextState       &aState
+                                          , SFrameGraphMaterial           const &aMaterial) -> EEngineStatus
+            {
+                VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+                OptRef_t<MaterialResourceState_t> materialOpt {};
+                {
+                    auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aMaterial.readableName);
+                    if(not success)
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    materialOpt = resource;
+                }
+                MaterialResourceState_t &material = *materialOpt;
+
+                for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
+                {
+                    OptRef_t<BufferResourceState_t> bufferOpt {};
+                    {
+                        auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, bufferDesc.name);
+                        if(not success)
+                        {
+                            return EEngineStatus::Ok;
+                        }
+                        bufferOpt = resource;
+                    }
+                    BufferResourceState_t &buffer = *bufferOpt;
+
+                    transferBufferData(device, bufferDesc.dataSource(), buffer.gpuApiHandles.attachedMemory);
+                }
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            struct SSampledImageBinding
+            {
+                OptRef_t<TextureViewResourceState_t> imageView;
+                OptRef_t<TextureResourceState_t>     image;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto const updateDescriptorSets = [=] (SFrameGraphRenderContextState                     const &aState
+                                                 , SFrameGraphMaterial                               const &aMaterialHandle
+                                                 , std::vector<OptRef_t<BufferResourceState_t>>      const &aUniformBufferStates
+                                                 , std::vector<OptRef_t<TextureViewResourceState_t>> const &aInputAttachmentStates
+                                                 , std::vector<SSampledImageBinding>                 const &aTextureViewStates) -> EEngineStatus
+            {
+                SHIRABE_UNUSED(aState);
+
+                VkDevice      device = aVulkanEnvironment->getLogicalDevice();
+                SVulkanState &state  = aVulkanEnvironment->getState();
+
+                VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+                auto const [success, resource] = fetchResource<PipelineResourceState_t>(aResourceManager, aMaterialHandle.readableName);
+                if(not success)
+                {
+                    return EEngineStatus::Error;
+                }
+
+                PipelineResourceState_t &pipeline = *resource;
+
+                SMaterialPipelineDescriptor const &pipelineDescriptor = pipeline.description;
+
+                std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
+                std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
+                std::vector<VkDescriptorImageInfo>  descriptorSetWriteAttachmentImageInfos {};
+                std::vector<VkDescriptorImageInfo>  descriptorSetWriteImageInfos {};
+
+                descriptorSetWriteBufferInfos         .resize(aGpuBufferHandles.size());
+                descriptorSetWriteAttachmentImageInfos.resize(aGpuInputAttachmentTextureViewHandles.size());
+                descriptorSetWriteImageInfos          .resize(aGpuTextureViewHandles.size());
+
+                uint64_t        writeCounter           = 0;
+                uint64_t        bufferCounter          = 0;
+                uint64_t        inputAttachmentCounter = 0;
+                uint64_t        inputImageCounter      = 0;
+                uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
+
+                for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
+                {
+                    std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
+                    for(std::size_t j=0; j<setBindings.size(); ++j)
+                    {
+                        VkDescriptorSetLayoutBinding const binding = setBindings[j];
+
+                        switch(binding.descriptorType)
+                        {
+                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+                            {
+                                auto const [success, resource] = fetchResource<BufferResourceState_t >(aResourceManager, aGpuBufferHandles[bufferCounter].readableName);
+                                if(not success)
+                                {
+                                    return EEngineStatus::Error;
+                                }
+
+                                BufferResourceState_t buffer = *resource;
+
+                                VkDescriptorBufferInfo bufferInfo = {};
+                                bufferInfo.buffer = buffer.gpuApiHandles.handle;
+                                bufferInfo.offset = 0;
+                                bufferInfo.range  = buffer.description.createInfo.size;
+                                descriptorSetWriteBufferInfos[bufferCounter] = bufferInfo;
+
+                                VkWriteDescriptorSet descriptorWrite = {};
+                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                descriptorWrite.pNext            = nullptr;
+                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                                descriptorWrite.dstSet           = pipeline.gpuApiHandles.descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstBinding       = binding.binding;
+                                descriptorWrite.dstArrayElement  = 0;
+                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                                descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[bufferCounter++]);
+                                descriptorWrite.pImageInfo       = nullptr; // Optional
+                                descriptorWrite.pTexelBufferView = nullptr;
+
+                                descriptorSetWrites.push_back(descriptorWrite);
+                                //descriptorSetWrites[writeCounter++] = descriptorWrite;
+                            }
+                                break;
+                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+                            {
+                                auto const [success, resource] = fetchResource<TextureViewResourceState_t >(aResourceManager, aGpuInputAttachmentTextureViewHandles[inputAttachmentCounter].readableName);
+                                if(not success)
+                                {
+                                    return EEngineStatus::Error;
+                                }
+
+                                TextureViewResourceState_t &textureView = *resource;
+
+                                VkDescriptorImageInfo imageInfo {};
+                                imageInfo.imageView   = textureView.gpuApiHandles.handle;
+                                imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                imageInfo.sampler     = VK_NULL_HANDLE;
+                                descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter] = imageInfo;
+
+                                VkWriteDescriptorSet descriptorWrite = {};
+                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                descriptorWrite.pNext            = nullptr;
+                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+                                descriptorWrite.dstSet           = pipeline.gpuApiHandles.descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstBinding       = binding.binding;
+                                descriptorWrite.dstArrayElement  = 0;
+                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                                descriptorWrite.pBufferInfo      = nullptr;
+                                descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter++]); // Optional
+                                descriptorWrite.pTexelBufferView = nullptr;
+                                // descriptorSetWrites[writeCounter++] = descriptorWrite;
+                                descriptorSetWrites.push_back(descriptorWrite);
+                            }
+                                break;
+                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                            {
+                                if(aGpuTextureViewHandles.size() <= inputImageCounter)
+                                {
+                                    continue;
+                                }
+
+                                auto const &imageBinding = aGpuTextureViewHandles[inputImageCounter];
+
+                                if(   (resources::GpuApiHandle_t)0 == imageBinding.imageView
+                                      || (resources::GpuApiHandle_t)0 == imageBinding.image)
+                                {
+                                    continue;
+                                }
+
+                                OptRef_t<TextureViewResourceState_t> textureViewOpt {};
+                                OptRef_t<TextureResourceState_t>     textureOpt     {};
+
+                                {
+                                    auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, aGpuTextureViewHandles[inputImageCounter].image.readableName);
+                                    if(not success)
+                                    {
+                                        return EEngineStatus::Error;
+                                    }
+                                    textureViewOpt = resource;
+                                }
+
+                                {
+                                    auto [success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, aGpuTextureViewHandles[inputImageCounter].imageView.readableName);
+                                    if(not success)
+                                    {
+                                        return EEngineStatus::Error;
+                                    }
+                                    textureOpt = resource;
+                                }
+
+                                TextureViewResourceState_t &textureView = *textureViewOpt;
+                                TextureResourceState_t     &texture     = *textureOpt;
+
+                                VkDescriptorImageInfo imageInfo {};
+                                imageInfo.imageView   = textureView.gpuApiHandles.handle;
+                                imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                imageInfo.sampler     = texture.gpuApiHandles.attachedSampler;
+                                descriptorSetWriteImageInfos[inputImageCounter] = imageInfo;
+
+                                VkWriteDescriptorSet descriptorWrite = {};
+                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                descriptorWrite.pNext            = nullptr;
+                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                                descriptorWrite.dstSet           = pipeline.gpuApiHandles.descriptorSets[startSetIndex + k];
+                                descriptorWrite.dstBinding       = binding.binding;
+                                descriptorWrite.dstArrayElement  = 0;
+                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
+                                descriptorWrite.pBufferInfo      = nullptr;
+                                descriptorWrite.pImageInfo       = &(descriptorSetWriteImageInfos[inputImageCounter++]); // Optional
+                                descriptorWrite.pTexelBufferView = nullptr;
+                                // descriptorSetWrites[writeCounter++] = descriptorWrite;
+                                descriptorSetWrites.push_back(descriptorWrite);
+                            }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                vkUpdateDescriptorSets(device, descriptorSetWrites.size(), descriptorSetWrites.data(), 0, nullptr);
+                return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
 
@@ -2116,70 +2215,82 @@ namespace engine
             {
                 VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
-                auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SMaterial, CVkApiResource<SMaterial>>(aResourceManager, aMaterial.readableName, false);
-                if(not success1)
+                OptRef_t<MaterialResourceState_t> materialOpt {};
                 {
-                    return EEngineStatus::Error;
-                }
-
-                SMaterial             const &logicalMaterialResource = *logical1;
-                SMaterialDependencies const &materialDependencies    = *(logicalMaterialResource.getCurrentDependencies());
-
-                SMaterialDependencies dependencies {};
-                dependencies.pipelineDependencies.systemUBOPipelineId   = "Core_pipeline";
-                dependencies.pipelineDependencies.referenceRenderPassId = materialDependencies.pipelineDependencies.referenceRenderPassId;
-                dependencies.pipelineDependencies.subpass               = aState.currentSubpassIndex;
-                dependencies.pipelineDependencies.shaderModuleId        = logicalMaterialResource.shaderModuleResource->getDescription().name;
-
-                for(auto const &buffer : logicalMaterialResource.bufferResources)
-                {
-                    buffer->initialize({});
-                }
-                logicalMaterialResource.shaderModuleResource->initialize({});
-                logicalMaterialResource.pipelineResource    ->initialize(dependencies.pipelineDependencies);
-
-                EEngineStatus const status = logicalMaterialResource.initialize(dependencies).result();
-
-                std::vector<SFrameGraphBuffer>       gpuBufferIds                     {};
-                std::vector<SFrameGraphTextureView>  gpuInputAttachmentTextureViewIds {};
-                std::vector<SSampledImageBinding>    gpuTextureViewIds                {};
-
-                for(auto const &buffer : logicalMaterialResource.bufferResources)
-                {
-                    auto const [success1, logical1, gpu1, gpuState1] = fetchResource<SBuffer, CVulkanBufferResource>(aResourceManager, buffer->getDescription().name, false);
-                    if(not success1)
+                    auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aMaterial.readableName);
+                    if(not success)
                     {
-                        continue;
+                        return EEngineStatus::Ok;
                     }
+                    materialOpt = resource;
+                }
+                MaterialResourceState_t &material = *materialOpt;
 
-                    CVulkanBufferResource const &gpuBuffer = *gpu1;
-                    transferBufferData(device, buffer->getDescription().dataSource(), gpuBuffer.attachedMemory);
-                    gpuBufferIds.push_back(buffer->getGpuApiResourceHandle());
+                OptRef_t<RenderPassResourceState_t> renderPassOpt {};
+                {
+                    auto [success, resource] = fetchResource<RenderPassResourceState_t>(aResourceManager, material.dependencies.pipelineDependencies.referenceRenderPassId);
+                    if(not success)
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    renderPassOpt = resource;
+                }
+                RenderPassResourceState_t &renderPass = *renderPassOpt;
+
+                std::vector<OptRef_t<BufferResourceState_t>>      buffers           {};
+                std::vector<OptRef_t<TextureViewResourceState_t>> inputAttachments  {};
+                std::vector<SSampledImageBinding>                 textureViews      {};
+
+                for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
+                {
+                    OptRef_t<BufferResourceState_t> bufferOpt {};
+                    {
+                        auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, bufferDesc.name);
+                        if(not success)
+                        {
+                            return EEngineStatus::Ok;
+                        }
+                        bufferOpt = resource;
+                    }
+                    buffers.push_back(bufferOpt);
                 }
 
-                auto const [rpsuccess, rplogical, rpgpu, rpgpustate] = fetchResource<SRenderPass, CVulkanRenderPassResource>(aResourceManager, aRenderPassId, false);
-
-                SRenderPass              const &renderPass     = *rplogical;
-                SRenderPassDescription   const &renderPassDesc = renderPass.getDescription();
-                SRenderPassDependencies  const &renderPassDeps = *(renderPass.getCurrentDependencies());
-
-                SSubpassDescription const &subPassDesc = renderPassDesc.subpassDescriptions.at(aState.currentSubpassIndex);
+                SSubpassDescription const &subPassDesc = renderPass.description.subpassDescriptions.at(aState.currentSubpassIndex);
                 for(auto const &inputAttachment : subPassDesc.inputAttachments)
                 {
                     uint32_t     const &attachmentIndex           = inputAttachment.attachment;
-                    ResourceId_t const &attachementResourceHandle = renderPassDeps.attachmentTextureViews.at(attachmentIndex);
+                    ResourceId_t const &attachementResourceHandle = renderPass.dependencies.attachmentTextureViews.at(attachmentIndex);
 
-                    auto const [tvsuccess, tvlogical, tvgpu, tvgpustate] = fetchResource<STextureView, CVulkanTextureResource>(aResourceManager, attachementResourceHandle, false);
-
-                    STextureView const &textureView = *tvlogical;
-                    gpuInputAttachmentTextureViewIds.push_back(textureView.getGpuApiResourceHandle());
+                    OptRef_t<TextureViewResourceState_t> textureViewOpt {};
+                    {
+                        auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, attachementResourceHandle);
+                        if(not success)
+                        {
+                            return EEngineStatus::Ok;
+                        }
+                        textureViewOpt = resource;
+                    }
+                    inputAttachments.push_back(textureViewOpt);
                 }
 
-                for(auto const &sampledImageAssetId : logicalMaterialResource.getDescription().sampledImages)
+                for(auto const &sampledImageResourceId : material.description.sampledImages)
                 {
+                    OptRef_t<TextureResourceState_t> sampledImageOpt {};
+                    {
+                        auto [success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
+                        if(not success)
+                        {
+                            return EEngineStatus::Ok;
+                        }
+                        sampledImageOpt = resource;
+                    }
+                    TextureResourceState_t &sampledImage = *sampledImageOpt;
+
+                    
+
                     std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
 
-                    Shared<ILogicalResourceObject> logicalTexture      = mResourceManager->useAssetResource(sampledImageResourceId, sampledImageAssetId).data();
+                    Shared<ILogicalResourceObject> logicalTexture      = aResourceManager->useAssetResource(sampledImageResourceId, sampledImageAssetId).data();
                     Shared<STexture>               sampledImageTexture = std::static_pointer_cast<STexture>(logicalTexture);
                     if(nullptr != sampledImageTexture)
                     {
@@ -2242,14 +2353,15 @@ namespace engine
                     }
                 }
 
-                context.updateMaterial( logicalMaterialResource.pipelineResource->getGpuApiResourceHandle()
-                        , gpuBufferIds
-                        , gpuInputAttachmentTextureViewIds
-                        , gpuTextureViewIds);
+                EEngineStatus const updateResult = updateDescriptorSets(logicalMaterialResource.pipelineResource->getGpuApiResourceHandle()
+                                                                      , gpuBufferIds
+                                                                      , gpuInputAttachmentTextureViewIds
+                                                                      , gpuTextureViewIds);
 
-                auto const result = bindPipeline(logicalMaterialResource.pipelineResource->getGpuApiResourceHandle());
+                auto const result = context.bindPipeline(aState, );
                 return result;
             };
+
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------

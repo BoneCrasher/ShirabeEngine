@@ -135,7 +135,7 @@ namespace engine
             // Write registered resources
             for(RefIndex_t::value_type const &textureRef : resources.textures())
             {
-                SFrameGraphTexture const &texture = *resources.get<SFrameGraphTexture>(textureRef);
+                SFrameGraphDynamicTexture const &texture = *resources.get<SFrameGraphDynamicTexture>(textureRef);
                 writeTextureResource(texture);
             }
 
@@ -198,7 +198,7 @@ namespace engine
                         {
                             for(FrameGraphResourceId_t const &id : creations)
                             {
-                                SFrameGraphTexture const &texture = *resources.get<SFrameGraphTexture>(id);
+                                SFrameGraphDynamicTexture const &texture = *resources.get<SFrameGraphDynamicTexture>(id);
                                 writePass2TextureResourceEdge(texture);
                             }
                         }
@@ -439,7 +439,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeTextureResource(SFrameGraphTexture const &aTexture)
+        void CFrameGraphGraphVizSerializer::writeTextureResource(SFrameGraphDynamicTexture const &aTexture)
         {
             std::string mode = "create";
             if(aTexture.isExternalResource)
@@ -476,7 +476,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writePass2TextureResourceEdge(SFrameGraphTexture const &aTexture)
+        void CFrameGraphGraphVizSerializer::writePass2TextureResourceEdge(SFrameGraphDynamicTexture const &aTexture)
         {
             bool const isImported = aTexture.isExternalResource;
 

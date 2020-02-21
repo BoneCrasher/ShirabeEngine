@@ -164,7 +164,7 @@ namespace engine
              */
             SFrameGraphResource registerTexture(
                     std::string        const &aReadableName,
-                    SFrameGraphTexture const &aTexture);
+                    SFrameGraphDynamicTexture const &aTexture);
 
             /**
              * Register a list of renderables for reading inside the render graph.
@@ -262,7 +262,7 @@ EST_EXPORT CGraphBuilder
              * @return             True, if valid. False otherwise.
              */
             bool validateTextureView(
-                    SFrameGraphTexture     const &aTexture,
+                    SFrameGraphDynamicTexture     const &aTexture,
                     SFrameGraphTextureView const &aTextureView);
 
             /**
@@ -272,7 +272,7 @@ EST_EXPORT CGraphBuilder
              * @param aTexture The texture to validate.
              * @return         True, if valid. False otherwise.
              */
-            bool validateTextureUsage(SFrameGraphTexture const &aTexture);
+            bool validateTextureUsage(SFrameGraphDynamicTexture const &aTexture);
 
             /**
              * Validate the formats of a texture and a texture view, i.e. check, whether
@@ -284,7 +284,7 @@ EST_EXPORT CGraphBuilder
              * @return             True, if valid. False otherwise.
              */
             bool validateTextureFormat(
-                    SFrameGraphTexture     const &aTexture,
+                    SFrameGraphDynamicTexture     const &aTexture,
                     SFrameGraphTextureView const &aTextureView);
 
             /**
@@ -297,7 +297,7 @@ EST_EXPORT CGraphBuilder
              * @return             True, if valid. False otherwise.
              */
             bool validateTextureSubresourceAccess(
-                    SFrameGraphTexture     const &aTexture,
+                    SFrameGraphDynamicTexture     const &aTexture,
                     SFrameGraphTextureView const &aTextureView);
 
             /**

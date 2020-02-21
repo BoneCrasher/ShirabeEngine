@@ -28,7 +28,7 @@ namespace engine
         using framegraph::CPassBase;
         using framegraph::SFrameGraphResource;
         using framegraph::PassUID_t;
-        using framegraph::SFrameGraphTexture;
+        using framegraph::SFrameGraphDynamicTexture;
         using framegraph::SFrameGraphTextureView;
         using framegraph::SFrameGraphRenderableList;
         using framegraph::SFrameGraphRenderableListView;
@@ -209,7 +209,7 @@ namespace engine
              * @param aTexture The texture resource to write.
              */
             void writeTextureResource(
-                    SFrameGraphTexture const &aTexture);
+                    SFrameGraphDynamicTexture const &aTexture);
 
             /**
              * Write out a texture view in dot format.
@@ -235,7 +235,7 @@ namespace engine
              *
              * @param aTexture The texture being created by the pass.
              */
-            void writePass2TextureResourceEdge(SFrameGraphTexture const &aTexture);
+            void writePass2TextureResourceEdge(SFrameGraphDynamicTexture const &aTexture);
 
             /**
              * Write an edge connecting a pass and a texture view, either in- or outgoing.
