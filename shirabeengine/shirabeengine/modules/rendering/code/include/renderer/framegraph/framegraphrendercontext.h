@@ -79,7 +79,7 @@ namespace engine
              *
              */
             std::function<EEngineStatus(SFrameGraphRenderContextState      & /* aState        */
-                    ,                 , SFrameGraphDynamicTexture            const& /* aImageHandle  */
+                                      , SFrameGraphDynamicTexture     const& /* aImageHandle  */
                                       , CRange                        const& /* aArrayRange   */
                                       , CRange                        const& /* aMipRange     */
                                       , VkImageAspectFlags            const& /* aAspectFlags  */
@@ -189,14 +189,8 @@ namespace engine
                                       , SFrameGraphMaterial           const& /* aMaterial */
                                       , ResourceId_t                  const& /* aRenderPassId */)>                                       initializeMaterial;
             std::function<EEngineStatus(SFrameGraphRenderContextState & /* aState */, SFrameGraphMaterial const& /* aMaterial */)>       transferMaterial;
-            std::function<EEngineStatus(SFrameGraphRenderContextState            & /* aState                    */
-                                        , SFrameGraphMaterial                 const& /* aMaterial                 */
-                                        , std::vector<SFrameGraphBuffer>      const& /* aMaterialBuffers          */
-                                        , std::vector<SFrameGraphTextureView> const& /* aMaterialInputAttachments */
-                                        , std::vector<SSampledImageBinding>   const& /* aMaterialSampledImages    */)>                    updateMaterial;
             std::function<EEngineStatus(SFrameGraphRenderContextState      & /* aState */
-                                      , SFrameGraphMaterial           const& /* aMaterial */
-                                      , ResourceId_t                  const& /* aRenderPassId */)>                                        bindMaterial;
+                                      , SFrameGraphMaterial           const& /* aMaterial */)>                                            bindMaterial;
             std::function<EEngineStatus(SFrameGraphRenderContextState & /* aState */, SFrameGraphMaterial const& /* aMaterial */)>        unbindMaterial;
             std::function<EEngineStatus(SFrameGraphRenderContextState & /* aState */, SFrameGraphMaterial const& /* aMaterial */)>        deinitializeMaterial;
             std::function<EEngineStatus(SFrameGraphRenderContextState & /* aState */, SFrameGraphMaterial const& /* aMaterial */)>        unloadMaterialAsset;

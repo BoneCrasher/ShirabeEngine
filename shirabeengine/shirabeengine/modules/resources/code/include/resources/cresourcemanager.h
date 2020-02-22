@@ -411,7 +411,7 @@ namespace engine::resources
     {
         using namespace core;
 
-        FetchedResource_t<TResource> resource = getResourceObject(aResourceId);
+        FetchedResource_t<TResource> resource = getResourceObject<TResource>(aResourceId);
         // Resource available?
         if(not resource.has_value())
         {
@@ -483,7 +483,7 @@ namespace engine::resources
     {
         using namespace core;
 
-        FetchedResource_t<TResource> resource = getResourceObject(aResourceId);
+        FetchedResource_t<TResource> resource = getResourceObject<TResource>(aResourceId);
         // Resource available?
         if(not resource.has_value())
         {
