@@ -1,10 +1,6 @@
 #include "vulkan_integration/rendering/vulkanrendercontext.h"
-#include "vulkan_integration/resources/types/vulkantextureresource.h"
-#include "vulkan_integration/resources/types/vulkanframebufferresource.h"
-#include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
-#include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
 
-#include <asset/assetstorage.h>
+#include <core/enginetypehelper.h>
 #include <mesh/loader.h>
 #include <mesh/declaration.h>
 #include <material/loader.h>
@@ -12,7 +8,6 @@
 #include <material/serialization.h>
 #include <renderer/framegraph/framegraphrendercontext.h>
 
-#include <thread>
 #include <base/string.h>
 
 namespace engine
@@ -96,8 +91,7 @@ namespace engine
             framegraph::SFrameGraphRenderContext context {};
 
             context.clearAttachments = [=] (SFrameGraphRenderContextState       &aState
-                                          , std::string                   const &aRenderPassId
-                                          , uint32_t                      const &aCurrentSubpassIndex) -> EEngineStatus
+                                          , std::string                   const &aRenderPassId) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -116,7 +110,7 @@ namespace engine
                 std::vector<VkClearRect>       clearRects       {};
                 std::vector<VkClearAttachment> clearAttachments {};
 
-                SSubpassDescription const &subpassDesc = description.subpassDescriptions.at(aCurrentSubpassIndex);
+                SSubpassDescription const &subpassDesc = description.subpassDescriptions.at(aState.currentSubpassIndex);
                 for(std::size_t k=0; k<subpassDesc.colorAttachments.size(); ++k)
                 {
                     SAttachmentReference   const &ref  = subpassDesc.colorAttachments[k];
@@ -450,7 +444,11 @@ namespace engine
 
                 return EEngineStatus::Ok;
             };
+            //<-----------------------------------------------------------------------------
 
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
             context.createRenderPass = [=] (SFrameGraphRenderContextState   const &aState,
                                             std::string                     const &aRenderPassId,
                                             std::vector<PassUID_t>          const &aPassExecutionOrder,
@@ -576,7 +574,7 @@ namespace engine
                         // If the parent texture view is null, the parent is a texture object.
                         Shared<SFrameGraphTextureView> const &parentTextureView = (parentTextureViewFetch.data());
 
-                        CEngineResult < Shared < SFrameGraphDynamicTexture > const> const &textureFetch = aFrameGraphResources.get<SFrameGraphDynamicTexture>(textureView.subjacentResource);
+                        CEngineResult<Shared<SFrameGraphDynamicTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphDynamicTexture>(textureView.subjacentResource);
                         if(not textureFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
@@ -767,7 +765,7 @@ namespace engine
                 // renderPassDesc.attachmentTextureViews  = textureViewIds;
 
                 {
-                    CEngineResult<Shared<ILogicalResourceObject>> renderPassObject = aResourceManager->useDynamicResource<SRenderPass>(renderPassDesc.name, renderPassDesc);
+                    CEngineResult<OptRef_t<RenderPassResourceState_t>> renderPassObject = aResourceManager->useDynamicResource<RenderPassResourceState_t>(renderPassDesc.name, renderPassDesc);
                     if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
                     {
                         return EEngineStatus::Ok;
@@ -781,7 +779,66 @@ namespace engine
 
                 return EEngineStatus::Ok;
             };
+            //<-----------------------------------------------------------------------------
 
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.initializeRenderPass = [=] (SFrameGraphRenderContextState   const &aState,
+                                                std::string                     const &aRenderPassId,
+                                                std::vector<PassUID_t>          const &aPassExecutionOrder,
+                                                SFrameGraphAttachmentCollection const &aAttachmentInfo,
+                                                CFrameGraphMutableResources     const &aFrameGraphResources) -> EEngineStatus
+            {
+                SRenderPassDependencies renderPassDependencies {};
+
+                auto const &attachmentResourceIds = aAttachmentInfo.getAttachementImageViewResourceIds();
+                auto const &assignment            = aAttachmentInfo.getAttachmentPassToViewAssignment();
+
+                for(auto const &passUid : aPassExecutionOrder)
+                {
+                    std::vector<uint64_t> const &attachmentResourceIndexList = assignment.at(passUid);
+
+                    SSubpassDescription subpassDesc = {};
+                    for(auto const &index : attachmentResourceIndexList)
+                    {
+                        FrameGraphResourceId_t const &resourceId = attachmentResourceIds.at(index);
+
+                        CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                        if(not textureViewFetch.successful())
+                        {
+                            CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
+                            return EEngineStatus::ResourceError_NotFound;
+                        }
+
+                        SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+
+                        auto const predicate = [textureView] (std::string const &aViewId) -> bool { return (aViewId == textureView.readableName); };
+
+                        if(renderPassDependencies.attachmentTextureViews.end() == std::find_if( renderPassDependencies.attachmentTextureViews.begin()
+                                                                                                , renderPassDependencies.attachmentTextureViews.end()
+                                                                                                , predicate))
+                        {
+                            renderPassDependencies.attachmentTextureViews.push_back(textureView.readableName);
+                        }
+                    }
+                }
+
+                OptRef_t<RenderPassResourceState_t>  renderPassResource {};
+                {
+                    auto [success, resource] = fetchResource<RenderPassResourceState_t>(aResourceManager, aRenderPassId);
+                    if (not success)
+                    {
+                        return EEngineStatus::Error;
+                    }
+                    renderPassResource = resource;
+                }
+                RenderPassResourceState_t renderPass = *renderPassResource;
+
+                CEngineResult<> const renderPassInitialized = aResourceManager->initializeResource<RenderPassResourceState_t>(aRenderPassId, renderPassDependencies, aVulkanEnvironment);
+                EngineStatusPrintOnError(renderPassInitialized.result(), logTag(), "Failed to load renderpass in backend.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(renderPassInitialized.result());
+            };
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -791,7 +848,6 @@ namespace engine
                                           std::string                     const &aRenderPassId,
                                           std::string                     const &aFrameBufferId,
                                           std::vector<PassUID_t>          const &aPassExecutionOrder,
-                                          SFrameGraphAttachmentCollection const &aAttachmentInfo,
                                           CFrameGraphMutableResources     const &aFrameGraphResources ) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
@@ -822,53 +878,6 @@ namespace engine
 
                 SVulkanState                 &state                 = aVulkanEnvironment->getState();
                 SRenderPassDescription const &renderPassDescription = renderPass.description;
-                SRenderPassDependencies       renderPassDependencies {};
-
-                FrameGraphResourceIdList const &attachmentResources = aAttachmentInfo.getAttachementImageViewResourceIds();
-
-                auto const &assignment = aAttachmentInfo.getAttachmentPassToViewAssignment();
-                for(auto const &passUid : aPassExecutionOrder)
-                {
-                    std::vector<uint64_t> const &attachmentResourceIndexList = assignment.at(passUid);
-
-                    SSubpassDescription subpassDesc = {};
-                    for(auto const &index : attachmentResourceIndexList)
-                    {
-                        FrameGraphResourceId_t const &resourceId = attachmentResources.at(index);
-
-                        CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
-                        if(not textureViewFetch.successful())
-                        {
-                            CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
-                            return EEngineStatus::ResourceError_NotFound;
-                        }
-
-                        SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
-
-                        auto const predicate = [textureView] (std::string const &aViewId) -> bool { return (aViewId == textureView.readableName); };
-
-                        // The texture view's dimensions are valid. Register it for the frame buffer texture view id list.
-                        if(renderPassDependencies.attachmentTextureViews.end() == std::find_if( renderPassDependencies.attachmentTextureViews.begin()
-                                                                                              , renderPassDependencies.attachmentTextureViews.end()
-                                                                                              , predicate))
-                        {
-                            renderPassDependencies.attachmentTextureViews.push_back(textureView.readableName);
-                        }
-                    }
-                }
-
-                CEngineResult<> const renderPassInitialized = aResourceManager->initializeResource<RenderPassResourceState_t>(aRenderPassId, renderPassDependencies, aVulkanEnvironment);
-                EngineStatusPrintOnError(renderPassInitialized.result(), logTag(), "Failed to load renderpass in backend.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(renderPassInitialized.result());
-
-                SFrameBufferDependencies frameBufferDependencies {};
-                frameBufferDependencies.referenceRenderPassId  = aRenderPassId;
-                frameBufferDependencies.attachmentExtent       = renderPassDescription.attachmentExtent;
-                frameBufferDependencies.attachmentTextureViews = renderPassDependencies.attachmentTextureViews;
-
-                CEngineResult<> const frameBufferInitialized = aResourceManager->initializeResource<FrameBufferResourceState_t>(aFrameBufferId, frameBufferDependencies, aVulkanEnvironment);
-                EngineStatusPrintOnError(frameBufferInitialized.result(), logTag(), "Failed to load framebuffer in backend.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(frameBufferInitialized);
 
                 std::vector<VkClearValue> clearValues {};
                 clearValues.resize(renderPassDescription.attachmentDescriptions.size());
@@ -907,7 +916,11 @@ namespace engine
 
                 return EEngineStatus::Ok;
             };
+            //<-----------------------------------------------------------------------------
 
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
             context.destroyFrameBuffer = [=] (SFrameGraphRenderContextState       &aState
                                             , std::string                   const &aFrameBufferId) -> EEngineStatus
             {
@@ -944,6 +957,72 @@ namespace engine
 
                 CEngineResult<> const deinitialized = aResourceManager->deinitializeResource<RenderPassResourceState_t>(aRenderPassId, renderPass.dependencies, aVulkanEnvironment);
                 return deinitialized.result();
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.createFrameBuffer = [=] (SFrameGraphRenderContextState       &aState
+                                           , std::string                   const &aFrameBufferId) -> EEngineStatus
+            {
+                SFrameBufferDescription desc {};
+                desc.name = aFrameBufferId;
+                {
+                    CEngineResult<OptionalRef_t<FrameBufferResourceState_t>> frameBufferObject = aResourceManager->useDynamicResource<FrameBufferResourceState_t>(desc.name, desc);
+                    if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == frameBufferObject.result())
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    else if( not (EEngineStatus::Ok == frameBufferObject.result()))
+                    {
+                        EngineStatusPrintOnError(frameBufferObject.result(), logTag(), "Failed to create frame buffer.");
+                        return frameBufferObject.result();
+                    }
+                }
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.initializeFrameBuffer = [=] (SFrameGraphRenderContextState         &aState
+                                               , std::string                     const &aRenderPassId
+                                               , std::string                     const &aFrameBufferId
+                                               , CFrameGraphMutableResources     const &aFrameGraphResources) -> EEngineStatus
+            {
+                OptRef_t<RenderPassResourceState_t>  renderPassResource {};
+                {
+                    auto [success, resource] = fetchResource<RenderPassResourceState_t>(aResourceManager, aRenderPassId);
+                    if (not success)
+                    {
+                        return EEngineStatus::Error;
+                    }
+                    renderPassResource = resource;
+                }
+                RenderPassResourceState_t renderPass = *renderPassResource;
+
+                OptRef_t<FrameBufferResourceState_t>  frameBufferResource {};
+                {
+                    auto [success, resource] = fetchResource<FrameBufferResourceState_t>(aResourceManager, aFrameBufferId);
+                    if (not success)
+                    {
+                        return EEngineStatus::Error;
+                    }
+                    frameBufferResource = resource;
+                }
+                FrameBufferResourceState_t frameBuffer = *frameBufferResource;
+
+                SFrameBufferDependencies frameBufferDependencies {};
+                frameBufferDependencies.referenceRenderPassId  = aRenderPassId;
+                frameBufferDependencies.attachmentExtent       = renderPass.description.attachmentExtent;
+                frameBufferDependencies.attachmentTextureViews = renderPass.dependencies.attachmentTextureViews;
+
+                CEngineResult<> const frameBufferInitialized = aResourceManager->initializeResource<FrameBufferResourceState_t>(aFrameBufferId, frameBufferDependencies, aVulkanEnvironment);
+                EngineStatusPrintOnError(frameBufferInitialized.result(), logTag(), "Failed to load framebuffer in backend.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(frameBufferInitialized);
+
+                return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
 
@@ -1079,8 +1158,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.createTexture = [=](SFrameGraphRenderContextState       &aState
-                                       , SFrameGraphDynamicTexture            const &aTexture) -> EEngineStatus
+            context.createDynamicTexture = [=](SFrameGraphRenderContextState       &aState
+                                             , SFrameGraphDynamicTexture     const &aTexture) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -1109,7 +1188,7 @@ namespace engine
                 desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 
                 {
-                    CEngineResult<Shared<ILogicalResourceObject>> textureObject = aResourceManager->useDynamicResource<STexture>(desc.name, desc);
+                    CEngineResult<TextureResourceState_t> textureObject = aResourceManager->useDynamicResource<TextureResourceState_t>(desc.name, desc);
                     if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == textureObject.result())
                     {
                         return EEngineStatus::Ok;
@@ -1125,8 +1204,8 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyTexture = [=](SFrameGraphRenderContextState       &aState
-                                        , SFrameGraphDynamicTexture            const &aTexture) -> EEngineStatus
+            context.destroyDynamicTexture = [=](SFrameGraphRenderContextState       &aState
+                                              , SFrameGraphDynamicTexture     const &aTexture) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -1150,7 +1229,7 @@ namespace engine
             //
             //<-----------------------------------------------------------------------------
             context.createTextureView = [=] (SFrameGraphRenderContextState       &aState
-                                           , SFrameGraphDynamicTexture            const &aTexture
+                                           , SFrameGraphDynamicTexture     const &aTexture
                                            , SFrameGraphTextureView        const &aView) -> EEngineStatus
             {
                 STextureViewDescription desc = { };
@@ -1160,7 +1239,7 @@ namespace engine
                 desc.arraySlices          = aView.arraySliceRange;
                 desc.mipMapSlices         = aView.mipSliceRange;
 
-                CEngineResult<Shared<ILogicalResourceObject>> textureViewObject = aResourceManager->useDynamicResource<STextureView>(desc.name, desc);
+                CEngineResult<TextureViewResourceState_t> textureViewObject = aResourceManager->useDynamicResource<TextureViewResourceState_t>(desc.name, desc);
                 EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(textureViewObject.result());
 
@@ -1247,7 +1326,7 @@ namespace engine
                 // createInfo.queueFamilyIndexCount = ...;
                 // createInfo.pQueueFamilyIndices   = ...;
 
-                CEngineResult<Shared<ILogicalResourceObject>> bufferObject = aResourceManager->useDynamicResource<SBuffer>(desc.name, desc);
+                CEngineResult<BufferResourceState_t> bufferObject = aResourceManager->useDynamicResource<BufferResourceState_t>(desc.name, desc);
                 EngineStatusPrintOnError(bufferObject.result(), logTag(), "Failed to create buffer.");
 
                 return bufferObject.result();
@@ -1257,8 +1336,62 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.destroyBuffer = [=] (SFrameGraphRenderContextState       &aState
-                                       , SFrameGraphBuffer             const &aBuffer) -> EEngineStatus
+            context.initializeBuffer = [=]  (SFrameGraphRenderContextState       &aState
+                                           , SFrameGraphBuffer             const &aBuffer) -> EEngineStatus
+            {
+                SHIRABE_UNUSED(aState);
+
+                OptRef_t<BufferResourceState_t> bufferOpt {};
+                {
+                    auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, aBuffer.readableName);
+                    if(not success)
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    bufferOpt = resource;
+                }
+                BufferResourceState_t &buffer = *bufferOpt;
+
+                CEngineResult<> const bufferInit = aResourceManager->initializeResource<BufferResourceState_t>(aBuffer.readableName, {}, aVulkanEnvironment);
+                EngineStatusPrintOnError(bufferInit.result(), logTag(), "Buffer initialization failed.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(bufferInit.result());
+
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.transferBuffer = [=]  (SFrameGraphRenderContextState       &aState
+                                         , SFrameGraphBuffer             const &aBuffer) -> EEngineStatus
+            {
+                SHIRABE_UNUSED(aState);
+
+                OptRef_t<BufferResourceState_t> bufferOpt {};
+                {
+                    auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, aBuffer.readableName);
+                    if(not success)
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    bufferOpt = resource;
+                }
+                BufferResourceState_t &buffer = *bufferOpt;
+
+                CEngineResult<> const bufferTransfer = aResourceManager->transferResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
+                EngineStatusPrintOnError(bufferTransfer.result(), logTag(), "Buffer initialization failed.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(bufferTransfer.result());
+
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.destroy = [=] (SFrameGraphRenderContextState       &aState
+                                 , SFrameGraphBuffer             const &aBuffer) -> EEngineStatus
             {
                 SHIRABE_UNUSED(aState);
 
@@ -1441,10 +1574,10 @@ namespace engine
                 meshDescription.indexSampleCount = dataFile.indexSampleCount;
 
                 Vector<VkDeviceSize> offsets;
-                offsets.resize(4);
+                offsets.resize(dataFile.attributes.size());
 
                 VkDeviceSize currentOffset = 0;
-                for(uint64_t k=0; k<4; ++k)
+                for(uint64_t k=0; k<dataFile.attributes.size(); ++k)
                 {
                     offsets[k] = currentOffset;
                     VkDeviceSize length = (dataFile.attributes[k].length * dataFile.attributes[k].bytesPerSample);
@@ -2439,7 +2572,7 @@ namespace engine
                     readMeshAsset(aMesh);
                     bindMesh     (aMesh);
                     Shared<SMesh> mesh = std::static_pointer_cast<SMesh>(getUsedResource(aMesh.readableName));
-                    mGraphicsAPIRenderContext->drawIndex(mesh->getDescription().indexSampleCount);
+                    mGraphicsAPIRenderContext->drawIndexed(mesh->getDescription().indexSampleCount);
                     unbindMesh     (aMesh);
                     unloadMeshAsset(aMesh);
                 }
@@ -2455,7 +2588,7 @@ namespace engine
             //
             //<-----------------------------------------------------------------------------
             context.drawIndexed = [=] (SFrameGraphRenderContextState       &aState
-                                     , uint32_t                      const  aIndexCount) -> EEngineStatus
+                                     , VkDeviceSize                  const  aIndexCount) -> EEngineStatus
             {
                 SVulkanState     &vkState        = aVulkanEnvironment->getState();
                 VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
@@ -2486,6 +2619,9 @@ namespace engine
             context.drawFullscreenQuadWithMaterial = [=] (SFrameGraphRenderContextState       &aState
                                                         , SFrameGraphMaterial           const &aMaterial) -> EEngineStatus
             {
+                context.bindMaterial(aState, aMaterial);
+                context.drawQuad(aState);
+
                 return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------

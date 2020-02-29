@@ -237,6 +237,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CGraph& CGraph::operator=(CGraph const &aOther)
         {
+            if(&aOther == this)
+            {
+                return (*this);
+            }
+
             mPasses                  = aOther.mPasses;
             mPassAdjacency           = aOther.mPassAdjacency;
             mPassExecutionOrder      = aOther.mPassExecutionOrder;
@@ -253,10 +258,40 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CGraph::initializeGraphResources()
+        {
+            CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(renderContextState, aRenderContext, executionOrder, sRenderPassResourceId, sFrameBufferResourceId);
+            if(not setUpRenderPassAndFrameBuffer.successful())
+            {
+                return setUpRenderPassAndFrameBuffer;
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CGraph::deinitializeGraphResources()
+        {
+            CEngineResult<> const setUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(renderContextState, aRenderContext, executionOrder, sRenderPassResourceId, sFrameBufferResourceId);
+            if(not setUpRenderPassAndFrameBuffer.successful())
+            {
+                return setUpRenderPassAndFrameBuffer;
+            }
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::execute(SFrameGraphRenderContext &aRenderContext)
+        CEngineResult<> CGraph::execute(SFrameGraphDataSource    const &aDataSource
+                                      , SFrameGraphRenderContext       &aRenderContext)
         {
+            // TODO: As soon as we have passgroups, the currentSubpassIndex comes from the passgroup.
+            SFrameGraphRenderContextState renderContextState {};
+
             std::vector<PassUID_t> executionOrder {};
             {
                 std::stack<PassUID_t> copy = mPassExecutionOrder;
@@ -267,61 +302,54 @@ namespace engine
                 }
             }
 
+            // Preload all meshes for the frame and spawn resource tasks where necessary.
             RefIndex_t const &meshReferenceIndex = mResourceData.meshes();
             for(auto const &reference : meshReferenceIndex)
             {
-                 auto [fetchSuccessCode, mesh] = mResourceData.getMutable<SFrameGraphMesh>(reference);
-                 if(CheckEngineError(fetchSuccessCode))
-                 {
-                     CLog::Error(logTag(), "Failed to fetch mesh w/ id {}", reference);
-                     continue;
-                 }
+                auto [fetchSuccessCode, mesh] = mResourceData.getMutable<SFrameGraphMesh>(reference);
+                if(CheckEngineError(fetchSuccessCode))
+                {
+                    CLog::Error(logTag(), "Failed to fetch mesh w/ id {}", reference);
+                    continue;
+                }
 
-                 EEngineStatus loadSuccessCode = aRenderContext.readMeshAsset(*mesh);
-                 if(CheckEngineError(loadSuccessCode))
-                 {
-                     CLog::Error(logTag(), "Failed to initialize mesh w/ id {}", reference);
-                     continue;
-                 }
+                EEngineStatus attributeBufferStatus = EEngineStatus::Ok;
+                EEngineStatus indexBufferStatus     = EEngineStatus::Ok;
+                attributeBufferStatus = aRenderContext.initializeBuffer(renderContextState, mesh->attributeBuffer);
+                if(not CheckEngineError(attributeBufferStatus))
+                {
+                    attributeBufferStatus = aRenderContext.transferBuffer(renderContextState, mesh->attributeBuffer);
+                }
+                indexBufferStatus = aRenderContext.initializeBuffer(renderContextState, mesh->indexBuffer);
+                if(not CheckEngineError(indexBufferStatus))
+                {
+                    indexBufferStatus = aRenderContext.transferBuffer(renderContextState, mesh->indexBuffer);
+                }
             }
 
             RefIndex_t const &materialReferenceIndex = mResourceData.materials();
-
+            for(auto const &reference : materialReferenceIndex)
+            {
+                auto [fetchSuccessCode, material] = mResourceData.getMutable<SFrameGraphMaterial>(reference);
+                if(CheckEngineError(fetchSuccessCode))
+                {
+                    CLog::Error(logTag(), "Failed to fetch material w/ id {}", reference);
+                    continue;
+                }
+            }
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext.beginGraphicsFrame();
-
-                CEngineResult<> const setUpRenderPassAndFrameBuffer = initializeRenderPassAndFrameBuffer(aRenderContext, executionOrder, sRenderPassResourceId, sFrameBufferResourceId);
-                if(not setUpRenderPassAndFrameBuffer.successful())
-                {
-                    return setUpRenderPassAndFrameBuffer;
-                }
-
-                //
-                // All descriptor resources need to be created and pushed to the GPU up front
-                //
-                // for(auto const &bufferId : mResourceData.buffers())
-                // {
-                //     auto const &bufferResource = mResourceData.getMutable<SFrameGraphBuffer>(bufferId).data();
-                //     aRenderContext.createBuffer(*bufferResource);
-                // }
+                aRenderContext.beginGraphicsFrame(renderContextState);
             }
 
             // In any case...
-            aRenderContext.beginFrameCommandBuffers();
-
-            SFrameGraphAttachmentCollection const &attachmentCollection = mResourceData.getAttachments();
+            aRenderContext.beginFrameCommandBuffers(renderContextState);
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext.bindRenderPass(sRenderPassResourceId, sFrameBufferResourceId, executionOrder, attachmentCollection, mResourceData);
+                aRenderContext.bindRenderPass(renderContextState, sRenderPassResourceId, sFrameBufferResourceId, mResourceData);
             }
-
-            // The subsequent data is used to properly derive layout transitions between attachment reads/writes.
-            SFrameGraphAttachmentCollection  const &attachments               = mResourceData.getAttachments();
-            Vector<FrameGraphResourceId_t>   const &attachmentResourceIds     = attachments.getAttachementImageViewResourceIds();
-            Map<PassUID_t, Vector<uint64_t>> const &attachmentPassAssignments = attachments.getAttachmentPassToViewAssignment();
 
             std::stack<PassUID_t> copy = mPassExecutionOrder;
             while(not copy.empty())
@@ -330,10 +358,10 @@ namespace engine
                 Shared<CPassBase>            const pass     = mPasses.at(passUID);
                 Unique<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
 
-                aRenderContext.beginPass();
-                aRenderContext.clearAttachments(sRenderPassResourceId);
+                aRenderContext.beginPass(renderContextState);
+                aRenderContext.clearAttachments(renderContextState, sRenderPassResourceId);
 
-                CEngineResult<> executed = pass->execute(mResourceData, aRenderContext);
+                CEngineResult<> executed = pass->execute(aDataSource, mResourceData, renderContextState, aRenderContext);
                 if(not executed.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to execute pass {}", pass->passUID()));
@@ -342,7 +370,7 @@ namespace engine
 
                 if(1 < copy.size()) // Implicit last pass '0' and effective last pass --> 2 passes
                 {
-                    aRenderContext.endPass();
+                    aRenderContext.endPass(renderContextState);
                 }
 
                 copy.pop();
@@ -350,7 +378,7 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
             {
-                aRenderContext.unbindRenderPass(sRenderPassResourceId, sFrameBufferResourceId);
+                aRenderContext.unbindRenderPass(renderContextState, sRenderPassResourceId, sFrameBufferResourceId);
 
                 CEngineResult<Shared<SFrameGraphTextureView>> sourceResourceFetch = mResourceData.get<SFrameGraphTextureView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
@@ -366,22 +394,16 @@ namespace engine
                     return {sourceResourceFetch.result()};
                 }
 
-                aRenderContext.copyImageToBackBuffer(*(parentResourceFetch.data()));
+                aRenderContext.copyImageToBackBuffer(renderContextState, *(parentResourceFetch.data()));
             }
 
             // In any case...
-            aRenderContext.endFrameCommandBuffers();
+            aRenderContext.endFrameCommandBuffers(renderContextState);
 
             if(EGraphMode::Graphics == mGraphMode)
             {
-                aRenderContext.present();
-                aRenderContext.endGraphicsFrame();
-
-                // CEngineResult<> const cleanedUpRenderPassAndFrameBuffer = deinitializeRenderPassAndFrameBuffer(aRenderContext, sFrameBufferResourceId, sRenderPassResourceId);
-                // if(not cleanedUpRenderPassAndFrameBuffer.successful())
-                // {
-                //     return cleanedUpRenderPassAndFrameBuffer;
-                // }
+                aRenderContext.present(renderContextState);
+                aRenderContext.endGraphicsFrame(renderContextState);
             }
 
             return { EEngineStatus::Ok };
@@ -392,8 +414,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeResources(
+                SFrameGraphRenderContextState  &aRenderContextState,
                 SFrameGraphRenderContext       &aRenderContext,
-                FrameGraphResourceIdList         const &aResourceIds)
+                FrameGraphResourceIdList const &aResourceIds)
         {
             CEngineResult<> initialization { EEngineStatus::Ok };
             CEngineResult<> result         { EEngineStatus::Ok };
@@ -418,7 +441,7 @@ namespace engine
                     it = std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId);
                     if(mInstantiatedResources.end() == it)
                     {
-                        initialization = initializeTexture(aRenderContext, texture);
+                        initialization = initializeTexture(aRenderContextState, aRenderContext, texture);
                         if(not initialization.successful())
                         {
                             EngineStatusPrintOnError(initialization.result(), logTag(), "Failed to initialize texture.");
@@ -451,7 +474,7 @@ namespace engine
                         bool const subjacentTextureCreated = (mInstantiatedResources.end() != std::find(mInstantiatedResources.begin(), mInstantiatedResources.end(), texture->resourceId));
                         if(not texture->isExternalResource && not subjacentTextureCreated)
                         {
-                            initialization = initializeResources(aRenderContext, {texture->resourceId});
+                            initialization = initializeResources(aRenderContextState, aRenderContext, {texture->resourceId});
                             if(not initialization.successful())
                             {
                                 EngineStatusPrintOnError(initialization.result(), logTag(), "Failed to initialize texture.");
@@ -465,7 +488,7 @@ namespace engine
                         }
 
                         // Don't forget to create the texture view...
-                        CEngineResult<> const textureViewInitialization = initializeTextureView(aRenderContext, texture, textureView);
+                        CEngineResult<> const textureViewInitialization = initializeTextureView(aRenderContextState, aRenderContext, texture, textureView);
                         if(not textureViewInitialization.successful())
                         {
                             EngineStatusPrintOnError(textureViewInitialization.result(), logTag(), "Failed to initialize texture view.");
@@ -492,30 +515,35 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeRenderPassAndFrameBuffer(
-                SFrameGraphRenderContext       &aRenderContext,
-                std::vector<PassUID_t>           const &aPassExecutionOrder,
-                std::string                      const &aRenderPassId,
-                std::string                      const &aFrameBufferId)
+                SFrameGraphRenderContextState         &aRenderContextState,
+                SFrameGraphRenderContext              &aRenderContext,
+                std::vector<PassUID_t>          const &aPassExecutionOrder,
+                std::string                     const &aRenderPassId,
+                std::string                     const &aFrameBufferId)
         {
-            std::vector<Shared<SFrameGraphDynamicTexture>> textureReferences{};
-            std::vector<Shared<SFrameGraphTextureView>>    textureViewReferences{};
-
-            SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
-            FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageViewResourceIds();
+            auto const &attachments           = mResourceData.getAttachments();
+            auto const &attachmentResourceIds = attachments.getAttachementImageViewResourceIds();
+            auto const &assignment            = attachments.getAttachmentPassToViewAssignment();
 
             // Make sure that all texture views and their subjacent textures are created upfront!
-            CEngineResult<> const initialization = initializeResources(aRenderContext, attachmentResourceIds);
+            CEngineResult<> const initialization = initializeResources(aRenderContextState, aRenderContext, attachmentResourceIds);
             if(not initialization.successful())
             {
                 EngineStatusPrintOnError(initialization.result(), logTag(), "Failed to initialize resource list.");
                 return initialization;
             }
 
-            CEngineResult<> const renderPassCreation = aRenderContext.createRenderPass(aRenderPassId, aPassExecutionOrder, attachments, mResourceData);
+            CEngineResult<> const renderPassCreation = aRenderContext.createRenderPass(aRenderContextState, aRenderPassId, aPassExecutionOrder, attachments, mResourceData);
             EngineStatusPrintOnError(renderPassCreation.result(), logTag(), "Failed to create render pass.");
 
-            CEngineResult<> const frameBufferCreation = aRenderContext.createFrameBuffer(aFrameBufferId, aRenderPassId);
+            CEngineResult<> const renderPassInit = aRenderContext.initializeRenderPass(aRenderContextState, aRenderPassId, aPassExecutionOrder, attachments, mResourceData);
+            EngineStatusPrintOnError(renderPassInit.result(), logTag(), "Failed to initialize render pass.");
+
+            CEngineResult<> const frameBufferCreation = aRenderContext.createFrameBuffer(aRenderContextState, aFrameBufferId, aRenderPassId);
             EngineStatusPrintOnError(frameBufferCreation.result(), logTag(), "Failed to create framebuffer.");
+
+            CEngineResult<> const frameBufferInit = aRenderContext.initializeFrameBuffer(aRenderContextState, aFrameBufferId, aRenderPassId, mResourceData);
+            EngineStatusPrintOnError(frameBufferInit.result(), logTag(), "Failed to initialize framebuffer.");
 
             return EEngineStatus::Ok;
         }
@@ -525,20 +553,21 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeRenderPassAndFrameBuffer(
-                SFrameGraphRenderContext       &aRenderContext,
-                std::string                      const &aRenderPassId,
-                std::string                      const &aFrameBufferId)
+                SFrameGraphRenderContextState       &aRenderContextState,
+                SFrameGraphRenderContext            &aRenderContext,
+                std::string                   const &aRenderPassId,
+                std::string                   const &aFrameBufferId)
         {
             SFrameGraphAttachmentCollection const &attachments           = mResourceData.getAttachments();
             FrameGraphResourceIdList        const &attachmentResourceIds = attachments.getAttachementImageResourceIds();
 
-            CEngineResult<> const frameBufferDestruction = aRenderContext.destroyFrameBuffer(aFrameBufferId);
+            CEngineResult<> const frameBufferDestruction = aRenderContext.destroyFrameBuffer(aRenderContextState, aFrameBufferId);
             EngineStatusPrintOnError(frameBufferDestruction.result(), logTag(), "Failed to destroy frame buffer.");
 
-            CEngineResult<> const renderPassDestruction = aRenderContext.destroyRenderPass(aRenderPassId);
+            CEngineResult<> const renderPassDestruction = aRenderContext.destroyRenderPass(aRenderContextState, aRenderPassId);
             EngineStatusPrintOnError(renderPassDestruction.result(), logTag(), "Failed to destroy render pass.");
 
-            CEngineResult<> const deinitialization = deinitializeResources(aRenderContext, attachmentResourceIds);
+            CEngineResult<> const deinitialization = deinitializeResources(aRenderContextState, aRenderContext, attachmentResourceIds);
             EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to deinitialize resources.");
 
             return EEngineStatus::Ok;
@@ -549,10 +578,11 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::bindResources(
+                SFrameGraphRenderContextState  &aRenderContextState,
                 SFrameGraphRenderContext       &aRenderContext,
                 FrameGraphResourceIdList const &aResourceIds)
         {
-            CEngineResult<> binding = EEngineStatus::Ok;
+            EEngineStatus binding = EEngineStatus::Ok;
 
             for(FrameGraphResourceId_t const &id : aResourceIds)
             {
@@ -565,14 +595,14 @@ namespace engine
                     break;
                 case EFrameGraphResourceType::TextureView:
                     textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
-                    binding     = aRenderContext.bindTextureView(*textureView);
+                    binding     = aRenderContext.bindTextureView(aRenderContextState, *textureView);
                     break;
                 default:
                     break;
                 }
 
                 // Break out on first error.
-                if(not binding.successful())
+                if(CheckEngineError(binding))
                 {
                     break;
                 }
@@ -586,10 +616,11 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::unbindResources(
+                SFrameGraphRenderContextState  &aRenderContextState,
                 SFrameGraphRenderContext       &aRenderContext,
                 FrameGraphResourceIdList const &aResourceIds)
         {
-            CEngineResult<> unbinding = EEngineStatus::Ok;
+            EEngineStatus unbinding = EEngineStatus::Ok;
 
             for(FrameGraphResourceId_t const &id : aResourceIds)
             {
@@ -602,13 +633,13 @@ namespace engine
                     break;
                 case EFrameGraphResourceType::TextureView:
                     textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
-                    unbinding   = aRenderContext.unbindTextureView(*textureView);
+                    unbinding   = aRenderContext.unbindTextureView(aRenderContextState, *textureView);
                     break;
                 default:
                     break;
                 }
 
-                if(not unbinding.successful())
+                if(CheckEngineError(unbinding))
                 {
                     break;
                 }
@@ -622,6 +653,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeResources(
+                SFrameGraphRenderContextState  &aRenderContextState,
                 SFrameGraphRenderContext       &aRenderContext,
                 FrameGraphResourceIdList const &aResourceIds)
         {
@@ -681,7 +713,7 @@ namespace engine
                         texture     = std::static_pointer_cast<SFrameGraphDynamicTexture>(subjacent);
                         textureView = std::static_pointer_cast<SFrameGraphTextureView>(resource);
 
-                        deinitialized = deinitializeTextureView(aRenderContext, texture, textureView);
+                        deinitialized = deinitializeTextureView(aRenderContextState, aRenderContext, texture, textureView);
 
                         auto const condition = [&] (FrameGraphResourceId_t const &aId) -> bool
                         {
@@ -730,17 +762,18 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTexture(
-                SFrameGraphRenderContext         &aRenderContext,
+                SFrameGraphRenderContextState           &aRenderContextState,
+                SFrameGraphRenderContext                &aRenderContext,
                 Shared<SFrameGraphDynamicTexture> const &aTexture)
         {
-            CEngineResult<> initialization = EEngineStatus::Ok;
+            EEngineStatus initialization = EEngineStatus::Ok;
 
             if(aTexture->isExternalResource)
-                initialization = aRenderContext.importTexture(*aTexture);
+                initialization = aRenderContext.importDynamicTexture(aRenderContextState, *aTexture);
             else
-                initialization = aRenderContext.createTexture(*aTexture);
+                initialization = aRenderContext.createDynamicTexture(aRenderContextState, *aTexture);
 
-            EngineStatusPrintOnError(initialization.result(), logTag(), "Failed to load texture for FrameGraphExecution.");
+            EngineStatusPrintOnError(initialization, logTag(), "Failed to load texture for FrameGraphExecution.");
 
             return initialization;
         }
@@ -750,9 +783,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::initializeTextureView(
-                SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphDynamicTexture>       const &aTexture,
-                Shared<SFrameGraphTextureView>   const &aTextureView)
+                SFrameGraphRenderContextState           &aRenderContextState,
+                SFrameGraphRenderContext                &aRenderContext,
+                Shared<SFrameGraphDynamicTexture> const &aTexture,
+                Shared<SFrameGraphTextureView>    const &aTextureView)
         {
             bool const isForwardedOrAccepted =
                     ((aTextureView->mode.check(EFrameGraphViewAccessMode::Forward)) ||
@@ -762,8 +796,8 @@ namespace engine
                 return { EEngineStatus::Ok }; // Nothing to be done and no error.
             }
 
-            CEngineResult<> creation = aRenderContext.createTextureView(*aTexture, *aTextureView);
-            EngineStatusPrintOnError(creation.result(), logTag(), "Failed to load texture view for FrameGraphExecution.");
+            EEngineStatus creation = aRenderContext.createTextureView(aRenderContextState, *aTexture, *aTextureView);
+            EngineStatusPrintOnError(creation, logTag(), "Failed to load texture view for FrameGraphExecution.");
 
             return creation;
         }
@@ -773,9 +807,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeTextureView(
-                SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphDynamicTexture>       const &aTexture,
-                Shared<SFrameGraphTextureView>   const &aTextureView)
+                SFrameGraphRenderContextState           &aRenderContextState,
+                SFrameGraphRenderContext                &aRenderContext,
+                Shared<SFrameGraphDynamicTexture> const &aTexture,
+                Shared<SFrameGraphTextureView>    const &aTextureView)
         {
             SHIRABE_UNUSED(aTexture);
 
@@ -787,8 +822,8 @@ namespace engine
                 return { EEngineStatus::Ok }; // Nothing to be done and no error.
             }
 
-            CEngineResult<> destruction = aRenderContext.destroyTextureView(*aTextureView);
-            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to unload texture view for FrameGraphExecution.");
+            EEngineStatus destruction = aRenderContext.destroyTextureView(aRenderContextState, *aTextureView);
+            EngineStatusPrintOnError(destruction, logTag(), "Failed to unload texture view for FrameGraphExecution.");
 
             return destruction;
         }
@@ -798,8 +833,9 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::deinitializeTexture(
-                SFrameGraphRenderContext       &aRenderContext,
-                Shared<SFrameGraphDynamicTexture>       const &aTexture)
+                SFrameGraphRenderContextState           &aRenderContextState,
+                SFrameGraphRenderContext                &aRenderContext,
+                Shared<SFrameGraphDynamicTexture> const &aTexture)
         {
             SHIRABE_UNUSED(aRenderContext);
 
@@ -808,8 +844,8 @@ namespace engine
                 return { EEngineStatus::Ok };
             }
 
-            CEngineResult<> destruction = aRenderContext.destroyTexture(*aTexture);
-            EngineStatusPrintOnError(destruction.result(), logTag(), "Failed to unload texture for FrameGraphExecution.");
+            EEngineStatus destruction = aRenderContext.destroyDynamicTexture(aRenderContextState, *aTexture);
+            EngineStatusPrintOnError(destruction, logTag(), "Failed to unload texture for FrameGraphExecution.");
 
             return destruction;
         }

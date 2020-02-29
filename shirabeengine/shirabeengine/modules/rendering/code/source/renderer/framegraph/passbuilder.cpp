@@ -695,13 +695,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string const &aMaterialId, asset::AssetId_t const &aMaterialAssetId)
+        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string const &aMaterialId, SFrameGraphMaterial &aMaterial)
         {
             SFrameGraphMaterial &materialResource = mResourceData.spawnResource<SFrameGraphMaterial>();
             materialResource.readableName       = aMaterialId;
             materialResource.type               = EFrameGraphResourceType::Material;
             materialResource.assignedPassUID    = mPassUID;
-            materialResource.materialAssetId    = aMaterialAssetId;
             materialResource.isExternalResource = false;
             materialResource.parentResource     = 0;
             materialResource.referenceCount     = 0;
@@ -714,17 +713,21 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(std::string const &aMeshId, asset::AssetId_t const &aMeshAssetId)
+        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(std::string const &aMeshId, SFrameGraphMesh &aMesh)
         {
             SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
             meshResource.readableName       = aMeshId;
             meshResource.type               = EFrameGraphResourceType::Mesh;
             meshResource.assignedPassUID    = mPassUID;
-            meshResource.meshAssetId        = aMeshAssetId;
             meshResource.isExternalResource = false;
             meshResource.parentResource     = 0;
             meshResource.referenceCount     = 0;
             meshResource.subjacentResource  = 0;
+
+            meshResource.attributeBuffer  = aMesh.attributeBuffer;
+            meshResource.indexBuffer      = aMesh.indexBuffer;
+            meshResource.attributeOffsets = aMesh.attributeOffsets;
+            meshResource.indexCount       = aMesh.indexCount;
 
             return { EEngineStatus::Ok, meshResource };
         }

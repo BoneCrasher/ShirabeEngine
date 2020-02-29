@@ -13,8 +13,7 @@ namespace engine
         >
         CFrameGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
                 std::string               const &aPassName,
-                CGraphBuilder                   &aGraphBuilder,
-                SFrameGraphRenderableList const &aRenderableInput)
+                CGraphBuilder                   &aGraphBuilder)
         {
             /**
              * The SState struct is the internal state of the gbuffer generation pass.
@@ -42,20 +41,18 @@ namespace engine
             // ----------------------------------------------------------------------------------
             // Setup
             // ----------------------------------------------------------------------------------
-            auto const setup = [&] (
-                    CPassBuilder &aBuilder,
-                    SPassData    &aOutPassData)
-                    -> CEngineResult<>
+            auto const setup = [&] (CPassBuilder &aBuilder,
+                                    SPassData    &aOutPassData) -> CEngineResult<>
             {
                 // Default extents.
                 uint32_t width  = 1920;
                 uint32_t height = 1080;
 
-                Shared<SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
+                Shared<os::SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
                 if(environment)
                 {
                     Shared<wsi::CWSIDisplay> const &display     = aGraphBuilder.display();
-                    SOSDisplayDescriptor     const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
+                    os::SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
                     width  = displayDesc.bounds.size.x();
                     height = displayDesc.bounds.size.y();
                 }
@@ -142,27 +139,6 @@ namespace engine
                 aOutPassData.exportData.gbuffer3     = aBuilder.writeAttachment(aOutPassData.state.gbufferTexture2And3Id, write3).data();
                 aOutPassData.exportData.depthStencil = aBuilder.writeAttachment(aOutPassData.state.depthStencilTextureId, depthFlags).data();
 
-                // Register all meshes and materials for use.
-                for(SRenderable const &renderable : aRenderableInput.renderableList)
-                {
-                    SRenderableResources resources {};
-                    if(0 != renderable.meshInstanceAssetId)
-                    {
-                        SFrameGraphMesh const &meshResource = aBuilder.useMesh(renderable.meshInstanceId,
-                                                                               renderable.meshInstanceAssetId).data();
-                        resources.meshResource = meshResource;
-                    }
-
-                    if(0 != renderable.materialInstanceAssetId)
-                    {
-                        SFrameGraphMaterial const &materialResource = aBuilder.useMaterial(renderable.materialInstanceId,
-                                                                                           renderable.materialInstanceAssetId).data();
-                        resources.materialResource = materialResource;
-                    }
-
-                    aOutPassData.importData.renderables.push_back(resources);
-                }
-
                 return { EEngineStatus::Ok };
             };
 
@@ -170,35 +146,24 @@ namespace engine
             // Execution
             // ----------------------------------------------------------------------------------
             auto const execute = [=] (
-                    SPassData                        const&aPassData,
-                    CFrameGraphResources             const&aFrameGraphResources,
-                    Shared<IFrameGraphRenderContext>      &aRenderContext)
+                    SPassData                const &aPassData,
+                    SFrameGraphDataSource    const &aDataSource,
+                    CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aRenderContextState,
+                    SFrameGraphRenderContext       &aRenderContext)
                     -> CEngineResult<>
             {
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
-               // aRenderContext->clearAttachments("DefaultRenderPass");
+                std::vector<SFrameGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
 
-                for(SRenderableResources const &renderableResources : aPassData.importData.renderables)
+                for(SFrameGraphRenderableResources const &renderableResources : renderables)
                 {
-                    auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(renderableResources.materialResource.resourceId);
-                    if(CheckEngineError(result) || nullptr == materialPointer)
-                    {
-                        CLog::Error(logTag(), "Failed to fetch material for id {}", renderableResources.materialResource);
-                        continue;
-                    }
-
-                    auto const &[result2, meshPointer] = aFrameGraphResources.get<SFrameGraphMesh>(renderableResources.meshResource.resourceId);
-                    if(CheckEngineError(result2) || nullptr == meshPointer)
-                    {
-                        CLog::Error(logTag(), "Failed to fetch mesh for id {}", renderableResources.meshResource);
-                        continue;
-                    }
-
-                    CEngineResult<> const renderOk = aRenderContext->render(*meshPointer, *materialPointer);
-                    return renderOk;
+                    aRenderContext.bindVertexBuffer(aRenderContextState, renderableResources.meshResource.attributeBuffer.readableName, renderableResources.meshResource.attributeOffsets);
+                    aRenderContext.bindIndexBuffer (aRenderContextState, renderableResources.meshResource.indexBuffer    .readableName, renderableResources.meshResource.indexCount);
+                    aRenderContext.drawIndexed     (aRenderContextState, renderableResources.meshResource.indexCount);
                 }
 
                 return { EEngineStatus::Ok };

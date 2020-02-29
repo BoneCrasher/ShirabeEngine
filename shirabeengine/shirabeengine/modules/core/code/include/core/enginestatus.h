@@ -23,6 +23,9 @@ namespace engine
             : int32_t
     {
         Ok                                                              =       0,
+        Resource_Initializing                                           =  100100,
+        Resource_Transferring                                           =  100101,
+        Resource_Deinitializing                                         =  100102,
         Error                                                           =      -1,  // Non-specific issues
         NotImplemented                                                  =     -10,
         NullPointer                                                     =     -26,  // General parameter issues

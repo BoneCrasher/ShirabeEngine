@@ -2,19 +2,23 @@
 #define __SHIRABE_RENDERER_H__
 
 #include <atomic>
-#include "renderer/irenderer.h"
+#include <os/applicationenvironment.h>
+#include <wsi/display.h>
+#include "renderer/framegraph/framegraphdata.h"
+#include "renderer/framegraph/framegraph.h"
 
 namespace engine
 {
     namespace rendering
     {
-        using engine::framegraph::IFrameGraphRenderContext;
+        using engine::framegraph::SFrameGraphRenderContext;
+        using engine::framegraph::SFrameGraphDataSource;
+        using engine::framegraph::CGraph;
 
         /**
          * @brief The CRenderer class
          */
         class CRenderer
-                : public IRenderer
         {
             SHIRABE_DECLARE_LOG_TAG(CRenderer);
 
@@ -22,7 +26,7 @@ namespace engine
             CRenderer();
 
         public_destructors:
-            ~CRenderer() final;
+            ~CRenderer();
 
         public_methods:
             /**
@@ -36,39 +40,38 @@ namespace engine
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             EEngineStatus initialize(
-                    Shared<SApplicationEnvironment>  const &aApplicationEnvironment,
-                    Shared<wsi::CWSIDisplay>         const &aDisplay,
-                    SRendererConfiguration           const &aConfiguration,
-                    Shared<IFrameGraphRenderContext>       &aFrameGraphRenderContext,
-                    Shared<IRenderContext>                 &aGpuApiRenderContext) final;
+                    Shared<os::SApplicationEnvironment> const &aApplicationEnvironment,
+                    Shared<wsi::CWSIDisplay>            const &aDisplay);
+
+            EEngineStatus createDeferredPipeline();
 
             /**
              * Deinitialize and clear the renderer.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus deinitialize() final;
+            EEngineStatus deinitialize();
 
             /**
              * Try to reinitialize the renderer, e.g. due to a configuration change.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus reinitialize() final;
+            EEngineStatus reinitialize();
 
             /**
              * Pause the renderer, stopping and rejecting all upcoming render requests.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus pause() final;
+            EEngineStatus pause();
 
             /**
              * Resume the renderer.
              *
              * @return EEngineStatus::Ok, if successful. An error code otherwise.
              */
-            EEngineStatus resume() final;
+            EEngineStatus resume();
 
             /**
              * Check, whether the renderer is paused.
@@ -76,24 +79,21 @@ namespace engine
              * @return True, if paused. False otherwise.
              */
              [[nodiscard]]
-            bool isPaused() const final;
-
-            EEngineStatus updateBuffer(GpuApiHandle_t const &aBufferId, ByteBuffer aData) final;
+            bool isPaused() const;
 
             /**
              * Render an entire scene... (format not specified yet..)
              * @return
              */
-            EEngineStatus renderScene(RenderableList const &aRenderableCollection) final;
+            EEngineStatus renderSceneDeferred(SFrameGraphDataSource    &aDataSource
+                                            , SFrameGraphRenderContext &aRenderContext);
 
         private_members:
-            SRendererConfiguration           mConfiguration;
-            Shared<SApplicationEnvironment>  mAppEnvironment;
-            Shared<wsi::CWSIDisplay>         mDisplay;
-            Shared<IFrameGraphRenderContext> mFrameGraphRenderContext;
-            Shared<IRenderContext>           mGpuApiRenderContext;
-            std::atomic<bool>                mPaused;
+            Shared<os::SApplicationEnvironment> mAppEnvironment;
+            Shared<wsi::CWSIDisplay>            mDisplay;
+            std::atomic<bool>                   mPaused;
 
+            Unique<engine::framegraph::CGraph> mDeferredGraph;
         };
 
     }

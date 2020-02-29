@@ -210,7 +210,9 @@ namespace engine
              * @return                     True, if successful. False otherwise.
              */
             virtual CEngineResult<> execute(
+                    SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aContextState,
                     SFrameGraphRenderContext       &aContext) = 0;
 
         private_methods:
@@ -247,7 +249,11 @@ namespace engine
 
         public_typedefs:
             using SetupCallback_t = std::function<CEngineResult<>(CPassBuilder&, TPassData&)>;
-            using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&, CFrameGraphResources const&, SFrameGraphRenderContext&)>;
+            using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&
+                                                                , SFrameGraphDataSource const &
+                                                                , CFrameGraphResources const &
+                                                                , SFrameGraphRenderContextState &
+                                                                , SFrameGraphRenderContext &)>;
 
         public_constructors:
             /**
@@ -281,8 +287,10 @@ namespace engine
              * @return                     True, if successful. False otherwise.
              */
             CEngineResult<> execute(
-                    CFrameGraphResources    const &aFrameGraphResources,
-                    SFrameGraphRenderContext      &aContext);
+                    SFrameGraphDataSource    const &aDataSource,
+                    CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aContextState,
+                    SFrameGraphRenderContext       &aContext);
 
             /**
              * Return the pass data struct associated with this callback pass.
@@ -344,12 +352,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
         CEngineResult<> CallbackPass<TPassData>::execute(
-                CFrameGraphResources                      const &aFrameGraphResources,
-                Shared<IFrameGraphRenderContext>       &aContext)
+                SFrameGraphDataSource    const &aDataSource,
+                CFrameGraphResources     const &aFrameGraphResources,
+                SFrameGraphRenderContextState  &aContextState,
+                SFrameGraphRenderContext       &aContext)
         {
             try
             {
-                CEngineResult<> execution = mExecCallback(mPassData, aFrameGraphResources, aContext);
+                CEngineResult<> execution = mExecCallback(mPassData, aDataSource, aFrameGraphResources, aContextState, aContext);
                 return execution;
             }
             catch(std::runtime_error const &e)

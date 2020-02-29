@@ -106,21 +106,16 @@ namespace engine
              * Implement the execute function
              */
             auto const execute = [=] (
-                    SPassData                                 const&aPassData,
-                    CFrameGraphResources                      const&aFrameGraphResources,
-                    Shared<IFrameGraphRenderContext>      &aContext)
+                    SPassData                const &aPassData,
+                    SFrameGraphDataSource    const &aDataSource,
+                    CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aRenderContextState,
+                    SFrameGraphRenderContext       &aContext)
                     -> CEngineResult<>
             {
                 CLog::Verbose(logTag(), "Lighting");
 
-                auto const &[result, materialPointer] = aFrameGraphResources.get<SFrameGraphMaterial>(aPassData.importData.material.resourceId);
-                if(CheckEngineError(result) || nullptr == materialPointer)
-                {
-                    CLog::Error(logTag(), "Failed to fetch material for id {}", aPassData.importData.material.resourceId);
-                    return  EEngineStatus::Error;
-                }
-
-                aContext->drawFullscreenQuadWithMaterial(*materialPointer);
+                aContext.drawFullscreenQuadWithMaterial(aRenderContextState, aPassData.importData.material);
 
                 return { EEngineStatus::Ok };
             };

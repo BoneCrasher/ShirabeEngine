@@ -305,7 +305,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TEnum>
         void
-        CBitField<TEnum>::set(TEnum const&e)
+        CBitField<TEnum>::set(TEnum const &e)
         {
             mCBitField = (mCBitField | CBitField<TEnum>::getValue(e));
         }
@@ -316,7 +316,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TEnum>
         void
-        CBitField<TEnum>::set(CBitField<TEnum> const&e)
+        CBitField<TEnum>::set(CBitField<TEnum> const &e)
         {
             mCBitField = (mCBitField | e.value());
         }
@@ -389,6 +389,7 @@ namespace engine
         bool CBitField<TEnum>::reset(TEnum const &aValue)
         {
             mCBitField = CBitField<TEnum>::getValue(aValue);
+            return true;
         }
         //<-----------------------------------------------------------------------------
 
@@ -399,6 +400,7 @@ namespace engine
         bool CBitField<TEnum>::reset(CBitField<TEnum> const &aBitfield)
         {
             mCBitField = aBitfield.value();
+            return true;
         }
         //<-----------------------------------------------------------------------------
 

@@ -1230,7 +1230,6 @@ namespace engine::vulkan
 
         bindSwapChain(); // Will derive the currentSwapChainImageIndex;
 
-
         VkCommandBuffer transferCmdBuffer = state.commandBuffers.at(sTransferAspectIndex).at(state.swapChain.currentSwapChainImageIndex);
         VkCommandBuffer graphicsCmdBuffer = state.commandBuffers.at(sGraphicsAspectIndex).at(state.swapChain.currentSwapChainImageIndex);
 

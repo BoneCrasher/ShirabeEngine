@@ -553,6 +553,27 @@ namespace engine
         using AdjacencyListMap_t = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
         /**
+         * The frame graph pipeline struct encapsulates information on specific fixed function
+         * pipeline configurations and references.
+         */
+        struct SFrameGraphShaderModule
+                : SFrameGraphResource
+        {
+        public_members:
+        };
+
+        /**
+         * The frame graph pipeline struct encapsulates information on specific fixed function
+         * pipeline configurations and references.
+         */
+        struct SFrameGraphPipeline
+            : SFrameGraphResource
+        {
+        public_members:
+            SFrameGraphShaderModule shaderModuleResource;
+        };
+
+        /**
          * The frame graph material struct encapsulates information on
          * the material used for rendering.
          */
@@ -560,18 +581,39 @@ namespace engine
             : SFrameGraphResource
         {
         public_members:
-            asset::AssetId_t materialAssetId;
+            std::vector<SFrameGraphBuffer>       uniformBuffers;
+            std::vector<SFrameGraphAssetTexture> textures;
+            SFrameGraphPipeline                  pipeline;
         };
 
         struct SFrameGraphMesh
             : SFrameGraphResource
         {
         public_members:
-            asset::AssetId_t meshAssetId;
+            SFrameGraphBuffer         attributeBuffer;
+            SFrameGraphBuffer         indexBuffer;
+            std::vector<VkDeviceSize> attributeOffsets;
+            VkDeviceSize              indexCount;
+        };
+
+        struct SFrameGraphRenderableResources
+        {
+            SFrameGraphMesh                      meshResource;
+            SFrameGraphMaterial                  materialResource;
+            std::vector<SFrameGraphBuffer>       bufferResources;
+            std::vector<SFrameGraphAssetTexture> textureResources;
+        };
+
+        struct SFrameGraphRenderableFetchFilter
+        {};
+
+        struct SFrameGraphDataSource
+        {
+            std::function<std::vector<SFrameGraphRenderableResources>(SFrameGraphRenderableFetchFilter)> fetchRenderables;
         };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES  \
-            SFrameGraphDynamicTexture,                              \
+            SFrameGraphDynamicTexture,                       \
             SFrameGraphTextureView,                          \
             SFrameGraphBuffer,                               \
             SFrameGraphBufferView,                           \
@@ -694,9 +736,9 @@ namespace engine
                 return { EEngineStatus::Ok, ptr };
             }
 
-            SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                   }
-            SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachements()        const { return mAttachements;                                                }
-            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphDynamicTexture>::get();            }
+            SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                    }
+            SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachements()        const { return mAttachements;                                                 }
+            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphDynamicTexture>::get();     }
             SHIRABE_INLINE RefIndex_t                      const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get();        }
             SHIRABE_INLINE RefIndex_t                      const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get();             }
             SHIRABE_INLINE RefIndex_t                      const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get();         }
