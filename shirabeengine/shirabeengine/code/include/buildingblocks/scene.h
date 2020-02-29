@@ -11,6 +11,26 @@ namespace engine
 {
     using namespace engine::datastructures;
 
+    namespace asset
+    {
+        class CAssetStorage;
+    }
+
+    namespace mesh
+    {
+        class CMeshLoader;
+    }
+
+    namespace material
+    {
+        class CMaterialLoader;
+    }
+
+    namespace textures
+    {
+        class CTextureLoader;
+    }
+
     /**
      * The CScene class wraps all necessary information for a fully functional
      * game scene.
@@ -38,7 +58,14 @@ namespace engine
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        CEngineResult<> initialize();
+        CEngineResult<> initialize(Shared<asset::CAssetStorage>      aAssetStorage
+                                 , Shared<mesh::CMeshLoader>         aMeshLoader
+                                 , Shared<material::CMaterialLoader> aMaterialLoader
+                                 , Shared<textures::CTextureLoader>  aTextureLoader);
+
+        CEngineResult<> initializeResources();
+
+        CEngineResult<> deinitializeResources();
 
         /**
          * Shutdown and deiniitalize the scene instance.

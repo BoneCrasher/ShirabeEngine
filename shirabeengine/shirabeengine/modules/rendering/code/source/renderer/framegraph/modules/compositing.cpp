@@ -47,7 +47,8 @@ namespace engine
                     SPassData    &aOutPassData)
                     -> CEngineResult<>
             {
-                auto gbufferTextureFetch = aGraphBuilder.getResources().get<SFrameGraphDynamicTexture>(aGbuffer0.subjacentResource);
+                auto gbufferTextureFetch = aGraphBuilder.getResources()
+                                                        .getResource<SFrameGraphDynamicTexture>(aGbuffer0.subjacentResource);
                 if(not gbufferTextureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch gbuffer texure.");

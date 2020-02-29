@@ -112,7 +112,7 @@ namespace engine
         }
 
         /**
-         * @brief get
+         * @brief getResource
          * @return
          */
         T const &get()
@@ -121,7 +121,7 @@ namespace engine
         }
 
         /**
-         * @brief get
+         * @brief getResource
          * @return
          */
         T const &get() const

@@ -179,7 +179,9 @@ namespace engine
 
 
                 // Important: The whole copyToBackBuffer-stuff may not be called from within a render pass.
-                CEngineResult<Shared<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(aPassData.importData.finalOutputId.resourceId);
+                CEngineResult<Shared<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(aPassData.importData
+                                                                                                                                                  .finalOutputId
+                                                                                                                                                  .resourceId);
                 if(not viewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch source image texture view resource.");
@@ -187,7 +189,7 @@ namespace engine
 
                 SFrameGraphTextureView const &view = *viewFetch.data();
 
-                CEngineResult<Shared<SFrameGraphDynamicTexture>> const textureFetch = aFrameGraphResources.get<SFrameGraphDynamicTexture>(view.subjacentResource);
+                CEngineResult<Shared<SFrameGraphDynamicTexture>> const textureFetch = aFrameGraphResources.getResource<SFrameGraphDynamicTexture>(view.subjacentResource);
                 if(not textureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch source image texture resource.");

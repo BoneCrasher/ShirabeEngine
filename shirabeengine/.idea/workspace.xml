@@ -56,14 +56,25 @@
     <list default="true" id="5d6f3558-3d84-40e2-a418-ceb18ce7a105" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/CONTRIBUTING.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/CONTRIBUTING.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/components.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/components.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/grid.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/grid.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/page-layout-test-navbar-subsite.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/page-layout-test-navbar-subsite.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/page-layout.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/page-layout.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/css/themes.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/css/themes.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/corrade.tag" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/corrade.tag" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/doxygen.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/doxygen.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/python.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/documentation/python.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/plugins.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/plugins.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/htmlsanity.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/htmlsanity.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/links.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/links.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/metadata.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/metadata.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/plots-and-graphs.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/plugins/plots-and-graphs.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/doc/themes/pelican.rst" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/doc/themes/pelican.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/doxygen.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/doxygen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/python.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/python.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/templates/python/entry-property.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/templates/python/entry-property.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_base_derived_in_root_namespace/structNamespace_1_1BothBaseAndDerivedInRootNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_base_derived_in_root_namespace/structNamespace_1_1BothBaseAndDerivedInRootNamespace.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_crazy_template_params/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_crazy_template_params/File_8h.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/DeprecatedFile_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_deprecated/DeprecatedFile_8h.html" afterDir="false" />
@@ -123,6 +134,7 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/File_8h.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/namespaceNamespace.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope/namespaceNamespace.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope_define_base_url/File_8h.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_namespace_members_in_file_scope_define_base_url/File_8h.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_warnings/Doxyfile" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_warnings/Doxyfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_warnings/namespaceMagnum.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/compound_warnings/namespaceMagnum.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_html_no_prefix_bug/some-long-page-name.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_html_no_prefix_bug/some-long-page-name.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_in_both_group_and_namespace/group__fizzbuzz.html" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/documentation/test_doxygen/contents_anchor_in_both_group_and_namespace/group__fizzbuzz.html" afterDir="false" />
@@ -268,48 +280,36 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/bitfield.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/bitfield.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doxygen/shirabeengine.doxyconf.template" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/shirabeengine.doxyconf.template" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabe_resource_compiler/code/source/applicationmain.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/scene.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/core/engine.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/core/engine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/core/engine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/enginestatus.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/enginestatus.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/ioc/iocproperty.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/ioc/iocproperty.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/source/benchmarking/timer/windowstime.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/source/benchmarking/timer/windowstime.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/gbuffergeneration.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/gbuffergeneration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/module.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/modules/module.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/pass.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/pass.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irendercontext.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/irenderer.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/renderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/renderer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gfxapicommon.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gfxapicommon.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobject.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/agpuapiresourceobjectfactory.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cgpuapiresourcestorage.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourceobject.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourceobject.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/igpuapiresourceobject.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/iloadablegpuapiresourceobject.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/ilogicalresourceobject.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/itransferrablegpuapiresourceobject.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/eresourcetype.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/iresource.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/iresourceproxy.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/requestdefaultimplementation.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/resourcebackendproxy.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/resourcedomaintransfer.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/resourcemanagerbase.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/resourcepool.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/resourceproxyfactory.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/old/resourcetraits.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/cgpuapiresourcestorage.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/source/old/resourcemanagerbase.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/vulkanenvironment.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/vulkanenvironment.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/shirabe_process_resources.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tools/shirabe_process_resources.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -344,7 +344,7 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="OCResolveContextSettings">
-    <option name="configuration" value="0-Debug-shirabeengine" />
+    <option name="configuration" value="0-Debug-rendering" />
   </component>
   <component name="ProjectId" id="1MxwnQZh6ezParMSrxJQc4EvUso" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -358,7 +358,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.advertisement.text.has.clang-format" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -369,17 +369,17 @@
     <property name="settings.editor.selected.configurable" value="language.cpp.clang-tidy" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types" />
-      <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include" />
-      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source" />
-      <recent name="$PROJECT_DIR$/shirabeengine/modules" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source/common" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/source" />
       <recent name="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph" />
+      <recent name="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types" />
+      <recent name="$PROJECT_DIR$/build_extension/thirdparty" />
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/include" />
+      <recent name="$PROJECT_DIR$/shirabe_resource_compiler/code/source" />
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.INSTALL_game">
@@ -773,7 +773,7 @@
       <workItem from="1582700071120" duration="1891000" />
       <workItem from="1582725406644" duration="599000" />
       <workItem from="1582899610510" duration="18461000" />
-      <workItem from="1582963598296" duration="348000" />
+      <workItem from="1582963598296" duration="11089000" />
     </task>
     <servers />
   </component>
@@ -887,24 +887,30 @@
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="752" y="442" width="414" height="163" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1044@0.0.1920.1044" timestamp="1582354167702" />
-    <state x="637" y="255" width="731" height="538" key="find.popup" timestamp="1582315071679">
+    <state x="554" y="193" width="1595" height="891" key="dock-window-1" timestamp="1583006520912">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
-    <state x="366" y="255" width="1442" height="539" key="find.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1577472365162" />
+    <state x="554" y="193" width="1595" height="891" key="dock-window-1/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1583006520912" />
+    <state x="366" y="255" width="1442" height="546" key="find.popup" timestamp="1582995766045">
+      <screen x="0" y="0" width="1920" height="1044" />
+    </state>
+    <state x="366" y="255" width="1442" height="546" key="find.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1582995766045" />
     <state x="637" y="255" width="731" height="538" key="find.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1582315071679" />
     <state x="854" y="256" width="1706" height="542" key="find.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1577264783274" />
     <state x="1025" y="167" key="refactoring.ChangeSignatureDialog" timestamp="1577266956252">
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state x="1025" y="167" key="refactoring.ChangeSignatureDialog/0.0.4480.1050@0.0.4480.1050" timestamp="1577266956252" />
-    <state x="944" y="240" width="672" height="677" key="run.anything.popup" timestamp="1582961755765">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state x="405" y="239" width="288" height="674" key="run.anything.popup" timestamp="1583006257099">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
+    <state x="405" y="239" width="288" height="674" key="run.anything.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1583006257099" />
     <state x="405" y="239" width="672" height="674" key="run.anything.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1582357881885" />
     <state x="944" y="240" width="672" height="677" key="run.anything.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1582961755765" />
-    <state x="1454" y="231" width="1568" height="682" key="search.everywhere.popup" timestamp="1582961753579">
-      <screen x="0" y="0" width="4480" height="1050" />
+    <state x="623" y="230" width="672" height="679" key="search.everywhere.popup" timestamp="1582966997095">
+      <screen x="0" y="0" width="1920" height="1044" />
     </state>
+    <state x="623" y="230" width="672" height="679" key="search.everywhere.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1582966997095" />
     <state x="623" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1582310163968" />
     <state x="1454" y="231" width="1568" height="682" key="search.everywhere.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1582961753579" />
   </component>

@@ -1,10 +1,10 @@
 #include <filesystem>
+#include <array>
 
 #include <asset/assetindex.h>
 #include <asset/filesystemassetdatasource.h>
 #include <core/enginestatus.h>
 #include <renderer/renderer.h>
-#include <renderer/framegraph/framegraphrendercontext.h>
 #include <graphicsapi/definitions.h>
 #include <material/loader.h>
 #include <material/assetloader.h>
@@ -12,19 +12,14 @@
 #include <mesh/assetloader.h>
 #include <textures/loader.h>
 #include <textures/assetloader.h>
-#include <resources/agpuapiresourceobjectfactory.h>
 #include <util/crc32.h>
+#include <renderer/rendererconfiguration.h>
+#include <renderer/framegraph/framegraphrendercontext.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>
 #include <vulkan_integration/vulkandevicecapabilities.h>
-#include <vulkan_integration/resources/cvulkanprivateresourceobjectfactory.h>
 
 #include <wsi/display.h>
 
-#include "ecws/meshcomponent.h"
-#include "ecws/materialcomponent.h"
-#include "ecws/transformcomponent.h"
-#include "ecws/cameracomponent.h"
-#include <array>
 
 #if defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11display.h>
@@ -38,6 +33,7 @@
 #include <material/assetloader.h>
 #include "core/engine.h"
 #include "../../../modules/textures/code/include/textures/loader.h"
+#include "../../../../_deploy/linux64/debug/include/renderer/framegraph/framegraphrendercontext.h"
 
 namespace engine
 {
@@ -200,7 +196,7 @@ namespace engine
             return { EEngineStatus::Ok };
         };
 
-        SRendererConfiguration rendererConfiguration = {};
+        rendering::SRendererConfiguration rendererConfiguration = {};
         rendererConfiguration.enableVSync             = false;
         rendererConfiguration.frustum                 = CVector4D<float>({ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f });
         rendererConfiguration.preferredBackBufferSize = CVector2D<uint32_t>({ windowWidth, windowHeight });
@@ -258,7 +254,6 @@ namespace engine
             // The resourceBackend-swithc for the desired platform will be here (if(dx11) ... elseif(vulkan1) ... ).
             //
 
-
             std::filesystem::path const root          = std::filesystem::current_path();
             std::filesystem::path const resourcesPath = root/"data/output/resources";
 
@@ -273,8 +268,6 @@ namespace engine
             mMaterialLoader = makeShared<material::CMaterialLoader>();
             mTextureLoader  = makeShared<textures::CTextureLoader>();
 
-            Unique<CGpuApiResourceObjectFactory> gpuApiResourceFactory = nullptr;
-
             // The graphics API resource backend is static and does not have to be replaced.
             // On switching the graphics API the task backend (also containing the effective API handles),
             // will be reset and replaced!
@@ -283,21 +276,9 @@ namespace engine
             // The reset of the taskbackend should thus occur through the resource backend.
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                gpuApiResourceFactory = makeUnique<CVulkanResourceObjectFactory>(gpuApiResourceStorage);
-
-                CEngineResult<> initializationResult = ((CVulkanResourceObjectFactory *)gpuApiResourceFactory.get())->initialize(mVulkanEnvironment);
-                if(CheckEngineError(initializationResult.result()))
-                {
-                    CLog::Error(logTag(), "Failed to initialize vulkan resource factory.");
-                    return { EEngineStatus::Error };
-                }
             }
 
-            Shared<CResourceManager> manager = makeShared<CResourceManager>(std::move(gpuApiResourceFactory), mAssetStorage);
-            // manager->addAssetLoader<SMesh>(...);
-            manager->addAssetLoader<SMaterial>(material::getAssetLoader(manager, mAssetStorage, mMaterialLoader));
-            manager->addAssetLoader<SMesh>    (mesh    ::getAssetLoader(manager, mAssetStorage, mMeshLoader));
-            manager->addAssetLoader<STexture> (textures::getAssetLoader(manager, mAssetStorage, mTextureLoader));
+            Shared<CResourceManager> manager = makeShared<CResourceManager>();
             mResourceManager = manager;
 
             return { EEngineStatus::Ok };
@@ -305,23 +286,20 @@ namespace engine
 
         auto const fnCreatePlatformRenderer = [&, this] () -> CEngineResult<>
         {
-            using engine::framegraph::IFrameGraphRenderContext;
-            using engine::framegraph::CFrameGraphRenderContext;
+            using engine::framegraph::SFrameGraphRenderContext;
 
             // How to decouple?
-            Shared<IRenderContext> gfxApiRenderContext = nullptr;
+            SFrameGraphRenderContext frameGraphRenderContext {};
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                Shared<CVulkanRenderContext> vulkanRenderContext = makeShared<CVulkanRenderContext>();
-                vulkanRenderContext->initialize(mVulkanEnvironment, gpuApiResourceStorage);
-
-                gfxApiRenderContext = vulkanRenderContext;
+                frameGraphRenderContext = vulkan::CreateRenderContextForVulkan(mVulkanEnvironment, mResourceManager, mAssetStorage);
             }
 
-            CEngineResult<Shared<IFrameGraphRenderContext>> frameGraphRenderContext = CFrameGraphRenderContext::create(mAssetStorage, mResourceManager, gfxApiRenderContext);
+            mRenderContext = makeShared(SFrameGraphRenderContext(frameGraphRenderContext));
 
             mRenderer = makeShared<CRenderer>();
-            status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration, frameGraphRenderContext.data(), gfxApiRenderContext);
+            status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration);
+            status    = mRenderer->createDeferredPipeline();
 
             return { status };
         };
@@ -341,82 +319,6 @@ namespace engine
             // Setup scene
             CEngineResult<> initialization = mScene.initialize();
             status = initialization.result();
-
-            auto const &[coreMaterialLoadResult, core] = mMaterialLoader->loadMaterialInstance(mAssetStorage
-                                                                                               , util::crc32FromString("materials/core/core.material.meta")
-                                                                                               , true
-                                                                                               , true);
-
-            auto const &[phongMaterialLoadResult, phong] = mMaterialLoader->loadMaterialInstance(mAssetStorage
-                                                                                               , util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta")
-                                                                                               , true);
-            auto const &[compositingMaterialLoadResult, compositing] = mMaterialLoader->loadMaterialInstance(mAssetStorage
-                                                                                                 , util::crc32FromString("materials/deferred/compositing/compositing.material.meta")
-                                                                                                 , true);
-
-            auto const &[materialLoadResult, material] = mMaterialLoader->loadMaterialInstance(mAssetStorage
-                                                                                               , util::crc32FromString("materials/standard/standard.material.meta")
-                                                                                               , true);
-
-            auto const &[meshLoadResult,     mesh]     = mMeshLoader->loadMeshInstance(mAssetStorage
-                                                                                       , util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
-
-            auto const &[textureResult,     texture]     = mTextureLoader->loadInstance(mAssetStorage
-                                                                                       , util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
-            auto const &[texture2Result,     texture2]     = mTextureLoader->loadInstance(mAssetStorage
-                                                                                        , util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
-
-            material->getMutableConfiguration().setSampledImage("diffuseTexture", util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
-            material->getMutableConfiguration().setSampledImage("normalTexture", util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
-
-
-            auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");
-            auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");
-            coreMaterialComponent->setMaterialInstance(core);
-
-            auto coreEntity = makeUnique<ecws::CEntity>("core");
-            coreEntity->addComponent(coreTransform);
-            coreEntity->addComponent(coreMaterialComponent);
-
-            auto transformComponent = makeShared<ecws::CTransformComponent>("barramundi_transform");
-            auto meshComponent      = makeShared<ecws::CMeshComponent>("barramundi_mesh");
-            auto materialComponent  = makeShared<ecws::CMaterialComponent>("barramundi_material");
-            meshComponent    ->setMeshInstance(mesh);
-            materialComponent->setMaterialInstance(material);
-
-            auto barramundi = makeUnique<ecws::CEntity>("barramundi");
-            barramundi->addComponent(materialComponent);
-            barramundi->addComponent(meshComponent);
-            barramundi->addComponent(transformComponent);
-
-
-            CCamera::SFrustumParameters frustum {};
-            frustum.width             = 1920;
-            frustum.height            = 1080;
-            frustum.nearPlaneDistance = 0.1f;
-            frustum.farPlaneDistance  = 10.0f;
-            frustum.fovY              = static_cast<float>(M_PI) / 4.0f; // 45 degrees
-
-            CCamera::SProjectionParameters projection {};
-            projection.projectionType = ECameraProjectionType::Perspective;
-
-            Shared<CCamera> camera = makeShared<CCamera>(ECameraViewType::FreeCamera
-                                        , frustum
-                                        , projection);
-
-            auto cameraTransform = makeShared<ecws::CTransformComponent>("primaryCamera_transform");
-            auto cameraComponent = makeShared<ecws::CCameraComponent>("primaryCamera_camera");
-            cameraTransform->getMutableTransform().translate(CVector3D<float>({0.0, 0.1, -1.0}));
-            cameraComponent->setCamera(camera);
-
-            auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
-            cameraEntity->addComponent(cameraTransform);
-            cameraEntity->addComponent(cameraComponent);
-
-            mScene.addEntity(std::move(coreEntity));
-            mScene.addEntity(std::move(barramundi), "core");
-            mScene.addEntity(std::move(cameraEntity), "barramundi");
-
         }
         catch(std::exception &stde)
         {

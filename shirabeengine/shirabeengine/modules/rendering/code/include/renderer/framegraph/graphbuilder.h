@@ -55,8 +55,8 @@ namespace engine
              * @return                        True, if successful. False otherwise.
              */
             CEngineResult<> initialize(
-                    Shared<SApplicationEnvironment> const &aApplicationEnvironment,
-                    Shared<wsi::CWSIDisplay>        const &aDisplay);
+                    Shared<os::SApplicationEnvironment> const &aApplicationEnvironment,
+                    Shared<wsi::CWSIDisplay>            const &aDisplay);
 
             /**
              * Clear all state and shutdown...
@@ -106,7 +106,7 @@ namespace engine
              *
              * @return A pionter to the registered application environment.
              */
-            Shared<SApplicationEnvironment> &applicationEnvironment();
+            Shared<os::SApplicationEnvironment> &applicationEnvironment();
 
             /**
              * Return the display pointer attached to this graph builder.
@@ -317,7 +317,7 @@ EST_EXPORT CGraphBuilder
             bool                                          mRenderToBackBuffer;
             FrameGraphResourceId_t                        mOutputResourceId;
 
-            Shared<SApplicationEnvironment>               mApplicationEnvironment;
+            Shared<os::SApplicationEnvironment>           mApplicationEnvironment;
             Shared<wsi::CWSIDisplay>                      mDisplay;
 
             Shared<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;

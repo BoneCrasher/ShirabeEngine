@@ -492,7 +492,7 @@ namespace engine::vulkan
         VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice.handle, vkSurface, &vkSurfaceCapabilities);
         if(VkResult::VK_SUCCESS != result)
         {
-            throw CVulkanError("Failed to get surface capabilities for physical device and surface.", result);
+            throw CVulkanError("Failed to getResource surface capabilities for physical device and surface.", result);
         }
 
         //

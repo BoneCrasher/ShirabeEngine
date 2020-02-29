@@ -181,8 +181,25 @@ namespace engine
             }
 #endif
 
-            CEngineResult<> initializeGraphResources();
-            CEngineResult<> deinitializeGraphResources();
+            /**
+             *
+             * @param aRenderContextState
+             * @param aRenderContext
+             * @param aPassExecutionOrder
+             * @return
+             */
+            CEngineResult<> initializeGraphResources(SFrameGraphRenderContextState &aRenderContextState
+                                                   , SFrameGraphRenderContext      &aRenderContext
+                                                   , std::vector<PassUID_t>        &aPassExecutionOrder);
+
+            /**
+             *
+             * @param aRenderContextState
+             * @param aRenderContext
+             * @return
+             */
+            CEngineResult<> deinitializeGraphResources(SFrameGraphRenderContextState &aRenderContextState
+                                                     , SFrameGraphRenderContext      &aRenderContext);
 
             /**
              * Execute the framegraph, causing it create the respective command buffers.

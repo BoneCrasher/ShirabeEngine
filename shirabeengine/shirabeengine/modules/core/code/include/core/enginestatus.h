@@ -298,13 +298,13 @@ namespace std
     // template <std::size_t N, typename TResult, typename TData>
     // struct tuple_element<N, engine::AResult<TResult, TData>>
     // {
-    //     using type = decltype(std::declval<engine::AResult<TResult, TData>>().get<N>());
+    //     using type = decltype(std::declval<engine::AResult<TResult, TData>>().getResource<N>());
     // };
     //
     // template <std::size_t N, typename TResult>
     // struct tuple_element<N, engine::AResult<TResult, void>>
     // {
-    //     using type = decltype(std::declval<engine::AResult<TResult, void>>().get<N>());
+    //     using type = decltype(std::declval<engine::AResult<TResult, void>>().getResource<N>());
     // };
 }
 

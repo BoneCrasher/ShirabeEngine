@@ -12,6 +12,10 @@ set(
         SHIRABEMODULETEXTURES
         SHIRABEMODULEWSI)
 
+set(SHIRABE_EXCLUDED_HEADERS)
+set(SHIRABE_EXCLUDED_SOURCES
+        renderer/framegraph/framegraphrendercontext.cpp)
+
 include(project_setup)
 
 add_dependencies(rendering INSTALL_asset)

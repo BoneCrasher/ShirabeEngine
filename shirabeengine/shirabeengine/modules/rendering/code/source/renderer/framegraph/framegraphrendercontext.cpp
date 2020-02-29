@@ -7,7 +7,6 @@
 #include <resources/cresourcemanager.h>
 #include <resources/resourcetypes.h>
 
-#include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
 
 namespace engine::framegraph
@@ -21,7 +20,7 @@ namespace engine::framegraph
     //<
     //<-----------------------------------------------------------------------------
     CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial
-                                                           , std::string       const &aRenderPassHandle)
+                                                         , std::string       const &aRenderPassHandle)
     {
         Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
 

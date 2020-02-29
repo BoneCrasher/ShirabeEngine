@@ -77,7 +77,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        Shared<SApplicationEnvironment> &CGraphBuilder::applicationEnvironment()
+        Shared<os::SApplicationEnvironment> &CGraphBuilder::applicationEnvironment()
         {
             return mApplicationEnvironment;
         }
@@ -96,8 +96,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraphBuilder::initialize(
-                Shared<SApplicationEnvironment> const &aApplicationEnvironment,
-                Shared<wsi::CWSIDisplay>        const &aDisplay)
+                Shared<os::SApplicationEnvironment> const &aApplicationEnvironment,
+                Shared<wsi::CWSIDisplay>            const &aDisplay)
         {
             bool const inputInvalid =
                     nullptr == aApplicationEnvironment or
@@ -119,9 +119,11 @@ namespace engine
             };
 
             auto const pseudoExec  = [] (
-                    bool                                      const &,
-                    CFrameGraphResources                      const &,
-                    Shared<IFrameGraphRenderContext>       &) -> CEngineResult<>
+                    bool                     const &aPassData,
+                    SFrameGraphDataSource    const &aDataSource,
+                    CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aRenderContextState,
+                    SFrameGraphRenderContext       &aRenderContext) -> CEngineResult<>
             {
                 return { EEngineStatus::Ok };
             };
@@ -375,7 +377,7 @@ namespace engine
 
             for(FrameGraphResourceId_t const &resourceId : resources)
             {
-                CEngineResult<Shared<SFrameGraphResource>> resourceFetch = mResourceData.getMutable<SFrameGraphResource>(resourceId);
+                CEngineResult<Shared<SFrameGraphResource>> resourceFetch = mResourceData.getResourceMutable<SFrameGraphResource>(resourceId);
                 if(not resourceFetch.successful())
                 {
                     CLog::Error(logTag(), "Could not fetch pass data.");
@@ -407,7 +409,7 @@ namespace engine
                     // Avoid internal references for passes!
                     // If the edge from pass k to pass k+1 was not added yet.
                     // Create edge: Parent-->Source
-                    CEngineResult<Shared<SFrameGraphResource> const> parentResourceFetch = mResourceData.get<SFrameGraphResource>(resource.parentResource);
+                    CEngineResult<Shared<SFrameGraphResource>> parentResourceFetch = mResourceData.getResource<SFrameGraphResource>(resource.parentResource);
                     if(not parentResourceFetch.successful())
                     {
                         CLog::Error(logTag(), "Could not fetch pass data.");
@@ -445,8 +447,8 @@ namespace engine
 
                     if(EFrameGraphResourceType::TextureView == resource.type)
                     {
-                        CEngineResult<Shared<SFrameGraphDynamicTexture>> textureFetch     = mResourceData.getMutable<SFrameGraphDynamicTexture>(resource.subjacentResource);
-                        CEngineResult<Shared<SFrameGraphTextureView>>    textureViewFetch = mResourceData.getMutable<SFrameGraphTextureView>(resource.resourceId);
+                        CEngineResult<Shared<SFrameGraphDynamicTexture>> textureFetch     = mResourceData.getResourceMutable<SFrameGraphDynamicTexture>(resource.subjacentResource);
+                        CEngineResult<Shared<SFrameGraphTextureView>>    textureViewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(resource.resourceId);
 
                         if(not (textureFetch.successful() and textureViewFetch.successful()))
                         {
@@ -508,10 +510,10 @@ namespace engine
 
             for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())
             {
-                CEngineResult<Shared<SFrameGraphTextureView> const> textureViewFetch = mResourceData.get<SFrameGraphTextureView>(textureViewRef);
+                CEngineResult<Shared<SFrameGraphTextureView>> textureViewFetch = mResourceData.getResource<SFrameGraphTextureView>(textureViewRef);
                 if(not textureViewFetch.successful())
                 {
-                    CLog::Error(logTag(), "Failed to get texture view to validate.");
+                    CLog::Error(logTag(), "Failed to getResource texture view to validate.");
                     return { textureViewFetch.result() };
                 }
 
@@ -522,10 +524,10 @@ namespace engine
 
                 FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
 
-                CEngineResult<Shared<SFrameGraphDynamicTexture> const> subjacentFetch = mResourceData.get<SFrameGraphDynamicTexture>(subjacentResourceId);
+                CEngineResult<Shared<SFrameGraphDynamicTexture>> subjacentFetch = mResourceData.getResource<SFrameGraphDynamicTexture>(subjacentResourceId);
                 if(not textureViewFetch.successful())
                 {
-                    CLog::Error(logTag(), "Failed to get subjacent texture to validate.");
+                    CLog::Error(logTag(), "Failed to getResource subjacent texture to validate.");
                     return { textureViewFetch.result() };
                 }
 

@@ -37,13 +37,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         EEngineStatus CRenderer::initialize(
                 Shared<os::SApplicationEnvironment> const &aApplicationEnvironment,
-                Shared<wsi::CWSIDisplay>            const &aDisplay)
+                Shared<wsi::CWSIDisplay>            const &aDisplay,
+                SRendererConfiguration              const &aConfig)
         {
             assert(nullptr != aApplicationEnvironment);
             assert(nullptr != aDisplay);
 
-            mAppEnvironment          = aApplicationEnvironment;
-            mDisplay                 = aDisplay;
+            mAppEnvironment = aApplicationEnvironment;
+            mDisplay        = aDisplay;
+            mConfiguration  = aConfig;
 
             return EEngineStatus::Ok;
         }
@@ -146,6 +148,7 @@ namespace engine
             }
 
             mDeferredGraph = std::move(compilation.data());
+            mDeferredGraph->initializeGraphResources();
 
             #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             static bool serializedOnce = false;

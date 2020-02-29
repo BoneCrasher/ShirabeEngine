@@ -21,7 +21,7 @@ namespace engine {
 	};
 
 	EEngineStatus WindowsTime::getConversionConstant(internal_time_value_type& buffer) const {
-		EEngineStatus res = queryPerformanceFrequency(buffer); // get current timestamp
+		EEngineStatus res = queryPerformanceFrequency(buffer); // getResource current timestamp
 
 		return res;
 	};

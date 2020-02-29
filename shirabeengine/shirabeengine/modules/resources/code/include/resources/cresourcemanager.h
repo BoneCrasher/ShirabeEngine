@@ -43,6 +43,8 @@ namespace engine::resources
         , Error        = 2048
     };
 
+    using ResourceId_t = std::string;
+
     /**
      * The SResourceState struct groups a logical resource, an optional gpu api
      * resource and it's current load state.

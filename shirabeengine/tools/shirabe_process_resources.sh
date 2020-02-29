@@ -21,7 +21,7 @@ function read_arguments
     SHRT_OPTIONS=r:
     LONG_OPTIONS=resources_root:
 
-    # -use ! and PIPESTATUS to get exit code with errexit set
+    # -use ! and PIPESTATUS to getResource exit code with errexit set
     # -temporarily store output to be able to check for errors
     # -activate quoting/enhanced mode (e.g. by writing out “--options”)
     # -pass arguments only via   -- "$@"   to separate them correctly

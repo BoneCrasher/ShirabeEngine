@@ -86,25 +86,26 @@ namespace engine
         Shared<os::SApplicationEnvironment> mApplicationEnvironment;
 
         // Timing
-        CTimer                       mTimer;
+        CTimer                           mTimer;
 
         // WSI
-        Shared<CWindowManager>        mWindowManager;
-        Shared<IWindow>               mMainWindow;
+        Shared<CWindowManager>           mWindowManager;
+        Shared<IWindow>                  mMainWindow;
 
         // Assets & Resources
-        Shared<CAssetStorage>         mAssetStorage;
-        Shared<CResourceManager>      mResourceManager;
-        Shared<CMaterialLoader>       mMaterialLoader;
-        Shared<CMeshLoader>           mMeshLoader;
-        Shared<CTextureLoader>        mTextureLoader;
+        Shared<CAssetStorage>            mAssetStorage;
+        Shared<CResourceManager>         mResourceManager;
+        Shared<CMaterialLoader>          mMaterialLoader;
+        Shared<CMeshLoader>              mMeshLoader;
+        Shared<CTextureLoader>           mTextureLoader;
 
         // Rendering
-        Shared<CVulkanEnvironment>    mVulkanEnvironment;
-        Shared<IRenderer>             mRenderer;
+        Shared<CVulkanEnvironment>       mVulkanEnvironment;
+        Shared<SFrameGraphRenderContext> mRenderContext;
+        Shared<CRenderer>                mRenderer;
 
         // Internals
-        CScene                        mScene;
+        CScene                           mScene;
     };
 }
 

@@ -10,7 +10,6 @@
 #include <core/passkey.h>
 #include <os/applicationenvironment.h>
 
-#include "renderer/irenderer.h"
 #include "renderer/framegraph/framegraphdata.h"
 #include "renderer/framegraph/framegraphrendercontext.h"
 #include "renderer/framegraph/framegraphserialization.h"

@@ -81,9 +81,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         framegraph::SFrameGraphRenderContext CreateRenderContextForVulkan(Shared<CVulkanEnvironment>        aVulkanEnvironment
                                                                         , Shared<VulkanResourceManager_t>   aResourceManager
-                                                                        , Shared<asset::CAssetStorage>      aAssetStorage
-                                                                        , Shared<mesh::CMeshLoader>         aMeshLoader
-                                                                        , Shared<material::CMaterialLoader> aMaterialLoader)
+                                                                        , Shared<asset::CAssetStorage>      aAssetStorage)
         {
             using namespace local;
             using namespace resources;
@@ -555,7 +553,7 @@ namespace engine
                     {
                         FrameGraphResourceId_t const &resourceId = viewResourceIdList.at(index);
 
-                        CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                        CEngineResult<Shared<SFrameGraphTextureView>> const textureViewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(resourceId);
                         if(not textureViewFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
@@ -564,7 +562,7 @@ namespace engine
 
                         SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
 
-                        CEngineResult<Shared<SFrameGraphTextureView> const> const &parentTextureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(textureView.parentResource);
+                        CEngineResult<Shared<SFrameGraphTextureView>> const parentTextureViewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(textureView.parentResource);
                         if(not parentTextureViewFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching parent texture view  w/ id {} failed.", textureView.parentResource));
@@ -572,9 +570,9 @@ namespace engine
                         }
 
                         // If the parent texture view is null, the parent is a texture object.
-                        Shared<SFrameGraphTextureView> const &parentTextureView = (parentTextureViewFetch.data());
+                        SFrameGraphTextureView const &parentTextureView = *(parentTextureViewFetch.data());
 
-                        CEngineResult<Shared<SFrameGraphDynamicTexture> const> const &textureFetch = aFrameGraphResources.get<SFrameGraphDynamicTexture>(textureView.subjacentResource);
+                        CEngineResult<Shared<SFrameGraphDynamicTexture>> const textureFetch = aFrameGraphResources.getResource<SFrameGraphDynamicTexture>(textureView.subjacentResource);
                         if(not textureFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
@@ -804,7 +802,7 @@ namespace engine
                     {
                         FrameGraphResourceId_t const &resourceId = attachmentResourceIds.at(index);
 
-                        CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.get<SFrameGraphTextureView>(resourceId);
+                        CEngineResult<Shared<SFrameGraphTextureView> const> const &textureViewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(resourceId);
                         if(not textureViewFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
@@ -1585,9 +1583,66 @@ namespace engine
                 }
                 meshDescription.offsets = offsets;
 
-                CEngineResult<OptRef_t<MeshResourceState_t>>   meshResult            = aResourceManager->useDynamicResource<MeshResourceState_t>  (meshDescription.name,        meshDescription       );
-                CEngineResult<OptRef_t<BufferResourceState_t>> attributeBufferResult = aResourceManager->useDynamicResource<BufferResourceState_t>(dataBufferDescription.name,  dataBufferDescription );
-                CEngineResult<OptRef_t<BufferResourceState_t>> indexBufferResult     = aResourceManager->useDynamicResource<BufferResourceState_t>(indexBufferDescription.name, indexBufferDescription);
+                CEngineResult<OptionalRef_t<MeshResourceState_t>>   meshResult            = aResourceManager->useDynamicResource<MeshResourceState_t>  (meshDescription.name,        meshDescription       );
+                CEngineResult<OptionalRef_t<BufferResourceState_t>> attributeBufferResult = aResourceManager->useDynamicResource<BufferResourceState_t>(dataBufferDescription.name,  dataBufferDescription );
+                CEngineResult<OptionalRef_t<BufferResourceState_t>> indexBufferResult     = aResourceManager->useDynamicResource<BufferResourceState_t>(indexBufferDescription.name, indexBufferDescription);
+
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.bindVertexBuffer = [=] (SFrameGraphRenderContextState   &aState
+                                          , SFrameGraphBuffer         const &aBuffer
+                                          , std::vector<VkDeviceSize> const &aOffsets) -> EEngineStatus
+            {
+                VkCommandBuffer vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+                OptRef_t<BufferResourceState_t> dataBufferOpt {};
+                {
+                    auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, aBuffer.readableName);
+                    if(not success)
+                    {
+                        return EEngineStatus::Error;
+                    }
+                    dataBufferOpt = resource;
+                }
+                BufferResourceState_t & dataBuffer = *dataBufferOpt;
+
+                std::vector<VkBuffer> buffers = { dataBuffer.gpuApiHandles.handle
+                                                , dataBuffer.gpuApiHandles.handle
+                                                , dataBuffer.gpuApiHandles.handle
+                                                , dataBuffer.gpuApiHandles.handle };
+
+                vkCmdBindVertexBuffers(vkCommandBuffer, 0, buffers.size(), buffers.data(), aOffsets.data());
+
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            context.bindVertexBuffer = [=] (SFrameGraphRenderContextState   &aState
+                                          , SFrameGraphBuffer         const &aBuffer
+                                          , VkDeviceSize              const &aIndexCount) -> EEngineStatus
+            {
+                VkCommandBuffer vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
+
+                OptRef_t<BufferResourceState_t> indexBufferOpt {};
+                {
+                    auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, aBuffer.readableName);
+                    if(not success)
+                    {
+                        return EEngineStatus::Error;
+                    }
+                    indexBufferOpt = resource;
+                }
+                BufferResourceState_t &indexBuffer = *indexBufferOpt;
+
+                vkCmdBindIndexBuffer(vkCommandBuffer, indexBuffer.gpuApiHandles.handle, 0, VkIndexType::VK_INDEX_TYPE_UINT16);
 
                 return EEngineStatus::Ok;
             };
@@ -1650,14 +1705,6 @@ namespace engine
 
                 transferBufferData(aVulkanEnvironment->getLogicalDevice(), dataBuffer.description.dataSource(),  dataBuffer.gpuApiHandles.attachedMemory);
                 transferBufferData(aVulkanEnvironment->getLogicalDevice(), indexBuffer.description.dataSource(), indexBuffer.gpuApiHandles.attachedMemory);
-
-                std::vector<VkBuffer> buffers = { dataBuffer.gpuApiHandles.handle
-                                                , dataBuffer.gpuApiHandles.handle
-                                                , dataBuffer.gpuApiHandles.handle
-                                                , dataBuffer.gpuApiHandles.handle };
-
-                vkCmdBindVertexBuffers(vkCommandBuffer, 0, buffers.size(), buffers.data(), mesh.description.offsets.data());
-                vkCmdBindIndexBuffer  (vkCommandBuffer, indexBuffer.gpuApiHandles.handle, 0, VkIndexType::VK_INDEX_TYPE_UINT16);
 
                 return EEngineStatus::Ok;
             };

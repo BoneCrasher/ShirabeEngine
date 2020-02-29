@@ -4,6 +4,7 @@
 #include <atomic>
 #include <os/applicationenvironment.h>
 #include <wsi/display.h>
+#include "renderer/rendererconfiguration.h"
 #include "renderer/framegraph/framegraphdata.h"
 #include "renderer/framegraph/framegraph.h"
 
@@ -41,7 +42,8 @@ namespace engine
              */
             EEngineStatus initialize(
                     Shared<os::SApplicationEnvironment> const &aApplicationEnvironment,
-                    Shared<wsi::CWSIDisplay>            const &aDisplay);
+                    Shared<wsi::CWSIDisplay>            const &aDisplay,
+                    SRendererConfiguration              const &aConfig);
 
             EEngineStatus createDeferredPipeline();
 
@@ -91,6 +93,7 @@ namespace engine
         private_members:
             Shared<os::SApplicationEnvironment> mAppEnvironment;
             Shared<wsi::CWSIDisplay>            mDisplay;
+            SRendererConfiguration              mConfiguration;
             std::atomic<bool>                   mPaused;
 
             Unique<engine::framegraph::CGraph> mDeferredGraph;

@@ -59,8 +59,9 @@ namespace engine
     namespace vulkan
     {
         static framegraph::SFrameGraphRenderContext
-            CreateRenderContextForVulkan(Shared<CVulkanEnvironment>     aVulkanEnvironment
-                                       , Shared<CGpuApiResourceStorage> aResourceStorage);
+            CreateRenderContextForVulkan(Shared<CVulkanEnvironment>        aVulkanEnvironment
+                                       , Shared<VulkanResourceManager_t>   aResourceManager
+                                       , Shared<asset::CAssetStorage>      aAssetStorage);
     }
 }
 

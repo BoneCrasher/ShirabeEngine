@@ -709,11 +709,8 @@ namespace engine
              * @throw             Throws std::runtime_error on error.
              */
             template <typename T>
-            CEngineResult
-            <
-                Shared<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>> const
-            >
-            get(FrameGraphResourceId_t const &aResourceId) const
+            CEngineResult<Shared<T>> const
+            getResource(FrameGraphResourceId_t const &aResourceId) const
             {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(mResources.size() <= aResourceId)
@@ -787,12 +784,10 @@ namespace engine
              * @throw             Throws std::runtime_error on error.
              */
             template <typename T> // with T : FrameGraphResource
-            CEngineResult<
-                Shared<typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T>>
-            >
-            getMutable(FrameGraphResourceId_t const &aResourceId)
+            CEngineResult<Shared<T>>
+            getResourceMutable(FrameGraphResourceId_t const &aResourceId)
             {
-                CEngineResult<Shared<T> const> fetch  = static_cast<CFrameGraphResources*>(this)->get<T>(aResourceId);
+                CEngineResult<Shared<T>> const fetch  = static_cast<CFrameGraphResources *>(this)->getResource<T>(aResourceId);
                 CEngineResult<Shared<T>>       result = { EEngineStatus::Ok };
                 if(not fetch.resultEquals(EEngineStatus::ResourceError_NotFound))
                 {
