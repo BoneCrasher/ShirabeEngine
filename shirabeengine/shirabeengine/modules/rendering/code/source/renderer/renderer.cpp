@@ -54,7 +54,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::createDeferredPipeline()
+        EEngineStatus CRenderer::createDeferredPipeline(framegraph::SFrameGraphResourceContext const &aResourceContext)
         {
             using namespace engine;
             using namespace engine::framegraph;
@@ -148,7 +148,7 @@ namespace engine
             }
 
             mDeferredGraph = std::move(compilation.data());
-            mDeferredGraph->initializeGraphResources();
+            mDeferredGraph->initializeGraphResources(aResourceContext);
 
             #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             static bool serializedOnce = false;

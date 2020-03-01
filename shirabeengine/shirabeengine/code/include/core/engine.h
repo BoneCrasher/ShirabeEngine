@@ -8,8 +8,8 @@
 #include <core/benchmarking/timer/timer.h>
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
-#include <renderer/irenderer.h>
 
+#include <renderer/framegraph/framegraphrendercontext.h>
 #include <resources/cresourcemanager.h>
 #include <material/loader.h>
 #include <mesh/loader.h>
@@ -26,7 +26,6 @@
 #endif
 
 #include "buildingblocks/scene.h"
-#include "../../../modules/textures/code/include/textures/loader.h"
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 
@@ -41,6 +40,8 @@ namespace engine
     using material::CMaterialLoader;
     using mesh::CMeshLoader;
     using textures::CTextureLoader;
+    using framegraph::SFrameGraphRenderContext;
+    using framegraph::SFrameGraphResourceContext;
 
     /**
      * @brief The CEngineInstance class
@@ -86,26 +87,27 @@ namespace engine
         Shared<os::SApplicationEnvironment> mApplicationEnvironment;
 
         // Timing
-        CTimer                           mTimer;
+        CTimer                             mTimer;
 
         // WSI
-        Shared<CWindowManager>           mWindowManager;
-        Shared<IWindow>                  mMainWindow;
+        Shared<CWindowManager>             mWindowManager;
+        Shared<IWindow>                    mMainWindow;
 
         // Assets & Resources
-        Shared<CAssetStorage>            mAssetStorage;
-        Shared<CResourceManager>         mResourceManager;
-        Shared<CMaterialLoader>          mMaterialLoader;
-        Shared<CMeshLoader>              mMeshLoader;
-        Shared<CTextureLoader>           mTextureLoader;
+        Shared<CAssetStorage>              mAssetStorage;
+        Shared<CResourceManager>           mResourceManager;
+        Shared<CMaterialLoader>            mMaterialLoader;
+        Shared<CMeshLoader>                mMeshLoader;
+        Shared<CTextureLoader>             mTextureLoader;
 
         // Rendering
-        Shared<CVulkanEnvironment>       mVulkanEnvironment;
-        Shared<SFrameGraphRenderContext> mRenderContext;
-        Shared<CRenderer>                mRenderer;
+        Shared<CVulkanEnvironment>         mVulkanEnvironment;
+        Shared<SFrameGraphRenderContext>   mRenderContext;
+        Shared<SFrameGraphResourceContext> mResourceContext;
+        Shared<CRenderer>                  mRenderer;
 
         // Internals
-        CScene                           mScene;
+        CScene                             mScene;
     };
 }
 

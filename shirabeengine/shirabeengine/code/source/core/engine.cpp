@@ -255,9 +255,9 @@ namespace engine
             //
 
             std::filesystem::path const root          = std::filesystem::current_path();
-            std::filesystem::path const resourcesPath = root/"data/output/resources";
+            std::filesystem::path const resourcesPath = root/ "data/output/resources"_path;
 
-            CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/"game.assetindex.xml");
+            CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/ "game.assetindex.xml"_path);
 
             Unique<IAssetDataSource> assetDataSource = makeUnique<CFileSystemAssetDataSource>(resourcesPath);
             Shared<CAssetStorage>    assetStorage    = makeShared<CAssetStorage>(std::move(assetDataSource));
@@ -289,17 +289,20 @@ namespace engine
             using engine::framegraph::SFrameGraphRenderContext;
 
             // How to decouple?
-            SFrameGraphRenderContext frameGraphRenderContext {};
+            SFrameGraphRenderContext   frameGraphRenderContext {};
+            SFrameGraphResourceContext frameGraphResourceContext {};
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                frameGraphRenderContext = vulkan::CreateRenderContextForVulkan(mVulkanEnvironment, mResourceManager, mAssetStorage);
+                frameGraphRenderContext   = vulkan::CreateRenderContextForVulkan  (mVulkanEnvironment, mResourceManager, mAssetStorage);
+                frameGraphResourceContext = vulkan::CreateResourceContextForVulkan(mVulkanEnvironment, mResourceManager, mAssetStorage);
             }
 
-            mRenderContext = makeShared(SFrameGraphRenderContext(frameGraphRenderContext));
+            mRenderContext   = makeShared(SFrameGraphRenderContext(frameGraphRenderContext));
+            mResourceContext = makeShared(SFrameGraphResourceContext(frameGraphResourceContext));
 
             mRenderer = makeShared<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration);
-            status    = mRenderer->createDeferredPipeline();
+            status    = mRenderer->createDeferredPipeline(frameGraphResourceContext);
 
             return { status };
         };
@@ -317,7 +320,10 @@ namespace engine
             creation = fnCreatePlatformRenderer();
 
             // Setup scene
-            CEngineResult<> initialization = mScene.initialize();
+            CEngineResult<> initialization = mScene.initialize(mAssetStorage
+                                                             , mMeshLoader
+                                                             , mMaterialLoader
+                                                             , mTextureLoader);
             status = initialization.result();
         }
         catch(std::exception &stde)
@@ -388,39 +394,6 @@ namespace engine
         }
         mTimer.resetTick();
         CLog::Debug(logTag(), "Tick...");
-
-        // JUST A TEST, Remove that stuff...
-        static int16_t counter = 0;
-        counter = (++counter % 360);
-
-        float x = cosf( deg_to_rad(static_cast<float>(counter)) );
-        float y = sinf( deg_to_rad(static_cast<float>(counter)) );
-
-        Unique<ecws::CEntity> const &barramundi = mScene.findEntity("barramundi");
-        ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>>  barramundiMaterials  = barramundi->getTypedComponentsOfType<ecws::CMaterialComponent>();
-        Shared<ecws::CMaterialComponent>                            barramundiMaterial   = *(barramundiMaterials.begin());
-        ecws::CBoundedCollection<Shared<ecws::CTransformComponent>> barramundiTransforms = barramundi->getTypedComponentsOfType<ecws::CTransformComponent>();
-        Shared<ecws::CTransformComponent>                           barramundiTransform  = *(barramundiTransforms.begin());
-
-        Unique<ecws::CEntity>                                    const &cameraEntity     = mScene.findEntity("primaryCamera");
-        ecws::CBoundedCollection<Shared<ecws::CCameraComponent>>        cameraComponents = cameraEntity->getTypedComponentsOfType<ecws::CCameraComponent>();
-        Shared<ecws::CCameraComponent>                           const &cameraComponent  = *(cameraComponents.cbegin());
-        Shared<CCamera>                                          const &camera           = cameraComponent->getCamera();
-
-        Unique<ecws::CEntity> const &core = mScene.findEntity("core");
-        ecws::CBoundedCollection<Shared<ecws::CMaterialComponent>> coreMaterials = core->getTypedComponentsOfType<ecws::CMaterialComponent>();
-        Shared<ecws::CMaterialComponent>                           coreMaterial  = *(coreMaterials.begin());
-        material::CMaterialConfig &config = coreMaterial->getMutableConfiguration();
-
-        mScene.update(mTimer);
-        cameraComponent->update(mTimer);
-
-        config.setBufferValue<float>                   ("struct_systemData",   "global.time",              mTimer.total_elapsed());
-        config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.view",       camera->view().const_data());
-        config.setBufferValue<CMatrix4x4::MatrixData_t>("struct_graphicsData", "primaryCamera.projection", camera->projection().const_data());
-
-        barramundiTransform->getMutableTransform().resetRotation(CVector3D<float>({0.0f, deg_to_rad((float)mTimer.total_elapsed() * 90.0f * 0.25f), 0.0f}));
-        barramundiMaterial->getMutableConfiguration().setBufferValue<CMatrix4x4::MatrixData_t>("struct_modelMatrices", "world", barramundiTransform->getTransform().world().const_data());
 
         if(mRenderer)
         {

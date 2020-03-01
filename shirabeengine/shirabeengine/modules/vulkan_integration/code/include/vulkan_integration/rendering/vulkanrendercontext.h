@@ -54,6 +54,7 @@ namespace engine
     namespace framegraph
     {
         struct SFrameGraphRenderContext;
+        struct SFrameGraphResourceContext;
     }
 
     namespace vulkan
@@ -62,6 +63,11 @@ namespace engine
             CreateRenderContextForVulkan(Shared<CVulkanEnvironment>        aVulkanEnvironment
                                        , Shared<VulkanResourceManager_t>   aResourceManager
                                        , Shared<asset::CAssetStorage>      aAssetStorage);
+
+        static framegraph::SFrameGraphResourceContext
+            CreateResourceContextForVulkan(Shared<CVulkanEnvironment>        aVulkanEnvironment
+                                         , Shared<VulkanResourceManager_t>   aResourceManager
+                                         , Shared<asset::CAssetStorage>      aAssetStorage);
     }
 }
 
