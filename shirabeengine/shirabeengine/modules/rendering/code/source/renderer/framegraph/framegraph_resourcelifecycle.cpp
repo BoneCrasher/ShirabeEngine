@@ -318,9 +318,9 @@ namespace engine
             EEngineStatus initialization = EEngineStatus::Ok;
 
             if(aTexture->isExternalResource)
-                initialization = aResourceContext.importDynamicTexture(aResourceContext, *aTexture);
+                initialization = aResourceContext.importDynamicTexture(*aTexture);
             else
-                initialization = aResourceContext.createDynamicTexture(aResourceContext, *aTexture);
+                initialization = aResourceContext.createDynamicTexture(*aTexture);
 
             EngineStatusPrintOnError(initialization, logTag(), "Failed to load texture for FrameGraphExecution.");
 
