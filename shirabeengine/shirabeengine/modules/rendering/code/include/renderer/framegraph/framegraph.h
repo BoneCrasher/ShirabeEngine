@@ -188,8 +188,7 @@ namespace engine
              * @param aPassExecutionOrder
              * @return
              */
-            CEngineResult<> initializeGraphResources(SFrameGraphResourceContext &aResourceContext
-                                                   , std::vector<PassUID_t>     &aPassExecutionOrder);
+            CEngineResult<> initializeGraphResources(SFrameGraphResourceContext &aResourceContext);
 
             /**
              *

@@ -54,7 +54,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::createDeferredPipeline(framegraph::SFrameGraphResourceContext const &aResourceContext)
+        EEngineStatus CRenderer::createDeferredPipeline(framegraph::SFrameGraphResourceContext &aResourceContext)
         {
             using namespace engine;
             using namespace engine::framegraph;

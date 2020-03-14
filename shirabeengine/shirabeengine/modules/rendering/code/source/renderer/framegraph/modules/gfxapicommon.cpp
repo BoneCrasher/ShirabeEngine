@@ -83,9 +83,11 @@ namespace engine
             };
 
             auto const execute = [=] (
-                    SPrePassData                     const &aPassData,
-                    CFrameGraphResources             const &aFrameGraphResources,
-                    Shared<IFrameGraphRenderContext>       &aContext)
+                    SPrePassData             const &aPassData,
+                    SFrameGraphDataSource    const &aDataSource,
+                    CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aRenderContextState,
+                    SFrameGraphRenderContext       &aContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aFrameGraphResources);
@@ -97,7 +99,7 @@ namespace engine
                 // Fetch the next backbuffer image and make it available to the resource manager.
                 // aContext->beginGraphicsFrame(aPassData.importData.backBufferInput);
                 // Begin a command buffer.
-                aContext->beginFrameCommandBuffers();
+                aContext.beginFrameCommandBuffers(aRenderContextState);
                 // Begin a render pass w/ a given framebuffer.
                 // aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
@@ -162,9 +164,11 @@ namespace engine
             };
 
             auto const execute = [=] (
-                    SPresentPassData                          const&aPassData,
-                    CFrameGraphResources                      const&aFrameGraphResources,
-                    Shared<IFrameGraphRenderContext>      &aContext)
+                    SPresentPassData         const &aPassData,
+                    SFrameGraphDataSource    const &aDataSource,
+                    CFrameGraphResources     const &aFrameGraphResources,
+                    SFrameGraphRenderContextState  &aRenderContextState,
+                    SFrameGraphRenderContext       &aContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aPassData);

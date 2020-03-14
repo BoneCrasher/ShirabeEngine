@@ -9,18 +9,29 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::initializeGraphResources(SFrameGraphResourceContext &aResourceContext
-                                                       , std::vector<PassUID_t>     &aPassExecutionOrder)
+        CEngineResult<> CGraph::initializeGraphResources(SFrameGraphResourceContext &aResourceContext)
         {
+            std::vector<PassUID_t> executionOrder {};
+            {
+                std::stack<PassUID_t> copy = mPassExecutionOrder;
+                while(not copy.empty())
+                {
+                    executionOrder.push_back(copy.top());
+                    copy.pop();
+                }
+            }
+
             CEngineResult<> const setUpRenderPassAndFrameBuffer =
                     initializeRenderPassAndFrameBuffer(aResourceContext
-                                                     , aPassExecutionOrder
+                                                     , executionOrder
                                                      , sRenderPassResourceId
                                                      , sFrameBufferResourceId);
             if(not setUpRenderPassAndFrameBuffer.successful())
             {
                 return setUpRenderPassAndFrameBuffer;
             }
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -37,6 +48,8 @@ namespace engine
             {
                 return setUpRenderPassAndFrameBuffer;
             }
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 

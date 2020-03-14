@@ -695,7 +695,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string const &aMaterialId, SFrameGraphMaterial &aMaterial)
+        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string const &aMaterialId, AssetId_t const &aMaterialAssetId)
         {
             SFrameGraphMaterial &materialResource = mResourceData.spawnResource<SFrameGraphMaterial>();
             materialResource.readableName       = aMaterialId;
