@@ -6,8 +6,10 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
+#include <resources/cresourcemanager.h>
 #include "vulkan_integration/resources/cvkapiresource.h"
-#include "vulkan_integration/rendering/vulkanrendercontext.h"
+#include "vulkan_integration/resources/ivkglobalcontext.h"
+#include "vulkan_integration/resources/types/vulkanbufferresource.h"
 
 namespace engine
 {
@@ -32,26 +34,40 @@ namespace engine
             };
 
             static EEngineStatus initialize(SBufferViewDescription  const &aDescription
-                                          , SBufferViewDependencies const &aDependencies
                                           , Handles_t                     &aGpuApiHandles
-                                          , Shared<IVkGlobalContext>       aVulkanEnvironment);
+                                          , IVkGlobalContext              *aVulkanEnvironment
+                                          , CResourceManager              *aResourceManager);
 
             static EEngineStatus deinitialize(SBufferViewDescription  const &aDescription
-                                            , SBufferViewDependencies const &aDependencies
                                             , Handles_t                     &aGpuApiHandles
-                                            , Shared<IVkGlobalContext>       aVulkanEnvironment);
+                                            , IVkGlobalContext              *aVulkanEnvironment
+                                            , CResourceManager              *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        using BufferViewResourceState_t = SResourceState<SBufferView, SVulkanBufferViewResource>;
+
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanBufferViewResource::initialize(SBufferViewDescription  const &aDescription
-                                                                 , SBufferViewDependencies const &aDependencies
                                                                  , Handles_t                     &aGpuApiHandles
-                                                                 , Shared<IVkGlobalContext>       aVulkanEnvironment)
+                                                                 , IVkGlobalContext              *aVulkanEnvironment
+                                                                 , CResourceManager              *aResourceManager)
         {
+            OptionalRef_t<BufferResourceState_t> const bufferOpt = aResourceManager->getResource(aDescription.subjacentBufferId);
+            if(not bufferOpt.has_value())
+            {
+                return EEngineStatus::ResourceError_DependencyNotFound;
+            }
+            BufferResourceState_t bufferState = *bufferOpt;
+
             VkBufferViewCreateInfo createInfo = aDescription.createInfo;
-            createInfo.buffer =  aDependencies.bufferHandle;
+            createInfo.buffer = bufferState.gpuApiHandles.handle;
 
             VkBufferView vkBufferView = VK_NULL_HANDLE;
 
@@ -74,9 +90,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanBufferViewResource::deinitialize(SBufferViewDescription  const &aDescription
-                                                                   , SBufferViewDependencies const &aDependencies
                                                                    , Handles_t                     &aGpuApiHandles
-                                                                   , Shared<IVkGlobalContext>       aVulkanEnvironment)
+                                                                   , IVkGlobalContext              *aVulkanEnvironment
+                                                                   , CResourceManager              *aResourceManager)
         {
             VkBufferView vkBufferView    = aGpuApiHandles.handle;
             VkDevice     vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();

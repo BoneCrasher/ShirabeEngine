@@ -228,7 +228,7 @@ namespace engine::resources
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = initializeResource(*resource, mGraphicsApiBackend);
+            auto const &[result] = initializeResource(*resource, *mGraphicsApiBackend, this);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -254,7 +254,7 @@ namespace engine::resources
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = transferResource(*resource, mGraphicsApiBackend);
+            auto const &[result] = transferResource(*resource, *mGraphicsApiBackend, this);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -286,7 +286,7 @@ namespace engine::resources
             TResource &resource = std::get<TResource>(value);
             if(EGpuApiResourceState::Discarded != resource.state)
             {
-                EEngineStatus const deinitResult = deinitializeResource<TResource>(aResourceId, mGraphicsApiBackend).result();
+                EEngineStatus const deinitResult = deinitializeResource<TResource>(aResourceId, *mGraphicsApiBackend, this).result();
                 if(CheckEngineError(deinitResult))
                 {
                     CLog::Error(logTag(), "Failed to deinitialize resource with ID '{}'", aResourceId);

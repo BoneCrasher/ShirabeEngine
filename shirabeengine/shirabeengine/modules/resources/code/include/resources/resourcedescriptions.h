@@ -51,20 +51,8 @@ namespace engine
             SHIRABE_TEST_EXPORT SBufferViewDescription
         {
             std::string            name;
+            ResourceId_t           subjacentBufferId;
             VkBufferViewCreateInfo createInfo;
-        };
-
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT SBufferViewDependencies
-        {
-            ResourceId_t bufferId;
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                return { bufferId };
-            }
         };
 
         struct
@@ -85,24 +73,11 @@ namespace engine
         {
         public_members:
             std::string   name;
-            STextureInfo  subjacentTextureInfo;
+            ResourceId_t  subjacentTextureId;
             EFormat       textureFormat;
             ArraySlices_t arraySlices;
             MipSlices_t   mipMapSlices;
             // TODO: Distinguish binding and read/write mode
-        };
-
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT STextureViewDependencies
-        {
-            ResourceId_t  subjacentTextureId;
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                return { subjacentTextureId };
-            }
         };
 
         struct

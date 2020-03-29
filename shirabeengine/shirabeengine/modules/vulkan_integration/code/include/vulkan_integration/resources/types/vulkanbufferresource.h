@@ -6,11 +6,11 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
+#include <resources/cresourcemanager.h>
 
 #include "vulkan_integration/vulkandevicecapabilities.h"
 #include "vulkan_integration/vulkanenvironment.h"
-#include "vulkan_integration/resources/cvkapiresource.h"
-#include "vulkan_integration/rendering/vulkanrendercontext.h"
+#include "vulkan_integration/resources/ivkglobalcontext.h"
 
 namespace engine
 {
@@ -58,25 +58,30 @@ namespace engine
             };
 
             static EEngineStatus initialize(SBufferDescription  const &aDescription
-                                          , SNoDependencies     const &aDependencies
                                           , Handles_t                 &aGpuApiHandles
-                                          , Shared<IVkGlobalContext>   aVulkanEnvironment);
+                                          , IVkGlobalContext          *aVulkanEnvironment
+                                          , CResourceManager          *aResourceManager);
 
             static EEngineStatus load(SBufferDescription  const &aDescription
-                                    , SNoDependencies     const &aDependencies
                                     , Handles_t                 &aGpuApiHandles
-                                    , Shared<IVkGlobalContext>   aVulkanEnvironment);
+                                    , IVkGlobalContext          *aVulkanEnvironment
+                                    , CResourceManager          *aResourceManager);
 
             static EEngineStatus unload(SBufferDescription  const &aDescription
-                                      , SNoDependencies     const &aDependencies
                                       , Handles_t                 &aGpuApiHandles
-                                      , Shared<IVkGlobalContext>   aVulkanEnvironment);
+                                      , IVkGlobalContext          *aVulkanEnvironment
+                                      , CResourceManager          *aResourceManager);
 
             static EEngineStatus deinitialize(SBufferDescription  const &aDescription
-                                            , SNoDependencies     const &aDependencies
                                             , Handles_t                 &aGpuApiHandles
-                                            , Shared<IVkGlobalContext>   aVulkanEnvironment);
+                                            , IVkGlobalContext          *aVulkanEnvironment
+                                            , CResourceManager          *aResourceManager);
         };
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        using BufferResourceState_t = SResourceState<SBuffer, SVulkanBufferResource>;
 
         //<-----------------------------------------------------------------------------
 
@@ -84,9 +89,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanBufferResource::initialize(SBufferDescription  const &aDescription
-                                                             , SNoDependencies     const &aDependencies
                                                              , Handles_t                 &aGpuApiHandles
-                                                             , Shared<IVkGlobalContext>   aVulkanEnvironment)
+                                                             , IVkGlobalContext          *aVulkanEnvironment
+                                                             , CResourceManager          *aResourceManager)
         {
             Shared<IVkGlobalContext> vkContext = aVulkanEnvironment;
 
@@ -155,9 +160,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanBufferResource::load(SBufferDescription  const &aDescription
-                                                       , SNoDependencies     const &aDependencies
                                                        , Handles_t                 &aGpuApiHandles
-                                                       , Shared<IVkGlobalContext>   aVulkanEnvironment)
+                                                       , IVkGlobalContext          *aVulkanEnvironment
+                                                       , CResourceManager          *aResourceManager)
         {
             if(nullptr != aDescription.dataSource)
             {
@@ -179,12 +184,11 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanBufferResource::unload(SBufferDescription  const &aDescription
-                                                         , SNoDependencies     const &aDependencies
                                                          , Handles_t                 &aGpuApiHandles
-                                                         , Shared<IVkGlobalContext>   aVulkanEnvironment)
+                                                         , IVkGlobalContext          *aVulkanEnvironment
+                                                         , CResourceManager          *aResourceManager)
         {
             SHIRABE_UNUSED(aDescription);
-            SHIRABE_UNUSED(aDependencies);
             SHIRABE_UNUSED(aGpuApiHandles);
             SHIRABE_UNUSED(aVulkanEnvironment);
 
@@ -196,9 +200,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanBufferResource::deinitialize(SBufferDescription  const &aDescription
-                                                               , SNoDependencies     const &aDependencies
                                                                , Handles_t                 &aGpuApiHandles
-                                                               , Shared<IVkGlobalContext>   aVulkanEnvironment)
+                                                               , IVkGlobalContext          *aVulkanEnvironment
+                                                               , CResourceManager          *aResourceManager)
         {
             VkBuffer       vkBuffer        = aGpuApiHandles.handle;
             VkDeviceMemory vkDeviceMemory  = aGpuApiHandles.attachedMemory;

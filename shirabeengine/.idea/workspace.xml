@@ -280,22 +280,18 @@
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/plugins/m/test/test_htmlsanity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/pelicanconf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" beforeDir="false" afterPath="$PROJECT_DIR$/doxygen/m.css/site/publishconf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/include/buildingblocks/scene.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/code/source/buildingblocks/scene.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/enginestatus.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/core/code/include/core/enginestatus.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/material/code/include/material/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/mesh/code/include/mesh/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/cresourcemanager.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/resources/code/include/resources/resourcedescriptions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/textures/code/include/textures/assetloader.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/textures/code/include/textures/assetloader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/cvkapiresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/cvkapiresource.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/rendering/vulkanrendercontext.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanbufferresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanbufferresource.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanbufferviewresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkanbufferviewresource.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/rendering/vulkanrendercontext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkantextureresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkantextureresource.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkantextureviewresource.h" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/include/vulkan_integration/resources/types/vulkantextureviewresource.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanbufferresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanbufferresource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanbufferviewresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkanbufferviewresource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkantextureresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkantextureresource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkantextureviewresource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/shirabeengine/modules/vulkan_integration/code/source/resources/types/vulkantextureviewresource.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -764,7 +760,7 @@
       <workItem from="1584167075879" duration="1415000" />
       <workItem from="1585122986493" duration="4560000" />
       <workItem from="1585321084426" duration="2771000" />
-      <workItem from="1585474162446" duration="15769000" />
+      <workItem from="1585474162446" duration="19084000" />
     </task>
     <servers />
   </component>
@@ -895,11 +891,11 @@
       <screen x="0" y="0" width="4480" height="1050" />
     </state>
     <state x="1025" y="167" key="refactoring.ChangeSignatureDialog/0.0.4480.1050@0.0.4480.1050" timestamp="1577266956252" />
-    <state x="405" y="239" width="672" height="674" key="run.anything.popup" timestamp="1585483791500">
+    <state x="405" y="239" width="672" height="674" key="run.anything.popup" timestamp="1585501778462">
       <screen x="0" y="0" width="1920" height="1044" />
     </state>
     <state x="405" y="239" width="288" height="674" key="run.anything.popup/0.0.1920.1044/2560.0.1920.1080@0.0.1920.1044" timestamp="1583006257099" />
-    <state x="405" y="239" width="672" height="674" key="run.anything.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1585483791500" />
+    <state x="405" y="239" width="672" height="674" key="run.anything.popup/0.0.1920.1044@0.0.1920.1044" timestamp="1585501778462" />
     <state x="944" y="240" width="672" height="677" key="run.anything.popup/0.0.4480.1050@0.0.4480.1050" timestamp="1582961755765" />
     <state x="623" y="230" width="672" height="679" key="search.everywhere.popup" timestamp="1582966997095">
       <screen x="0" y="0" width="1920" height="1044" />

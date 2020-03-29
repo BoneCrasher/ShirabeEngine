@@ -49,6 +49,7 @@ namespace engine
         ResourceError_UnloadFailed                                      =    -255,
         ResourceError_DestructionFailed                                 =    -256,
         ResourceError_ResourceInvalid                                   =    -257,
+        ResourceError_DependencyNotFound                                =    -258,
         WindowCreationError                                             =    -351, // Window issues
         WindowMessageHandlerError                                       =    -352,
         WindowEventError                                                =    -353,

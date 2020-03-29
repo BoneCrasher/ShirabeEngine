@@ -3,7 +3,6 @@
 
 #include <log/log.h>
 #include <resources/resourcetypes.h>
-#include <renderer/irendercontext.h>
 #include <renderer/renderertypes.h>
 #include <resources/cresourcemanager.h>
 #include "vulkan_integration/vulkanenvironment.h"
@@ -24,10 +23,6 @@ namespace engine
 {
     namespace resources
     {
-        using TextureResourceState_t      = SResourceState<STexture,      SVulkanTextureResource>;
-        using TextureViewResourceState_t  = SResourceState<STextureView,  SVulkanTextureViewResource>;
-        using BufferResourceState_t       = SResourceState<SBuffer,       SVulkanBufferResource>;
-        using BufferViewResourceState_t   = SResourceState<SBufferView,   SVulkanBufferViewResource>;
         using RenderPassResourceState_t   = SResourceState<SRenderPass,   SVulkanRenderPassResource>;
         using FrameBufferResourceState_t  = SResourceState<SFrameBuffer,  SVulkanFrameBufferResource>;
         using ShaderModuleResourceState_t = SResourceState<SShaderModule, SVulkanShaderModuleResource>;
