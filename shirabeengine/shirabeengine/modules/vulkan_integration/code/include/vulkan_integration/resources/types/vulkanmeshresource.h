@@ -19,7 +19,8 @@ namespace engine
         struct SVulkanMeshResource
         {
             struct Handles_t
-            { };
+            {
+            };
         };
     }
 }

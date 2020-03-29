@@ -25,7 +25,6 @@ namespace engine
     {
         using RenderPassResourceState_t   = SResourceState<SRenderPass,   SVulkanRenderPassResource>;
         using FrameBufferResourceState_t  = SResourceState<SFrameBuffer,  SVulkanFrameBufferResource>;
-        using ShaderModuleResourceState_t = SResourceState<SShaderModule, SVulkanShaderModuleResource>;
         using PipelineResourceState_t     = SResourceState<SPipeline,     SVulkanPipelineResource>;
         using MeshResourceState_t         = SResourceState<SMesh,         SVulkanMeshResource>;
         using MaterialResourceState_t     = SResourceState<SMaterial,     SVulkanMaterialResource>;

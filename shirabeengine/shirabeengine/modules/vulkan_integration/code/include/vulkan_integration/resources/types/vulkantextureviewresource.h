@@ -55,9 +55,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanTextureViewResource::initialize(STextureViewDescription const &aDescription
-                                                                  , Handles_t                     &aGpuApiHandles
-                                                                  , IVkGlobalContext              *aVulkanEnvironment
-                                                                  , CResourceManager              *aResourceManager)
+                                                                    , Handles_t                     &aGpuApiHandles
+                                                                    , IVkGlobalContext              *aVulkanEnvironment
+                                                                    , CResourceManager              *aResourceManager)
         {
             OptionalRef_t<TextureResourceState_t> const textureOpt = aResourceManager->getResource(aDescription.subjacentBufferId);
             if(not textureOpt.has_value())
@@ -156,9 +156,9 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         static EEngineStatus SVulkanTextureViewResource::deinitialize(STextureViewDescription const &aDescription
-                                                                    , Handles_t                     &aGpuApiHandles
-                                                                    , IVkGlobalContext              *aVulkanEnvironment
-                                                                    , CResourceManager              *aResourceManager)
+                                                                      , Handles_t                     &aGpuApiHandles
+                                                                      , IVkGlobalContext              *aVulkanEnvironment
+                                                                      , CResourceManager              *aResourceManager)
         {
             VkImageView vkImageView     = aGpuApiHandles.handle;
             VkDevice    vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
