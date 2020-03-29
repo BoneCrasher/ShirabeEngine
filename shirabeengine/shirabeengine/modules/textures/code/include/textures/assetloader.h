@@ -12,30 +12,20 @@
 #include "textures/declaration.h"
 #include "textures/loader.h"
 
-namespace engine::textures
+namespace engine::resources
 {
-    using namespace resources;
+    using namespace asset;
+    using namespace textures;
 
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-    static Shared<CResourceFromAssetResourceObjectCreator<STexture>> getAssetLoader(Shared<resources::CResourceManager> const &aResourceManager
-                                                                                   , Shared<asset::IAssetStorage>       const &aAssetStorage
-                                                                                   , Shared<textures::CTextureLoader>   const &aLoader)
+    template<>
+    class CResourceDescDeriver<CTextureInstance, STextureDescription>
     {
-        auto const loader = [=] (ResourceId_t const &aResourceId, AssetId_t const &aAssetId) -> Shared<ILogicalResourceObject>
+    public:
+        static STextureDescription derive(Shared<CAssetStorage> aAssetStorage, Shared<CTextureInstance> aTextureInstance)
         {
-            auto const &[result, instance] = aLoader->loadInstance(aAssetStorage, aAssetId);
-            if(CheckEngineError(result))
-            {
-                return nullptr;
-            }
-
-            Shared<CTextureInstance> textureInstance = instance;
-
             DataSourceAccessor_t initialData = [=]() -> ByteBuffer
             {
-                asset::AssetID_t const uid = textureInstance->imageLayersBinaryAssetUid();
+                asset::AssetID_t const uid = aTextureInstance->imageLayersBinaryAssetUid();
 
                 auto const[result, buffer] = aAssetStorage->loadAssetData(uid);
                 if( CheckEngineError(result))
@@ -50,22 +40,17 @@ namespace engine::textures
             using core::operator|; // bitwise concat of enum class...
 
             STextureDescription textureDescription {};
-            textureDescription.name        = instance->name();
-            textureDescription.textureInfo = instance->textureInfo();
+            textureDescription.name        = aTextureInstance->name();
+            textureDescription.textureInfo = aTextureInstance->textureInfo();
             textureDescription.cpuGpuUsage = EResourceUsage::CPU_InitConst_GPU_Read;
             textureDescription.gpuBinding  = EBufferBinding::TextureInput | EBufferBinding::CopyTarget;
             textureDescription.gpuBinding.set(EBufferBinding::CopyTarget);
 
             textureDescription.initialData = { initialData };
 
-            CEngineResult<Shared<ILogicalResourceObject>> textureObject = aResourceManager->useDynamicResource<STexture>(textureDescription.name, textureDescription);
-            EngineStatusPrintOnError(textureObject.result(),  "Texture::AssetLoader", "Failed to load texture.");
-
-            return textureObject.data();
-        };
-
-        return makeShared<CResourceFromAssetResourceObjectCreator<STexture>>(loader);
-    }
+            return textureDescription;
+        }
+    };
 }
 
 #endif //__SHIRABEDEVELOPMENT_ASSETLOADER_H__

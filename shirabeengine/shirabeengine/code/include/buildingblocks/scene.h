@@ -16,6 +16,11 @@ namespace engine
         class CAssetStorage;
     }
 
+    namespace resources
+    {
+        class CResourceManager;
+    }
+
     namespace mesh
     {
         class CMeshLoader;
@@ -58,10 +63,11 @@ namespace engine
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        CEngineResult<> initialize(Shared<asset::CAssetStorage>      aAssetStorage
-                                 , Shared<mesh::CMeshLoader>         aMeshLoader
-                                 , Shared<material::CMaterialLoader> aMaterialLoader
-                                 , Shared<textures::CTextureLoader>  aTextureLoader);
+        CEngineResult<> initialize(Shared<asset::CAssetStorage>        aAssetStorage
+                                 , Shared<resources::CResourceManager> aResourceManager
+                                 , Shared<mesh::CMeshLoader>           aMeshLoader
+                                 , Shared<material::CMaterialLoader>   aMaterialLoader
+                                 , Shared<textures::CTextureLoader>    aTextureLoader;
 
         CEngineResult<> initializeResources();
 

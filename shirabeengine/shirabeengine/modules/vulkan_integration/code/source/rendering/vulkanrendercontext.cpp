@@ -1360,7 +1360,7 @@ namespace engine
                 // renderPassDesc.attachmentTextureViews  = textureViewIds;
 
                 {
-                    CEngineResult<OptRef_t<RenderPassResourceState_t>> renderPassObject = aResourceManager->useDynamicResource<RenderPassResourceState_t>(renderPassDesc.name, renderPassDesc);
+                    CEngineResult<OptRef_t<RenderPassResourceState_t>> renderPassObject = aResourceManager->useResource<RenderPassResourceState_t>(renderPassDesc.name, renderPassDesc);
                     if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == renderPassObject.result())
                     {
                         return EEngineStatus::Ok;
@@ -1483,7 +1483,7 @@ namespace engine
                 SFrameBufferDescription desc {};
                 desc.name = aFrameBufferId;
                 {
-                    CEngineResult<OptionalRef_t<FrameBufferResourceState_t>> frameBufferObject = aResourceManager->useDynamicResource<FrameBufferResourceState_t>(desc.name, desc);
+                    CEngineResult<OptionalRef_t<FrameBufferResourceState_t>> frameBufferObject = aResourceManager->useResource<FrameBufferResourceState_t>(desc.name, desc);
                     if(EEngineStatus::ResourceManager_ResourceAlreadyCreated == frameBufferObject.result())
                     {
                         return EEngineStatus::Ok;
@@ -1571,7 +1571,7 @@ namespace engine
                 desc.cpuGpuUsage = EResourceUsage::CPU_None_GPU_ReadWrite;
 
                 {
-                    CEngineResult<TextureResourceState_t> textureObject = aResourceManager->useDynamicResource<TextureResourceState_t>(desc.name, desc);
+                    CEngineResult<TextureResourceState_t> textureObject = aResourceManager->useResource<TextureResourceState_t>(desc.name, desc);
                     if( EEngineStatus::ResourceManager_ResourceAlreadyCreated == textureObject.result())
                     {
                         return EEngineStatus::Ok;
@@ -1618,7 +1618,7 @@ namespace engine
                 desc.arraySlices          = aView.arraySliceRange;
                 desc.mipMapSlices         = aView.mipSliceRange;
 
-                CEngineResult<TextureViewResourceState_t> textureViewObject = aResourceManager->useDynamicResource<TextureViewResourceState_t>(desc.name, desc);
+                CEngineResult<TextureViewResourceState_t> textureViewObject = aResourceManager->useResource<TextureViewResourceState_t>(desc.name, desc);
                 EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(textureViewObject.result());
 
@@ -1701,7 +1701,7 @@ namespace engine
                 // createInfo.queueFamilyIndexCount = ...;
                 // createInfo.pQueueFamilyIndices   = ...;
 
-                CEngineResult<BufferResourceState_t> bufferObject = aResourceManager->useDynamicResource<BufferResourceState_t>(desc.name, desc);
+                CEngineResult<BufferResourceState_t> bufferObject = aResourceManager->useResource<BufferResourceState_t>(desc.name, desc);
                 EngineStatusPrintOnError(bufferObject.result(), logTag(), "Failed to create buffer.");
 
                 return bufferObject.result();
@@ -1796,7 +1796,7 @@ namespace engine
                 // createInfo.format = "...";
                 // createInfo.range  = "...";
 
-                auto const &[success, resource] = aResourceManager->useDynamicResource<BufferViewResourceState_t>(desc.name, desc);
+                auto const &[success, resource] = aResourceManager->useResource<BufferViewResourceState_t>(desc.name, desc);
                 EngineStatusPrintOnError(success, logTag(), "Failed to create buffer view.");
             };
             //<-----------------------------------------------------------------------------
@@ -1917,9 +1917,9 @@ namespace engine
                 }
                 meshDescription.offsets = offsets;
 
-                CEngineResult<OptionalRef_t<MeshResourceState_t>>   meshResult            = aResourceManager->useDynamicResource<MeshResourceState_t>  (meshDescription.name,        meshDescription       );
-                CEngineResult<OptionalRef_t<BufferResourceState_t>> attributeBufferResult = aResourceManager->useDynamicResource<BufferResourceState_t>(dataBufferDescription.name,  dataBufferDescription );
-                CEngineResult<OptionalRef_t<BufferResourceState_t>> indexBufferResult     = aResourceManager->useDynamicResource<BufferResourceState_t>(indexBufferDescription.name, indexBufferDescription);
+                CEngineResult<OptionalRef_t<MeshResourceState_t>>   meshResult            = aResourceManager->useResource<MeshResourceState_t>(meshDescription.name, meshDescription);
+                CEngineResult<OptionalRef_t<BufferResourceState_t>> attributeBufferResult = aResourceManager->useResource<BufferResourceState_t>(dataBufferDescription.name, dataBufferDescription);
+                CEngineResult<OptionalRef_t<BufferResourceState_t>> indexBufferResult     = aResourceManager->useResource<BufferResourceState_t>(indexBufferDescription.name, indexBufferDescription);
 
                 return EEngineStatus::Ok;
             };
@@ -2387,7 +2387,7 @@ namespace engine
                 {
                     auto const &bufferDescriptor = materialDescriptor.uniformBufferDescriptors.at(k);
 
-                    CEngineResult<Shared<ILogicalResourceObject>> bufferResourceObject = aResourceManager->useDynamicResource<SBuffer>(bufferDescriptor.name, bufferDescriptor);
+                    CEngineResult<Shared<ILogicalResourceObject>> bufferResourceObject = aResourceManager->useResource<SBuffer>(bufferDescriptor.name, bufferDescriptor);
                     EngineStatusPrintOnError(bufferResourceObject.result(),  "Material::AssetLoader", "Failed to create buffer.");
                     pipelineDependencies.push_back(bufferDescriptor.name);
 
@@ -2415,17 +2415,20 @@ namespace engine
                     desc.mipMapSlices         = { 0, 1 };
                     desc.textureFormat        = texture.description.textureInfo.format;
 
-                    CEngineResult<OptRef_t<ShaderModuleResourceState_t>> textureViewObject = aResourceManager->useDynamicResource<TextureViewResourceState_t>(desc.name, desc);
+                    CEngineResult<OptRef_t<ShaderModuleResourceState_t>> textureViewObject = aResourceManager->useResource<TextureViewResourceState_t>(desc.name, desc);
                     EngineStatusPrintOnError(textureViewObject.result(),  "Material::AssetLoader", "Failed to create texture view.");
                 }
 
-                CEngineResult<OptRef_t<ShaderModuleResourceState_t>> shaderModuleObject = aResourceManager->useDynamicResource<ShaderModuleResourceState_t>(materialDescriptor.shaderModuleDescriptor.name, materialDescriptor.shaderModuleDescriptor);
+                CEngineResult<OptRef_t<ShaderModuleResourceState_t>> shaderModuleObject = aResourceManager->useResource<ShaderModuleResourceState_t>(materialDescriptor.shaderModuleDescriptor
+                                                                                                                                                                       .name
+                                                                                                                                                     , materialDescriptor.shaderModuleDescriptor);
                 EngineStatusPrintOnError(shaderModuleObject.result(),  "Material::AssetLoader", "Failed to create shader module.");
 
-                CEngineResult<OptRef_t<PipelineResourceState_t>> pipelineObject = aResourceManager->useDynamicResource<PipelineResourceState_t>(materialDescriptor.pipelineDescriptor.name, materialDescriptor.pipelineDescriptor);
+                CEngineResult<OptRef_t<PipelineResourceState_t>> pipelineObject = aResourceManager->useResource<PipelineResourceState_t>(materialDescriptor.pipelineDescriptor
+                                                                                                                                                           .name, materialDescriptor.pipelineDescriptor);
                 EngineStatusPrintOnError(pipelineObject.result(),  "Material::AssetLoader", "Failed to create pipeline.");
 
-                CEngineResult<OptRef_t<MaterialResourceState_t>> materialObject = aResourceManager->useDynamicResource<MaterialResourceState_t>(materialDescriptor.name, materialDescriptor);
+                CEngineResult<OptRef_t<MaterialResourceState_t>> materialObject = aResourceManager->useResource<MaterialResourceState_t>(materialDescriptor.name, materialDescriptor);
                 EngineStatusPrintOnError(materialObject.result(),  "Material::AssetLoader", "Failed to create material.");
             };
             //<-----------------------------------------------------------------------------

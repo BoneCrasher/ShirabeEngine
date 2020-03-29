@@ -695,13 +695,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string const &aMaterialId, AssetId_t const &aMaterialAssetId)
+        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string               const &aMaterialId,
+                                                                     AssetId_t                 const &aMaterialAssetId,
+                                                                     SFrameGraphPipelineConfig const &aPipelineConfig)
         {
             SFrameGraphMaterial &materialResource = mResourceData.spawnResource<SFrameGraphMaterial>();
             materialResource.readableName       = aMaterialId;
             materialResource.type               = EFrameGraphResourceType::Material;
             materialResource.assignedPassUID    = mPassUID;
-            materialResource.isExternalResource = false;
+            materialResource.isExternalResource = true;
             materialResource.parentResource     = 0;
             materialResource.referenceCount     = 0;
             materialResource.subjacentResource  = 0;
@@ -713,21 +715,21 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(std::string const &aMeshId, SFrameGraphMesh &aMesh)
+        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(std::string const &aMeshId, AssetId_t const &aMeshAssetId)
         {
             SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
             meshResource.readableName       = aMeshId;
             meshResource.type               = EFrameGraphResourceType::Mesh;
             meshResource.assignedPassUID    = mPassUID;
-            meshResource.isExternalResource = false;
+            meshResource.isExternalResource = true;
             meshResource.parentResource     = 0;
             meshResource.referenceCount     = 0;
             meshResource.subjacentResource  = 0;
 
-            meshResource.attributeBuffer  = aMesh.attributeBuffer;
-            meshResource.indexBuffer      = aMesh.indexBuffer;
-            meshResource.attributeOffsets = aMesh.attributeOffsets;
-            meshResource.indexCount       = aMesh.indexCount;
+            // meshResource.attributeBuffer  = aMesh.attributeBuffer;
+            // meshResource.indexBuffer      = aMesh.indexBuffer;
+            // meshResource.attributeOffsets = aMesh.attributeOffsets;
+            // meshResource.indexCount       = aMesh.indexCount;
 
             return { EEngineStatus::Ok, meshResource };
         }

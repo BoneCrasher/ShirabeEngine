@@ -13,6 +13,7 @@
 #include <core/databuffer.h>
 #include <core/bitfield.h>
 #include <asset/assettypes.h>
+#include <asset/assetstorage.h>
 #include <graphicsapi/definitions.h>
 #include "resources/resourcedatasource.h"
 
@@ -372,6 +373,12 @@ namespace engine
             }
         };
 
+        template<typename TResource, typename TResourceDesc>
+        class CResourceDescDeriver
+        {
+        public:
+            static TResourceDesc derive(Shared<asset::CAssetStorage> aAssetStorage, Shared<TResource> aTextureInstance);
+        };
     }
 }
 

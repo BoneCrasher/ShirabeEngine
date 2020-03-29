@@ -573,6 +573,9 @@ namespace engine
             SFrameGraphShaderModule shaderModuleResource;
         };
 
+        struct SFrameGraphPipelineConfig
+        {};
+
         /**
          * The frame graph material struct encapsulates information on
          * the material used for rendering.
@@ -584,7 +587,7 @@ namespace engine
             std::vector<SFrameGraphBuffer>       uniformBuffers;
             std::vector<SFrameGraphAssetTexture> textures;
             SFrameGraphPipeline                  pipeline;
-        };
+        };/
 
         struct SFrameGraphMesh
             : SFrameGraphResource

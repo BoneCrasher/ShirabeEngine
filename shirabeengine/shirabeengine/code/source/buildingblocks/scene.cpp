@@ -1,8 +1,10 @@
 #include "buildingblocks/scene.h"
 
-#include <asset/assetstorage.h>
 #include <util/crc32.h>
 #include <log/log.h>
+
+#include <asset/assetstorage.h>
+#include <resources/cresourcemanager.h>
 
 #include <material/declaration.h>
 #include <material/loader.h>
@@ -97,24 +99,51 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::initialize(Shared<asset::CAssetStorage>      aAssetStorage
-                                     , Shared<mesh::CMeshLoader>         aMeshLoader
-                                     , Shared<material::CMaterialLoader> aMaterialLoader
-                                     , Shared<textures::CTextureLoader>  aTextureLoader)
+    CEngineResult<> CScene::initialize(Shared<asset::CAssetStorage>        aAssetStorage
+                                     , Shared<resources::CResourceManager> aResourceManager
+                                     , Shared<mesh::CMeshLoader>           aMeshLoader
+                                     , Shared<material::CMaterialLoader>   aMaterialLoader
+                                     , Shared<textures::CTextureLoader>    aTextureLoader)
     {
+        using mesh::CMeshInstance;
+        using material::CMaterialInstance;
+        using textures::CTextureInstance;
+        using resources::CResourceDescDeriver;
+        using resources::SMeshDescriptor;
+        using resources::SMaterialDescriptor;
+        using resources::STextureDescription;
+
+        //
+        // Load assets
+        //
+
         // Materials
         auto const &[r0, mat_core]        = loadMaterial(aAssetStorage, aMaterialLoader, util::crc32FromString("materials/core/core.material.meta"));
         auto const &[r1, mat_lighting]    = loadMaterial(aAssetStorage, aMaterialLoader, util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta"));
         auto const &[r2, mat_compositing] = loadMaterial(aAssetStorage, aMaterialLoader, util::crc32FromString("materials/deferred/compositing/compositing.material.meta"));
         auto const &[r3, mat_standard]    = loadMaterial(aAssetStorage, aMaterialLoader, util::crc32FromString("materials/standard/standard.material.meta"));
         // Meshes
-        auto const &[r4, mesh_fish]       = loadMesh(aAssetStorage, aMeshLoader, util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
+        auto const &[r4, mesh_fish]       = loadMesh    (aAssetStorage, aMeshLoader,     util::crc32FromString("meshes/barramundi/BarramundiFish.mesh.meta"));
         // Textures
-        auto const &[r5, tex_fish_base]   = loadTexture (aAssetStorage, aTextureLoader, util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
-        auto const &[r6, tex_fish_normal] = loadTexture (aAssetStorage, aTextureLoader, util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
+        auto const &[r5, tex_fish_base]   = loadTexture (aAssetStorage, aTextureLoader,  util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
+        auto const &[r6, tex_fish_normal] = loadTexture (aAssetStorage, aTextureLoader,  util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
 
+        //
+        // Register resources in resource manager
+        //
+        aResourceManager->useResource(mat_core->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_core));
+        aResourceManager->useResource(mat_lighting->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_lighting));
+        aResourceManager->useResource(mat_compositing->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_compositing));
+        aResourceManager->useResource(mat_standard->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_standard));
+        aResourceManager->useResource(mesh_fish->name(), CResourceDescDeriver<CMeshInstance, SMeshDescriptor>::derive(aAssetStorage, mesh_fish));
+        aResourceManager->useResource(tex_fish_base->name(), CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_base));
+        aResourceManager->useResource(tex_fish_normal->name(), CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_normal));
+
+        //
+        // Configure entities
+        //
         mat_standard->getMutableConfiguration().setSampledImage("diffuseTexture", util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
-        mat_standard->getMutableConfiguration().setSampledImage("normalTexture", util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
+        mat_standard->getMutableConfiguration().setSampledImage("normalTexture",  util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
 
         auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");
         auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");
