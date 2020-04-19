@@ -7,9 +7,11 @@
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
 #include <resources/cresourcemanager.h>
+
 #include "vulkan_integration/resources/cvkapiresource.h"
 #include "vulkan_integration/resources/ivkglobalcontext.h"
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
+#include "vulkan_integration/rendering/vulkanrendercontext.h"
 
 namespace engine
 {
@@ -36,12 +38,12 @@ namespace engine
             static EEngineStatus initialize(STextureViewDescription const &aDescription
                                           , Handles_t                     &aGpuApiHandles
                                           , IVkGlobalContext              *aVulkanEnvironment
-                                          , CResourceManager              *aResourceManager);
+                                          , VulkanResourceManager_t       *aResourceManager);
 
             static EEngineStatus deinitialize(STextureViewDescription const &aDescription
                                             , Handles_t                     &aGpuApiHandles
                                             , IVkGlobalContext              *aVulkanEnvironment
-                                            , CResourceManager              *aResourceManager);
+                                            , VulkanResourceManager_t       *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
@@ -57,7 +59,7 @@ namespace engine
         static EEngineStatus SVulkanTextureViewResource::initialize(STextureViewDescription const &aDescription
                                                                     , Handles_t                     &aGpuApiHandles
                                                                     , IVkGlobalContext              *aVulkanEnvironment
-                                                                    , CResourceManager              *aResourceManager)
+                                                                    , VulkanResourceManager_t   *aResourceManager)
         {
             OptionalRef_t<TextureResourceState_t> const textureOpt = aResourceManager->getResource(aDescription.subjacentBufferId);
             if(not textureOpt.has_value())
@@ -158,7 +160,7 @@ namespace engine
         static EEngineStatus SVulkanTextureViewResource::deinitialize(STextureViewDescription const &aDescription
                                                                       , Handles_t                     &aGpuApiHandles
                                                                       , IVkGlobalContext              *aVulkanEnvironment
-                                                                      , CResourceManager              *aResourceManager)
+                                                                      , VulkanResourceManager_t   *aResourceManager)
         {
             VkImageView vkImageView     = aGpuApiHandles.handle;
             VkDevice    vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();

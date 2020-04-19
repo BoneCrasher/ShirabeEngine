@@ -587,7 +587,7 @@ namespace engine
             std::vector<SFrameGraphBuffer>       uniformBuffers;
             std::vector<SFrameGraphAssetTexture> textures;
             SFrameGraphPipeline                  pipeline;
-        };/
+        };
 
         struct SFrameGraphMesh
             : SFrameGraphResource

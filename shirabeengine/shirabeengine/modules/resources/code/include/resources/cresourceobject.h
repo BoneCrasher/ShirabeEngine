@@ -19,14 +19,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        template <typename TDescription, typename TDependencies>
+        template <typename TDescription>
         class
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT CResourceObject
         {
         public_typedefs:
-            using Descriptor_t   = TDescription;
-            using Dependencies_t = TDependencies;
+            using Descriptor_t = TDescription;
         };
         //<-----------------------------------------------------------------------------
     }

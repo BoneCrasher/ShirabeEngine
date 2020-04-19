@@ -9,5 +9,8 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
 project(shirabedevelopment)
 
+SET(SHIRABE_BUILDSYSTEM_ENV_FILEPATH     ${CMAKE_SOURCE_DIR}/buildsystem)
+SET(SHIRABE_WORKSPACE_PATH_SHIRABEENGINE ${CMAKE_SOURCE_DIR})
+
 add_subdirectory(shirabeengine)
         

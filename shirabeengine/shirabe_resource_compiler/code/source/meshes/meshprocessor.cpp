@@ -30,18 +30,18 @@ namespace meshes
      * @param aOutSerializedData
      * @return
      */
-    static CResult<EResult> serializeMeshMeta(mesh::SMeshMeta const &aMeta, std::string &aOutSerializedData)
+    static CResult<EResult> serializeMeshMeta(mesh::SMeshAsset const &aMeta, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
         using namespace engine::documents;
 
-        Unique<IJSONSerializer<mesh::SMeshMeta>> serializer  = makeUnique<CJSONSerializer<mesh::SMeshMeta>>();
-        bool const                               initialized = serializer->initialize();
+        Unique<IJSONSerializer<mesh::SMeshAsset>> serializer  = makeUnique<CJSONSerializer<mesh::SMeshAsset>>();
+        bool const                                initialized = serializer->initialize();
         if( not initialized )
         {
             return EResult::SerializationFailed;
         }
-        CResult<Shared<serialization::ISerializer<mesh::SMeshMeta>::IResult>> const serialization = serializer->serialize(aMeta);
+        CResult<Shared<serialization::ISerializer<mesh::SMeshAsset>::IResult>> const serialization = serializer->serialize(aMeta);
         if( not serialization.successful())
         {
             return EResult::SerializationFailed;
@@ -370,7 +370,7 @@ namespace meshes
 
         engine::writeFile(outputDataFilePathAbs, serializedData);
 
-        engine::mesh::SMeshMeta meta {};
+        engine::mesh::SMeshAsset meta {};
         meta.uid        = 1234;
         meta.name       = meshID;
         meta.dataFileId = engine::util::crc32FromString(outputDataFilePath);

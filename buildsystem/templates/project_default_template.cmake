@@ -11,7 +11,7 @@
 #--------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.10)
 # Uncomment for your project
-# include($ENV{SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/<your workspace>.environment.cmake)
+# include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/<your workspace>.environment.cmake)
 # include(project_default_template)
 
 # Uncomment this: Specify target type of this project

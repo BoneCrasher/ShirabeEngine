@@ -27,17 +27,6 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SNoDependencies {
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                return {};
-            }
-        };
-
-        struct
-            [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBufferDescription
         {
             std::string                       name;

@@ -56,11 +56,9 @@ namespace engine::resources
         using LogicalResource_t = TLogicalResource;
         using GpuApiResource_t  = TGpuApiResource;
         using Descriptor_t      = typename LogicalResource_t::Descriptor_t;
-        using Dependencies_t    = typename LogicalResource_t::Dependencies_t;
         using GpuApiHandles_t   = typename GpuApiResource_t ::Handles_t;
 
         Descriptor_t    description;
-        Dependencies_t  dependencies;
         GpuApiHandles_t gpuApiHandles;
         ResourceState_t loadState;
     };
@@ -69,7 +67,7 @@ namespace engine::resources
     /**
      *
      */
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     class
         [[nodiscard]]
         SHIRABE_LIBRARY_EXPORT CResourceManager
@@ -80,10 +78,10 @@ namespace engine::resources
         using ResourceVariants_t = std::variant<TResources...>;
 
     public_constructors:
-        CResourceManager(Shared<TGraphicsApiBackend> aGraphicsApiBackend);
+        CResourceManager();
 
     public_destructors:
-        ~CResourceManager() = default;
+        ~CResourceManager();
 
     public_methods:
         template <typename TResource>
@@ -152,19 +150,16 @@ namespace engine::resources
 
         std::unordered_map<ResourceId_t, ResourceVariants_t> mResourceObjects;
         CAdjacencyTree<ResourceId_t>                         mResourceTree;
-
-        Shared<TGraphicsApiBackend> mGraphicsApiBackend;
     };
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
-    CResourceManager<TResources...>::CResourceManager(Shared<TGraphicsApiBackend> aGraphicsApiBackend)
+    template <typename... TResources>
+    CResourceManager<TResources...>::CResourceManager()
         : mResourceObjects    ()
         , mResourceTree       ()
-        , mGraphicsApiBackend (std::move(aGraphicsApiBackend))
     {
         mResourceThreadLooper.initialize();
         mResourceThreadLooper.run();
@@ -174,7 +169,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     CResourceManager<TResources...>::~CResourceManager()
     {
         mResourceThreadLooper.abortAndJoin();
@@ -185,7 +180,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource>
     CEngineResult<OptionalRef_t<TResource>> CResourceManager<TResources...>
             ::useResource(
@@ -207,7 +202,6 @@ namespace engine::resources
         //
         TResource resource {};
         resource.descriptor    = aDescriptor;
-        resource.dependencies  = {};
         resource.gpuApiHandles = {};
         resource.loadState     = EGpuApiResourceState::Unloaded;
 
@@ -221,14 +215,14 @@ namespace engine::resources
     //
     //<-----------------------------------------------------------------------------
 
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource>
     CEngineResult<OptionalRef_t<TResource>> CResourceManager<TResources...>::getResource(ResourceId_t const &aId)
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = initializeResource(*resource, *mGraphicsApiBackend, this);
+            auto const &[result] = initializeResource(*resource, this);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -247,14 +241,14 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource>
     CEngineResult<OptionalRef_t<TResource>> CResourceManager<TResources...>::uploadResource(ResourceId_t const &aId)
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = transferResource(*resource, *mGraphicsApiBackend, this);
+            auto const &[result] = transferResource(*resource, this);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -273,7 +267,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource>
     CEngineResult<> CResourceManager<TResources...>::discardResource(ResourceId_t const &aResourceId)
     {
@@ -286,7 +280,7 @@ namespace engine::resources
             TResource &resource = std::get<TResource>(value);
             if(EGpuApiResourceState::Discarded != resource.state)
             {
-                EEngineStatus const deinitResult = deinitializeResource<TResource>(aResourceId, *mGraphicsApiBackend, this).result();
+                EEngineStatus const deinitResult = deinitializeResource<TResource>(aResourceId, this).result();
                 if(CheckEngineError(deinitResult))
                 {
                     CLog::Error(logTag(), "Failed to deinitialize resource with ID '{}'", aResourceId);
@@ -321,7 +315,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<> CResourceManager<TResources...>::initializeResource(TResource const &aResource
                                                                       , TArgs       &&...aArgs)
@@ -404,7 +398,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<> CResourceManager<TResources...>::deinitializeResource(TResource const &aResourceId
                                                                         , TArgs       &&...aArgs)
@@ -485,7 +479,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources, typename TGraphicsApiBackend>
+    template <typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<> CResourceManager<TResources...>::transferResource(TResource const &aResourceId
                                                                     , TArgs       &&...aArgs)

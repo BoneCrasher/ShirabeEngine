@@ -27,9 +27,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBuffer
-            : public CResourceObject<SBufferDescription, SNoDependencies>
+            : public CResourceObject<SBufferDescription>
         {
-            using CResourceObject<SBufferDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<SBufferDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -39,9 +39,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBufferView
-            : public CResourceObject<SBufferViewDescription, SBufferViewDependencies>
+            : public CResourceObject<SBufferViewDescription>
         {
-            using CResourceObject<SBufferViewDescription, SBufferViewDependencies>::CResourceObject;
+            using CResourceObject<SBufferViewDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -51,9 +51,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT STexture
-            : public CResourceObject<STextureDescription, SNoDependencies>
+            : public CResourceObject<STextureDescription>
         {
-            using CResourceObject<STextureDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<STextureDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -63,9 +63,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT STextureView
-            : public CResourceObject<STextureViewDescription, STextureViewDependencies>
+            : public CResourceObject<STextureViewDescription>
         {
-            using CResourceObject<STextureViewDescription, STextureViewDependencies>::CResourceObject;
+            using CResourceObject<STextureViewDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -75,9 +75,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SDepthStencilState
-            : public CResourceObject<SDepthStencilStateDescription, SNoDependencies>
+            : public CResourceObject<SDepthStencilStateDescription>
         {
-            using CResourceObject<SDepthStencilStateDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<SDepthStencilStateDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -87,9 +87,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SRasterizerState
-            : public CResourceObject<SRasterizerStateDescription, SNoDependencies>
+            : public CResourceObject<SRasterizerStateDescription>
         {
-            using CResourceObject<SRasterizerStateDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<SRasterizerStateDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -99,9 +99,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SSubpass
-            : public CResourceObject<SSubpassDescription, SNoDependencies>
+            : public CResourceObject<SSubpassDescription>
         {
-            using CResourceObject<SSubpassDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<SSubpassDescription>::CResourceObject;
         };
         //<-----------------------------------------------------------------------------
 
@@ -111,17 +111,17 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SRenderPass
-            : public CResourceObject<SRenderPassDescription, SRenderPassDependencies>
+            : public CResourceObject<SRenderPassDescription>
         {
-            using CResourceObject<SRenderPassDescription, SRenderPassDependencies>::CResourceObject;
+            using CResourceObject<SRenderPassDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SFrameBuffer
-            : public CResourceObject<SFrameBufferDescription, SFrameBufferDependencies>
+            : public CResourceObject<SFrameBufferDescription>
         {
-            using CResourceObject<SFrameBufferDescription, SFrameBufferDependencies>::CResourceObject;
+            using CResourceObject<SFrameBufferDescription>::CResourceObject;
 
         };
         //<-----------------------------------------------------------------------------
@@ -132,41 +132,41 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SSwapChainBuffer
-            : public CResourceObject<SSwapChainBufferDescription, SNoDependencies>
+            : public CResourceObject<SSwapChainBufferDescription>
         {
-            using CResourceObject<SSwapChainBufferDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<SSwapChainBufferDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SSwapChain
-            : public CResourceObject<SSwapChainDescription, SNoDependencies>
+            : public CResourceObject<SSwapChainDescription>
         {
-            using CResourceObject<SSwapChainDescription, SNoDependencies>::CResourceObject;
+            using CResourceObject<SSwapChainDescription>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SPipeline
-            : public CResourceObject<SMaterialPipelineDescriptor, SMaterialPipelineDependencies>
+            : public CResourceObject<SMaterialPipelineDescriptor>
         {
-            using CResourceObject<SMaterialPipelineDescriptor, SMaterialPipelineDependencies>::CResourceObject;
+            using CResourceObject<SMaterialPipelineDescriptor>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SShaderModule
-            : public CResourceObject<SShaderModuleDescriptor, SNoDependencies>
+            : public CResourceObject<SShaderModuleDescriptor>
         {
-            using CResourceObject<SShaderModuleDescriptor, SNoDependencies>::CResourceObject;
+            using CResourceObject<SShaderModuleDescriptor>::CResourceObject;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SMaterial
-            : public CResourceObject<SMaterialDescriptor, SMaterialDependencies>
+            : public CResourceObject<SMaterialDescriptor>
         {
-            using CResourceObject<SMaterialDescriptor, SMaterialDependencies>::CResourceObject;
+            using CResourceObject<SMaterialDescriptor>::CResourceObject;
 
             Shared<SPipeline>       pipelineResource;
             Shared<SShaderModule>   shaderModuleResource;
@@ -176,9 +176,9 @@ namespace engine
         struct
                 [[nodiscard]]
                 SHIRABE_LIBRARY_EXPORT SMesh
-                : public CResourceObject<SMeshDescriptor, SMeshDependencies>
+                : public CResourceObject<SMeshDescriptor>
         {
-            using CResourceObject<SMeshDescriptor, SMeshDependencies>::CResourceObject;
+            using CResourceObject<SMeshDescriptor>::CResourceObject;
 
             Shared<SBuffer> vertexDataBufferResource;
             Shared<SBuffer> indexBufferResource;
