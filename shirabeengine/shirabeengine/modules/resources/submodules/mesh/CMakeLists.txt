@@ -8,6 +8,7 @@ set(SHIRABE_TEMPLATE "StaticLib")
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULERESOURCES
+        SHIRABEMODULEBUFFERS
         FXGLTF)
 
 include(project_setup)
@@ -19,5 +20,6 @@ add_dependencies(mesh INSTALL_core)
 add_dependencies(mesh INSTALL_utility)
 add_dependencies(mesh INSTALL_graphicsapi)
 add_dependencies(mesh INSTALL_resources)
+add_dependencies(mesh INSTALL_buffers)
 add_dependencies(mesh INSTALL_math)
 add_dependencies(mesh INSTALL_asset)

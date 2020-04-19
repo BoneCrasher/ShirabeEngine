@@ -133,7 +133,7 @@ namespace engine
                 return { EEngineStatus::Ok, mInstances.at(aMeshInstanceAssetId) };
             }
 
-            return mInstances(aAssetStorage, aMeshInstanceAssetId);
+            return loadInstance(aAssetStorage, aMeshInstanceAssetId);
         }
         //<-----------------------------------------------------------------------------
 
@@ -170,7 +170,7 @@ namespace engine
                     SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
                 }
 
-                instance = CMeshInstance::fromMeshAsset(meshData);
+                instance = CMeshInstance::fromAsset(meshData);
                 mInstances[aMeshInstanceAssetId] = instance;
             }
 

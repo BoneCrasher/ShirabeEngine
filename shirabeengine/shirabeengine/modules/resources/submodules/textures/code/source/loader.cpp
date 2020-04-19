@@ -9,7 +9,6 @@
 #include "textures/declaration.h"
 #include "textures/loader.h"
 
-
 namespace engine
 {
     namespace textures
@@ -62,9 +61,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<STextureMeta> readMeta(std::string const &aLogTag, Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetId_t const &aAssetUID)
+        CEngineResult<STextureAsset> readTextureFile(std::string const &aLogTag, Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetId_t const &aAssetUID)
         {
-            return readFile<STextureMeta>(aLogTag, aAssetStorage, aAssetUID);
+            return readFile<STextureAsset>(aLogTag, aAssetStorage, aAssetUID);
         }
         //<-----------------------------------------------------------------------------
 
@@ -89,9 +88,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<STextureMeta> CTextureLoader::loadMeta(Shared<asset::IAssetStorage> const &aAssetStorage, engine::asset::AssetID_t const &aAssetId)
+        CEngineResult<STextureAsset> CTextureLoader::loadTextureFile(Shared<asset::IAssetStorage> const &aAssetStorage, engine::asset::AssetID_t const &aAssetId)
         {
-            return readMeta(logTag(), aAssetStorage, aAssetId);
+            return readTextureFile(logTag(), aAssetStorage, aAssetId);
         }
         //<-----------------------------------------------------------------------------
 
@@ -108,23 +107,23 @@ namespace engine
             //
             Shared<CTextureInstance> instance = nullptr;
 
-            if(mInstantiatedInstances.end() != mInstantiatedInstances.find(aAssetId))
+            if(mInstances.end() != mInstances.find(aAssetId))
             {
-                instance = mInstantiatedInstances.at(aAssetId);
+                instance = mInstances.at(aAssetId);
             }
             else
             {
-                auto const [metaDataFetchResult, metaData] = readMeta(logTag(), aAssetStorage, aAssetId);
+                auto const [textureFileFetchResult, textureFile] = readTextureFile(logTag(), aAssetStorage, aAssetId);
                 {
-                    PrintEngineError(metaDataFetchResult, logTag(), "Could not fetch master meta data.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(metaDataFetchResult);
+                    PrintEngineError(textureFileFetchResult, logTag(), "Could not fetch master meta data.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(textureFileFetchResult);
                 }
 
                 static uint64_t sInstanceIndex = 0;
-                std::string instanceName = fmt::format("{}_instance_{}", metaData.name, ++sInstanceIndex);
+                std::string instanceName = fmt::format("{}_instance_{}", textureFile.name, ++sInstanceIndex);
 
-                instance = makeShared<CTextureInstance>(metaData.name, metaData.textureInfo, metaData.imageLayersBinaryUid);
-                mInstantiatedInstances[aAssetId] = instance;
+                instance = CTextureInstance::fromAsset(textureFile);
+                mInstances[aAssetId] = instance;
             }
 
             if(nullptr == instance)

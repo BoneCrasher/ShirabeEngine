@@ -3,7 +3,7 @@ function(linkLibrary)
     set(BINARY_NAME material)
     set(LINK_STATIC OFF)
 
-    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/material)
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/resources/submodules/material)
 
     # -I
     append_parentscope(

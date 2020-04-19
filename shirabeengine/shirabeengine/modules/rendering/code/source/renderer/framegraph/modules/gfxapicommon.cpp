@@ -202,9 +202,9 @@ namespace engine
                 SFrameGraphDynamicTexture const &texture = *textureFetch.data();
 
                 // aContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
-                aContext->copyImageToBackBuffer(texture);
-                aContext->commitFrameCommandBuffers();
-                aContext->present();
+                aContext.copyImageToBackBuffer(aRenderContextState, texture);
+                aContext.endFrameCommandBuffers(aRenderContextState);
+                aContext.present(aRenderContextState);
 
                 return { EEngineStatus::Ok };
             };

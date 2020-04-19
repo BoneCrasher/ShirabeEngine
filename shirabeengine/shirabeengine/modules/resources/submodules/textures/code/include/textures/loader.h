@@ -4,6 +4,7 @@
 #include <log/log.h>
 #include <core/enginestatus.h>
 #include <resources/resourcedescriptions.h>
+#include <bits/shared_ptr.h>
 
 namespace engine
 {
@@ -16,8 +17,8 @@ namespace engine
 
     namespace textures
     {
-        struct STextureMeta;
         class  CTextureInstance;
+        struct STextureAsset;
 
         /**
          * @brief The CMaterialLoader class
@@ -36,17 +37,17 @@ namespace engine
 
         public_methods:
 
-            CEngineResult <Shared<CTextureInstance>> createInstance(asset::AssetID_t const &aAssetId);
+            CEngineResult<Shared<CTextureInstance>> createInstance(asset::AssetID_t const &aAssetId);
 
-            CEngineResult <STextureMeta> loadMeta(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aAssetId);
+            CEngineResult<STextureAsset> loadTextureFile(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aAssetId);
 
-            CEngineResult <Shared<CTextureInstance>> loadInstance( Shared<asset::IAssetStorage> const &aAssetStorage
+            CEngineResult<Shared<CTextureInstance>> loadInstance( Shared<asset::IAssetStorage> const &aAssetStorage
                                                                  , asset::AssetID_t             const &aAssetId);
 
             CEngineResult<> destroyInstance(asset::AssetID_t const &aAssetId);
 
         private_members:
-            Map <asset::AssetID_t, Shared<CTextureInstance>> mInstantiatedInstances;
+            Map <asset::AssetID_t, Shared<CTextureInstance>> mInstances;
         };
 
     }

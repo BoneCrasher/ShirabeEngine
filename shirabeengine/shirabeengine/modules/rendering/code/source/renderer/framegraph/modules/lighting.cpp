@@ -97,7 +97,8 @@ namespace engine
 
                 aOutPassData.exportData.lightAccumulationBuffer = aBuilder.writeAttachment(aOutPassData.state.lightAccumulationBufferTextureId, writeFlags).data();
 
-                SFrameGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta")).data();
+                SFrameGraphPipelineConfig pipelineConfig {};
+                SFrameGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta"), pipelineConfig).data();
                 aOutPassData.importData.material = material;
 
                 return { EEngineStatus::Ok };

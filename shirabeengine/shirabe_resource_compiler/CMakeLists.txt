@@ -16,6 +16,7 @@ set(
         SHIRABEMODULEMATERIAL
         SHIRABEMODULEMESH
         SHIRABEMODULETEXTURES
+        SHIRABEMODULEBUFFERS
         SPIRVCROSS
         SPIRVTOOLS
         GLSLANG
@@ -32,6 +33,7 @@ add_dependencies(shirabe_resource_compiler INSTALL_asset)
 add_dependencies(shirabe_resource_compiler INSTALL_math)
 add_dependencies(shirabe_resource_compiler INSTALL_resources)
 add_dependencies(shirabe_resource_compiler INSTALL_graphicsapi)
+add_dependencies(shirabe_resource_compiler INSTALL_buffers)
 add_dependencies(shirabe_resource_compiler INSTALL_material)
 add_dependencies(shirabe_resource_compiler INSTALL_mesh)
 add_dependencies(shirabe_resource_compiler INSTALL_textures)

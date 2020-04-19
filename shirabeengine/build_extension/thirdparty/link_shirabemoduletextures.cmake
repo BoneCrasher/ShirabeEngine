@@ -3,7 +3,7 @@ function(linkLibrary)
     set(BINARY_NAME textures)
     set(LINK_STATIC OFF)
 
-    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/textures)
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/resources/submodules/textures)
 
     # -I
     append_parentscope(

@@ -182,7 +182,7 @@ namespace engine::textures
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    bool STextureMeta::acceptSerializer(documents::IJSONSerializer<STextureMeta> &aSerializer) const
+    bool STextureAsset::acceptSerializer(documents::IJSONSerializer<STextureAsset> &aSerializer) const
     {
         aSerializer.beginObject(name);
 
@@ -215,7 +215,7 @@ namespace engine::textures
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    bool STextureMeta::acceptDeserializer(documents::IJSONDeserializer<STextureMeta> &aDeserializer)
+    bool STextureAsset::acceptDeserializer(documents::IJSONDeserializer<STextureAsset> &aDeserializer)
     {
         aDeserializer.readValue("uid",                       uid);
         aDeserializer.readValue("name",                      name);

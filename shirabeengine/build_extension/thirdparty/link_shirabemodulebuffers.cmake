@@ -1,9 +1,9 @@
 function(linkLibrary)
-    set(TARGET_NAME mesh)
-    set(BINARY_NAME mesh)
+    set(TARGET_NAME buffers)
+    set(BINARY_NAME buffers)
     set(LINK_STATIC OFF)
 
-    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/resources/submodules/mesh)
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/resources/submodules/buffers)
 
     # -I
     append_parentscope(

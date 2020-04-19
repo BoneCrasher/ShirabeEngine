@@ -96,7 +96,8 @@ namespace engine
 
                 aOutPassData.exportData.output = aBuilder.writeAttachment(aOutPassData.state.compositingBufferId, writeFlags).data();
 
-                SFrameGraphMaterial const &material = aBuilder.useMaterial("compositing", util::crc32FromString("materials/deferred/compositing/compositing.material.meta")).data();
+                SFrameGraphPipelineConfig pipelineConfig {};
+                SFrameGraphMaterial const &material = aBuilder.useMaterial("compositing", util::crc32FromString("materials/deferred/compositing/compositing.material.meta"), pipelineConfig).data();
                 aOutPassData.importData.material = material;
 
                 return { EEngineStatus::Ok };

@@ -11,8 +11,6 @@
 
 #include <platform/platform.h>
 
-#include <vulkan/vulkan.h>
-
 #include <base/declaration.h>
 #include <base/stl_container_helpers.h>
 #include <core/enginestatus.h>

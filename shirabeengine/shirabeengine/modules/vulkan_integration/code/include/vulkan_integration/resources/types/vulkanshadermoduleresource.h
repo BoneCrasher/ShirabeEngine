@@ -6,11 +6,11 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include <resources/cresourcemanager.h>
 
 #include "vulkan_integration/vulkandevicecapabilities.h"
 #include "vulkan_integration/resources/cvkapiresource.h"
 #include "vulkan_integration/resources/ivkglobalcontext.h"
+#include "vulkan_integration/rendering/vulkanrendercontext.h"
 
 namespace engine
 {
@@ -37,12 +37,12 @@ namespace engine
             static EEngineStatus initialize(SShaderModuleDescriptor const &aDescription
                                           , Handles_t                     &aGpuApiHandles
                                           , IVkGlobalContext              *aVulkanEnvironment
-                                          , CResourceManager              *aResourceManager);
+                                          , VulkanResourceManager_t       *aResourceManager);
 
             static EEngineStatus deinitialize(SShaderModuleDescriptor const &aDescription
                                             , Handles_t                     &aGpuApiHandles
                                             , IVkGlobalContext              *aVulkanEnvironment
-                                            , CResourceManager              *aResourceManager);
+                                            , VulkanResourceManager_t       *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace engine
         static EEngineStatus SVulkanShaderModuleResource::initialize(SShaderModuleDescriptor const &aDescription
                                                                    , Handles_t                     &aGpuApiHandles
                                                                    , IVkGlobalContext              *aVulkanEnvironment
-                                                                   , CResourceManager              *aResourceManager)
+                                                                   , VulkanResourceManager_t       *aResourceManager)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
@@ -117,7 +117,7 @@ namespace engine
         static EEngineStatus SVulkanShaderModuleResource::deinitialize(SShaderModuleDescriptor const &aDescription
                                                                      , Handles_t                     &aGpuApiHandles
                                                                      , IVkGlobalContext              *aVulkanEnvironment
-                                                                     , CResourceManager              *aResourceManager)
+                                                                     , VulkanResourceManager_t       *aResourceManager)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 

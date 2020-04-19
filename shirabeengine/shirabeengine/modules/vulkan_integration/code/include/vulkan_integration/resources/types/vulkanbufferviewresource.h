@@ -6,10 +6,11 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include <resources/cresourcemanager.h>
+
 #include "vulkan_integration/resources/cvkapiresource.h"
 #include "vulkan_integration/resources/ivkglobalcontext.h"
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
+#include "vulkan_integration/rendering/vulkanrendercontext.h"
 
 namespace engine
 {
@@ -36,12 +37,12 @@ namespace engine
             static EEngineStatus initialize(SBufferViewDescription  const &aDescription
                                           , Handles_t                     &aGpuApiHandles
                                           , IVkGlobalContext              *aVulkanEnvironment
-                                          , CResourceManager              *aResourceManager);
+                                          , VulkanResourceManager_t       *aResourceManager);
 
             static EEngineStatus deinitialize(SBufferViewDescription  const &aDescription
                                             , Handles_t                     &aGpuApiHandles
                                             , IVkGlobalContext              *aVulkanEnvironment
-                                            , CResourceManager              *aResourceManager);
+                                            , VulkanResourceManager_t       *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
@@ -57,7 +58,7 @@ namespace engine
         static EEngineStatus SVulkanBufferViewResource::initialize(SBufferViewDescription  const &aDescription
                                                                  , Handles_t                     &aGpuApiHandles
                                                                  , IVkGlobalContext              *aVulkanEnvironment
-                                                                 , CResourceManager              *aResourceManager)
+                                                                 , VulkanResourceManager_t       *aResourceManager)
         {
             OptionalRef_t<BufferResourceState_t> const bufferOpt = aResourceManager->getResource(aDescription.subjacentBufferId);
             if(not bufferOpt.has_value())
@@ -92,7 +93,7 @@ namespace engine
         static EEngineStatus SVulkanBufferViewResource::deinitialize(SBufferViewDescription  const &aDescription
                                                                    , Handles_t                     &aGpuApiHandles
                                                                    , IVkGlobalContext              *aVulkanEnvironment
-                                                                   , CResourceManager              *aResourceManager)
+                                                                   , VulkanResourceManager_t       *aResourceManager)
         {
             VkBufferView vkBufferView    = aGpuApiHandles.handle;
             VkDevice     vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
