@@ -28,8 +28,8 @@ namespace engine
         static
         ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage>  const &aAssetStorage
                                                                          , std::string                 const &aMaterialName
-                                                                         , SMaterialSignature          const &aSignature
-                                                                         , CMaterialConfig             const &aConfiguration
+                                                                         , CMaterialMaster             const &aMaster
+                                                                         , CMaterialInstance           const &aInstance
                                                                          , bool                               aIncludeSystemBuffers = false)
         {
             using namespace resources;
@@ -94,7 +94,7 @@ namespace engine
             pipelineDescriptor.depthStencilState.minDepthBounds          = 0.0f;
             pipelineDescriptor.depthStencilState.maxDepthBounds          = 1.0f;
 
-            for(auto const &[stageKey, stage] : aSignature.stages)
+            for(auto const &[stageKey, stage] : aMaster.stages())
             {
                 if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT == stageKey)
                 {
@@ -193,7 +193,7 @@ namespace engine
             }
 
             uint32_t const setSubtractionValue = aIncludeSystemBuffers ? 0 : 2;
-            uint32_t const setCount            = aSignature.layoutInfo.setCount - setSubtractionValue;
+            uint32_t const setCount            = aMaster.layoutInfo().setCount - setSubtractionValue;
 
             std::vector<VkDescriptorSetLayoutCreateInfo> descriptorSets {};
             descriptorSets.resize(setCount);
@@ -206,14 +206,14 @@ namespace engine
                 info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
                 info.pNext        = nullptr;
                 info.flags        = 0;
-                info.bindingCount = aSignature.layoutInfo.setBindingCount[k + setSubtractionValue];
+                info.bindingCount = aMaster.layoutInfo().setBindingCount[k + setSubtractionValue];
 
                 pipelineDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
             }
 
             pipelineDescriptor.descriptorSetLayoutCreateInfos = descriptorSets;
 
-            for(SSubpassInput const &input : aSignature.subpassInputs)
+            for(SSubpassInput const &input : aMaster.subpassInputs())
             {
                 if(not aIncludeSystemBuffers && 2 > input.set)
                 {
@@ -229,7 +229,7 @@ namespace engine
                 pipelineDescriptor.descriptorSetLayoutBindings[input.set - setSubtractionValue][input.binding] = layoutBinding;
             }
 
-            for(SUniformBuffer const &uniformBuffer : aSignature.uniformBuffers)
+            for(SUniformBuffer const &uniformBuffer : aMaster.uniformBuffers())
             {
                 if(not aIncludeSystemBuffers && 2 > uniformBuffer.set)
                 {
@@ -244,7 +244,7 @@ namespace engine
                 layoutBinding.pImmutableSamplers = nullptr;
                 pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set - setSubtractionValue][uniformBuffer.binding] = layoutBinding;
 
-                CEngineResult<void const *const> bufferDataFetch = aConfiguration.getBuffer(uniformBuffer.name);
+                CEngineResult<void const *const> bufferDataFetch = aInstance.config().getBuffer(uniformBuffer.name);
                 if(CheckEngineError(bufferDataFetch.result()))
                 {
                     CLog::Debug("AssetLoader - Materials", "Can't find buffer w/ name {} in config.", uniformBuffer.name);
@@ -274,7 +274,7 @@ namespace engine
                 bufferDescriptions.push_back(desc);
             }
 
-            for(SSampledImage const &sampledImage : aSignature.sampledImages)
+            for(SSampledImage const &sampledImage : aMaster.sampledImages())
             {
                 if(not aIncludeSystemBuffers && 2 > sampledImage.set)
                 {
@@ -316,9 +316,7 @@ namespace engine
             {
                 static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
 
-                Shared <CMaterialMaster> const &master    = aInstance->master();
-                SMaterialSignature const       &signature = master->signature();
-                CMaterialConfig const          &config    = aInstance->config();
+                Shared <CMaterialMaster> const &master = aInstance->master();
 
                 bool const includeSystemBuffers = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == master->name());
                 auto [derivationSuccessful
@@ -326,11 +324,11 @@ namespace engine
                       , shaderModuleDescription
                       , bufferDescriptions] = deriveResourceDescriptions(aAssetStorage
                                                                        , master->name()
-                                                                       , master->signature()
-                                                                       , aInstance->config()
+                                                                       , *master
+                                                                       , *aInstance
                                                                        , includeSystemBuffers);
 
-                Vector <SSampledImage> sampledImages = signature.sampledImages;
+                Vector <SSampledImage> sampledImages = master->sampledImages();
                 std::sort(sampledImages.begin(), sampledImages.end(), [](SSampledImage const &aLHS
                                                                        , SSampledImage const &aRHS) -> bool
                 {
@@ -340,7 +338,7 @@ namespace engine
                 Vector <asset::AssetId_t> sampledImageResources{};
                 for( auto const           &sampledImage : sampledImages )
                 {
-                    CMaterialConfig::SampledImageMap_t const &assignment = config.getSampledImageAssignment();
+                    CMaterialConfig::SampledImageMap_t const &assignment = aInstance->config().getSampledImageAssignment();
                     if( assignment.end() == assignment.find(sampledImage.name))
                     {
                         sampledImageResources.push_back(asset::AssetId_t{}); // Fill gaps...

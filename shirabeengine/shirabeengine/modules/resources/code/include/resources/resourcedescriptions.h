@@ -29,10 +29,9 @@ namespace engine
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBufferDescription
         {
-            std::string                       name;
-            VkBufferCreateInfo                createInfo;
-            DataSourceAccessor_t              dataSource;
-            std::vector<DataSourceAccessor_t> initialData; // Important: Just an accessor. Resource data is not in memory here.
+            std::string          name;
+            VkBufferCreateInfo   createInfo;
+            DataSourceAccessor_t dataSource;
         };
 
         struct
@@ -53,7 +52,7 @@ namespace engine
             STextureInfo                     textureInfo;
             EResourceUsage                   cpuGpuUsage;
             core::CBitField<EBufferBinding>  gpuBinding;
-            Vector<DataSourceAccessor_t>     initialData;
+            DataSourceAccessor_t             initialData;
         };
 
         struct
@@ -299,31 +298,22 @@ namespace engine
             Vector<asset::AssetId_t>           sampledImages;
         };
 
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT SMaterialDependencies
-        {
-            SMaterialPipelineDependencies pipelineDependencies;
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                return {};
-            }
-        };
-
+        /**
+         * SMeshDescriptor provides all information necessary in order to create mesh resource
+         * and it's attribute and index buffer entries.
+         */
         struct
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMeshDescriptor
         {
             std::string                               name;
             uint32_t                                  attributeCount;
-            uint32_t                                  indexSampleCount;
-            SBufferDescription                        dataBufferDescription;
-            SBufferDescription                        indexBufferDescription;
             Vector<VkVertexInputBindingDescription>   bindingDescriptions;
             Vector<VkVertexInputAttributeDescription> attributeDescriptions;
             Vector<VkDeviceSize>                      offsets;
+            VkDeviceSize                              firstIndexOffset;
+            uint32_t                                  indexSampleCount;
+            SBufferDescription                        attributeBufferDesc;
         };
 
         struct

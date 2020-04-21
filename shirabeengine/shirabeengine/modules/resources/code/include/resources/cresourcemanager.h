@@ -75,6 +75,7 @@ namespace engine::resources
         SHIRABE_DECLARE_LOG_TAG(CResourceManager);
 
     private_typedefs:
+        using My_t               = CResourceManager<TResources...>;
         using ResourceVariants_t = std::variant<TResources...>;
 
     public_constructors:
@@ -299,16 +300,16 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template<typename T>
+    template<typename TResourceManager, typename T>
     struct is_loadable
     {
     private:
-        template<typename U> static auto check(int) -> decltype(std::declval<U>().load() == 1, std::true_type());
+        template<typename UResourceManager, typename U> static auto check(int) -> decltype(std::declval<U>().template load<UResourceManager>() == 1, std::true_type());
 
         template<typename> static std::false_type check(...);
 
     public:
-        static constexpr bool value = std::is_same<decltype(check<T>(0)), std::true_type>::value;
+        static constexpr bool value = std::is_same<decltype(check<TResourceManager, T>(0)), std::true_type>::value;
     };
     //<-----------------------------------------------------------------------------
 
@@ -344,7 +345,7 @@ namespace engine::resources
             {
                 aResource.loadState.set(EGpuApiResourceState::Creating);
 
-                EEngineStatus const initResult = TResource::GpuApiResource_t::initialize(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const initResult = TResource::GpuApiResource_t::template initialize<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(initResult))
                 {
                     aResource.loadState.set(EGpuApiResourceState::Error);
@@ -354,20 +355,23 @@ namespace engine::resources
                 aResource.loadState.reset(EGpuApiResourceState::Created);
             }
 
-            if(not aResource.loadState.checkAny(EGpuApiResourceState::Loading
-                                              | EGpuApiResourceState::Loaded))
+            if constexpr(is_loadable<My_t, TResource>::value)
             {
-                aResource.loadState.set(EGpuApiResourceState::Loading);
-
-                EEngineStatus const loadResult = TResource::GpuApiResource_t::load(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
-                if(not CheckEngineError(loadResult))
+                if(not aResource.loadState.checkAny(EGpuApiResourceState::Loading
+                                                  | EGpuApiResourceState::Loaded))
                 {
-                    aResource.loadState.set(EGpuApiResourceState::Error);
-                    return loadResult;
-                }
+                    aResource.loadState.set(EGpuApiResourceState::Loading);
 
-                aResource.loadState.unset(EGpuApiResourceState::Loading);
-                aResource.loadState.set(EGpuApiResourceState::Loaded);
+                    EEngineStatus const loadResult = TResource::GpuApiResource_t::template load<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                    if(not CheckEngineError(loadResult))
+                    {
+                        aResource.loadState.set(EGpuApiResourceState::Error);
+                        return loadResult;
+                    }
+
+                    aResource.loadState.unset(EGpuApiResourceState::Loading);
+                    aResource.loadState.set(EGpuApiResourceState::Loaded);
+                }
             }
 
             return EEngineStatus::Ok;
@@ -382,16 +386,16 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template<typename T>
+    template<typename TResourceManager, typename T>
     struct is_unloadable
     {
     private:
-        template<typename U> static auto check(int) -> decltype(std::declval<U>().unload() == 1, std::true_type());
+        template<typename UResourceManager, typename U> static auto check(int) -> decltype(std::declval<U>().template unload<UResourceManager>() == 1, std::true_type());
 
         template<typename> static std::false_type check(...);
 
     public:
-        static constexpr bool value = std::is_same<decltype(check<T>(0)), std::true_type>::value;
+        static constexpr bool value = std::is_same<decltype(check<TResourceManager, T>(0)), std::true_type>::value;
     };
     //<-----------------------------------------------------------------------------
 
@@ -424,29 +428,31 @@ namespace engine::resources
 
         // In any case:
         aResourceId.loadState.unset(EGpuApiResourceState::Transferred);
-
-        if(not aResourceId.loadState.checkAny(EGpuApiResourceState::Unloading
-                                          | EGpuApiResourceState::Unloaded))
+        if constexpr(is_unloadable<My_t, TResource>::value)
         {
-            aResourceId.loadState.set(EGpuApiResourceState::Unloading);
-
-            EEngineStatus const unloadResult = TResource::GpuApiResource_t::unload(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
-            if(not CheckEngineError(unloadResult))
+            if(not aResourceId.loadState.checkAny(EGpuApiResourceState::Unloading
+                                              | EGpuApiResourceState::Unloaded))
             {
-                aResourceId.loadState.set(EGpuApiResourceState::Error);
-                return unloadResult;
-            }
+                aResourceId.loadState.set(EGpuApiResourceState::Unloading);
 
-            aResourceId.loadState.unset(EGpuApiResourceState::Unloading | EGpuApiResourceState::Loaded);
-            aResourceId.loadState.set  (EGpuApiResourceState::Unloaded);
+                EEngineStatus const unloadResult = TResource::GpuApiResource_t::template unload<My_t>(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                if(not CheckEngineError(unloadResult))
+                {
+                    aResourceId.loadState.set(EGpuApiResourceState::Error);
+                    return unloadResult;
+                }
+
+                aResourceId.loadState.unset(EGpuApiResourceState::Unloading | EGpuApiResourceState::Loaded);
+                aResourceId.loadState.set  (EGpuApiResourceState::Unloaded);
+            }
         }
 
         if(not aResourceId.loadState.checkAny(EGpuApiResourceState::Discarding
-                                      | EGpuApiResourceState::Discarded))
+                                            | EGpuApiResourceState::Discarded))
         {
             aResourceId.loadState.reset(EGpuApiResourceState::Discarding);
 
-            EEngineStatus const deinitResult = TResource::GpuApiResource_t::deinitialize(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const deinitResult = TResource::GpuApiResource_t::template deinitialize<My_t>(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(deinitResult))
             {
                 return deinitResult;
@@ -463,16 +469,16 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template<typename T>
+    template<typename TResourceManager, typename T>
     struct is_transferrable
     {
     private:
-        template<typename U> static auto check(int) -> decltype(std::declval<U>().transfer() == 1, std::true_type());
+        template<typename UResourceManager, typename U> static auto check(int) -> decltype(std::declval<U>().template transfer<UResourceManager>() == 1, std::true_type());
 
         template<typename> static std::false_type check(...);
 
     public:
-        static constexpr bool value = std::is_same<decltype(check<T>(0)), std::true_type>::value;
+        static constexpr bool value = std::is_same<decltype(check<TResourceManager, T>(0)), std::true_type>::value;
     };
     //<-----------------------------------------------------------------------------
 
@@ -486,7 +492,7 @@ namespace engine::resources
     {
         using namespace core;
 
-        if constexpr(is_transferrable<TResource>::value)
+        if constexpr(is_transferrable<My_t, TResource>::value)
         {
             // Resource is created or loaded?
             if(not aResourceId.loadState.checkAny(EGpuApiResourceState::Loaded))
@@ -500,7 +506,7 @@ namespace engine::resources
             {
                 aResourceId.loadState.set(EGpuApiResourceState::Transferring);
 
-                EEngineStatus const transferResult = TResource::GpuApiResource_t::transfer(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const transferResult = TResource::GpuApiResource_t::template transfer<My_t>(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(transferResult))
                 {
                     return transferResult;

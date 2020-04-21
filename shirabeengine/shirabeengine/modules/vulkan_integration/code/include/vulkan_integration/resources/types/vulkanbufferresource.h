@@ -57,25 +57,29 @@ namespace engine
                 VkDeviceMemory attachedMemory;
             };
 
+            template <typename TResourceManager>
             static EEngineStatus initialize(SBufferDescription  const &aDescription
                                           , Handles_t                 &aGpuApiHandles
                                           , IVkGlobalContext          *aVulkanEnvironment
-                                          , CResourceManager          *aResourceManager);
+                                          , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus load(SBufferDescription  const &aDescription
                                     , Handles_t                 &aGpuApiHandles
                                     , IVkGlobalContext          *aVulkanEnvironment
-                                    , CResourceManager          *aResourceManager);
+                                    , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus unload(SBufferDescription  const &aDescription
                                       , Handles_t                 &aGpuApiHandles
                                       , IVkGlobalContext          *aVulkanEnvironment
-                                      , CResourceManager          *aResourceManager);
+                                      , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus deinitialize(SBufferDescription  const &aDescription
                                             , Handles_t                 &aGpuApiHandles
                                             , IVkGlobalContext          *aVulkanEnvironment
-                                            , CResourceManager          *aResourceManager);
+                                            , TResourceManager          *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
@@ -88,12 +92,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanBufferResource::initialize(SBufferDescription  const &aDescription
-                                                             , Handles_t                 &aGpuApiHandles
-                                                             , IVkGlobalContext          *aVulkanEnvironment
-                                                             , CResourceManager          *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanBufferResource::initialize(SBufferDescription  const &aDescription
+                                                      , Handles_t                 &aGpuApiHandles
+                                                      , IVkGlobalContext          *aVulkanEnvironment
+                                                      , TResourceManager          *aResourceManager)
         {
-            Shared<IVkGlobalContext> vkContext = aVulkanEnvironment;
+            IVkGlobalContext *vkContext = aVulkanEnvironment;
 
             VkDevice         const &vkLogicalDevice  = vkContext->getLogicalDevice();
             VkPhysicalDevice const &vkPhysicalDevice = vkContext->getPhysicalDevice();
@@ -159,10 +164,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanBufferResource::load(SBufferDescription  const &aDescription
-                                                       , Handles_t                 &aGpuApiHandles
-                                                       , IVkGlobalContext          *aVulkanEnvironment
-                                                       , CResourceManager          *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanBufferResource::load(SBufferDescription  const &aDescription
+                                                , Handles_t                 &aGpuApiHandles
+                                                , IVkGlobalContext          *aVulkanEnvironment
+                                                , TResourceManager          *aResourceManager)
         {
             if(nullptr != aDescription.dataSource)
             {
@@ -183,10 +189,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanBufferResource::unload(SBufferDescription  const &aDescription
-                                                         , Handles_t                 &aGpuApiHandles
-                                                         , IVkGlobalContext          *aVulkanEnvironment
-                                                         , CResourceManager          *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanBufferResource::unload(SBufferDescription  const &aDescription
+                                                  , Handles_t                 &aGpuApiHandles
+                                                  , IVkGlobalContext          *aVulkanEnvironment
+                                                  , TResourceManager          *aResourceManager)
         {
             SHIRABE_UNUSED(aDescription);
             SHIRABE_UNUSED(aGpuApiHandles);
@@ -199,10 +206,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanBufferResource::deinitialize(SBufferDescription  const &aDescription
-                                                               , Handles_t                 &aGpuApiHandles
-                                                               , IVkGlobalContext          *aVulkanEnvironment
-                                                               , CResourceManager          *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanBufferResource::deinitialize(SBufferDescription  const &aDescription
+                                                        , Handles_t                 &aGpuApiHandles
+                                                        , IVkGlobalContext          *aVulkanEnvironment
+                                                        , TResourceManager          *aResourceManager)
         {
             VkBuffer       vkBuffer        = aGpuApiHandles.handle;
             VkDeviceMemory vkDeviceMemory  = aGpuApiHandles.attachedMemory;

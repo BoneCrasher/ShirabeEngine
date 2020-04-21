@@ -174,9 +174,9 @@ namespace engine
         };
 
         struct
-                [[nodiscard]]
-                SHIRABE_LIBRARY_EXPORT SMesh
-                : public CResourceObject<SMeshDescriptor>
+            [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SMesh
+            : public CResourceObject<SMeshDescriptor>
         {
             using CResourceObject<SMeshDescriptor>::CResourceObject;
 

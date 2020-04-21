@@ -47,6 +47,7 @@ namespace engine
         {
             Undefined = 0,
             Meta,
+            BinaryData,
             /** Material **/
             Master    = 10,
             Signature,

@@ -358,8 +358,6 @@ namespace engine
             //<-----------------------------------------------------------------------------
             context.beginFrameCommandBuffers = [=] (SFrameGraphRenderContextState const &aState) -> EEngineStatus
             {
-               
-
                 SVulkanState &state = aVulkanEnvironment->getState();
 
                 auto const begin = [&] (VkCommandBuffer const &buffer) -> void
@@ -450,7 +448,6 @@ namespace engine
             context.bindRenderPass = [=] (SFrameGraphRenderContextState   const &aRenderContextState,
                                           std::string                     const &aRenderPassId,
                                           std::string                     const &aFrameBufferId,
-                                          std::vector<PassUID_t>          const &aPassExecutionOrder,
                                           CFrameGraphMutableResources     const &aFrameGraphResources ) -> EEngineStatus
             {
                
@@ -684,9 +681,9 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.bindVertexBuffer = [=] (SFrameGraphRenderContextState   &aState
-                                          , SFrameGraphBuffer         const &aBuffer
-                                          , VkDeviceSize              const &aIndexCount) -> EEngineStatus
+            context.bindIndexBuffer = [=] (SFrameGraphRenderContextState   &aState
+                                         , SFrameGraphBuffer         const &aBuffer
+                                         , VkDeviceSize              const &aIndexCount) -> EEngineStatus
             {
                 VkCommandBuffer vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 

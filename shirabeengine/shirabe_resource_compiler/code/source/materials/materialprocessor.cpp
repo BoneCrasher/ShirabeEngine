@@ -205,7 +205,7 @@ namespace materials
     CResult<SShaderCompilationUnit> generateCompilationUnit(  SConfiguration                     const &aConfiguration
                                                             , std::vector<std::filesystem::path> const &aFilenames
                                                             , std::filesystem::path              const &aModuleOutputPath
-                                                            , SMaterialMeta                            &aInOutMeta)
+                                                            , SMaterialAsset                            &aInOutMeta)
     {
         using namespace materials;
 
@@ -251,7 +251,7 @@ namespace materials
             element.outputPathRelative = std::filesystem::relative(outputPath, (std::filesystem::current_path() / aConfiguration.outputPath));
 
             std::string const path = element.outputPathRelative;
-            aInOutMeta.stages[stage].spvModuleAssetId = asset::assetIdFromUri(path);
+            aInOutMeta.stages[stage].filename = asset::assetIdFromUri(path);
 
             return element;
         };
@@ -422,56 +422,17 @@ namespace materials
      * @param aOutSerializedData
      * @return
      */
-    static CResult<EResult> serializeMaterialMeta(SMaterialMeta const &aMaterialMeta, std::string &aOutSerializedData)
+    static CResult<EResult> serializeMaterialAsset(SMaterialAsset const &aMaterialMeta, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
 
-        Unique<IJSONSerializer<SMaterialMeta>> serializer = makeUnique<CJSONSerializer<SMaterialMeta>>();
-        bool const initialized = serializer->initialize();
+        Unique<IJSONSerializer<SMaterialAsset>> serializer  = makeUnique<CJSONSerializer<SMaterialAsset>>();
+        bool const                              initialized = serializer->initialize();
         if(false == initialized)
         {
             return EResult::SerializationFailed;
         }
-        CResult<Shared<serialization::ISerializer<SMaterialMeta>::IResult>> const serialization = serializer->serialize(aMaterialMeta);
-        if(not serialization.successful())
-        {
-            return EResult::SerializationFailed;
-        }
-
-        CResult<std::string> data = serialization.data()->asString();
-        aOutSerializedData = data.data();
-
-        bool const deinitialized = serializer->deinitialize();
-        if(false == deinitialized)
-        {
-            return EResult::SerializationFailed;
-        }
-
-        serializer = nullptr;
-
-        CLog::Debug(logTag(), aOutSerializedData);
-
-        return EResult::Success;
-    }
-
-    /**
-     * Accept a SMaterial instance and serialize it to a JSON string.
-     *
-     * @param aMaterial
-     * @param aOutSerializedData
-     * @return
-     */
-    static CResult<EResult> serializeMaterialSignature(SMaterialSignature const &aMaterial, std::string &aOutSerializedData)
-    {
-        using namespace resource_compiler::serialization;
-
-        Unique<IJSONSerializer<SMaterialSignature>> serializer = makeUnique<CJSONSerializer<SMaterialSignature>>();
-        bool const initialized = serializer->initialize();
-        if(false == initialized)
-        {
-            return EResult::SerializationFailed;
-        }
-        CResult<Shared<serialization::ISerializer<SMaterialSignature>::IResult>> const serialization = serializer->serialize(aMaterial);
+        CResult<Shared<serialization::ISerializer<SMaterialAsset>::IResult>> const serialization = serializer->serialize(aMaterialMeta);
         if(not serialization.successful())
         {
             return EResult::SerializationFailed;
@@ -540,17 +501,12 @@ namespace materials
         // Make sure the output config is correct.
         std::filesystem::path const outputPath                      = ( parentPath)                                                              .lexically_normal();
         std::filesystem::path const outputModulePath                = ( parentPath / "modules")                                                  .lexically_normal();
-        std::filesystem::path const outputMetaPath                  = ( parentPath / (std::filesystem::path(materialID.string() + ".material.meta"))).lexically_normal();
         std::filesystem::path const outputIndexPath                 = ( parentPath / (std::filesystem::path(materialID.string() + ".material")))     .lexically_normal();
-        std::filesystem::path const outputSignaturePath             = ( parentPath / (std::filesystem::path(materialID.string() + ".signature")))    .lexically_normal();
         std::filesystem::path const outputConfigurationPath         = ( parentPath / (std::filesystem::path(materialID.string() + ".config")))       .lexically_normal();
         std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / aConfig.outputPath / outputPath             ).lexically_normal();
         std::filesystem::path const outputModulePathAbsolute        = (std::filesystem::current_path() / aConfig.outputPath / outputModulePath       ).lexically_normal();
-        std::filesystem::path const outputMetaPathAbsolute          = (std::filesystem::current_path() / aConfig.outputPath / outputMetaPath         ).lexically_normal();
         std::filesystem::path const outputIndexPathAbsolute         = (std::filesystem::current_path() / aConfig.outputPath / outputIndexPath        ).lexically_normal();
-        std::filesystem::path const outputSignaturePathAbsolute     = (std::filesystem::current_path() / aConfig.outputPath / outputSignaturePath    ).lexically_normal();
         std::filesystem::path const outputConfigurationPathAbsolute = (std::filesystem::current_path() / aConfig.outputPath / outputConfigurationPath).lexically_normal();
-
 
         checkPathExists(outputPathAbsolute);
         checkPathExists(outputModulePathAbsolute);
@@ -577,11 +533,10 @@ namespace materials
 
         SMaterialMasterIndex const indexData = *static_cast<SMaterialMasterIndex const *>(&(index->asT().data()));
 
-        SMaterialMeta metaData = {};
-        metaData.uid                   = indexData.uid;
-        metaData.name                  = indexData.name;
-        metaData.signatureAssetUid     = asset::assetIdFromUri(outputSignaturePath);
-        metaData.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
+        SMaterialAsset assetData = {};
+        assetData.uid                   = indexData.uid;
+        assetData.name                  = indexData.name;
+        assetData.configurationAssetUid = asset::assetIdFromUri(outputConfigurationPath);
 
         for(auto const &[stage, pathReferences] : indexData.stages)
         {
@@ -592,7 +547,7 @@ namespace materials
         }
 
         // Determine compilation items and config.
-        auto [generationSuccessful, unit] = generateCompilationUnit(aConfig, inputFiles, outputModulePathAbsolute, metaData);
+        auto [generationSuccessful, unit] = generateCompilationUnit(aConfig, inputFiles, outputModulePathAbsolute, assetData);
         if(not generationSuccessful)
         {
             CLog::Error(logTag(), "Failed to derive shader compilation units and configuration");
@@ -606,7 +561,7 @@ namespace materials
             return glslangResult;
         }
 
-        CResult<SMaterialSignature> const extractionResult = spirvCrossExtract(unit);
+        CResult<bool> const extractionResult = spirvCrossExtract(unit, assetData);
         if(not extractionResult.successful())
         {
             CLog::Error(logTag(), "Failed to extract data from Spir-V file(s).");
@@ -616,23 +571,14 @@ namespace materials
         std::string serializedData = {};
 
         // Write meta
-        CResult<EResult> const metaSerializationResult = serializeMaterialMeta(metaData, serializedData);
-        if(not metaSerializationResult.successful())
+        CResult<EResult> const assetSerializationResult = serializeMaterialAsset(assetData, serializedData);
+        if(not assetSerializationResult.successful())
         {
-            CLog::Error(logTag(), "Failed to serialize meta data.");
+            CLog::Error(logTag(), "Failed to serialize asset data.");
             return EResult::SerializationFailed;
         }
 
-        writeFile(outputMetaPathAbsolute, serializedData);
-
-        CResult<EResult> const signatureSerializationResult = serializeMaterialSignature(extractionResult.data(), serializedData);
-        if(not signatureSerializationResult.successful())
-        {
-            CLog::Error(logTag(), "Failed to serialize signature data.");
-            return EResult::SerializationFailed;
-        }
-
-        writeFile(outputSignaturePathAbsolute, serializedData);
+        writeFile(outputIndexPathAbsolute, serializedData);
 
         //CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data(), );
         //CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);

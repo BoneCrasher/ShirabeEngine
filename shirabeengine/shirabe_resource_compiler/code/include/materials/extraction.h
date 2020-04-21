@@ -10,13 +10,13 @@
 
 namespace engine::material
 {
-    struct SMaterialSignature;
+    struct SMaterialAsset;
 }
 
 namespace materials
 {
     using engine::CResult;
-    using engine::material::SMaterialSignature;
+    using engine::material::SMaterialAsset;
     
     /**
      * Read a uint32_t word SPIR-V file into a vector<uint32_t>.
@@ -31,7 +31,7 @@ namespace materials
      * @param aUnit
      * @return
      */
-    CResult<SMaterialSignature> spirvCrossExtract(SShaderCompilationUnit const &aUnit);
+    CResult<bool> spirvCrossExtract(SShaderCompilationUnit const &aUnit, SMaterialAsset &aInOutAsset);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_EXTRACTION_H_

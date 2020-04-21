@@ -175,11 +175,9 @@ namespace materials
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CResult<SMaterialSignature> spirvCrossExtract(materials::SShaderCompilationUnit const &aUnit)
+    CResult<bool> spirvCrossExtract(materials::SShaderCompilationUnit const &aUnit, SMaterialAsset &aInOutAsset)
     {
         std::underlying_type_t<EResult> result = EnumValueOf(EResult::Success);
-
-        SMaterialSignature materialExtracted {};
 
         //
         // As we process elements below, which affect sets and bindings, store some information
@@ -365,7 +363,7 @@ namespace materials
                 stageSubpassInputExtracted.attachmentIndex = attachmentIndex;
                 stageSubpassInputExtracted.set             = set;
                 stageSubpassInputExtracted.binding         = binding;
-                materialExtracted.subpassInputs.push_back(stageSubpassInputExtracted);
+                aInOutAsset.subpassInputs.push_back(stageSubpassInputExtracted);
 
                 CLog::Debug(logTag(),
                             "\nSubpassInput: "
@@ -475,7 +473,7 @@ namespace materials
                 // separate_samplers
                 // separate_images
 
-                auto possiblyDuplicateBufferOrEmpty = checkForDuplicateBoundResource(materialExtracted.uniformBuffers, uniformBufferExtracted);
+                auto possiblyDuplicateBufferOrEmpty = checkForDuplicateBoundResource(aInOutAsset.uniformBuffers, uniformBufferExtracted);
                 if(possiblyDuplicateBufferOrEmpty.has_value())
                 {
                     possiblyDuplicateBufferOrEmpty->get().stageBinding.set(uniformBufferExtracted.stageBinding); // Append the additional stage binding.
@@ -483,7 +481,7 @@ namespace materials
                 }
                 else
                 {
-                    materialExtracted.uniformBuffers.push_back(uniformBufferExtracted);
+                    aInOutAsset.uniformBuffers.push_back(uniformBufferExtracted);
                 }
             }
 
@@ -501,7 +499,7 @@ namespace materials
                 image.binding = binding;
                 image.stageBinding.set(stageExtracted.stage);
 
-                auto possiblyDuplicateImageOrEmpty = checkForDuplicateBoundResource(materialExtracted.sampledImages, image);
+                auto possiblyDuplicateImageOrEmpty = checkForDuplicateBoundResource(aInOutAsset.sampledImages, image);
                 if(possiblyDuplicateImageOrEmpty.has_value())
                 {
                     possiblyDuplicateImageOrEmpty->get().stageBinding.set(image.stageBinding); // Append the additional stage binding.
@@ -509,7 +507,7 @@ namespace materials
                 }
                 else
                 {
-                    materialExtracted.sampledImages.push_back(image);
+                    aInOutAsset.sampledImages.push_back(image);
                 }
 
                 CLog::Debug(logTag(),
@@ -524,16 +522,16 @@ namespace materials
                             binding);
             }
 
-            materialExtracted.stages[aElement.stage] = stageExtracted;
+            aInOutAsset.stages[aElement.stage] = stageExtracted;
 
             result |= EnumValueOf(EResult::Success);
         };
 
         std::for_each(aUnit.elements.begin(), aUnit.elements.end(), reflect);
 
-        materialExtracted.layoutInfo = layoutInfo;
+        aInOutAsset.layoutInfo = layoutInfo;
 
-        return { ( EResult::Success == static_cast<EResult>(result) ), materialExtracted };
+        return { ( EResult::Success == static_cast<EResult>(result) ) };
     }
     //<-----------------------------------------------------------------------------
 }

@@ -22,7 +22,6 @@ namespace meshes
     using engine::CResult;
     using resource_compiler::EResult;
 
-
     /**
      * Accept a SMaterial instance and serialize it to a JSON string.
      *
@@ -30,7 +29,7 @@ namespace meshes
      * @param aOutSerializedData
      * @return
      */
-    static CResult<EResult> serializeMeshMeta(mesh::SMeshAsset const &aMeta, std::string &aOutSerializedData)
+    static CResult<EResult> serializeMeshAsset(mesh::SMeshAsset const &aMeta, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
         using namespace engine::documents;
@@ -47,52 +46,11 @@ namespace meshes
             return EResult::SerializationFailed;
         }
 
-        CResult<std::string> data = serialization.data()
-                                                 ->asString();
-        aOutSerializedData = data.data();
-
-        bool const deinitialized = serializer->deinitialize();
-        if( not deinitialized )
-        {
-            return EResult::SerializationFailed;
-        }
-
-        serializer = nullptr;
-
-        CLog::Debug(logTag(), aOutSerializedData);
-
-        return EResult::Success;
-    }
-
-    /**
-     * Accept a SMaterial instance and serialize it to a JSON string.
-     *
-     * @param aMaterial
-     * @param aOutSerializedData
-     * @return
-     */
-    static CResult<EResult> serializeMeshDataFile(mesh::SMeshDataFile const &aDataFile, std::string &aOutSerializedData)
-    {
-        using namespace resource_compiler::serialization;
-        using namespace engine::documents;
-
-        Unique<IJSONSerializer<mesh::SMeshDataFile>> serializer = makeUnique<CJSONSerializer<mesh::SMeshDataFile>>();
-        bool const initialized = serializer->initialize();
-        if(not initialized)
-        {
-            return EResult::SerializationFailed;
-        }
-        CResult<Shared<serialization::ISerializer<mesh::SMeshDataFile>::IResult>> const serialization = serializer->serialize(aDataFile);
-        if(not serialization.successful())
-        {
-            return EResult::SerializationFailed;
-        }
-
         CResult<std::string> data = serialization.data()->asString();
         aOutSerializedData = data.data();
 
         bool const deinitialized = serializer->deinitialize();
-        if(not deinitialized)
+        if( not deinitialized )
         {
             return EResult::SerializationFailed;
         }
@@ -206,16 +164,12 @@ namespace meshes
         std::filesystem::path const &parentPath = std::filesystem::relative(aMeshFile, aConfig.inputPath).parent_path();
         std::filesystem::path const &meshID     = aMeshFile.stem();
 
-        std::filesystem::path const outputPath                      = ( parentPath)                                                                  .lexically_normal();
-        std::filesystem::path const outputMetaFilePath              = ( parentPath / (std::filesystem::path(meshID.string() + ".mesh.meta"))) .lexically_normal();
-        std::filesystem::path const outputDataFilePath              = ( parentPath / (std::filesystem::path(meshID.string() + ".datafile")))  .lexically_normal();
-        std::filesystem::path const outputAttributeBufferPath       = ( parentPath / (std::filesystem::path(meshID.string() + ".attributes"))).lexically_normal();
-        std::filesystem::path const outputIndexBufferPath           = ( parentPath / (std::filesystem::path(meshID.string() + ".indices")))   .lexically_normal();
+        std::filesystem::path const outputPath                      = ( parentPath)                                                            .lexically_normal();
+        std::filesystem::path const outputMetaFilePath              = ( parentPath / (std::filesystem::path(meshID.string() + ".mesh"))).lexically_normal();
+        std::filesystem::path const outputAttributeBufferPath       = ( parentPath / (std::filesystem::path(meshID.string() + ".bin"))) .lexically_normal();
         std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / aConfig.outputPath / outputPath               ).lexically_normal();
         std::filesystem::path const outputMetaFilePathAbs           = (std::filesystem::current_path() / aConfig.outputPath / outputMetaFilePath       ).lexically_normal();
-        std::filesystem::path const outputDataFilePathAbs           = (std::filesystem::current_path() / aConfig.outputPath / outputDataFilePath       ).lexically_normal();
         std::filesystem::path const outputAttributeBufferPathAbs    = (std::filesystem::current_path() / aConfig.outputPath / outputAttributeBufferPath).lexically_normal();
-        std::filesystem::path const outputIndexBufferPathAbs        = (std::filesystem::current_path() / aConfig.outputPath / outputIndexBufferPath    ).lexically_normal();
 
         resource_compiler::checkPathExists(outputPathAbsolute);
 
@@ -280,6 +234,7 @@ namespace meshes
         attributeBuffer.insert(attributeBuffer.end(), normals      .begin(), normals      .end());
         attributeBuffer.insert(attributeBuffer.end(), tangents     .begin(), tangents     .end());
         attributeBuffer.insert(attributeBuffer.end(), uvcoordinates.begin(), uvcoordinates.end());
+        attributeBuffer.insert(attributeBuffer.end(), indices      .begin(), indices      .end());
 
         indexBuffer = indices;
 
@@ -301,19 +256,17 @@ namespace meshes
         writeBufferToString(normals,       3, "Normals",   ss);
         writeBufferToString(tangents,      4, "Tangents",  ss);
         writeBufferToString(uvcoordinates, 2, "Texcoords", ss);
+        writeBufferToString(indices,       2, "Indices",   ss);
         engine::writeFile(std::filesystem::path(outputAttributeBufferPathAbs).concat(".cleartext"), ss.str());
         #endif
 
         engine::writeFile(outputAttributeBufferPathAbs, attributeBuffer);
-        engine::writeFile(outputIndexBufferPathAbs,     indexBuffer);
 
-        mesh::SMeshDataFile dataFile {};
-        dataFile.uid                  = 1234;
-        dataFile.name                 = meshID;
-        dataFile.dataBinaryFilename   = outputAttributeBufferPath;
-        dataFile.indexBinaryFilename  = outputIndexBufferPath;
-        dataFile.attributeSampleCount = positionBufferInfo.count;
-        dataFile.indexSampleCount     = indexBufferInfo.count;
+        engine::mesh::SMeshAsset asset {};
+        asset.uid                  = 1234;
+        asset.name                 = meshID;
+        asset.attributeSampleCount = positionBufferInfo.count;
+        asset.indexSampleCount     = indexBufferInfo.count;
 
         mesh::SMeshAttributeDescription positionAttribute {};
         mesh::SMeshAttributeDescription normalAttribute   {};
@@ -345,10 +298,10 @@ namespace meshes
         texcoordAttribute.length         = texcoordBufferInfo.count;
         texcoordAttribute.bytesPerSample = texcoordBufferInfo.stride;
 
-        dataFile.attributes.push_back(positionAttribute);
-        dataFile.attributes.push_back(normalAttribute);
-        dataFile.attributes.push_back(tangentAttribute);
-        dataFile.attributes.push_back(texcoordAttribute);
+        asset.attributes.push_back(positionAttribute);
+        asset.attributes.push_back(normalAttribute);
+        asset.attributes.push_back(tangentAttribute);
+        asset.attributes.push_back(texcoordAttribute);
 
         indexAttribute.name           = "Indices";
         indexAttribute.index          = 0;
@@ -356,27 +309,12 @@ namespace meshes
         indexAttribute.length         = indexBufferInfo.count;
         indexAttribute.bytesPerSample = indexBufferInfo.stride;
 
-        dataFile.indices = indexAttribute;
+        asset.indices = indexAttribute;
 
         std::string serializedData = {};
 
-        // Write datafile
-        CResult<EResult> const dataFileSerializationResult = serializeMeshDataFile(dataFile, serializedData);
-        if(not dataFileSerializationResult.successful())
-        {
-            CLog::Error(logTag(), "Failed to serialize data file.");
-            return EResult::SerializationFailed;
-        }
-
-        engine::writeFile(outputDataFilePathAbs, serializedData);
-
-        engine::mesh::SMeshAsset meta {};
-        meta.uid        = 1234;
-        meta.name       = meshID;
-        meta.dataFileId = engine::util::crc32FromString(outputDataFilePath);
-
         // Write meta
-        CResult<EResult> const metaSerializationResult = serializeMeshMeta(meta, serializedData);
+        CResult<EResult> const metaSerializationResult = serializeMeshAsset(asset, serializedData);
         if(not metaSerializationResult.successful())
         {
             CLog::Error(logTag(), "Failed to serialize meta data.");

@@ -16,10 +16,9 @@ namespace engine
 
     namespace material
     {
-        struct SMaterialMeta;
-        class CMaterialMaster;
-
-        class CMaterialInstance;
+        struct SMaterialAsset;
+        class  CMaterialMaster;
+        class  CMaterialInstance;
 
         /**
          * @brief The CMaterialLoader class
@@ -46,41 +45,34 @@ namespace engine
              * @param aBaseMaterialAssetId
              * @return
              */
-            CEngineResult <Shared<CMaterialInstance>> createMaterialInstance(asset::AssetID_t const &aMasterMaterialAssetId);
+            CEngineResult <Shared<CMaterialInstance>> createInstance(asset::AssetID_t const &aAssetId);
 
-            /**
-             * @brief loadMaterialMeta
-             * @param aMaterialId
-             * @return
-             */
-            CEngineResult <SMaterialMeta> loadMaterialMeta(Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetID_t const &aMaterialInstanceAssetId);
-
-            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( Shared<asset::IAssetStorage> const &aAssetStorage
-                                                                          , asset::AssetID_t             const &aMaterialInstanceAssetId
-                                                                          , bool                                aAutoCreateConfiguration
-                                                                          , bool                                aIncludeSystemBuffers = false);
+            CEngineResult <Shared<CMaterialInstance>> loadInstance( Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                  , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                  , bool                                aAutoCreateConfiguration
+                                                                  , bool                                aIncludeSystemBuffers = false);
             /**
              * @brief loadMaterial
              * @param aMaterialId
              * @return
              */
-            CEngineResult <Shared<CMaterialInstance>> loadMaterialInstance( std::string                  const &aMaterialInstanceId
-                                                                          , Shared<asset::IAssetStorage> const &aAssetStorage
-                                                                          , asset::AssetID_t             const &aMaterialInstanceAssetId
-                                                                          , bool                                aAutoCreateConfiguration);
+            CEngineResult <Shared<CMaterialInstance>> loadInstance( std::string                  const &aMaterialInstanceId
+                                                                  , Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                  , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                  , bool                                aAutoCreateConfiguration);
 
             /**
              * @brief destroyMaterialInstance
              * @param aMaterialInstanceAssetId
              * @return
              */
-            CEngineResult<> destroyMaterialInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
+            CEngineResult<> destroyInstance(asset::AssetID_t const &aMaterialInstanceAssetId);
 
         private_methods:
 
         private_members:
-            Map <asset::AssetID_t, Shared<CMaterialMaster>>          mInstantiatedMaterialMasters;
-            Map <resources::ResourceId_t, Shared<CMaterialInstance>> mInstantiatedMaterialInstances;
+            Map <asset::AssetID_t, Shared<CMaterialMaster>>          mMasterInstances;
+            Map <resources::ResourceId_t, Shared<CMaterialInstance>> mInstanceInstances;
         };
 
     }

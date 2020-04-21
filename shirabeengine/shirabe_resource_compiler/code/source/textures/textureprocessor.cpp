@@ -29,18 +29,18 @@ namespace texture
      * @param aOutSerializedData
      * @return
      */
-    static CResult<EResult> serializeTextureMeta(textures::STextureMeta const &aMeta, std::string &aOutSerializedData)
+    static CResult<EResult> serializeTextureAsset(textures::STextureAsset const &aAsset, std::string &aOutSerializedData)
     {
         using namespace resource_compiler::serialization;
         using namespace engine::documents;
 
-        Unique<IJSONSerializer<textures::STextureMeta>> serializer  = makeUnique<CJSONSerializer<textures::STextureMeta>>();
+        Unique<IJSONSerializer<textures::STextureAsset>> serializer  = makeUnique<CJSONSerializer<textures::STextureAsset>>();
         bool const                                      initialized = serializer->initialize();
         if( not initialized )
         {
             return EResult::SerializationFailed;
         }
-        CResult<Shared<serialization::ISerializer<textures::STextureMeta>::IResult>> const serialization = serializer->serialize(aMeta);
+        CResult<Shared<serialization::ISerializer<textures::STextureAsset>::IResult>> const serialization = serializer->serialize(aAsset);
         if( not serialization.successful())
         {
             return EResult::SerializationFailed;
@@ -249,8 +249,8 @@ namespace texture
         std::filesystem::path const &textureID  = aTextureFile.stem();
 
         std::filesystem::path const outputPath                      = ( parentPath)                                                                      .lexically_normal();
-        std::filesystem::path const outputMetaFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".texture.meta"))  ).lexically_normal();
-        std::filesystem::path const outputDataFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".texturedata"))).lexically_normal();
+        std::filesystem::path const outputMetaFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".texture"))    ).lexically_normal();
+        std::filesystem::path const outputDataFilePath              = ( parentPath / (std::filesystem::path(textureID.string() + ".bin"))        ).lexically_normal();
         std::filesystem::path const outputPathAbsolute              = (std::filesystem::current_path() / aConfig.outputPath / outputPath                 ).lexically_normal();
         std::filesystem::path const outputMetaFilePathAbs           = (std::filesystem::current_path() / aConfig.outputPath / outputMetaFilePath         ).lexically_normal();
         std::filesystem::path const outputDataFilePathAbs           = (std::filesystem::current_path() / aConfig.outputPath / outputDataFilePath         ).lexically_normal();
@@ -294,13 +294,13 @@ namespace texture
         std::string serializedData = {};
 
         // Write meta
-        textures::STextureMeta meta {};
-        meta.uid                  = indexData.uid;
-        meta.name                 = indexData.name;
-        meta.textureInfo          = textureInputLoads.meta;
-        meta.imageLayersBinaryUid = util::crc32FromString(outputDataFilePath.string());
+        textures::STextureAsset asset {};
+        asset.uid                  = indexData.uid;
+        asset.name                 = indexData.name;
+        asset.textureInfo          = textureInputLoads.meta;
+        asset.imageLayersBinaryUid = util::crc32FromString(outputDataFilePath.string());
 
-        CResult<EResult> const metaSerializationResult = serializeTextureMeta(meta, serializedData);
+        CResult<EResult> const metaSerializationResult = serializeTextureAsset(asset, serializedData);
         if(not metaSerializationResult.successful())
         {
             CLog::Error(logTag(), "Failed to serialize meta data.");

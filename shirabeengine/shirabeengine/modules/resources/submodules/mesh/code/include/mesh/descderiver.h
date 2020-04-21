@@ -24,12 +24,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        using ResourceDescriptionDerivationReturn_t = std::tuple<bool, resources::SBufferDescription, resources::SBufferDescription>;
+        using ResourceDescriptionDerivationReturn_t = std::tuple<bool, resources::SBufferDescription>;
 
         static
-        ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage> const &aAssetStorage
-                                                                         , std::string                const &aMeshName
-                                                                         , Shared<CMeshInstance>      const &aInstance)
+        ResourceDescriptionDerivationReturn_t deriveAttributeAndIndexBufferDesc(Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                              , std::string                  const &aMeshName
+                                                                              , Shared<CMeshInstance>        const &aInstance)
         {
             using namespace resources;
 
@@ -38,6 +38,8 @@ namespace engine
             {
                 accumulatedVertexDataSize += (attributeDescription.length * attributeDescription.bytesPerSample);
             }
+
+            uint64_t indexDataSize = (aInstance->indices().length * aInstance->indices().bytesPerSample);
 
             DataSourceAccessor_t dataAccessor = [=]() -> ByteBuffer
             {
@@ -49,7 +51,7 @@ namespace engine
                     return {};
                 }
 
-                ByteBuffer bufferView = buffer.createView(0, accumulatedVertexDataSize);
+                ByteBuffer bufferView = buffer.createView(0, (accumulatedVertexDataSize + indexDataSize));
                 return buffer;
             };
 
@@ -65,34 +67,7 @@ namespace engine
             dataBufferDescription.createInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
             dataBufferDescription.createInfo.usage                 = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
-            DataSourceAccessor_t indexDataAccessor = [=]() -> ByteBuffer
-            {
-                asset::AssetID_t const assetUid = asset::assetIdFromUri(aInstance->binaryFilename());
-                auto const[result, buffer] = aAssetStorage->loadAssetData(assetUid);
-                if( CheckEngineError(result))
-                {
-                    CLog::Error("DataSourceAccessor_t::MeshBinaryData", "Failed to load binary data for mesh. Result: {}", result);
-                    return {};
-                }
-
-                ByteBuffer bufferView = buffer.createView(aInstance->indices().offset
-                                                        , aInstance->indices().length);
-                return buffer;
-            };
-
-            SBufferDescription indexBufferDescription{};
-            indexBufferDescription.name                             = fmt::format("{}_{}", aMeshName, "indexbuffer");
-            indexBufferDescription.createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-            indexBufferDescription.createInfo.pNext                 = nullptr;
-            indexBufferDescription.createInfo.flags                 = 0;
-            indexBufferDescription.dataSource                       = indexDataAccessor;
-            indexBufferDescription.createInfo.size                  = (aInstance->indices().length * aInstance->indices().bytesPerSample);
-            indexBufferDescription.createInfo.pQueueFamilyIndices   = nullptr;
-            indexBufferDescription.createInfo.queueFamilyIndexCount = 0;
-            indexBufferDescription.createInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
-            indexBufferDescription.createInfo.usage                 = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-
-            return {true, dataBufferDescription, indexBufferDescription};
+            return { true, dataBufferDescription };
         };
     }
 
@@ -109,15 +84,17 @@ namespace engine
             {
                 static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
 
-                auto [derivationSuccessful, vertexBufferDescription, indexBufferDescription] = deriveResourceDescriptions(aAssetStorage, aInstance->name(), aInstance);
+                auto [derivationSuccessful, vertexBufferDescription] = deriveAttributeAndIndexBufferDesc(
+                    aAssetStorage
+                    , aInstance->name()
+                    , aInstance);
 
                 SMeshDescriptor meshDescriptor {};
-                meshDescriptor.name                   = aInstance->name();
-                meshDescriptor.dataBufferDescription  = vertexBufferDescription;
-                meshDescriptor.indexBufferDescription = indexBufferDescription;
+                meshDescriptor.name                = aInstance->name();
+                meshDescriptor.attributeBufferDesc = vertexBufferDescription;
 
-                meshDescriptor.attributeCount         = aInstance->attributeSampleCount();
-                meshDescriptor.indexSampleCount       = aInstance->indexSampleCount();
+                meshDescriptor.attributeCount      = aInstance->attributeSampleCount();
+                meshDescriptor.indexSampleCount    = aInstance->indexSampleCount();
 
                 Vector<VkDeviceSize> offsets;
                 offsets.resize(4);
@@ -129,7 +106,8 @@ namespace engine
                     VkDeviceSize length = (aInstance->attributes()[k].length * aInstance->attributes()[k].bytesPerSample);
                     currentOffset += length;
                 }
-                meshDescriptor.offsets = offsets;
+                meshDescriptor.offsets          = offsets;
+                meshDescriptor.firstIndexOffset = currentOffset;
 
                 return meshDescriptor;
             }

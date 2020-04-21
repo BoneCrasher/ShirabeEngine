@@ -148,186 +148,7 @@ namespace engine
             bool acceptDeserializer(documents::IJSONDeserializer<SMaterialMasterIndex> &aDeserializer) final;
         };
 
-        /**
-         * The SMaterialIndex describes all necessary data for a basic material composition
-         * in the engine.
-         * The specific implementation will be provided in files referenced by the stages member.
-         */
-        struct SMaterialInstanceIndex
-                : engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>
-                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>
-        {
-            static std::unordered_map<EShaderStage, SMaterialIndexStage> const sEmptyMap;
 
-        public_constructors:
-            SHIRABE_INLINE
-            SMaterialInstanceIndex()
-                : serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>()
-                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>()
-                , uid                 (0 )
-                , name                ({})
-                , masterIndexAssetId  (0 )
-                , configurationAssetId(0 )
-            {}
-
-            SHIRABE_INLINE
-            SMaterialInstanceIndex(SMaterialInstanceIndex const &aOther)
-                : serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>()
-                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>()
-                , uid                 (aOther.uid                 )
-                , name                (aOther.name                )
-                , masterIndexAssetId  (aOther.masterIndexAssetId  )
-                , configurationAssetId(aOther.configurationAssetId)
-            {}
-
-            SHIRABE_INLINE
-            SMaterialInstanceIndex(SMaterialInstanceIndex &&aOther)
-                : serialization::ISerializable<documents::IJSONSerializer<SMaterialInstanceIndex>>()
-                , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialInstanceIndex>>()
-                , uid                 (std::move(aOther.uid                   ))
-                , name                (std::move(aOther.name                  ))
-                , masterIndexAssetId  (std::move(aOther.masterIndexAssetId    ))
-                , configurationAssetId(std::move(aOther.configurationAssetId  ))
-            {}
-
-        public_operators:
-            SHIRABE_INLINE
-            SMaterialInstanceIndex &operator=(SMaterialInstanceIndex const &aOther)
-            {
-                uid                  = aOther.uid;
-                name                 = aOther.name;
-                masterIndexAssetId   = aOther.masterIndexAssetId;
-                configurationAssetId = aOther.configurationAssetId;
-
-                return (*this);
-            }
-
-            SHIRABE_INLINE
-            SMaterialInstanceIndex &operator=(SMaterialInstanceIndex &&aOther)
-            {
-                uid                  = std::move(aOther.uid);
-                name                 = std::move(aOther.name);
-                masterIndexAssetId   = std::move(aOther.masterIndexAssetId);
-                configurationAssetId = std::move(aOther.configurationAssetId);
-
-                return (*this);
-            }
-
-        public_members:
-            uint64_t         uid;
-            std::string      name;
-            asset::AssetId_t masterIndexAssetId;
-            asset::AssetId_t configurationAssetId;
-
-        public_methods:
-            /**
-             * @brief acceptSerializer
-             * @param aSerializer
-             * @return
-             */
-            bool acceptSerializer(documents::IJSONSerializer<SMaterialInstanceIndex> &aSerializer) const;
-
-            /**
-             * @brief acceptDeserializer
-             * @param aSerializer
-             * @return
-             */
-            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialInstanceIndex> &aDeserializer);
-        };
-
-
-        /**
-         * The SMaterialIndex describes all necessary data for a basic material composition
-         * in the engine.
-         * The specific implementation will be provided in files referenced by the stages member.
-         */
-        struct SMaterialMeta
-                : engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>
-                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>
-        {
-            static std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> const sEmptyMetaMap;
-
-        public_constructors:
-            SHIRABE_INLINE
-            SMaterialMeta()
-                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>()
-                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>()
-                    , uid                  (0 )
-                    , name                 ({})
-                    , signatureAssetUid    (0 )
-                    , configurationAssetUid(0 )
-                    , stages(sEmptyMetaMap)
-            {}
-
-            SHIRABE_INLINE
-            SMaterialMeta(SMaterialMeta const &aOther)
-                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>()
-                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>()
-                    , uid                  (aOther.uid                  )
-                    , name                 (aOther.name                 )
-                    , signatureAssetUid    (aOther.signatureAssetUid    )
-                    , configurationAssetUid(aOther.configurationAssetUid)
-                    , stages               (aOther.stages               )
-            {}
-
-            SHIRABE_INLINE
-            SMaterialMeta(SMaterialMeta &&aOther) noexcept
-                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialMeta>>()
-                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialMeta>>()
-                    , uid                  (aOther.uid                  )
-                    , name                 (std::move(aOther.name      ))
-                    , signatureAssetUid    (aOther.signatureAssetUid    )
-                    , configurationAssetUid(aOther.configurationAssetUid)
-                    , stages               (std::move(aOther.stages    ))
-            {}
-
-        public_operators:
-            SHIRABE_INLINE
-            SMaterialMeta &operator=(SMaterialMeta const &aOther)
-            {
-                uid                   = aOther.uid;
-                name                  = aOther.name;
-                signatureAssetUid     = aOther.signatureAssetUid;
-                configurationAssetUid = aOther.configurationAssetUid;
-                stages                = aOther.stages;
-
-                return (*this);
-            }
-
-            SHIRABE_INLINE
-            SMaterialMeta &operator=(SMaterialMeta &&aOther) noexcept
-            {
-                uid                   = aOther.uid;
-                name                  = std::move(aOther.name);
-                signatureAssetUid     = aOther.signatureAssetUid;
-                configurationAssetUid = aOther.configurationAssetUid;
-                stages                = std::move(aOther.stages);
-
-                return (*this);
-            }
-
-        public_members:
-            uint64_t                                                        uid;
-            std::string                                                     name;
-            asset::AssetId_t                                                signatureAssetUid;
-            asset::AssetId_t                                                configurationAssetUid;
-            std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> stages;
-
-        public_methods:
-            /**
-             * @brief acceptSerializer
-             * @param aSerializer
-             * @return
-             */
-            bool acceptSerializer(documents::IJSONSerializer<SMaterialMeta> &aSerializer) const final;
-
-            /**
-             * @brief acceptDeserializer
-             * @param aSerializer
-             * @return
-             */
-            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialMeta> &aDeserializer) final;
-        };
 
         using MutableMaterialTypeMap_t = std::unordered_map<std::string, Shared<struct SMaterialType>>;
         using MaterialTypeMap_t        = std::unordered_map<std::string, Shared<struct SMaterialType const>>;
@@ -360,7 +181,7 @@ namespace engine
          * Describes a shader stage input by it's name and explicit location.
          */
         struct SStageInput
-            : public SNamedResource
+                : public SNamedResource
         {
             uint32_t                    location;
             Shared<SMaterialType const> type;
@@ -370,7 +191,7 @@ namespace engine
          * Describes a shader stage input by it's name and explicit location.
          */
         struct SStageOutput
-            : public SNamedResource
+                : public SNamedResource
         {
             uint32_t                    location;
             Shared<SMaterialType const> type;
@@ -380,7 +201,7 @@ namespace engine
          * A bound resource is any resource, which is part of a set and has an assigned binding.
          */
         struct SBoundResource
-            : public SNamedResource
+                : public SNamedResource
         {
             uint32_t set;
             uint32_t binding;
@@ -390,7 +211,7 @@ namespace engine
          * Describes a fragment shader subpass input. Will be empty for all other shader types.
          */
         struct SSubpassInput
-            : public SBoundResource
+                : public SBoundResource
         {
             uint32_t attachmentIndex;
         };
@@ -471,10 +292,10 @@ namespace engine
 
             SHIRABE_INLINE
             SMaterialBuffer(SMaterialBuffer const &aOther)
-            : SBoundResource(aOther)
-            , location(aOther.location)
-            , members (aOther.members )
-            , array   (aOther.array   )
+                    : SBoundResource(aOther)
+                      , location(aOther.location)
+                      , members (aOther.members )
+                      , array   (aOther.array   )
             {}
 
         public_operators:
@@ -497,7 +318,7 @@ namespace engine
          * as a collection of buffer members.
          */
         struct SUniformBuffer
-            : public SMaterialBuffer
+                : public SMaterialBuffer
         {
         public_members:
             core::CBitField<VkPipelineStageFlagBits> stageBinding;
@@ -507,8 +328,8 @@ namespace engine
 
             SHIRABE_INLINE
             SUniformBuffer(SUniformBuffer const &aOther)
-                : SMaterialBuffer(aOther)
-                , stageBinding(aOther.stageBinding)
+                    : SMaterialBuffer(aOther)
+                      , stageBinding(aOther.stageBinding)
             {}
 
         public_operators:
@@ -526,7 +347,7 @@ namespace engine
          * Describes a sampled image in a GLSL shader, as well as its set and binding.
          */
         struct SSampledImage
-            : public SBoundResource
+                : public SBoundResource
         {
             core::CBitField<VkPipelineStageFlagBits> stageBinding;
         };
@@ -590,23 +411,101 @@ namespace engine
         };
 
         /**
-         * Describes a material signature composed of:
-         *
-         *     1. Material name
-         *     2. A list of stages
-         *     3. A list of uniform buffer signatures
-         *     4. A list of sampled image signatures
-         *     5. A list of subpass input signatures
-         *
-         * Implements signature de/serialization to .signature files.
+         * The SMaterialIndex describes all necessary data for a basic material composition
+         * in the engine.
+         * The specific implementation will be provided in files referenced by the stages member.
          */
-        struct SMaterialSignature
-                : public asset::CAssetReference
-                , public engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialSignature>>
-                , public engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialSignature>>
+        struct SMaterialAsset
+                : engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialAsset>>
+                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialAsset>>
         {
+            static std::unordered_map<VkPipelineStageFlagBits, SMaterialStage> const sEmptyMetaMap;
+
+        public_constructors:
+            SHIRABE_INLINE
+            SMaterialAsset()
+                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialAsset>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialAsset>>()
+                    , uid                  (0 )
+                    , name                 ({})
+                    , signatureAssetUid    (0 )
+                    , configurationAssetUid(0 )
+                    , layoutInfo           ({})
+                    , stages               (sEmptyMetaMap)
+                    , uniformBuffers       ({})
+                    , sampledImages        ({})
+                    , subpassInputs        ({})
+            {}
+
+            SHIRABE_INLINE
+            SMaterialAsset(SMaterialAsset const &aOther)
+                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialAsset>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialAsset>>()
+                    , uid                  (aOther.uid                  )
+                    , name                 (aOther.name                 )
+                    , signatureAssetUid    (aOther.signatureAssetUid    )
+                    , configurationAssetUid(aOther.configurationAssetUid)
+                    , layoutInfo           (aOther.layoutInfo)
+                    , stages               (aOther.stages               )
+                    , uniformBuffers       (aOther.uniformBuffers)
+                    , sampledImages        (aOther.sampledImages)
+                    , subpassInputs        (aOther.subpassInputs)
+            {}
+
+            SHIRABE_INLINE
+            SMaterialAsset(SMaterialAsset &&aOther) noexcept
+                    : serialization::ISerializable<documents::IJSONSerializer<SMaterialAsset>>()
+                    , serialization::IDeserializable<documents::IJSONDeserializer<SMaterialAsset>>()
+                    , uid                  (aOther.uid                  )
+                    , name                 (std::move(aOther.name      ))
+                    , signatureAssetUid    (aOther.signatureAssetUid    )
+                    , configurationAssetUid(aOther.configurationAssetUid)
+                    , layoutInfo           (aOther.layoutInfo)
+                    , stages               (std::move(aOther.stages    ))
+                    , uniformBuffers       (aOther.uniformBuffers)
+                    , sampledImages        (aOther.sampledImages)
+                    , subpassInputs        (aOther.subpassInputs)
+            {}
+
+        public_operators:
+            SHIRABE_INLINE
+            SMaterialAsset &operator=(SMaterialAsset const &aOther)
+            {
+                uid                   = aOther.uid;
+                name                  = aOther.name;
+                signatureAssetUid     = aOther.signatureAssetUid;
+                configurationAssetUid = aOther.configurationAssetUid;
+                layoutInfo            = aOther.layoutInfo;
+                stages                = aOther.stages;
+                uniformBuffers        = aOther.uniformBuffers;
+                sampledImages         = aOther.sampledImages;
+                subpassInputs         = aOther.subpassInputs;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            SMaterialAsset &operator=(SMaterialAsset &&aOther) noexcept
+            {
+                uid                   = aOther.uid;
+                name                  = std::move(aOther.name);
+                signatureAssetUid     = aOther.signatureAssetUid;
+                configurationAssetUid = aOther.configurationAssetUid;
+                layoutInfo            = aOther.layoutInfo;
+                stages                = std::move(aOther.stages);
+                uniformBuffers        = aOther.uniformBuffers;
+                sampledImages         = aOther.sampledImages;
+                subpassInputs         = aOther.subpassInputs;
+
+                return (*this);
+            }
+
         public_members:
-            std::string                 name;
+            uint64_t                   uid;
+            std::string                name;
+            asset::AssetId_t           signatureAssetUid;
+            asset::AssetId_t           configurationAssetUid;
+            //std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> stages;
             SMaterialLayoutInfo         layoutInfo;
             StageMap_t                  stages;
             // Although each stage defines uniform buffers individually, they are shared
@@ -616,71 +515,145 @@ namespace engine
             // Fragment shader only
             std::vector<SSubpassInput>  subpassInputs;
 
-        public_constructors:
-            SHIRABE_INLINE
-            SMaterialSignature(asset::AssetId_t const &aAssetUid = 0)
-                : asset::CAssetReference(aAssetUid)
-                , engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialSignature>>()
-                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialSignature>>()
-                , name          ({})
-                , layoutInfo    ({})
-                , stages        ({})
-                , uniformBuffers({})
-                , sampledImages ({})
-                , subpassInputs ({})
-            {}
-
-            SHIRABE_INLINE
-            SMaterialSignature(SMaterialSignature const &aOther)
-                : asset::CAssetReference(aOther.getAssetId())
-                , engine::serialization::ISerializable<documents::IJSONSerializer<SMaterialSignature>>()
-                , engine::serialization::IDeserializable<documents::IJSONDeserializer<SMaterialSignature>>()
-                , name          (aOther.name)
-                , layoutInfo    (aOther.layoutInfo)
-                , stages        (aOther.stages)
-                , uniformBuffers(aOther.uniformBuffers)
-                , sampledImages (aOther.sampledImages)
-                , subpassInputs (aOther.subpassInputs)
-            {}
-
-        public_operators:
-            SHIRABE_INLINE
-            SMaterialSignature &operator=(SMaterialSignature const &aOther)
-            {
-                asset::CAssetReference::operator=(aOther);
-
-                name           = aOther.name;
-                layoutInfo     = aOther.layoutInfo;
-                stages         = aOther.stages;
-                uniformBuffers = aOther.uniformBuffers;
-                sampledImages  = aOther.sampledImages;
-                subpassInputs  = aOther.subpassInputs;
-
-                return (*this);
-            }
-
         public_methods:
-            SHIRABE_INLINE bool hasVertexStage()          const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT);                  }
-            SHIRABE_INLINE bool hasTessControlStage()     const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT);    }
-            SHIRABE_INLINE bool hasTessEvalutationStage() const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT); }
-            SHIRABE_INLINE bool hasGeometryStage()        const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT);                }
-            SHIRABE_INLINE bool hasFragmentStage()        const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);                }
-            SHIRABE_INLINE bool hasComputeStage()         const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);                 }
-
             /**
              * @brief acceptSerializer
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(documents::IJSONSerializer<SMaterialSignature> &aSerializer) const;
+            bool acceptSerializer(documents::IJSONSerializer<SMaterialAsset> &aSerializer) const final;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialSignature> &aDeserializer);
+            bool acceptDeserializer(documents::IJSONDeserializer<SMaterialAsset> &aDeserializer) final;
+
+            SHIRABE_INLINE bool hasVertexStage()          const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT);                  }
+            SHIRABE_INLINE bool hasTessControlStage()     const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT);    }
+            SHIRABE_INLINE bool hasTessEvalutationStage() const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT); }
+            SHIRABE_INLINE bool hasGeometryStage()        const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT);                }
+            SHIRABE_INLINE bool hasFragmentStage()        const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);                }
+            SHIRABE_INLINE bool hasComputeStage()         const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);                 }
         };
+
+        class CMaterialConfig;
+
+        /**
+         * A material master is composed by a signature and base configuration.
+         * It will be used to create instances from this material.
+         */
+        class CMaterialMaster
+        {
+        public_static_functions:
+            static Shared<CMaterialMaster> fromAsset(SMaterialAsset const &aAsset);
+
+        public_constructors:
+            CMaterialMaster() = default;
+
+            SHIRABE_INLINE
+            CMaterialMaster(asset::AssetId_t   const &aAssetUID,
+                            std::string        const &aName,
+                            SMaterialAsset          &&aSignature,
+                            CMaterialConfig         &&aConfig)
+                : mName          (aName                )
+                , mLayoutInfo    ({})
+                , mStages        ({})
+                , mUniformBuffers({})
+                , mSampledImages ({})
+                , mSubpassInputs ({})
+            {}
+
+            SHIRABE_INLINE
+            CMaterialMaster(CMaterialMaster const &aOther)
+                : mName           (aOther.mName)
+                , mLayoutInfo     (aOther.mLayoutInfo)
+                , mStages         (aOther.mStages)
+                , mUniformBuffers (aOther.mUniformBuffers)
+                , mSampledImages  (aOther.mSampledImages)
+                , mSubpassInputs  (aOther.mSubpassInputs)
+            {}
+
+            SHIRABE_INLINE
+            CMaterialMaster(CMaterialMaster &&aOther)
+                : mName         (std::move(aOther.mName))
+                , mLayoutInfo    (aOther.mLayoutInfo)
+                , mStages        (std::move(aOther.mStages))
+                , mUniformBuffers(aOther.mUniformBuffers)
+                , mSampledImages (aOther.mSampledImages)
+                , mSubpassInputs (aOther.mSubpassInputs)
+            {}
+
+        public_destructors:
+            ~CMaterialMaster() = default;
+
+        public_operators:
+            SHIRABE_INLINE
+            CMaterialMaster &operator=(CMaterialMaster const &aOther)
+            {
+                mName           = aOther.mName;
+                mLayoutInfo     = aOther.mLayoutInfo;
+                mStages         = aOther.mStages;
+                mUniformBuffers = aOther.mUniformBuffers;
+                mSampledImages  = aOther.mSampledImages;
+                mSubpassInputs  = aOther.mSubpassInputs;
+
+                return (*this);
+            }
+
+            SHIRABE_INLINE
+            CMaterialMaster &operator=(CMaterialMaster &&aOther) noexcept
+            {
+                mName           = std::move(aOther.mName);
+                mLayoutInfo     = aOther.mLayoutInfo;
+                mStages         = std::move(aOther.mStages);
+                mUniformBuffers = aOther.mUniformBuffers;
+                mSampledImages  = aOther.mSampledImages;
+                mSubpassInputs  = aOther.mSubpassInputs;
+
+                return (*this);
+            }
+
+        public_methods:
+            SHIRABE_INLINE
+            std::string                 const &name()           const { return mName; }
+            SMaterialLayoutInfo         const &layoutInfo()     const { return mLayoutInfo; }
+            StageMap_t                  const &stages()         const { return mStages; }
+            std::vector<SUniformBuffer> const &uniformBuffers() const { return mUniformBuffers; }
+            std::vector<SSampledImage>  const &sampledImages()  const { return mSampledImages; }
+            std::vector<SSubpassInput>  const &subpassInputs()  const { return mSubpassInputs; }
+
+        private_methods:
+            friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
+
+        private_members:
+            std::string                 mName;
+            //std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> stages;
+            SMaterialLayoutInfo         mLayoutInfo;
+            StageMap_t                  mStages;
+            // Although each stage defines uniform buffers individually, they are shared
+            // across all stages, due to indexing them with set and binding.
+            std::vector<SUniformBuffer> mUniformBuffers;
+            std::vector<SSampledImage>  mSampledImages;
+            // Fragment shader only
+            std::vector<SSubpassInput>  mSubpassInputs;
+        };
+
+        Shared<CMaterialMaster> CMaterialMaster::fromAsset(SMaterialAsset const &aAsset)
+        {
+            Shared<CMaterialMaster> instance = makeShared<CMaterialMaster>();
+
+            instance->mName           = aAsset.name;
+            instance->mLayoutInfo     = aAsset.layoutInfo;
+            instance->mStages         = aAsset.stages;
+            instance->mUniformBuffers = aAsset.uniformBuffers;
+            instance->mSampledImages  = aAsset.sampledImages;
+            instance->mSubpassInputs  = aAsset.subpassInputs;
+
+            return instance;
+        }
+
 
         // Fwd-Declare for friending...
         class CMaterialConfig;
@@ -754,9 +727,9 @@ namespace engine
          * Implements de/serialization to .config files.
          */
         class CMaterialConfig
-                : public asset::CAssetReference
-                , public engine::serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>
-                , public engine::serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>
+            : public asset::CAssetReference
+              , public engine::serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>
+              , public engine::serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>
         {
 
         public_typedefs:
@@ -766,7 +739,7 @@ namespace engine
             using SampledImageMap_t  = Map<std::string, asset::AssetId_t>;
 
         public_static_functions:
-            static CMaterialConfig fromMaterialDesc(SMaterialSignature const &aMaterial, bool aIncludeSystemBuffers = false);
+            static CMaterialConfig fromMaterialDesc(CMaterialMaster const &aMaterial, bool aIncludeSystemBuffers = false);
 
         public_constructors:
             /**
@@ -775,28 +748,28 @@ namespace engine
             SHIRABE_INLINE
             CMaterialConfig(asset::AssetId_t const &aAssetUID = 0)
                 : asset::CAssetReference(aAssetUID)
-                , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
-                , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
-                , mBufferIndex({})
-                , mData({})
+                  , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
+                  , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
+                  , mBufferIndex({})
+                  , mData({})
             { }
 
             SHIRABE_INLINE
             CMaterialConfig(CMaterialConfig const &aOther)
                 : asset::CAssetReference(aOther.getAssetId())
-                , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
-                , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
-                , mBufferIndex(aOther.mBufferIndex)
-                , mData       (aOther.mData)
+                  , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
+                  , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
+                  , mBufferIndex(aOther.mBufferIndex)
+                  , mData       (aOther.mData)
             { }
 
             SHIRABE_INLINE
             CMaterialConfig(CMaterialConfig  &&aOther)
                 : asset::CAssetReference(aOther.getAssetId())
-                , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
-                , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
-                , mBufferIndex(std::move(aOther.mBufferIndex))
-                , mData       (std::move(aOther.mData))
+                  , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
+                  , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
+                  , mBufferIndex(std::move(aOther.mBufferIndex))
+                  , mData       (std::move(aOther.mData))
             { }
 
         public_destructors:
@@ -866,8 +839,8 @@ namespace engine
              */
             template <typename TDataType>
             CEngineResult<TDataType const*> getBufferValue(
-                    std::string const &aBufferName,
-                    std::string const &aFieldName) const;
+                std::string const &aBufferName,
+                std::string const &aFieldName) const;
 
             /**
              * setValue
@@ -881,9 +854,9 @@ namespace engine
              */
             template <typename TDataType>
             CEngineResult<> setBufferValue(
-                    std::string const &aBufferName,
-                    std::string const &aFieldName,
-                    TDataType   const &aFieldValue);
+                std::string const &aBufferName,
+                std::string const &aFieldName,
+                TDataType   const &aFieldValue);
 
             SHIRABE_INLINE void setSampledImage(std::string const &aSlotId, asset::AssetId_t const &aSampledImageResourceId)
             {
@@ -926,8 +899,8 @@ namespace engine
              */
             template <typename TDataType>
             CEngineResult<TDataType const*> getBufferValuePointer(
-                    std::string const &aBufferName,
-                    std::string const &aBufferValue) const;
+                std::string const &aBufferName,
+                std::string const &aBufferValue) const;
 
             /**
              * Where there is a will there is a way
@@ -939,8 +912,8 @@ namespace engine
              */
             template <typename TDataType>
             CEngineResult<TDataType *> getBufferValuePointer(
-                    std::string const &aBufferName,
-                    std::string const &aBufferValue);
+                std::string const &aBufferName,
+                std::string const &aBufferValue);
 
             /**
              * Check, whether a desired buffer is available.
@@ -968,8 +941,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
         CEngineResult<TDataType const*> CMaterialConfig::getBufferValuePointer(
-                std::string  const        &aBufferName,
-                std::string  const        &aBufferValue) const
+            std::string  const        &aBufferName,
+            std::string  const        &aBufferValue) const
         {
             bool const hasBuffer = this->hasBuffer(aBufferName);
             if(not hasBuffer)
@@ -1001,8 +974,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
         CEngineResult<TDataType *> CMaterialConfig::getBufferValuePointer(
-                std::string  const &aBufferName,
-                std::string  const &aBufferValue)
+            std::string  const &aBufferName,
+            std::string  const &aBufferValue)
         {
             // Dirty hack to reuse the function implementation...
             CEngineResult<TDataType const*> const  result    = static_cast<CMaterialConfig const*>(this)->getBufferValuePointer<TDataType>(aBufferName, aBufferValue);
@@ -1040,8 +1013,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
         CEngineResult<TDataType const*> CMaterialConfig::getBufferValue(
-                std::string const &aBufferName,
-                std::string const &aFieldName) const
+            std::string const &aBufferName,
+            std::string const &aFieldName) const
         {
             return getBufferValuePointer<TDataType>(aBufferName, aFieldName);
         }
@@ -1052,9 +1025,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TDataType>
         CEngineResult<> CMaterialConfig::setBufferValue(
-                std::string const &aBufferName,
-                std::string const &aFieldName,
-                TDataType   const &aFieldValue)
+            std::string const &aBufferName,
+            std::string const &aFieldName,
+            TDataType   const &aFieldValue)
         {
             CEngineResult<TDataType *> result = getBufferValuePointer<TDataType>(aBufferName, aFieldName);
             if(result.successful())
@@ -1066,87 +1039,6 @@ namespace engine
             return result.result();
         }
         //<-----------------------------------------------------------------------------
-
-        /**
-         * A material master is composed by a signature and base configuration.
-         * It will be used to create instances from this material.
-         */
-        class CMaterialMaster
-                : public asset::CAssetReference
-        {
-        public_constructors:
-            CMaterialMaster() = default;
-
-            SHIRABE_INLINE
-            CMaterialMaster(asset::AssetId_t   const &aAssetUID,
-                            std::string        const &aName,
-                            SMaterialSignature      &&aSignature,
-                            CMaterialConfig         &&aConfig)
-                : asset::CAssetReference (aAssetUID)
-                , mName                  (aName                )
-                , mSignature             (std::move(aSignature))
-            {}
-
-            SHIRABE_INLINE
-            CMaterialMaster(CMaterialMaster const &aOther)
-                : asset::CAssetReference (aOther.getAssetId())
-                , mName                  (aOther.mName         )
-                , mSignature             (aOther.mSignature    )
-            {}
-
-            SHIRABE_INLINE
-            CMaterialMaster(CMaterialMaster &&aOther)
-                : asset::CAssetReference (aOther.getAssetId())
-                , mName                  (std::move(aOther.mName         ))
-                , mSignature             (std::move(aOther.mSignature    ))
-            {}
-
-        public_destructors:
-            ~CMaterialMaster() = default;
-
-        public_operators:
-            SHIRABE_INLINE
-            CMaterialMaster &operator=(CMaterialMaster const &aOther)
-            {
-                asset::CAssetReference::operator=(aOther.getAssetId());
-
-                mName      = aOther.mName;
-                mSignature = aOther.mSignature;
-
-                return (*this);
-            }
-
-            SHIRABE_INLINE
-            CMaterialMaster &operator=(CMaterialMaster &&aOther) noexcept
-            {
-                asset::CAssetReference::operator=(aOther.getAssetId());
-
-                mName      = std::move(aOther.mName     );
-                mSignature = std::move(aOther.mSignature);
-
-                return (*this);
-            }
-
-        public_methods:
-            SHIRABE_INLINE
-            std::string const &name() const
-            {
-                return mName;
-            }
-
-            SHIRABE_INLINE
-            SMaterialSignature const &signature() const
-            {
-                return mSignature;
-            }
-
-        private_methods:
-            friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
-
-        private_members:
-            std::string        mName;
-            SMaterialSignature mSignature;
-        };
 
         /**
          * A material instance describes a configurable and bindable material state which can be imagined
@@ -1212,7 +1104,7 @@ namespace engine
                     return mMasterReference;
                 }
 
-                EEngineStatus createConfiguration(bool aIncludeSystemBuffers = false);
+                EEngineStatus createConfiguration(CMaterialMaster const &aAsset, bool aIncludeSystemBuffers = false);
 
         private_members:
             std::string                    mName;

@@ -352,32 +352,36 @@ public_methods:
 
             std::cout << extension.string() << std::endl;
 
-            if(".meta" == extension)
+            if(".material" == extension)
             {
-                std::filesystem::path const stemExtension = filePath.stem().extension();
-                if(".material" == stemExtension) a.type = asset::EAssetType::Material;
-                if(".mesh"     == stemExtension) a.type = asset::EAssetType::Mesh;
-                if(".texture"  == stemExtension) a.type = asset::EAssetType::Texture;
-
+                a.type    = asset::EAssetType::Material;
                 a.subtype = asset::EAssetSubtype::Meta;
                 a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
                 a.id      = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);
             }
-            else if(".signature" == extension)
+            else if(".mesh" == extension)
             {
-                a.type    = asset::EAssetType::Material;
-                a.subtype = asset::EAssetSubtype::Signature;
-                a.uri = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
-                a.id  = asset::assetIdFromUri(a.uri);
+                a.type    = asset::EAssetType::Mesh;
+                a.subtype = asset::EAssetSubtype::Meta;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
+                processedAssets.push_back(a);
+            }
+            else if(".texture" == extension)
+            {
+                a.type    = asset::EAssetType::Texture;
+                a.subtype = asset::EAssetSubtype::Meta;
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);
             }
             else if(".config" == extension)
             {
                 a.type    = asset::EAssetType::Material;
                 a.subtype = asset::EAssetSubtype::Config;
-                a.uri = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
-                a.id  = asset::assetIdFromUri(a.uri);
+                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
+                a.id      = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);
             }
             else if(".spv" == extension)
@@ -388,34 +392,10 @@ public_methods:
                 a.id      = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);
             }
-            else if(".attributes" == extension)
+            else if(".bin" == extension)
             {
-                a.type    = asset::EAssetType::Mesh;
-                a.subtype = asset::EAssetSubtype::AttributeBuffer;
-                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
-                a.id      = asset::assetIdFromUri(a.uri);
-                processedAssets.push_back(a);
-            }
-            else if(".indices" == extension)
-            {
-                a.type    = asset::EAssetType::Mesh;
-                a.subtype = asset::EAssetSubtype::AttributeBuffer;
-                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
-                a.id      = asset::assetIdFromUri(a.uri);
-                processedAssets.push_back(a);
-            }
-            else if(".datafile" == extension)
-            {
-                a.type    = asset::EAssetType::Mesh;
-                a.subtype = asset::EAssetSubtype::DataFile;
-                a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
-                a.id      = asset::assetIdFromUri(a.uri);
-                processedAssets.push_back(a);
-            }
-            else if(".texturedata" == extension)
-            {
-                a.type    = asset::EAssetType::Texture;
-                a.subtype = asset::EAssetSubtype::DataFile;
+                a.type    = asset::EAssetType::Buffer;
+                a.subtype = asset::EAssetSubtype::BinaryData;
                 a.uri     = std::filesystem::relative(filePath, (std::filesystem::current_path() / mConfig.outputPath));
                 a.id      = asset::assetIdFromUri(a.uri);
                 processedAssets.push_back(a);

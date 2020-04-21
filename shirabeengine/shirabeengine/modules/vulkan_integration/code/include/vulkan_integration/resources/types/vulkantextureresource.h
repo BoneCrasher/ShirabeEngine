@@ -10,7 +10,6 @@
 
 #include "vulkan_integration/resources/cvkapiresource.h"
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
-#include "vulkan_integration/rendering/vulkanrendercontext.h"
 
 namespace engine
 {
@@ -38,30 +37,35 @@ namespace engine
                 VkSampler      attachedSampler;
             };
 
+            template <typename TResourceManager>
             static EEngineStatus initialize(STextureDescription const &aDescription
                                           , Handles_t                 &aGpuApiHandles
                                           , IVkGlobalContext          *aVulkanEnvironment
-                                          , VulkanResourceManager_t   *aResourceManager);
+                                          , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus load(STextureDescription const &aDescription
                                     , Handles_t                 &aGpuApiHandles
                                     , IVkGlobalContext          *aVulkanEnvironment
-                                    , VulkanResourceManager_t   *aResourceManager);
+                                    , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus transfer(STextureDescription const &aDescription
                                         , Handles_t                 &aGpuApiHandles
                                         , IVkGlobalContext          *aVulkanEnvironment
-                                        , VulkanResourceManager_t   *aResourceManager);
+                                        , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus unload(STextureDescription const &aDescription
                                       , Handles_t                 &aGpuApiHandles
                                       , IVkGlobalContext          *aVulkanEnvironment
-                                      , VulkanResourceManager_t   *aResourceManager);
+                                      , TResourceManager          *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus deinitialize(STextureDescription const &aDescription
                                             , Handles_t                 &aGpuApiHandles
                                             , IVkGlobalContext          *aVulkanEnvironment
-                                            , VulkanResourceManager_t   *aResourceManager);
+                                            , TResourceManager          *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
@@ -74,10 +78,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureResource::initialize(STextureDescription const &aDescription
-                                                              , Handles_t                 &aGpuApiHandles
-                                                              , IVkGlobalContext          *aVulkanEnvironment
-                                                              , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureResource::initialize(STextureDescription const &aDescription
+                                                       , Handles_t                 &aGpuApiHandles
+                                                       , IVkGlobalContext          *aVulkanEnvironment
+                                                       , TResourceManager *aResourceManager)
         {
 
             /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
@@ -272,10 +277,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureResource::load(STextureDescription const &aDescription
-                                                        , Handles_t                 &aGpuApiHandles
-                                                        , IVkGlobalContext          *aVulkanEnvironment
-                                                        , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureResource::load(STextureDescription const &aDescription
+                                                 , Handles_t                 &aGpuApiHandles
+                                                 , IVkGlobalContext          *aVulkanEnvironment
+                                                 , TResourceManager          *aResourceManager)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
@@ -297,10 +303,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureResource::transfer(STextureDescription const &aDescription
-                                                            , Handles_t                 &aGpuApiHandles
-                                                            , IVkGlobalContext          *aVulkanEnvironment
-                                                            , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureResource::transfer(STextureDescription const &aDescription
+                                                     , Handles_t                 &aGpuApiHandles
+                                                     , IVkGlobalContext          *aVulkanEnvironment
+                                                     , TResourceManager *aResourceManager)
         {
             Shared<IVkFrameContext> frameContext = aVulkanEnvironment->getVkCurrentFrameContext();
 
@@ -330,10 +337,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureResource::unload(STextureDescription const &aDescription
-                                                          , Handles_t                 &aGpuApiHandles
-                                                          , IVkGlobalContext          *aVulkanEnvironment
-                                                          , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureResource::unload(STextureDescription const &aDescription
+                                                   , Handles_t                 &aGpuApiHandles
+                                                   , IVkGlobalContext          *aVulkanEnvironment
+                                                   , TResourceManager          *aResourceManager)
         {
             return { EEngineStatus::Ok };
         }
@@ -342,10 +350,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureResource::deinitialize(STextureDescription const &aDescription
-                                                                , Handles_t                 &aGpuApiHandles
-                                                                , IVkGlobalContext          *aVulkanEnvironment
-                                                                , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureResource::deinitialize(STextureDescription const &aDescription
+                                                         , Handles_t                 &aGpuApiHandles
+                                                         , IVkGlobalContext          *aVulkanEnvironment
+                                                         , TResourceManager          *aResourceManager)
         {
             VkImage        vkImage         = aGpuApiHandles.imageHandle;
             VkDeviceMemory vkImageMemory   = aGpuApiHandles.imageMemory;

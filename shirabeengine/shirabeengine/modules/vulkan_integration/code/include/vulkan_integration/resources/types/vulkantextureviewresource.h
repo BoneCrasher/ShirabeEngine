@@ -11,7 +11,6 @@
 #include "vulkan_integration/resources/cvkapiresource.h"
 #include "vulkan_integration/resources/ivkglobalcontext.h"
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
-#include "vulkan_integration/rendering/vulkanrendercontext.h"
 
 namespace engine
 {
@@ -35,15 +34,17 @@ namespace engine
                 VkImageView handle;
             };
 
+            template <typename TResourceManager>
             static EEngineStatus initialize(STextureViewDescription const &aDescription
                                           , Handles_t                     &aGpuApiHandles
                                           , IVkGlobalContext              *aVulkanEnvironment
-                                          , VulkanResourceManager_t       *aResourceManager);
+                                          , TResourceManager              *aResourceManager);
 
+            template <typename TResourceManager>
             static EEngineStatus deinitialize(STextureViewDescription const &aDescription
                                             , Handles_t                     &aGpuApiHandles
                                             , IVkGlobalContext              *aVulkanEnvironment
-                                            , VulkanResourceManager_t       *aResourceManager);
+                                            , TResourceManager              *aResourceManager);
         };
 
         //<-----------------------------------------------------------------------------
@@ -56,12 +57,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureViewResource::initialize(STextureViewDescription const &aDescription
-                                                                    , Handles_t                     &aGpuApiHandles
-                                                                    , IVkGlobalContext              *aVulkanEnvironment
-                                                                    , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureViewResource::initialize(STextureViewDescription const &aDescription
+                                                             , Handles_t                   &aGpuApiHandles
+                                                             , IVkGlobalContext            *aVulkanEnvironment
+                                                             , TResourceManager            *aResourceManager)
         {
-            OptionalRef_t<TextureResourceState_t> const textureOpt = aResourceManager->getResource(aDescription.subjacentBufferId);
+            OptionalRef_t<TextureResourceState_t> const textureOpt = aResourceManager->getResource(aDescription.subjacentTextureId);
             if(not textureOpt.has_value())
             {
                 return EEngineStatus::ResourceError_DependencyNotFound;
@@ -108,7 +110,7 @@ namespace engine
             // VkDeviceMemory const vkDeviceMemory = texture->imageMemory; // TODO: Required?
 
             auto const isDepthStencilImageOp = [](EFormat const aFormat) -> bool
-            {
+                {
                 switch(aFormat)
                 {
                     case EFormat::D24_UNORM_S8_UINT:
@@ -118,7 +120,7 @@ namespace engine
                     default:
                         return false;
                 }
-            };
+                };
 
             VkImageViewCreateInfo vkImageViewCreateInfo ={ };
             vkImageViewCreateInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -157,10 +159,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        static EEngineStatus SVulkanTextureViewResource::deinitialize(STextureViewDescription const &aDescription
-                                                                      , Handles_t                     &aGpuApiHandles
-                                                                      , IVkGlobalContext              *aVulkanEnvironment
-                                                                      , VulkanResourceManager_t   *aResourceManager)
+        template <typename TResourceManager>
+        EEngineStatus SVulkanTextureViewResource::deinitialize(STextureViewDescription const &aDescription
+                                                               , Handles_t                   &aGpuApiHandles
+                                                               , IVkGlobalContext            *aVulkanEnvironment
+                                                               , TResourceManager            *aResourceManager)
         {
             VkImageView vkImageView     = aGpuApiHandles.handle;
             VkDevice    vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
