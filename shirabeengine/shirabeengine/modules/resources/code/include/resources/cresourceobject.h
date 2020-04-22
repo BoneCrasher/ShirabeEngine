@@ -8,8 +8,6 @@
 #include <platform/platform.h>
 #include <core/patterns/observer.h>
 
-class CResourceManager; // Declared/defined in resources/cresourcemanager.h
-
 namespace engine
 {
     namespace resources

@@ -278,7 +278,7 @@ namespace engine
             {
             }
 
-            Shared<CResourceManager> manager = makeShared<CResourceManager>();
+            Shared<CResourceManagerBase> manager = makeShared<CResourceManagerBase>();
             mResourceManager = manager;
 
             return { EEngineStatus::Ok };

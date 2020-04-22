@@ -6,6 +6,7 @@
 #define SHIRABEDEVELOPMENT_RESOURCEDESCRIPTIONS_H
 
 #include <vector>
+
 #include <platform/platform.h>
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
@@ -15,6 +16,7 @@
 #include <asset/assettypes.h>
 #include <asset/assetstorage.h>
 #include <graphicsapi/definitions.h>
+
 #include "resources/resourcedatasource.h"
 
 namespace engine

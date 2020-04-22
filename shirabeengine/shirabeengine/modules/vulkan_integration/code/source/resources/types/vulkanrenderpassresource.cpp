@@ -9,7 +9,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CVulkanRenderPassResource::create(  SRenderPassDescription       const &aDescription
+    CEngineResult<> SVulkanRenderPassResource::create(  SRenderPassDescription       const &aDescription
                                                       , SRenderPassDependencies      const &aDependencies
                                                       , GpuApiResourceDependencies_t const &aResolvedDependencies)
     {

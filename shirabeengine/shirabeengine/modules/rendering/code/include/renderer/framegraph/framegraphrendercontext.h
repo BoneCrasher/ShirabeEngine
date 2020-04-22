@@ -15,7 +15,7 @@ namespace engine
     namespace resources
     {
         template <typename... TResources>
-        class CResourceManager;
+        class CResourceManagerBase;
     }
 
     namespace material

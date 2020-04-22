@@ -6,7 +6,7 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include <resources/cresourcemanager.h>
+#include <resources/extensibility.h>
 
 #include "vulkan_integration/resources/cvkapiresource.h"
 #include "vulkan_integration/resources/ivkglobalcontext.h"
@@ -14,6 +14,16 @@
 
 namespace engine
 {
+    namespace vulkan
+    {
+        struct SVulkanTextureViewResource;
+    }
+
+    namespace resources
+    {
+        template <> struct SLogicalToGpuApiResourceTypeMap<STextureView>  { using TGpuApiResource = struct vulkan::SVulkanTextureViewResource;  };
+    }
+
     namespace vulkan
     {
         using namespace resources;
@@ -50,7 +60,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        using TextureViewResourceState_t = SResourceState<STextureView,  SVulkanTextureViewResource>;
+        using TextureViewResourceState_t = SResourceState<STextureView>;
 
         //<-----------------------------------------------------------------------------
 

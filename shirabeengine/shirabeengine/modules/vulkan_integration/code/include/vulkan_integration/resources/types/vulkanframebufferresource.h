@@ -6,10 +6,20 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include "vulkan_integration/resources/cvkapiresource.h"
+#include <resources/extensibility.h>
 
 namespace engine
 {
+    namespace vulkan
+    {
+        struct SVulkanFrameBufferResource;
+    }
+
+    namespace resources
+    {
+        template <> struct SLogicalToGpuApiResourceTypeMap<SFrameBuffer> { using TGpuApiResource = struct vulkan::SVulkanFrameBufferResource;  };
+    }
+
     namespace vulkan
     {
         using namespace resources;
@@ -25,6 +35,7 @@ namespace engine
                 VkFramebuffer handle;
             };
         };
+        using FrameBufferResourceState_t = SResourceState<SFrameBuffer>;
     }
 }
 

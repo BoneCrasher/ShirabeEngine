@@ -6,10 +6,20 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include "vulkan_integration/resources/cvkapiresource.h"
+#include <resources/extensibility.h>
 
 namespace engine
 {
+    namespace vulkan
+    {
+        struct SVulkanRenderPassResource;
+    }
+
+    namespace resources
+    {
+        template <> struct SLogicalToGpuApiResourceTypeMap<SRenderPass> { using TGpuApiResource = struct vulkan::SVulkanRenderPassResource; };
+    }
+
     namespace vulkan
     {
         using namespace resources;
@@ -25,6 +35,8 @@ namespace engine
                 VkRenderPass handle;
             };
         };
+
+        using RenderPassResourceState_t = SResourceState<SRenderPass>;
     }
 }
 

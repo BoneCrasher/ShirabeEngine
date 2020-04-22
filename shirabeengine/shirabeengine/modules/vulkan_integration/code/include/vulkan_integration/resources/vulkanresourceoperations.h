@@ -6,7 +6,11 @@
 #define __SHIRABEDEVELOPMENT_VULKANRESOURCEOPERATIONS_H__
 
 #include <base/cpp_tools.h>
+
+#include "vulkan_integration/resources/ivkglobalcontext.h"
+
 #include <resources/resourcetypes.h>
+
 #include "vulkan_integration/resources/types/vulkanbufferresource.h"
 #include "vulkan_integration/resources/types/vulkanbufferviewresource.h"
 #include "vulkan_integration/resources/types/vulkantextureresource.h"
@@ -14,7 +18,11 @@
 #include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
 #include "vulkan_integration/resources/types/vulkanframebufferresource.h"
 #include "vulkan_integration/resources/types/vulkanmaterialpipelineresource.h"
-#include "vulkan_integration/resources/ivkglobalcontext.h"
+#include "vulkan_integration/resources/types/vulkanshadermoduleresource.h"
+#include "vulkan_integration/resources/types/vulkanmeshresource.h"
+#include "vulkan_integration/resources/types/vulkanmaterialresource.h"
+
+#include <resources/cresourcemanager.h>
 
 namespace engine::resources
 {

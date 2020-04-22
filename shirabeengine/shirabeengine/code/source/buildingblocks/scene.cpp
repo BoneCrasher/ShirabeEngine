@@ -100,7 +100,7 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     CEngineResult<> CScene::initialize(Shared<asset::CAssetStorage>        aAssetStorage
-                                     , Shared<resources::CResourceManager> aResourceManager
+                                     , Shared<resources::CResourceManagerBase> aResourceManager
                                      , Shared<mesh::CMeshLoader>           aMeshLoader
                                      , Shared<material::CMaterialLoader>   aMaterialLoader
                                      , Shared<textures::CTextureLoader>    aTextureLoader)

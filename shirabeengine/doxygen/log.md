@@ -1270,8 +1270,8 @@ Possible candidates:
   SHIRABE_INLINE shader_precompiler::SShaderCompilationUnit::SShaderCompilationUnit(SShaderCompilationUnit const &aOther)
   SHIRABE_INLINE shader_precompiler::SShaderCompilationUnit::SShaderCompilationUnit(SShaderCompilationUnit &&aOther)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:64: warning: documented symbol `private_methods engine::CResourceManager::std::placeholders::_1' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:65: warning: documented symbol `private_methods engine::CResourceManager::std::placeholders::_2' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:64: warning: documented symbol `private_methods engine::CResourceManagerBase::std::placeholders::_1' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:65: warning: documented symbol `private_methods engine::CResourceManagerBase::std::placeholders::_2' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/buildingblocks/camera.cpp:13: warning: no matching class member found for 
   engine::CCamera::CCamera()
 Possible candidates:
@@ -1298,10 +1298,10 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/core/engine.cpp:147: warning: no uniquely matching class member found for 
   CEngineResult engine::CEngineInstance::initialize()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:15: warning: documented symbol `engine::CResourceManager::CResourceManager' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:23: warning: documented symbol `engine::CResourceManager::~CResourceManager' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:15: warning: documented symbol `engine::CResourceManagerBase::CResourceManagerBase' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:23: warning: documented symbol `engine::CResourceManagerBase::~CResourceManagerBase' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:30: warning: no uniquely matching class member found for 
-  CEngineResult engine::CResourceManager::initialize()
+  CEngineResult engine::CResourceManagerBase::initialize()
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/asset/code/include/asset/assetregistry.h:77: warning: documented symbol `EAssetErrorCode engine::asset::CAssetRegistry< T >::addAsset' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/asset/code/source/assetstorage.cpp:20: warning: documented symbol `engine::asset::CAssetStorage::CAssetStorage' was not declared or defined.
@@ -2811,7 +2811,7 @@ Generating docs for compound engine::CObserver...
 Generating docs for compound engine::CPassKey...
 Generating docs for compound engine::CPlatformTime...
 Generating docs for compound engine::CRange...
-Generating docs for compound engine::CResourceManager...
+Generating docs for compound engine::CResourceManagerBase...
 Generating docs for compound engine::CResult...
 Generating docs for compound engine::CReverseIterationAdapter...
 Generating docs for compound engine::CScene...
@@ -3859,7 +3859,7 @@ Generating XML output for class engine::resources::CResourceCreationRequestAdapt
 Generating XML output for class engine::resources::CResourceDataSource
 Generating XML output for class engine::resources::CResourceDescriptorAdapter
 Generating XML output for class engine::resources::CResourceDestructionRequestAdapter
-Generating XML output for class engine::CResourceManager
+Generating XML output for class engine::CResourceManagerBase
 Generating XML output for class engine::resources::CResourceManagerBase
 Generating XML output for class engine::resources::CResourceProxyFactory
 Generating XML output for class engine::resources::CResourcePublicTraits

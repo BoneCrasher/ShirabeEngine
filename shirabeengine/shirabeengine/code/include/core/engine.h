@@ -94,9 +94,9 @@ namespace engine
         Shared<IWindow>                    mMainWindow;
 
         // Assets & Resources
-        Shared<CAssetStorage>              mAssetStorage;
-        Shared<CResourceManager>           mResourceManager;
-        Shared<CMaterialLoader>            mMaterialLoader;
+        Shared<CAssetStorage>        mAssetStorage;
+        Shared<CResourceManagerBase> mResourceManager;
+        Shared<CMaterialLoader>      mMaterialLoader;
         Shared<CMeshLoader>                mMeshLoader;
         Shared<CTextureLoader>             mTextureLoader;
 

@@ -7,10 +7,20 @@
 
 #include <base/declaration.h>
 #include <resources/resourcetypes.h>
-#include "vulkan_integration/resources/cvkapiresource.h"
+#include <resources/extensibility.h>
 
 namespace engine
 {
+    namespace vulkan
+    {
+        struct SVulkanPipelineResource;
+    }
+
+    namespace resources
+    {
+        template <> struct SLogicalToGpuApiResourceTypeMap<SPipeline> { using TGpuApiResource = struct vulkan::SVulkanPipelineResource; };
+    }
+
     namespace vulkan
     {
         using namespace resources;
@@ -29,6 +39,8 @@ namespace engine
                 std::vector<VkDescriptorSet> descriptorSets;
             };
         };
+
+        using PipelineResourceState_t = SResourceState<SPipeline>;
     }
 }
 

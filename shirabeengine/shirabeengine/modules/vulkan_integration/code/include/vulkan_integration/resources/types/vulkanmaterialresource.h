@@ -6,10 +6,23 @@
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
+#include <resources/resourcetypes.h>
+#include <resources/extensibility.h>
+
 #include <base/declaration.h>
 
 namespace engine
 {
+    namespace vulkan
+    {
+        struct SVulkanMaterialResource;
+    }
+
+    namespace resources
+    {
+        template <> struct SLogicalToGpuApiResourceTypeMap<SMaterial> { using TGpuApiResource = struct vulkan::SVulkanMaterialResource;  };
+    }
+
     namespace vulkan
     {
         /**
@@ -21,6 +34,8 @@ namespace engine
             struct Handles_t
             { };
         };
+
+        using MaterialResourceState_t = SResourceState<SMaterial>;
     }
 }
 

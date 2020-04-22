@@ -44,6 +44,9 @@ namespace engine
             [[nodiscard]]
             ByteBuffer getData() const;
 
+            SHIRABE_INLINE
+            bool isBound() const { return mAccessorFunction.operator bool(); }
+
         private_members:
             ResourceAccessFn_t mAccessorFunction;
         };

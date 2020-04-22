@@ -6,10 +6,23 @@
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
+#include <resources/extensibility.h>
+#include <resources/resourcetypes.h>
+
 #include <base/declaration.h>
 
 namespace engine
 {
+    namespace vulkan
+    {
+        struct SVulkanMeshResource;
+    }
+
+    namespace resources
+    {
+        template <> struct SLogicalToGpuApiResourceTypeMap<SMesh> { using TGpuApiResource = struct vulkan::SVulkanMeshResource;  };
+    }
+
     namespace vulkan
     {
         /**
@@ -22,6 +35,7 @@ namespace engine
             {
             };
         };
+        using MeshResourceState_t = SResourceState<SMesh>;
     }
 }
 
