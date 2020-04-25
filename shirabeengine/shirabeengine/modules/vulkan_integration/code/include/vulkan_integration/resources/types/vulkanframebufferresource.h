@@ -8,6 +8,11 @@
 #include <resources/resourcetypes.h>
 #include <resources/extensibility.h>
 
+#include "vulkan_integration/resources/ivkglobalcontext.h"
+#include "vulkan_integration/vulkandevicecapabilities.h"
+
+#include "vulkan_integration/resources/types/vulkanrenderpassresource.h"
+
 namespace engine
 {
     namespace vulkan
@@ -34,8 +39,92 @@ namespace engine
             {
                 VkFramebuffer handle;
             };
+
+            template <typename TResourceManager>
+            static EEngineStatus initialize(SFrameBufferDescription const &aDescription
+                                          , Handles_t                     &aGpuApiHandles
+                                          , TResourceManager              *aResourceManager
+                                          , IVkGlobalContext              *aVulkanEnvironment);
+
+            template <typename TResourceManager>
+            static EEngineStatus deinitialize(SFrameBufferDescription const &aDescription
+                                            , Handles_t                     &aGpuApiHandles
+                                          , TResourceManager                *aResourceManager
+                                          , IVkGlobalContext                *aVulkanEnvironment);
         };
         using FrameBufferResourceState_t = SResourceState<SFrameBuffer>;
+
+
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TResourceManager>
+        EEngineStatus SVulkanFrameBufferResource::initialize(SFrameBufferDescription const &aDescription
+                                                           , Handles_t                     &aGpuApiHandles
+                                                           , TResourceManager              *aResourceManager
+                                                           , IVkGlobalContext              *aVulkanEnvironment)
+        {
+            auto const &[success, renderPassOptRef] = aResourceManager->template getResource<RenderPassResourceState_t>(aDescription.renderPassResourceId);
+            if(CheckEngineError(success))
+            {
+                return success;
+            }
+            RenderPassResourceState_t const &renderPass = *renderPassOptRef;
+
+            std::vector<VkImageView> textureViews {};
+            for(auto const &id : renderPass.description.attachmentTextureViews)
+            {
+                auto const &[success, textureViewOptRef] = aResourceManager->template getResource<TextureViewResourceState_t>(id, aVulkanEnvironment);
+                if(CheckEngineError(success))
+                {
+                    return success;
+                }
+                TextureViewResourceState_t const &textureView = *textureViewOptRef;
+
+                textureViews.push_back(textureView.gpuApiHandles.handle);
+            }
+
+            VkFramebufferCreateInfo vkFrameBufferCreateInfo {};
+            vkFrameBufferCreateInfo.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            vkFrameBufferCreateInfo.pNext           = nullptr;
+            vkFrameBufferCreateInfo.pAttachments    = textureViews.data();
+            vkFrameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(textureViews.size());
+            vkFrameBufferCreateInfo.renderPass      = renderPass.gpuApiHandles.handle;
+            vkFrameBufferCreateInfo.width           = renderPass.description.attachmentExtent.width;
+            vkFrameBufferCreateInfo.height          = renderPass.description.attachmentExtent.height;
+            vkFrameBufferCreateInfo.layers          = renderPass.description.attachmentExtent.depth;
+            vkFrameBufferCreateInfo.flags           = 0;
+
+            VkFramebuffer vkFrameBuffer = VK_NULL_HANDLE;
+
+            VkResult result = vkCreateFramebuffer(aVulkanEnvironment->getLogicalDevice(), &vkFrameBufferCreateInfo, nullptr, &vkFrameBuffer);
+            if(VkResult::VK_SUCCESS != result)
+            {
+                CLog::Error("SVulkanFrameBufferResource::initialize", CString::format("Failed to create frame buffer instance. Vulkan result: {}", result));
+                return { EEngineStatus::Error };
+            }
+
+            aGpuApiHandles.handle = vkFrameBuffer;
+
+            return { EEngineStatus::Ok };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TResourceManager>
+        EEngineStatus SVulkanFrameBufferResource::deinitialize(SFrameBufferDescription const &aDescription
+                                                             , Handles_t                     &aGpuApiHandles
+                                                             , TResourceManager              *aResourceManager
+                                                             , IVkGlobalContext              *aVulkanEnvironment)
+        {
+            vkDestroyFramebuffer(aVulkanEnvironment->getLogicalDevice(), aGpuApiHandles.handle, nullptr);
+
+            return { EEngineStatus::Ok };
+        }
     }
 }
 

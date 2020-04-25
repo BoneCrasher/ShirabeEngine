@@ -6,6 +6,7 @@
 #define SHIRABEDEVELOPMENT_RESOURCEDESCRIPTIONS_H
 
 #include <vector>
+#include <string>
 
 #include <platform/platform.h>
 #include <vulkan/vk_platform.h>
@@ -152,52 +153,18 @@ namespace engine
             std::string                         name;
             VkExtent3D                          attachmentExtent;
             std::vector<SAttachmentDescription> attachmentDescriptions;
+            std::vector<ResourceId_t>           attachmentTextureViews;
             std::vector<SSubpassDescription>    subpassDescriptions;
             std::vector<SSubpassDependency>     subpassDependencies;
         };
 
         struct
             [[nodiscard]]
-            SHIRABE_LIBRARY_EXPORT SRenderPassDependencies
-        {
-            std::vector<ResourceId_t> attachmentTextureViews;
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                return std::vector<ResourceId_t>(attachmentTextureViews);
-            }
-        };
-
-        struct
-            [[nodiscard]]
             SHIRABE_TEST_EXPORT SFrameBufferDescription
         {
-
         public_members:
-            std::string name;
-        };
-
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT SFrameBufferDependencies
-        {
-            ResourceId_t              referenceRenderPassId; // Used as a template to create a compatible framebuffer
-            VkExtent3D                attachmentExtent;
-            std::vector<ResourceId_t> attachmentTextureViews;
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                std::vector<ResourceId_t> dependencies {};
-                dependencies.push_back(referenceRenderPassId);
-                for(auto const &view : attachmentTextureViews)
-                {
-                    dependencies.push_back(view);
-                }
-
-                return dependencies;
-            }
+            std::string  name;
+            ResourceId_t renderPassResourceId;
         };
 
         struct
@@ -235,58 +202,37 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialPipelineDescriptor
         {
-            std::string                                                  name;
+            std::string name;
 
-            VkViewport                                                   viewPort;
-            VkRect2D                                                     scissor;
+            ResourceId_t systemUBOPipelineId;
+            ResourceId_t shaderModuleId;
+            ResourceId_t materialResourceId;
+            ResourceId_t referenceRenderPassId;
+            uint32_t     subpass;
 
-            bool                                                         includesSystemBuffers;
+            VkViewport   viewPort;
+            VkRect2D     scissor;
+            bool         includesSystemBuffers;
 
-            VkPipelineInputAssemblyStateCreateInfo                       inputAssemblyState;
-            std::vector<VkVertexInputBindingDescription>                 vertexInputBindings;
-            std::vector<VkVertexInputAttributeDescription>               vertexInputAttributes;
+            VkPipelineInputAssemblyStateCreateInfo                 inputAssemblyState;
+            std::vector<VkVertexInputBindingDescription>           vertexInputBindings;
+            std::vector<VkVertexInputAttributeDescription>         vertexInputAttributes;
 
-            VkPipelineRasterizationStateCreateInfo                       rasterizerState;
-            VkPipelineMultisampleStateCreateInfo                         multiSampler;
-            VkPipelineDepthStencilStateCreateInfo                        depthStencilState;
-            std::vector<VkPipelineColorBlendAttachmentState>             colorBlendAttachmentStates;
-            VkPipelineColorBlendStateCreateInfo                          colorBlendState;
+            VkPipelineRasterizationStateCreateInfo                 rasterizerState;
+            VkPipelineMultisampleStateCreateInfo                   multiSampler;
+            VkPipelineDepthStencilStateCreateInfo                  depthStencilState;
+            std::vector<VkPipelineColorBlendAttachmentState>       colorBlendAttachmentStates;
+            VkPipelineColorBlendStateCreateInfo                    colorBlendState;
 
-            VkPipelineLayoutCreateInfo                                   pipelineLayout;
-            std::vector<VkDescriptorSetLayoutCreateInfo>                 descriptorSetLayoutCreateInfos;
-            std::vector<std::vector<VkDescriptorSetLayoutBinding>>       descriptorSetLayoutBindings;
+            VkPipelineLayoutCreateInfo                             pipelineLayout;
+            std::vector<VkDescriptorSetLayoutCreateInfo>           descriptorSetLayoutCreateInfos;
+            std::vector<std::vector<VkDescriptorSetLayoutBinding>> descriptorSetLayoutBindings;
         };
 
         struct
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialPipelineDependencies
         {
-            ResourceId_t              systemUBOPipelineId;
-            ResourceId_t              referenceRenderPassId;
-            uint32_t                  subpass;
-            ResourceId_t              shaderModuleId;
-            std::vector<ResourceId_t> bufferViewIds;
-            std::vector<ResourceId_t> textureViewIds;
-
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                std::vector<ResourceId_t> dependencies {};
-                dependencies.push_back(systemUBOPipelineId);
-                dependencies.push_back(referenceRenderPassId);
-                dependencies.push_back(shaderModuleId);
-
-                for(auto const &buffer : bufferViewIds)
-                {
-                    dependencies.push_back(buffer);
-                }
-                for(auto const &texture : textureViewIds)
-                {
-                    dependencies.push_back(texture);
-                }
-
-                return dependencies;
-            }
         };
 
         struct
@@ -297,7 +243,7 @@ namespace engine
             SMaterialPipelineDescriptor        pipelineDescriptor;
             SShaderModuleDescriptor            shaderModuleDescriptor;
             Vector<SBufferDescription>         uniformBufferDescriptors;
-            Vector<asset::AssetId_t>           sampledImages;
+            Vector<STextureDescription>        sampledImages;
         };
 
         /**

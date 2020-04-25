@@ -23,6 +23,10 @@
 #include <math/geometric/rect.h>
 #include "renderer/renderertypes.h"
 
+#ifdef None
+#undef None
+#endif
+
 namespace engine
 {
     namespace framegraph

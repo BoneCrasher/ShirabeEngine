@@ -22,7 +22,7 @@ namespace engine
     namespace resources
     {
         template <>
-        struct SLogicalToGpuApiResourceTypeMap<SBuffer> { using TGpuApiResource = struct vulkan::SVulkanBufferResource;  };
+        struct SLogicalToGpuApiResourceTypeMap<SBuffer> { using TGpuApiResource = vulkan::SVulkanBufferResource;  };
     }
 
     namespace vulkan
@@ -71,26 +71,26 @@ namespace engine
             template <typename TResourceManager>
             static EEngineStatus initialize(SBufferDescription  const &aDescription
                                           , Handles_t                 &aGpuApiHandles
-                                          , IVkGlobalContext          *aVulkanEnvironment
-                                          , TResourceManager          *aResourceManager);
+                                          , TResourceManager          *aResourceManager
+                                          , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus load(SBufferDescription  const &aDescription
                                     , Handles_t                 &aGpuApiHandles
-                                    , IVkGlobalContext          *aVulkanEnvironment
-                                    , TResourceManager          *aResourceManager);
+                                    , TResourceManager          *aResourceManager
+                                    , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus unload(SBufferDescription  const &aDescription
                                       , Handles_t                 &aGpuApiHandles
-                                      , IVkGlobalContext          *aVulkanEnvironment
-                                      , TResourceManager          *aResourceManager);
+                                      , TResourceManager          *aResourceManager
+                                      , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus deinitialize(SBufferDescription  const &aDescription
                                             , Handles_t                 &aGpuApiHandles
-                                            , IVkGlobalContext          *aVulkanEnvironment
-                                            , TResourceManager          *aResourceManager);
+                                            , TResourceManager          *aResourceManager
+                                            , IVkGlobalContext          *aVulkanEnvironment);
         };
 
         //<-----------------------------------------------------------------------------
@@ -106,8 +106,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanBufferResource::initialize(SBufferDescription  const &aDescription
                                                       , Handles_t                 &aGpuApiHandles
-                                                      , IVkGlobalContext          *aVulkanEnvironment
-                                                      , TResourceManager          *aResourceManager)
+                                                      , TResourceManager          *aResourceManager
+                                                      , IVkGlobalContext          *aVulkanEnvironment)
         {
             IVkGlobalContext *vkContext = aVulkanEnvironment;
 
@@ -178,8 +178,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanBufferResource::load(SBufferDescription  const &aDescription
                                                 , Handles_t                 &aGpuApiHandles
-                                                , IVkGlobalContext          *aVulkanEnvironment
-                                                , TResourceManager          *aResourceManager)
+                                                , TResourceManager          *aResourceManager
+                                                , IVkGlobalContext          *aVulkanEnvironment)
         {
             if(nullptr != aDescription.dataSource)
             {
@@ -203,8 +203,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanBufferResource::unload(SBufferDescription  const &aDescription
                                                   , Handles_t                 &aGpuApiHandles
-                                                  , IVkGlobalContext          *aVulkanEnvironment
-                                                  , TResourceManager          *aResourceManager)
+                                                  , TResourceManager          *aResourceManager
+                                                  , IVkGlobalContext          *aVulkanEnvironment)
         {
             SHIRABE_UNUSED(aDescription);
             SHIRABE_UNUSED(aGpuApiHandles);
@@ -220,8 +220,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanBufferResource::deinitialize(SBufferDescription  const &aDescription
                                                         , Handles_t                 &aGpuApiHandles
-                                                        , IVkGlobalContext          *aVulkanEnvironment
-                                                        , TResourceManager          *aResourceManager)
+                                                        , TResourceManager          *aResourceManager
+                                                        , IVkGlobalContext          *aVulkanEnvironment)
         {
             VkBuffer       vkBuffer        = aGpuApiHandles.handle;
             VkDeviceMemory vkDeviceMemory  = aGpuApiHandles.attachedMemory;

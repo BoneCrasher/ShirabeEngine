@@ -47,14 +47,14 @@ namespace engine
             template <typename TResourceManager>
             static EEngineStatus initialize(SBufferViewDescription  const &aDescription
                                           , Handles_t                     &aGpuApiHandles
-                                          , IVkGlobalContext              *aVulkanEnvironment
-                                          , TResourceManager              *aResourceManager);
+                                          , TResourceManager              *aResourceManager
+                                          , IVkGlobalContext              *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus deinitialize(SBufferViewDescription  const &aDescription
                                             , Handles_t                     &aGpuApiHandles
-                                            , IVkGlobalContext              *aVulkanEnvironment
-                                            , TResourceManager              *aResourceManager);
+                                            , TResourceManager              *aResourceManager
+                                            , IVkGlobalContext              *aVulkanEnvironment);
         };
 
         //<-----------------------------------------------------------------------------
@@ -70,15 +70,15 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanBufferViewResource::initialize(SBufferViewDescription  const &aDescription
                                                           , Handles_t                     &aGpuApiHandles
-                                                          , IVkGlobalContext              *aVulkanEnvironment
-                                                          , TResourceManager              *aResourceManager)
+                                                          , TResourceManager              *aResourceManager
+                                                          , IVkGlobalContext              *aVulkanEnvironment)
         {
-            OptionalRef_t<BufferResourceState_t> const bufferOpt = aResourceManager->getResource(aDescription.subjacentBufferId);
+            OptionalRef_t<BufferResourceState_t> const bufferOpt = aResourceManager->template getResource(aDescription.subjacentBufferId, aVulkanEnvironment);
             if(not bufferOpt.has_value())
             {
                 return EEngineStatus::ResourceError_DependencyNotFound;
             }
-            BufferResourceState_t bufferState = *bufferOpt;
+            BufferResourceState_t const &bufferState = *bufferOpt;
 
             VkBufferViewCreateInfo createInfo = aDescription.createInfo;
             createInfo.buffer = bufferState.gpuApiHandles.handle;
@@ -106,8 +106,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanBufferViewResource::deinitialize(SBufferViewDescription  const &aDescription
                                                             , Handles_t                     &aGpuApiHandles
-                                                            , IVkGlobalContext              *aVulkanEnvironment
-                                                            , TResourceManager              *aResourceManager)
+                                                            , TResourceManager              *aResourceManager
+                                                            , IVkGlobalContext              *aVulkanEnvironment)
         {
             VkBufferView vkBufferView    = aGpuApiHandles.handle;
             VkDevice     vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();

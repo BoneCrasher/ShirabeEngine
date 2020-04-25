@@ -13,16 +13,19 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    using CResourceManager = CResourceManagerBase<SResourceState<STexture>
-                                                , SResourceState<STextureView>
-                                                , SResourceState<SBuffer>
-                                                , SResourceState<SBufferView>
-                                                , SResourceState<SShaderModule>
-                                                , SResourceState<SRenderPass>
-                                                , SResourceState<SFrameBuffer>
-                                                , SResourceState<SPipeline>
-                                                , SResourceState<SMesh>
-                                                , SResourceState<SMaterial>>;
+    template <typename... TResources>
+    using CResourceManagerRemap = CResourceManagerBase<SResourceState<TResources>...>;
+
+    using CResourceManager = CResourceManagerRemap<STexture
+                                                 , STextureView
+                                                 , SBuffer
+                                                 , SBufferView
+                                                 , SShaderModule
+                                                 , SRenderPass
+                                                 , SFrameBuffer
+                                                 , SPipeline
+                                                 , SMesh
+                                                 , SMaterial>;
     //<-----------------------------------------------------------------------------
 }
 

@@ -49,32 +49,32 @@ namespace engine
             template <typename TResourceManager>
             static EEngineStatus initialize(STextureDescription const &aDescription
                                           , Handles_t                 &aGpuApiHandles
-                                          , IVkGlobalContext          *aVulkanEnvironment
-                                          , TResourceManager          *aResourceManager);
+                                          , TResourceManager          *aResourceManager
+                                          , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus load(STextureDescription const &aDescription
                                     , Handles_t                 &aGpuApiHandles
-                                    , IVkGlobalContext          *aVulkanEnvironment
-                                    , TResourceManager          *aResourceManager);
+                                    , TResourceManager          *aResourceManager
+                                    , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus transfer(STextureDescription const &aDescription
                                         , Handles_t                 &aGpuApiHandles
-                                        , IVkGlobalContext          *aVulkanEnvironment
-                                        , TResourceManager          *aResourceManager);
+                                        , TResourceManager          *aResourceManager
+                                        , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus unload(STextureDescription const &aDescription
                                       , Handles_t                 &aGpuApiHandles
-                                      , IVkGlobalContext          *aVulkanEnvironment
-                                      , TResourceManager          *aResourceManager);
+                                      , TResourceManager          *aResourceManager
+                                      , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus deinitialize(STextureDescription const &aDescription
                                             , Handles_t                 &aGpuApiHandles
-                                            , IVkGlobalContext          *aVulkanEnvironment
-                                            , TResourceManager          *aResourceManager);
+                                            , TResourceManager          *aResourceManager
+                                            , IVkGlobalContext          *aVulkanEnvironment);
         };
 
         //<-----------------------------------------------------------------------------
@@ -90,8 +90,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanTextureResource::initialize(STextureDescription const &aDescription
                                                        , Handles_t                 &aGpuApiHandles
-                                                       , IVkGlobalContext          *aVulkanEnvironment
-                                                       , TResourceManager *aResourceManager)
+                                                       , TResourceManager          *aResourceManager
+                                                       , IVkGlobalContext          *aVulkanEnvironment)
         {
 
             /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
@@ -289,15 +289,14 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanTextureResource::load(STextureDescription const &aDescription
                                                  , Handles_t                 &aGpuApiHandles
-                                                 , IVkGlobalContext          *aVulkanEnvironment
-                                                 , TResourceManager          *aResourceManager)
+                                                 , TResourceManager          *aResourceManager
+                                                 , IVkGlobalContext          *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
-            if(not aDescription.initialData.empty())
+            if(aDescription.initialData)
             {
-                CResourceDataSource const &dataSource = aDescription.initialData[0];
-                ByteBuffer          const &data       = dataSource.getData();
+                ByteBuffer const &data = aDescription.initialData();
 
                 void *mappedData = nullptr;
                 vkMapMemory(device, aGpuApiHandles.stagingBufferMemory, 0, data.size(), 0, &mappedData);
@@ -315,8 +314,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanTextureResource::transfer(STextureDescription const &aDescription
                                                      , Handles_t                 &aGpuApiHandles
-                                                     , IVkGlobalContext          *aVulkanEnvironment
-                                                     , TResourceManager *aResourceManager)
+                                                     , TResourceManager          *aResourceManager
+                                                     , IVkGlobalContext          *aVulkanEnvironment)
         {
             Shared<IVkFrameContext> frameContext = aVulkanEnvironment->getVkCurrentFrameContext();
 
@@ -349,8 +348,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanTextureResource::unload(STextureDescription const &aDescription
                                                    , Handles_t                 &aGpuApiHandles
-                                                   , IVkGlobalContext          *aVulkanEnvironment
-                                                   , TResourceManager          *aResourceManager)
+                                                   , TResourceManager          *aResourceManager
+                                                   , IVkGlobalContext          *aVulkanEnvironment)
         {
             return { EEngineStatus::Ok };
         }
@@ -362,8 +361,8 @@ namespace engine
         template <typename TResourceManager>
         EEngineStatus SVulkanTextureResource::deinitialize(STextureDescription const &aDescription
                                                          , Handles_t                 &aGpuApiHandles
-                                                         , IVkGlobalContext          *aVulkanEnvironment
-                                                         , TResourceManager          *aResourceManager)
+                                                         , TResourceManager          *aResourceManager
+                                                         , IVkGlobalContext          *aVulkanEnvironment)
         {
             VkImage        vkImage         = aGpuApiHandles.imageHandle;
             VkDeviceMemory vkImageMemory   = aGpuApiHandles.imageMemory;
