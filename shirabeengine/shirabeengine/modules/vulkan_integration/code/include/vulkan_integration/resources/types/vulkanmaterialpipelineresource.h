@@ -27,7 +27,7 @@ namespace engine
 
     namespace resources
     {
-        template <> struct SLogicalToGpuApiResourceTypeMap<SPipeline> { using TGpuApiResource = struct vulkan::SVulkanPipelineResource; };
+        template <> struct SLogicalToGpuApiResourceTypeMap<SPipeline> { using TGpuApiResource = vulkan::SVulkanPipelineResource; };
     }
 
     namespace vulkan

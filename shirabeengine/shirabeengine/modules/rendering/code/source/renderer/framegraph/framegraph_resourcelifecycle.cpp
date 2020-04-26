@@ -78,14 +78,8 @@ namespace engine
             CEngineResult<> const renderPassCreation = aResourceContext.createRenderPass(aRenderPassId, aPassExecutionOrder, attachments, mResourceData);
             EngineStatusPrintOnError(renderPassCreation.result(), logTag(), "Failed to create render pass.");
 
-            CEngineResult<> const renderPassInit = aResourceContext.initializeRenderPass(aRenderPassId, aPassExecutionOrder, attachments, mResourceData);
-            EngineStatusPrintOnError(renderPassInit.result(), logTag(), "Failed to initialize render pass.");
-
             CEngineResult<> const frameBufferCreation = aResourceContext.createFrameBuffer(aFrameBufferId, aRenderPassId);
             EngineStatusPrintOnError(frameBufferCreation.result(), logTag(), "Failed to create framebuffer.");
-
-            CEngineResult<> const frameBufferInit = aResourceContext.initializeFrameBuffer(aFrameBufferId, aRenderPassId, mResourceData);
-            EngineStatusPrintOnError(frameBufferInit.result(), logTag(), "Failed to initialize framebuffer.");
 
             return EEngineStatus::Ok;
         }

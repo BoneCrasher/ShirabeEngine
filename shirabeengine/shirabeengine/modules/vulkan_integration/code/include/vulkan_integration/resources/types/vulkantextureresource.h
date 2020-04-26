@@ -93,7 +93,6 @@ namespace engine
                                                        , TResourceManager          *aResourceManager
                                                        , IVkGlobalContext          *aVulkanEnvironment)
         {
-
             /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
 
             VkDevice         const &vkLogicalDevice  = aVulkanEnvironment->getLogicalDevice();

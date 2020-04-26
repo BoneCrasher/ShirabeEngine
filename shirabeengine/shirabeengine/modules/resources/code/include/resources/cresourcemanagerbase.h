@@ -55,9 +55,6 @@ namespace engine::resources
         CEngineResult<OptionalRef_t<TResource>> getResource(ResourceId_t const &aId, TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
-        CEngineResult<OptionalRef_t<TResource>> getResourceAsync(ResourceId_t const &aId, TArgs &&...aArgs);
-
-        template <typename TResource, typename... TArgs>
         CEngineResult<> uploadResource(ResourceId_t const &aId, TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
@@ -75,6 +72,10 @@ namespace engine::resources
         template <typename TResource, typename... TArgs>
         CEngineResult<> transferResource(TResource const &aResourceId
                                        , TArgs       &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> updateResource(TResource const &aResource
+                                     , TArgs       &&...aArgs);
 
         template <typename TResource>
         OptionalRef_t<TResource> getResourceObject(ResourceId_t const &aId)
@@ -186,15 +187,14 @@ namespace engine::resources
     template <typename TResource, typename... TArgs>
     CEngineResult<OptionalRef_t<TResource>>
         CResourceManagerBase<TResources...>
-            ::getResourceImpl(
+            ::getResource(
                   ResourceId_t const &aId
-                , bool                aAsync
                 , TArgs          &&...aArgs)
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = initializeResource(*resource, aAsync, this, std::forward<TArgs>(aArgs)...);
+            auto const &[result] = initializeResource(*resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -207,32 +207,6 @@ namespace engine::resources
         }
 
         return EEngineStatus::ResourceError_NotFound;
-    }
-
-    template <typename... TResources>
-    template <typename TResource, typename... TArgs>
-    CEngineResult<OptionalRef_t<TResource>>
-        CResourceManagerBase<TResources...>::getResource(ResourceId_t const &aId
-                                                       , TArgs          &&...aArgs)
-        {
-            bool const async = false;
-            return getResourceImpl<TResource, TArgs...>(aId, async, std::forward<TArgs>(aArgs)...);
-        }
-
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //
-    //<-----------------------------------------------------------------------------
-
-    template <typename... TResources>
-    template <typename TResource, typename... TArgs>
-    CEngineResult<OptionalRef_t<TResource>>
-    CResourceManagerBase<TResources...>::getResource(ResourceId_t const &aId
-                                                     , TArgs          &&...aArgs)
-    {
-        bool const async = true;
-        return getResourceImpl<TResource, TArgs...>(aId, async, std::forward<TArgs>(aArgs)...);
     }
     //<-----------------------------------------------------------------------------
 
@@ -316,7 +290,6 @@ namespace engine::resources
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<> CResourceManagerBase<TResources...>::initializeResource(TResource const &aResource
-                                                                          , bool             aAsync,
                                                                           , TArgs       &&...aArgs)
     {
         using namespace core;
@@ -336,55 +309,94 @@ namespace engine::resources
         }
 
         // Run asynchronously
-        auto const run = [=] () -> EEngineStatus
+        // auto const run = [=] () -> EEngineStatus
+        // {
+        if(not aResource.loadState.checkAny(EGpuApiResourceState::Creating
+                                          | EGpuApiResourceState::Created))
         {
-            if(not aResource.loadState.checkAny(EGpuApiResourceState::Creating
-                                              | EGpuApiResourceState::Created))
+            aResource.loadState.set(EGpuApiResourceState::Creating);
+
+            EEngineStatus const initResult = TResource::GpuApiResource_t::template initialize<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+            if(not CheckEngineError(initResult))
             {
-                aResource.loadState.set(EGpuApiResourceState::Creating);
-
-                EEngineStatus const initResult = TResource::GpuApiResource_t::template initialize<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
-                if(not CheckEngineError(initResult))
-                {
-                    aResource.loadState.set(EGpuApiResourceState::Error);
-                    return initResult;
-                }
-
-                aResource.loadState.reset(EGpuApiResourceState::Created);
+                aResource.loadState.set(EGpuApiResourceState::Error);
+                return initResult;
             }
 
-            if constexpr(is_loadable<My_t, TResource>::value)
-            {
-                if(not aResource.loadState.checkAny(EGpuApiResourceState::Loading
-                                                  | EGpuApiResourceState::Loaded))
-                {
-                    aResource.loadState.set(EGpuApiResourceState::Loading);
-
-                    EEngineStatus const loadResult = TResource::GpuApiResource_t::template load<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
-                    if(not CheckEngineError(loadResult))
-                    {
-                        aResource.loadState.set(EGpuApiResourceState::Error);
-                        return loadResult;
-                    }
-
-                    aResource.loadState.unset(EGpuApiResourceState::Loading);
-                    aResource.loadState.set(EGpuApiResourceState::Loaded);
-                }
-            }
+            aResource.loadState.reset(EGpuApiResourceState::Created);
+        }
 
             return EEngineStatus::Ok;
-        };
+        // };
 
-        if(aAsync)
+        // if(aAsync)
+        // {
+        //     mResourceThreadLooper.getDispatcher().post(run);
+        // }
+        // else
+        // {
+        //    run();
+        // }
+
+        // return EEngineStatus::Ok;
+    };
+
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<> CResourceManagerBase<TResources...>::updateResource(TResource const &aResource
+                                                                      , TArgs       &&...aArgs)
+    {
+        using namespace core;
+
+        // Resource is being created and/or loaded.
+        // Do not check for ::Created, since otherwise the resource won't be loaded.
+        if(aResource.loadState.checkAny(EGpuApiResourceState::Loading))
         {
-            mResourceThreadLooper.getDispatcher().post(run);
+            return EEngineStatus::Resource_NotReady;
         }
-        else
+
+        if(aResource.loadState.checkAny(EGpuApiResourceState::Loaded))
         {
-            run();
+            return EEngineStatus::Ok;
+        }
+
+        if constexpr(is_loadable<My_t, TResource>::value)
+        {
+            if(not aResource.loadState.checkAny(EGpuApiResourceState::Loading
+                                              | EGpuApiResourceState::Loaded))
+            {
+                aResource.loadState.set(EGpuApiResourceState::Loading);
+
+                EEngineStatus const loadResult = TResource::GpuApiResource_t::template load<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                if(not CheckEngineError(loadResult))
+                {
+                    aResource.loadState.set(EGpuApiResourceState::Error);
+                    return loadResult;
+                }
+
+                aResource.loadState.unset(EGpuApiResourceState::Loading);
+                aResource.loadState.set(EGpuApiResourceState::Loaded);
+            }
         }
 
         return EEngineStatus::Ok;
+        // };
+
+        // if(aAsync)
+        // {
+        //     mResourceThreadLooper.getDispatcher().post(run);
+        // }
+        // else
+        // {
+        // run();
+        // }
+
+        // return EEngineStatus::Ok;
     };
     //<-----------------------------------------------------------------------------
 

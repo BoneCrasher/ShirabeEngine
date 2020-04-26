@@ -161,13 +161,8 @@ namespace engine
 
                 for(SFrameGraphRenderableResources const &renderableResources : renderables)
                 {
-                    aRenderContext.bindVertexBuffer(aRenderContextState, renderableResources.meshResource.attributeBuffer
-                                                                       , renderableResources.meshResource.attributeOffsets);
-
-                    aRenderContext.bindIndexBuffer (aRenderContextState, renderableResources.meshResource.indexBuffer
-                                                                       , renderableResources.meshResource.indexCount);
-
-                    aRenderContext.drawIndexed     (aRenderContextState, renderableResources.meshResource.indexCount);
+                    aRenderContext.useMesh    (aRenderContextState, renderableResources.meshResource);
+                    aRenderContext.drawIndexed(aRenderContextState, renderableResources.meshResource.indexCount);
                 }
 
                 return { EEngineStatus::Ok };

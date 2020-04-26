@@ -22,7 +22,7 @@ namespace engine
 
     namespace resources
     {
-        template <> struct SLogicalToGpuApiResourceTypeMap<SFrameBuffer> { using TGpuApiResource = struct vulkan::SVulkanFrameBufferResource;  };
+        template <> struct SLogicalToGpuApiResourceTypeMap<SFrameBuffer> { using TGpuApiResource = vulkan::SVulkanFrameBufferResource;  };
     }
 
     namespace vulkan

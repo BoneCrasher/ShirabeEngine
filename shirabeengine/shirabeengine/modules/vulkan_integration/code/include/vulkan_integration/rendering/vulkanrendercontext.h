@@ -10,24 +10,6 @@
 
 namespace engine
 {
-    namespace resources
-    {
-        // using VulkanResourceManager_t =
-        //         CResourceManagerBase<
-        //             // List of supported resource states...
-        //               TextureResourceState_t
-        //             , TextureViewResourceState_t
-        //             , BufferResourceState_t
-        //             , BufferViewResourceState_t
-        //             , RenderPassResourceState_t
-        //             , FrameBufferResourceState_t
-        //             , ShaderModuleResourceState_t
-        //             , PipelineResourceState_t
-        //             , MeshResourceState_t
-        //             , MaterialResourceState_t
-        //         >;
-    }
-
     namespace framegraph
     {
         struct SFrameGraphRenderContext;
@@ -40,11 +22,6 @@ namespace engine
             CreateRenderContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
                                        , Shared<CResourceManager>     aResourceManager
                                        , Shared<asset::CAssetStorage> aAssetStorage);
-
-        static framegraph::SFrameGraphResourceContext
-            CreateResourceContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
-                                         , Shared<CResourceManager>     aResourceManager
-                                         , Shared<asset::CAssetStorage> aAssetStorage);
     }
 }
 
