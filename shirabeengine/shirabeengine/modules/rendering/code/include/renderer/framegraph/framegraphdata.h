@@ -21,6 +21,7 @@
 #include <core/enginestatus.h>
 #include <log/log.h>
 #include <math/geometric/rect.h>
+#include <resources/extensibility.h>
 #include "renderer/renderertypes.h"
 
 #ifdef None
@@ -286,6 +287,14 @@ namespace engine
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphBuffer, SFrameGraphBuffer);
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphBuffer, SFrameGraphBuffer);
 
+        struct SHIRABE_TEST_EXPORT SFrameGraphTransientBuffer
+            : public SFrameGraphBuffer
+        { };
+
+        struct SHIRABE_TEST_EXPORT SFrameGraphPersistentBuffer
+            : public SFrameGraphBuffer
+        { };
+
         /**
          * The SFrameGraphBufferView struct describes any kind of buffer view resources in the framegraph.
          */
@@ -307,16 +316,10 @@ namespace engine
         SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphBufferView, SFrameGraphBufferView);
         SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphBufferView, SFrameGraphBufferView);
 
-        struct SHIRABE_TEST_EXPORT SFrameGraphAssetTexture
-                : public SFrameGraphResource
-        {
-            asset::AssetId_t assetId;
-        };
-
         /**
-         * @brief The SFrameGraphDynamicTexture struct
+         * @brief The SFrameGraphTexture struct
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphDynamicTexture
+        struct SHIRABE_TEST_EXPORT SFrameGraphTexture
                 : public SFrameGraphResource
                 , public graphicsapi::STextureInfo
         {
@@ -324,10 +327,10 @@ namespace engine
             /**
              * Default-Construt a frame graph texture
              */
-            SFrameGraphDynamicTexture();
+            SFrameGraphTexture();
 
         public_destructors:
-            virtual ~SFrameGraphDynamicTexture() = default;
+            virtual ~SFrameGraphTexture() = default;
 
         public_methods:
             /**
@@ -335,7 +338,7 @@ namespace engine
              *
              * @param aOther The other texture to copy the texture information from.
              */
-            void assignTextureParameters(SFrameGraphDynamicTexture const &aOther);
+            void assignTextureParameters(SFrameGraphTexture const &aOther);
 
             /**
              * Validate the texture data.
@@ -351,8 +354,18 @@ namespace engine
             CBitField<EFrameGraphResourceUsage> requestedUsage;
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphDynamicTexture, SFrameGraphDynamicTexture);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphDynamicTexture, SFrameGraphDynamicTexture);
+        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTexture, SFrameGraphTexture);
+        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphTexture, SFrameGraphTexture);
+
+        struct SHIRABE_TEST_EXPORT SFrameGraphTransientTexture
+            : public SFrameGraphTexture
+        {
+        };
+
+        struct SHIRABE_TEST_EXPORT SFrameGraphPersistentTexture
+            : public SFrameGraphTexture
+        {
+        };
 
         /**
          * The SFrameGraphTextureView struct describes any kind of frame graph texture view in the framegraph
@@ -566,6 +579,9 @@ namespace engine
         public_members:
         };
 
+        struct SFrameGraphPipelineConfig
+        {};
+
         /**
          * The frame graph pipeline struct encapsulates information on specific fixed function
          * pipeline configurations and references.
@@ -574,11 +590,9 @@ namespace engine
             : SFrameGraphResource
         {
         public_members:
-            SFrameGraphShaderModule shaderModuleResource;
+            SFrameGraphPipelineConfig pipelineConfig;
+            SFrameGraphShaderModule   shaderModuleResource;
         };
-
-        struct SFrameGraphPipelineConfig
-        {};
 
         /**
          * The frame graph material struct encapsulates information on
@@ -590,7 +604,6 @@ namespace engine
         public_members:
             std::vector<SFrameGraphBuffer>       uniformBuffers;
             std::vector<SFrameGraphAssetTexture> textures;
-            SFrameGraphPipeline                  pipeline;
         };
 
         struct SFrameGraphMesh
@@ -620,7 +633,7 @@ namespace engine
         };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES  \
-            SFrameGraphDynamicTexture,                       \
+            SFrameGraphTexture,                       \
             SFrameGraphTextureView,                          \
             SFrameGraphBuffer,                               \
             SFrameGraphBufferView,                           \
@@ -742,7 +755,7 @@ namespace engine
 
             SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                    }
             SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachements()        const { return mAttachements;                                                 }
-            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphDynamicTexture>::get();     }
+            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get();     }
             SHIRABE_INLINE RefIndex_t                      const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get();        }
             SHIRABE_INLINE RefIndex_t                      const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get();             }
             SHIRABE_INLINE RefIndex_t                      const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get();         }
@@ -839,7 +852,7 @@ namespace engine
 
 
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SFrameGraphDynamicTexture>(framegraph::SFrameGraphDynamicTexture const &aTexture);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SFrameGraphTexture>(framegraph::SFrameGraphTexture const &aTexture);
     template <>
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SFrameGraphTextureView>(framegraph::SFrameGraphTextureView const &aTextureView);
     template <>

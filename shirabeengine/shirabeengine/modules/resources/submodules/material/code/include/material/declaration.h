@@ -538,26 +538,23 @@ namespace engine
             SHIRABE_INLINE bool hasComputeStage()         const { return stages.end() != stages.find(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);                 }
         };
 
-        class CMaterialConfig;
-
         /**
-         * A material master is composed by a signature and base configuration.
+         * A material sharedMaterial is composed by a signature and base configuration.
          * It will be used to create instances from this material.
          */
-        class CMaterialMaster
+        class CSharedMaterial
         {
         public_static_functions:
-            static Shared<CMaterialMaster> fromAsset(SMaterialAsset const &aAsset);
+            static Shared<CSharedMaterial> fromAsset(SMaterialAsset const &aAsset);
 
         public_constructors:
-            CMaterialMaster() = default;
+            CSharedMaterial() = default;
 
             SHIRABE_INLINE
-            CMaterialMaster(asset::AssetId_t   const &aAssetUID,
+            CSharedMaterial(asset::AssetId_t   const &aAssetUID,
                             std::string        const &aName,
-                            SMaterialAsset          &&aSignature,
-                            CMaterialConfig         &&aConfig)
-                : mName          (aName                )
+                            SMaterialAsset          &&aSignature)
+                : mName          (aName)
                 , mLayoutInfo    ({})
                 , mStages        ({})
                 , mUniformBuffers({})
@@ -566,7 +563,7 @@ namespace engine
             {}
 
             SHIRABE_INLINE
-            CMaterialMaster(CMaterialMaster const &aOther)
+            CSharedMaterial(CSharedMaterial const &aOther)
                 : mName           (aOther.mName)
                 , mLayoutInfo     (aOther.mLayoutInfo)
                 , mStages         (aOther.mStages)
@@ -576,7 +573,7 @@ namespace engine
             {}
 
             SHIRABE_INLINE
-            CMaterialMaster(CMaterialMaster &&aOther)
+            CSharedMaterial(CSharedMaterial &&aOther)
                 : mName         (std::move(aOther.mName))
                 , mLayoutInfo    (aOther.mLayoutInfo)
                 , mStages        (std::move(aOther.mStages))
@@ -586,11 +583,11 @@ namespace engine
             {}
 
         public_destructors:
-            ~CMaterialMaster() = default;
+            ~CSharedMaterial() = default;
 
         public_operators:
             SHIRABE_INLINE
-            CMaterialMaster &operator=(CMaterialMaster const &aOther)
+            CSharedMaterial &operator=(CSharedMaterial const &aOther)
             {
                 mName           = aOther.mName;
                 mLayoutInfo     = aOther.mLayoutInfo;
@@ -603,7 +600,7 @@ namespace engine
             }
 
             SHIRABE_INLINE
-            CMaterialMaster &operator=(CMaterialMaster &&aOther) noexcept
+            CSharedMaterial &operator=(CSharedMaterial &&aOther) noexcept
             {
                 mName           = std::move(aOther.mName);
                 mLayoutInfo     = aOther.mLayoutInfo;
@@ -640,9 +637,9 @@ namespace engine
             std::vector<SSubpassInput>  mSubpassInputs;
         };
 
-        Shared<CMaterialMaster> CMaterialMaster::fromAsset(SMaterialAsset const &aAsset)
+        Shared<CSharedMaterial> CSharedMaterial::fromAsset(SMaterialAsset const &aAsset)
         {
-            Shared<CMaterialMaster> instance = makeShared<CMaterialMaster>();
+            Shared<CSharedMaterial> instance = makeShared<CSharedMaterial>();
 
             instance->mName           = aAsset.name;
             instance->mLayoutInfo     = aAsset.layoutInfo;
@@ -739,7 +736,7 @@ namespace engine
             using SampledImageMap_t  = Map<std::string, asset::AssetId_t>;
 
         public_static_functions:
-            static CMaterialConfig fromMaterialDesc(CMaterialMaster const &aMaterial, bool aIncludeSystemBuffers = false);
+            static CMaterialConfig fromMaterialDesc(CSharedMaterial const &aMaterial, bool aIncludeSystemBuffers = false);
 
         public_constructors:
             /**
@@ -1044,7 +1041,7 @@ namespace engine
          * A material instance describes a configurable and bindable material state which can be imagined
          * to be a single render call for an object having this material assigned.
          *
-         * Instances track their master during edit-time, in case the master signature changes due to
+         * Instances track their master during edit-time, in case the sharedMaterial signature changes due to
          * base configuration value changes or shader file updates.
          */
         class CMaterialInstance
@@ -1052,17 +1049,17 @@ namespace engine
             public_constructors:
                 SHIRABE_INLINE
                 explicit CMaterialInstance(std::string             const &aName,
-                                           Shared<CMaterialMaster>        aMaster)
+                                           Shared<CSharedMaterial>        aSharedMaterial)
                     : mName           ( aName            )
                     , mConfiguration  (                  )
-                    , mMasterReference(std::move(aMaster))
+                    , mSharedMaterial(std::move(aSharedMaterial))
                 {}
 
                 SHIRABE_INLINE
                 explicit CMaterialInstance(CMaterialInstance &&aOther)
-                    : mName                  (std::move(aOther.mName           ))
-                    , mConfiguration         (std::move(aOther.mConfiguration  ))
-                    , mMasterReference       (std::move(aOther.mMasterReference))
+                    : mName         (std::move(aOther.mName           ))
+                    , mConfiguration(std::move(aOther.mConfiguration  ))
+                    , mSharedMaterial(std::move(aOther.mSharedMaterial))
                 {}
 
             public_destructors:
@@ -1072,9 +1069,9 @@ namespace engine
                 SHIRABE_INLINE
                 CMaterialInstance &operator=(CMaterialInstance &&aOther)
                 {
-                    mName            = std::move(aOther.mName           );
-                    mMasterReference = std::move(aOther.mMasterReference);
-                    mConfiguration   = std::move(aOther.mConfiguration  );
+                    mName           = std::move(aOther.mName           );
+                    mSharedMaterial = std::move(aOther.mSharedMaterial);
+                    mConfiguration  = std::move(aOther.mConfiguration  );
 
                     return (*this);
                 }
@@ -1099,17 +1096,17 @@ namespace engine
                 }
 
                 SHIRABE_INLINE
-                Shared<CMaterialMaster> const &master() const
+                Shared<CSharedMaterial> const &sharedMaterial() const
                 {
-                    return mMasterReference;
+                    return mSharedMaterial;
                 }
 
-                EEngineStatus createConfiguration(CMaterialMaster const &aAsset, bool aIncludeSystemBuffers = false);
+                EEngineStatus createConfiguration(CSharedMaterial const &aAsset, bool aIncludeSystemBuffers = false);
 
         private_members:
             std::string                    mName;
             std::optional<CMaterialConfig> mConfiguration;
-            Shared<CMaterialMaster>        mMasterReference;
+            Shared<CSharedMaterial>        mSharedMaterial;
         };
 
 

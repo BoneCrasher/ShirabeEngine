@@ -32,7 +32,10 @@ namespace engine
         struct SVulkanMaterialResource
         {
             struct Handles_t
-            { };
+            {
+                VkDescriptorPool             descriptorPool;
+                std::vector<VkDescriptorSet> descriptorSets;
+            };
         };
 
         using MaterialResourceState_t = SResourceState<SMaterial>;

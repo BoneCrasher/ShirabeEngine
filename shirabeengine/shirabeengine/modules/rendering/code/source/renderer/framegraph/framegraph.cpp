@@ -325,8 +325,8 @@ namespace engine
                     return {sourceResourceFetch.result()};
                 }
 
-                CEngineResult<Shared<SFrameGraphDynamicTexture>> const parentResourceFetch = mResourceData.getResource<SFrameGraphDynamicTexture>(sourceResourceFetch.data()
-                                                                                                                                                                     ->subjacentResource);
+                CEngineResult<Shared<SFrameGraphTexture>> const parentResourceFetch = mResourceData.getResource<SFrameGraphTexture>(sourceResourceFetch.data()
+                                                                                                                                                       ->subjacentResource);
                 if(not parentResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));

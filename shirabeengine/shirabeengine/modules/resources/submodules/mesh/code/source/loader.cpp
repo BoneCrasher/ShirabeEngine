@@ -91,7 +91,7 @@ namespace engine
 
             auto const [meshDataFetchResult, meshData] = readMeshData(aLogTag, aAssetStorage, meshAsset.id);
             {
-                PrintEngineError(meshDataFetchResult, aLogTag, "Could not fetch master meta data.");
+                PrintEngineError(meshDataFetchResult, aLogTag, "Could not fetch sharedMaterial meta data.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(meshDataFetchResult, failureReturnValue);
             }
 
@@ -166,7 +166,7 @@ namespace engine
             {
                 auto[successful, meshName, meshData] = loadMeshFiles(logTag(), aAssetStorage, mInstances, aMeshInstanceAssetId);
                 {
-                    PrintEngineError(not successful, logTag(), "Couldn't fetch master material data.");
+                    PrintEngineError(not successful, logTag(), "Couldn't fetch sharedMaterial material data.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
                 }
 

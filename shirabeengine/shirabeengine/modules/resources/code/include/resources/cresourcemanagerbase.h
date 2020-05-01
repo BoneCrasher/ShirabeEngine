@@ -13,7 +13,6 @@
 #include <asset/assettypes.h>
 #include <asset/assetstorage.h>
 #include <core/bitfield.h>
-#include <core/datastructures/adjacencytree.h>
 #include <core/threading/looper.h>
 #include <base/stl_container_helpers.h>
 
@@ -23,8 +22,6 @@
 namespace engine::resources
 {
     using asset::AssetId_t ;
-    using datastructures::CAdjacencyTree;
-    using datastructures::CAdjacencyTreeHelper;
 
     /**
      *
@@ -49,10 +46,20 @@ namespace engine::resources
     public_methods:
         template <typename TResource>
         CEngineResult<OptionalRef_t <TResource>> useResource(ResourceId_t                     const &aResourceId
-                                                           , typename TResource::Descriptor_t const &aDescriptor);
+                                                           , typename TResource::Descriptor_t const &aDescriptor
+                                                           , bool                                    aInitializeImmediately = false);
 
         template <typename TResource, typename... TArgs>
         CEngineResult<OptionalRef_t<TResource>> getResource(ResourceId_t const &aId, TArgs &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> initializeResource(ResourceId_t const &aId, TArgs &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> updateResource(ResourceId_t const &aId, TArgs &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> deinitializeResource(ResourceId_t const &aId, TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
         CEngineResult<> uploadResource(ResourceId_t const &aId, TArgs &&...aArgs);
@@ -62,20 +69,20 @@ namespace engine::resources
 
     private_methods:
         template <typename TResource, typename... TArgs>
-        CEngineResult<> initializeResource(TResource const &aResource
-                                         , TArgs       &&...aArgs);
+        CEngineResult<> initializeResourceImpl(TResource const &aResource
+                                             , TArgs       &&...aArgs);
 
         template <typename TResource, typename... TArgs>
-        CEngineResult<> deinitializeResource(TResource const &aResource
+        CEngineResult<> deinitializeResourceImpl(TResource const &aResource
+                                               , TArgs       &&...aArgs);
+
+        template <typename TResource, typename... TArgs>
+        CEngineResult<> transferResourceImpl(TResource const &aResourceId
                                            , TArgs       &&...aArgs);
 
         template <typename TResource, typename... TArgs>
-        CEngineResult<> transferResource(TResource const &aResourceId
-                                       , TArgs       &&...aArgs);
-
-        template <typename TResource, typename... TArgs>
-        CEngineResult<> updateResource(TResource const &aResource
-                                     , TArgs       &&...aArgs);
+        CEngineResult<> updateResourceImpl(TResource const &aResource
+                                         , TArgs       &&...aArgs);
 
         template <typename TResource>
         OptionalRef_t<TResource> getResourceObject(ResourceId_t const &aId)
@@ -116,7 +123,6 @@ namespace engine::resources
         engine::threading::CLooper<EEngineStatus> mResourceThreadLooper;
 
         std::unordered_map<ResourceId_t, ResourceVariants_t> mResourceObjects;
-        CAdjacencyTree<ResourceId_t>                         mResourceTree;
     };
     //<-----------------------------------------------------------------------------
 
@@ -126,7 +132,6 @@ namespace engine::resources
     template <typename... TResources>
     CResourceManagerBase<TResources...>::CResourceManagerBase()
         : mResourceObjects    ()
-        , mResourceTree       ()
     {
         mResourceThreadLooper.initialize();
         mResourceThreadLooper.run();
@@ -153,7 +158,8 @@ namespace engine::resources
         CResourceManagerBase<TResources...>
             ::useResource(
                   ResourceId_t                     const &aResourceId
-                , typename TResource::Descriptor_t const &aDescriptor)
+                , typename TResource::Descriptor_t const &aDescriptor
+                , bool                                    aInitializeImmediately )
     {
         CEngineResult<OptionalRef_t<TResource>> result = {EEngineStatus::Error, {} };
 
@@ -188,13 +194,33 @@ namespace engine::resources
     CEngineResult<OptionalRef_t<TResource>>
         CResourceManagerBase<TResources...>
             ::getResource(
-                  ResourceId_t const &aId
-                , TArgs          &&...aArgs)
+                ResourceId_t const &aId
+                , TArgs        &&...aArgs)
+    {
+        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
+        if(false == resource.has_value())
+            return { EEngineStatus::ResourceError_NotFound };
+
+        return resource;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::initializeResource(
+                ResourceId_t const &aId
+                , TArgs        &&...aArgs)
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = initializeResource(*resource, this, std::forward<TArgs>(aArgs)...);
+            auto const &[result] = initializeResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -213,19 +239,79 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::uploadResource(ResourceId_t const &aId, TArgs &&...aArgs)
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::updateResource(
+                ResourceId_t const &aId
+                , TArgs        &&...aArgs)
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(resource.has_value())
         {
-            auto const &[result] = transferResource(*resource, this, std::forward<TArgs>(aArgs)...);
+            auto const &[result] = updateResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
-                    return result;
-                case EEngineStatus::Resource_NotReady:
+                    return { result, resource };
+                default:
+                    return EEngineStatus::Error;
+            }
+        }
+
+        return EEngineStatus::ResourceError_NotFound;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::deinitializeResource(
+                ResourceId_t const &aId
+                , TArgs        &&...aArgs)
+    {
+        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
+        if(resource.has_value())
+        {
+            auto const &[result] = deinitializeResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
+            switch(result)
+            {
+                case EEngineStatus::Ok:
+                    return { result, resource };
+                default:
+                    return EEngineStatus::Error;
+            }
+        }
+
+        return EEngineStatus::ResourceError_NotFound;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename... TResources>
+    template <typename TResource, typename... TArgs>
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::uploadResource(
+                  ResourceId_t const &aId
+                , TArgs          &&...aArgs)
+    {
+        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
+        if(resource.has_value())
+        {
+            auto const &[result] = transferResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
+            switch(result)
+            {
+                case EEngineStatus::Ok:
                     return result;
                 default:
                     return EEngineStatus::Error;
@@ -241,23 +327,20 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::discardResource(ResourceId_t const &aResourceId, TArgs &&...aArgs)
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::discardResource(
+                ResourceId_t const &aResourceId
+                , TArgs        &&...aArgs)
     {
-        auto iterator = mResourceObjects.find(aResourceId);
-        if(mResourceObjects.end() != iterator)
+        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aResourceId);
+        if(resource.has_value())
         {
-            ResourceVariants_t &variant = *iterator;
-            TResource          &value   = std::get<TResource>(variant);
-
-            TResource &resource = std::get<TResource>(value);
-            if(EGpuApiResourceState::Discarded != resource.state)
+            EEngineStatus const deinitialized = deinitializeResourceImpl(*resource, std::forward<TArgs>(aArgs)...);
+            if(CheckEngineError(deinitialized))
             {
-                EEngineStatus const deinitResult = deinitializeResource<TResource>(aResourceId, this, std::forward<TArgs>(aArgs)...).result();
-                if(CheckEngineError(deinitResult))
-                {
-                    CLog::Error(logTag(), "Failed to deinitialize resource with ID '{}'", aResourceId);
-                    return EEngineStatus::Error;
-                }
+                CLog::Error(logTag(), "Failed to deinitialize resource with ID '{}'", aResourceId);
+                return EEngineStatus::Error;
             }
 
             removeResourceObject(aResourceId);
@@ -289,8 +372,11 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::initializeResource(TResource const &aResource
-                                                                          , TArgs       &&...aArgs)
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::initializeResourceImpl(
+                TResource const &aResource
+              , TArgs       &&...aArgs)
     {
         using namespace core;
 
@@ -326,7 +412,7 @@ namespace engine::resources
             aResource.loadState.reset(EGpuApiResourceState::Created);
         }
 
-            return EEngineStatus::Ok;
+        return EEngineStatus::Ok;
         // };
 
         // if(aAsync)
@@ -348,8 +434,11 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::updateResource(TResource const &aResource
-                                                                      , TArgs       &&...aArgs)
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::updateResourceImpl(
+                TResource const &aResource
+              , TArgs       &&...aArgs)
     {
         using namespace core;
 
@@ -421,7 +510,7 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::deinitializeResource(TResource const &aResourceId
+    CEngineResult<> CResourceManagerBase<TResources...>::deinitializeResourceImpl(TResource const &aResourceId
                                                                             , TArgs       &&...aArgs)
     {
         using namespace core;
@@ -504,8 +593,10 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::transferResource(TResource const &aResourceId
-                                                                          , TArgs       &&...aArgs)
+    CEngineResult<>
+        CResourceManagerBase<TResources...>
+            ::transferResourceImpl(
+                TResource const &aResourceId, TArgs &&...aArgs)
     {
         using namespace core;
 

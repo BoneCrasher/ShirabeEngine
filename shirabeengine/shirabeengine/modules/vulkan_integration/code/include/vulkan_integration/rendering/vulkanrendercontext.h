@@ -1,11 +1,7 @@
 #ifndef __SHIRABE_VULKAN_RENDERCONTEXT_H__
 #define __SHIRABE_VULKAN_RENDERCONTEXT_H__
 
-#include <log/log.h>
-#include <resources/resourcetypes.h>
-#include <renderer/renderertypes.h>
-
-#include "vulkan_integration/vulkanenvironment.h"
+#include <core/enginetypehelper.h>
 #include "vulkan_integration/resources/vulkanresourceoperations.h"
 
 namespace engine
@@ -19,8 +15,8 @@ namespace engine
     namespace vulkan
     {
         static framegraph::SFrameGraphRenderContext
-            CreateRenderContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
-                                       , Shared<CResourceManager>     aResourceManager
+            CreateRenderContextForVulkan(Shared<CVulkanEnvironment>          aVulkanEnvironment
+                                       , Shared<resources::CResourceManager> aResourceManager
                                        , Shared<asset::CAssetStorage> aAssetStorage);
     }
 }

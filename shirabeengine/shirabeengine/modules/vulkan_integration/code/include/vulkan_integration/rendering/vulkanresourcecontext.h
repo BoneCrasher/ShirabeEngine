@@ -5,7 +5,6 @@
 #include <resources/resourcetypes.h>
 #include <renderer/renderertypes.h>
 
-#include "vulkan_integration/vulkanenvironment.h"
 #include "vulkan_integration/resources/vulkanresourceoperations.h"
 
 namespace engine

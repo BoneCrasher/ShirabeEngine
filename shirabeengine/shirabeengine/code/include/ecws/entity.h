@@ -1,8 +1,9 @@
 #ifndef __SHIRABE_ENTITY_H__
 #define __SHIRABE_ENTITY_H__
 
-#include "core/enginestatus.h"
-#include "ecws/icomponent.h"
+#include <core/enginestatus.h>
+#include <core/benchmarking/timer/timer.h>
+#include "ecws/componentbase.h"
 
 namespace engine::ecws
 {
@@ -10,7 +11,9 @@ namespace engine::ecws
      * A CEntity instance describes an engine entity, which can be enriched by various
      * types of engine components.
      */
+
     class CEntity
+        : public CComponentBase
     {
     public_constructors:
         explicit CEntity(std::string aName);
@@ -19,67 +22,6 @@ namespace engine::ecws
         ~CEntity();
 
     public_methods:
-        /**
-         * Return the name of the component.
-         *
-         * @return See brief.
-         */
-         [[nodiscard]]
-        SHIRABE_INLINE const std::string &name() const { return mName; }
-
-        /**
-         * Set the component name.
-         *
-         * @param aName The new name of the component.
-         */
-        SHIRABE_INLINE void setName(std::string const& aName) { mName = aName; }
-
-        /**
-         * Update the component with an optionally usable timer component.
-         *
-         * @param aTimer A timer providing the currently elapsed time.
-         * @return       Return EEngineStatus::Ok, if successful. An error code otherwise.
-         */
-        EEngineStatus update(CTimer const &aTimer);
-
-        /**
-         * Add a component to the internal component collection.
-         *
-         * @param aComponent The component to add to the entity instance.
-         * @return           EEngineStatus::Ok, if successful. An error code otherwise.
-         */
-        template <typename TComponent>
-        EEngineStatus addComponent(Shared<TComponent> const &aComponent);
-
-        /**
-         * Remove a component from the internal component collection.
-         *
-         * @param aComponent The component to add to the entity instance.
-         * @return           EEngineStatus::Ok, if successful. An error code otherwise.
-         */
-        template <typename TComponent>
-        EEngineStatus removeComponent(Shared<TComponent> const &aComponent);
-
-        /**
-         * Check, wether a specific component type is available in the internal component collection.
-         *
-         * @tparam TComponent The type of component to check for.
-         */
-        template<typename TComponent>
-        [[nodiscard]]
-        bool hasComponentOfType() const;
-
-        /**
-         * Fetch a list of components of specific type TComponent, if any.
-         *
-         * @tparam TComponent The type of component to enumerate.
-         */
-        template <typename TComponent>
-        CBoundedCollection<Shared<TComponent>> const getTypedComponentsOfType() const;
-
-    private_members:
-        std::string   mName;
-        IComponentMap mComponents;
     };
 
     //<-----------------------------------------------------------------------------

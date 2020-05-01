@@ -149,7 +149,7 @@ namespace engine
 
                 auto [result, asset] = readBufferAsset(logTag(), aAssetStorage, aAssetId);
                 {
-                    PrintEngineError(CheckEngineError(result), logTag(), "Couldn't fetch master material data.");
+                    PrintEngineError(CheckEngineError(result), logTag(), "Couldn't fetch sharedMaterial material data.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(CheckEngineError(result));
                 }
 

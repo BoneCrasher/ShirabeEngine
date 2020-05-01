@@ -97,7 +97,7 @@ namespace engine
              */
             CEngineResult<SFrameGraphResource> createTexture(
                     std::string        const &aName,
-                    SFrameGraphDynamicTexture const &aDescriptor);
+                    SFrameGraphTexture const &aDescriptor);
 
             // createBuffer
             // create~?
@@ -112,7 +112,7 @@ namespace engine
              */
             CEngineResult<SFrameGraphResource> importTexture(
                     std::string        const &aName,
-                    SFrameGraphDynamicTexture const &aDescriptor);
+                    SFrameGraphTexture const &aDescriptor);
 
             /**
              * Request a forward-op of a texture.

@@ -57,7 +57,7 @@ namespace engine
                     height = displayDesc.bounds.size.y();
                 }
 
-                SFrameGraphDynamicTexture gbuffer0Desc ={ };
+                SFrameGraphTexture gbuffer0Desc ={ };
                 gbuffer0Desc.width              = width;
                 gbuffer0Desc.height             = height;
                 gbuffer0Desc.depth              = 1;
@@ -67,7 +67,7 @@ namespace engine
                 gbuffer0Desc.mipLevels          = 1;
                 gbuffer0Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
                                                   | EFrameGraphResourceUsage::ColorAttachment;
-                SFrameGraphDynamicTexture gbuffer1Desc ={ };
+                SFrameGraphTexture gbuffer1Desc ={ };
                 gbuffer1Desc.width              = width;
                 gbuffer1Desc.height             = height;
                 gbuffer1Desc.depth              = 1;
@@ -77,7 +77,7 @@ namespace engine
                 gbuffer1Desc.mipLevels          = 1;
                 gbuffer1Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
                                                   | EFrameGraphResourceUsage::ColorAttachment;
-                SFrameGraphDynamicTexture gbuffer2And3Desc ={ };
+                SFrameGraphTexture gbuffer2And3Desc ={ };
                 gbuffer2And3Desc.width          = width;
                 gbuffer2And3Desc.height         = height;
                 gbuffer2And3Desc.depth          = 1;
@@ -88,7 +88,7 @@ namespace engine
                 gbuffer2And3Desc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
                                                   | EFrameGraphResourceUsage::ColorAttachment;
 
-                SFrameGraphDynamicTexture depthStencilDesc ={ };
+                SFrameGraphTexture depthStencilDesc ={ };
                 depthStencilDesc.width          = width;
                 depthStencilDesc.height         = height;
                 depthStencilDesc.depth          = 1;

@@ -45,8 +45,6 @@ namespace engine
             {
                 VkPipeline                   pipeline;
                 VkPipelineLayout             pipelineLayout;
-                VkDescriptorPool             descriptorPool;
-                std::vector<VkDescriptorSet> descriptorSets;
             };
 
             template <typename TResourceManager>

@@ -115,7 +115,7 @@ namespace engine
             {
                 auto const [textureFileFetchResult, textureFile] = readTextureFile(logTag(), aAssetStorage, aAssetId);
                 {
-                    PrintEngineError(textureFileFetchResult, logTag(), "Could not fetch master meta data.");
+                    PrintEngineError(textureFileFetchResult, logTag(), "Could not fetch sharedMaterial meta data.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(textureFileFetchResult);
                 }
 

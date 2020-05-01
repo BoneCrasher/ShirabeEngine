@@ -9,7 +9,7 @@
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
 
-#include <renderer/framegraph/framegraphrendercontext.h>
+#include <renderer/framegraph/framegraphcontexts.h>
 #include <resources/cresourcemanager.h>
 #include <material/loader.h>
 #include <mesh/loader.h>
@@ -26,6 +26,7 @@
 #endif
 
 #include "buildingblocks/scene.h"
+#include "ecws/componentmanager.h"
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 

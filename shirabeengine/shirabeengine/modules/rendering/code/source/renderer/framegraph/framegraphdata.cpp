@@ -235,7 +235,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphDynamicTexture::SFrameGraphDynamicTexture()
+        SFrameGraphTexture::SFrameGraphTexture()
             : SFrameGraphResource()
             , STextureInfo()
             , initialState(EFrameGraphResourceInitState::Undefined)
@@ -247,7 +247,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void SFrameGraphDynamicTexture::assignTextureParameters(SFrameGraphDynamicTexture const &aOther)
+        void SFrameGraphTexture::assignTextureParameters(SFrameGraphTexture const &aOther)
         {
             graphicsapi::STextureInfo::operator=(aOther); // Use implicitly defined assignment op
 
@@ -260,7 +260,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool SFrameGraphDynamicTexture::validate() const
+        bool SFrameGraphTexture::validate() const
         {
             bool const dimensionsValid = (0 == width || not (0 == width || 0 == height || 0 == depth));
             bool const mipLevelsValid  = (1 <= mipLevels);
@@ -422,7 +422,7 @@ namespace engine
 
                 for(RefIndex_t::value_type const&id : aOther.textures())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphDynamicTexture>::insert(id);
+                    CFrameGraphResourcesRef<SFrameGraphTexture>::insert(id);
                 }
 
                 for(RefIndex_t::value_type const&id : aOther.textureViews())
@@ -484,7 +484,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SFrameGraphDynamicTexture>(framegraph::SFrameGraphDynamicTexture const &aTexture)
+    std::string convert_to_string<framegraph::SFrameGraphTexture>(framegraph::SFrameGraphTexture const &aTexture)
     {
         std::string s =
                 CString::format(

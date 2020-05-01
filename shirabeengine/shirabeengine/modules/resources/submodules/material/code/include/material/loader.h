@@ -3,6 +3,7 @@
 
 #include <log/log.h>
 #include <core/enginestatus.h>
+#include <core/enginetypehelper.h>
 #include <resources/resourcedescriptions.h>
 
 namespace engine
@@ -17,7 +18,7 @@ namespace engine
     namespace material
     {
         struct SMaterialAsset;
-        class  CMaterialMaster;
+        class  CSharedMaterial;
         class  CMaterialInstance;
 
         /**
@@ -47,19 +48,19 @@ namespace engine
              */
             CEngineResult <Shared<CMaterialInstance>> createInstance(asset::AssetID_t const &aAssetId);
 
-            CEngineResult <Shared<CMaterialInstance>> loadInstance( Shared<asset::IAssetStorage> const &aAssetStorage
-                                                                  , asset::AssetID_t             const &aMaterialInstanceAssetId
-                                                                  , bool                                aAutoCreateConfiguration
-                                                                  , bool                                aIncludeSystemBuffers = false);
+            CEngineResult <Shared<CMaterialInstance>> loadInstance(Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                 , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                 , bool                                aAutoCreateConfiguration
+                                                                 , bool                                aIncludeSystemBuffers = false);
             /**
              * @brief loadMaterial
              * @param aMaterialId
              * @return
              */
-            CEngineResult <Shared<CMaterialInstance>> loadInstance( std::string                  const &aMaterialInstanceId
-                                                                  , Shared<asset::IAssetStorage> const &aAssetStorage
-                                                                  , asset::AssetID_t             const &aMaterialInstanceAssetId
-                                                                  , bool                                aAutoCreateConfiguration);
+            CEngineResult <Shared<CMaterialInstance>> loadInstance(std::string                  const &aMaterialInstanceId
+                                                                 , Shared<asset::IAssetStorage> const &aAssetStorage
+                                                                 , asset::AssetID_t             const &aMaterialInstanceAssetId
+                                                                 , bool                                aAutoCreateConfiguration);
 
             /**
              * @brief destroyMaterialInstance
@@ -71,8 +72,8 @@ namespace engine
         private_methods:
 
         private_members:
-            Map <asset::AssetID_t, Shared<CMaterialMaster>>          mMasterInstances;
-            Map <resources::ResourceId_t, Shared<CMaterialInstance>> mInstanceInstances;
+            Map <asset::AssetID_t, Shared<CSharedMaterial>>          mSharedMaterials;
+            Map <resources::ResourceId_t, Shared<CMaterialInstance>> mMaterialInstances;
         };
 
     }

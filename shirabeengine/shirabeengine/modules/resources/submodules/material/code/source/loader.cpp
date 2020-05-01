@@ -10,7 +10,6 @@
 #include "material/serialization.h"
 #include "material/loader.h"
 
-
 namespace engine
 {
     namespace material
@@ -109,7 +108,7 @@ namespace engine
         static
         auto loadMasterMaterialFiles(std::string                                    const &aLogTag,
                                      Shared<asset::IAssetStorage>                   const &aAssetStorage,
-                                     Map<asset::AssetID_t, Shared<CMaterialMaster>>       &aMasterMaterialIndex,
+                                     Map<asset::AssetID_t, Shared<CSharedMaterial>>       &aMasterMaterialIndex,
                                      asset::AssetID_t                               const &aMasterMaterialAssetId)
             -> MasterMaterialReturn_t
         {
@@ -122,7 +121,7 @@ namespace engine
 
             auto const [assetDataFetchResult, assetData] = readMaterialAsset(aLogTag, aAssetStorage, masterIndexId);
             {
-                PrintEngineError(assetDataFetchResult, aLogTag, "Could not fetch master asset data.");
+                PrintEngineError(assetDataFetchResult, aLogTag, "Could not fetch sharedMaterial asset data.");
                 SHIRABE_RETURN_VALUE_ON_ERROR(assetDataFetchResult, failureReturnValue);
             }
 
@@ -171,9 +170,9 @@ namespace engine
                                                                               , asset::AssetID_t             const &aMaterialInstanceAssetId
                                                                               , bool                                aAutoCreateConfiguration)
         {
-            if(mInstanceInstances.end() != mInstanceInstances.find(aMaterialInstanceId))
+            if(mMaterialInstances.end() != mMaterialInstances.find(aMaterialInstanceId))
             {
-                return { EEngineStatus::Ok, mInstanceInstances.at(aMaterialInstanceId) };
+                return { EEngineStatus::Ok, mMaterialInstances.at(aMaterialInstanceId) };
             }
 
             return loadInstance(aAssetStorage, aMaterialInstanceAssetId, aAutoCreateConfiguration);
@@ -200,7 +199,7 @@ namespace engine
             }
 
             //--------------------------------------------------------------------------------------------------------------------
-            // Fetch master data
+            // Fetch sharedMaterial data
             //--------------------------------------------------------------------------------------------------------------------
             AssetID_t masterIndexId = aMaterialInstanceAssetId; // instanceIndexAsset.parent;
             // if(0_uid == masterIndexId)
@@ -211,22 +210,22 @@ namespace engine
             //
             // If the material has been loaded already, return it!
             //
-            Shared<CMaterialMaster> master = nullptr;
+            Shared<CSharedMaterial> master = nullptr;
 
-            if(mMasterInstances.end() != mMasterInstances.find(masterIndexId))
+            if(mSharedMaterials.end() != mSharedMaterials.find(masterIndexId))
             {
-                master = mMasterInstances.at(masterIndexId);
+                master = mSharedMaterials.at(masterIndexId);
             }
             else
             {
-                auto[successful, masterName, masterAsset, masterConfig] = loadMasterMaterialFiles(logTag(), aAssetStorage, mMasterInstances, masterIndexId);
+                auto[successful, masterName, masterAsset, masterConfig] = loadMasterMaterialFiles(logTag(), aAssetStorage, mSharedMaterials, masterIndexId);
                 {
-                    PrintEngineError(not successful, logTag(), "Couldn't fetch master material data.");
+                    PrintEngineError(not successful, logTag(), "Couldn't fetch sharedMaterial material data.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
                 }
 
-                master = CMaterialMaster::fromAsset(masterAsset);
-                mMasterInstances[masterAsset.uid] = master;
+                master = CSharedMaterial::fromAsset(masterAsset);
+                mSharedMaterials[masterAsset.uid] = master;
             }
 
             if(nullptr == master)
@@ -243,7 +242,7 @@ namespace engine
                 instance->createConfiguration(*master, aIncludeSystemBuffers);
             }
 
-            mInstanceInstances.insert({ instanceName, instance });
+            mMaterialInstances.insert({instanceName, instance });
 
             return { EEngineStatus::Ok, instance };
         }

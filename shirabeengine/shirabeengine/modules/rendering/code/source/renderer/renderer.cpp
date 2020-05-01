@@ -5,7 +5,7 @@
 #include "renderer/framegraph/modules/gbuffergeneration.h"
 #include "renderer/framegraph/modules/lighting.h"
 #include "renderer/framegraph/modules/compositing.h"
-#include "renderer/framegraph/framegraphrendercontext.h"
+#include "renderer/framegraph/framegraphcontexts.h"
 #include "renderer/framegraph/framegraphserialization.h"
 
 #include "renderer/renderer.h"

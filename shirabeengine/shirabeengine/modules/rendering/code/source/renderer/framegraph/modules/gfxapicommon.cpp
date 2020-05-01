@@ -43,7 +43,7 @@ namespace engine
                     SPrePassData &aOutPassData)
                     -> CEngineResult<>
             {
-                SFrameGraphDynamicTexture backBufferTextureDesc{ };
+                SFrameGraphTexture backBufferTextureDesc{ };
                 backBufferTextureDesc.readableName   = "BackBuffer";
                 backBufferTextureDesc.width          = aWidth;
                 backBufferTextureDesc.height         = aHeight;
@@ -193,13 +193,13 @@ namespace engine
 
                 SFrameGraphTextureView const &view = *viewFetch.data();
 
-                CEngineResult<Shared<SFrameGraphDynamicTexture>> const textureFetch = aFrameGraphResources.getResource<SFrameGraphDynamicTexture>(view.subjacentResource);
+                CEngineResult<Shared<SFrameGraphTexture>> const textureFetch = aFrameGraphResources.getResource<SFrameGraphTexture>(view.subjacentResource);
                 if(not textureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch source image texture resource.");
                 }
 
-                SFrameGraphDynamicTexture const &texture = *textureFetch.data();
+                SFrameGraphTexture const &texture = *textureFetch.data();
 
                 // aContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
                 aContext.copyImageToBackBuffer(aRenderContextState, texture);

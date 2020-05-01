@@ -200,7 +200,7 @@ namespace engine
          * A material instance describes a configurable and bindable material state which can be imagined
          * to be a single render call for an object having this material assigned.
          *
-         * Instances track their master during edit-time, in case the master signature changes due to
+         * Instances track their master during edit-time, in case the sharedMaterial signature changes due to
          * base configuration value changes or shader file updates.
          */
         class CTextureInstance

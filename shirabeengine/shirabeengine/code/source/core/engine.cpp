@@ -14,7 +14,7 @@
 #include <textures/assetloader.h>
 #include <util/crc32.h>
 #include <renderer/rendererconfiguration.h>
-#include <renderer/framegraph/framegraphrendercontext.h>
+#include <renderer/framegraph/framegraphcontexts.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>
 #include <vulkan_integration/vulkandevicecapabilities.h>
 

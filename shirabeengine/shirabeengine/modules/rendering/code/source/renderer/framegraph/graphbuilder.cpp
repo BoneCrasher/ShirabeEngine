@@ -209,11 +209,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         SFrameGraphResource CGraphBuilder::registerTexture(
                 std::string        const &aReadableName,
-                SFrameGraphDynamicTexture const &aTexture)
+                SFrameGraphTexture const &aTexture)
         {
             try
             {
-                SFrameGraphDynamicTexture &resource = mResourceData.spawnResource<SFrameGraphDynamicTexture>();
+                SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
                 resource.assignedPassUID    = 0; // Pre-Pass
                 resource.parentResource     = 0; // No internal tree, has to be resolved differently.
                 resource.type               = EFrameGraphResourceType::Texture;
@@ -447,8 +447,8 @@ namespace engine
 
                     if(EFrameGraphResourceType::TextureView == resource.type)
                     {
-                        CEngineResult<Shared<SFrameGraphDynamicTexture>> textureFetch     = mResourceData.getResourceMutable<SFrameGraphDynamicTexture>(resource.subjacentResource);
-                        CEngineResult<Shared<SFrameGraphTextureView>>    textureViewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(resource.resourceId);
+                        CEngineResult<Shared<SFrameGraphTexture>>     textureFetch     = mResourceData.getResourceMutable<SFrameGraphTexture>(resource.subjacentResource);
+                        CEngineResult<Shared<SFrameGraphTextureView>> textureViewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(resource.resourceId);
 
                         if(not (textureFetch.successful() and textureViewFetch.successful()))
                         {
@@ -456,8 +456,8 @@ namespace engine
                             return { resourceFetch.result() };
                         }
 
-                        SFrameGraphDynamicTexture &texture     = *(textureFetch.data());
-                        SFrameGraphTextureView    &textureView = *(textureViewFetch.data());
+                        SFrameGraphTexture     &texture     = *(textureFetch.data());
+                        SFrameGraphTextureView &textureView = *(textureViewFetch.data());
 
                         // Auto adjust format if requested
                         if(FrameGraphFormat_t::Automatic == textureView.format)
@@ -524,14 +524,14 @@ namespace engine
 
                 FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
 
-                CEngineResult<Shared<SFrameGraphDynamicTexture>> subjacentFetch = mResourceData.getResource<SFrameGraphDynamicTexture>(subjacentResourceId);
+                CEngineResult<Shared<SFrameGraphTexture>> subjacentFetch = mResourceData.getResource<SFrameGraphTexture>(subjacentResourceId);
                 if(not textureViewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to getResource subjacent texture to validate.");
                     return { textureViewFetch.result() };
                 }
 
-                SFrameGraphDynamicTexture const &texture = *(subjacentFetch.data());
+                SFrameGraphTexture const &texture = *(subjacentFetch.data());
 
                 bool viewBindingValid = true;
                 viewBindingValid  = validateTextureView(texture, textureView);
@@ -549,7 +549,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureView(
-                SFrameGraphDynamicTexture     const &aTexture,
+            SFrameGraphTexture     const &aTexture,
                 SFrameGraphTextureView const &atextureView)
         {
             bool const usageValid             = validateTextureUsage(aTexture);
@@ -563,7 +563,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::validateTextureUsage(SFrameGraphDynamicTexture const &aTexture)
+        bool CGraphBuilder::validateTextureUsage(SFrameGraphTexture const &aTexture)
         {
             // Cross both bitsets... permittedUsage should fully contain requestedUsage
             return aTexture.permittedUsage.check(aTexture.requestedUsage);
@@ -574,7 +574,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureFormat(
-                SFrameGraphDynamicTexture     const &aTexture,
+            SFrameGraphTexture     const &aTexture,
                 SFrameGraphTextureView const &aTextureView)
         {
             using FormatValue_t = std::underlying_type_t<FrameGraphFormat_t>;
@@ -620,7 +620,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureSubresourceAccess(
-                SFrameGraphDynamicTexture     const &aTexture,
+            SFrameGraphTexture     const &aTexture,
                 SFrameGraphTextureView const &aTextureView)
         {
             CRange const &arraySliceRange = aTextureView.arraySliceRange;

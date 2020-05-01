@@ -11,7 +11,7 @@
 #include "renderer/framegraph/framegraphserialization.h"
 #include "renderer/framegraph/pass.h"
 #include "renderer/framegraph/framegraphdata.h"
-#include "renderer/framegraph/framegraphrendercontext.h"
+#include "renderer/framegraph/framegraphcontexts.h"
 
 namespace engine
 {
@@ -320,7 +320,7 @@ namespace engine
              */
             CEngineResult<> initializeTexture(
                     SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphDynamicTexture> const &aTexture);
+                    Shared<SFrameGraphTexture> const &aTexture);
 
             /**
              * Initialize a texture view for execution.
@@ -331,8 +331,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> initializeTextureView(
-                    SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphDynamicTexture> const &aTexture,
+                SFrameGraphResourceContext              &aResourceContext,
+                    Shared<SFrameGraphTexture> const &aTexture,
                     Shared<SFrameGraphTextureView>    const &aTextureView);
             /**
              * Initialize a buffer for execution.
@@ -358,7 +358,7 @@ namespace engine
              */
             CEngineResult<> deinitializeTexture(
                     SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphDynamicTexture> const &aTexture);
+                    Shared<SFrameGraphTexture> const &aTexture);
 
             /**
              * Deinitialize a texture view for execution.
@@ -369,8 +369,8 @@ namespace engine
              * @return              True, if sucessful. False otherwise.
              */
             CEngineResult<> deinitializeTextureView(
-                    SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphDynamicTexture> const &aTexture,
+                SFrameGraphResourceContext              &aResourceContext,
+                    Shared<SFrameGraphTexture> const &aTexture,
                     Shared<SFrameGraphTextureView>    const &aTextureView);
 
             /**

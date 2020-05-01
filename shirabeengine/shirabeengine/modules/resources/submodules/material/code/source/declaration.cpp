@@ -36,14 +36,14 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    EEngineStatus CMaterialInstance::createConfiguration(CMaterialMaster const &aMaterial, bool aIncludeSystemBuffers)
+    EEngineStatus CMaterialInstance::createConfiguration(CSharedMaterial const &aMaterial, bool aIncludeSystemBuffers)
     {
         if(mConfiguration.has_value())
         {
             return EEngineStatus::Ok;
         }
 
-        Shared<CMaterialMaster> m = master();
+        Shared<CSharedMaterial> m = sharedMaterial();
 
         CMaterialConfig config = CMaterialConfig::fromMaterialDesc(aMaterial, aIncludeSystemBuffers);
 
@@ -56,7 +56,7 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CMaterialConfig CMaterialConfig::fromMaterialDesc(CMaterialMaster const &aMaterial, bool aIncludeSystemBuffers)
+    CMaterialConfig CMaterialConfig::fromMaterialDesc(CSharedMaterial const &aMaterial, bool aIncludeSystemBuffers)
     {
         // uint32_t const minUBOOffsetAlignment = 0x100; // Hardcoded for the platform SCHLACHTSCHIFF ... make accessible in any other way...
         uint32_t const minUBOOffsetAlignment = 256; // 0x20;  // Hardcoded for the platform LENOVO ... make accessible in any other way...

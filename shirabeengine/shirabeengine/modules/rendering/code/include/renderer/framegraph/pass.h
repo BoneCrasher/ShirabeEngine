@@ -11,7 +11,7 @@
 #include <os/applicationenvironment.h>
 
 #include "renderer/framegraph/framegraphdata.h"
-#include "renderer/framegraph/framegraphrendercontext.h"
+#include "renderer/framegraph/framegraphcontexts.h"
 #include "renderer/framegraph/framegraphserialization.h"
 #include "renderer/framegraph/passbuilder.h"
 

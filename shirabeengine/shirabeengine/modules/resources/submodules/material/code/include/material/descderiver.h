@@ -28,7 +28,7 @@ namespace engine
         static
         ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage>  const &aAssetStorage
                                                                          , std::string                 const &aMaterialName
-                                                                         , CMaterialMaster             const &aMaster
+                                                                         , CSharedMaterial             const &aMaster
                                                                          , CMaterialInstance           const &aInstance
                                                                          , bool                               aIncludeSystemBuffers = false)
         {
@@ -168,7 +168,7 @@ namespace engine
                 }
 
                 //
-                // Derive data accessors for shader module creation from master material
+                // Derive data accessors for shader module creation from sharedMaterial material
                 //
                 std::filesystem::path const  stageSpirVFilename = stage.filename;
                 bool                  const  isEmptyFilename    = stageSpirVFilename.empty();
@@ -316,7 +316,7 @@ namespace engine
             {
                 static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
 
-                Shared <CMaterialMaster> const &master = aInstance->master();
+                Shared<CSharedMaterial> const &master = aInstance->master();
 
                 bool const includeSystemBuffers = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == master->name());
                 auto [derivationSuccessful
