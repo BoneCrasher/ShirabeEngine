@@ -63,6 +63,10 @@ namespace engine
          */
         struct SVulkanBufferResource
         {
+            static constexpr bool is_loadable      = true;
+            static constexpr bool is_unloadable    = true;
+            static constexpr bool is_transferrable = false;
+
             struct Handles_t {
                 VkBuffer       handle;
                 VkDeviceMemory attachedMemory;

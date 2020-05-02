@@ -110,7 +110,7 @@ namespace engine
         using textures::CTextureInstance;
         using resources::CResourceDescDeriver;
         using resources::SMeshDescriptor;
-        using resources::SMaterialDescriptor;
+        using resources::SMaterialDescription;
         using resources::STextureDescription;
 
         //
@@ -131,10 +131,10 @@ namespace engine
         //
         // Register resources in resource manager
         //
-        aResourceManager->useResource(mat_core->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_core));
-        aResourceManager->useResource(mat_lighting->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_lighting));
-        aResourceManager->useResource(mat_compositing->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_compositing));
-        aResourceManager->useResource(mat_standard->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescriptor>::derive(aAssetStorage, mat_standard));
+        aResourceManager->useResource(mat_core->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_core));
+        aResourceManager->useResource(mat_lighting->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_lighting));
+        aResourceManager->useResource(mat_compositing->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_compositing));
+        aResourceManager->useResource(mat_standard->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_standard));
         aResourceManager->useResource(mesh_fish->name(), CResourceDescDeriver<CMeshInstance, SMeshDescriptor>::derive(aAssetStorage, mesh_fish));
         aResourceManager->useResource(tex_fish_base->name(), CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_base));
         aResourceManager->useResource(tex_fish_normal->name(), CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_normal));

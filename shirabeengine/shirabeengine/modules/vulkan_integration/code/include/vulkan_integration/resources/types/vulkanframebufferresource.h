@@ -35,6 +35,10 @@ namespace engine
          */
         struct SVulkanFrameBufferResource
         {
+            static constexpr bool is_loadable      = false;
+            static constexpr bool is_unloadable    = false;
+            static constexpr bool is_transferrable = false;
+
             struct Handles_t
             {
                 VkFramebuffer handle;

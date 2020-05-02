@@ -237,7 +237,7 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SMaterialDescriptor
+            SHIRABE_TEST_EXPORT SMaterialDescription
         {
             std::string                        name;
             SMaterialPipelineDescriptor        pipelineDescriptor;

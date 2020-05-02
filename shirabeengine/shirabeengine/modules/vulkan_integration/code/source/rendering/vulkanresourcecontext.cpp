@@ -821,9 +821,33 @@ namespace engine
             auto initializeMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
                                   , Shared<CResourceManager>      aResourceManager
                                   , Shared<asset::CAssetStorage>  aAssetStorage
-                                  , SFrameGraphMaterial    const &aMesh) -> EEngineStatus
+                                  , SFrameGraphMaterial    const &aMaterial) -> EEngineStatus
             {
+                for(auto const &buffer : aMaterial.uniformBuffers)
+                {
+                    EEngineStatus const &opSuccessCode = detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, buffer);
+                    if(CheckEngineError(opSuccessCode))
+                    {
+                        return EEngineStatus::InitializationError;
+                    }
+                }
 
+                for(auto const &texture : aMaterial.textures)
+                {
+                    EEngineStatus const &opSuccessCode = detail::initializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage, texture);
+                    if(CheckEngineError(opSuccessCode))
+                    {
+                        return EEngineStatus::InitializationError;
+                    }
+                }
+
+                auto const [opSuccessCode] = aResourceManager->initializeResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
+                if(CheckEngineError(opSuccessCode))
+                {
+                    return EEngineStatus::InitializationError;
+                }
+
+                return EEngineStatus::Ok;
             }
             //<-----------------------------------------------------------------------------
 
@@ -833,19 +857,33 @@ namespace engine
             auto updateMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
                               , Shared<CResourceManager>      aResourceManager
                               , Shared<asset::CAssetStorage>  aAssetStorage
-                              , SFrameGraphMaterial    const &aMesh) -> EEngineStatus
+                              , SFrameGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                EEngineStatus const &attributeBufferOpSuccessCode = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
-                EEngineStatus const &indexBufferOpSuccessCode     = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+                for(auto const &buffer : aMaterial.uniformBuffers)
+                {
+                    EEngineStatus const &opSuccessCode = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, buffer);
+                    if(CheckEngineError(opSuccessCode))
+                    {
+                        return EEngineStatus::UpdateError;
+                    }
+                }
 
-                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                for(auto const &texture : aMaterial.textures)
                 {
-                    return EEngineStatus::InitializationError;
+                    EEngineStatus const &opSuccessCode = detail::updatePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage, texture);
+                    if(CheckEngineError(opSuccessCode))
+                    {
+                        return EEngineStatus::UpdateError;
+                    }
                 }
-                else
+
+                auto const [opSuccessCode] = aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
+                if(CheckEngineError(opSuccessCode))
                 {
-                    return EEngineStatus::Ok;
+                    return EEngineStatus::UpdateError;
                 }
+
+                return EEngineStatus::Ok;
             }
             //<-----------------------------------------------------------------------------
 
@@ -855,19 +893,55 @@ namespace engine
             auto deinitializeMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
                                     , Shared<CResourceManager>      aResourceManager
                                     , Shared<asset::CAssetStorage>  aAssetStorage
-                                    , SFrameGraphMaterial    const &aMesh) -> EEngineStatus
+                                    , SFrameGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                EEngineStatus const &attributeBufferOpSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
-                EEngineStatus const &indexBufferOpSuccessCode     = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+                for(auto const &buffer : aMaterial.uniformBuffers)
+                {
+                    EEngineStatus const &opSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, buffer);
+                    if(CheckEngineError(opSuccessCode))
+                    {
+                        return EEngineStatus::UpdateError;
+                    }
+                }
 
-                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                for(auto const &texture : aMaterial.textures)
                 {
-                    return EEngineStatus::InitializationError;
+                    EEngineStatus const &opSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, texture);
+                    if(CheckEngineError(opSuccessCode))
+                    {
+                        return EEngineStatus::UpdateError;
+                    }
                 }
-                else
+
+                auto const [opSuccessCode] = aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
+                if(CheckEngineError(opSuccessCode))
                 {
-                    return EEngineStatus::Ok;
+                    return EEngineStatus::UpdateError;
                 }
+
+                return EEngineStatus::Ok;
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto createPipeline(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                                , Shared<CResourceManager>      aResourceManager
+                                , Shared<asset::CAssetStorage>  aAssetStorage
+                                , SFrameGraphPipeline    const &aPipeline) -> EEngineStatus
+            {
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto destroyPipeline(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                                 , Shared<CResourceManager>      aResourceManager
+                                 , Shared<asset::CAssetStorage>  aAssetStorage
+                                 , SFrameGraphPipeline    const &aMesh) -> EEngineStatus
+            {
             }
         }
         //<-----------------------------------------------------------------------------
@@ -1020,8 +1094,14 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Pipelines
             //---------------------------------------------------------------------------------------------------------------
-            // std::function<EEngineStatus(SFrameGraphPipeline const &/* aPipeline */)> createPipeline;
-            // std::function<EEngineStatus(SFrameGraphPipeline const &/* aPipeline */)> destroyPipeline;
+            context.createPipeline =
+                [&] (SFrameGraphPipeline const &aPipeline)
+                    { return detail::createPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                   , aPipeline); };
+            context.destroyPipeline =
+                [&] (SFrameGraphPipeline const &aPipeline)
+                    { return detail::destroyPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                     , aPipeline); };
         }
     }
 }

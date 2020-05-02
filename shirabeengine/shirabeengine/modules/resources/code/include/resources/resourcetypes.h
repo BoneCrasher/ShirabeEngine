@@ -166,9 +166,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SMaterial
-            : public CResourceObject<SMaterialDescriptor>
+            : public CResourceObject<SMaterialDescription>
         {
-            using CResourceObject<SMaterialDescriptor>::CResourceObject;
+            using CResourceObject<SMaterialDescription>::CResourceObject;
 
             Shared<SPipeline>       pipelineResource;
             Shared<SShaderModule>   shaderModuleResource;

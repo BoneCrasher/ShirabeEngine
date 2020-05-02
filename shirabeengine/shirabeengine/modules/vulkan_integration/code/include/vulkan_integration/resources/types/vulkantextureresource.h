@@ -37,6 +37,10 @@ namespace engine
          */
         struct SVulkanTextureResource
         {
+            static constexpr bool is_loadable      = true;
+            static constexpr bool is_unloadable    = true;
+            static constexpr bool is_transferrable = true;
+
             struct Handles_t
             {
                 VkBuffer       stagingBuffer;

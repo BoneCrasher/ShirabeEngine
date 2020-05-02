@@ -590,6 +590,7 @@ namespace engine
             : SFrameGraphResource
         {
         public_members:
+            resources::ResourceId_t   basePipelineId;
             SFrameGraphPipelineConfig pipelineConfig;
             SFrameGraphShaderModule   shaderModuleResource;
         };
@@ -602,6 +603,7 @@ namespace engine
             : SFrameGraphResource
         {
         public_members:
+            SFrameGraphPipeline                       basePipeline;
             std::vector<SFrameGraphPersistentBuffer>  uniformBuffers;
             std::vector<SFrameGraphPersistentTexture> textures;
         };
@@ -614,14 +616,15 @@ namespace engine
             SFrameGraphPersistentBuffer indexBuffer;
             std::vector<VkDeviceSize>   attributeOffsets;
             VkDeviceSize                indexCount;
+
+            std::array<SFrameGraphMaterial, 4> materials;
         };
 
         struct SFrameGraphRenderableResources
         {
             SFrameGraphMesh                           meshResource;
-            SFrameGraphMaterial                       materialResource;
-            std::vector<SFrameGraphPersistentBuffer>  bufferResources;
-            std::vector<SFrameGraphPersistentTexture> textureResources;
+            // std::vector<SFrameGraphPersistentBuffer>  bufferResources;
+            // std::vector<SFrameGraphPersistentTexture> textureResources;
         };
 
         struct SFrameGraphRenderableFetchFilter

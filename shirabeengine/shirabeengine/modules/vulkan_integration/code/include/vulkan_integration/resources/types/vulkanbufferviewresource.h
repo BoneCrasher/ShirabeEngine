@@ -39,6 +39,10 @@ namespace engine
          */
         struct SVulkanBufferViewResource
         {
+            static constexpr bool is_loadable      = false;
+            static constexpr bool is_unloadable    = false;
+            static constexpr bool is_transferrable = false;
+
             struct Handles_t
             {
                 VkBufferView handle;
