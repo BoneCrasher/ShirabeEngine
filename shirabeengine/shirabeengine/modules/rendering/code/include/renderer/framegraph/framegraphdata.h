@@ -602,26 +602,26 @@ namespace engine
             : SFrameGraphResource
         {
         public_members:
-            std::vector<SFrameGraphBuffer>       uniformBuffers;
-            std::vector<SFrameGraphAssetTexture> textures;
+            std::vector<SFrameGraphPersistentBuffer>  uniformBuffers;
+            std::vector<SFrameGraphPersistentTexture> textures;
         };
 
         struct SFrameGraphMesh
             : SFrameGraphResource
         {
         public_members:
-            SFrameGraphBuffer         attributeBuffer;
-            SFrameGraphBuffer         indexBuffer;
-            std::vector<VkDeviceSize> attributeOffsets;
-            VkDeviceSize              indexCount;
+            SFrameGraphPersistentBuffer attributeBuffer;
+            SFrameGraphPersistentBuffer indexBuffer;
+            std::vector<VkDeviceSize>   attributeOffsets;
+            VkDeviceSize                indexCount;
         };
 
         struct SFrameGraphRenderableResources
         {
-            SFrameGraphMesh                      meshResource;
-            SFrameGraphMaterial                  materialResource;
-            std::vector<SFrameGraphBuffer>       bufferResources;
-            std::vector<SFrameGraphAssetTexture> textureResources;
+            SFrameGraphMesh                           meshResource;
+            SFrameGraphMaterial                       materialResource;
+            std::vector<SFrameGraphPersistentBuffer>  bufferResources;
+            std::vector<SFrameGraphPersistentTexture> textureResources;
         };
 
         struct SFrameGraphRenderableFetchFilter

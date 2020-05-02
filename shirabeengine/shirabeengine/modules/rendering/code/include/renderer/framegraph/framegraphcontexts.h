@@ -227,7 +227,7 @@ namespace engine
 
             std::function<EEngineStatus(SFrameGraphTexture     const& /* aTexture     */
                                       , SFrameGraphTextureView const& /* aTextureView */)> createTextureView;
-            std::function<EEngineStatus(SFrameGraphTextureView const& /* aTextureView */)>  destroyTextureView;
+            std::function<EEngineStatus(SFrameGraphTextureView const& /* aTextureView */)> destroyTextureView;
 
             //---------------------------------------------------------------------------------------------------------------
             // Buffers
@@ -235,9 +235,9 @@ namespace engine
             std::function<EEngineStatus(SFrameGraphTransientBuffer const& /* aBuffer */)> createTransientBuffer;
             std::function<EEngineStatus(SFrameGraphTransientBuffer const& /* aBuffer */)> destroyTransientBuffer;
 
-            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> createPersistentBuffer;
+            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> initializePersistentBuffer;
             std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> updatePersistentBuffer;
-            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> destroyPersistentBuffer;
+            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> deinitializePersistentBuffer;
 
             std::function<EEngineStatus(SFrameGraphBuffer     const& /* aBuffer     */
                                       , SFrameGraphBufferView const& /* aBufferView */)> createBufferView;
@@ -246,16 +246,16 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Meshes
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> createMesh;
+            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> initializeMesh;
             std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> updateMesh;
-            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> destroyMesh;
+            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> deinitializeMesh;
 
             //---------------------------------------------------------------------------------------------------------------
             // Materials
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> createMaterial;
+            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> initializeMaterial;
             std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> updateMaterial;
-            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> destroyMaterial;
+            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> deinitializeMaterial;
 
             //---------------------------------------------------------------------------------------------------------------
             // Pipelines

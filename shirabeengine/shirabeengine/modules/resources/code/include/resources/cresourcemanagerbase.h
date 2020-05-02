@@ -201,7 +201,7 @@ namespace engine::resources
         if(false == resource.has_value())
             return { EEngineStatus::ResourceError_NotFound };
 
-        return resource;
+        return { EEngineStatus::Ok, resource };
     }
     //<-----------------------------------------------------------------------------
 
@@ -224,7 +224,7 @@ namespace engine::resources
             switch(result)
             {
                 case EEngineStatus::Ok:
-                    return { result, resource };
+                    return { result };
                 case EEngineStatus::Resource_NotReady:
                     return result;
                 default:
@@ -255,7 +255,7 @@ namespace engine::resources
             switch(result)
             {
                 case EEngineStatus::Ok:
-                    return { result, resource };
+                    return { result };
                 default:
                     return EEngineStatus::Error;
             }
@@ -284,7 +284,7 @@ namespace engine::resources
             switch(result)
             {
                 case EEngineStatus::Ok:
-                    return { result, resource };
+                    return { result };
                 default:
                     return EEngineStatus::Error;
             }
@@ -496,7 +496,7 @@ namespace engine::resources
     struct is_unloadable
     {
     private:
-        template<typename UResourceManager, typename U> static auto check(int) -> decltype(std::declval<U>().template unload<UResourceManager>() == 1, std::true_type());
+        template<typename UResourceManager, typename U> static auto check(int) -> decltype(std::declval<U>()::template unload<UResourceManager>() == 1, std::true_type());
 
         template<typename> static std::false_type check(...);
 

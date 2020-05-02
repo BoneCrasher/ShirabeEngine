@@ -53,7 +53,7 @@ namespace engine
 
         namespace local
         {
-            SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphRenderContext);
+            SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphResourceContext);
         }
         //<-----------------------------------------------------------------------------
 
@@ -613,10 +613,10 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto createBuffer(Shared<CVulkanEnvironment>      aVulkanEnvironment
-                              , Shared<CResourceManager>      aResourceManager
-                              , Shared<asset::CAssetStorage>  aAssetStorage
-                              , SFrameGraphBuffer      const &aBuffer) -> EEngineStatus
+            auto createTransientBuffer(Shared<CVulkanEnvironment>        aVulkanEnvironment
+                                     , Shared<CResourceManager>          aResourceManager
+                                     , Shared<asset::CAssetStorage>      aAssetStorage
+                                     , SFrameGraphTransientBuffer const &aBuffer) -> EEngineStatus
             {
                 SBufferDescription desc = { };
                 desc.name = aBuffer.readableName;
@@ -632,32 +632,54 @@ namespace engine
                 // createInfo.queueFamilyIndexCount = ...;
                 // createInfo.pQueueFamilyIndices   = ...;
 
-                CEngineResult<BufferResourceState_t> bufferObject = aResourceManager->useResource<BufferResourceState_t>(desc.name, desc);
+                CEngineResult<BufferResourceState_t> bufferObject = aResourceManager->useResource<BufferResourceState_t>(desc.name, desc, true);
                 EngineStatusPrintOnError(bufferObject.result(), logTag(), "Failed to create buffer.");
-
-                return bufferObject.result();
+                SHIRABE_RETURN_RESULT_ON_ERROR(bufferObject.result());
+                return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto transferBuffer(Shared<CVulkanEnvironment>      aVulkanEnvironment
-                                , Shared<CResourceManager>      aResourceManager
-                                , Shared<asset::CAssetStorage>  aAssetStorage
-                                , SFrameGraphBuffer      const &aBuffer) -> EEngineStatus
+            auto destroyTransientBuffer(Shared<CVulkanEnvironment>        aVulkanEnvironment
+                                      , Shared<CResourceManager>          aResourceManager
+                                      , Shared<asset::CAssetStorage>      aAssetStorage
+                                      , SFrameGraphTransientBuffer const &aBuffer) -> EEngineStatus
             {
-                OptRef_t<BufferResourceState_t> bufferOpt {};
-                {
-                    auto [success, resource] = fetchResource<BufferResourceState_t>(aBuffer.readableName, aResourceManager, aVulkanEnvironment);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    bufferOpt = resource;
-                }
-                BufferResourceState_t &buffer = *bufferOpt;
+                CEngineResult<> const deinitialization = aResourceManager->discardResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
+                EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to destroy buffer.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(deinitialization.result());
+                return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
 
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto initializePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
+                                          , Shared<CResourceManager>           aResourceManager
+                                          , Shared<asset::CAssetStorage>       aAssetStorage
+                                          , SFrameGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+            {
+                {
+                    auto const &[successCode] = aResourceManager->deinitializeResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
+                    EngineStatusPrintOnError(successCode, logTag(), "Failed to initialize persistent buffer.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(successCode);
+                }
+
+                return EEngineStatus::Ok;
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto updatePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
+                                      , Shared<CResourceManager>           aResourceManager
+                                      , Shared<asset::CAssetStorage>       aAssetStorage
+                                      , SFrameGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+            {
                 CEngineResult<> const bufferTransfer = aResourceManager->uploadResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(bufferTransfer.result(), logTag(), "Buffer initialization failed.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(bufferTransfer.result());
@@ -669,26 +691,19 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto destroyBuffer(Shared<CVulkanEnvironment>      aVulkanEnvironment
-                               , Shared<CResourceManager>      aResourceManager
-                               , Shared<asset::CAssetStorage>  aAssetStorage
-                               , SFrameGraphBuffer      const &aBuffer) -> EEngineStatus
+            auto deinitializePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
+                                            , Shared<CResourceManager>           aResourceManager
+                                            , Shared<asset::CAssetStorage>       aAssetStorage
+                                            , SFrameGraphPersistentBuffer const &aBuffer) -> EEngineStatus
             {
-                OptRef_t<BufferResourceState_t> resourceOpt {};
                 {
-                    auto [success, resource] = fetchResource<BufferResourceState_t>(aBuffer.readableName, aResourceManager, aVulkanEnvironment);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    resourceOpt = resource;
+                    auto const &[successCode] = aResourceManager->deinitializeResource<TextureResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
+                    EngineStatusPrintOnError(successCode, logTag(), "Failed to deinitialize persistent buffer.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(successCode);
                 }
-                BufferResourceState_t &buffer = *resourceOpt;
 
-                CEngineResult<> const deinitialization = aResourceManager->discardResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
-                EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to deinitialize buffer.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(deinitialization.result());
-            };
+                return EEngineStatus::Ok;
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -714,6 +729,8 @@ namespace engine
 
                 auto const &[success, resource] = aResourceManager->useResource<BufferViewResourceState_t>(desc.name, desc);
                 EngineStatusPrintOnError(success, logTag(), "Failed to create buffer view.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(success);
+                return EEngineStatus::Ok;
             };
             //<-----------------------------------------------------------------------------
 
@@ -725,578 +742,133 @@ namespace engine
                                    , Shared<asset::CAssetStorage>  aAssetStorage
                                    , SFrameGraphBufferView  const &aView) -> EEngineStatus
             {
-                OptRef_t<BufferViewResourceState_t> resourceOpt {};
-                {
-                    auto [success, resource] = fetchResource<BufferViewResourceState_t>(aView.readableName, aResourceManager, aVulkanEnvironment);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    resourceOpt = resource;
-                }
-                BufferViewResourceState_t &bufferView = *resourceOpt;
-
                 CEngineResult<> const deinitialization = aResourceManager->discardResource<BufferViewResourceState_t>(aView.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to deinitialize buffer.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialization.result());
-            };
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            auto const configureInputAssembly =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
-                               {
-                                   aPipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-                                   aPipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
-                                   aPipelineDescriptor.inputAssemblyState.flags                  = 0;
-                                   aPipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-                                   aPipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
-                               };
-
-            auto const configureRasterizer =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
-                               {
-                                   aPipelineDescriptor.rasterizerState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-                                   aPipelineDescriptor.rasterizerState.pNext                   = nullptr;
-                                   aPipelineDescriptor.rasterizerState.flags                   = 0;
-                                   aPipelineDescriptor.rasterizerState.cullMode                = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
-                                   aPipelineDescriptor.rasterizerState.frontFace               = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
-                                   aPipelineDescriptor.rasterizerState.polygonMode             = VkPolygonMode::VK_POLYGON_MODE_FILL;
-                                   aPipelineDescriptor.rasterizerState.lineWidth               = 1.0f;
-                                   aPipelineDescriptor.rasterizerState.rasterizerDiscardEnable = VK_FALSE; // isCoreMaterial ? VK_TRUE : VK_FALSE;
-                                   aPipelineDescriptor.rasterizerState.depthClampEnable        = VK_FALSE;
-                                   aPipelineDescriptor.rasterizerState.depthBiasEnable         = VK_FALSE;
-                                   aPipelineDescriptor.rasterizerState.depthBiasSlopeFactor    = 0.0f;
-                                   aPipelineDescriptor.rasterizerState.depthBiasConstantFactor = 0.0f;
-                                   aPipelineDescriptor.rasterizerState.depthBiasClamp          = 0.0f;
-                               };
-
-            auto const configureMultisampler =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
-                               {
-                                   aPipelineDescriptor.multiSampler.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-                                   aPipelineDescriptor.multiSampler.pNext                 = nullptr;
-                                   aPipelineDescriptor.multiSampler.flags                 = 0;
-                                   aPipelineDescriptor.multiSampler.sampleShadingEnable   = VK_FALSE;
-                                   aPipelineDescriptor.multiSampler.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT;
-                                   aPipelineDescriptor.multiSampler.minSampleShading      = 1.0f;
-                                   aPipelineDescriptor.multiSampler.pSampleMask           = nullptr;
-                                   aPipelineDescriptor.multiSampler.alphaToCoverageEnable = VK_FALSE;
-                                   aPipelineDescriptor.multiSampler.alphaToOneEnable      = VK_FALSE;
-                               };
-
-            auto const configureDepthStencil =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
-                               {
-                                   aPipelineDescriptor.depthStencilState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-                                   aPipelineDescriptor.depthStencilState.pNext                 = nullptr;
-                                   aPipelineDescriptor.depthStencilState.flags                 = 0;
-                                   aPipelineDescriptor.depthStencilState.depthTestEnable       = VK_TRUE;
-                                   aPipelineDescriptor.depthStencilState.depthWriteEnable      = VK_TRUE;
-                                   aPipelineDescriptor.depthStencilState.depthCompareOp        = VkCompareOp::VK_COMPARE_OP_LESS;
-                                   aPipelineDescriptor.depthStencilState.stencilTestEnable     = VK_FALSE;
-                                   aPipelineDescriptor.depthStencilState.front.passOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
-                                   aPipelineDescriptor.depthStencilState.front.failOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
-                                   aPipelineDescriptor.depthStencilState.front.depthFailOp     = VkStencilOp::VK_STENCIL_OP_KEEP;
-                                   aPipelineDescriptor.depthStencilState.front.compareOp       = VkCompareOp::VK_COMPARE_OP_ALWAYS;
-                                   aPipelineDescriptor.depthStencilState.front.compareMask     = 0;
-                                   aPipelineDescriptor.depthStencilState.front.writeMask       = 0;
-                                   aPipelineDescriptor.depthStencilState.front.reference       = 0;
-                                   aPipelineDescriptor.depthStencilState.back                  = aPipelineDescriptor.depthStencilState.front;
-                                   aPipelineDescriptor.depthStencilState.depthBoundsTestEnable = VK_FALSE;
-                                   aPipelineDescriptor.depthStencilState.minDepthBounds        = 0.0f;
-                                   aPipelineDescriptor.depthStencilState.maxDepthBounds        = 1.0f;
-                               };
-
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            auto initializeMaterial(Shared<CVulkanEnvironment>     aVulkanEnvironment
-                                    , Shared<CResourceManager>     aResourceManager
-                                    , Shared<asset::CAssetStorage> aAssetStorage
-                                    , SFrameGraphMaterial   const &aMaterial
-                                    , ResourceId_t          const &aRenderPassId) -> EEngineStatus
-            {
-                OptRef_t<MaterialResourceState_t> materialOpt {};
-                {
-                    auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aMaterial.readableName);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    materialOpt = resource;
-                }
-                MaterialResourceState_t &material = *materialOpt;
-
-                SMaterialPipelineDependencies pipelineDependencies {};
-                pipelineDependencies.systemUBOPipelineId   = "Core_pipeline";
-                pipelineDependencies.referenceRenderPassId = aRenderPassId;
-                pipelineDependencies.subpass               = aState.currentSubpassIndex;
-                pipelineDependencies.shaderModuleId        = material.description.shaderModuleDescriptor.name;
-
-                for(auto const &buffer : material.description.uniformBufferDescriptors)
-                {
-                    SNoDependencies dependencies {};
-
-                    CEngineResult<> const bufferInitialization = aResourceManager->initializeResource<BufferResourceState_t>(buffer.name, aVulkanEnvironment);
-                    EngineStatusPrintOnError(bufferInitialization.result(), logTag(), "Failed to initialize buffer.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(bufferInitialization.result());
-                }
-
-                for(auto const &sampledImageAssetId : material.description.sampledImages)
-                {
-                    std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
-
-                    OptRef_t <TextureResourceState_t> sampledImageOpt{};
-                    {
-                        auto[success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
-                        if( not success )
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        sampledImageOpt = resource;
-                    }
-                    TextureResourceState_t &sampledImage = *sampledImageOpt;
-
-                    std::string const sampledImageViewResourceId = fmt::format("{}_{}_view", material.description.name, sampledImage.description.name);
-                    OptRef_t<TextureViewResourceState_t> sampledImageViewOpt {};
-                    {
-                        auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, sampledImageViewResourceId);
-                        if(not success)
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        sampledImageViewOpt = resource;
-                    }
-                    TextureViewResourceState_t &sampledImageView = *sampledImageViewOpt;
-
-                    CEngineResult<> const textureInitialization = aResourceManager->initializeResource<TextureResourceState_t>(sampledImageResourceId, aVulkanEnvironment);
-                    EngineStatusPrintOnError(textureInitialization.result(), logTag(), "Failed to initialize texture.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(textureInitialization.result());
-
-                    STextureViewDependencies textureViewInitDependencies {};
-                    textureViewInitDependencies.subjacentTextureId = sampledImageResourceId;
-
-                    CEngineResult<> const textureViewInitialization = aResourceManager->initializeResource<TextureViewResourceState_t>(sampledImageViewResourceId, aVulkanEnvironment);
-                    EngineStatusPrintOnError(textureViewInitialization.result(), logTag(), "Failed to initialize texture view.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(textureViewInitialization.result());
-                }
-
-                CEngineResult<> const shaderModuleInitialization = aResourceManager->initializeResource<ShaderModuleResourceState_t>(material.description.shaderModuleDescriptor.name, aVulkanEnvironment);
-                EngineStatusPrintOnError(shaderModuleInitialization.result(), logTag(), "Failed to initialize shader module.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(shaderModuleInitialization.result());
-
-                CEngineResult<> const pipelineInitialization = aResourceManager->initializeResource<PipelineResourceState_t>(material.description.pipelineDescriptor.name, aVulkanEnvironment);
-                EngineStatusPrintOnError(pipelineInitialization.result(), logTag(), "Failed to initialize pipeline.");
-                SHIRABE_RETURN_RESULT_ON_ERROR(pipelineInitialization.result());
-            };
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            auto transferMaterial(Shared<CVulkanEnvironment>     aVulkanEnvironment
-                                  , Shared<CResourceManager>     aResourceManager
-                                  , Shared<asset::CAssetStorage> aAssetStorage
-                                  , SFrameGraphMaterial   const &aMaterial) -> EEngineStatus
-            {
-                VkDevice device = aVulkanEnvironment->getLogicalDevice();
-
-                OptRef_t<MaterialResourceState_t> materialOpt {};
-                {
-                    auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aMaterial.readableName);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    materialOpt = resource;
-                }
-                MaterialResourceState_t &material = *materialOpt;
-
-                for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
-                {
-                    OptRef_t<BufferResourceState_t> bufferOpt {};
-                    {
-                        auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, bufferDesc.name);
-                        if(not success)
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        bufferOpt = resource;
-                    }
-                    BufferResourceState_t &buffer = *bufferOpt;
-
-                    transferBufferData(device, bufferDesc.dataSource(), buffer.gpuApiHandles.attachedMemory);
-                }
-
-                for(auto const &sampledImageAssetId : material.description.sampledImages)
-                {
-                    std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
-
-                    OptRef_t <TextureResourceState_t> sampledImageOpt{};
-                    {
-                        auto[success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
-                        if( not success )
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        sampledImageOpt = resource;
-                    }
-                    TextureResourceState_t &sampledImage = *sampledImageOpt;
-
-                    // Make sure, that the texture is in the correct pre-transfer layout!
-                    if(sampledImage.description.gpuBinding.check(EBufferBinding::TextureInput))
-                    {
-                        EEngineStatus const layoutTransfer =
-                                                performImageLayoutTransferImpl(aState
-                                                                               , sampledImage
-                                                                               , CRange(0, 1)
-                                                                               , CRange(0, 1)
-                                                                               , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
-                                                                               , VK_IMAGE_LAYOUT_UNDEFINED
-                                                                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-                        EngineStatusPrintOnError(layoutTransfer, logTag(), "Failed to transfer texture.");
-                        SHIRABE_RETURN_RESULT_ON_ERROR(layoutTransfer);
-                    }
-
-                    CEngineResult<> const textureTransfer = aResourceManager->transferResource<TextureResourceState_t>(sampledImageResourceId, aVulkanEnvironment);
-                    EngineStatusPrintOnError(textureTransfer.result(), logTag(), "Failed to transfer texture.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(textureTransfer.result());
-
-                    // Make sure, that the texture is in the correct post-transfer layout!
-                    if(sampledImage.description.gpuBinding.check(EBufferBinding::TextureInput))
-                    {
-                        EEngineStatus const layoutTransfer =
-                                                performImageLayoutTransferImpl(aState
-                                                                               , sampledImage
-                                                                               , CRange(0, 1)
-                                                                               , CRange(0, 1)
-                                                                               , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
-                                                                               , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-                                                                               , VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-                        EngineStatusPrintOnError(layoutTransfer, logTag(), "Failed to transfer texture.");
-                        SHIRABE_RETURN_RESULT_ON_ERROR(layoutTransfer);
-                    }
-                }
-            };
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            struct SSampledImageBinding
-            {
-                OptRef_t<TextureViewResourceState_t> imageView;
-                OptRef_t<TextureResourceState_t>     image;
-            };
-            //<-----------------------------------------------------------------------------
-
-            //<-----------------------------------------------------------------------------
-            //
-            //<-----------------------------------------------------------------------------
-            auto updateDescriptorSets(Shared<CVulkanEnvironment>                                 aVulkanEnvironment
-                                      , Shared<CResourceManager>                                 aResourceManager
-                                      , Shared<asset::CAssetStorage>                             aAssetStorage
-                                      , SFrameGraphRenderContextState                     const &aState
-                                      , MaterialResourceState_t                           const &aMaterialHandle
-                                      , std::vector<OptRef_t<BufferResourceState_t>>      const &aUniformBufferStates
-                                      , std::vector<OptRef_t<TextureViewResourceState_t>> const &aInputAttachmentStates
-                                      , std::vector<SSampledImageBinding>                 const &aTextureViewStates) -> EEngineStatus
-            {
-                VkDevice      device = aVulkanEnvironment->getLogicalDevice();
-                SVulkanState &state  = aVulkanEnvironment->getState();
-
-                VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-
-                auto const [success, resource] = fetchResource<PipelineResourceState_t>(aMaterialHandle.description.pipelineDescriptor.name, aResourceManager, aVulkanEnvironment);
-                if(not success)
-                {
-                    return EEngineStatus::Error;
-                }
-
-                PipelineResourceState_t &pipeline = *resource;
-
-                SMaterialPipelineDescriptor const &pipelineDescriptor = pipeline.description;
-
-                std::vector<VkWriteDescriptorSet>   descriptorSetWrites {};
-                std::vector<VkDescriptorBufferInfo> descriptorSetWriteBufferInfos {};
-                std::vector<VkDescriptorImageInfo>  descriptorSetWriteAttachmentImageInfos {};
-                std::vector<VkDescriptorImageInfo>  descriptorSetWriteImageInfos {};
-
-                descriptorSetWriteBufferInfos         .resize(aUniformBufferStates.size());
-                descriptorSetWriteAttachmentImageInfos.resize(aInputAttachmentStates.size());
-                descriptorSetWriteImageInfos          .resize(aTextureViewStates.size());
-
-                uint64_t        writeCounter           = 0;
-                uint64_t        bufferCounter          = 0;
-                uint64_t        inputAttachmentCounter = 0;
-                uint64_t        inputImageCounter      = 0;
-                uint64_t const startSetIndex = (pipelineDescriptor.includesSystemBuffers ? 0 : 2); // Set 0 and 1 are system buffers...
-
-                for(std::size_t k=0; k<pipelineDescriptor.descriptorSetLayoutBindings.size(); ++k)
-                {
-                    std::vector<VkDescriptorSetLayoutBinding> const setBindings  = pipelineDescriptor.descriptorSetLayoutBindings[k];
-                    for(std::size_t j=0; j<setBindings.size(); ++j)
-                    {
-                        VkDescriptorSetLayoutBinding const binding = setBindings[j];
-
-                        switch(binding.descriptorType)
-                        {
-                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-                            {
-                                BufferResourceState_t buffer = *(aUniformBufferStates[bufferCounter]);
-
-                                VkDescriptorBufferInfo bufferInfo = {};
-                                bufferInfo.buffer = buffer.gpuApiHandles.handle;
-                                bufferInfo.offset = 0;
-                                bufferInfo.range  = buffer.description.createInfo.size;
-                                descriptorSetWriteBufferInfos[bufferCounter] = bufferInfo;
-
-                                VkWriteDescriptorSet descriptorWrite = {};
-                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                descriptorWrite.pNext            = nullptr;
-                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                                descriptorWrite.dstSet           = aMaterialHandle.gpuApiHandles.descriptorSets[startSetIndex + k];
-                                descriptorWrite.dstBinding       = binding.binding;
-                                descriptorWrite.dstArrayElement  = 0;
-                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                                descriptorWrite.pBufferInfo      = &(descriptorSetWriteBufferInfos[bufferCounter++]);
-                                descriptorWrite.pImageInfo       = nullptr; // Optional
-                                descriptorWrite.pTexelBufferView = nullptr;
-
-                                descriptorSetWrites.push_back(descriptorWrite);
-                                //descriptorSetWrites[writeCounter++] = descriptorWrite;
-                            }
-                                break;
-                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
-                            {
-                                TextureViewResourceState_t &textureView = *(aInputAttachmentStates[inputAttachmentCounter]);
-
-                                VkDescriptorImageInfo imageInfo {};
-                                imageInfo.imageView   = textureView.gpuApiHandles.handle;
-                                imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                                imageInfo.sampler     = VK_NULL_HANDLE;
-                                descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter] = imageInfo;
-
-                                VkWriteDescriptorSet descriptorWrite = {};
-                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                descriptorWrite.pNext            = nullptr;
-                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-                                descriptorWrite.dstSet           = aMaterialHandle.gpuApiHandles.descriptorSets[startSetIndex + k];
-                                descriptorWrite.dstBinding       = binding.binding;
-                                descriptorWrite.dstArrayElement  = 0;
-                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                                descriptorWrite.pBufferInfo      = nullptr;
-                                descriptorWrite.pImageInfo       = &(descriptorSetWriteAttachmentImageInfos[inputAttachmentCounter++]); // Optional
-                                descriptorWrite.pTexelBufferView = nullptr;
-                                // descriptorSetWrites[writeCounter++] = descriptorWrite;
-                                descriptorSetWrites.push_back(descriptorWrite);
-                            }
-                                break;
-                            case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-                            {
-                                if(aTextureViewStates.size() <= inputImageCounter)
-                                {
-                                    continue;
-                                }
-
-                                auto const &imageBinding = aTextureViewStates[inputImageCounter];
-
-                                if(not (imageBinding.image.has_value() && imageBinding.imageView.has_value()))
-                                {
-                                    continue;
-                                }
-
-                                TextureViewResourceState_t &textureView = *(imageBinding.imageView);
-                                TextureResourceState_t     &texture     = *(imageBinding.image);
-
-                                VkDescriptorImageInfo imageInfo {};
-                                imageInfo.imageView   = textureView.gpuApiHandles.handle;
-                                imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                                imageInfo.sampler     = texture.gpuApiHandles.attachedSampler;
-                                descriptorSetWriteImageInfos[inputImageCounter] = imageInfo;
-
-                                VkWriteDescriptorSet descriptorWrite = {};
-                                descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                descriptorWrite.pNext            = nullptr;
-                                descriptorWrite.descriptorType   = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                                descriptorWrite.dstSet           = aMaterialHandle.gpuApiHandles.descriptorSets[startSetIndex + k];
-                                descriptorWrite.dstBinding       = binding.binding;
-                                descriptorWrite.dstArrayElement  = 0;
-                                descriptorWrite.descriptorCount  = 1; // We only update one descriptor, i.e. pBufferInfo.count;
-                                descriptorWrite.pBufferInfo      = nullptr;
-                                descriptorWrite.pImageInfo       = &(descriptorSetWriteImageInfos[inputImageCounter++]); // Optional
-                                descriptorWrite.pTexelBufferView = nullptr;
-                                // descriptorSetWrites[writeCounter++] = descriptorWrite;
-                                descriptorSetWrites.push_back(descriptorWrite);
-                            }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-
-                vkUpdateDescriptorSets(device, descriptorSetWrites.size(), descriptorSetWrites.data(), 0, nullptr);
                 return EEngineStatus::Ok;
+            };
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto initializeMesh(Shared<CVulkanEnvironment>  aVulkanEnvironment
+                            , Shared<CResourceManager>      aResourceManager
+                            , Shared<asset::CAssetStorage>  aAssetStorage
+                            , SFrameGraphMesh        const &aMesh) -> EEngineStatus
+            {
+                EEngineStatus const &attributeBufferOpSuccessCode = detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
+                EEngineStatus const &indexBufferOpSuccessCode     = detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+
+                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                {
+                    return EEngineStatus::InitializationError;
+                }
+                else
+                {
+                    return EEngineStatus::Ok;
+                }
             }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto const bindPipeline = [=] (PipelineResourceState_t &aPipeline) -> EEngineStatus
+            auto updateMesh(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                            , Shared<CResourceManager>      aResourceManager
+                            , Shared<asset::CAssetStorage>  aAssetStorage
+                            , SFrameGraphMesh        const &aMesh) -> EEngineStatus
+            {
+                EEngineStatus const &attributeBufferOpSuccessCode = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
+                EEngineStatus const &indexBufferOpSuccessCode     = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+
+                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
                 {
-                SVulkanState     &vkState        = aVulkanEnvironment->getState();
-                VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
-
-                vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, aPipeline.gpuApiHandles.pipeline);
-
-                vkCmdBindDescriptorSets(vkCommandBuffer
-                                        , VK_PIPELINE_BIND_POINT_GRAPHICS
-                                        , aPipeline.gpuApiHandles.pipelineLayout
-                                        , 0
-                                        , aPipeline.gpuApiHandles.descriptorSets.size()
-                                        , aPipeline.gpuApiHandles.descriptorSets.data()
-                                        , 0, nullptr);
-
-                return EEngineStatus::Ok;
-                };
+                    return EEngineStatus::InitializationError;
+                }
+                else
+                {
+                    return EEngineStatus::Ok;
+                }
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            context.bindMaterial = [=] (SFrameGraphMaterial const &aMaterial) -> EEngineStatus
-                {
-                VkDevice device = aVulkanEnvironment->getLogicalDevice();
+            auto deinitializeMesh(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                                , Shared<CResourceManager>      aResourceManager
+                                , Shared<asset::CAssetStorage>  aAssetStorage
+                                , SFrameGraphMesh        const &aMesh) -> EEngineStatus
+            {
+                EEngineStatus const &attributeBufferOpSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
+                EEngineStatus const &indexBufferOpSuccessCode     = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
 
-                OptRef_t<MaterialResourceState_t> materialOpt {};
+                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
                 {
-                    auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aMaterial.readableName);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    materialOpt = resource;
+                    return EEngineStatus::InitializationError;
                 }
-                MaterialResourceState_t &material = *materialOpt;
-
-                OptRef_t<RenderPassResourceState_t> renderPassOpt {};
+                else
                 {
-                    auto [success, resource] = fetchResource<RenderPassResourceState_t>(aResourceManager, material.dependencies.pipelineDependencies.referenceRenderPassId);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    renderPassOpt = resource;
+                    return EEngineStatus::Ok;
                 }
-                RenderPassResourceState_t &renderPass = *renderPassOpt;
-
-                std::vector<OptRef_t<BufferResourceState_t>>      buffers           {};
-                std::vector<OptRef_t<TextureViewResourceState_t>> inputAttachments  {};
-                std::vector<SSampledImageBinding>                 textureViews      {};
-
-                for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
-                {
-                    OptRef_t<BufferResourceState_t> bufferOpt {};
-                    {
-                        auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, bufferDesc.name);
-                        if(not success)
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        bufferOpt = resource;
-                    }
-                    buffers.push_back(bufferOpt);
-                }
-
-                SSubpassDescription const &subPassDesc = renderPass.description.subpassDescriptions.at(aState.currentSubpassIndex);
-                for(auto const &inputAttachment : subPassDesc.inputAttachments)
-                {
-                    uint32_t     const &attachmentIndex           = inputAttachment.attachment;
-                    ResourceId_t const &attachementResourceHandle = renderPass.dependencies.attachmentTextureViews.at(attachmentIndex);
-
-                    OptRef_t<TextureViewResourceState_t> textureViewOpt {};
-                    {
-                        auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, attachementResourceHandle);
-                        if(not success)
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        textureViewOpt = resource;
-                    }
-                    inputAttachments.push_back(textureViewOpt);
-                }
-
-                for(auto const &sampledImageAssetId : material.description.sampledImages)
-                {
-                    OptRef_t<TextureResourceState_t> sampledImageOpt {};
-                    {
-                        std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
-                        auto [success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
-                        if(not success)
-                        {
-                            return EEngineStatus::Ok;
-                        }
-                        sampledImageOpt = resource;
-                    }
-
-                    if(not sampledImageOpt.has_value())
-                    {
-                        textureViews.push_back({}); // Fill gaps
-                    }
-                    else
-                    {
-                        TextureResourceState_t &sampledImage = *sampledImageOpt;
-
-                        std::string const sampledImageViewResourceId = fmt::format("{}_{}_view", material.description.name, sampledImage.description.name);
-
-                        OptRef_t<TextureViewResourceState_t> sampledImageViewOpt {};
-                        {
-                            auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, sampledImageViewResourceId);
-                            if(not success)
-                            {
-                                return EEngineStatus::Ok;
-                            }
-                            sampledImageViewOpt = resource;
-                        }
-
-                        SSampledImageBinding binding {};
-                        binding.image     = sampledImageOpt;
-                        binding.imageView = sampledImageViewOpt;
-
-                        textureViews.push_back(binding);
-                    }
-                }
-
-                EEngineStatus const updateResult = updateDescriptorSets(aState
-                                                                        , material
-                                                                        , buffers
-                                                                        , inputAttachments
-                                                                        , textureViews);
-
-                OptRef_t<PipelineResourceState_t> pipelineResourceOpt {};
-                {
-                    auto [success, resource] = fetchResource<PipelineResourceState_t>(aResourceManager, material.description.pipelineDescriptor.name);
-                    if(not success)
-                    {
-                        return EEngineStatus::Ok;
-                    }
-                    pipelineResourceOpt = resource;
-                }
-                PipelineResourceState_t &pipelineResource = *pipelineResourceOpt;
-
-                auto const result = bindPipeline(aState, pipelineResource);
-                return result;
-                };
+            }
             //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto initializeMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                                  , Shared<CResourceManager>      aResourceManager
+                                  , Shared<asset::CAssetStorage>  aAssetStorage
+                                  , SFrameGraphMaterial    const &aMesh) -> EEngineStatus
+            {
+
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto updateMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                              , Shared<CResourceManager>      aResourceManager
+                              , Shared<asset::CAssetStorage>  aAssetStorage
+                              , SFrameGraphMaterial    const &aMesh) -> EEngineStatus
+            {
+                EEngineStatus const &attributeBufferOpSuccessCode = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
+                EEngineStatus const &indexBufferOpSuccessCode     = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+
+                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                {
+                    return EEngineStatus::InitializationError;
+                }
+                else
+                {
+                    return EEngineStatus::Ok;
+                }
+            }
+            //<-----------------------------------------------------------------------------
+
+            //<-----------------------------------------------------------------------------
+            //
+            //<-----------------------------------------------------------------------------
+            auto deinitializeMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                                    , Shared<CResourceManager>      aResourceManager
+                                    , Shared<asset::CAssetStorage>  aAssetStorage
+                                    , SFrameGraphMaterial    const &aMesh) -> EEngineStatus
+            {
+                EEngineStatus const &attributeBufferOpSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
+                EEngineStatus const &indexBufferOpSuccessCode     = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+
+                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                {
+                    return EEngineStatus::InitializationError;
+                }
+                else
+                {
+                    return EEngineStatus::Ok;
+                }
+            }
         }
         //<-----------------------------------------------------------------------------
 
@@ -1381,24 +953,75 @@ namespace engine
             // --------------------------------------------------------------------------------------------
             // Buffers
             // --------------------------------------------------------------------------------------------
-            context.createBuffer =
-                [&] (SFrameGraphBuffer const &aBuffer)
-                    { return detail::createBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aBuffer); };
-            context.transferBuffer =
-                [&] (SFrameGraphBuffer const &aBuffer)
-                    { return detail::transferBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aBuffer); };
-            context.destroyBuffer =
-                [&] (SFrameGraphBuffer const &aBuffer)
-                    { return detail::destroyBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aBuffer); };
+            context.createTransientBuffer =
+                [&](SFrameGraphTransientBuffer const &aBuffer)
+                    { return detail::createTransientBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                         , aBuffer); };
+            context.destroyTransientBuffer =
+                [&](SFrameGraphTransientBuffer const &aBuffer)
+                    { return detail::destroyTransientBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                          , aBuffer); };
+            context.initializePersistentBuffer =
+                [&](SFrameGraphPersistentBuffer const &aBuffer)
+                    { return detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                              , aBuffer); };
+            context.updatePersistentBuffer =
+                [&](SFrameGraphPersistentBuffer const &aBuffer)
+                    { return detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                          , aBuffer); };
+            context.deinitializePersistentBuffer =
+                [&](SFrameGraphPersistentBuffer const &aBuffer)
+                    { return detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                                , aBuffer); };
             context.createBufferView =
-                [&] (SFrameGraphBuffer     const &aBuffer
-                   , SFrameGraphBufferView const &aView)
-                    { return detail::createBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage, aBuffer, aView); };
+                [&] (SFrameGraphBuffer const &aBuffer
+                     , SFrameGraphBufferView  const &aView)
+                    { return detail::createBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                    , aBuffer
+                                                    , aView); };
             context.destroyBufferView =
-                [&] (SFrameGraphBufferView const &aView)
-                    { return detail::destroyBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage, aView); };
+                [&] (SFrameGraphBufferView const &aBufferView)
+                    { return detail::destroyBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                     , aBufferView); };
 
 
+            //---------------------------------------------------------------------------------------------------------------
+            // Meshes
+            //---------------------------------------------------------------------------------------------------------------
+            context.initializeMesh =
+                [&] (SFrameGraphMesh const &aMesh)
+                    { return detail::initializeMesh(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                              , aMesh); };
+            context.updateMesh =
+                [&] (SFrameGraphMesh const &aMesh)
+                    { return detail::updateMesh(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                , aMesh); };
+            context.deinitializeMesh =
+                [&] (SFrameGraphMesh const &aMesh)
+                    { return detail::deinitializeMesh(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                    , aMesh); };
+
+            //---------------------------------------------------------------------------------------------------------------
+            // Materials
+            //---------------------------------------------------------------------------------------------------------------
+            context.initializeMaterial =
+                [&] (SFrameGraphMaterial const &aMaterial)
+                    { return detail::initializeMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                      , aMaterial); };
+            context.updateMaterial =
+                [&] (SFrameGraphMaterial const &aMaterial)
+                    { return detail::updateMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                  , aMaterial); };
+            context.deinitializeMaterial =
+                [&] (SFrameGraphMaterial const &aMaterial)
+                    { return detail::deinitializeMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
+                                                        , aMaterial); };
+
+            //---------------------------------------------------------------------------------------------------------------
+            // Pipelines
+            //---------------------------------------------------------------------------------------------------------------
+            // std::function<EEngineStatus(SFrameGraphPipeline const &/* aPipeline */)> createPipeline;
+            // std::function<EEngineStatus(SFrameGraphPipeline const &/* aPipeline */)> destroyPipeline;
         }
     }
 }

@@ -25,24 +25,16 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename TResource, typename... TArgs>
-    FetchResult_t<TResource> fetchResource(ResourceId_t             const &aResourceId
-                                         , Shared<CResourceManager>        aResourceManager
-                                         , TArgs                      &&...aArgs)
+
+    namespace local
     {
-        static FetchResult_t<TResource> const sInvalid = { false, {} };
-
-        auto const &[success, resource] = aResourceManager->getResource<TResource>(aResourceId, std::forward<TArgs>(aArgs)...);
-        if(CheckEngineError(success))
-        {
-            return sInvalid;
-        }
-
-        return { true, resource };
+        SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphRenderContext);
     }
 
     namespace detail
     {
+        using local::logTag;
+
         auto clearAttachments(Shared<CVulkanEnvironment>     aVulkanEnvironment
                             , Shared<CResourceManager>       aResourceManager
                             , Shared<asset::CAssetStorage>   aAssetStorage
@@ -52,8 +44,8 @@ namespace engine::vulkan
             SVulkanState    &state        = aVulkanEnvironment->getState();
             VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
-            auto const [success, resource] = fetchResource<RenderPassResourceState_t>(aRenderPassId, aResourceManager, aVulkanEnvironment);
-            if(not success)
+            auto const [success, resource] = aResourceManager->getResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment);
+            if(CheckEngineError(success))
             {
                 return EEngineStatus::Error;
             }
@@ -162,8 +154,8 @@ namespace engine::vulkan
 
             OptRef_t <TextureResourceState_t> sampledImageOpt{};
             {
-                auto[success, resource] = fetchResource<TextureResourceState_t>(aTexture.readableName, aResourceManager, aVulkanEnvironment);
-                if( not success )
+                auto const [success, resource] = aResourceManager->getResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
+                if(CheckEngineError(success))
                 {
                     return EEngineStatus::Ok;
                 }
@@ -215,8 +207,8 @@ namespace engine::vulkan
             VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
             VkImage         swapChainImage = state.swapChain.swapChainImages.at(state.swapChain.currentSwapChainImageIndex);
 
-            auto const [success, resource] = fetchResource<TextureResourceState_t>(aSourceImageId.readableName, aResourceManager, aVulkanEnvironment);
-            if(not success)
+            auto const [success, resource] = aResourceManager->getResource<TextureResourceState_t>(aSourceImageId.readableName, aVulkanEnvironment);
+            if(CheckEngineError(success))
             {
                 return EEngineStatus::Error;
             }
@@ -390,8 +382,8 @@ namespace engine::vulkan
             OptRef_t<FrameBufferResourceState_t> frameBufferResource {};
 
             {
-                auto [success, resource] = fetchResource<RenderPassResourceState_t>(aRenderPassId, aResourceManager, aVulkanEnvironment);
-                if (not success)
+                auto const [success, resource] = aResourceManager->getResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment);
+                if(CheckEngineError(success))
                 {
                     return EEngineStatus::Error;
                 }
@@ -399,8 +391,8 @@ namespace engine::vulkan
             }
 
             {
-                auto [success, resource] = fetchResource<FrameBufferResourceState_t>(aFrameBufferId, aResourceManager, aVulkanEnvironment);
-                if(not success)
+                auto const [success, resource] = aResourceManager->getResource<FrameBufferResourceState_t>(aFrameBufferId, aVulkanEnvironment);
+                if(CheckEngineError(success))
                 {
                     return EEngineStatus::Error;
                 }
@@ -604,8 +596,8 @@ namespace engine::vulkan
 
             OptRef_t<MeshResourceState_t> meshOpt {};
             {
-                auto [success, resource] = fetchResource<MeshResourceState_t>(aMesh.readableName, aResourceManager, aVulkanEnvironment);
-                if(not success)
+                auto [success, resource] = aResourceManager->getResource<MeshResourceState_t>(aMesh.readableName, aVulkanEnvironment);
+                if(CheckEngineError(success))
                 {
                     return EEngineStatus::Ok;
                 }
@@ -615,8 +607,8 @@ namespace engine::vulkan
 
             OptRef_t<BufferResourceState_t> dataBufferOpt {};
             {
-                auto [success, resource] = fetchResource<BufferResourceState_t>(dataBufferId, aResourceManager, aVulkanEnvironment);
-                if(not success)
+                auto [success, resource] = aResourceManager->getResource<BufferResourceState_t>(dataBufferId, aVulkanEnvironment);
+                if(CheckEngineError(success))
                 {
                     return EEngineStatus::Ok;
                 }
@@ -626,8 +618,8 @@ namespace engine::vulkan
 
             OptRef_t<BufferResourceState_t> indexBufferOpt {};
             {
-                auto [success, resource] = fetchResource<BufferResourceState_t>(indexBufferId, aResourceManager, aVulkanEnvironment);
-                if(not success)
+                auto [success, resource] = aResourceManager->getResource<BufferResourceState_t>(indexBufferId, aVulkanEnvironment);
+                if(CheckEngineError(success))
                 {
                     return EEngineStatus::Ok;
                 }
@@ -635,13 +627,13 @@ namespace engine::vulkan
             }
             BufferResourceState_t &indexBuffer = *indexBufferOpt;
 
-            auto const &[attrBufferInit, attributeBufferResource] = aResourceManager->getResource<BufferResourceState_t>(dataBufferId, aVulkanEnvironment);
-            EngineStatusPrintOnError(attrBufferInit, "useMesh", "Failed to initialize attribute buffer.");
-            SHIRABE_RETURN_RESULT_ON_ERROR(attrBufferInit);
+            auto const &[attrBufferGet, attributeBufferResource] = aResourceManager->getResource<BufferResourceState_t>(dataBufferId, aVulkanEnvironment);
+            EngineStatusPrintOnError(attrBufferGet, logTag(), "Failed to get attribute buffer.");
+            SHIRABE_RETURN_RESULT_ON_ERROR(attrBufferGet);
 
-            auto const &[indexBufferInit, indexBufferResource] = aResourceManager->getResource<BufferResourceState_t>(indexBufferId, aVulkanEnvironment);
-            EngineStatusPrintOnError(indexBufferInit, "useMesh", "Failed to initialize indexbuffer.");
-            SHIRABE_RETURN_RESULT_ON_ERROR(indexBufferInit);
+            auto const &[indexBufferGet, indexBufferResource] = aResourceManager->getResource<BufferResourceState_t>(indexBufferId, aVulkanEnvironment);
+            EngineStatusPrintOnError(indexBufferGet, logTag(), "Failed to get indexbuffer.");
+            SHIRABE_RETURN_RESULT_ON_ERROR(indexBufferGet);
 
             std::vector<VkBuffer> buffers = { dataBuffer.gpuApiHandles.handle
                                               , dataBuffer.gpuApiHandles.handle
@@ -667,15 +659,15 @@ namespace engine::vulkan
         {
             VkCommandBuffer vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
-            auto const [pipelineSuccess, pipelineOpt] = fetchResource<PipelineResourceState_t>(aPipeline.readableName, aResourceManager, aVulkanEnvironment);
-            if(not pipelineSuccess)
+            auto const [pipelineSuccess, pipelineOpt] = aResourceManager->getResource<PipelineResourceState_t>(aPipeline.readableName, aVulkanEnvironment);
+            if(CheckEngineError(pipelineSuccess))
             {
                 return EEngineStatus::Error;
             }
             PipelineResourceState_t &pipeline = *pipelineOpt;
 
-            auto const [materialSuccess, materialOpt] = fetchResource<MaterialResourceState_t>(aMaterial.readableName, aResourceManager, aVulkanEnvironment);
-            if(not materialSuccess)
+            auto const [materialSuccess, materialOpt] = aResourceManager->getResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
+            if(CheckEngineError(materialSuccess))
             {
                 return EEngineStatus::Error;
             }
@@ -715,8 +707,8 @@ namespace engine::vulkan
             SVulkanState     &vkState        = aVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
 
-            auto const [success, resource] = fetchResource<PipelineResourceState_t>(aPipeline.readableName, aResourceManager, aVulkanEnvironment);
-            if(not success)
+            auto const [success, resource] = aResourceManager->getResource<PipelineResourceState_t>(aPipeline.readableName, aVulkanEnvironment);
+            if(CheckEngineError(success))
             {
                 return EEngineStatus::Error;
             }
