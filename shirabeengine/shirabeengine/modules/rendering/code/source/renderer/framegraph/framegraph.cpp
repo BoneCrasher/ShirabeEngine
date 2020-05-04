@@ -261,6 +261,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::execute(SFrameGraphDataSource    const &aDataSource
+                                      , SFrameGraphResourceContext     &aResourceContext
                                       , SFrameGraphRenderContext       &aRenderContext)
         {
             // TODO: As soon as we have passgroups, the currentSubpassIndex comes from the passgroup.
@@ -299,7 +300,7 @@ namespace engine
                 aRenderContext.beginPass(renderContextState);
                 aRenderContext.clearAttachments(renderContextState, sRenderPassResourceId);
 
-                CEngineResult<> executed = pass->execute(aDataSource, mResourceData, renderContextState, aRenderContext);
+                CEngineResult<> executed = pass->execute(aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
                 if(not executed.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to execute pass {}", pass->passUID()));

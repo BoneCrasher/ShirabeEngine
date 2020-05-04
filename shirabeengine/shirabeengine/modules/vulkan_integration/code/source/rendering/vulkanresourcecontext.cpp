@@ -23,34 +23,6 @@ namespace engine
         template <typename TResource>
         using FetchResult_t = std::tuple<bool, OptRef_t<TResource>>;
 
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        EEngineStatus transferBufferData(VkDevice aDevice, ByteBuffer const &aDataSource, VkDeviceMemory const &aBufferMemory)
-        {
-            VkDeviceSize     const offset = 0;
-            VkDeviceSize     const size   = aDataSource.size();
-            VkMemoryMapFlags const flags  = 0;
-
-            void *data = nullptr;
-            VkResult const result = vkMapMemory(aDevice, aBufferMemory, offset, size, flags, &data);
-            if(VkResult::VK_SUCCESS != result)
-            {
-                // CLog::Error(logTag(), "Failed to map vulkan buffer w/ handle {}", aGpuBufferHandle);
-                return EEngineStatus::Error;
-            }
-
-            if(nullptr != data) {
-                auto input = aDataSource.data();
-                memcpy(data, (void *) input, size);
-                vkUnmapMemory(aDevice, aBufferMemory);
-            }
-
-            return EEngineStatus::Ok;
-        }
-
         namespace local
         {
             SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphResourceContext);

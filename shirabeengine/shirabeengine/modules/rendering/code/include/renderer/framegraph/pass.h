@@ -212,7 +212,8 @@ namespace engine
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aContextState,
-                    SFrameGraphRenderContext       &aContext) = 0;
+                    SFrameGraphResourceContext     &aResourceContext,
+                    SFrameGraphRenderContext       &aRenderContext) = 0;
 
         private_methods:
             /**
@@ -252,6 +253,7 @@ namespace engine
                                                                 , SFrameGraphDataSource const &
                                                                 , CFrameGraphResources const &
                                                                 , SFrameGraphRenderContextState &
+                                                                , SFrameGraphResourceContext &
                                                                 , SFrameGraphRenderContext &)>;
 
         public_constructors:
@@ -289,7 +291,8 @@ namespace engine
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aContextState,
-                    SFrameGraphRenderContext       &aContext);
+                    SFrameGraphResourceContext     &aResourceContext,
+                    SFrameGraphRenderContext       &aRenderContext);
 
             /**
              * Return the pass data struct associated with this callback pass.
@@ -354,11 +357,12 @@ namespace engine
                 SFrameGraphDataSource    const &aDataSource,
                 CFrameGraphResources     const &aFrameGraphResources,
                 SFrameGraphRenderContextState  &aContextState,
-                SFrameGraphRenderContext       &aContext)
+                SFrameGraphResourceContext     &aResourceContext,
+                SFrameGraphRenderContext       &aRenderContext)
         {
             try
             {
-                CEngineResult<> execution = mExecCallback(mPassData, aDataSource, aFrameGraphResources, aContextState, aContext);
+                CEngineResult<> execution = mExecCallback(mPassData, aDataSource, aFrameGraphResources, aContextState, aResourceContext, aRenderContext);
                 return execution;
             }
             catch(std::runtime_error const &e)

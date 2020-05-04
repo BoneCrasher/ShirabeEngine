@@ -8,6 +8,7 @@
 
 #include <resources/resourcetypes.h>
 #include <resources/extensibility.h>
+#include <resources/cresourcemanager.h>
 
 #include <base/declaration.h>
 
@@ -21,6 +22,11 @@ namespace engine
     namespace resources
     {
         template <> struct SLogicalToGpuApiResourceTypeMap<SMaterial> { using TGpuApiResource = vulkan::SVulkanMaterialResource;  };
+    }
+
+    namespace material_log
+    {
+        SHIRABE_DECLARE_LOG_TAG(SVulkanMaterialResource);
     }
 
     namespace vulkan
@@ -79,10 +85,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
+        struct SSampledImageBinding
+        {
+            OptionalRef_t<TextureViewResourceState_t> imageView;
+            OptionalRef_t<TextureResourceState_t>     image;
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
         auto updateDescriptorSets(Shared<CVulkanEnvironment>                                      aVulkanEnvironment
                                   , Shared<CResourceManager>                                      aResourceManager
-                                  , Shared<asset::CAssetStorage>                                  aAssetStorage
-                                  , SFrameGraphRenderContextState                          const &aState
                                   , MaterialResourceState_t                                const &aMaterialHandle
                                   , std::vector<OptionalRef_t<BufferResourceState_t>>      const &aUniformBufferStates
                                   , std::vector<OptionalRef_t<TextureViewResourceState_t>> const &aInputAttachmentStates
@@ -91,14 +105,11 @@ namespace engine
             VkDevice      device = aVulkanEnvironment->getLogicalDevice();
             SVulkanState &state  = aVulkanEnvironment->getState();
 
-            VkCommandBuffer commandBuffer  = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
-
-            auto const [success, resource] = fetchResource<PipelineResourceState_t>(aMaterialHandle.description.pipelineDescriptor.name, aResourceManager, aVulkanEnvironment);
-            if(not success)
+            auto const [success, resource] = aResourceManager->getResource<PipelineResourceState_t>(aMaterialHandle.description.basePipelineDescriptor.name, aVulkanEnvironment);
+            if(CheckEngineError(success))
             {
                 return EEngineStatus::Error;
             }
-
             PipelineResourceState_t &pipeline = *resource;
 
             SMaterialPipelineDescriptor const &pipelineDescriptor = pipeline.description;
@@ -237,6 +248,87 @@ namespace engine
                                                           , TResourceManager          *aResourceManager
                                                           , IVkGlobalContext          *aVulkanEnvironment)
         {
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+            auto const findTypesAndSizes =
+                           [&device] (SMaterialPipelineDescriptor const &aDescriptor) -> std::unordered_map<VkDescriptorType, uint32_t>
+                               {
+                                   std::unordered_map<VkDescriptorType, uint32_t> pipelineLayoutDescriptorTypesAndSizes;
+                                   for(uint64_t k=0; k<aDescriptor.descriptorSetLayoutCreateInfos.size(); ++k)
+                                   {
+                                       std::vector<VkDescriptorSetLayoutBinding> bindings = aDescriptor.descriptorSetLayoutBindings[k];
+                                       for( auto const &binding : bindings )
+                                       {
+                                           pipelineLayoutDescriptorTypesAndSizes[binding.descriptorType] += binding.descriptorCount;
+                                       }
+                                   }
+                                   return pipelineLayoutDescriptorTypesAndSizes;
+                               };
+
+            std::vector<VkDescriptorPoolSize> poolSizes {};
+            auto const addPoolSizeFn =
+                           [&poolSizes] (VkDescriptorType const &aType, std::size_t const &aSize)
+                               {
+                                   VkDescriptorPoolSize poolSize = {};
+                                   poolSize.type            = aType;
+                                   poolSize.descriptorCount = static_cast<uint32_t>(aSize);
+
+                                   poolSizes.push_back(poolSize);
+                               };
+
+            auto const [success, resource] = aResourceManager->template getResource<PipelineResourceState_t>(aDescription.basePipelineDescriptor.name, aVulkanEnvironment);
+            if(CheckEngineError(success))
+            {
+                return EEngineStatus::Error;
+            }
+            PipelineResourceState_t &pipeline = *resource;
+
+            for(auto const &[type, size] : findTypesAndSizes(aDescription))
+            {
+                addPoolSizeFn(type, size);
+            }
+
+            VkDeviceSize const descriptorSetCount = pipeline.gpuApiHandles.descriptorSetLayouts.size();
+
+            VkDescriptorPoolCreateInfo vkDescriptorPoolCreateInfo = {};
+            vkDescriptorPoolCreateInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+            vkDescriptorPoolCreateInfo.pNext         = nullptr;
+            vkDescriptorPoolCreateInfo.flags         = 0;
+            vkDescriptorPoolCreateInfo.maxSets       = descriptorSetCount;
+            vkDescriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
+            vkDescriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
+
+            VkDescriptorPool vkDescriptorPool = VK_NULL_HANDLE;
+            {
+                VkResult const result = vkCreateDescriptorPool(device, &vkDescriptorPoolCreateInfo, nullptr, &vkDescriptorPool);
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    CLog::Error("SVulkanMaterialPipelineResource::initialize", "Could not create descriptor pool.");
+                    return { EEngineStatus::Error };
+                }
+            }
+
+            VkDescriptorSetAllocateInfo vkDescriptorSetAllocateInfo = {};
+            vkDescriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            vkDescriptorSetAllocateInfo.pNext              = nullptr;
+            vkDescriptorSetAllocateInfo.descriptorPool     = vkDescriptorPool;
+            vkDescriptorSetAllocateInfo.descriptorSetCount = descriptorSetCount;
+            vkDescriptorSetAllocateInfo.pSetLayouts        = pipeline.gpuApiHandles.descriptorSetLayouts.data();
+
+            std::vector<VkDescriptorSet> vkDescriptorSets {};
+            {
+                vkDescriptorSets.resize(descriptorSetCount);
+
+                VkResult const result = vkAllocateDescriptorSets(device, &vkDescriptorSetAllocateInfo, vkDescriptorSets.data());
+                if(VkResult::VK_SUCCESS != result)
+                {
+                    CLog::Error("SVulkanMaterialPipelineResource::initialize", "Could not create descriptor sets.");
+                    return { EEngineStatus::Error };
+                }
+            }
+
+            aGpuApiHandles.descriptorPool = vkDescriptorPool;
+            aGpuApiHandles.descriptorSets = vkDescriptorSets;
         }
         //<-----------------------------------------------------------------------------
 
@@ -249,6 +341,28 @@ namespace engine
                                                    , TResourceManager          *aResourceManager
                                                    , IVkGlobalContext          *aVulkanEnvironment)
         {
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+            auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aDescription.name);
+            if(not success)
+            {
+                return EEngineStatus::Ok;
+            }
+            MaterialResourceState_t &material = *resource;
+
+            for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
+            {
+                auto [success, resource] = aResourceManager->template getResource<BufferResourceState_t>(bufferDesc.name, aVulkanEnvironment);
+                if(not success)
+                {
+                    return EEngineStatus::Ok;
+                }
+                BufferResourceState_t &buffer = *resource;
+
+                CEngineResult<> updateResult = aResourceManager->updateResource(buffer, aVulkanEnvironment);
+                EngineStatusPrintOnError(updateResult.result(), material_log::logTag(), "Failed to update buffer.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(updateResult.result());
+            }
         }
         //<-----------------------------------------------------------------------------
 
@@ -261,6 +375,28 @@ namespace engine
                                                        , TResourceManager          *aResourceManager
                                                        , IVkGlobalContext          *aVulkanEnvironment)
         {
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+            auto [success, resource] = fetchResource<MaterialResourceState_t>(aResourceManager, aDescription.name);
+            if(not success)
+            {
+                return EEngineStatus::Ok;
+            }
+            MaterialResourceState_t &material = *resource;
+
+            for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
+            {
+                auto [success, resource] = aResourceManager->template getResource<BufferResourceState_t>(bufferDesc.name, aVulkanEnvironment);
+                if(not success)
+                {
+                    return EEngineStatus::Ok;
+                }
+                BufferResourceState_t &buffer = *resource;
+
+                CEngineResult<> transferResult = aResourceManager->transferResource(buffer, aVulkanEnvironment);
+                EngineStatusPrintOnError(transferResult.result(), material_log::logTag(), "Failed to transfer buffer.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(transferResult.result());
+            }
         }
         //<-----------------------------------------------------------------------------
 
@@ -273,6 +409,7 @@ namespace engine
                                                      , TResourceManager          *aResourceManager
                                                      , IVkGlobalContext          *aVulkanEnvironment)
         {
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -285,7 +422,30 @@ namespace engine
                                                            , TResourceManager          *aResourceManager
                                                            , IVkGlobalContext          *aVulkanEnvironment)
         {
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
+            auto [success, resource] = aResourceManager->template getResource<MaterialResourceState_t>(aDescription.name, aVulkanEnvironment);
+            if(not success)
+            {
+                return EEngineStatus::Ok;
+            }
+            MaterialResourceState_t &material = *resource;
+
+            for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
+            {
+                auto [success, resource] = aResourceManager->template getResource<BufferResourceState_t>(bufferDesc.name, aVulkanEnvironment);
+                if(not success)
+                {
+                    return EEngineStatus::Ok;
+                }
+                BufferResourceState_t &buffer = *resource;
+
+                CEngineResult<> deinitializationResult = aResourceManager->transferResource(buffer, aVulkanEnvironment);
+                EngineStatusPrintOnError(deinitializationResult.result(), material_log::logTag(), "Failed to deinitialize buffer.");
+                SHIRABE_RETURN_RESULT_ON_ERROR(deinitializationResult.result());
+            }
+
+            vkDestroyDescriptorPool(device, aGpuApiHandles.descriptorPool, nullptr);
         }
     }
 }

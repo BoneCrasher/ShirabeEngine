@@ -22,14 +22,14 @@ namespace engine
         template <> struct SLogicalToGpuApiResourceTypeMap<STexture>  { using TGpuApiResource = struct vulkan::SVulkanTextureResource;  };
     }
 
+    namespace texture_log
+    {
+        SHIRABE_DECLARE_LOG_TAG(SVulkanTextureResource);
+    }
+
     namespace vulkan
     {
         using namespace resources;
-
-        namespace texture_log
-        {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanTextureResource);
-        }
 
         /**
          * The SVulkanTextureResource struct describes the relevant data to deal
@@ -80,6 +80,14 @@ namespace engine
                                             , TResourceManager          *aResourceManager
                                             , IVkGlobalContext          *aVulkanEnvironment);
         };
+
+        auto __performImageLayoutTransfer(IVkGlobalContext                          *aVulkanEnvironment
+                                          , SVulkanTextureResource::Handles_t const &aTexture
+                                          , CRange                            const &aArrayRange
+                                          , CRange                            const &aMipRange
+                                          , VkImageAspectFlags                const &aAspectFlags
+                                          , VkImageLayout                     const &aSourceLayout
+                                          , VkImageLayout                     const &aTargetLayout) -> EEngineStatus;
 
         //<-----------------------------------------------------------------------------
         //
@@ -335,11 +343,33 @@ namespace engine
             region.imageOffset = {0, 0, 0};
             region.imageExtent = { aDescription.textureInfo.width, aDescription.textureInfo.height, 1 };
 
+            EEngineStatus const layoutTransferForTransfer =
+                                    __performImageLayoutTransfer(aVulkanEnvironment
+                                                                 , aGpuApiHandles
+                                                                 , CRange(0, 1)
+                                                                 , CRange(0, 1)
+                                                                 , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
+                                                                 , VK_IMAGE_LAYOUT_UNDEFINED
+                                                                 , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            EngineStatusPrintOnError(layoutTransferForTransfer, texture_log::logTag(), "Failed to transfer texture.");
+            SHIRABE_RETURN_RESULT_ON_ERROR(layoutTransferForTransfer);
+
             vkCmdCopyBufferToImage(frameContext->getTransferCommandBuffer()
                                  , aGpuApiHandles.stagingBuffer
                                  , aGpuApiHandles.imageHandle
                                  , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
                                  , 1, &region);
+
+            EEngineStatus const layoutTransferForRead =
+                                    __performImageLayoutTransfer(aVulkanEnvironment
+                                                                 , aGpuApiHandles
+                                                                 , CRange(0, 1)
+                                                                 , CRange(0, 1)
+                                                                 , VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT
+                                                                 , VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                                                                 , VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            EngineStatusPrintOnError(layoutTransferForRead, texture_log::logTag(), "Failed to transfer texture.");
+            SHIRABE_RETURN_RESULT_ON_ERROR(layoutTransferForRead);
 
             return { EEngineStatus::Ok };
         }

@@ -204,7 +204,7 @@ namespace engine
         {
             std::string name;
 
-            ResourceId_t systemUBOPipelineId;
+            ResourceId_t systemBasePipelineId;
             ResourceId_t shaderModuleId;
             ResourceId_t materialResourceId;
             ResourceId_t referenceRenderPassId;
@@ -231,19 +231,14 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SMaterialPipelineDependencies
-        {
-        };
-
-        struct
-            [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialDescription
         {
-            std::string                        name;
-            SMaterialPipelineDescriptor        pipelineDescriptor;
-            SShaderModuleDescriptor            shaderModuleDescriptor;
-            Vector<SBufferDescription>         uniformBufferDescriptors;
-            Vector<STextureDescription>        sampledImages;
+            std::string                  name;
+            ResourceId_t                 systemMaterialId;
+            SMaterialPipelineDescriptor  basePipelineDescriptor;
+            SShaderModuleDescriptor      shaderModuleDescriptor;
+            Vector<SBufferDescription>   uniformBufferDescriptors;
+            Vector<STextureDescription>  sampledImages;
         };
 
         /**

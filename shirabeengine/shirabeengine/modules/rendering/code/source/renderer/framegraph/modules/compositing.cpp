@@ -108,12 +108,13 @@ namespace engine
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
-                    SFrameGraphRenderContext       &aContext)
+                    SFrameGraphResourceContext     &aResourceContext,
+                    SFrameGraphRenderContext       &aRenderContext)
                     -> CEngineResult<>
             {
                 CLog::Verbose(logTag(), "Compositing");
 
-                aContext.drawFullscreenQuadWithMaterial(aRenderContextState, aPassData.importData.material);
+                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aPassData.importData.material);
 
                 return { EEngineStatus::Ok };
             };

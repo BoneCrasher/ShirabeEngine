@@ -203,8 +203,9 @@ namespace engine
              *
              * @return True, if successfully executed. False otherwise.
              */
-            CEngineResult<> execute(SFrameGraphDataSource    const &aDataSource
-                                  , SFrameGraphRenderContext       &aRenderContext);
+            CEngineResult<> execute(SFrameGraphDataSource      const &aDataSource
+                                    , SFrameGraphResourceContext     &aResourceContext
+                                    , SFrameGraphRenderContext       &aRenderContext);
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**

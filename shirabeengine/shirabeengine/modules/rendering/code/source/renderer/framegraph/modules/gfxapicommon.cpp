@@ -87,7 +87,8 @@ namespace engine
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
-                    SFrameGraphRenderContext       &aContext)
+                    SFrameGraphResourceContext     &aResourceContext,
+                    SFrameGraphRenderContext       &aRenderContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aFrameGraphResources);
@@ -99,7 +100,7 @@ namespace engine
                 // Fetch the next backbuffer image and make it available to the resource manager.
                 // aContext->beginGraphicsFrame(aPassData.importData.backBufferInput);
                 // Begin a command buffer.
-                aContext.beginFrameCommandBuffers(aRenderContextState);
+                aRenderContext.beginFrameCommandBuffers(aRenderContextState);
                 // Begin a render pass w/ a given framebuffer.
                 // aContext->bindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
 
@@ -168,7 +169,8 @@ namespace engine
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
-                    SFrameGraphRenderContext       &aContext)
+                    SFrameGraphResourceContext     &aResourceContext,
+                    SFrameGraphRenderContext       &aRenderContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aPassData);
@@ -202,9 +204,9 @@ namespace engine
                 SFrameGraphTexture const &texture = *textureFetch.data();
 
                 // aContext->unbindRenderPass(sFrameBufferResourceId, sRenderPassResourceId);
-                aContext.copyImageToBackBuffer(aRenderContextState, texture);
-                aContext.endFrameCommandBuffers(aRenderContextState);
-                aContext.present(aRenderContextState);
+                aRenderContext.copyImageToBackBuffer(aRenderContextState, texture);
+                aRenderContext.endFrameCommandBuffers(aRenderContextState);
+                aRenderContext.present(aRenderContextState);
 
                 return { EEngineStatus::Ok };
             };

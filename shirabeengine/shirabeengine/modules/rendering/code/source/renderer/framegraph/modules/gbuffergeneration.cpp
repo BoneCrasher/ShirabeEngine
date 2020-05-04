@@ -150,6 +150,7 @@ namespace engine
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
+                    SFrameGraphResourceContext     &aResourceContext,
                     SFrameGraphRenderContext       &aRenderContext)
                     -> CEngineResult<>
             {
@@ -159,10 +160,16 @@ namespace engine
 
                 std::vector<SFrameGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
 
+                // Render-Loop
                 for(SFrameGraphRenderableResources const &renderableResources : renderables)
                 {
-                    aRenderContext.useMesh    (aRenderContextState, renderableResources.meshResource);
-                    aRenderContext.drawIndexed(aRenderContextState, renderableResources.meshResource.indexCount);
+                    aRenderContext.useMesh(aRenderContextState, renderableResources.meshResource);
+
+                    for(SFrameGraphMaterial const &material : renderableResources.meshResource.materials)
+                    {
+                        aResourceContext.
+                        aRenderContext.drawIndexed(aRenderContextState, renderableResources.meshResource.indexCount);
+                    }
                 }
 
                 return { EEngineStatus::Ok };

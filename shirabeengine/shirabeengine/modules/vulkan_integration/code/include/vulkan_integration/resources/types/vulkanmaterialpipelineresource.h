@@ -47,8 +47,9 @@ namespace engine
 
             struct Handles_t
             {
-                VkPipeline                   pipeline;
-                VkPipelineLayout             pipelineLayout;
+                VkPipeline       pipeline;
+                VkPipelineLayout pipelineLayout;
+                std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
             };
 
             template <typename TResourceManager>
@@ -83,7 +84,7 @@ namespace engine
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
-            auto const &[fetchSystemPipelineSuccess, systemPipelineOptRef] = aResourceManager->template getResource<PipelineResourceState_t>(aDescription.systemUBOPipelineId, aVulkanEnvironment);
+            auto const &[fetchSystemPipelineSuccess, systemPipelineOptRef] = aResourceManager->template getResource<PipelineResourceState_t>(aDescription.systemBasePipelineId, aVulkanEnvironment);
             if(CheckEngineError(fetchSystemPipelineSuccess))
             {
                 return fetchSystemPipelineSuccess;
@@ -121,12 +122,10 @@ namespace engine
             viewPortStateCreateInfo.scissorCount   = 1;
             viewPortStateCreateInfo.pScissors      = &(scissor);
 
-            std::unordered_map<VkDescriptorType, uint32_t> typesAndSizes    {};
-            std::vector<VkDescriptorSetLayout>             setLayouts       {};
-            std::vector<VkDescriptorSetLayout>             createdSetLayouts{};
+            std::vector<VkDescriptorSetLayout> setLayouts {};
 
             auto const createDescriptorSetLayouts =
-                [&device, &typesAndSizes, &setLayouts, &createdSetLayouts] (SMaterialPipelineDescriptor const &aDescriptor, bool aRegisterForDescriptorSetAlloc) -> EEngineStatus
+                [&device] (SMaterialPipelineDescriptor const &aDescriptor, std::vector<VkDescriptorSetLayout> &aTargetSet) -> EEngineStatus
             {
                 for(uint64_t k=0; k<aDescriptor.descriptorSetLayoutCreateInfos.size(); ++k)
                 {
@@ -145,22 +144,15 @@ namespace engine
                             return EEngineStatus::Error;
                         }
 
-                        setLayouts.push_back(vkDescriptorSetLayout);
-                    }
-
-                    if(aRegisterForDescriptorSetAlloc)
-                    {
-                        createdSetLayouts.push_back(vkDescriptorSetLayout);
-
-                        for( auto const &binding : bindings )
-                        {
-                            typesAndSizes[binding.descriptorType] += binding.descriptorCount;
-                        }
+                        aTargetSet.push_back(vkDescriptorSetLayout);
                     }
                 }
 
                 return EEngineStatus::Ok;
             };
+
+            std::vector<VkDescriptorSetLayout> systemSets;
+            std::vector<VkDescriptorSetLayout> materialSets;
 
             //
             // First of all, push back all system UBOs...
@@ -170,85 +162,16 @@ namespace engine
                 PipelineResourceState_t const &systemUBOPipeline = *systemPipelineOptRef;
 
                 // Add the system UBO layouts in order to have them included in the pipeline layout
-                EEngineStatus const status = createDescriptorSetLayouts(systemUBOPipeline.description, false);
+                EEngineStatus const status = createDescriptorSetLayouts(systemUBOPipeline.description, systemSets);
             }
 
             //
             // Then everything else...
             //
-            EEngineStatus const status = createDescriptorSetLayouts(aDescription, true);
+            EEngineStatus const status = createDescriptorSetLayouts(aDescription, materialSets);
             if(CheckEngineError(status))
             {
                 return { EEngineStatus::Error };
-            }
-
-            std::vector<VkDescriptorPoolSize> poolSizes {};
-            auto const addPoolSizeFn = [&poolSizes] (VkDescriptorType const &aType, std::size_t const &aSize)
-            {
-                VkDescriptorPoolSize poolSize = {};
-                poolSize.type            = aType;
-                poolSize.descriptorCount = static_cast<uint32_t>(aSize);
-
-                poolSizes.push_back(poolSize);
-            };
-
-            for(auto const &[type, size] : typesAndSizes)
-            {
-                addPoolSizeFn(type, size);
-            }
-
-            VkDescriptorPoolCreateInfo vkDescriptorPoolCreateInfo = {};
-            vkDescriptorPoolCreateInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-            vkDescriptorPoolCreateInfo.pNext         = nullptr;
-            vkDescriptorPoolCreateInfo.flags         = 0;
-            vkDescriptorPoolCreateInfo.maxSets       = createdSetLayouts.size();
-            vkDescriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
-            vkDescriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
-
-            VkDescriptorPool vkDescriptorPool = VK_NULL_HANDLE;
-            {
-                VkResult const result = vkCreateDescriptorPool(device, &vkDescriptorPoolCreateInfo, nullptr, &vkDescriptorPool);
-                if(VkResult::VK_SUCCESS != result)
-                {
-                    CLog::Error("SVulkanMaterialPipelineResource::initialize", "Could not create descriptor pool.");
-                    return { EEngineStatus::Error };
-                }
-            }
-
-            VkDescriptorSetAllocateInfo vkDescriptorSetAllocateInfo = {};
-            vkDescriptorSetAllocateInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-            vkDescriptorSetAllocateInfo.pNext              = nullptr;
-            vkDescriptorSetAllocateInfo.descriptorPool     = vkDescriptorPool;
-            vkDescriptorSetAllocateInfo.descriptorSetCount = createdSetLayouts.size();
-            vkDescriptorSetAllocateInfo.pSetLayouts        = createdSetLayouts.data();
-
-            std::vector<VkDescriptorSet> vkCreatedDescriptorSets {};
-            {
-                vkCreatedDescriptorSets.resize(createdSetLayouts.size());
-
-                VkResult const result = vkAllocateDescriptorSets(device, &vkDescriptorSetAllocateInfo, vkCreatedDescriptorSets.data());
-                if(VkResult::VK_SUCCESS != result)
-                {
-                    CLog::Error("SVulkanMaterialPipelineResource::initialize", "Could not create descriptor sets.");
-                    return { EEngineStatus::Error };
-                }
-            }
-
-            std::vector<VkDescriptorSet> vkDescriptorSets {};
-            if(systemPipelineOptRef.has_value())
-            {
-                PipelineResourceState_t const &systemUBOPipeline = *systemPipelineOptRef;
-
-                // Add the system up descriptors sets in order to reuse them with this material.
-                for(VkDescriptorSet set : systemUBOPipeline.gpuApiHandles.descriptorSets)
-                {
-                    vkDescriptorSets.push_back(set);
-                }
-            }
-
-            for(VkDescriptorSet set : vkCreatedDescriptorSets)
-            {
-                vkDescriptorSets.push_back(set);
             }
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo {};
@@ -326,10 +249,9 @@ namespace engine
                 }
             }
 
-            aGpuApiHandles.pipeline       = pipelineHandle;
-            aGpuApiHandles.pipelineLayout = vkPipelineLayout;
-            aGpuApiHandles.descriptorPool = vkDescriptorPool;
-            aGpuApiHandles.descriptorSets = vkDescriptorSets;
+            aGpuApiHandles.pipeline             = pipelineHandle;
+            aGpuApiHandles.pipelineLayout       = vkPipelineLayout;
+            aGpuApiHandles.descriptorSetLayouts = materialSets; // System-Sets won't be stored, as they are not relevant for further operation.
 
             return EEngineStatus::Ok;
         }
@@ -346,7 +268,10 @@ namespace engine
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
-            vkDestroyDescriptorPool(device, aGpuApiHandles.descriptorPool, nullptr);
+            for(auto const &setLayout : aGpuApiHandles.descriptorSetLayouts)
+            {
+                vkDestroyDescriptorSetLayout(device, setLayout, nullptr);
+            }
             vkDestroyPipeline(device, aGpuApiHandles.pipeline, nullptr);
 
             return EEngineStatus::Ok;
