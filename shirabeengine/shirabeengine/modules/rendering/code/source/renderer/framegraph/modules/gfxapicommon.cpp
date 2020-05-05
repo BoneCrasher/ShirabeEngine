@@ -30,7 +30,7 @@ namespace engine
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SPrePassData
+            struct SPrePassStaticData
             {
                 SPrePassImportData importData;
                 SPrePassExportData exportData;
@@ -38,10 +38,12 @@ namespace engine
                 SState state;
             };
 
-            auto const setup = [&] (
-                    CPassBuilder &aBuilder,
-                    SPrePassData &aOutPassData)
-                    -> CEngineResult<>
+            struct SPrePassDynamicData
+            { };
+
+            auto const staticSetup = [&](
+                CPassStaticBuilder &aBuilder,
+                SPrePassStaticData       &aOutPassData) -> CEngineResult<>
             {
                 SFrameGraphTexture backBufferTextureDesc{ };
                 backBufferTextureDesc.readableName   = "BackBuffer";
@@ -82,13 +84,22 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
+            auto const dynamicSetup =
+                           [&] (CPassDynamicBuilder           &aBuilder
+                                , SFrameGraphDataSource const &aDataSource
+                                , SPrePassDynamicData         &aOutPassData) -> CEngineResult<>
+                               {
+                                   return EEngineStatus::Ok;
+                               };
+
             auto const execute = [=] (
-                    SPrePassData             const &aPassData,
-                    SFrameGraphDataSource    const &aDataSource,
-                    CFrameGraphResources     const &aFrameGraphResources,
-                    SFrameGraphRenderContextState  &aRenderContextState,
-                    SFrameGraphResourceContext     &aResourceContext,
-                    SFrameGraphRenderContext       &aRenderContext)
+                SPrePassStaticData      const &aStaticPassData,
+                SPrePassDynamicData     const &aDynamicPassData,
+                SFrameGraphDataSource   const &aDataSource,
+                CFrameGraphResources    const &aFrameGraphResources,
+                SFrameGraphRenderContextState &aRenderContextState,
+                SFrameGraphResourceContext    &aResourceContext,
+                SFrameGraphRenderContext      &aRenderContext)
                     -> CEngineResult<>
             {
                 SHIRABE_UNUSED(aFrameGraphResources);
@@ -107,14 +118,14 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
-            CEngineResult<Shared<CallbackPass<SPrePassData>>> passFetch = aGraphBuilder.spawnPass<CallbackPass<SPrePassData>>(aPassName, setup, execute);
+            CEngineResult<Shared<CallbackPass<SPrePassStaticData, SPrePassDynamicData>>> passFetch = aGraphBuilder.spawnPass<CallbackPass<SPrePassStaticData, SPrePassDynamicData>>(aPassName, staticSetup, dynamicSetup, execute);
             if(not passFetch.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
+                return { EEngineStatus::Ok, passFetch.data()->staticPassData().exportData };
             }
         }
         //<-----------------------------------------------------------------------------
@@ -142,7 +153,7 @@ namespace engine
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SPresentPassData
+            struct SPresentPassStaticData
             {
                 SPresentPassImportData importData;
                 SPresentPassExportData exportData;
@@ -150,9 +161,12 @@ namespace engine
                 SState state;
             };
 
-            auto const setup = [&] (
-                    CPassBuilder     &aBuilder,
-                    SPresentPassData &aOutPassData)
+            struct SPresentPassDynamicData
+            { };
+
+            auto const staticSetup = [&] (
+                CPassStaticBuilder     &aBuilder,
+                SPresentPassStaticData &aOutPassData)
                     -> CEngineResult<>
             {
                 SFrameGraphReadTextureFlags readFlags{ };
@@ -164,8 +178,17 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
+            auto const dynamicSetup =
+                           [&] (CPassDynamicBuilder             &aBuilder
+                                , SFrameGraphDataSource   const &aDataSource
+                                , SPresentPassDynamicData       &aOutPassData) -> CEngineResult<>
+                               {
+                                   return EEngineStatus::Ok;
+                               };
+
             auto const execute = [=] (
-                    SPresentPassData         const &aPassData,
+                    SPresentPassStaticData   const &aStaticPassData,
+                    SPresentPassDynamicData  const &aDynamicPassData,
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
@@ -173,7 +196,8 @@ namespace engine
                     SFrameGraphRenderContext       &aRenderContext)
                     -> CEngineResult<>
             {
-                SHIRABE_UNUSED(aPassData);
+                SHIRABE_UNUSED(aStaticPassData);
+                SHIRABE_UNUSED(aDynamicPassData);
                 SHIRABE_UNUSED(aFrameGraphResources);
 
                 using namespace engine::rendering;
@@ -185,9 +209,9 @@ namespace engine
 
 
                 // Important: The whole copyToBackBuffer-stuff may not be called from within a render pass.
-                CEngineResult<Shared<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(aPassData.importData
-                                                                                                                                                  .finalOutputId
-                                                                                                                                                  .resourceId);
+                CEngineResult<Shared<SFrameGraphTextureView>> const viewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(aStaticPassData.importData
+                                                                                                                                                            .finalOutputId
+                                                                                                                                                            .resourceId);
                 if(not viewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch source image texture view resource.");
@@ -211,21 +235,21 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
-            CEngineResult<Shared<CallbackPass<SPresentPassData>>> spawn = aGraphBuilder.spawnPass<CallbackPass<SPresentPassData>>(aPassName, setup, execute);
+            CEngineResult<Shared<CallbackPass<SPresentPassStaticData, SPresentPassDynamicData>>> spawn = aGraphBuilder.spawnPass<CallbackPass<SPresentPassStaticData, SPresentPassDynamicData>>(aPassName, staticSetup, dynamicSetup, execute);
             if(not spawn.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                Shared<CallbackPass<SPresentPassData>> pass = spawn.data();
+                Shared<CallbackPass<SPresentPassStaticData, SPresentPassDynamicData>> pass = spawn.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };
                 }
                 else
                 {
-                    return { EEngineStatus::Ok, pass->passData().exportData };
+                    return { EEngineStatus::Ok, pass->staticPassData().exportData };
                 }
             }
         }

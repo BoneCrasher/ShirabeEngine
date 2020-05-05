@@ -571,9 +571,6 @@ namespace engine::vulkan
             SVulkanState     &vkState        = aVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
-            std::string const dataBufferId  = fmt::format("{}_{}", aMesh.readableName, "databuffer");
-            std::string const indexBufferId = fmt::format("{}_{}", aMesh.readableName, "indexbuffer");
-
             OptRef_t<MeshResourceState_t> meshOpt {};
             {
                 auto [success, resource] = aResourceManager->getResource<MeshResourceState_t>(aMesh.readableName, aVulkanEnvironment);
@@ -585,35 +582,14 @@ namespace engine::vulkan
             }
             MeshResourceState_t &mesh = *meshOpt;
 
-            OptRef_t<BufferResourceState_t> dataBufferOpt {};
-            {
-                auto [success, resource] = aResourceManager->getResource<BufferResourceState_t>(dataBufferId, aVulkanEnvironment);
-                if(CheckEngineError(success))
-                {
-                    return EEngineStatus::Ok;
-                }
-                dataBufferOpt = resource;
-            }
-            BufferResourceState_t & dataBuffer = *dataBufferOpt;
-
-            OptRef_t<BufferResourceState_t> indexBufferOpt {};
-            {
-                auto [success, resource] = aResourceManager->getResource<BufferResourceState_t>(indexBufferId, aVulkanEnvironment);
-                if(CheckEngineError(success))
-                {
-                    return EEngineStatus::Ok;
-                }
-                indexBufferOpt = resource;
-            }
-            BufferResourceState_t &indexBuffer = *indexBufferOpt;
+            std::string const dataBufferId         = mesh.description.attributeBufferDesc.name;
+            VkDeviceSize      firstIndexByteOffset = mesh.description.firstIndexOffset;
 
             auto const &[attrBufferGet, attributeBufferResource] = aResourceManager->getResource<BufferResourceState_t>(dataBufferId, aVulkanEnvironment);
-            EngineStatusPrintOnError(attrBufferGet, logTag(), "Failed to get attribute buffer.");
+            EngineStatusPrintOnError(attrBufferGet, logTag(), "Failed to get data buffer.");
             SHIRABE_RETURN_RESULT_ON_ERROR(attrBufferGet);
 
-            auto const &[indexBufferGet, indexBufferResource] = aResourceManager->getResource<BufferResourceState_t>(indexBufferId, aVulkanEnvironment);
-            EngineStatusPrintOnError(indexBufferGet, logTag(), "Failed to get indexbuffer.");
-            SHIRABE_RETURN_RESULT_ON_ERROR(indexBufferGet);
+            BufferResourceState_t const &dataBuffer = *attributeBufferResource;
 
             std::vector<VkBuffer> buffers = { dataBuffer.gpuApiHandles.handle
                                               , dataBuffer.gpuApiHandles.handle
@@ -621,7 +597,7 @@ namespace engine::vulkan
                                               , dataBuffer.gpuApiHandles.handle };
 
             vkCmdBindVertexBuffers(vkCommandBuffer, 0, buffers.size(), buffers.data(), mesh.description.offsets.data());
-            vkCmdBindIndexBuffer(vkCommandBuffer, indexBuffer.gpuApiHandles.handle, 0, VkIndexType::VK_INDEX_TYPE_UINT16);
+            vkCmdBindIndexBuffer(vkCommandBuffer, dataBuffer.gpuApiHandles.handle, firstIndexByteOffset, VkIndexType::VK_INDEX_TYPE_UINT16);
 
             return EEngineStatus::Ok;
         };

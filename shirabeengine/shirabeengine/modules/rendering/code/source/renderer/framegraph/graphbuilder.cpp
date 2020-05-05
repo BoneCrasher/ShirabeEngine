@@ -113,23 +113,32 @@ namespace engine
             graph()                  = makeUnique<CGraph>();
 
             // TODO: We add a dummy pass for the algorithm to work... Need to fix that up
-            auto const pseudoSetup = [] (CPassBuilder const &, bool &) -> CEngineResult<>
-            {
-                return { EEngineStatus::Ok };
-            };
+            auto const pseudoStaticSetup =
+                           [](CPassStaticBuilder const &, bool &) -> CEngineResult<>
+                               {
+                                   return { EEngineStatus::Ok };
+                               };
+            auto const pseudoDynamicSetup =
+                           [](CPassDynamicBuilder const &, SFrameGraphDataSource const &, bool &) -> CEngineResult<>
+                               {
+                                   return { EEngineStatus::Ok };
+                               };
 
-            auto const pseudoExec  = [] (
-                    bool                     const &aPassData,
-                    SFrameGraphDataSource    const &aDataSource,
-                    CFrameGraphResources     const &aFrameGraphResources,
-                    SFrameGraphRenderContextState  &aRenderContextState,
-                    SFrameGraphRenderContext       &aRenderContext) -> CEngineResult<>
-            {
-                return { EEngineStatus::Ok };
-            };
+            auto const pseudoExec =
+                           [] (
+                               bool                     const &aStaticPassData,
+                               bool                     const &aDynamicPassData,
+                               SFrameGraphDataSource    const &aDataSource,
+                               CFrameGraphResources     const &aFrameGraphResources,
+                               SFrameGraphRenderContextState  &aRenderContextState,
+                               SFrameGraphResourceContext     &aResourceContext,
+                               SFrameGraphRenderContext       &aRenderContext) -> CEngineResult<>
+                           {
+                               return { EEngineStatus::Ok };
+                           };
 
             // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
-            spawnPass<CallbackPass<bool>>("Pseudo-Pass", pseudoSetup, pseudoExec);
+            spawnPass<CallbackPass<bool, bool>>("Pseudo-Pass", pseudoStaticSetup, pseudoDynamicSetup, pseudoExec);
 
             return { EEngineStatus::Ok };
         }
@@ -223,8 +232,7 @@ namespace engine
 
                 mResources.push_back(resource.resourceId);
 
-                Unique<CPassBase::CMutableAccessor> accessor = mPasses.at(0)->getMutableAccessor(CPassKey<CGraphBuilder>());
-                accessor->mutableResourceReferences().push_back(resource.resourceId);
+                mPasses.at(0)->mutableResourceReferences().push_back(resource.resourceId);
 
                 return resource;
             }
@@ -270,8 +278,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<Unique<CGraph>> CGraphBuilder::compile()
         {
-            Unique<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
-
             // First (No-Op, automatically performed on call to 'setPassDependency(...)':
             //   Evaluate explicit pass dependencies without resource flow.
 
@@ -287,7 +293,7 @@ namespace engine
             }
 
             // Third: Sort the passes by their relationships and dependencies.
-            CEngineResult<> const topologicalPassSort = topologicalSort<PassUID_t>(accessor->mutablePassExecutionOrder());
+            CEngineResult<> const topologicalPassSort = topologicalSort<PassUID_t>(graph()->mutablePassExecutionOrder());
             if(not topologicalPassSort.successful())
             {
                 CLog::Error(logTag(), "Failed to perform topologicalSort(...) for passes on graph compilation.");
@@ -307,7 +313,7 @@ namespace engine
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
 
-            CEngineResult<> const validation = validate(accessor->passExecutionOrder());
+            CEngineResult<> const validation = validate(graph()->passExecutionOrder());
             if(not validation.successful())
             {
                 CLog::Error(logTag(), "Failed to perform validation(...) on graph compilation.");
@@ -318,13 +324,13 @@ namespace engine
 
             // Move out the current adjacency state to the frame graph, so that it can be used for further processing.
             // It is no more needed at this point within the GraphBuilder.
-            accessor->mutablePassAdjacency() = std::move(this->mPassAdjacency);
-            accessor->mutableResources()     = std::move(this->mResources);
-            accessor->mutableResourceData().mergeIn(this->mResourceData);
+            graph()->mutablePassAdjacency() = std::move(this->mPassAdjacency);
+            graph()->mutableResources()     = std::move(this->mResources);
+            graph()->resourceData().mergeIn(this->mResourceData);
 
-            accessor->mutableGraphMode()               = mGraphMode;
-            accessor->mutableRenderToBackBuffer()      = mRenderToBackBuffer;
-            accessor->mutableOutputTextureResourceId() = mOutputResourceId;
+            graph()->mutableGraphMode()               = mGraphMode;
+            graph()->mutableRenderToBackBuffer()      = mRenderToBackBuffer;
+            graph()->mutableOutputTextureResourceId() = mOutputResourceId;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             accessor->mutableResourceAdjacency()       = std::move(this->mResourceAdjacency);
@@ -371,9 +377,7 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            Unique<CPassBase::CMutableAccessor> accessor = aPass->getMutableAccessor(CPassKey<CGraphBuilder>());
-
-            FrameGraphResourceIdList const resources = accessor->mutableResourceReferences();
+            FrameGraphResourceIdList const resources = aPass->mutableResourceReferences();
 
             for(FrameGraphResourceId_t const &resourceId : resources)
             {

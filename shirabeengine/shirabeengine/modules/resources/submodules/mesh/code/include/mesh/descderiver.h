@@ -56,7 +56,7 @@ namespace engine
             };
 
             SBufferDescription dataBufferDescription{};
-            dataBufferDescription.name                             = fmt::format("{}_{}_", aMeshName, "vertexbuffer");
+            dataBufferDescription.name                             = fmt::format("{}_{}_", aMeshName, "databuffer");
             dataBufferDescription.dataSource                       = dataAccessor;
             dataBufferDescription.createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
             dataBufferDescription.createInfo.pNext                 = nullptr;

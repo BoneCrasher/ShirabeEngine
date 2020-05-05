@@ -359,11 +359,9 @@ EST_EXPORT CGraphBuilder
 
             try
             {
-                Unique<CGraph::CMutableAccessor> accessor = graph()->getMutableAccessor(CPassKey<CGraphBuilder>());
-
                 PassUID_t const uid = generatePassUID();
 
-                CEngineResult<Shared<TPass>> passCreation = accessor->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
+                CEngineResult<Shared<TPass>> passCreation = graph()->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
                 if(not passCreation.successful())
                 {
                     CLog::Error(logTag(), "No pass instance created.");
@@ -373,9 +371,9 @@ EST_EXPORT CGraphBuilder
                 Shared<TPass> &pass = passCreation.data();
 
                 // Link the pass providing the import and export resources for the passes from the variadic argument list.
-                CPassBuilder passBuilder(uid, pass, mResourceData);
+                CPassStaticBuilder passBuilder(uid, pass, mResourceData);
 
-                CEngineResult<> const passSetup = pass->setup(passBuilder);
+                CEngineResult<> const passSetup = pass->staticSetup(passBuilder);
                 if(not passSetup.successful())
                 {
                     CLog::Error(logTag(), "Cannot setup pass instance.");

@@ -903,6 +903,8 @@ namespace engine
                                 , Shared<asset::CAssetStorage>  aAssetStorage
                                 , SFrameGraphPipeline    const &aPipeline) -> EEngineStatus
             {
+                // Create a pipline descriptor here and invoke creation in the resource manager.
+                // Initialize immediately.
             }
             //<-----------------------------------------------------------------------------
 

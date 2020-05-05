@@ -46,116 +46,11 @@ namespace engine
             };
 
         public_classes:
-            /**
-             * The CAccessor class immutably provides all data members of the graph.
-             */
-            class SHIRABE_TEST_EXPORT CAccessor
-            {
-            public_constructors:
-                /**
-                 * Default-Construct an immutable accessor from aGraph.
-                 *
-                 * @param aGraph
-                 */
-                CAccessor(CGraph const *aGraph);
-
-            public_methods:
-                AdjacencyListMap_t<PassUID_t>                         const &passAdjacency()           const;
-                std::stack<PassUID_t>                                 const &passExecutionOrder()      const;
-                FrameGraphResourceIdList                              const &resources()               const;
-                CFrameGraphMutableResources                           const &resourceData()            const;
-#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-                AdjacencyListMap_t<FrameGraphResourceId_t>            const &resourceAdjacency()       const;
-                std::stack<FrameGraphResourceId_t>                    const &resourceOrder()           const;
-                AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &passToResourceAdjacency() const;
-#endif
-                EGraphMode                                                   graphMode()               const;
-                bool                                                         renderToBackBuffer()      const;
-                FrameGraphResourceId_t                                const &outputTextureResourceId() const;
-
-            private_members:
-                CGraph const *m_graph;
-            };
-
-            /**
-             * The CMutableAccessor class extends the CAccessor and mutably provides all data members of the graph.
-             */
-            class SHIRABE_TEST_EXPORT CMutableAccessor
-                    : public CAccessor
-            {
-            public_constructors:
-                /**
-                 * Default-Construct an mutable accessor from aGraph.
-                 *
-                 * @param aGraph
-                 */
-                CMutableAccessor(CGraph *aGraph);
-
-            public_methods:
-                AdjacencyListMap_t<PassUID_t> &mutablePassAdjacency();
-                std::stack<PassUID_t>         &mutablePassExecutionOrder();
-                FrameGraphResourceIdList      &mutableResources();
-                CFrameGraphMutableResources   &mutableResourceData();
-#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-                AdjacencyListMap_t<FrameGraphResourceId_t>            &mutableResourceAdjacency();
-                std::stack<FrameGraphResourceId_t>                    &mutableResourceOrder();
-                AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> &mutablePassToResourceAdjacency();
-#endif                
-                EGraphMode                    &mutableGraphMode();
-                bool                          &mutableRenderToBackBuffer();
-                FrameGraphResourceId_t        &mutableOutputTextureResourceId();
-
-                /**
-                 * Create a new pass of type TPass given a uid and name.
-                 * This will implicitly setup the pass.
-                 *
-                 * @tparam TPass             The type of the pass to create.
-                 * @tparam TPassCreationArgs The arguments required to create the specific pass.
-                 */
-                template <
-                        typename    TPass,
-                        typename... TPassCreationArgs
-                        >
-                CEngineResult<Shared<TPass>> createPass(
-                        PassUID_t         const      &uid,
-                        std::string       const      &name,
-                        TPassCreationArgs       &&...args);
-
-            private_members:
-                CGraph *mGraph;
-            };
 
         private_static_fields:
             static constexpr char const *sRenderPassResourceId  = "DefaultRenderPass";
             static constexpr char const *sFrameBufferResourceId = "DefaultFrameBuffer";
             static constexpr char const *sSwapChainResourceId   = "BackBuffer";
-
-        public_methods:
-            /**
-             * Getter method for the graph builder class to fetch an immutable accessor class.
-             *
-             * @param aKey PassKey creatable only by GraphBuilder instances.
-             * @return     A CAccessor instance to access the graph's data.
-             */
-            Unique<CAccessor> getAccessor(CPassKey<class CGraphBuilder> &&aKey) const
-            {
-                SHIRABE_UNUSED(aKey);
-
-                return std::make_unique<CAccessor>(this);
-            }
-
-            /**
-             * Getter method for the graph builder class to fetch a mutable accessor class.
-             *
-             * @param aKey PassKey creatable only by GraphBuilder instances.
-             * @return     A CAccessor instance to access the graph's data.
-             */
-            Unique<CMutableAccessor> getMutableAccessor(CPassKey<class CGraphBuilder> &&aKey)
-            {
-                SHIRABE_UNUSED(aKey);
-
-                return std::make_unique<CMutableAccessor>(this);
-            }
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
@@ -232,13 +127,6 @@ namespace engine
              * @return       See brief.
              */
             SHIRABE_INLINE CGraph &operator=(CGraph const &aOther);
-
-            /**
-             * Return all passes currently attached to the framegraph.
-             *
-             * @return See brief.
-             */
-            PassMap const&passes() const;
 
         private_methods:
             /**
@@ -389,7 +277,30 @@ namespace engine
              */
             CEngineResult<> deinitializeBuffer(SFrameGraphResourceContext &aResourceContext);
 
-            /**
+        public_methods:
+
+            PassMap const &passes() const { return mPasses; }
+            PassMap       &passes()       { return mPasses; }
+
+            AdjacencyListMap_t<PassUID_t> const &passAdjacency() const  { return mPassAdjacency; }
+            AdjacencyListMap_t<PassUID_t>       &mutablePassAdjacency() { return mPassAdjacency; }
+
+            std::stack<PassUID_t> const &passExecutionOrder() const  { return mPassExecutionOrder; }
+            std::stack<PassUID_t>       &mutablePassExecutionOrder() { return mPassExecutionOrder; }
+
+            FrameGraphResourceIdList const &resources() const  { return mResources; }
+            FrameGraphResourceIdList       &mutableResources() { return mResources; }
+
+            CFrameGraphMutableResources &resourceData() { return mResourceData; }
+
+            EGraphMode const &graphMode()  const { return mGraphMode; }
+            EGraphMode       &mutableGraphMode() { return mGraphMode; }
+            bool const &renderToBackBuffer()   const { return mRenderToBackBuffer; };
+            bool        &mutableRenderToBackBuffer() { return mRenderToBackBuffer; };
+            FrameGraphResourceId_t const &outputTextureResourceId()  const { return mOutputTextureResourceId; }
+            FrameGraphResourceId_t       &mutableOutputTextureResourceId() { return mOutputTextureResourceId; }
+
+           /**
              * Add a new pass to this graph.
              *
              * @param aPass The pass to add.
@@ -434,23 +345,6 @@ namespace engine
 #endif
 
         };
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <
-                typename   TPass,
-                typename... TPassCreationArgs
-                >
-        CEngineResult<Shared<TPass>> CGraph::CMutableAccessor::createPass(
-                PassUID_t         const &aUID,
-                std::string       const &aName,
-                TPassCreationArgs       &&...aArgs)
-        {
-            CEngineResult<Shared<TPass>> pass = mGraph->createPass<TPass, TPassCreationArgs...>(aUID, aName, std::forward<TPassCreationArgs>(aArgs)...);
-            return pass;
-        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

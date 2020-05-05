@@ -11,7 +11,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CPassBuilder::CPassBuilder(
+        CPassStaticBuilder::CPassStaticBuilder(
                 PassUID_t                   const &aPassUID,
                 Shared<CPassBase>                  aPass,
                 CFrameGraphMutableResources       &aOutResourceData)
@@ -25,7 +25,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::createTexture(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::createTexture(
                 std::string        const &aName,
                 SFrameGraphTexture const &aDescriptor)
         {
@@ -38,7 +38,7 @@ namespace engine
             resource.readableName        = aName;
             resource.type                = EFrameGraphResourceType::Texture;
 
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
             accessor->registerResource(resource.resourceId);
 
             return { EEngineStatus::Ok, resource };
@@ -48,7 +48,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::importTexture(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::importTexture(
                 std::string        const &aName,
                 SFrameGraphTexture const &aDescriptor)
         {
@@ -61,7 +61,7 @@ namespace engine
             resource.type                = EFrameGraphResourceType::Texture;
             resource.isExternalResource  = true;
 
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
             accessor->registerResource(resource.resourceId);
 
             return { EEngineStatus::Ok, resource };
@@ -71,7 +71,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<FrameGraphResourceId_t> CPassBuilder::findDuplicateTextureView(
+        CEngineResult<FrameGraphResourceId_t> CPassStaticBuilder::findDuplicateTextureView(
                 FrameGraphResourceId_t               const &aSubjacentResourceId,
                 FrameGraphFormat_t                   const &aFormat,
                 EFrameGraphViewPurpose                const &aViewSource,
@@ -109,7 +109,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CPassBuilder::adjustArrayAndMipSliceRanges(
+        CEngineResult<> CPassStaticBuilder::adjustArrayAndMipSliceRanges(
                 CFrameGraphResources const &aResourceData,
                 SFrameGraphResource  const &aSourceResource,
                 CRange               const &aArraySliceRange,
@@ -193,7 +193,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CPassBuilder::validateArrayAndMipSliceRanges(
+        CEngineResult<> CPassStaticBuilder::validateArrayAndMipSliceRanges(
                 CFrameGraphResources const &aResourceData,
                 SFrameGraphResource  const &aSourceResource,
                 CRange               const &aArraySliceRange,
@@ -266,11 +266,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::forwardTexture(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::forwardTexture(
                 SFrameGraphResource             const &aSubjacentTargetResource,
                 SFrameGraphTextureResourceFlags const &aFlags)
         {
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
 
             OptionalRef_t<SFrameGraphResource> resource = {};
 
@@ -368,9 +368,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::acceptTexture(SFrameGraphResource const &aSubjacentTargetResource)
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::acceptTexture(SFrameGraphResource const &aSubjacentTargetResource)
         {
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
 
             FrameGraphResourceId_t const subjacentResourceId =
                     (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
@@ -477,7 +477,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::useTexture(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::useTexture(
                 SFrameGraphResource          const &aSubjacentTargetResource,
                 EFrameGraphViewPurpose       const &aSourceOrTarget,
                 EFormat                      const &aRequiredFormat,
@@ -486,7 +486,7 @@ namespace engine
                 EFrameGraphViewAccessMode    const &aMode,
                 EEngineStatus                const &aFailCode)
         {
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassBuilder>());
+            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
 
             FrameGraphResourceId_t const subjacentResourceId =
                     (EFrameGraphResourceType::Texture == aSubjacentTargetResource.type)
@@ -610,7 +610,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::writeAttachment(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::writeAttachment(
                 SFrameGraphResource          const &aSubjacentTargetResource,
                 SFrameGraphWriteTextureFlags const &aFlags)
         {
@@ -650,7 +650,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::readAttachment(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::readAttachment(
                 SFrameGraphResource         const &aSubjacentTargetResource,
                 SFrameGraphReadTextureFlags const &aFlags)
         {                        
@@ -676,7 +676,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassBuilder::readTexture(
+        CEngineResult<SFrameGraphResource> CPassStaticBuilder::readTexture(
                 SFrameGraphResource             const &aSubjacentTargetResource,
                 SFrameGraphTextureResourceFlags const &aFlags)
         {
@@ -695,7 +695,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(std::string               const &aMaterialId,
+        CEngineResult<SFrameGraphMaterial> CPassStaticBuilder::useMaterial(std::string               const &aMaterialId,
                                                                      AssetId_t                 const &aMaterialAssetId,
                                                                      SFrameGraphPipelineConfig const &aPipelineConfig)
         {
@@ -715,7 +715,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(std::string const &aMeshId, AssetId_t const &aMeshAssetId)
+        CEngineResult<SFrameGraphMesh> CPassStaticBuilder::useMesh(std::string const &aMeshId, AssetId_t const &aMeshAssetId)
         {
             SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
             meshResource.readableName       = aMeshId;
@@ -738,7 +738,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<bool> CPassBuilder::isTextureBeingReadInSubresourceRange(
+        CEngineResult<bool> CPassStaticBuilder::isTextureBeingReadInSubresourceRange(
                 RefIndex_t           const &aResourceViews,
                 CFrameGraphResources const &aResources,
                 SFrameGraphResource  const &aSourceResource,
@@ -797,7 +797,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<bool> CPassBuilder::isTextureBeingWrittenInSubresourceRange(
+        CEngineResult<bool> CPassStaticBuilder::isTextureBeingWrittenInSubresourceRange(
                 RefIndex_t           const &aResourceViews,
                 CFrameGraphResources const &aResources,
                 SFrameGraphResource  const &aSourceResource,

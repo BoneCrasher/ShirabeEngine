@@ -58,9 +58,9 @@ namespace engine
          * The PassBuilder class is the setup interface for all passes and collects all public resource and state requests
          * of a pass, performing some validation to make sure that passes do not request invalid behaviour.
          */
-        class CPassBuilder
+        class CPassStaticBuilder
         {
-            SHIRABE_DECLARE_LOG_TAG(CPassBuilder);
+            SHIRABE_DECLARE_LOG_TAG(CPassStaticBuilder);
 
         public_constructors:
             /**
@@ -70,7 +70,7 @@ namespace engine
              * @param aPass            The pass instance to build up.
              * @param aOutResourceData Container for the pass' resources requested/used.
              */
-            CPassBuilder(
+            CPassStaticBuilder(
                     PassUID_t                   const &aPassUID,
                     Shared<CPassBase>                  aPass,
                     CFrameGraphMutableResources       &aOutResourceData);
@@ -170,23 +170,6 @@ namespace engine
             CEngineResult<SFrameGraphResource> readTexture(
                     SFrameGraphResource             const &subjacentTargetResource,
                     SFrameGraphTextureResourceFlags const &aFlags);
-
-            /**
-             * Register a mesh for use in the framegraph.
-             *
-             * @param aMeshId
-             * @return
-             */
-            CEngineResult<SFrameGraphMesh> useMesh(std::string const &aMeshId, AssetId_t const &aMaterialAssetId);
-
-            /**
-             * Register a material for use in the framegraph.
-             * @param aMaterialId
-             * @return
-             */
-            CEngineResult<SFrameGraphMaterial> useMaterial(std::string               const &aMaterialId,
-                                                           AssetId_t                 const &aMaterialAssetId,
-                                                           SFrameGraphPipelineConfig const &aPipelineConfig);
 
         private_methods:
             /**
@@ -311,11 +294,48 @@ namespace engine
 
         private_members:
             PassUID_t                        mPassUID;
-            Shared<CPassBase>       mPass;
+            Shared<CPassBase>                mPass;
             CFrameGraphMutableResources     &mResourceData;
             SFrameGraphAttachmentCollection &mAttachmentCollection;
         };
 
+        class CPassDynamicBuilder
+        {
+            SHIRABE_DECLARE_LOG_TAG(CPassDynamicBuilder);
+
+        public_constructors:
+            /**
+             * Construct a pass builder.
+             *
+             * @param aPassUID         The pass' UID.
+             * @param aPass            The pass instance to build up.
+             * @param aOutResourceData Container for the pass' resources requested/used.
+             */
+            CPassDynamicBuilder(
+                PassUID_t             const &aPassUID,
+                Shared<CPassBase>            aPass,
+                CFrameGraphMutableResources &aOutResourceData);
+
+        public_methods:
+            CEngineResult<SFrameGraphPipeline> usePipeline(std::string const &aPipelineId, SFrameGraphPipelineConfig const &aConfig);
+
+            /**
+             * Register a mesh for use in the framegraph.
+             *
+             * @param aMeshId
+             * @return
+             */
+            CEngineResult<SFrameGraphMesh> useMesh(std::string const &aMeshId);
+
+            /**
+             * Register a material for use in the framegraph.
+             * @param aMaterialId
+             * @return
+             */
+            CEngineResult<SFrameGraphMaterial> useMaterial(std::string const &aMaterialId);
+
+            CEngineResult<SFrameGraphTexture> useTexture(std::string const &aTextureId);
+        };
     }
 }
 

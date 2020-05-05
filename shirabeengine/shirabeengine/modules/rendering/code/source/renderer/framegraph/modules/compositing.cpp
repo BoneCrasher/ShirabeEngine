@@ -34,7 +34,7 @@ namespace engine
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SPassData
+            struct SStaticPassData
             {
                 SImportData importData;
                 SExportData exportData;
@@ -42,9 +42,12 @@ namespace engine
                 SState state;
             };
 
-            auto const setup = [&] (
-                    CPassBuilder &aBuilder,
-                    SPassData    &aOutPassData)
+            struct SDynamicPassData
+            {};
+
+            auto const staticSetup = [&] (
+                CPassStaticBuilder &aBuilder,
+                SStaticPassData    &aOutPassData)
                     -> CEngineResult<>
             {
                 auto gbufferTextureFetch = aGraphBuilder.getResources()
@@ -103,8 +106,17 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
+            auto const dynamicSetup =
+                           [&] (CPassDynamicBuilder           &aBuilder
+                                , SFrameGraphDataSource const &aDataSource
+                                , SDynamicPassData            &aOutPassData) -> CEngineResult<>
+                               {
+                                   return EEngineStatus::Ok;
+                               };
+
             auto const execute = [=] (
-                    SPassData                const &aPassData,
+                    SStaticPassData          const &aStaticPassData,
+                    SDynamicPassData         const &asDynamicPassData,
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
@@ -114,26 +126,26 @@ namespace engine
             {
                 CLog::Verbose(logTag(), "Compositing");
 
-                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aPassData.importData.material);
+                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aStaticPassData.importData.material);
 
                 return { EEngineStatus::Ok };
             };
 
-            auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SPassData>>(aPassName, setup, execute);
+            auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SStaticPassData, SDynamicPassData>>(aPassName, staticSetup, dynamicSetup, execute);
             if(not passFetch.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                Shared<CallbackPass<SPassData>> pass = passFetch.data();
+                Shared<CallbackPass<SStaticPassData, SDynamicPassData>> pass = passFetch.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };
                 }
                 else
                 {
-                    return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
+                    return { EEngineStatus::Ok, passFetch.data()->staticPassData().exportData };
                 }
             }
         }
