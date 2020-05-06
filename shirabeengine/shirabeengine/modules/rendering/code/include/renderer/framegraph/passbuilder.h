@@ -71,9 +71,9 @@ namespace engine
              * @param aOutResourceData Container for the pass' resources requested/used.
              */
             CPassStaticBuilder(
-                    PassUID_t                   const &aPassUID,
-                    Shared<CPassBase>                  aPass,
-                    CFrameGraphMutableResources       &aOutResourceData);
+                    PassUID_t             const &aPassUID,
+                    Shared<CPassBase>            aPass,
+                    CFrameGraphMutableResources &aOutResourceData);
 
         public_methods:
             /**
@@ -98,42 +98,6 @@ namespace engine
             CEngineResult<SFrameGraphResource> createTexture(
                     std::string        const &aName,
                     SFrameGraphTexture const &aDescriptor);
-
-            // createBuffer
-            // create~?
-
-            /**
-             * Request the import of a texture resource in the framegraph.
-             *
-             * @param aName       Name of the texture to import.
-             * @param aDescriptor Descriptor of the texture to import.
-             * @return            Return a framegraph resource handle for the texture
-             *                    import.
-             */
-            CEngineResult<SFrameGraphResource> importTexture(
-                    std::string        const &aName,
-                    SFrameGraphTexture const &aDescriptor);
-
-            /**
-             * Request a forward-op of a texture.
-             *
-             * @param aSubjacentTargetResource The resource id of the texture to forward.
-             * @param aFlags                   Flags detailing the texture forward operation.
-             * @return                         Return a framegraph resource handle for the texture
-             *                                 forwarding.
-             */
-            CEngineResult<SFrameGraphResource> forwardTexture(
-                    SFrameGraphResource             const &aSubjacentTargetResource,
-                    SFrameGraphTextureResourceFlags const &aFlags);
-
-            /**
-             * Accept a forwarded resource but do nothing further with it.
-             *
-             * @param aSubjacentTargetResource The resource id of the texture to accept.
-             * @return                         Return a framegraph resource handle for the texture acceptance.
-             */
-            CEngineResult<SFrameGraphResource> acceptTexture(
-                    SFrameGraphResource const &aSubjacentTargetResource);
 
             /**
              * Request a write operation on a subjacent texture instance.
@@ -170,6 +134,13 @@ namespace engine
             CEngineResult<SFrameGraphResource> readTexture(
                     SFrameGraphResource             const &subjacentTargetResource,
                     SFrameGraphTextureResourceFlags const &aFlags);
+
+            CEngineResult<SFrameGraphMesh> useMesh(SFrameGraphMesh const &aMesh);
+            CEngineResult<SFrameGraphMaterial> useMaterial(SFrameGraphMaterial const &aMaterial);
+
+            CEngineResult<SFrameGraphPipeline> usePipeline(SFrameGraphPipeline const &aPipeline, SFrameGraphPipelineConfig const &aConfig);
+
+            // Buffers?
 
         private_methods:
             /**
@@ -300,41 +271,9 @@ namespace engine
         };
 
         class CPassDynamicBuilder
+            : public CPassStaticBuilder
         {
-            SHIRABE_DECLARE_LOG_TAG(CPassDynamicBuilder);
 
-        public_constructors:
-            /**
-             * Construct a pass builder.
-             *
-             * @param aPassUID         The pass' UID.
-             * @param aPass            The pass instance to build up.
-             * @param aOutResourceData Container for the pass' resources requested/used.
-             */
-            CPassDynamicBuilder(
-                PassUID_t             const &aPassUID,
-                Shared<CPassBase>            aPass,
-                CFrameGraphMutableResources &aOutResourceData);
-
-        public_methods:
-            CEngineResult<SFrameGraphPipeline> usePipeline(std::string const &aPipelineId, SFrameGraphPipelineConfig const &aConfig);
-
-            /**
-             * Register a mesh for use in the framegraph.
-             *
-             * @param aMeshId
-             * @return
-             */
-            CEngineResult<SFrameGraphMesh> useMesh(std::string const &aMeshId);
-
-            /**
-             * Register a material for use in the framegraph.
-             * @param aMaterialId
-             * @return
-             */
-            CEngineResult<SFrameGraphMaterial> useMaterial(std::string const &aMaterialId);
-
-            CEngineResult<SFrameGraphTexture> useTexture(std::string const &aTextureId);
         };
     }
 }

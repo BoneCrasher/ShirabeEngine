@@ -208,6 +208,8 @@ namespace engine::datastructures
         bool disconnect(TIdType const &aSource, TIdType const &aTarget);
         bool disconnectMany(TIdType const &aId, EDisconnectAllType const aType = EDisconnectAllType::All);
 
+        std::vector<TIdType> topologicalSort();
+
         List_t<TIdType> const getAdjacentFor(TIdType const &aId);
 
         bool foreachEdgeFromRoot(std::function<bool(TIdType const &aSource, TIdType const &aTarget)> aCallback, TIdType aRoot, EOrder const aOrder = EOrder::RootFirst, bool const aAbortOnFirstError = true)
@@ -380,8 +382,8 @@ namespace engine::datastructures
             return false;
         }
 
-        CAdjacencyTreeHelper::removeListEntryIfAdded(mForwardRoots, aSource);
         CAdjacencyTreeHelper::insertListEntryIfNotAddedFn(mForwardTree[aSource], aTarget);
+        CAdjacencyTreeHelper::removeListEntryIfAdded(mForwardRoots, aSource);
         return true;
     }
     //<-----------------------------------------------------------------------------
@@ -478,6 +480,73 @@ namespace engine::datastructures
         // }
 
         CAdjacencyTreeHelper::deriveReverseTree(mForwardTree, mForwardRoots, TIdType{}, mReverseTree, mReverseRoots);
+    }
+
+    template <typename TIdType>
+    std::vector<TIdType> CAdjacencyTree<TIdType>::topologicalSort()
+    {
+        std::vector<TIdType> ordered;
+
+        std::function<void(Tree_t<TIdType> const   &,
+                           TIdType const           &,
+                           std::map<TIdType, bool> &,
+                           std::vector<TIdType>    &)> DSFi_fn;
+
+        // Define the recursive sort function
+        DSFi_fn =
+            [&](Tree_t<TIdType> const   &aEdges,
+                TIdType const           &aVertex,
+                std::map<TIdType, bool> &aVisitedEdges,
+                std::vector<TIdType>    &aPassOrder) -> void
+                {
+                    bool const edgeVisited = aVisitedEdges[aVertex];
+                    if(edgeVisited)
+                    {
+                        return;
+                    }
+
+                    aVisitedEdges[aVertex] = true;
+
+                    // For each outgoing edge...
+                    bool const doesContainEdge = (false == (aEdges.end() == aEdges.find(aVertex)));
+                    if(doesContainEdge)
+                    {
+                        for(TIdType const &adjacent : aEdges.at(aVertex))
+                        {
+                            DSFi_fn(aEdges, adjacent, aVisitedEdges, aPassOrder);
+                        }
+                    }
+
+                    aPassOrder.push(aVertex);
+                };
+
+        // Kick-off the sort algorithm
+        try
+        {
+            std::map<TIdType, bool> visitedEdges = {};
+            for(typename Tree_t<TIdType>::value_type &passAdjacency : mForwardTree)
+            {
+                visitedEdges[passAdjacency.first] = false;
+            }
+
+            for(typename Tree_t<TIdType>::value_type &passAdjacency : mForwardTree)
+            {
+                DSFi_fn(mForwardTree, passAdjacency.first, visitedEdges, ordered);
+            }
+        }
+        catch(std::runtime_error const &aRTE)
+        {
+            // CLog::Error(logTag(), CString::format("Failed to perform topological sort: {} ", aRTE.what()));
+        }
+        catch(...)
+        {
+            // CLog::Error(logTag(), "Failed to perform topological sort. Unknown error.");
+        }
+
+        // Reverse order, as the first item is at the end w/ this algorithm.
+        std::reverse(ordered);
+
+        return ordered;
     }
     //<-----------------------------------------------------------------------------
 }

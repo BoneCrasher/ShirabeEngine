@@ -151,11 +151,39 @@ namespace engine
                                 , SDynamicPassData            &aOutPassData) -> CEngineResult<>
                                {
                                    std::vector<SFrameGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
+                                   std::vector<SFrameGraphMesh>                validMeshes;
 
                                    // Render-Loop
-                                   for(SFrameGraphRenderableResources const &renderableResources : renderables)
+                                   for(auto const &renderableResources : renderables)
                                    {
-                                        aBuilder.useMesh(renderableResources.meshResource);
+                                        auto [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
+
+                                       for(std::size_t k=0; k<renderableResources.mesh.materials.size(); ++k)
+                                       {
+                                           auto [result, material] = aBuilder.useMaterial(renderableResources.mesh.materials[k]);
+
+                                           for(auto const &buffer : renderableResources.mesh.materials[k].uniformBuffers)
+                                           {
+                                               auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
+                                               material.uniformBuffers.push_back(bufferResource);
+                                           }
+
+                                           for(auto const &texture : renderableResources.mesh.materials[k].textures)
+                                           {
+                                               SFrameGraphTextureResourceFlags flags;
+                                               flags.arraySliceRange = CRange(0, 1);
+                                               flags.mipSliceRange   = CRange(0, 1);
+                                               flags.requiredFormat  = EFormat::Automatic;
+                                               auto const [result, textureResource] = aBuilder.readTexture(texture, flags);
+                                               material.textures.push_back(textureResource);
+                                           }
+
+                                           auto const [pipelineResult, pipeline] = aBuilder.usePipeline(material.basePipeline, {});
+
+                                           mesh.materials[k] = material;
+                                       }
+
+                                       validMeshes.push_back(mesh);
                                    }
                                };
             // ----------------------------------------------------------------------------------

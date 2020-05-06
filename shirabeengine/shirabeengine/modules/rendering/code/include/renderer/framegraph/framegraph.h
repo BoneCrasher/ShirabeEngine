@@ -8,8 +8,9 @@
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <core/passkey.h>
+#include <core/datastructures/adjacencytree.h>
 #include "renderer/framegraph/framegraphserialization.h"
-#include "renderer/framegraph/pass.h"
+#include "renderer/framegraph/renderpass.h"
 #include "renderer/framegraph/framegraphdata.h"
 #include "renderer/framegraph/framegraphcontexts.h"
 
@@ -17,6 +18,8 @@ namespace engine
 {
     namespace framegraph
     {
+        using datastructures::CAdjacencyTree;
+
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
         using namespace serialization;
 #endif
@@ -75,6 +78,8 @@ namespace engine
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
 #endif
+
+        public_methods:
 
             /**
              *
@@ -279,26 +284,17 @@ namespace engine
 
         public_methods:
 
-            PassMap const &passes() const { return mPasses; }
-            PassMap       &passes()       { return mPasses; }
+            RenderPassMap const &renderPasses() const { return mRenderPasses; }
+            RenderPassMap       &renderPasses()       { return mRenderPasses; }
 
-            AdjacencyListMap_t<PassUID_t> const &passAdjacency() const  { return mPassAdjacency; }
-            AdjacencyListMap_t<PassUID_t>       &mutablePassAdjacency() { return mPassAdjacency; }
-
+            CAdjacencyTree<PassUID_t> const &renderPassAdjacency() const  { return mRenderPassTree; }
             std::stack<PassUID_t> const &passExecutionOrder() const  { return mPassExecutionOrder; }
-            std::stack<PassUID_t>       &mutablePassExecutionOrder() { return mPassExecutionOrder; }
-
             FrameGraphResourceIdList const &resources() const  { return mResources; }
-            FrameGraphResourceIdList       &mutableResources() { return mResources; }
-
             CFrameGraphMutableResources &resourceData() { return mResourceData; }
 
             EGraphMode const &graphMode()  const { return mGraphMode; }
-            EGraphMode       &mutableGraphMode() { return mGraphMode; }
             bool const &renderToBackBuffer()   const { return mRenderToBackBuffer; };
-            bool        &mutableRenderToBackBuffer() { return mRenderToBackBuffer; };
             FrameGraphResourceId_t const &outputTextureResourceId()  const { return mOutputTextureResourceId; }
-            FrameGraphResourceId_t       &mutableOutputTextureResourceId() { return mOutputTextureResourceId; }
 
            /**
              * Add a new pass to this graph.
@@ -327,16 +323,20 @@ namespace engine
                     TPassCreationArgs       &&...aArgs);
 
         private_members:
-            PassMap                               mPasses;
-            AdjacencyListMap_t<PassUID_t>         mPassAdjacency;
-            std::stack<PassUID_t>                 mPassExecutionOrder;
-            FrameGraphResourceIdList              mResources;
-            CFrameGraphMutableResources           mResourceData;
-            FrameGraphResourceIdList              mInstantiatedResources;
+            friend class CGraphBuilder;
 
-            EGraphMode                            mGraphMode;
-            bool                                  mRenderToBackBuffer;
-            FrameGraphResourceId_t                mOutputTextureResourceId;
+            RenderPassMap               mRenderPasses;
+            CAdjacencyTree<PassUID_t>   mRenderPassTree;
+
+            std::vector<PassUID_t>      mPassExecutionOrder;
+
+            FrameGraphResourceIdList    mResources;
+            CFrameGraphMutableResources mResourceData;
+            FrameGraphResourceIdList    mInstantiatedResources;
+
+            EGraphMode                  mGraphMode;
+            bool                        mRenderToBackBuffer;
+            FrameGraphResourceId_t      mOutputTextureResourceId;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             AdjacencyListMap_t<FrameGraphResourceId_t>            mResourceAdjacency;

@@ -38,31 +38,7 @@ namespace engine
             resource.readableName        = aName;
             resource.type                = EFrameGraphResourceType::Texture;
 
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
-            accessor->registerResource(resource.resourceId);
-
-            return { EEngineStatus::Ok, resource };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassStaticBuilder::importTexture(
-                std::string        const &aName,
-                SFrameGraphTexture const &aDescriptor)
-        {
-            SFrameGraphTexture &resource = mResourceData.spawnResource<SFrameGraphTexture>();
-            resource.assignTextureParameters(aDescriptor);
-            resource.assignedPassUID     = mPassUID;
-            resource.parentResource      = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
-            resource.subjacentResource   = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
-            resource.readableName        = aName;
-            resource.type                = EFrameGraphResourceType::Texture;
-            resource.isExternalResource  = true;
-
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
-            accessor->registerResource(resource.resourceId);
+            mPass->registerResource(resource.resourceId);
 
             return { EEngineStatus::Ok, resource };
         }
@@ -266,217 +242,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassStaticBuilder::forwardTexture(
-                SFrameGraphResource             const &aSubjacentTargetResource,
-                SFrameGraphTextureResourceFlags const &aFlags)
-        {
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
-
-            OptionalRef_t<SFrameGraphResource> resource = {};
-
-            FrameGraphResourceId_t const subjacentResourceId =
-                    (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
-                     ? aSubjacentTargetResource.resourceId
-                     : aSubjacentTargetResource.subjacentResource;
-
-            EFrameGraphViewAccessMode const mode   = EFrameGraphViewAccessMode::Forward;
-            EFrameGraphViewPurpose     const source = EFrameGraphViewPurpose::Undefined;
-
-            CRange adjustedArraySliceRange = aFlags.arraySliceRange;
-            CRange adjustedMipSliceRange   = aFlags.mipSliceRange;
-
-            adjustArrayAndMipSliceRanges(
-                        mResourceData,
-                        aSubjacentTargetResource,
-                        aFlags.arraySliceRange,
-                        aFlags.mipSliceRange,
-                        adjustedArraySliceRange,
-                        adjustedMipSliceRange);
-
-            // Can we cull?
-            bool duplicateFound = false;
-            if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
-            {
-                CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery =
-                        findDuplicateTextureView(
-                            subjacentResourceId,
-                            aFlags.requiredFormat,
-                            source,
-                            adjustedArraySliceRange,
-                            adjustedMipSliceRange,
-                            mode);
-                if(not duplicateViewIdQuery.successful())
-                {
-                    return { duplicateViewIdQuery.result() };
-                }
-
-                duplicateFound = duplicateViewIdQuery.resultEquals(EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId);
-                if(duplicateFound)
-                {
-                    FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
-
-                    CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(duplicateViewId);
-                    if(not viewFetch.successful())
-                    {
-                        return { viewFetch.result() };
-                    }
-
-                    resource = *(viewFetch.data());
-                }
-            }
-
-            if(not duplicateFound)
-            {
-                SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
-                view.arraySliceRange    = adjustedArraySliceRange;
-                view.mipSliceRange      = adjustedMipSliceRange;
-                view.format             = aFlags.requiredFormat;
-                view.source             = source;
-                view.assignedPassUID    = mPassUID;
-                view.parentResource     = aSubjacentTargetResource.resourceId;
-                view.subjacentResource  = subjacentResourceId;
-                view.readableName       = CString::format("TextureView ID {} - Forward #{}", view.resourceId, aSubjacentTargetResource.resourceId);
-                view.type               = EFrameGraphResourceType::TextureView;
-                view.mode.set(mode);
-
-                CEngineResult<Shared<SFrameGraphResource>> const &subjacentFetch = mResourceData.getResourceMutable<SFrameGraphResource>(subjacentResourceId);
-                if(not subjacentFetch.successful())
-                {
-                    return { subjacentFetch.result() };
-                }
-
-                SFrameGraphResource &subjacent = *(subjacentFetch.data());
-                ++(subjacent.referenceCount);
-
-                resource = view;
-            }
-
-            if(resource.has_value())
-            {
-                SFrameGraphResource &ref = resource->get();
-
-                accessor->registerResource(ref.resourceId);
-                ++(ref.referenceCount);
-
-                return { EEngineStatus::Ok, *resource };
-            }
-
-            return { EEngineStatus::FrameGraph_PassBuilder_ForwardResourceFailed, *resource };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphResource> CPassStaticBuilder::acceptTexture(SFrameGraphResource const &aSubjacentTargetResource)
-        {
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
-
-            FrameGraphResourceId_t const subjacentResourceId =
-                    (aSubjacentTargetResource.type == EFrameGraphResourceType::Texture)
-                     ? aSubjacentTargetResource.resourceId
-                     : aSubjacentTargetResource.subjacentResource;
-
-            EFrameGraphViewAccessMode const mode   = EFrameGraphViewAccessMode::Accept;
-            EFrameGraphViewPurpose     const source = EFrameGraphViewPurpose::Undefined;
-
-            // TODO: Naming correct? SHouldn't it be parent resource?
-            CEngineResult<Shared<SFrameGraphTextureView>> const &subjacentTargetFetch = mResourceData.getResource<SFrameGraphTextureView>(aSubjacentTargetResource.resourceId);
-            if(not subjacentTargetFetch.successful())
-            {
-                return { subjacentTargetFetch.result() };
-            }
-
-            SFrameGraphTextureView const &subjacentTextureView = *(subjacentTargetFetch.data());
-
-            CRange adjustedArraySliceRange = subjacentTextureView.arraySliceRange;
-            CRange adjustedMipSliceRange   = subjacentTextureView.mipSliceRange;
-
-            adjustArrayAndMipSliceRanges(
-                        mResourceData,
-                        aSubjacentTargetResource,
-                        subjacentTextureView.arraySliceRange,
-                        subjacentTextureView.mipSliceRange,
-                        adjustedArraySliceRange,
-                        adjustedMipSliceRange);
-
-            Optional_t<RefWrapper_t<SFrameGraphTextureView>> resource{};
-
-            // Can we cull?
-            bool duplicateFound = false;
-            if(aSubjacentTargetResource.type == EFrameGraphResourceType::TextureView)
-            {
-                CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery =
-                        findDuplicateTextureView(
-                            subjacentResourceId,
-                            subjacentTextureView.format,
-                            source,
-                            adjustedArraySliceRange,
-                            adjustedMipSliceRange,
-                            mode);
-                if(not duplicateViewIdQuery.successful())
-                {
-                    return { duplicateViewIdQuery.result() };
-                }
-
-                duplicateFound = duplicateViewIdQuery.resultEquals(EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId);
-                if(duplicateFound)
-                {
-                    FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
-
-                    CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(duplicateViewId);
-                    if(not viewFetch.successful())
-                    {
-                        return { viewFetch.result() };
-                    }
-
-                    resource = *(viewFetch.data());
-                }
-            }
-
-            if(not duplicateFound)
-            {
-                SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
-                view.arraySliceRange    = adjustedArraySliceRange;
-                view.mipSliceRange      = adjustedMipSliceRange;
-                view.format             = subjacentTextureView.format;
-                view.source             = source;
-                view.assignedPassUID    = mPassUID;
-                view.parentResource     = aSubjacentTargetResource.resourceId;
-                view.subjacentResource  = subjacentResourceId;
-                view.readableName       = CString::format("TextureView ID {} - Forward #{}", view.resourceId, aSubjacentTargetResource.resourceId);
-                view.type               = EFrameGraphResourceType::TextureView;
-                view.mode.set(mode);
-
-                CEngineResult<Shared<SFrameGraphResource>> const &subjacentFetch = mResourceData.getResourceMutable<SFrameGraphResource>(subjacentResourceId);
-                if(not subjacentFetch.successful())
-                {
-                    return { subjacentFetch.result() };
-                }
-
-                SFrameGraphResource &subjacent = *(subjacentFetch.data());
-                ++(subjacent.referenceCount);
-
-                resource = view;
-            }
-
-            if(resource.has_value())
-            {
-                SFrameGraphResource &ref = resource->get();
-
-                accessor->registerResource(ref.resourceId);
-                ++(ref.referenceCount);
-
-                return { EEngineStatus::Ok, *resource };
-            }
-
-            return { EEngineStatus::FrameGraph_PassBuilder_AcceptResourceFailed, *resource };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
         CEngineResult<SFrameGraphResource> CPassStaticBuilder::useTexture(
                 SFrameGraphResource          const &aSubjacentTargetResource,
                 EFrameGraphViewPurpose       const &aSourceOrTarget,
@@ -486,8 +251,6 @@ namespace engine
                 EFrameGraphViewAccessMode    const &aMode,
                 EEngineStatus                const &aFailCode)
         {
-            Unique<CPassBase::CMutableAccessor> accessor = mPass->getMutableAccessor(CPassKey<CPassStaticBuilder>());
-
             FrameGraphResourceId_t const subjacentResourceId =
                     (EFrameGraphResourceType::Texture == aSubjacentTargetResource.type)
                      ? aSubjacentTargetResource.resourceId
@@ -597,7 +360,7 @@ namespace engine
             {
                 SFrameGraphResource &ref = resource->get();
 
-                accessor->registerResource(ref.resourceId);
+                mPass->registerResource(ref.resourceId);
                 ++(ref.referenceCount);
 
                 return { EEngineStatus::Ok, *resource };
@@ -695,9 +458,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMaterial> CPassStaticBuilder::useMaterial(std::string               const &aMaterialId,
-                                                                     AssetId_t                 const &aMaterialAssetId,
-                                                                     SFrameGraphPipelineConfig const &aPipelineConfig)
+        CEngineResult<SFrameGraphMaterial> CPassStaticBuilder::useMaterial(resources::ResourceId_t const &aMaterialId)
         {
             SFrameGraphMaterial &materialResource = mResourceData.spawnResource<SFrameGraphMaterial>();
             materialResource.readableName       = aMaterialId;
@@ -715,10 +476,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMesh> CPassStaticBuilder::useMesh(std::string const &aMeshId, AssetId_t const &aMeshAssetId)
+        CEngineResult<SFrameGraphMesh> CPassStaticBuilder::useMesh(SFrameGraphMesh const &aMesh)
         {
             SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
-            meshResource.readableName       = aMeshId;
+            meshResource.readableName       = aMesh.readableName;
             meshResource.type               = EFrameGraphResourceType::Mesh;
             meshResource.assignedPassUID    = mPassUID;
             meshResource.isExternalResource = true;
@@ -726,12 +487,27 @@ namespace engine
             meshResource.referenceCount     = 0;
             meshResource.subjacentResource  = 0;
 
-            // meshResource.attributeBuffer  = aMesh.attributeBuffer;
-            // meshResource.indexBuffer      = aMesh.indexBuffer;
-            // meshResource.attributeOffsets = aMesh.attributeOffsets;
-            // meshResource.indexCount       = aMesh.indexCount;
-
             return { EEngineStatus::Ok, meshResource };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SFrameGraphPipeline> CPassStaticBuilder::usePipeline(resources::ResourceId_t const &aPipelineId, SFrameGraphPipelineConfig const &aConfig)
+        {
+            SFrameGraphPipeline &resource = mResourceData.spawnResource<SFrameGraphPipeline>();
+            resource.readableName       = aPipelineId;
+            resource.type               = EFrameGraphResourceType::Mesh;
+            resource.assignedPassUID    = mPassUID;
+            resource.isExternalResource = true;
+            resource.parentResource     = 0;
+            resource.referenceCount     = 0;
+            resource.subjacentResource  = 0;
+            resource.basePipelineId     = aPipelineId;
+            resource.pipelineConfig     = aConfig;
+
+            return { EEngineStatus::Ok, resource };
         }
         //<-----------------------------------------------------------------------------
 

@@ -10,11 +10,12 @@
 
 #include <log/log.h>
 #include <core/enginetypehelper.h>
+#include <core/datastructures/adjacencytree.h>
 #include <core/random.h>
 #include <core/uid.h>
 #include <wsi/display.h>
 #include "renderer/framegraph/framegraph.h"
-#include "renderer/framegraph/pass.h"
+#include "renderer/framegraph/renderpass.h"
 
 namespace engine
 {
@@ -66,35 +67,6 @@ namespace engine
             CEngineResult<> deinitialize();
 
             /**
-             * Set the graph mode used for resource management configuration.
-             *
-             * @param aMode The requested mode to use.
-             */
-            SHIRABE_INLINE
-            void setGraphMode(framegraph::CGraph::EGraphMode const &aMode)
-            {
-                if(framegraph::CGraph::EGraphMode::Graphics != aMode && mRenderToBackBuffer)
-                {
-                    return; // render to backbuffer implies graphics mode.
-                }
-
-                mGraphMode = aMode;
-            }
-
-            SHIRABE_INLINE
-            void setRenderToBackBuffer(bool const &aRenderToBackBuffer)
-            {
-                mRenderToBackBuffer = aRenderToBackBuffer;
-                setGraphMode(framegraph::CGraph::EGraphMode::Graphics);
-            }
-
-            SHIRABE_INLINE
-            void setOutputTextureResourceId(FrameGraphResourceId_t const &aOutputResourceId)
-            {
-                mOutputResourceId = aOutputResourceId;
-            }
-
-            /**
              * Fetch the internal resource UID generator to request a new UID.
              *
              * @return Pointer to the internal resource UID generator.
@@ -127,6 +99,35 @@ namespace engine
             }
 
             /**
+             * Set the graph mode used for resource management configuration.
+             *
+             * @param aMode The requested mode to use.
+             */
+            SHIRABE_INLINE
+            void setGraphMode(framegraph::CGraph::EGraphMode const &aMode)
+            {
+                if(framegraph::CGraph::EGraphMode::Graphics != aMode && mRenderToBackBuffer)
+                {
+                    return; // render to backbuffer implies graphics mode.
+                }
+
+                mGraphMode = aMode;
+            }
+
+            SHIRABE_INLINE
+            void setRenderToBackBuffer(bool const &aRenderToBackBuffer)
+            {
+                mRenderToBackBuffer = aRenderToBackBuffer;
+                setGraphMode(framegraph::CGraph::EGraphMode::Graphics);
+            }
+
+            SHIRABE_INLINE
+            void setOutputTextureResourceId(FrameGraphResourceId_t const &aOutputResourceId)
+            {
+                mOutputResourceId = aOutputResourceId;
+            }
+
+            /**
              * Spawn and register a new pass of type TPass to this graph builder using
              * the TPassCreationArgs as creation input.
              * This will implicitly invoke "setup" on the pass.
@@ -141,41 +142,12 @@ namespace engine
                     typename    TPass,
                     typename... TPassCreationArgs
                     >
-            CEngineResult<Shared<TPass>> spawnPass(
-                    std::string       const &aName,
-                    TPassCreationArgs  &&... aArgs);
+            CEngineResult<Shared<TPass>> spawnPass(std::string       const &aName
+                                                 , TPassCreationArgs  &&... aArgs);
 
-            /**
-             * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
-             *
-             * @param aPassSource Name of pass to depend on.
-             * @param aPassTarget Dependent pass name.
-             */
-            CEngineResult<> createPassDependency(
-                     std::string const &aPassSource,
-                     std::string const &aPassTarget);
+            CEngineResult<Shared<CRenderPass>> beginRenderPass(std::string const &aId);
 
-            /**
-             * Register an external texture for read/write inside the render graph.
-             *
-             * @param aReadableName The name of the texture to register
-             * @param aTexture      The texture descriptor to register.
-             * @return              Returns a framegraph resource handle for the texture.
-             */
-            SFrameGraphResource registerTexture(
-                    std::string        const &aReadableName,
-                    SFrameGraphTexture const &aTexture);
-
-            /**
-             * Register a list of renderables for reading inside the render graph.
-             *
-             * @param readableIdentifier The name of the renderable collection.
-             * @param renderables        The renderables to register.
-             * @return                   Returns a framgraph resource hadnle for the list.
-             */
-            SFrameGraphRenderableList registerRenderables(
-                    std::string               const &aReadableIdentifier,
-                    rendering::RenderableList const &aRenderables);
+            CEngineResult<> endRenderPass();
 
             /**
              * Compile the graph, collecting all passes, resources and relationship,
@@ -188,6 +160,15 @@ namespace engine
             CEngineResult<Unique<CGraph>> compile();
 
         private_methods:
+            /**
+             * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
+             *
+             * @param aPassSource Name of pass to depend on.
+             * @param aPassTarget Dependent pass name.
+             */
+            CEngineResult<> createRenderPassDependency(std::string const &aPassSource
+                                                     , std::string const &aPassTarget);
+
             /**
              * Generate a new PassUID.
              *
@@ -208,9 +189,9 @@ namespace engine
              * @param aPassSource UID of the Pass to depend on.
              * @param aPassTarget Dependent pass UID.
              */
-            CEngineResult<> createPassDependencyByUID(
-                     PassUID_t const &aPassSource,
-                     PassUID_t const &aPassTarget);
+            CEngineResult<> createRenderPassDependencyByUID(
+                     RenderPassUID_t const &aPassSource,
+                     RenderPassUID_t const &aPassTarget);
 
             /**
              * Accepts an arbitrary resource and tries to traverse the resource-resourceview-path to find
@@ -232,17 +213,7 @@ EST_EXPORT CGraphBuilder
              * @param aPass The pass to collect.
              * @return      True, if successful. False, otherwise.
              */
-            CEngineResult<> collectPass(Shared<CPassBase> aPass);
-
-            /**
-             * Perform a topological depth first sort of the graph,
-             * yielding it's pass execution order.
-             *
-             * @param aOutPassOrder Stack to push the pass execution order to.
-             * @return              True, if successful. False otherwise.
-             */
-            template <typename TUID>
-            CEngineResult<> topologicalSort(std::stack<TUID> &aOutPassOrder);
+            CEngineResult<> collectRenderPass(Shared<CRenderPass> aRenderPass);
 
             /**
              * Validate the pass order and data flow dependencies of a sorted
@@ -313,24 +284,24 @@ EST_EXPORT CGraphBuilder
 
         private_members:
 
-            framegraph::CGraph::EGraphMode                mGraphMode;
-            bool                                          mRenderToBackBuffer;
-            FrameGraphResourceId_t                        mOutputResourceId;
+            framegraph::CGraph::EGraphMode                  mGraphMode;
+            bool                                            mRenderToBackBuffer;
+            FrameGraphResourceId_t                          mOutputResourceId;
 
-            Shared<os::SApplicationEnvironment>           mApplicationEnvironment;
-            Shared<wsi::CWSIDisplay>                      mDisplay;
+            Shared<os::SApplicationEnvironment>             mApplicationEnvironment;
+            Shared<wsi::CWSIDisplay>                        mDisplay;
 
-            Shared<IUIDGenerator<FrameGraphResourceId_t>> mPassUIDGenerator;
-            Shared<IUIDGenerator<FrameGraphResourceId_t>> mResourceUIDGenerator;
-            Map<std::string, std::string>                 mImportedResources;
+            Shared<IUIDGenerator<RenderPassUID_t>>          mRenderPassUIDGenerator;
+            Shared<IUIDGenerator<FrameGraphResourceId_t>>   mResourceUIDGenerator;
+            Map<std::string, std::string>                   mImportedResources;
 
-            PassMap                                       mPasses;
-            FrameGraphResourceIdList                      mResources;
-            CFrameGraphMutableResources                   mResourceData;
+            FrameGraphResourceIdList                        mResources;
+            CFrameGraphMutableResources                     mResourceData;
 
-            AdjacencyListMap_t<PassUID_t>                 mPassAdjacency;
+            RenderPassMap                                   mRenderPasses;
+            datastructures::CAdjacencyTree<RenderPassUID_t> mRenderPassTree;
 
-            Unique<CGraph>                                mFrameGraph;
+            Unique<CGraph>                                  mFrameGraph;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             AdjacencyListMap_t<FrameGraphResourceId_t>             mResourceAdjacency;
@@ -389,76 +360,6 @@ EST_EXPORT CGraphBuilder
                 CLog::Error(logTag(), e.what());
                 return { EEngineStatus::Error };
             }
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename TUID>
-        CEngineResult<> CGraphBuilder::topologicalSort(std::stack<TUID> &aOutPassOrder)
-        {
-            std::function<
-                    void(
-                        AdjacencyListMap_t<TUID> const&,
-                        TUID const                    &,
-                        std::map<TUID, bool>          &,
-                        std::stack<TUID>              &)> DSFi_fn;
-
-            // Define the recursive sort function
-            DSFi_fn = [&](
-                    AdjacencyListMap_t<TUID> const &aEdges,
-                    TUID const                     &aVertex,
-                    std::map<TUID, bool>           &aVisitedEdges,
-                    std::stack<TUID>               &aPassOrder) -> void
-            {
-                bool const edgeVisited = aVisitedEdges[aVertex];
-                if(edgeVisited)
-                {
-                    return;
-                }
-
-                aVisitedEdges[aVertex] = true;
-
-                // For each outgoing edge...
-                bool const doesNotContainEdge = (aEdges.end() == aEdges.find(aVertex));
-                if(!doesNotContainEdge)
-                {
-                    for(TUID const &adjacent : aEdges.at(aVertex))
-                    {
-                        DSFi_fn(aEdges, adjacent, aVisitedEdges, aPassOrder);
-                    }
-                }
-
-                aPassOrder.push(aVertex);
-            };
-
-            // Kick-off the sort algorithm
-            try
-            {
-                std::map<TUID, bool> visitedEdges = {};
-                for(typename AdjacencyListMap_t<TUID>::value_type &passAdjacency : mPassAdjacency)
-                {
-                    visitedEdges[passAdjacency.first] = false;
-                }
-
-                for(typename AdjacencyListMap_t<TUID>::value_type &passAdjacency : mPassAdjacency)
-                {                    
-                    DSFi_fn(mPassAdjacency, passAdjacency.first, visitedEdges, aOutPassOrder);
-                }
-            }
-            catch(std::runtime_error const &aRTE)
-            {
-                CLog::Error(logTag(), CString::format("Failed to perform topological sort: {} ", aRTE.what()));
-                return { EEngineStatus::Error };
-            }
-            catch(...)
-            {
-                CLog::Error(logTag(), "Failed to perform topological sort. Unknown error.");
-                return { EEngineStatus::Error };
-            }
-
-            return { EEngineStatus::Ok };
         }
         //<-----------------------------------------------------------------------------
 

@@ -530,36 +530,6 @@ namespace engine
         };
 
         /**
-         * Describes a list of renderables as a resource bound to a framegraph.
-         */
-        struct SFrameGraphRenderableList
-                : public SFrameGraphResource
-        {
-        public_members:
-            rendering::RenderableList renderableList;
-        };
-
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphRenderableList, SFrameGraphRenderableList);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphRenderableList, SFrameGraphRenderableList);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, rendering::RenderableList, RenderableList);
-
-        /**
-         * Describes a view of a list of renderables as a subset range of the full list of renderables available.
-         */
-        struct SFrameGraphRenderableListView
-                : public SFrameGraphResource
-        {
-        public_members:
-            std::vector<uint64_t> renderableRefIndices;
-        };
-
-        using FrameGraphRenderable_t = rendering::SRenderable;
-
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphRenderableListView, SFrameGraphRenderableListView);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphRenderableListView, SFrameGraphRenderableListView);
-
-
-        /**
          * Describes an adjacency list collection, mapping from a source id to a list of target ids.
          * Basically a list of lists of graph edges.
          */
@@ -582,49 +552,59 @@ namespace engine
         struct SFrameGraphPipelineConfig
         {};
 
+        struct SFrameGraphRequestedResource
+        {
+        public_members:
+            resources::ResourceId_t readableName;
+        };
+
         /**
          * The frame graph pipeline struct encapsulates information on specific fixed function
          * pipeline configurations and references.
          */
+        struct SFrameGraphRequestedPipeline
+            : SFrameGraphRequestedResource
+        {
+        public_members:
+            resources::ResourceId_t basePipelineId;
+            resources::ResourceId_t shaderModuleId;
+        };
+
         struct SFrameGraphPipeline
             : SFrameGraphResource
         {
         public_members:
-            resources::ResourceId_t   basePipelineId;
-            SFrameGraphPipelineConfig pipelineConfig;
-            SFrameGraphShaderModule   shaderModuleResource;
+            FrameGraphResourceId_t shaderModule
         };
 
         /**
          * The frame graph material struct encapsulates information on
          * the material used for rendering.
          */
-        struct SFrameGraphMaterial
-            : SFrameGraphResource
+        struct SFrameGraphRequestedMaterial
+            : SFrameGraphRequestedResource
         {
         public_members:
-            SFrameGraphPipeline                       basePipeline;
-            std::vector<SFrameGraphPersistentBuffer>  uniformBuffers;
-            std::vector<SFrameGraphPersistentTexture> textures;
+            resources::ResourceId_t              pipelineId;
+            std::vector<resources::ResourceId_t> uniformBufferIds;
+            std::vector<resources::ResourceId_t> textureIds;
         };
 
-        struct SFrameGraphMesh
-            : SFrameGraphResource
+        struct SFrameGraphRequestedMesh
+            : SFrameGraphRequestedResource
         {
         public_members:
-            SFrameGraphPersistentBuffer attributeBuffer;
-            SFrameGraphPersistentBuffer indexBuffer;
-            std::vector<VkDeviceSize>   attributeOffsets;
-            VkDeviceSize                indexCount;
-
-            std::array<SFrameGraphMaterial, 4> materials;
+            resources::ResourceId_t                attributeBufferId;
+            std::array<resources::ResourceId_t, 4> materialIds;
         };
 
-        struct SFrameGraphRenderableResources
+        struct SFrameGraphRequestedRenderableResources
         {
-            SFrameGraphMesh                           meshResource;
-            // std::vector<SFrameGraphPersistentBuffer>  bufferResources;
-            // std::vector<SFrameGraphPersistentTexture> textureResources;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedMesh>     meshes;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedMaterial> materials;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedPipeline> pipelines;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedBuffer>   meshes;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedTexture>  meshes;
         };
 
         struct SFrameGraphRenderableFetchFilter
@@ -632,18 +612,17 @@ namespace engine
 
         struct SFrameGraphDataSource
         {
-            std::function<std::vector<SFrameGraphRenderableResources>(SFrameGraphRenderableFetchFilter)> fetchRenderables;
+            std::function<std::vector<SFrameGraphRequestedRenderableResources>(SFrameGraphRenderableFetchFilter)> fetchRenderables;
         };
 
-        #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES  \
-            SFrameGraphTexture,                       \
-            SFrameGraphTextureView,                          \
-            SFrameGraphBuffer,                               \
-            SFrameGraphBufferView,                           \
-            SFrameGraphMaterial,                             \
-            SFrameGraphMesh,                                 \
-            SFrameGraphRenderableList,                       \
-            SFrameGraphRenderableListView
+        #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
+            SFrameGraphTexture                              \
+            , SFrameGraphTextureView                        \
+            , SFrameGraphBuffer                             \
+            , SFrameGraphBufferView                         \
+            , SFrameGraphMesh                               \
+            , SFrameGraphMaterial                           \
+            , SFrameGraphPipeline
 
 
         /**
@@ -758,14 +737,13 @@ namespace engine
 
             SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                    }
             SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachements()        const { return mAttachements;                                                 }
-            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get();     }
+            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get();            }
             SHIRABE_INLINE RefIndex_t                      const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get();        }
             SHIRABE_INLINE RefIndex_t                      const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get();             }
             SHIRABE_INLINE RefIndex_t                      const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get();         }
-            SHIRABE_INLINE RefIndex_t                      const &renderablesLists()    const { return CFrameGraphResourcesRef<SFrameGraphRenderableList>::get();     }
-            SHIRABE_INLINE RefIndex_t                      const &renderableListViews() const { return CFrameGraphResourcesRef<SFrameGraphRenderableListView>::get(); }
             SHIRABE_INLINE RefIndex_t                      const &meshes()              const { return CFrameGraphResourcesRef<SFrameGraphMesh>::get();               }
             SHIRABE_INLINE RefIndex_t                      const &materials()           const { return CFrameGraphResourcesRef<SFrameGraphMaterial>::get();           }
+            SHIRABE_INLINE RefIndex_t                      const &pipelines()           const { return CFrameGraphResourcesRef<SFrameGraphPipeline>::get();           }
 
         protected_members:
             Index_t                         mResources;

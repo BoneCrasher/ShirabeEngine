@@ -90,6 +90,14 @@ namespace engine
             FrameGraphResourceIdList       &mutableResourceReferences() { return mResourceReferences; }
 
             /**
+             * Register a resource in this pass instance.
+             *
+             * @param aResourceUID The resource uid of the resource to register.
+             * @return             True, if successful. False otherwise.
+             */
+            CEngineResult<> registerResource(FrameGraphResourceId_t const &aResourceUID);
+
+            /**
              * Interface method for all passes' setup.
              * To be implemented by specific pass classes.
              *
@@ -115,15 +123,6 @@ namespace engine
                     SFrameGraphRenderContextState  &aContextState,
                     SFrameGraphResourceContext     &aResourceContext,
                     SFrameGraphRenderContext       &aRenderContext) = 0;
-
-        private_methods:
-            /**
-             * Register a resource in this pass instance.
-             *
-             * @param aResourceUID The resource uid of the resource to register.
-             * @return             True, if successful. False otherwise.
-             */
-            CEngineResult<> registerResource(FrameGraphResourceId_t const &aResourceUID);
 
         private_members:
             PassUID_t                mPassUID;

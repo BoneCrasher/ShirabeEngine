@@ -1,7 +1,6 @@
 ﻿#include <renderer/framegraph/framegraphdata.h>
 #include "renderer/framegraph/graphbuilder.h"
 #include "renderer/framegraph/passbuilder.h"
-#include "renderer/framegraph/modules/gfxapicommon.h"
 #include "renderer/framegraph/modules/gbuffergeneration.h"
 #include "renderer/framegraph/modules/lighting.h"
 #include "renderer/framegraph/modules/compositing.h"
@@ -70,11 +69,9 @@ namespace engine
             graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
             graphBuilder.setRenderToBackBuffer(true);
 
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>                     graphicsAPICommonModule{ };
             CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule          { };
             CFrameGraphModule<SLightingModuleTag_t>                              lightingModule         { };
             CFrameGraphModule<SCompositingModuleTag_t>                           compositingModule      { };
-            CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPrePassExportData prePassExportData      { };
 
             // static std::string const sPrePassID               = "PrePass";
             static std::string const sGBufferGenerationPassID = "GBufferGenerationPass";
