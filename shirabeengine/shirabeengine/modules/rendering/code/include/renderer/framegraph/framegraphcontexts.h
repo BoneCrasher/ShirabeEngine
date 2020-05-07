@@ -105,12 +105,12 @@ namespace engine
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> beginPass;
+            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> beginSubpass;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> endPass;
+            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> nextSubpass;
 
             /**
              *
@@ -138,8 +138,7 @@ namespace engine
              */
             std::function<EEngineStatus(SFrameGraphRenderContextState     &/* aState               */
                                       , ResourceId_t                const &/* aRenderPassId        */
-                                      , ResourceId_t                const &/* aFrameBufferId       */
-                                      , CFrameGraphMutableResources const &/* aFrameGraphResources */)> bindRenderPass;
+                                      , ResourceId_t                const &/* aFrameBufferId       */)> bindRenderPass;
 
             /**
              *
@@ -191,10 +190,10 @@ namespace engine
             /**
              *
              */
-            std::function<EEngineStatus(ResourceId_t                    const& /* aRenderPassId        */
-                                      , std::vector<PassUID_t>          const& /* aPassExecutionOrder  */
-                                      , SFrameGraphAttachmentCollection const& /* aAttachmentInfo      */
-                                      , CFrameGraphMutableResources     const& /* aFrameGraphResources */)> createRenderPass;
+            std::function<EEngineStatus(ResourceId_t                      const& /* aRenderPassId        */
+                                        , std::vector<PassUID_t>          const& /* aPassExecutionOrder  */
+                                        , SFrameGraphAttachmentCollection const& /* aAttachmentInfo      */
+                                        , CFrameGraphMutableResources     const& /* aFrameGraphResources */)> createRenderPass;
 
             /**
              *
@@ -207,8 +206,8 @@ namespace engine
             /**
              *
              */
-            std::function<EEngineStatus(ResourceId_t const& /* aFrameBufferId */
-                                      , ResourceId_t const& /* aRenderPassId  */)> createFrameBuffer;
+            std::function<EEngineStatus(ResourceId_t   const& /* aFrameBufferId */
+                                        , ResourceId_t const& /* aRenderPassId  */)> createFrameBuffer;
 
             /**
              *

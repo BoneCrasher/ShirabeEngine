@@ -13,28 +13,28 @@ namespace engine
             CFrameGraphModule<SCompositingModuleTag_t>::SExportData
         >
         CFrameGraphModule<SCompositingModuleTag_t>::addDefaultCompositingPass(
-                std::string         const &aPassName,
-                CGraphBuilder             &aGraphBuilder,
-                SFrameGraphResource const &aGbuffer0,
-                SFrameGraphResource const &aGbuffer1,
-                SFrameGraphResource const &aGbuffer2,
-                SFrameGraphResource const &aGbuffer3,
-                SFrameGraphResource const &aDepthStencil,
-                SFrameGraphResource const &aLightAccumulationBuffer)
+                std::string const      &aPassName,
+                CGraphBuilder          &aGraphBuilder,
+                SFrameGraphTextureView &aGbuffer0,
+                SFrameGraphTextureView &aGbuffer1,
+                SFrameGraphTextureView &aGbuffer2,
+                SFrameGraphTextureView &aGbuffer3,
+                SFrameGraphTextureView &aDepthStencil,
+                SFrameGraphTextureView &aLightAccumulationBuffer)
         {
             /**
              * The SState struct is the internal state of the compositing pass.
              */
             struct SState
             {
-                SFrameGraphResource compositingBufferId;
+                SFrameGraphRenderTarget compositingBufferId;
             };
 
             /**
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SStaticPassData
+            struct SPassData
             {
                 SImportData importData;
                 SExportData exportData;
@@ -42,12 +42,9 @@ namespace engine
                 SState state;
             };
 
-            struct SDynamicPassData
-            {};
-
-            auto const staticSetup = [&] (
-                CPassStaticBuilder &aBuilder,
-                SStaticPassData    &aOutPassData)
+            auto const setup = [&] (
+                CPassBuilder &aBuilder,
+                SPassData    &aOutPassData)
                     -> CEngineResult<>
             {
                 auto gbufferTextureFetch = aGraphBuilder.getResources()
@@ -60,7 +57,7 @@ namespace engine
 
                 SFrameGraphTexture gbufferTexture = *(gbufferTextureFetch.data());
 
-                SFrameGraphTexture compositingBufferDesc ={ };
+                SFrameGraphRenderTarget compositingBufferDesc ={ };
                 compositingBufferDesc.width          = gbufferTexture.width;
                 compositingBufferDesc.height         = gbufferTexture.height;
                 compositingBufferDesc.depth          = 1;
@@ -70,7 +67,7 @@ namespace engine
                 compositingBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
                 compositingBufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
 
-                aOutPassData.state.compositingBufferId = aBuilder.createTexture("Compositing Buffer", compositingBufferDesc).data();
+                aOutPassData.state.compositingBufferId = aBuilder.createRenderTarget("Compositing Buffer", compositingBufferDesc).data();
 
                 SFrameGraphReadTextureFlags readFlags{ };
                 readFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
@@ -106,17 +103,8 @@ namespace engine
                 return { EEngineStatus::Ok };
             };
 
-            auto const dynamicSetup =
-                           [&] (CPassDynamicBuilder           &aBuilder
-                                , SFrameGraphDataSource const &aDataSource
-                                , SDynamicPassData            &aOutPassData) -> CEngineResult<>
-                               {
-                                   return EEngineStatus::Ok;
-                               };
-
             auto const execute = [=] (
-                    SStaticPassData          const &aStaticPassData,
-                    SDynamicPassData         const &asDynamicPassData,
+                    SPassData                const &aPassData,
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
@@ -126,26 +114,26 @@ namespace engine
             {
                 CLog::Verbose(logTag(), "Compositing");
 
-                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aStaticPassData.importData.material);
+                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aPassData.importData.material);
 
                 return { EEngineStatus::Ok };
             };
 
-            auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SStaticPassData, SDynamicPassData>>(aPassName, staticSetup, dynamicSetup, execute);
+            auto passFetch = aGraphBuilder.addSubpass<CallbackPass<SPassData>>(aPassName, setup, execute);
             if(not passFetch.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                Shared<CallbackPass<SStaticPassData, SDynamicPassData>> pass = passFetch.data();
+                Shared<CallbackPass<SPassData>> pass = passFetch.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };
                 }
                 else
                 {
-                    return { EEngineStatus::Ok, passFetch.data()->staticPassData().exportData };
+                    return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
                 }
             }
         }

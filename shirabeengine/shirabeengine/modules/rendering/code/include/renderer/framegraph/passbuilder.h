@@ -20,6 +20,7 @@ namespace engine
         using namespace engine::graphicsapi;
 
         class CPassBase;
+        class CRenderPass;
 
         /**
          * The EPassResourceConstraintFlags enum describes various parameters which can be constrained.
@@ -58,9 +59,9 @@ namespace engine
          * The PassBuilder class is the setup interface for all passes and collects all public resource and state requests
          * of a pass, performing some validation to make sure that passes do not request invalid behaviour.
          */
-        class CPassStaticBuilder
+        class CPassBuilder
         {
-            SHIRABE_DECLARE_LOG_TAG(CPassStaticBuilder);
+            SHIRABE_DECLARE_LOG_TAG(CPassBuilder);
 
         public_constructors:
             /**
@@ -70,9 +71,10 @@ namespace engine
              * @param aPass            The pass instance to build up.
              * @param aOutResourceData Container for the pass' resources requested/used.
              */
-            CPassStaticBuilder(
+            CPassBuilder(
                     PassUID_t             const &aPassUID,
                     Shared<CPassBase>            aPass,
+                    Shared<CRenderPass>          aEnclosingRenderPass,
                     CFrameGraphMutableResources &aOutResourceData);
 
         public_methods:
@@ -95,9 +97,21 @@ namespace engine
              * @return            Return a framegraph resource handle for the texture
              *                    creation.
              */
-            CEngineResult<SFrameGraphResource> createTexture(
-                    std::string        const &aName,
-                    SFrameGraphTexture const &aDescriptor);
+            CEngineResult<SFrameGraphTransientTexture> createTexture(
+                    std::string    const &aName,
+                SFrameGraphTexture const &aDescriptor);
+
+            /**
+             * Request the creation of a texture resource in the framegraph.
+             *
+             * @param aName       Name of the texture to create.
+             * @param aDescriptor Descriptor of the texture to create.
+             * @return            Return a framegraph resource handle for the texture
+             *                    creation.
+             */
+            CEngineResult<SFrameGraphRenderTarget> createRenderTarget(
+                std::string       const &aName,
+                SFrameGraphTexture const &aDescriptor);
 
             /**
              * Request a write operation on a subjacent texture instance.
@@ -107,9 +121,21 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphResource> writeAttachment(
-                    SFrameGraphResource          const &aSubjacentTargetResource,
+            CEngineResult<SFrameGraphTextureView> writeAttachment(
+                    SFrameGraphTexture                 &aTexture,
                     SFrameGraphWriteTextureFlags const &aFlags);
+
+            /**
+             * Request a write operation on a subjacent texture instance.
+             *
+             * @param aSubjacentTargetResource The resource id of the texture to write.
+             * @param aFlags                   Flags detailing the texture write operation.
+             * @return                         Return a framegraph resource handle for the texture
+             *                                 creation.
+             */
+            CEngineResult<SFrameGraphTextureView> writeAttachment(
+                SFrameGraphTextureView             &aTextureView,
+                SFrameGraphWriteTextureFlags const &aFlags);
 
             /**
              * Request a read operation on a subjacent texture instance.
@@ -119,8 +145,8 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphResource> readAttachment(
-                    SFrameGraphResource         const &aSubjacentTargetResource,
+            CEngineResult<SFrameGraphTextureView> readAttachment(
+                    SFrameGraphTexture                &aTexture,
                     SFrameGraphReadTextureFlags const &aFlags);
 
             /**
@@ -131,8 +157,20 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphResource> readTexture(
-                    SFrameGraphResource             const &subjacentTargetResource,
+            CEngineResult<SFrameGraphTextureView> readAttachment(
+                SFrameGraphTextureView            &aTextureView,
+                SFrameGraphReadTextureFlags const &aFlags);
+
+            /**
+             * Request a read operation on a subjacent texture instance.
+             *
+             * @param aSubjacentTargetResource The resource id of the texture to read.
+             * @param aFlags                   Flags detailing the texture read operation.
+             * @return                         Return a framegraph resource handle for the texture
+             *                                 creation.
+             */
+            CEngineResult<SFrameGraphTextureView> readTexture(
+                    SFrameGraphTexture                    &subjacentTargetResource,
                     SFrameGraphTextureResourceFlags const &aFlags);
 
             CEngineResult<SFrameGraphMesh> useMesh(SFrameGraphMesh const &aMesh);
@@ -254,8 +292,17 @@ namespace engine
                     CRange               const &aMipSliceRange);
 
         private_methods:
-            CEngineResult<SFrameGraphResource> useTexture(
-                    SFrameGraphResource          const &aSubjacentTargetResource,
+            CEngineResult<SFrameGraphTextureView> useTexture(
+                    SFrameGraphTexture                 &aTexture,
+                    EFrameGraphViewPurpose       const &aSourceOrTarget,
+                    EFormat                      const &aRequiredFormat,
+                    CRange                       const &aArraySliceRange,
+                    CRange                       const &aMipSliceRange,
+                    EFrameGraphViewAccessMode    const &aMode,
+                    EEngineStatus                const &aFailCode);
+
+            CEngineResult<SFrameGraphTextureView> useTextureView(
+                    SFrameGraphTextureView             &aTextureView,
                     EFrameGraphViewPurpose       const &aSourceOrTarget,
                     EFormat                      const &aRequiredFormat,
                     CRange                       const &aArraySliceRange,
@@ -266,14 +313,9 @@ namespace engine
         private_members:
             PassUID_t                        mPassUID;
             Shared<CPassBase>                mPass;
+            Shared<CRenderPass>              mEnclosingRenderPass;
             CFrameGraphMutableResources     &mResourceData;
             SFrameGraphAttachmentCollection &mAttachmentCollection;
-        };
-
-        class CPassDynamicBuilder
-            : public CPassStaticBuilder
-        {
-
         };
     }
 }

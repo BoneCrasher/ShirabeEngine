@@ -80,24 +80,6 @@ namespace engine
 #endif
 
         public_methods:
-
-            /**
-             *
-             * @param aRenderContextState
-             * @param aRenderContext
-             * @param aPassExecutionOrder
-             * @return
-             */
-            CEngineResult<> initializeGraphResources(SFrameGraphResourceContext &aResourceContext);
-
-            /**
-             *
-             * @param aRenderContextState
-             * @param aRenderContext
-             * @return
-             */
-            CEngineResult<> deinitializeGraphResources(SFrameGraphResourceContext &aResourceContext);
-
             /**
              * Execute the framegraph, causing it create the respective command buffers.
              *
@@ -134,175 +116,26 @@ namespace engine
             SHIRABE_INLINE CGraph &operator=(CGraph const &aOther);
 
         private_methods:
-            /**
-             * Initialize all resources required for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param resourceIds   The list of ids of resources to create.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> initializeResources(
-                    SFrameGraphResourceContext     &aResourceContext,
-                    FrameGraphResourceIdList const &aResourceIds);
+            bool initializeAttachments(SFrameGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
+            bool deinitializeAttachments(SFrameGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
 
-            /**
-             * Initialize all subpasses, the render pass and the framebuffer.
-             *
-             * @param aRenderContext The render context interface to the graphics API.
-             * @param aRenderPassId  Unique Id of the render pass to initialize.
-             * @param aFrameBufferId Unique Id of the frame buffer to initialize.
-             * @return               True, if successful. False, otherwise.
-             */
-            CEngineResult<> initializeRenderPassAndFrameBuffer(
-                    SFrameGraphResourceContext     &aResourceContext,
-                    std::vector<PassUID_t>   const &aPassExecutionOrder,
-                    std::string              const &aRenderPassId,
-                    std::string              const &aFrameBufferId);
-
-            /**
-             * Bind all automatic resources required for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param resourceIds   The list of ids of resources to create.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> bindResources(
-                    SFrameGraphResourceContext     &aResourceContext,
-                    FrameGraphResourceIdList const &aResourceIds);
-
-            /**
-             * Unbind all automatic resources required for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param resourceIds   The list of ids of resources to create.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> unbindResources(
-                    SFrameGraphResourceContext     &aResourceContext,
-                    FrameGraphResourceIdList const &aResourceIds);
-
-            /**
-             * Deinitialize all subpasses, the render pass and the framebuffer.
-             *
-             * @param aRenderContext The render context interface to the graphics API.
-             * @param aRenderPassId  Unique Id of the render pass to deinitialize.
-             * @param aFrameBufferId Unique Id of the frame buffer to deinitialize.
-             * @return               True, if successful. False, otherwise.
-             */
-            CEngineResult<> deinitializeRenderPassAndFrameBuffer(
-                    SFrameGraphResourceContext     &aResourceContext,
-                    std::string              const &aRenderPassId,
-                    std::string              const &aFrameBufferId);
-
-            /**
-             * Deinitialize all resources required for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param resourceIds   The list of ids of resources to create.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> deinitializeResources(
-                    SFrameGraphResourceContext     &aResourceContext,
-                    FrameGraphResourceIdList const &aResourceIds);
-
-            /**
-             * Initialize a texture for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param aTexture      The texture to create.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> initializeTexture(
-                    SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphTexture> const &aTexture);
-
-            /**
-             * Initialize a texture view for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param aTexture      The texture of the view to create.
-             * @param aTextureView  The texture view to create.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> initializeTextureView(
-                SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphTexture> const &aTexture,
-                    Shared<SFrameGraphTextureView>    const &aTextureView);
-            /**
-             * Initialize a buffer for execution.
-             *
-             * @param renderContext
-             * @return
-             */
-            CEngineResult<> initializeBuffer(SFrameGraphResourceContext &aResourceContext);
-
-            /**
-             * Initialize a buffer view for execution
-             * @param renderContext
-             * @return
-             */
-            CEngineResult<> initializeBufferView(SFrameGraphResourceContext &aResourceContext);
-
-            /**
-             * Deinitialize a texture for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param aTexture      The texture to destroy.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> deinitializeTexture(
-                    SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphTexture> const &aTexture);
-
-            /**
-             * Deinitialize a texture view for execution.
-             *
-             * @param renderContext The render context interfacing to the graphics API.
-             * @param aTexture      The texture of the view to destroy.
-             * @param aTextureView  The texture view to destroy.
-             * @return              True, if sucessful. False otherwise.
-             */
-            CEngineResult<> deinitializeTextureView(
-                SFrameGraphResourceContext              &aResourceContext,
-                    Shared<SFrameGraphTexture> const &aTexture,
-                    Shared<SFrameGraphTextureView>    const &aTextureView);
-
-            /**
-             * Deinitialize a buffer view for execution.
-             *
-             * @param renderContext
-             * @return
-             */
-            CEngineResult<> deinitializeBufferView(SFrameGraphResourceContext &aResourceContext);
-            /**
-             * Deinitialize a buffer view for execution.
-             *
-             * @param renderContext
-             * @return
-             */
-            CEngineResult<> deinitializeBuffer(SFrameGraphResourceContext &aResourceContext);
+            bool initializeSubpassResources(SFrameGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
+            bool deinitializeSubpassResources(SFrameGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
 
         public_methods:
+            PassMap const &subpasses() const { return mSubpasses; }
+            PassMap       &subpasses()       { return mSubpasses; }
 
             RenderPassMap const &renderPasses() const { return mRenderPasses; }
             RenderPassMap       &renderPasses()       { return mRenderPasses; }
 
-            CAdjacencyTree<PassUID_t> const &renderPassAdjacency() const  { return mRenderPassTree; }
-            std::stack<PassUID_t> const &passExecutionOrder() const  { return mPassExecutionOrder; }
-            FrameGraphResourceIdList const &resources() const  { return mResources; }
-            CFrameGraphMutableResources &resourceData() { return mResourceData; }
+            std::vector<PassUID_t>      const &renderpassExecutionOrder() const  { return mRenderpassExecutionOrder; }
+            FrameGraphResourceIdList    const &resources()                const  { return mResources; }
+            CFrameGraphMutableResources       &resourceData()                    { return mResourceData; }
 
-            EGraphMode const &graphMode()  const { return mGraphMode; }
-            bool const &renderToBackBuffer()   const { return mRenderToBackBuffer; };
+            EGraphMode             const &graphMode()                const { return mGraphMode; }
+            bool                   const &renderToBackBuffer()       const { return mRenderToBackBuffer; };
             FrameGraphResourceId_t const &outputTextureResourceId()  const { return mOutputTextureResourceId; }
-
-           /**
-             * Add a new pass to this graph.
-             *
-             * @param aPass The pass to add.
-             * @return      True, if successfully added. False otherwise.
-             */
-            CEngineResult<> addPass(Shared<CPassBase> const &aPass);
 
             /**
              * Create a new pass of type TPass with TPassCreationArgs and set it up.
@@ -325,10 +158,9 @@ namespace engine
         private_members:
             friend class CGraphBuilder;
 
-            RenderPassMap               mRenderPasses;
-            CAdjacencyTree<PassUID_t>   mRenderPassTree;
-
-            std::vector<PassUID_t>      mPassExecutionOrder;
+            PassMap                      mSubpasses;
+            RenderPassMap                mRenderPasses;
+            std::vector<RenderPassUID_t> mRenderpassExecutionOrder;
 
             FrameGraphResourceIdList    mResources;
             CFrameGraphMutableResources mResourceData;
@@ -366,7 +198,6 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            this->addPass(pass);
             return { EEngineStatus::Ok, pass };
         }
         //<-----------------------------------------------------------------------------

@@ -38,6 +38,7 @@ namespace engine
 
         using FrameGraphResourceId_t = uint64_t;
         using PassUID_t              = uint64_t;
+        using RenderPassUID_t        = uint64_t;
 
 #define SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE 0
 
@@ -223,6 +224,7 @@ namespace engine
 
         public_members:
             uint32_t                       referenceCount;
+            RenderPassUID_t                assignedRenderpassUID;
             PassUID_t                      assignedPassUID;
             FrameGraphResourceId_t         resourceId;
             FrameGraphResourceId_t         parentResource;
@@ -367,6 +369,11 @@ namespace engine
         {
         };
 
+        struct SHIRABE_TEST_EXPORT SFrameGraphRenderTarget
+            : public SFrameGraphTexture
+        {
+        };
+
         /**
          * The SFrameGraphTextureView struct describes any kind of frame graph texture view in the framegraph
          */
@@ -446,8 +453,8 @@ namespace engine
              *
              * @return See brief.
              */
-            Vector<FrameGraphResourceId_t>        const &getAttachementImageResourceIds()     const { return mAttachmentImageResourceIds;     }
-            Vector<FrameGraphResourceId_t>        const &getAttachementImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
+            Vector<FrameGraphResourceId_t>        const &getAttachmentImageResourceIds()     const { return mAttachmentImageResourceIds;     }
+            Vector<FrameGraphResourceId_t>        const &getAttachmentImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
             Vector<uint64_t>                      const &getColorAttachments()                const { return mColorAttachments;               }
             Vector<uint64_t>                      const &getDepthAttachments()                const { return mDepthAttachments;               }
             Vector<uint64_t>                      const &getInputAttachments()                const { return mInputAttachments;               }
@@ -552,22 +559,15 @@ namespace engine
         struct SFrameGraphPipelineConfig
         {};
 
-        struct SFrameGraphRequestedResource
-        {
-        public_members:
-            resources::ResourceId_t readableName;
-        };
-
         /**
          * The frame graph pipeline struct encapsulates information on specific fixed function
          * pipeline configurations and references.
          */
-        struct SFrameGraphRequestedPipeline
-            : SFrameGraphRequestedResource
+        struct SFrameGraphPipeline
+            : SFrameGraphResource
         {
         public_members:
             resources::ResourceId_t basePipelineId;
-            resources::ResourceId_t shaderModuleId;
         };
 
         struct SFrameGraphPipeline
@@ -603,8 +603,8 @@ namespace engine
             std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedMesh>     meshes;
             std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedMaterial> materials;
             std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedPipeline> pipelines;
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedBuffer>   meshes;
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedTexture>  meshes;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedBuffer>   buffers;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedTexture>  textures;
         };
 
         struct SFrameGraphRenderableFetchFilter
@@ -736,7 +736,6 @@ namespace engine
             }
 
             SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                    }
-            SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachements()        const { return mAttachements;                                                 }
             SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get();            }
             SHIRABE_INLINE RefIndex_t                      const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get();        }
             SHIRABE_INLINE RefIndex_t                      const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get();             }
@@ -746,8 +745,7 @@ namespace engine
             SHIRABE_INLINE RefIndex_t                      const &pipelines()           const { return CFrameGraphResourcesRef<SFrameGraphPipeline>::get();           }
 
         protected_members:
-            Index_t                         mResources;
-            SFrameGraphAttachmentCollection mAttachements;
+            Index_t mResources;
         };
         
         /**
@@ -798,12 +796,6 @@ namespace engine
 
                 return result;
             }
-
-            SHIRABE_INLINE SFrameGraphAttachmentCollection &getAttachments()
-            {
-                return mAttachements;
-            }
-
 
             /**
              * Merge two sets of framegraph resources together.

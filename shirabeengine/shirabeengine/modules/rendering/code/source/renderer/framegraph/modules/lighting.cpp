@@ -13,27 +13,27 @@ namespace engine
             CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData
         >
         CFrameGraphModule<SLightingModuleTag_t>::addLightingPass(
-                std::string         const &aPassName,
-                CGraphBuilder             &aGraphBuilder,
-                SFrameGraphResource const &aGbuffer0,
-                SFrameGraphResource const &aGbuffer1,
-                SFrameGraphResource const &aGbuffer2,
-                SFrameGraphResource const &aGbuffer3,
-                SFrameGraphResource const &aDepthStencil)
+                std::string const      &aPassName,
+                CGraphBuilder          &aGraphBuilder,
+                SFrameGraphTextureView &aGbuffer0,
+                SFrameGraphTextureView &aGbuffer1,
+                SFrameGraphTextureView &aGbuffer2,
+                SFrameGraphTextureView &aGbuffer3,
+                SFrameGraphTextureView &aDepthStencil)
         {
             /**
              * The SState struct is the internal state of the lighting pass.
              */
             struct SState
             {
-                SFrameGraphResource lightAccumulationBufferTextureId;
+                SFrameGraphRenderTarget lightAccumulationBufferTextureId;
             };
 
             /**
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SStaticPassData
+            struct SPassData
             {
                 SLightingImportData importData;
                 SLightingExportData exportData;
@@ -41,16 +41,13 @@ namespace engine
                 SState state;
             };
 
-            struct SDynamicPassData
-            { };
-
             /**
              * Implement the setup function
              */
-            auto const staticSetup =
+            auto const setup =
                            [&] (
-                               CPassStaticBuilder &aBuilder,
-                               SStaticPassData    &aOutPassData) -> CEngineResult<>
+                               CPassBuilder &aBuilder,
+                               SPassData    &aOutPassData) -> CEngineResult<>
                                {
                                    auto gbufferTextureFetch = aGraphBuilder.getResources()
                                                                            .getResource<SFrameGraphTexture>(aGbuffer0.subjacentResource);
@@ -62,7 +59,7 @@ namespace engine
 
                                    SFrameGraphTexture gbufferTexture = *(gbufferTextureFetch.data());
 
-                                   SFrameGraphTexture lightAccBufferDesc ={ };
+                                   SFrameGraphRenderTarget lightAccBufferDesc ={ };
                                    lightAccBufferDesc.width          = gbufferTexture.width;
                                    lightAccBufferDesc.height         = gbufferTexture.height;
                                    lightAccBufferDesc.depth          = 1;
@@ -72,7 +69,7 @@ namespace engine
                                    lightAccBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
                                    lightAccBufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
 
-                                   aOutPassData.state.lightAccumulationBufferTextureId = aBuilder.createTexture("Light Accumulation Buffer", lightAccBufferDesc).data();
+                                   aOutPassData.state.lightAccumulationBufferTextureId = aBuilder.createRenderTarget("Light Accumulation Buffer", lightAccBufferDesc).data();
 
                                    SFrameGraphReadTextureFlags readFlags{ };
                                    readFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
@@ -107,20 +104,11 @@ namespace engine
                                    return { EEngineStatus::Ok };
                                };
 
-            auto const dynamicSetup =
-                           [&] (CPassDynamicBuilder           &aBuilder
-                                , SFrameGraphDataSource const &aDataSource
-                                , SDynamicPassData            &aOutPassData) -> CEngineResult<>
-                               {
-                                   return EEngineStatus::Ok;
-                               };
-
             /**
              * Implement the execute function
              */
             auto const execute = [=] (
-                    SStaticPassData          const &aStaticPassData,
-                    SDynamicPassData         const &aDynamicPassData,
+                    SPassData                const &aPassData,
                     SFrameGraphDataSource    const &aDataSource,
                     CFrameGraphResources     const &aFrameGraphResources,
                     SFrameGraphRenderContextState  &aRenderContextState,
@@ -130,26 +118,26 @@ namespace engine
             {
                 CLog::Verbose(logTag(), "Lighting");
 
-                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aStaticPassData.importData.material);
+                aRenderContext.drawFullscreenQuadWithMaterial(aRenderContextState, aPassData.importData.material);
 
                 return { EEngineStatus::Ok };
             };
 
-            auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SStaticPassData, SDynamicPassData>>(aPassName, staticSetup, dynamicSetup, execute);
+            auto passFetch = aGraphBuilder.addSubpass<CallbackPass<SPassData>>(aPassName, setup, execute);
             if(not passFetch.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                Shared<CallbackPass<SStaticPassData, SDynamicPassData>> pass = passFetch.data();
+                Shared<CallbackPass<SPassData>> pass = passFetch.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };
                 }
                 else
                 {
-                    return { EEngineStatus::Ok, passFetch.data()->staticPassData().exportData };
+                    return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
                 }
             }
         }

@@ -20,33 +20,29 @@ namespace engine
              */
             struct SState
             {
-                SFrameGraphResource gbufferTexture0Id;
-                SFrameGraphResource gbufferTexture1Id;
-                SFrameGraphResource gbufferTexture2And3Id;
-                SFrameGraphResource depthStencilTextureId;
+                SFrameGraphRenderTarget gbufferTexture0Id;
+                SFrameGraphRenderTarget gbufferTexture1Id;
+                SFrameGraphRenderTarget gbufferTexture2And3Id;
+                SFrameGraphRenderTarget depthStencilTextureId;
             };
 
             /**
              * The SPassData struct declares the externally managed pass data
              * for the pass to be created.
              */
-            struct SStaticPassData
+            struct SPassData
             {
                 SGBufferGenerationImportData importData;
                 SGBufferGenerationExportData exportData;
 
                 SState state;
             };
-
-            struct SDynamicPassData
-            { };
-
             // ----------------------------------------------------------------------------------
             // Setup
             // ----------------------------------------------------------------------------------
-            auto const staticSetup =
-                           [&] (CPassStaticBuilder &aBuilder
-                                , SStaticPassData  &aOutPassData) -> CEngineResult<>
+            auto const setup =
+                           [&] (CPassBuilder &aBuilder
+                                , SPassData  &aOutPassData) -> CEngineResult<>
                                {
                                    // Default extents.
                                    uint32_t width  = 1920;
@@ -61,7 +57,7 @@ namespace engine
                                        height = displayDesc.bounds.size.y();
                                    }
 
-                                   SFrameGraphTexture gbuffer0Desc ={ };
+                                   SFrameGraphRenderTarget gbuffer0Desc ={ };
                                    gbuffer0Desc.width              = width;
                                    gbuffer0Desc.height             = height;
                                    gbuffer0Desc.depth              = 1;
@@ -71,7 +67,7 @@ namespace engine
                                    gbuffer0Desc.mipLevels          = 1;
                                    gbuffer0Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
                                                                        | EFrameGraphResourceUsage::ColorAttachment;
-                                   SFrameGraphTexture gbuffer1Desc ={ };
+                                   SFrameGraphRenderTarget gbuffer1Desc ={ };
                                    gbuffer1Desc.width              = width;
                                    gbuffer1Desc.height             = height;
                                    gbuffer1Desc.depth              = 1;
@@ -81,7 +77,7 @@ namespace engine
                                    gbuffer1Desc.mipLevels          = 1;
                                    gbuffer1Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
                                                                        | EFrameGraphResourceUsage::ColorAttachment;
-                                   SFrameGraphTexture gbuffer2And3Desc ={ };
+                                   SFrameGraphRenderTarget gbuffer2And3Desc ={ };
                                    gbuffer2And3Desc.width          = width;
                                    gbuffer2And3Desc.height         = height;
                                    gbuffer2And3Desc.depth          = 1;
@@ -92,7 +88,7 @@ namespace engine
                                    gbuffer2And3Desc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
                                                                        | EFrameGraphResourceUsage::ColorAttachment;
 
-                                   SFrameGraphTexture depthStencilDesc ={ };
+                                   SFrameGraphRenderTarget depthStencilDesc ={ };
                                    depthStencilDesc.width          = width;
                                    depthStencilDesc.height         = height;
                                    depthStencilDesc.depth          = 1;
@@ -104,10 +100,10 @@ namespace engine
                                                                        | EFrameGraphResourceUsage::DepthAttachment;
 
                                    // Basic underlying output buffer to be linked
-                                   aOutPassData.state.gbufferTexture0Id     = aBuilder.createTexture("GBuffer Array Texture - Positions", gbuffer0Desc).data();
-                                   aOutPassData.state.gbufferTexture1Id     = aBuilder.createTexture("GBuffer Array Texture - Normals",   gbuffer1Desc).data();
-                                   aOutPassData.state.gbufferTexture2And3Id = aBuilder.createTexture("GBuffer Array Texture - Other",     gbuffer2And3Desc).data();
-                                   aOutPassData.state.depthStencilTextureId = aBuilder.createTexture("DepthStencil Texture",              depthStencilDesc).data();
+                                   aOutPassData.state.gbufferTexture0Id     = aBuilder.createRenderTarget("GBuffer Array Texture - Positions", gbuffer0Desc).data();
+                                   aOutPassData.state.gbufferTexture1Id     = aBuilder.createRenderTarget("GBuffer Array Texture - Normals",   gbuffer1Desc).data();
+                                   aOutPassData.state.gbufferTexture2And3Id = aBuilder.createRenderTarget("GBuffer Array Texture - Other",     gbuffer2And3Desc).data();
+                                   aOutPassData.state.depthStencilTextureId = aBuilder.createRenderTarget("DepthStencil Texture",              depthStencilDesc).data();
 
                                    // This will create a list of render targets for the texutre array to render to.
                                    // They'll be internally created and managed.
@@ -143,20 +139,13 @@ namespace engine
                                    aOutPassData.exportData.gbuffer3     = aBuilder.writeAttachment(aOutPassData.state.gbufferTexture2And3Id, write3).data();
                                    aOutPassData.exportData.depthStencil = aBuilder.writeAttachment(aOutPassData.state.depthStencilTextureId, depthFlags).data();
 
-                                   return { EEngineStatus::Ok };
-                               };
-            auto const dynamicSetup =
-                           [&] (CPassDynamicBuilder           &aBuilder
-                                , SFrameGraphDataSource const &aDataSource
-                                , SDynamicPassData            &aOutPassData) -> CEngineResult<>
-                               {
                                    std::vector<SFrameGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
                                    std::vector<SFrameGraphMesh>                validMeshes;
 
                                    // Render-Loop
                                    for(auto const &renderableResources : renderables)
                                    {
-                                        auto [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
+                                       auto [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
 
                                        for(std::size_t k=0; k<renderableResources.mesh.materials.size(); ++k)
                                        {
@@ -185,12 +174,13 @@ namespace engine
 
                                        validMeshes.push_back(mesh);
                                    }
+
+                                   return { EEngineStatus::Ok };
                                };
             // ----------------------------------------------------------------------------------
             // Execution
             // ----------------------------------------------------------------------------------
-            auto const execute = [=] (SStaticPassData          const &aStaticPassData,
-                                      SDynamicPassData         const &aDynamicPassData,
+            auto const execute = [=] (SPassData                const &aPassData,
                                       SFrameGraphDataSource    const &aDataSource,
                                       CFrameGraphResources     const &aFrameGraphResources,
                                       SFrameGraphRenderContextState  &aRenderContextState,
@@ -233,21 +223,21 @@ namespace engine
             // ----------------------------------------------------------------------------------
             // Spawn the pass
             // ----------------------------------------------------------------------------------
-            auto passFetch = aGraphBuilder.spawnPass<CallbackPass<SStaticPassData, SDynamicPassData>>(aPassName, staticSetup, dynamicSetup, execute);
+            auto passFetch = aGraphBuilder.addSubpass<CallbackPass<SPassData>>(aPassName, setup, execute);
             if(not passFetch.successful())
             {
                 return { EEngineStatus::Error };
             }
             else
             {
-                Shared<CallbackPass<SStaticPassData, SDynamicPassData>> pass = passFetch.data();
+                Shared<CallbackPass<SPassData>> pass = passFetch.data();
                 if(nullptr == pass)
                 {
                     return { EEngineStatus::NullPointer };
                 }
                 else
                 {
-                    return { EEngineStatus::Ok, passFetch.data()->staticPassData().exportData };
+                    return { EEngineStatus::Ok, passFetch.data()->passData().exportData };
                 }
             }
         }

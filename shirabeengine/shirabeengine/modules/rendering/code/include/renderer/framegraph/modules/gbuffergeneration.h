@@ -40,11 +40,11 @@ namespace engine
              */
             struct SGBufferGenerationExportData
             {
-                SFrameGraphResource gbuffer0;
-                SFrameGraphResource gbuffer1;
-                SFrameGraphResource gbuffer2;
-                SFrameGraphResource gbuffer3;
-                SFrameGraphResource depthStencil;
+                SFrameGraphTextureView gbuffer0;
+                SFrameGraphTextureView gbuffer1;
+                SFrameGraphTextureView gbuffer2;
+                SFrameGraphTextureView gbuffer3;
+                SFrameGraphTextureView depthStencil;
             };
 
         public_methods:

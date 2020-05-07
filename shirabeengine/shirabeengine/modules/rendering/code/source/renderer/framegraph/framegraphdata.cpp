@@ -440,16 +440,6 @@ namespace engine
                     CFrameGraphResourcesRef<SFrameGraphBufferView>::insert(id);
                 }
 
-                for(RefIndex_t::value_type const&id : aOther.renderablesLists())
-                {
-                    CFrameGraphResourcesRef<SFrameGraphRenderableList>::insert(id);
-                }
-
-                for(RefIndex_t::value_type const&id : aOther.renderableListViews())
-                {
-                    CFrameGraphResourcesRef<SFrameGraphRenderableListView>::insert(id);
-                }
-
                 for(RefIndex_t::value_type const &id : aOther.meshes())
                 {
                     CFrameGraphResourcesRef<SFrameGraphMesh>::insert(id);
@@ -459,8 +449,6 @@ namespace engine
                 {
                     CFrameGraphResourcesRef<SFrameGraphMaterial>::insert(id);
                 }
-
-                mAttachements = aOther.attachements();
 
                 return true;
 

@@ -32,12 +32,12 @@ namespace engine
              */
             struct SImportData
             {
-                SFrameGraphResource gbuffer0;
-                SFrameGraphResource gbuffer1;
-                SFrameGraphResource gbuffer2;
-                SFrameGraphResource gbuffer3;
-                SFrameGraphResource depth;
-                SFrameGraphResource lightAccumulationBuffer;
+                SFrameGraphTextureView gbuffer0;
+                SFrameGraphTextureView gbuffer1;
+                SFrameGraphTextureView gbuffer2;
+                SFrameGraphTextureView gbuffer3;
+                SFrameGraphTextureView depth;
+                SFrameGraphTextureView lightAccumulationBuffer;
 
                 SFrameGraphMaterial material;
             };
@@ -48,7 +48,7 @@ namespace engine
              */
             struct SExportData
             {
-                SFrameGraphResource output;
+                SFrameGraphTextureView output;
             };
 
         public_methods:
@@ -65,14 +65,14 @@ namespace engine
              * @return                         Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SExportData> addDefaultCompositingPass(
-                    std::string         const &aPassName,
-                    CGraphBuilder             &aGraphBuilder,
-                    SFrameGraphResource const &aGbuffer0,
-                    SFrameGraphResource const &aGbuffer1,
-                    SFrameGraphResource const &aGbuffer2,
-                    SFrameGraphResource const &aGbuffer3,
-                    SFrameGraphResource const &aDepthStencil,
-                    SFrameGraphResource const &aLightAccumulationBuffer);
+                    std::string const      &aPassName,
+                    CGraphBuilder          &aGraphBuilder,
+                    SFrameGraphTextureView &aGbuffer0,
+                    SFrameGraphTextureView &aGbuffer1,
+                    SFrameGraphTextureView &aGbuffer2,
+                    SFrameGraphTextureView &aGbuffer3,
+                    SFrameGraphTextureView &aDepthStencil,
+                    SFrameGraphTextureView &aLightAccumulationBuffer);
         };
 
     }

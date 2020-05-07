@@ -5,25 +5,58 @@
 #ifndef __SHIRABEDEVELOPMENT_RENDERPASS_H__
 #define __SHIRABEDEVELOPMENT_RENDERPASS_H__
 
+#include <core/datastructures/adjacencytree.h>
 #include "renderer/framegraph/subpass.h"
 
 namespace engine::framegraph
 {
+    using datastructures::CAdjacencyTree;
+
     using RenderPassUID_t = uint64_t;
 
     class CRenderPass
     {
+        SHIRABE_DECLARE_LOG_TAG(CRenderPass);
+
     public_constructors:
+        CRenderPass(RenderPassUID_t const         &aRenderPassUid
+                    , std::string const           &aRenderPassName
+                    , FrameGraphResourceIdList    &aAccumulatedResourceReferences
+                    , CFrameGraphMutableResources &aAccumulatedResourceData)
+            : mRenderPassUid(aRenderPassUid)
+            , mRenderPassName(aRenderPassName)
+            , mSubpassAdjacency()
+            , mSubpasses()
+            , mAccumulatedResourceData(aAccumulatedResourceData)
+            , mAccumulatedResourceReferences(aAccumulatedResourceReferences)
+        {};
+
     public_destructors:
 
     public_methods:
-        RenderPassUID_t const &getRenderPassUid() const { return mRenderPassUid; }
+        SHIRABE_INLINE RenderPassUID_t const &getRenderPassUid() const { return mRenderPassUid; }
+        SHIRABE_INLINE std::string     const &getRenderPassName() const { return mRenderPassName; }
+
+        SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachments() const { return mAttachments; }
+        SHIRABE_INLINE SFrameGraphAttachmentCollection &attachments() { return mAttachments; }
 
         void addSubpass(Shared<CPassBase> const &aPass);
 
+        void collectSubpasses(class CGraphBuilder &aGraphBuilder);
+
+        std::vector<PassUID_t> getTopologicallySortedSubpassList();
+
     private_members:
-        RenderPassUID_t mRenderPassUid;
-        PassMap         mPasses;
+        RenderPassUID_t const     mRenderPassUid;
+        std::string const         mRenderPassName;
+
+        PassMap                   mSubpasses;
+        CAdjacencyTree<PassUID_t> mSubpassAdjacency;
+
+        CFrameGraphMutableResources &mAccumulatedResourceData;
+        FrameGraphResourceIdList    &mAccumulatedResourceReferences;
+
+        SFrameGraphAttachmentCollection mAttachments;
     };
 
     SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CRenderPass>, CRenderPassPass);

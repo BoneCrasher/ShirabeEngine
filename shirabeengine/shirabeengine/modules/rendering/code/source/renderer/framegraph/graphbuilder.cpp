@@ -33,8 +33,8 @@ namespace engine
             , mApplicationEnvironment (nullptr                                                                        )
             , mDisplay                (nullptr                                                                        )
             , mRenderPassUIDGenerator (std::make_shared<CSequenceUIDGenerator<RenderPassUID_t>>(0))
+            , mSubpassUIDGenerator    (std::make_shared<CSequenceUIDGenerator<PassUID_t>>(0))
             , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator<FrameGraphResourceId_t >>(1))
-            , mImportedResources      (                                                                               )
             , mRenderPasses           (                                                                               )
             , mResources              (                                                                               )
             , mResourceData           (                                                                               )
@@ -50,18 +50,27 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        Shared<IUIDGenerator<FrameGraphResourceId_t>> CGraphBuilder::resourceUIDGenerator()
+        RenderPassUID_t CGraphBuilder::generateRenderPassUID()
         {
-            return mResourceUIDGenerator;
+            return mRenderPassUIDGenerator->generate();
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        FrameGraphResourceId_t CGraphBuilder::generatePassUID()
+        PassUID_t CGraphBuilder::generateSubpassUID()
         {
-            return mRenderPassUIDGenerator->generate();
+            return mSubpassUIDGenerator->generate();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        FrameGraphResourceId_t CGraphBuilder::generateResourceUID()
+        {
+            return mResourceUIDGenerator->generate();
         }
         //<-----------------------------------------------------------------------------
 
@@ -71,24 +80,6 @@ namespace engine
         Unique<CGraph> &CGraphBuilder::graph()
         {
             return mFrameGraph;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        Shared<os::SApplicationEnvironment> &CGraphBuilder::applicationEnvironment()
-        {
-            return mApplicationEnvironment;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        Shared<wsi::CWSIDisplay> const &CGraphBuilder::display()
-        {
-            return mDisplay;
         }
         //<-----------------------------------------------------------------------------
 
@@ -108,37 +99,7 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            applicationEnvironment() = aApplicationEnvironment;
-            mDisplay                 = aDisplay;
-            graph()                  = makeUnique<CGraph>();
-
-            // TODO: We add a dummy pass for the algorithm to work... Need to fix that up
-            auto const pseudoStaticSetup =
-                           [](CPassStaticBuilder const &, bool &) -> CEngineResult<>
-                               {
-                                   return { EEngineStatus::Ok };
-                               };
-            auto const pseudoDynamicSetup =
-                           [](CPassDynamicBuilder const &, SFrameGraphDataSource const &, bool &) -> CEngineResult<>
-                               {
-                                   return { EEngineStatus::Ok };
-                               };
-
-            auto const pseudoExec =
-                           [] (
-                               bool                     const &aStaticPassData,
-                               bool                     const &aDynamicPassData,
-                               SFrameGraphDataSource    const &aDataSource,
-                               CFrameGraphResources     const &aFrameGraphResources,
-                               SFrameGraphRenderContextState  &aRenderContextState,
-                               SFrameGraphResourceContext     &aResourceContext,
-                               SFrameGraphRenderContext       &aRenderContext) -> CEngineResult<>
-                           {
-                               return { EEngineStatus::Ok };
-                           };
-
-            // Spawn pseudo pass to simplify algorithms and have "empty" execution blocks.
-            spawnPass<CallbackPass<bool, bool>>("Pseudo-Pass", pseudoStaticSetup, pseudoDynamicSetup, pseudoExec);
+            graph() = makeUnique<CGraph>();
 
             return { EEngineStatus::Ok };
         }
@@ -149,11 +110,46 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraphBuilder::deinitialize()
         {
-            graph()                  = nullptr;
-            applicationEnvironment() = nullptr;
+            graph() = nullptr;
 
             return { EEngineStatus::Ok };
         }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<Shared<CRenderPass>> CGraphBuilder::beginRenderPass(std::string const &aName)
+        {
+            if(nullptr != mRenderPassUnderConstruction)
+            {
+                CLog::Error(logTag(), "Cannot begin a render pass, if another one is currently under construction.");
+                return EEngineStatus::Error;
+            }
+
+            RenderPassUID_t const uid = generateRenderPassUID();
+
+            Shared<CRenderPass> renderPass = makeShared<CRenderPass>(uid, aName, mResources, mResourceData);
+
+            mRenderPasses.insert({uid, renderPass});
+            mRenderPassTree.add(uid);
+
+            mRenderPassUnderConstruction = renderPass;
+
+            return { EEngineStatus::Ok, mRenderPassUnderConstruction };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<> CGraphBuilder::endRenderPass()
+        {
+            mRenderPassUnderConstruction = nullptr;
+
+            return { EEngineStatus::Ok };
+        }
+
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -217,19 +213,22 @@ namespace engine
             // First (No-Op, automatically performed on call to 'setPassDependency(...)':
             //   Evaluate explicit pass dependencies without resource flow.
 
-            // Second: Evaluate all pass resources and their implicit relations to passes and other resources.
-            for(RenderPassMap::value_type const &assignment : graph()->renderPasses())
+            // Evaluate all pass resources and their implicit relations to passes and other resources.
+            for(RenderPassMap::value_type const &renderPassAssignment : graph()->renderPasses())
             {
-                CEngineResult<> const collection = collectRenderPass(assignment.second);
+                RenderPassUID_t     renderpassUid = renderPassAssignment.first;
+                Shared<CRenderPass> renderpass    = renderPassAssignment.second;
+
+                CEngineResult<> const collection = collectRenderPass(renderpass);
                 if(not collection.successful())
                 {
-                    CLog::Error(logTag(), "Failed to perform pass collection.");
+                    CLog::Error(logTag(), "Failed to perform renderpass collection.");
                     return { EEngineStatus::Error };
                 }
             }
 
-            // Third: Sort the passes by their relationships and dependencies.
-            std::vector<RenderPassUID_t> const topologicalPassSort = mRenderPassTree.topologicalSort();
+            // Fourth: Do the same sorting for the renderpasses itself.
+            std::vector<RenderPassUID_t> const topologicalRenderpassSort = mRenderPassTree.topologicalSort();
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
 
@@ -244,7 +243,7 @@ namespace engine
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
 
-            CEngineResult<> const validation = validate(graph()->passExecutionOrder());
+            CEngineResult<> const validation = validate();
             if(not validation.successful())
             {
                 CLog::Error(logTag(), "Failed to perform validation(...) on graph compilation.");
@@ -255,8 +254,11 @@ namespace engine
 
             // Move out the current adjacency state to the frame graph, so that it can be used for further processing.
             // It is no more needed at this point within the GraphBuilder.
-            graph()->mRenderPassTree = std::move(this->mRenderPassTree);
-            graph()->mResources      = std::move(this->mResources);
+            graph()->mSubpasses                = std::move(this->mSubpasses);
+            graph()->mRenderPasses             = std::move(this->mRenderPasses);
+            graph()->mRenderpassExecutionOrder = std::move(topologicalRenderpassSort);
+
+            graph()->mResources          = std::move(this->mResources);
             graph()->mResourceData.mergeIn(this->mResourceData);
 
             graph()->mGraphMode               = mGraphMode;
@@ -308,127 +310,7 @@ namespace engine
                 return { EEngineStatus::Error };
             }
 
-            FrameGraphResourceIdList const resources = aRenderPass->mutableResourceReferences();
-
-            for(FrameGraphResourceId_t const &resourceId : resources)
-            {
-                CEngineResult<Shared<SFrameGraphResource>> resourceFetch = mResourceData.getResourceMutable<SFrameGraphResource>(resourceId);
-                if(not resourceFetch.successful())
-                {
-                    CLog::Error(logTag(), "Could not fetch pass data.");
-
-                    return { resourceFetch.result() };
-                }
-
-                SFrameGraphResource &resource = *(resourceFetch.data());
-
-                // For each underlying OR imported resource (textures/buffers or whatever importable)
-                if(SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE == resource.parentResource)
-                {
-                    if(EFrameGraphResourceType::Texture == resource.type)
-                    {
-#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-                        // Map the resources to it's pass appropriately
-                        bool const alreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[aPass->passUID()], resource.resourceId);
-                        if(!alreadyRegistered)
-                        {
-                            mPassToResourceAdjacency[aPass->passUID()].push_back(resource.resourceId);
-                        }
-#endif
-                        continue;
-                    }
-                }
-                // For each derived resource (views)
-                else
-                {
-                    // Avoid internal references for passes!
-                    // If the edge from pass k to pass k+1 was not added yet.
-                    // Create edge: Parent-->Source
-                    CEngineResult<Shared<SFrameGraphResource>> parentResourceFetch = mResourceData.getResource<SFrameGraphResource>(resource.parentResource);
-                    if(not parentResourceFetch.successful())
-                    {
-                        CLog::Error(logTag(), "Could not fetch pass data.");
-
-                        return { resourceFetch.result() };
-                    }
-
-                    SFrameGraphResource const &parentResource = *(parentResourceFetch.data());
-                    PassUID_t           const &passUID        = aRenderPass->getRenderPassUid();
-
-                    // Create a pass dependency used for topologically sorting the graph
-                    // to derive the pass execution order.
-                    if(parentResource.assignedPassUID != passUID)
-                    {
-                        createRenderPassDependencyByUID(parentResource.assignedPassUID, passUID);
-                    }
-
-#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-
-                    // Do the same for the resources!
-                    bool const resourceAdjacencyAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mResourceAdjacency[parentResource.resourceId], resource.resourceId);
-                    if(!resourceAdjacencyAlreadyRegistered)
-                    {
-                        mResourceAdjacency[parentResource.resourceId].push_back(resource.resourceId);
-                    }
-
-                    // And map the resources to it's pass appropriately
-                    bool const resourceEdgeAlreadyRegistered = alreadyRegisteredFn<FrameGraphResourceId_t>(mPassToResourceAdjacency[passUID], resource.resourceId);
-                    if(!resourceEdgeAlreadyRegistered)
-                    {
-                        mPassToResourceAdjacency[passUID].push_back(resource.resourceId);
-                    }
-
-#endif
-
-                    if(EFrameGraphResourceType::TextureView == resource.type)
-                    {
-                        CEngineResult<Shared<SFrameGraphTexture>>     textureFetch     = mResourceData.getResourceMutable<SFrameGraphTexture>(resource.subjacentResource);
-                        CEngineResult<Shared<SFrameGraphTextureView>> textureViewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(resource.resourceId);
-
-                        if(not (textureFetch.successful() and textureViewFetch.successful()))
-                        {
-                            CLog::Error(logTag(), "Could not fetch texture and/or texture view from resource registry.");
-                            return { resourceFetch.result() };
-                        }
-
-                        SFrameGraphTexture     &texture     = *(textureFetch.data());
-                        SFrameGraphTextureView &textureView = *(textureViewFetch.data());
-
-                        // Auto adjust format if requested
-                        if(FrameGraphFormat_t::Automatic == textureView.format)
-                        {
-                            textureView.format = texture.format;
-                        }
-                    }
-                    else if(EFrameGraphResourceType::BufferView == resource.type)
-                    {
-                        // TODO
-                    }
-                    else if(EFrameGraphResourceType::RenderableListView == resource.type)
-                    {
-                        // TODO
-                    }
-                }
-            }
-
-            // Now that the internal resource references were adjusted and duplicates removed, confirm the index in the graph builder
-            for(FrameGraphResourceId_t const &id : aRenderPass->mResourceReferences())
-            {
-                mResources.push_back(id);
-            }
-
-#ifdef SHIRABE_DEBUG
-            CLog::Verbose(logTag(), CString::format("Current Adjacency State collecting pass '{}':", aPass->passUID()));
-            for(auto const &[uid, adjacentUIDs] : mPassAdjacency)
-            {
-                CLog::Verbose(logTag(), CString::format("  Pass-UID: {}", uid));
-
-                for(PassUID_t const &adjacentUID : adjacentUIDs)
-                {
-                    CLog::Verbose(logTag(), CString::format("    Adjacent Pass-UID: {}", adjacentUID));
-                }
-            }
-#endif
+            aRenderPass->collectSubpasses(*this);
 
             return { EEngineStatus::Ok };
         }
@@ -437,10 +319,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraphBuilder::validate(std::stack<PassUID_t> const &aPassOrder)
+        CEngineResult<> CGraphBuilder::validate()
         {
-            SHIRABE_UNUSED(aPassOrder);
-
             bool allBindingsValid = true;
 
             for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())

@@ -67,27 +67,6 @@ namespace engine
             CEngineResult<> deinitialize();
 
             /**
-             * Fetch the internal resource UID generator to request a new UID.
-             *
-             * @return Pointer to the internal resource UID generator.
-             */
-            Shared<IUIDGenerator<FrameGraphResourceId_t>> resourceUIDGenerator();
-
-            /**
-             * Return the application environment pointer used by the builder.
-             *
-             * @return A pionter to the registered application environment.
-             */
-            Shared<os::SApplicationEnvironment> &applicationEnvironment();
-
-            /**
-             * Return the display pointer attached to this graph builder.
-             *
-             * @return See brief.
-             */
-            Shared<wsi::CWSIDisplay> const &display();
-
-            /**
              * Return all current resources stored in the builder.
              *
              * @return See brief.
@@ -142,11 +121,22 @@ namespace engine
                     typename    TPass,
                     typename... TPassCreationArgs
                     >
-            CEngineResult<Shared<TPass>> spawnPass(std::string       const &aName
-                                                 , TPassCreationArgs  &&... aArgs);
+            CEngineResult<Shared<TPass>> addSubpass(std::string       const &aName
+                                                  , TPassCreationArgs  &&... aArgs);
 
-            CEngineResult<Shared<CRenderPass>> beginRenderPass(std::string const &aId);
+            /**
+             * Begin a render pass, to which all subsequent calls of addSubpass will attach to.
+             *
+             * @param aId
+             * @return
+             */
+            CEngineResult<Shared<CRenderPass>> beginRenderPass(std::string const &aName);
 
+            /**
+             * End and commit the currently render pass under construction.
+             *
+             * @return
+             */
             CEngineResult<> endRenderPass();
 
             /**
@@ -160,6 +150,8 @@ namespace engine
             CEngineResult<Unique<CGraph>> compile();
 
         private_methods:
+            friend class CRenderPass;
+
             /**
              * Create a ordered dependency from aPassTarget on aPassSource, to enforce execution of source before target.
              *
@@ -174,7 +166,21 @@ namespace engine
              *
              * @return See brief.
              */
-            FrameGraphResourceId_t generatePassUID();
+            RenderPassUID_t generateRenderPassUID();
+
+            /**
+             * Generate a new PassUID.
+             *
+             * @return See brief.
+             */
+            PassUID_t generateSubpassUID();
+
+            /**
+             * Generate a new PassUID.
+             *
+             * @return See brief.
+             */
+            FrameGraphResourceId_t generateResourceUID();
 
             /**
              * Return the current internal graph state.
@@ -222,7 +228,7 @@ EST_EXPORT CGraphBuilder
              * @param aPassOrder The stack containing the pass order to be validated.
              * @return           True, if valid. False otherwise.
              */
-            CEngineResult<> validate(std::stack<PassUID_t> const &aPassOrder);
+            CEngineResult<> validate();
 
             /**
              * Validate, whether the textureview tries to access the subjacent texture in
@@ -292,14 +298,16 @@ EST_EXPORT CGraphBuilder
             Shared<wsi::CWSIDisplay>                        mDisplay;
 
             Shared<IUIDGenerator<RenderPassUID_t>>          mRenderPassUIDGenerator;
+            Shared<IUIDGenerator<PassUID_t>>                mSubpassUIDGenerator;
             Shared<IUIDGenerator<FrameGraphResourceId_t>>   mResourceUIDGenerator;
-            Map<std::string, std::string>                   mImportedResources;
 
             FrameGraphResourceIdList                        mResources;
             CFrameGraphMutableResources                     mResourceData;
 
+            Shared<CRenderPass>                             mRenderPassUnderConstruction;
             RenderPassMap                                   mRenderPasses;
             datastructures::CAdjacencyTree<RenderPassUID_t> mRenderPassTree;
+            PassMap                                         mSubpasses;
 
             Unique<CGraph>                                  mFrameGraph;
 
@@ -318,7 +326,7 @@ EST_EXPORT CGraphBuilder
                 typename    TPass,
                 typename... TPassCreationArgs
                 >
-        CEngineResult<Shared<TPass>> CGraphBuilder::spawnPass(
+        CEngineResult<Shared<TPass>> CGraphBuilder::addSubpass(
                 std::string       const &aName,
                 TPassCreationArgs &&...  aArgs)
         {
@@ -328,9 +336,15 @@ EST_EXPORT CGraphBuilder
                 return { EEngineStatus::Error };
             }
 
+            if(nullptr == mRenderPassUnderConstruction)
+            {
+                CLog::Error(logTag(), "No render pass instance under construction to which the subpass could be added.");
+                return { EEngineStatus::Error };
+            }
+
             try
             {
-                PassUID_t const uid = generatePassUID();
+                PassUID_t const uid = generateSubpassUID();
 
                 CEngineResult<Shared<TPass>> passCreation = graph()->createPass<TPass, TPassCreationArgs...>(uid, aName, std::forward<TPassCreationArgs>(aArgs)...);
                 if(not passCreation.successful())
@@ -338,20 +352,20 @@ EST_EXPORT CGraphBuilder
                     CLog::Error(logTag(), "No pass instance created.");
                     return { EEngineStatus::Error };
                 }
-
                 Shared<TPass> &pass = passCreation.data();
 
                 // Link the pass providing the import and export resources for the passes from the variadic argument list.
-                CPassStaticBuilder passBuilder(uid, pass, mResourceData);
+                CPassBuilder passBuilder(uid, pass, mRenderPassUnderConstruction, mResourceData);
 
-                CEngineResult<> const passSetup = pass->staticSetup(passBuilder);
+                CEngineResult<> const passSetup = pass->setup(passBuilder);
                 if(not passSetup.successful())
                 {
                     CLog::Error(logTag(), "Cannot setup pass instance.");
                     return { EEngineStatus::Error };
                 }
 
-                mPasses[pass->passUID()] = pass;
+                mRenderPassUnderConstruction->addSubpass(pass);
+                mSubpasses.insert({ uid, pass });
 
                 return { EEngineStatus::Ok, pass };
             }

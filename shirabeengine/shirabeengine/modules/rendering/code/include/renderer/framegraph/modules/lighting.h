@@ -31,11 +31,11 @@ namespace engine
              */
             struct SLightingImportData
             {
-                SFrameGraphResource gbuffer0;
-                SFrameGraphResource gbuffer1;
-                SFrameGraphResource gbuffer2;
-                SFrameGraphResource gbuffer3;
-                SFrameGraphResource depth;
+                SFrameGraphTextureView gbuffer0;
+                SFrameGraphTextureView gbuffer1;
+                SFrameGraphTextureView gbuffer2;
+                SFrameGraphTextureView gbuffer3;
+                SFrameGraphTextureView depth;
 
                 SFrameGraphMaterial material;
             };
@@ -46,7 +46,7 @@ namespace engine
              */
             struct SLightingExportData
             {
-                SFrameGraphResource lightAccumulationBuffer;
+                SFrameGraphTextureView lightAccumulationBuffer;
             };
 
         public_methods:
@@ -62,13 +62,13 @@ namespace engine
              * @return              Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SLightingExportData> addLightingPass(
-                    std::string         const &aPassName,
-                    CGraphBuilder             &aGraphBuilder,
-                    SFrameGraphResource const &aGbuffer0,
-                    SFrameGraphResource const &aGbuffer1,
-                    SFrameGraphResource const &aGbuffer2,
-                    SFrameGraphResource const &aGbuffer4,
-                    SFrameGraphResource const &aDepthStencil);
+                    std::string const      &aPassName,
+                    CGraphBuilder          &aGraphBuilder,
+                    SFrameGraphTextureView &aGbuffer0,
+                    SFrameGraphTextureView &aGbuffer1,
+                    SFrameGraphTextureView &aGbuffer2,
+                    SFrameGraphTextureView &aGbuffer4,
+                    SFrameGraphTextureView &aDepthStencil);
 
         };
 

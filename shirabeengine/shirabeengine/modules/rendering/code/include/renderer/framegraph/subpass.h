@@ -60,7 +60,7 @@ namespace engine
              *
              * @return See brief.
              */
-            PassUID_t const &passUID() const;
+            PassUID_t const &getSubpassUid() const;
 
             /**
              * Return the name assigned to this pass.
@@ -104,9 +104,7 @@ namespace engine
              * @param aPassBuilder The pass builder instance to use for setup.
              * @return             True, if successful. False otherwise.
              */
-            virtual CEngineResult<> staticSetup(CPassStaticBuilder &aPassBuilder) = 0;
-
-            virtual CEngineResult<> dynamicSetup(SFrameGraphDataSource const &aDataSource, CPassDynamicBuilder &aPassBuilder) = 0;
+            virtual CEngineResult<> setup(CPassBuilder &aPassBuilder) = 0;
 
             /**
              * Interface method for all passes' execution.
@@ -141,17 +139,15 @@ namespace engine
          *
          * @tparam TPassData The data struct of the pass to externally manage and provide on execution.
          */
-        template <typename TStaticPassData, typename TDynamicPassData>
+        template <typename TPassData>
         class CallbackPass
                 : public CPassBase
         {
             SHIRABE_DECLARE_LOG_TAG(CallbackPass);
 
         public_typedefs:
-            using StaticSetupCallback_t  = std::function<CEngineResult<>(CPassStaticBuilder&, TStaticPassData&)>;
-            using DynamicSetupCallback_t = std::function<CEngineResult<>(CPassDynamicBuilder&, SFrameGraphDataSource const &, TDynamicPassData&)>;
-            using ExecCallback_t  = std::function<CEngineResult<>(TStaticPassData const&
-                                                                , TDynamicPassData const &
+            using SetupCallback_t = std::function<CEngineResult<>(CPassBuilder&, TPassData&)>;
+            using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&
                                                                 , SFrameGraphDataSource const &
                                                                 , CFrameGraphResources const &
                                                                 , SFrameGraphRenderContextState &
@@ -170,8 +166,7 @@ namespace engine
             CallbackPass(
                     PassUID_t       const   &aPassUID,
                     std::string     const   &aPassName,
-                    StaticSetupCallback_t  &&aStaticSetupCb,
-                    DynamicSetupCallback_t &&aDynamicSetupCb,
+                    SetupCallback_t        &&aSetupCb,
                     ExecCallback_t         &&aExecCb);
 
             /**
@@ -180,9 +175,7 @@ namespace engine
              * @param aBuilder The pass builder to use for setup.
              * @return         True, if successful. False otherwise.
              */
-            CEngineResult<> staticSetup(CPassStaticBuilder &aBuilder);
-
-            CEngineResult<> dynamicSetup(SFrameGraphDataSource const &aDataSource, CPassDynamicBuilder &aBuilder);
+            CEngineResult<> setup(CPassBuilder &aBuilder);
 
             /**
              * Execute implementation, invoking the execute callback.
@@ -204,50 +197,34 @@ namespace engine
              *
              * @return See brief.
              */
-            TStaticPassData const &staticPassData() const
+            TPassData const &passData() const
             {
-                return mStaticPassData;
-            }
-
-            /**
-             * Return the pass data struct associated with this callback pass.
-             *
-             * @return See brief.
-             */
-            TStaticPassData const &dynamicPassData() const
-            {
-                return mDynamicPassData;
+                return mPassData;
             }
 
         private_members:
-            StaticSetupCallback_t    mStaticSetupCallback;
-            DynamicSetupCallback_t   mDynamicSetupCallback;
+            SetupCallback_t          mSetupCallback;
             ExecCallback_t           mExecCallback;
             FrameGraphResourceIdList mResources;
-            TStaticPassData          mStaticPassData;
-            TDynamicPassData         mDynamicPassData;
+            TPassData                mPassData;
         };
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template <typename TStaticPassData, typename TDynamicPassData>
-        CallbackPass<TStaticPassData, TDynamicPassData>::CallbackPass(
+        template <typename TPassData>
+        CallbackPass<TPassData>::CallbackPass(
                 PassUID_t       const   &passUID,
                 std::string     const   &passName,
-                StaticSetupCallback_t  &&staticSetupCb,
-                DynamicSetupCallback_t &&dynamicSetupCb,
+                SetupCallback_t        &&setupCb,
                 ExecCallback_t         &&execCb)
             : CPassBase(passUID, passName)
-            , mStaticSetupCallback(staticSetupCb)
-            , mDynamicSetupCallback(dynamicSetupCb)
+            , mSetupCallback(setupCb)
             , mExecCallback(execCb)
-            , mStaticPassData()
-            , mDynamicPassData()
+            , mPassData()
         {
-            assert(nullptr != mStaticSetupCallback);
-            assert(nullptr != mDynamicSetupCallback);
+            assert(nullptr != mSetupCallback);
             assert(nullptr != mExecCallback );
         }
         //<-----------------------------------------------------------------------------
@@ -255,15 +232,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template <typename TStaticPassData, typename TDynamicPassData>
-        CEngineResult<> CallbackPass<TStaticPassData, TDynamicPassData>::staticSetup(CPassStaticBuilder &aPassBuilder)
+        template <typename TPassData>
+        CEngineResult<> CallbackPass<TPassData>::setup(CPassBuilder &aPassBuilder)
         {
-            TStaticPassData passData{ };
+            TPassData passData{ };
 
             CEngineResult<> setup = mStaticSetupCallback(aPassBuilder, passData);
             if(setup.successful())
             {
-                mStaticPassData = passData;
+                mPassData = passData;
             }
 
             return setup;
@@ -273,26 +250,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        template <typename TStaticPassData, typename TDynamicPassData>
-        CEngineResult<> CallbackPass<TStaticPassData, TDynamicPassData>::dynamicSetup(SFrameGraphDataSource const &aDataSource, CPassDynamicBuilder &aPassBuilder)
-        {
-            TDynamicPassData passData{ };
-
-            CEngineResult<> setup = mDynamicSetupCallback(aPassBuilder, aDataSource, passData);
-            if(setup.successful())
-            {
-                mDynamicPassData = passData;
-            }
-
-            return setup;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        template <typename TStaticPassData, typename TDynamicPassData>
-        CEngineResult<> CallbackPass<TStaticPassData, TDynamicPassData>::execute(
+        template <typename TPassData>
+        CEngineResult<> CallbackPass<TPassData>::execute(
                 SFrameGraphDataSource    const &aDataSource,
                 CFrameGraphResources     const &aFrameGraphResources,
                 SFrameGraphRenderContextState  &aContextState,
@@ -301,7 +260,7 @@ namespace engine
         {
             try
             {
-                CEngineResult<> execution = mExecCallback(mStaticPassData, mDynamicPassData, aDataSource, aFrameGraphResources, aContextState, aResourceContext, aRenderContext);
+                CEngineResult<> execution = mExecCallback(mPassData, aDataSource, aFrameGraphResources, aContextState, aResourceContext, aRenderContext);
                 return execution;
             }
             catch(std::runtime_error const &e)

@@ -7,210 +7,6 @@ namespace engine
     namespace framegraph
     {
         //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        CGraph::CAccessor::CAccessor(CGraph const *aGraph)
-            : m_graph(aGraph)
-        { }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        AdjacencyListMap_t<PassUID_t> const &CGraph::CAccessor::passAdjacency() const
-        {
-            return m_graph->mPassAdjacency;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        std::stack<PassUID_t> const &CGraph::CAccessor::passExecutionOrder() const
-        {
-            return m_graph->mPassExecutionOrder;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        FrameGraphResourceIdList const &CGraph::CAccessor::resources() const
-        {
-            return m_graph->mResources;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CFrameGraphMutableResources const &CGraph::CAccessor::resourceData() const
-        {
-            return m_graph->mResourceData;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-
-#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-
-        AdjacencyListMap_t<FrameGraphResourceId_t> const &CGraph::CAccessor::resourceAdjacency() const
-        {
-            return m_graph->mResourceAdjacency;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        std::stack<FrameGraphResourceId_t> const &CGraph::CAccessor::resourceOrder() const
-        {
-            return m_graph->mResourceOrder;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &CGraph::CAccessor::passToResourceAdjacency() const
-        {
-            return m_graph->mPassToResourceAdjacency;
-        }
-
-#endif
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CGraph::EGraphMode CGraph::CAccessor::graphMode() const
-        {
-            return m_graph->mGraphMode;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        bool CGraph::CAccessor::renderToBackBuffer() const
-        {
-            return m_graph->mRenderToBackBuffer;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        FrameGraphResourceId_t const &CGraph::CAccessor::outputTextureResourceId() const
-        {
-            return m_graph->mOutputTextureResourceId;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CGraph::CMutableAccessor::CMutableAccessor(CGraph *aGraph)
-            : CAccessor(aGraph)
-            , mGraph(aGraph)
-        {}
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        AdjacencyListMap_t<PassUID_t> &CGraph::CMutableAccessor::mutablePassAdjacency()
-        {
-            return mGraph->mPassAdjacency;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        std::stack<PassUID_t> &CGraph::CMutableAccessor::mutablePassExecutionOrder()
-        {
-            return mGraph->mPassExecutionOrder;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        FrameGraphResourceIdList &CGraph::CMutableAccessor::mutableResources()
-        {
-            return mGraph->mResources;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CFrameGraphMutableResources &CGraph::CMutableAccessor::mutableResourceData()
-        {
-            return mGraph->mResourceData;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-#if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-
-        AdjacencyListMap_t<FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutableResourceAdjacency()
-        {
-            return mGraph->mResourceAdjacency;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        std::stack<FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutableResourceOrder()
-        {
-            return mGraph->mResourceOrder;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> &CGraph::CMutableAccessor::mutablePassToResourceAdjacency()
-        {
-            return mGraph->mPassToResourceAdjacency;
-        }
-
-#endif
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CGraph::EGraphMode &CGraph::CMutableAccessor::mutableGraphMode()
-        {
-            return mGraph->mGraphMode;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        bool &CGraph::CMutableAccessor::mutableRenderToBackBuffer()
-        {
-            return mGraph->mRenderToBackBuffer;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        FrameGraphResourceId_t &CGraph::CMutableAccessor::mutableOutputTextureResourceId()
-        {
-            return mGraph->mOutputTextureResourceId;
-        }
-        //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
@@ -242,9 +38,9 @@ namespace engine
                 return (*this);
             }
 
-            mPasses                  = aOther.mPasses;
-            mPassAdjacency           = aOther.mPassAdjacency;
-            mPassExecutionOrder      = aOther.mPassExecutionOrder;
+            mSubpasses                = aOther.mSubpasses;
+            mRenderPasses             = aOther.mRenderPasses;
+            mRenderpassExecutionOrder = aOther.mRenderpassExecutionOrder;
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             mResourceAdjacency       = aOther.mResourceAdjacency;
             mResourceOrder           = aOther.mResourceOrder;
@@ -264,18 +60,7 @@ namespace engine
                                       , SFrameGraphResourceContext     &aResourceContext
                                       , SFrameGraphRenderContext       &aRenderContext)
         {
-            // TODO: As soon as we have passgroups, the currentSubpassIndex comes from the passgroup.
             SFrameGraphRenderContextState renderContextState {};
-
-            std::vector<PassUID_t> executionOrder {};
-            {
-                std::stack<PassUID_t> copy = mPassExecutionOrder;
-                while(not copy.empty())
-                {
-                    executionOrder.push_back(copy.top());
-                    copy.pop();
-                }
-            }
 
             if(EGraphMode::Graphics == mGraphMode)
             {
@@ -285,40 +70,55 @@ namespace engine
             // In any case...
             aRenderContext.beginFrameCommandBuffers(renderContextState);
 
-            if(EGraphMode::Graphics == mGraphMode)
+            // if(EGraphMode::Graphics == mGraphMode)
+            // {
+            //     aRenderContext.bindRenderPass(renderContextState, sRenderPassResourceId, sFrameBufferResourceId, mResourceData);
+            // }
+
+            for(std::size_t k=0; k < mRenderpassExecutionOrder.size(); ++k)
             {
-                aRenderContext.bindRenderPass(renderContextState, sRenderPassResourceId, sFrameBufferResourceId, mResourceData);
-            }
+                RenderPassUID_t     const renderpassUid = mRenderpassExecutionOrder.at(k);
+                Shared<CRenderPass> const renderpass    = mRenderPasses.at(renderpassUid);
+                std::vector<PassUID_t>    subpasses     = renderpass->getTopologicallySortedSubpassList();
 
-            std::stack<PassUID_t> copy = mPassExecutionOrder;
-            while(not copy.empty())
-            {
-                PassUID_t                    const passUID  = copy.top();
-                Shared<CPassBase>            const pass     = mPasses.at(passUID);
-                Unique<CPassBase::CAccessor> const accessor = pass->getAccessor(CPassKey<CGraph>());
+                resources::ResourceId_t renderpassResourceId  = renderpass->getRenderPassName();
+                resources::ResourceId_t framebufferResourceId = renderpassResourceId + "_framebuffer";
 
-                aRenderContext.beginPass(renderContextState);
-                aRenderContext.clearAttachments(renderContextState, sRenderPassResourceId);
+                initializeAttachments(aResourceContext, renderpass);
 
-                CEngineResult<> executed = pass->execute(aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
-                if(not executed.successful())
+                aResourceContext.createRenderPass(renderpassResourceId, subpasses, renderpass->attachments(), mResourceData);
+                aResourceContext.createFrameBuffer(framebufferResourceId, renderpassResourceId);
+                aRenderContext.bindRenderPass(renderContextState, renderpassResourceId, framebufferResourceId);
+                aRenderContext.clearAttachments(renderContextState, renderpassResourceId);
+
+                for(std::size_t j=0; j < subpasses.size(); ++j)
                 {
-                    CLog::Error(logTag(), CString::format("Failed to execute pass {}", pass->passUID()));
-                    break;
+                    PassUID_t         const subpassUid = subpasses.at(j);
+                    Shared<CPassBase> const subpass    = mSubpasses.at(subpassUid);
+
+                    initializeSubpassResources(aResourceContext, subpass);
+
+                    CEngineResult<> executed = subpass->execute(aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
+                    if(not executed.successful())
+                    {
+                        CLog::Error(logTag(), CString::format("Failed to execute pass {}", subpass->getSubpassUid()));
+                        break;
+                    }
+
+                    // deinitializeSubpassResources(subpass);
+
+                    aRenderContext.nextSubpass(renderContextState);
                 }
 
-                if(1 < copy.size()) // Implicit last pass '0' and effective last pass --> 2 passes
-                {
-                    aRenderContext.endPass(renderContextState);
-                }
+                aRenderContext.unbindRenderPass(renderContextState, renderpassResourceId, framebufferResourceId);
+                // aResourceContext.destroyFrameBuffer(framebufferResourceId);
+                // aResourceContext.destroyRenderPass(renderpassResourceId);
 
-                copy.pop();
+                // deinitializeAttachments(renderpass);
             }
 
             if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
             {
-                aRenderContext.unbindRenderPass(renderContextState, sRenderPassResourceId, sFrameBufferResourceId);
-
                 CEngineResult<Shared<SFrameGraphTextureView>> const sourceResourceFetch = mResourceData.getResource<SFrameGraphTextureView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
                 {
@@ -327,7 +127,7 @@ namespace engine
                 }
 
                 CEngineResult<Shared<SFrameGraphTexture>> const parentResourceFetch = mResourceData.getResource<SFrameGraphTexture>(sourceResourceFetch.data()
-                                                                                                                                                       ->subjacentResource);
+                    ->subjacentResource);
                 if(not parentResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));
@@ -347,31 +147,6 @@ namespace engine
             }
 
             return { EEngineStatus::Ok };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        PassMap const &CGraph::passes() const
-        {
-            return mPasses;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::addPass(Shared<CPassBase> const &aPass)
-        {
-            if(mPasses.end() != mPasses.find(aPass->passUID()))
-            {
-                return EEngineStatus::Error;
-            }
-
-            mPasses[aPass->passUID()] = aPass;
-
-            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
     }

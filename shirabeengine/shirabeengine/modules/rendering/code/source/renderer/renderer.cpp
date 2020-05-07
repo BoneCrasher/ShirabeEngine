@@ -69,24 +69,15 @@ namespace engine
             graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
             graphBuilder.setRenderToBackBuffer(true);
 
-            CFrameGraphModule<SGBufferModuleTag_t>                               gbufferModule          { };
-            CFrameGraphModule<SLightingModuleTag_t>                              lightingModule         { };
-            CFrameGraphModule<SCompositingModuleTag_t>                           compositingModule      { };
+            CFrameGraphModule<SGBufferModuleTag_t>     gbufferModule          { };
+            CFrameGraphModule<SLightingModuleTag_t>    lightingModule         { };
+            CFrameGraphModule<SCompositingModuleTag_t> compositingModule      { };
 
-            // static std::string const sPrePassID               = "PrePass";
             static std::string const sGBufferGenerationPassID = "GBufferGenerationPass";
             static std::string const sLightingPassID          = "LightingPass";
             static std::string const sCompositingPassID       = "CompositingPass";
-            // static std::string const sPresentPassID           = "PresentPass";
 
-            // Prepass
-            // prePassExportData =
-            //         graphicsAPICommonModule.addPrePass(
-            //             sPrePassID,
-            //             graphBuilder,
-            //             width,
-            //             height,
-            //             FrameGraphFormat_t::R8G8B8A8_UNORM).data();
+            graphBuilder.beginRenderPass("DeferredPipeline");
 
             // GBuffer
             CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
@@ -123,6 +114,8 @@ namespace engine
                                              gbufferExportData.depthStencil,
                                              lightingExportData.lightAccumulationBuffer).data();
 
+            graphBuilder.endRenderPass();
+
             graphBuilder.setOutputTextureResourceId(compositingExportData.output.resourceId);
 
             // Present
@@ -145,7 +138,6 @@ namespace engine
             }
 
             mDeferredGraph = std::move(compilation.data());
-            mDeferredGraph->initializeGraphResources(aResourceContext);
 
             #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             static bool serializedOnce = false;

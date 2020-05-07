@@ -104,10 +104,10 @@ namespace engine::vulkan
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        auto endPass(Shared<CVulkanEnvironment>     aVulkanEnvironment
-                   , Shared<CResourceManager>       aResourceManager
-                   , Shared<asset::CAssetStorage>   aAssetStorage
-                   , SFrameGraphRenderContextState &aState) -> EEngineStatus
+        auto nextSubpass(Shared<CVulkanEnvironment>     aVulkanEnvironment
+                         , Shared<CResourceManager>       aResourceManager
+                         , Shared<asset::CAssetStorage>   aAssetStorage
+                         , SFrameGraphRenderContextState &aState) -> EEngineStatus
         {
             SVulkanState    &state        = aVulkanEnvironment->getState();
             VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
@@ -355,8 +355,7 @@ namespace engine::vulkan
                           , Shared<asset::CAssetStorage>         aAssetStorage
                           , SFrameGraphRenderContextState const &aRenderContextState
                           , ResourceId_t                  const &aRenderPassId
-                          , ResourceId_t                  const &aFrameBufferId
-                          , CFrameGraphMutableResources   const &aFrameGraphResources) -> EEngineStatus
+                          , ResourceId_t                  const &aFrameBufferId) -> EEngineStatus
         {
             OptRef_t<RenderPassResourceState_t>  renderPassResource {};
             OptRef_t<FrameBufferResourceState_t> frameBufferResource {};
@@ -742,9 +741,9 @@ namespace engine::vulkan
             = [&] (SFrameGraphRenderContextState &aState, std::string const &aRenderPassId)
                 { return detail::clearAttachments(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                 , aState, aRenderPassId); };
-        context.endPass
+        context.nextSubpass
             = [&] (SFrameGraphRenderContextState &aState)
-                { return detail::endPass(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
+                { return detail::nextSubpass(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.copyImage
             = [&](SFrameGraphRenderContextState   &aState
                  , SFrameGraphTexture const &aSourceImageId
@@ -780,13 +779,11 @@ namespace engine::vulkan
         context.bindRenderPass
             = [&] (SFrameGraphRenderContextState const &aRenderContextState
                  , ResourceId_t                  const &aRenderPassId
-                 , ResourceId_t                  const &aFrameBufferId
-                 , CFrameGraphMutableResources   const &aFrameGraphResources)
+                 , ResourceId_t                  const &aFrameBufferId)
                 { return detail::bindRenderPass(aVulkanEnvironment, aResourceManager, aAssetStorage
                                               , aRenderContextState
                                               , aRenderPassId
-                                              , aFrameBufferId
-                                              , aFrameGraphResources); };
+                                              , aFrameBufferId); };
         context.unbindRenderPass
             = [&] (SFrameGraphRenderContextState &aState
                  , ResourceId_t            const &aFrameBufferId

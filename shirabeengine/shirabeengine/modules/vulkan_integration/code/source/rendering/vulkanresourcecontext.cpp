@@ -103,8 +103,8 @@ namespace engine
                 // Begin the render pass derivation
                 //<-----------------------------------------------------------------------------
 
-                auto const &imageResourceIdList   = aAttachmentInfo.getAttachementImageResourceIds();
-                auto const &viewResourceIdList    = aAttachmentInfo.getAttachementImageViewResourceIds();
+                auto const &imageResourceIdList   = aAttachmentInfo.getAttachmentImageResourceIds();
+                auto const &viewResourceIdList    = aAttachmentInfo.getAttachmentImageViewResourceIds();
                 auto const &viewToImageAssignment = aAttachmentInfo.getAttachmentViewToImageAssignment();
                 auto const &passToViewAssignment  = aAttachmentInfo.getAttachmentPassToViewAssignment();
 
@@ -212,15 +212,15 @@ namespace engine
                         dependency.srcPass         = (k - 1);
                         dependency.dstPass         = k;
 
-                        bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
-                        bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
-                        bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
+                        bool const isColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), textureView.resourceId);
+                        bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
+                        bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
 
                         if(nullptr != parentTextureView && EFrameGraphResourceType::TextureView == parentTextureView->type)
                         {
-                            bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
-                            bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
-                            bool const isParentInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachementImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), parentTextureView->resourceId);
+                            bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
+                            bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
+                            bool const isParentInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), parentTextureView->resourceId);
 
                             dependency.srcPass = std::distance(aPassExecutionOrder.begin(), std::find_if( aPassExecutionOrder.begin()
                                                                                                           , aPassExecutionOrder.end()
@@ -382,7 +382,7 @@ namespace engine
                                    , Shared<asset::CAssetStorage>  aAssetStorage
                                    , ResourceId_t           const &aRenderPassId) -> EEngineStatus
             {
-                CEngineResult<> const deinitialized = aResourceManager->discardResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment);
+                CEngineResult<> const deinitialized = aResourceManager->template discardResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy render pass.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
             };
