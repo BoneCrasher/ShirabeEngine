@@ -151,17 +151,22 @@ namespace engine
                                        {
                                            auto [result, mesh] = aBuilder.useMesh(renderableMesh); // Will trace down the component hierarchies...
 
-                                           for(std::size_t k=0; k<renderableResources.mesh.materials.size(); ++k)
+                                           auto const materials = renderableMesh.materials;
+                                           for(std::size_t k=0; k<materials.size(); ++k)
                                            {
-                                               auto [result, material] = aBuilder.useMaterial(renderableResources.mesh.materials[k]);
+                                               auto const renderableMaterial       = materials[k];
+                                               auto const renderableUniformBuffers = renderableMaterial.uniformBufferIds;
+                                               auto const renderableImages         = renderableMaterial.textureIds;
 
-                                               for(auto const &buffer : renderableResources.mesh.materials[k].uniformBuffers)
+                                               auto [result, material] = aBuilder.useMaterial(renderableMaterial);
+
+                                               for(auto const &buffer : renderableUniformBuffers)
                                                {
                                                    auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
                                                    material.uniformBuffers.push_back(bufferResource);
                                                }
 
-                                               for(auto const &texture : renderableResources.mesh.materials[k].textures)
+                                               for(auto const &texture : renderableImages)
                                                {
                                                    SFrameGraphTextureResourceFlags flags;
                                                    flags.arraySliceRange = CRange(0, 1);

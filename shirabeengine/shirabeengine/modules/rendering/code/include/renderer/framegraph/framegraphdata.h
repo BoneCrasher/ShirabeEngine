@@ -559,59 +559,44 @@ namespace engine
         struct SFrameGraphPipelineConfig
         {};
 
-        /**
-         * The frame graph pipeline struct encapsulates information on specific fixed function
-         * pipeline configurations and references.
-         */
-        struct SFrameGraphSharedPipeline
+        //<-----------------------------------------------------------------------------
+        // Renderable structures
+        //<-----------------------------------------------------------------------------
+        struct SFrameGraphRenderablePipeline
             : SFrameGraphResource
         {
         public_members:
-            resources::ResourceId_t sharedPipelineId;
-            SFrameGraphShaderModule shaderModule;
+            resources::ResourceId_t pipelineResourceId;
         };
 
-        /**
-         * The frame graph pipeline struct encapsulates information on specific fixed function
-         * pipeline configurations and references.
-         */
-        struct SFrameGraphPipeline
+        struct SFrameGraphRenderableMaterial
             : SFrameGraphResource
         {
         public_members:
-            SFrameGraphSharedPipeline sharedPipeline;
-            resources::ResourceId_t   renderPassId;
-            uint32_t                  subpassIndex;
+            resources::ResourceId_t       materialResourceId;
+            SFrameGraphRenderablePipeline pipeline;
         };
 
-        /**
-         * The frame graph material struct encapsulates information on
-         * the material used for rendering.
-         */
-        struct SFrameGraphMaterial
-            : SFrameGraphResource
+        struct SFrameGraphRenderableMesh
         {
         public_members:
-            SFrameGraphPipeline                       pipelineId;
-            std::vector<SFrameGraphPersistentBuffer>  uniformBufferIds;
-            std::vector<SFrameGraphPersistentTexture> textureIds;
+            resources::ResourceId_t                      meshResourceId;
+            std::array<SFrameGraphRenderableMaterial, 4> materials;
         };
 
-        struct SFrameGraphMesh
-            : SFrameGraphResource
+        struct SFrameGraphRenderable
         {
-        public_members:
-            SFrameGraphPersistentBuffer        attributeBufferId;
-            std::array<SFrameGraphMaterial, 4> materials;
-        };
-
-        struct SFrameGraphRenderableResources
-        {
-            std::unordered_map<resources::ResourceId_t, SFrameGraphMesh> meshes;
+            SFrameGraphRenderableMesh mesh;
         };
 
         struct SFrameGraphRenderableFetchFilter
         {};
+        //<-----------------------------------------------------------------------------
+
+        struct SFrameGraphDataSource
+        {
+            std::function<std::vector<SFrameGraphRenderable>(SFrameGraphRenderableFetchFilter)> fetchRenderables;
+        };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
             SFrameGraphTexture                              \
