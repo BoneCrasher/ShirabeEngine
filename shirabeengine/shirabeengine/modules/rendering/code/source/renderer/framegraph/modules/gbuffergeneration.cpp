@@ -41,17 +41,19 @@ namespace engine
             // Setup
             // ----------------------------------------------------------------------------------
             auto const setup =
-                           [&] (CPassBuilder &aBuilder
-                                , SPassData  &aOutPassData) -> CEngineResult<>
+                           [&] (CPassBuilder                       &aBuilder
+                                , SPassData                        &aOutPassData
+                                , SFrameGraphPlatformContext const &aPlatformContext
+                                , SFrameGraphDataSource const      &aDataSource) -> CEngineResult<>
                                {
                                    // Default extents.
                                    uint32_t width  = 1920;
                                    uint32_t height = 1080;
 
-                                   Shared<os::SApplicationEnvironment> environment = aGraphBuilder.applicationEnvironment();
+                                   Shared<os::SApplicationEnvironment> environment = aPlatformContext.applicationEnvironment;
                                    if(environment)
                                    {
-                                       Shared<wsi::CWSIDisplay> const &display     = aGraphBuilder.display();
+                                       Shared<wsi::CWSIDisplay> const &display     = aPlatformContext.display;
                                        os::SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
                                        width  = displayDesc.bounds.size.x();
                                        height = displayDesc.bounds.size.y();
@@ -145,31 +147,34 @@ namespace engine
                                    // Render-Loop
                                    for(auto const &renderableResources : renderables)
                                    {
-                                       auto [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
-
-                                       for(std::size_t k=0; k<renderableResources.mesh.materials.size(); ++k)
+                                       for(auto const &[id, renderableMesh] : renderableResources.meshes)
                                        {
-                                           auto [result, material] = aBuilder.useMaterial(renderableResources.mesh.materials[k]);
+                                           auto [result, mesh] = aBuilder.useMesh(renderableMesh); // Will trace down the component hierarchies...
 
-                                           for(auto const &buffer : renderableResources.mesh.materials[k].uniformBuffers)
+                                           for(std::size_t k=0; k<renderableResources.mesh.materials.size(); ++k)
                                            {
-                                               auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
-                                               material.uniformBuffers.push_back(bufferResource);
+                                               auto [result, material] = aBuilder.useMaterial(renderableResources.mesh.materials[k]);
+
+                                               for(auto const &buffer : renderableResources.mesh.materials[k].uniformBuffers)
+                                               {
+                                                   auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
+                                                   material.uniformBuffers.push_back(bufferResource);
+                                               }
+
+                                               for(auto const &texture : renderableResources.mesh.materials[k].textures)
+                                               {
+                                                   SFrameGraphTextureResourceFlags flags;
+                                                   flags.arraySliceRange = CRange(0, 1);
+                                                   flags.mipSliceRange   = CRange(0, 1);
+                                                   flags.requiredFormat  = EFormat::Automatic;
+                                                   auto const [result, textureResource] = aBuilder.readTexture(texture, flags);
+                                                   material.textures.push_back(textureResource);
+                                               }
+
+                                               auto const [pipelineResult, pipeline] = aBuilder.usePipeline(material.basePipeline, {});
+
+                                               mesh.materials[k] = material;
                                            }
-
-                                           for(auto const &texture : renderableResources.mesh.materials[k].textures)
-                                           {
-                                               SFrameGraphTextureResourceFlags flags;
-                                               flags.arraySliceRange = CRange(0, 1);
-                                               flags.mipSliceRange   = CRange(0, 1);
-                                               flags.requiredFormat  = EFormat::Automatic;
-                                               auto const [result, textureResource] = aBuilder.readTexture(texture, flags);
-                                               material.textures.push_back(textureResource);
-                                           }
-
-                                           auto const [pipelineResult, pipeline] = aBuilder.usePipeline(material.basePipeline, {});
-
-                                           mesh.materials[k] = material;
                                        }
 
                                        validMeshes.push_back(mesh);
@@ -180,12 +185,13 @@ namespace engine
             // ----------------------------------------------------------------------------------
             // Execution
             // ----------------------------------------------------------------------------------
-            auto const execute = [=] (SPassData                const &aPassData,
-                                      SFrameGraphDataSource    const &aDataSource,
-                                      CFrameGraphResources     const &aFrameGraphResources,
-                                      SFrameGraphRenderContextState  &aRenderContextState,
-                                      SFrameGraphResourceContext     &aResourceContext,
-                                      SFrameGraphRenderContext       &aRenderContext) -> CEngineResult<>
+            auto const execute = [=] (SPassData const                    &aPassData
+                                      , SFrameGraphPlatformContext const &aPlatformContext
+                                      , SFrameGraphDataSource const      &aDataSource
+                                      , CFrameGraphResources const       &aFrameGraphResources
+                                      , SFrameGraphRenderContextState    &aRenderContextState
+                                      , SFrameGraphResourceContext       &aResourceContext
+                                      , SFrameGraphRenderContext         &aRenderContext) -> CEngineResult<>
             {
                 using namespace engine::rendering;
 
@@ -196,24 +202,29 @@ namespace engine
                 // Render-Loop
                 for(SFrameGraphRenderableResources const &renderableResources : renderables)
                 {
-                    EEngineStatus const meshInitState = aResourceContext.initializeMesh(renderableResources.meshResource);
-                    if(EEngineStatus::Ok != meshInitState) { continue; }
-                    EEngineStatus const meshLoadState = aResourceContext.updateMesh(renderableResources.meshResource);
-                    if(EEngineStatus::Ok != meshLoadState) { continue; }
-
-                    aRenderContext.useMesh(aRenderContextState, renderableResources.meshResource);
-
-                    for(SFrameGraphMaterial const &material : renderableResources.meshResource.materials)
+                    for(auto const &[id, mesh] : renderableResources.meshes)
                     {
-                        EEngineStatus const pipelineInitState = aResourceContext.createPipeline(material.basePipeline);
-                        if(EEngineStatus::Ok != pipelineInitState) { continue; }
+                        EEngineStatus const meshInitState = aResourceContext.initializeMesh(mesh);
+                        if(EEngineStatus::Ok != meshInitState) { continue; }
+                        EEngineStatus const meshLoadState = aResourceContext.updateMesh(mesh);
+                        if(EEngineStatus::Ok != meshLoadState) { continue; }
 
-                        EEngineStatus const materialInitState = aResourceContext.initializeMaterial(material);
-                        if(EEngineStatus::Ok != materialInitState) { continue; }
-                        EEngineStatus const materialLoadState = aResourceContext.updateMaterial(material);
-                        if(EEngineStatus::Ok != materialLoadState) { continue; }
+                        aRenderContext.useMesh(aRenderContextState, mesh);
 
-                        aRenderContext.drawIndexed(aRenderContextState, renderableResources.meshResource.indexCount);
+                        for(SFrameGraphMaterial const &material : mesh.materials)
+                        {
+
+
+                            EEngineStatus const pipelineInitState = aResourceContext.createPipeline(material.basePipeline);
+                            if(EEngineStatus::Ok != pipelineInitState) { continue; }
+
+                            EEngineStatus const materialInitState = aResourceContext.initializeMaterial(material);
+                            if(EEngineStatus::Ok != materialInitState) { continue; }
+                            EEngineStatus const materialLoadState = aResourceContext.updateMaterial(material);
+                            if(EEngineStatus::Ok != materialLoadState) { continue; }
+
+                            aRenderContext.drawIndexed(aRenderContextState, renderableResources.meshResource.indexCount);
+                        }
                     }
                 }
 

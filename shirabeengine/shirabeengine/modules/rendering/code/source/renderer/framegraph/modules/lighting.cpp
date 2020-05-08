@@ -46,8 +46,11 @@ namespace engine
              */
             auto const setup =
                            [&] (
-                               CPassBuilder &aBuilder,
-                               SPassData    &aOutPassData) -> CEngineResult<>
+                               CPassBuilder                       &aBuilder
+                               , SPassData                        &aOutPassData
+                               , SFrameGraphPlatformContext const &aPlatformContext
+                               , SFrameGraphDataSource const      &aDataSource
+                               ) -> CEngineResult<>
                                {
                                    auto gbufferTextureFetch = aGraphBuilder.getResources()
                                                                            .getResource<SFrameGraphTexture>(aGbuffer0.subjacentResource);
@@ -107,13 +110,13 @@ namespace engine
             /**
              * Implement the execute function
              */
-            auto const execute = [=] (
-                    SPassData                const &aPassData,
-                    SFrameGraphDataSource    const &aDataSource,
-                    CFrameGraphResources     const &aFrameGraphResources,
-                    SFrameGraphRenderContextState  &aRenderContextState,
-                    SFrameGraphResourceContext     &aResourceContext,
-                    SFrameGraphRenderContext       &aRenderContext)
+            auto const execute = [=] (SPassData const                    &aPassData
+                                      , SFrameGraphPlatformContext const &aPlatformContext
+                                      , SFrameGraphDataSource const      &aDataSource
+                                      , CFrameGraphResources const       &aFrameGraphResources
+                                      , SFrameGraphRenderContextState    &aRenderContextState
+                                      , SFrameGraphResourceContext       &aResourceContext
+                                      , SFrameGraphRenderContext         &aRenderContext)
                     -> CEngineResult<>
             {
                 CLog::Verbose(logTag(), "Lighting");

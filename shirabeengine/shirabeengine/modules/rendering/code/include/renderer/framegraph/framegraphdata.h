@@ -563,57 +563,55 @@ namespace engine
          * The frame graph pipeline struct encapsulates information on specific fixed function
          * pipeline configurations and references.
          */
-        struct SFrameGraphPipeline
+        struct SFrameGraphSharedPipeline
             : SFrameGraphResource
         {
         public_members:
-            resources::ResourceId_t basePipelineId;
+            resources::ResourceId_t sharedPipelineId;
+            SFrameGraphShaderModule shaderModule;
         };
 
+        /**
+         * The frame graph pipeline struct encapsulates information on specific fixed function
+         * pipeline configurations and references.
+         */
         struct SFrameGraphPipeline
             : SFrameGraphResource
         {
         public_members:
-            FrameGraphResourceId_t shaderModule
+            SFrameGraphSharedPipeline sharedPipeline;
+            resources::ResourceId_t   renderPassId;
+            uint32_t                  subpassIndex;
         };
 
         /**
          * The frame graph material struct encapsulates information on
          * the material used for rendering.
          */
-        struct SFrameGraphRequestedMaterial
-            : SFrameGraphRequestedResource
+        struct SFrameGraphMaterial
+            : SFrameGraphResource
         {
         public_members:
-            resources::ResourceId_t              pipelineId;
-            std::vector<resources::ResourceId_t> uniformBufferIds;
-            std::vector<resources::ResourceId_t> textureIds;
+            SFrameGraphPipeline                       pipelineId;
+            std::vector<SFrameGraphPersistentBuffer>  uniformBufferIds;
+            std::vector<SFrameGraphPersistentTexture> textureIds;
         };
 
-        struct SFrameGraphRequestedMesh
-            : SFrameGraphRequestedResource
+        struct SFrameGraphMesh
+            : SFrameGraphResource
         {
         public_members:
-            resources::ResourceId_t                attributeBufferId;
-            std::array<resources::ResourceId_t, 4> materialIds;
+            SFrameGraphPersistentBuffer        attributeBufferId;
+            std::array<SFrameGraphMaterial, 4> materials;
         };
 
-        struct SFrameGraphRequestedRenderableResources
+        struct SFrameGraphRenderableResources
         {
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedMesh>     meshes;
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedMaterial> materials;
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedPipeline> pipelines;
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedBuffer>   buffers;
-            std::unordered_map<resources::ResourceId_t, SFrameGraphRequestedTexture>  textures;
+            std::unordered_map<resources::ResourceId_t, SFrameGraphMesh> meshes;
         };
 
         struct SFrameGraphRenderableFetchFilter
         {};
-
-        struct SFrameGraphDataSource
-        {
-            std::function<std::vector<SFrameGraphRequestedRenderableResources>(SFrameGraphRenderableFetchFilter)> fetchRenderables;
-        };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
             SFrameGraphTexture                              \
@@ -747,7 +745,7 @@ namespace engine
         protected_members:
             Index_t mResources;
         };
-        
+
         /**
          * Extends CFrameGraphResources so that mutable resource operations become possible. Also permits the creation of a new resource.
          */

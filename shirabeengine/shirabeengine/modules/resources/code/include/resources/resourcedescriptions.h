@@ -256,6 +256,7 @@ namespace engine
             Vector<VkDeviceSize>                      offsets;
             VkDeviceSize                              firstIndexOffset;
             uint32_t                                  indexSampleCount;
+
             SBufferDescription                        attributeBufferDesc;
         };
 

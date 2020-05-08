@@ -14,6 +14,8 @@
 #include "renderer/framegraph/framegraphcontexts.h"
 #include "renderer/framegraph/framegraphserialization.h"
 #include "renderer/framegraph/passbuilder.h"
+#include "renderer/framegraph/scenedatasource.h"
+#include "renderer/framegraph/platformcontext.h"
 
 namespace engine
 {
@@ -104,7 +106,10 @@ namespace engine
              * @param aPassBuilder The pass builder instance to use for setup.
              * @return             True, if successful. False otherwise.
              */
-            virtual CEngineResult<> setup(CPassBuilder &aPassBuilder) = 0;
+            virtual CEngineResult<> setup(
+                SFrameGraphPlatformContext const &aPlatformContext,
+                SFrameGraphDataSource const      &aDataSource,
+                CPassBuilder                     &aPassBuilder) = 0;
 
             /**
              * Interface method for all passes' execution.
@@ -116,11 +121,12 @@ namespace engine
              * @return                     True, if successful. False otherwise.
              */
             virtual CEngineResult<> execute(
-                    SFrameGraphDataSource    const &aDataSource,
-                    CFrameGraphResources     const &aFrameGraphResources,
-                    SFrameGraphRenderContextState  &aContextState,
-                    SFrameGraphResourceContext     &aResourceContext,
-                    SFrameGraphRenderContext       &aRenderContext) = 0;
+                SFrameGraphPlatformContext const &aPlatformContext,
+                SFrameGraphDataSource const      &aDataSource,
+                CFrameGraphResources const       &aFrameGraphResources,
+                SFrameGraphRenderContextState    &aContextState,
+                SFrameGraphResourceContext       &aResourceContext,
+                SFrameGraphRenderContext         &aRenderContext) = 0;
 
         private_members:
             PassUID_t                mPassUID;
@@ -146,13 +152,17 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CallbackPass);
 
         public_typedefs:
-            using SetupCallback_t = std::function<CEngineResult<>(CPassBuilder&, TPassData&)>;
+            using SetupCallback_t = std::function<CEngineResult<>(CPassBuilder&
+                                                                , TPassData&
+                                                                , SFrameGraphPlatformContext const &
+                                                                , SFrameGraphDataSource const &)>;
             using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&
-                                                                , SFrameGraphDataSource const &
-                                                                , CFrameGraphResources const &
-                                                                , SFrameGraphRenderContextState &
-                                                                , SFrameGraphResourceContext &
-                                                                , SFrameGraphRenderContext &)>;
+                                                                  , SFrameGraphPlatformContext const &
+                                                                  , SFrameGraphDataSource const &
+                                                                  , CFrameGraphResources const &
+                                                                  , SFrameGraphRenderContextState &
+                                                                  , SFrameGraphResourceContext &
+                                                                  , SFrameGraphRenderContext &)>;
 
         public_constructors:
             /**
@@ -175,7 +185,9 @@ namespace engine
              * @param aBuilder The pass builder to use for setup.
              * @return         True, if successful. False otherwise.
              */
-            CEngineResult<> setup(CPassBuilder &aBuilder);
+            CEngineResult<> setup(CPassBuilder                       &aBuilder
+                                  , SFrameGraphPlatformContext const &aPlatformContext
+                                  , SFrameGraphDataSource const      &aDataSource);
 
             /**
              * Execute implementation, invoking the execute callback.
@@ -186,11 +198,12 @@ namespace engine
              * @return                     True, if successful. False otherwise.
              */
             CEngineResult<> execute(
-                    SFrameGraphDataSource    const &aDataSource,
-                    CFrameGraphResources     const &aFrameGraphResources,
-                    SFrameGraphRenderContextState  &aContextState,
-                    SFrameGraphResourceContext     &aResourceContext,
-                    SFrameGraphRenderContext       &aRenderContext);
+                    SFrameGraphPlatformContext const &aPlatformContext
+                    , SFrameGraphDataSource const    &aDataSource
+                    , CFrameGraphResources const     &aFrameGraphResources
+                    , SFrameGraphRenderContextState  &aContextState
+                    , SFrameGraphResourceContext     &aResourceContext
+                    , SFrameGraphRenderContext       &aRenderContext);
 
             /**
              * Return the pass data struct associated with this callback pass.
@@ -233,11 +246,13 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
-        CEngineResult<> CallbackPass<TPassData>::setup(CPassBuilder &aPassBuilder)
+        CEngineResult<> CallbackPass<TPassData>::setup(CPassBuilder                       &aPassBuilder
+                                                       , SFrameGraphPlatformContext const &aPlatformContext
+                                                       , SFrameGraphDataSource const      &aDataSource)
         {
             TPassData passData{ };
 
-            CEngineResult<> setup = mStaticSetupCallback(aPassBuilder, passData);
+            CEngineResult<> setup = mStaticSetupCallback(aPassBuilder, passData, aPlatformContext, aDataSource);
             if(setup.successful())
             {
                 mPassData = passData;
@@ -251,16 +266,16 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
-        CEngineResult<> CallbackPass<TPassData>::execute(
-                SFrameGraphDataSource    const &aDataSource,
-                CFrameGraphResources     const &aFrameGraphResources,
-                SFrameGraphRenderContextState  &aContextState,
-                SFrameGraphResourceContext     &aResourceContext,
-                SFrameGraphRenderContext       &aRenderContext)
+        CEngineResult<> CallbackPass<TPassData>::execute(SFrameGraphPlatformContext const &aPlatformContext
+                                                         , SFrameGraphDataSource const    &aDataSource
+                                                         , CFrameGraphResources const     &aFrameGraphResources
+                                                         , SFrameGraphRenderContextState  &aContextState
+                                                         , SFrameGraphResourceContext     &aResourceContext
+                                                         , SFrameGraphRenderContext       &aRenderContext)
         {
             try
             {
-                CEngineResult<> execution = mExecCallback(mPassData, aDataSource, aFrameGraphResources, aContextState, aResourceContext, aRenderContext);
+                CEngineResult<> execution = mExecCallback(mPassData, aPlatformContext, aDataSource, aFrameGraphResources, aContextState, aResourceContext, aRenderContext);
                 return execution;
             }
             catch(std::runtime_error const &e)
